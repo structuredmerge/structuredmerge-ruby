@@ -56,4 +56,38 @@ RSpec.describe Markly::Merge do
       json_ready(matching_fixture.dig(:expected, :matched))
     )
   end
+
+  it "conforms to the provider named-suite plan and manifest-report fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-206-markdown-provider-named-suite-plans",
+        "ruby-markdown-provider-named-suite-plans.json"
+      )
+    )
+    report_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-207-markdown-provider-manifest-report",
+        "ruby-markdown-provider-manifest-report.json"
+      )
+    )
+
+    contexts = plans_fixture.dig(:contexts, :markly)
+    expect(json_ready(Ast::Merge.plan_named_conformance_suites(plans_fixture[:manifest], contexts))).to eq(
+      json_ready(plans_fixture.dig(:expected_entries, :markly))
+    )
+
+    executions = report_fixture[:executions]
+    entries = Ast::Merge.report_planned_named_conformance_suites(
+      Ast::Merge.plan_named_conformance_suites(report_fixture[:manifest], report_fixture.dig(:options, :markly, :contexts))
+    ) do |run|
+      key = "#{run[:ref][:family]}:#{run[:ref][:role]}:#{run[:ref][:case]}"
+      executions[key.to_sym] || executions[key] || { outcome: "failed", messages: ["missing execution"] }
+    end
+
+    expect(json_ready(Ast::Merge.report_named_conformance_suite_envelope(entries))).to eq(
+      json_ready(report_fixture.dig(:expected_reports, :markly))
+    )
+  end
 end
