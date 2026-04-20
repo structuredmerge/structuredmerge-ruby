@@ -123,4 +123,20 @@ RSpec.describe TreeHaver do
       )
     ).to eq(json_ready(fixture.dig(:expected, :imports)))
   end
+
+  it "supports temporary backend context selection" do
+    expect(described_class.current_backend_id).to be_nil
+
+    described_class.with_backend("citrus") do
+      expect(described_class.current_backend_id).to eq("citrus")
+
+      described_class.with_backend("parslet") do
+        expect(described_class.current_backend_id).to eq("parslet")
+      end
+
+      expect(described_class.current_backend_id).to eq("citrus")
+    end
+
+    expect(described_class.current_backend_id).to be_nil
+  end
 end

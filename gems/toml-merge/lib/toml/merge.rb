@@ -26,9 +26,10 @@ module Toml
       }
     end
 
-    def toml_backend_feature_profile(backend: "citrus")
-      backend_ref = backend_reference_for(backend)
-      return unsupported_feature_result("Unsupported TOML backend #{backend}.") unless backend_ref
+    def toml_backend_feature_profile(backend: nil)
+      resolved_backend = resolve_backend(backend)
+      backend_ref = backend_reference_for(resolved_backend)
+      return unsupported_feature_result("Unsupported TOML backend #{resolved_backend}.") unless backend_ref
 
       toml_feature_profile.merge(
         backend: backend_ref.id,
@@ -40,10 +41,10 @@ module Toml
       BACKEND_REFERENCES.values
     end
 
-    def parse_toml(source, dialect, backend: "citrus")
+    def parse_toml(source, dialect, backend: nil)
       return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
 
-      parsed = load_toml_document(source, backend)
+      parsed = load_toml_document(source, resolve_backend(backend))
       validated = validate_toml_node(parsed, "")
       return { ok: false, diagnostics: [validated[:diagnostic]] } unless validated[:ok]
       return parse_error_result("TOML documents must parse to a table root.") unless validated[:value].is_a?(Hash)
@@ -77,11 +78,12 @@ module Toml
       }
     end
 
-    def merge_toml(template_source, destination_source, dialect, backend: "citrus")
-      template = parse_toml(template_source, dialect, backend: backend)
+    def merge_toml(template_source, destination_source, dialect, backend: nil)
+      resolved_backend = resolve_backend(backend)
+      template = parse_toml(template_source, dialect, backend: resolved_backend)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
-      destination = parse_toml(destination_source, dialect, backend: backend)
+      destination = parse_toml(destination_source, dialect, backend: resolved_backend)
       unless destination[:ok]
         return {
           ok: false,
@@ -93,8 +95,8 @@ module Toml
       end
 
       merged = merge_toml_tables(
-        load_toml_document(template.dig(:analysis, :normalized_source), backend),
-        load_toml_document(destination.dig(:analysis, :normalized_source), backend)
+        load_toml_document(template.dig(:analysis, :normalized_source), resolved_backend),
+        load_toml_document(destination.dig(:analysis, :normalized_source), resolved_backend)
       )
 
       {
@@ -115,6 +117,11 @@ module Toml
       BACKEND_REFERENCES[name.to_s]
     end
     private_class_method :backend_reference_for
+
+    def resolve_backend(backend)
+      backend.to_s.empty? ? (TreeHaver.current_backend_id || "citrus") : backend.to_s
+    end
+    private_class_method :resolve_backend
 
     def load_toml_document(source, backend)
       case backend.to_s

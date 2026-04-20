@@ -64,4 +64,13 @@ RSpec.describe Toml::Merge do
       json_ready({ id: "parslet", family: "peg" })
     )
   end
+
+  it "uses the tree_haver backend context when no explicit TOML backend is given" do
+    TreeHaver.with_backend("parslet") do
+      fixture = toml_fixture("merge")
+      merge_result = described_class.merge_toml(fixture[:template], fixture[:destination], "toml")
+      expect(merge_result[:ok]).to be(true)
+      expect(merge_result[:output]).to eq(fixture.dig(:expected, :output))
+    end
+  end
 end
