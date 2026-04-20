@@ -36,7 +36,5 @@ jobs:
         with:
           ruby-version: 4.0.2
           bundler-cache: true
-      - name: Setup mise
-        uses: jdx/mise-action@v4
       - name: Run checks
-        run: mise run check
+        run: bundle exec rspec
