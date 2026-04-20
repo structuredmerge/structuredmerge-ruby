@@ -514,4 +514,31 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
+
+  it "conforms to the YAML family suite-definition, named-suite plan, and manifest report fixtures" do
+    suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-144-yaml-family-suite-definitions", "yaml-suite-definitions.json")
+    )
+    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "yaml_portable")).to eq(
+      suite_fixture.dig(:definitions, :yaml_portable)
+    )
+
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-145-yaml-family-named-suite-plans", "ruby-yaml-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-146-yaml-family-manifest-report", "ruby-yaml-manifest-report.json")
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
 end

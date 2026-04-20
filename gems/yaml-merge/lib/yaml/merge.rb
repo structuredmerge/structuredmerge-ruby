@@ -20,6 +20,17 @@ module Yaml
       }
     end
 
+    def yaml_plan_context
+      {
+        family_profile: yaml_feature_profile,
+        feature_profile: {
+          backend: "psych",
+          supports_dialects: true,
+          supported_policies: yaml_feature_profile[:supported_policies]
+        }
+      }
+    end
+
     def parse_yaml(source, dialect)
       return unsupported_feature_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
 

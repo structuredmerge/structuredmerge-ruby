@@ -54,4 +54,42 @@ RSpec.describe Yaml::Merge do
 
     expect(json_ready(described_class.yaml_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
   end
+
+  it "conforms to the slice-142 YAML plan-context fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-142-yaml-family-plan-contexts",
+        "ruby-yaml-plan-contexts.json"
+      )
+    )
+
+    expect(json_ready(described_class.yaml_plan_context)).to eq(json_ready(fixture[:native]))
+  end
+
+  it "conforms to the slice-143 YAML family manifest fixture" do
+    yaml_manifest = read_json(fixtures_root.join("conformance", "slice-143-yaml-family-manifest", "yaml-family-manifest.json"))
+
+    expect(Ast::Merge.conformance_family_feature_profile_path(yaml_manifest, "yaml")).to eq(
+      %w[diagnostics slice-95-yaml-family-feature-profile yaml-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(yaml_manifest, "yaml", "analysis")).to eq(
+      %w[yaml slice-97-structure mapping-and-sequence.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(yaml_manifest, "yaml", "merge")).to eq(
+      %w[yaml slice-99-merge mapping-merge.json]
+    )
+  end
+
+  it "resolves YAML paths through the canonical manifest" do
+    expect(Ast::Merge.conformance_family_feature_profile_path(manifest, "yaml")).to eq(
+      %w[diagnostics slice-95-yaml-family-feature-profile yaml-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "yaml", "matching")).to eq(
+      %w[yaml slice-98-matching path-equality.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "yaml", "merge")).to eq(
+      %w[yaml slice-99-merge mapping-merge.json]
+    )
+  end
 end
