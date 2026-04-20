@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require_relative "lib/ast/merge/version"
+require_relative "lib/tree_haver/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "ast-merge"
-  spec.version = Ast::Merge::VERSION
+  spec.name = "tree_haver"
+  spec.version = TreeHaver::VERSION
   spec.authors = ["Structured Merge Contributors"]
   spec.email = ["opensource@structuredmerge.dev"]
 
-  spec.summary = "Structured Merge AST/core contracts for the Ruby monorepo"
-  spec.description = "Core diagnostics, conformance, planning, reporting, and review-state contracts for Structured Merge."
+  spec.summary = "Structured Merge parser abstraction and process analysis for Ruby"
+  spec.description = "Backend registry, parser request/result contracts, and tree-sitter language-pack integration for Structured Merge."
   spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
   spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
   spec.required_ruby_version = ">= 4.0.0"
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "tree_haver", "= #{Ast::Merge::VERSION}"
+  spec.add_dependency "tree_sitter_language_pack", "~> 1.6"
 end

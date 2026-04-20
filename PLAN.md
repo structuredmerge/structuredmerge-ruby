@@ -47,6 +47,9 @@ Initial gem candidates:
 - `json-merge`
 - `toml-merge`
 - `yaml-merge`
+- `typescript-merge`
+- `rust-merge`
+- `go-merge`
 
 Possible later gems:
 
@@ -89,6 +92,9 @@ cross-language contracts over legacy implementation detail.
 - `json-merge`
 - `toml-merge`
 - `yaml-merge`
+- `typescript-merge`
+- `rust-merge`
+- `go-merge`
 
 Each family gem should catch up through the current shared fixture slices
 before deeper Ruby-specific extensions are considered.
@@ -105,3 +111,5 @@ before deeper Ruby-specific extensions are considered.
 - Treat the current spec and shared fixtures as the primary source of truth.
 - Use the dynamic-language perspective to pressure contracts that may be too
   type-shaped today.
+- Use Bundler path gems for monorepo isolation, and prefer `nomono` when
+  sibling workspace overrides become necessary outside the monorepo itself.

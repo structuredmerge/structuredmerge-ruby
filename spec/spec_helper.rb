@@ -1,3 +1,11 @@
 # frozen_string_literal: true
 
 require_relative "../gems/ast-merge/spec/spec_helper"
+require_relative "../gems/tree_haver/spec/spec_helper"
+require_relative "../gems/text-merge/spec/spec_helper"
+require_relative "../gems/json-merge/spec/spec_helper"
+require_relative "../gems/toml-merge/spec/spec_helper"
+require_relative "../gems/yaml-merge/spec/spec_helper"
+require_relative "../gems/typescript-merge/spec/spec_helper"
+require_relative "../gems/rust-merge/spec/spec_helper"
+require_relative "../gems/go-merge/spec/spec_helper"
