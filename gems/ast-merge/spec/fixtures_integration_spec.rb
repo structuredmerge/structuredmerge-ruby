@@ -614,4 +614,20 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(state)).to eq(json_ready(review_fixture[:expected_state]))
   end
+
+  it "conforms to the source-family review-state fixtures" do
+    %w[
+      slice-158-source-family-review-state/source-family-review-state.json
+      slice-159-source-family-reviewed-default/source-family-reviewed-default.json
+      slice-160-source-family-replay-application/source-family-replay-application.json
+    ].each do |relative_path|
+      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      state = described_class.review_conformance_manifest(
+        fixture[:manifest],
+        fixture[:options],
+        &execute_from(fixture[:executions])
+      )
+      expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+    end
+  end
 end
