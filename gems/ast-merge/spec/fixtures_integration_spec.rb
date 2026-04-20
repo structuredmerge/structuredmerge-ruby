@@ -541,4 +541,32 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
+
+  it "conforms to the aggregate config-family manifest, plan, and report fixtures" do
+    manifest_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-148-config-family-aggregate-manifest", "config-family-aggregate.json")
+    )
+    expect(described_class.conformance_suite_names(manifest_fixture[:manifest])).to eq(manifest_fixture[:suite_names])
+
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-149-config-family-aggregate-suite-plans", "config-family-aggregate-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-150-config-family-aggregate-manifest-report",
+        "config-family-aggregate-manifest-report.json"
+      )
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
 end
