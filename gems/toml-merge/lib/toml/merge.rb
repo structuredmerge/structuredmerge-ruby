@@ -41,6 +41,20 @@ module Toml
       BACKEND_REFERENCES.values
     end
 
+    def toml_plan_context(backend: nil)
+      profile = toml_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: toml_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: profile[:backend] != "citrus" && profile[:backend] != "parslet" ? true : false,
+          supported_policies: profile[:supported_policies]
+        }
+      }
+    end
+
     def parse_toml(source, dialect, backend: nil)
       return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
 

@@ -65,6 +65,53 @@ RSpec.describe Toml::Merge do
     )
   end
 
+  it "conforms to the slice-135 TOML backend feature profile fixtures" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-135-toml-family-backend-feature-profiles",
+        "ruby-toml-backend-feature-profiles.json"
+      )
+    )
+
+    expect(json_ready(described_class.toml_backend_feature_profile(backend: "citrus"))).to include(
+      json_ready(fixture[:citrus])
+    )
+    expect(json_ready(described_class.toml_backend_feature_profile(backend: "parslet"))).to include(
+      json_ready(fixture[:parslet])
+    )
+  end
+
+  it "conforms to the slice-136 TOML plan-context fixtures" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-136-toml-family-plan-contexts",
+        "ruby-toml-plan-contexts.json"
+      )
+    )
+
+    expect(json_ready(described_class.toml_plan_context(backend: "citrus"))).to eq(json_ready(fixture[:citrus]))
+    expect(json_ready(described_class.toml_plan_context(backend: "parslet"))).to eq(json_ready(fixture[:parslet]))
+  end
+
+  it "conforms to the slice-137 TOML family manifest fixture" do
+    manifest = read_json(fixtures_root.join("conformance", "slice-137-toml-family-manifest", "toml-family-manifest.json"))
+
+    expect(Ast::Merge.conformance_family_feature_profile_path(manifest, "toml")).to eq(
+      %w[diagnostics slice-90-toml-family-feature-profile toml-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "analysis")).to eq(
+      %w[toml slice-92-structure table-and-array.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "matching")).to eq(
+      %w[toml slice-93-matching path-equality.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "merge")).to eq(
+      %w[toml slice-94-merge table-merge.json]
+    )
+  end
+
   it "uses the tree_haver backend context when no explicit TOML backend is given" do
     TreeHaver.with_backend("parslet") do
       fixture = toml_fixture("merge")
