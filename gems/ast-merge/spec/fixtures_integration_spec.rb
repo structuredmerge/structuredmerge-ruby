@@ -732,35 +732,52 @@ RSpec.describe Ast::Merge do
   end
 
   it "conforms to the canonical widened-suite backend fixtures" do
-    plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-178-canonical-widened-suite-backend-plans", "ruby-canonical-widened-suite-backend-plans.json")
-    )
-    expect(
-      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
-    ).to eq(json_ready(plans_fixture[:expected_entries]))
+    [
+      [
+        "slice-178-canonical-widened-suite-backend-plans",
+        "ruby-canonical-widened-suite-backend-plans.json",
+        "slice-179-canonical-widened-suite-backend-report",
+        "ruby-canonical-widened-suite-backend-report.json",
+        %w[
+          slice-180-canonical-widened-suite-backend-review-state/ruby-canonical-widened-suite-backend-review-state.json
+          slice-181-canonical-widened-suite-backend-reviewed-default/ruby-canonical-widened-suite-backend-reviewed-default.json
+          slice-182-canonical-widened-suite-backend-replay-application/ruby-canonical-widened-suite-backend-replay-application.json
+        ]
+      ],
+      [
+        "slice-187-canonical-widened-suite-polyglot-backend-plans",
+        "ruby-canonical-widened-suite-polyglot-backend-plans.json",
+        "slice-188-canonical-widened-suite-polyglot-backend-report",
+        "ruby-canonical-widened-suite-polyglot-backend-report.json",
+        %w[
+          slice-189-canonical-widened-suite-polyglot-backend-review-state/ruby-canonical-widened-suite-polyglot-backend-review-state.json
+          slice-190-canonical-widened-suite-polyglot-backend-reviewed-default/ruby-canonical-widened-suite-polyglot-backend-reviewed-default.json
+          slice-191-canonical-widened-suite-polyglot-backend-replay-application/ruby-canonical-widened-suite-polyglot-backend-replay-application.json
+        ]
+      ]
+    ].each do |plans_slice, plans_file, report_slice, report_file, review_paths|
+      plans_fixture = read_json(fixtures_root.join("diagnostics", plans_slice, plans_file))
+      expect(
+        json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+      ).to eq(json_ready(plans_fixture[:expected_entries]))
 
-    report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-179-canonical-widened-suite-backend-report", "ruby-canonical-widened-suite-backend-report.json")
-    )
-    report = described_class.report_conformance_manifest(
-      report_fixture[:manifest],
-      report_fixture[:options],
-      &execute_from(report_fixture[:executions])
-    )
-    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
-
-    %w[
-      slice-180-canonical-widened-suite-backend-review-state/ruby-canonical-widened-suite-backend-review-state.json
-      slice-181-canonical-widened-suite-backend-reviewed-default/ruby-canonical-widened-suite-backend-reviewed-default.json
-      slice-182-canonical-widened-suite-backend-replay-application/ruby-canonical-widened-suite-backend-replay-application.json
-    ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
-      state = described_class.review_conformance_manifest(
-        fixture[:manifest],
-        fixture[:options],
-        &execute_from(fixture[:executions])
+      report_fixture = read_json(fixtures_root.join("diagnostics", report_slice, report_file))
+      report = described_class.report_conformance_manifest(
+        report_fixture[:manifest],
+        report_fixture[:options],
+        &execute_from(report_fixture[:executions])
       )
-      expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+      expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+
+      review_paths.each do |relative_path|
+        fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+        state = described_class.review_conformance_manifest(
+          fixture[:manifest],
+          fixture[:options],
+          &execute_from(fixture[:executions])
+        )
+        expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+      end
     end
   end
 
