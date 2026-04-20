@@ -1,0 +1,10 @@
+[tools]
+ruby = "4.0.2"
+
+[tasks.test]
+description = "Run Ruby specs"
+run = "bundle exec rspec"
+
+[tasks.check]
+description = "Run the local Ruby verification suite"
+run = "bundle exec rspec"
