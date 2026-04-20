@@ -569,4 +569,20 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
+
+  it "conforms to the aggregate config-family review-state fixtures" do
+    %w[
+      slice-151-config-family-aggregate-review-state/config-family-aggregate-review-state.json
+      slice-152-config-family-aggregate-reviewed-default/config-family-aggregate-reviewed-default.json
+      slice-153-config-family-aggregate-replay-application/config-family-aggregate-replay-application.json
+    ].each do |relative_path|
+      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      state = described_class.review_conformance_manifest(
+        fixture[:manifest],
+        fixture[:options],
+        &execute_from(fixture[:executions])
+      )
+      expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+    end
+  end
 end
