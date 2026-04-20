@@ -31,27 +31,37 @@ RSpec.describe Toml::Merge do
     Ast::Merge.json_ready(value)
   end
 
-  it "conforms to the TOML parse, structure, matching, merge, and feature fixtures" do
-    parse_fixture = toml_fixture("parse_valid")
-    parse_result = described_class.parse_toml(parse_fixture[:source], parse_fixture[:dialect])
-    expect(parse_result[:ok]).to eq(parse_fixture.dig(:expected, :ok))
-    expect(parse_result.dig(:analysis, :root_kind)).to eq(parse_fixture.dig(:expected, :root_kind))
+  %w[citrus parslet].each do |backend|
+    it "conforms to the TOML parse, structure, matching, and merge fixtures with #{backend}" do
+      parse_fixture = toml_fixture("parse_valid")
+      parse_result = described_class.parse_toml(parse_fixture[:source], parse_fixture[:dialect], backend: backend)
+      expect(parse_result[:ok]).to eq(parse_fixture.dig(:expected, :ok))
+      expect(parse_result.dig(:analysis, :root_kind)).to eq(parse_fixture.dig(:expected, :root_kind))
 
-    structure_fixture = toml_fixture("structure")
-    structure_result = described_class.parse_toml(structure_fixture[:source], structure_fixture[:dialect])
-    expect(json_ready(structure_result.dig(:analysis, :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
+      structure_fixture = toml_fixture("structure")
+      structure_result = described_class.parse_toml(structure_fixture[:source], structure_fixture[:dialect], backend: backend)
+      expect(json_ready(structure_result.dig(:analysis, :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
 
-    matching_fixture = toml_fixture("matching")
-    template = described_class.parse_toml(matching_fixture[:template], "toml")
-    destination = described_class.parse_toml(matching_fixture[:destination], "toml")
-    matching_result = described_class.match_toml_owners(template[:analysis], destination[:analysis])
-    expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(json_ready(matching_fixture.dig(:expected, :matched)))
+      matching_fixture = toml_fixture("matching")
+      template = described_class.parse_toml(matching_fixture[:template], "toml", backend: backend)
+      destination = described_class.parse_toml(matching_fixture[:destination], "toml", backend: backend)
+      matching_result = described_class.match_toml_owners(template[:analysis], destination[:analysis])
+      expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(json_ready(matching_fixture.dig(:expected, :matched)))
 
-    merge_fixture = toml_fixture("merge")
-    merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], "toml")
-    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+      merge_fixture = toml_fixture("merge")
+      merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], "toml", backend: backend)
+      expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+      expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    end
+  end
 
+  it "keeps the shared family feature fixture stable while exposing backend-specific feature profiles" do
     expect(json_ready(described_class.toml_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
+    expect(json_ready(described_class.toml_backend_feature_profile(backend: "citrus")[:backend_ref])).to eq(
+      json_ready({ id: "citrus", family: "peg" })
+    )
+    expect(json_ready(described_class.toml_backend_feature_profile(backend: "parslet")[:backend_ref])).to eq(
+      json_ready({ id: "parslet", family: "peg" })
+    )
   end
 end

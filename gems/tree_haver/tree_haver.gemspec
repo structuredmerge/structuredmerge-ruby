@@ -23,5 +23,7 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "citrus", "~> 3.0"
+  spec.add_dependency "parslet", "~> 2.0"
   spec.add_dependency "tree_sitter_language_pack", "~> 1.6"
 end

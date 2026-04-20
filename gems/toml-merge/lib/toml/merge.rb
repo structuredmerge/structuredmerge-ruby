@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
+require "toml"
 require "toml-rb"
+require "tree_haver"
 
 module Toml
   module Merge
@@ -8,6 +10,10 @@ module Toml
     DESTINATION_WINS_ARRAY_POLICY = {
       surface: "array",
       name: "destination_wins_array"
+    }.freeze
+    BACKEND_REFERENCES = {
+      "citrus" => TreeHaver::CITRUS_BACKEND,
+      "parslet" => TreeHaver::PARSLET_BACKEND
     }.freeze
 
     module_function
@@ -20,10 +26,24 @@ module Toml
       }
     end
 
-    def parse_toml(source, dialect)
+    def toml_backend_feature_profile(backend: "citrus")
+      backend_ref = backend_reference_for(backend)
+      return unsupported_feature_result("Unsupported TOML backend #{backend}.") unless backend_ref
+
+      toml_feature_profile.merge(
+        backend: backend_ref.id,
+        backend_ref: backend_ref.to_h
+      )
+    end
+
+    def available_toml_backends
+      BACKEND_REFERENCES.values
+    end
+
+    def parse_toml(source, dialect, backend: "citrus")
       return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
 
-      parsed = TomlRB.parse(source)
+      parsed = load_toml_document(source, backend)
       validated = validate_toml_node(parsed, "")
       return { ok: false, diagnostics: [validated[:diagnostic]] } unless validated[:ok]
       return parse_error_result("TOML documents must parse to a table root.") unless validated[:value].is_a?(Hash)
@@ -57,11 +77,11 @@ module Toml
       }
     end
 
-    def merge_toml(template_source, destination_source, dialect)
-      template = parse_toml(template_source, dialect)
+    def merge_toml(template_source, destination_source, dialect, backend: "citrus")
+      template = parse_toml(template_source, dialect, backend: backend)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
-      destination = parse_toml(destination_source, dialect)
+      destination = parse_toml(destination_source, dialect, backend: backend)
       unless destination[:ok]
         return {
           ok: false,
@@ -73,8 +93,8 @@ module Toml
       end
 
       merged = merge_toml_tables(
-        TomlRB.parse(template.dig(:analysis, :normalized_source)),
-        TomlRB.parse(destination.dig(:analysis, :normalized_source))
+        load_toml_document(template.dig(:analysis, :normalized_source), backend),
+        load_toml_document(destination.dig(:analysis, :normalized_source), backend)
       )
 
       {
@@ -90,6 +110,37 @@ module Toml
         policies: []
       }
     end
+
+    def backend_reference_for(name)
+      BACKEND_REFERENCES[name.to_s]
+    end
+    private_class_method :backend_reference_for
+
+    def load_toml_document(source, backend)
+      case backend.to_s
+      when "citrus"
+        normalize_toml_value(TomlRB.parse(source))
+      when "parslet"
+        normalize_toml_value(TOML.load(source))
+      else
+        raise ArgumentError, "Unsupported TOML backend #{backend}."
+      end
+    end
+    private_class_method :load_toml_document
+
+    def normalize_toml_value(value)
+      case value
+      when Hash
+        value.each_with_object({}) do |(key, child), memo|
+          memo[key.to_s] = normalize_toml_value(child)
+        end
+      when Array
+        value.map { |child| normalize_toml_value(child) }
+      else
+        value
+      end
+    end
+    private_class_method :normalize_toml_value
 
     def validate_toml_node(value, path)
       if scalar?(value)
@@ -201,7 +252,7 @@ module Toml
     private_class_method :parse_error_result
 
     def unsupported_feature_result(message)
-      { ok: false, diagnostic: { severity: "error", category: "unsupported_feature", message: message } }
+      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }] }
     end
     private_class_method :unsupported_feature_result
   end

@@ -37,12 +37,16 @@ PATH
   specs:
     toml-merge (0.1.0)
       ast-merge (= 0.1.0)
+      toml (~> 0.3)
       toml-rb (~> 4.1)
+      tree_haver (= 0.1.0)
 
 PATH
   remote: gems/tree_haver
   specs:
     tree_haver (0.1.0)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
       tree_sitter_language_pack (~> 1.6)
 
 PATH
@@ -63,6 +67,7 @@ GEM
   specs:
     citrus (3.0.2)
     diff-lcs (1.6.2)
+    parslet (2.0.0)
     racc (1.8.1)
     rake (13.4.2)
     rspec (3.13.2)
@@ -78,6 +83,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.7)
+    toml (0.3.0)
+      parslet (>= 1.8.0, < 3.0.0)
     toml-rb (4.1.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
@@ -105,6 +112,7 @@ CHECKSUMS
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   go-merge (0.1.0)
   json-merge (0.1.0)
+  parslet (2.0.0) sha256=d45130695d39b43d7e6a91f4d2ec66b388a8d822bae38de9b4de9a5fbde1f606
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
@@ -114,6 +122,7 @@ CHECKSUMS
   rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
   rust-merge (0.1.0)
   text-merge (0.1.0)
+  toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9
   toml-merge (0.1.0)
   toml-rb (4.1.0) sha256=14456ec4549e4703881bf04b83a56f3264ef99884880092d83c98a2058d95846
   tree_haver (0.1.0)

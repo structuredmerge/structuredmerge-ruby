@@ -77,6 +77,22 @@ RSpec.describe TreeHaver do
     expect(json_ready(profile.to_h[:backend_ref])).to eq(json_ready(fixture[:backends][1]))
   end
 
+  it "exposes PEG backend references for parser-plurality slices" do
+    expect(json_ready(described_class::CITRUS_BACKEND.to_h)).to eq(
+      json_ready({ id: "citrus", family: "peg" })
+    )
+    expect(json_ready(described_class::PARSLET_BACKEND.to_h)).to eq(
+      json_ready({ id: "parslet", family: "peg" })
+    )
+
+    expect(json_ready(described_class.peg_adapter_info(described_class::CITRUS_BACKEND).to_h[:backend_ref])).to eq(
+      json_ready({ id: "citrus", family: "peg" })
+    )
+    expect(json_ready(described_class.peg_feature_profile(described_class::PARSLET_BACKEND).to_h[:backend_ref])).to eq(
+      json_ready({ id: "parslet", family: "peg" })
+    )
+  end
+
   it "conforms to the slice-100 process baseline fixture" do
     fixture = diagnostics_fixture("process_baseline")
     result = described_class.process_with_language_pack(

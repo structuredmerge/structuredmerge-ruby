@@ -24,5 +24,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ast-merge", "= #{Toml::Merge::VERSION}"
+  spec.add_dependency "toml", "~> 0.3"
   spec.add_dependency "toml-rb", "~> 4.1"
+  spec.add_dependency "tree_haver", "= #{Toml::Merge::VERSION}"
 end
