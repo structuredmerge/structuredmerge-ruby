@@ -570,6 +570,45 @@ RSpec.describe Ast::Merge do
     expect(json_ready(ready_groups)).to eq(json_ready(fixture[:expected_ready_groups]))
   end
 
+  it "conforms to the slice-236 delegated child group review request fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-236-delegated-child-group-review-request",
+        "delegated-child-group-review-request.json"
+      )
+    )
+
+    expect(described_class.review_request_id_for_projected_child_group(fixture[:group])).to eq(
+      fixture.dig(:expected_request, :id)
+    )
+    expect(
+      json_ready(
+        described_class.projected_child_group_review_request(fixture[:group], fixture[:family])
+      )
+    ).to eq(json_ready(fixture[:expected_request]))
+  end
+
+  it "conforms to the slice-237 delegated child groups accepted-for-apply fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-237-delegated-child-group-accepted-for-apply",
+        "delegated-child-groups-accepted-for-apply.json"
+      )
+    )
+
+    expect(
+      json_ready(
+        described_class.select_projected_child_review_groups_accepted_for_apply(
+          fixture[:groups],
+          fixture[:family],
+          fixture[:decisions]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_accepted_groups]))
+  end
+
   it "conforms to the widened source-family manifest and report fixtures" do
     source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
     source_report_fixture = diagnostics_fixture("manifest_backend_report")

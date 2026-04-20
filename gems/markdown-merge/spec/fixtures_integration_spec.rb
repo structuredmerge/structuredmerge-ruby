@@ -203,4 +203,29 @@ RSpec.describe Markdown::Merge do
       )
     ).to eq(json_ready(fixture[:expected_ready_groups]))
   end
+
+  it "conforms to the slice-238 delegated child review transport fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "markdown",
+        "slice-238-delegated-child-review-transport",
+        "fenced-code-review-transport.json"
+      )
+    )
+
+    expect(
+      json_ready(
+        Ast::Merge.projected_child_group_review_request(fixture[:group], fixture[:family])
+      )
+    ).to eq(json_ready(fixture[:expected_request]))
+    expect(
+      json_ready(
+        Ast::Merge.select_projected_child_review_groups_accepted_for_apply(
+          fixture[:groups],
+          fixture[:family],
+          fixture[:decisions]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_accepted_groups]))
+  end
 end

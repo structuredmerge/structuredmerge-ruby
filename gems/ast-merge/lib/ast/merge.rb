@@ -150,6 +150,35 @@ module Ast
       end
     end
 
+    def review_request_id_for_projected_child_group(group)
+      "projected_child_group:#{group[:delegated_apply_group]}"
+    end
+
+    def projected_child_group_review_request(group, family)
+      {
+        id: review_request_id_for_projected_child_group(group),
+        kind: "delegated_child_group",
+        family: family,
+        message: "delegated child group #{group[:delegated_apply_group]} is ready to apply for #{family}.",
+        blocking: true,
+        delegated_group: deep_dup(group),
+        action_offers: [
+          { action: "apply_delegated_child_group", requires_context: false }
+        ],
+        default_action: "apply_delegated_child_group"
+      }
+    end
+
+    def select_projected_child_review_groups_accepted_for_apply(groups, _family, decisions)
+      accepted_request_ids = decisions
+        .select { |decision| decision[:action] == "apply_delegated_child_group" }
+        .map { |decision| decision[:request_id] }
+
+      groups.select do |group|
+        accepted_request_ids.include?(review_request_id_for_projected_child_group(group))
+      end
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|
