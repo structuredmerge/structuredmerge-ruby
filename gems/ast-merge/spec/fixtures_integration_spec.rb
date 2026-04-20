@@ -487,4 +487,31 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(mixed_source_report_fixture[:expected_report]))
     expect(source_report_fixture).not_to be_nil
   end
+
+  it "conforms to the TOML family suite-definition, named-suite plan, and manifest report fixtures" do
+    suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-138-toml-family-suite-definitions", "toml-suite-definitions.json")
+    )
+    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "toml_portable")).to eq(
+      suite_fixture.dig(:definitions, :toml_portable)
+    )
+
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-139-toml-family-named-suite-plans", "ruby-toml-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-140-toml-family-manifest-report", "ruby-toml-manifest-report.json")
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
 end
