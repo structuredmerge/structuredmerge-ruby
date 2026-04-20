@@ -542,6 +542,25 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
+  it "conforms to the backend-aware YAML family named-suite plan and manifest report fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-173-yaml-family-backend-named-suite-plans", "ruby-yaml-backend-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-174-yaml-family-backend-manifest-report", "ruby-yaml-backend-manifest-report.json")
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
+
   it "conforms to the aggregate config-family manifest, plan, and report fixtures" do
     manifest_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-148-config-family-aggregate-manifest", "config-family-aggregate.json")

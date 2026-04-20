@@ -31,40 +31,69 @@ RSpec.describe Yaml::Merge do
     Ast::Merge.json_ready(value)
   end
 
-  it "conforms to the YAML parse, structure, matching, merge, and feature fixtures" do
+  it "conforms to the YAML parse, structure, matching, merge, and feature fixtures across backends" do
     parse_fixture = yaml_fixture("parse_valid")
-    parse_result = described_class.parse_yaml(parse_fixture[:source], parse_fixture[:dialect])
-    expect(parse_result[:ok]).to eq(parse_fixture.dig(:expected, :ok))
-    expect(parse_result.dig(:analysis, :root_kind)).to eq(parse_fixture.dig(:expected, :root_kind))
-
     structure_fixture = yaml_fixture("structure")
-    structure_result = described_class.parse_yaml(structure_fixture[:source], structure_fixture[:dialect])
-    expect(json_ready(structure_result.dig(:analysis, :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
-
     matching_fixture = yaml_fixture("matching")
-    template = described_class.parse_yaml(matching_fixture[:template], "yaml")
-    destination = described_class.parse_yaml(matching_fixture[:destination], "yaml")
-    matching_result = described_class.match_yaml_owners(template[:analysis], destination[:analysis])
-    expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(json_ready(matching_fixture.dig(:expected, :matched)))
-
     merge_fixture = yaml_fixture("merge")
-    merge_result = described_class.merge_yaml(merge_fixture[:template], merge_fixture[:destination], "yaml")
-    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+
+    %w[psych kreuzberg-language-pack].each do |backend|
+      parse_result = described_class.parse_yaml(parse_fixture[:source], parse_fixture[:dialect], backend: backend)
+      expect(parse_result[:ok]).to eq(parse_fixture.dig(:expected, :ok))
+      expect(parse_result.dig(:analysis, :root_kind)).to eq(parse_fixture.dig(:expected, :root_kind))
+
+      structure_result = described_class.parse_yaml(structure_fixture[:source], structure_fixture[:dialect], backend: backend)
+      expect(json_ready(structure_result.dig(:analysis, :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
+
+      template = described_class.parse_yaml(matching_fixture[:template], "yaml", backend: backend)
+      destination = described_class.parse_yaml(matching_fixture[:destination], "yaml", backend: backend)
+      matching_result = described_class.match_yaml_owners(template[:analysis], destination[:analysis])
+      expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
+        json_ready(matching_fixture.dig(:expected, :matched))
+      )
+
+      merge_result = described_class.merge_yaml(merge_fixture[:template], merge_fixture[:destination], "yaml", backend: backend)
+      expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+      expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    end
 
     expect(json_ready(described_class.yaml_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
   end
 
-  it "conforms to the slice-142 YAML plan-context fixture" do
+  it "conforms to the slice-171 YAML backend feature profile fixtures" do
     fixture = read_json(
       fixtures_root.join(
         "diagnostics",
-        "slice-142-yaml-family-plan-contexts",
+        "slice-171-yaml-family-backend-feature-profiles",
+        "ruby-yaml-backend-feature-profiles.json"
+      )
+    )
+
+    expect(json_ready(described_class.available_yaml_backends.map(&:to_h))).to eq(
+      json_ready([
+        { id: "psych", family: "native" },
+        { id: "kreuzberg-language-pack", family: "tree-sitter" }
+      ])
+    )
+    expect(json_ready(described_class.yaml_backend_feature_profile(backend: "psych"))).to eq(json_ready(fixture[:psych]))
+    expect(json_ready(described_class.yaml_backend_feature_profile(backend: "kreuzberg-language-pack"))).to eq(
+      json_ready(fixture[:tree_sitter])
+    )
+  end
+
+  it "conforms to the slice-172 YAML backend plan-context fixtures" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-172-yaml-family-backend-plan-contexts",
         "ruby-yaml-plan-contexts.json"
       )
     )
 
-    expect(json_ready(described_class.yaml_plan_context)).to eq(json_ready(fixture[:native]))
+    expect(json_ready(described_class.yaml_plan_context(backend: "psych"))).to eq(json_ready(fixture[:psych]))
+    expect(json_ready(described_class.yaml_plan_context(backend: "kreuzberg-language-pack"))).to eq(
+      json_ready(fixture[:tree_sitter])
+    )
   end
 
   it "conforms to the slice-143 YAML family manifest fixture" do
@@ -91,5 +120,14 @@ RSpec.describe Yaml::Merge do
     expect(Ast::Merge.conformance_fixture_path(manifest, "yaml", "merge")).to eq(
       %w[yaml slice-99-merge mapping-merge.json]
     )
+  end
+
+  it "uses the tree_haver backend context when no explicit YAML backend is given" do
+    TreeHaver.with_backend("kreuzberg-language-pack") do
+      fixture = yaml_fixture("merge")
+      merge_result = described_class.merge_yaml(fixture[:template], fixture[:destination], "yaml")
+      expect(merge_result[:ok]).to be(true)
+      expect(merge_result[:output]).to eq(fixture.dig(:expected, :output))
+    end
   end
 end

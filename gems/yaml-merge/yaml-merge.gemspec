@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ast-merge", "= #{Yaml::Merge::VERSION}"
+  spec.add_dependency "tree_haver", "= #{Yaml::Merge::VERSION}"
 end
