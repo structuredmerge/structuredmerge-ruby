@@ -805,5 +805,18 @@ RSpec.describe Ast::Merge do
       )
       expect(json_ready(report)).to eq(json_ready(fixture[:expected_report]))
     end
+
+    %w[
+      slice-192-backend-sensitive-aggregate-tree-sitter-review-state/backend-sensitive-aggregate-tree-sitter-review-state.json
+      slice-193-backend-sensitive-aggregate-native-review-state/backend-sensitive-aggregate-native-review-state.json
+    ].each do |relative_path|
+      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      state = described_class.review_conformance_manifest(
+        fixture[:manifest],
+        fixture[:options],
+        &execute_from(fixture[:executions])
+      )
+      expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+    end
   end
 end
