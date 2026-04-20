@@ -779,6 +779,58 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
+  it "conforms to the slice-246 through slice-251 nested Markdown and Ruby suite fixtures" do
+    markdown_suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-246-markdown-nested-suite-definitions", "markdown-nested-suite-definitions.json")
+    )
+    expect(described_class.conformance_suite_names(markdown_suite_fixture[:manifest])).to eq(markdown_suite_fixture[:suite_names])
+    expect(described_class.conformance_suite_definition(markdown_suite_fixture[:manifest], "markdown_nested_portable")).to eq(
+      markdown_suite_fixture.dig(:definitions, :markdown_nested_portable)
+    )
+
+    markdown_plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-247-markdown-nested-named-suite-plans", "markdown-nested-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(markdown_plans_fixture[:manifest], markdown_plans_fixture[:contexts]))
+    ).to eq(json_ready(markdown_plans_fixture[:expected_entries]))
+
+    markdown_report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-248-markdown-nested-manifest-report", "markdown-nested-manifest-report.json")
+    )
+    markdown_report = described_class.report_conformance_manifest(
+      markdown_report_fixture[:manifest],
+      markdown_report_fixture[:options],
+      &execute_from(markdown_report_fixture[:executions])
+    )
+    expect(json_ready(markdown_report)).to eq(json_ready(markdown_report_fixture[:expected_report]))
+
+    ruby_suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-249-ruby-nested-suite-definitions", "ruby-nested-suite-definitions.json")
+    )
+    expect(described_class.conformance_suite_names(ruby_suite_fixture[:manifest])).to eq(ruby_suite_fixture[:suite_names])
+    expect(described_class.conformance_suite_definition(ruby_suite_fixture[:manifest], "ruby_nested_portable")).to eq(
+      ruby_suite_fixture.dig(:definitions, :ruby_nested_portable)
+    )
+
+    ruby_plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-250-ruby-nested-named-suite-plans", "ruby-nested-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(ruby_plans_fixture[:manifest], ruby_plans_fixture[:contexts]))
+    ).to eq(json_ready(ruby_plans_fixture[:expected_entries]))
+
+    ruby_report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-251-ruby-nested-manifest-report", "ruby-nested-manifest-report.json")
+    )
+    ruby_report = described_class.report_conformance_manifest(
+      ruby_report_fixture[:manifest],
+      ruby_report_fixture[:options],
+      &execute_from(ruby_report_fixture[:executions])
+    )
+    expect(json_ready(ruby_report)).to eq(json_ready(ruby_report_fixture[:expected_report]))
+  end
+
   it "conforms to the polyglot YAML family named-suite plan and manifest report fixtures" do
     plans_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-185-yaml-family-polyglot-backend-named-suite-plans", "ruby-yaml-polyglot-named-suite-plans.json")
