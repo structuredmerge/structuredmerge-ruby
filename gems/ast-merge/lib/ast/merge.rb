@@ -144,6 +144,12 @@ module Ast
       end
     end
 
+    def select_projected_child_review_groups_ready_for_apply(groups, resolved_case_ids)
+      groups.select do |group|
+        group[:case_ids].all? { |case_id| resolved_case_ids.include?(case_id) }
+      end
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|
