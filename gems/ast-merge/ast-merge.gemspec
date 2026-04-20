@@ -3,7 +3,7 @@
 require_relative "lib/structured_merge/ast_merge/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "structuredmerge-ast-merge"
+  spec.name = "ast-merge"
   spec.version = StructuredMerge::AstMerge::VERSION
   spec.authors = ["Structured Merge Contributors"]
   spec.email = ["opensource@structuredmerge.dev"]

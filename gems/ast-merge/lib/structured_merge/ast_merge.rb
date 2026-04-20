@@ -5,7 +5,7 @@ require_relative "ast_merge/version"
 
 module StructuredMerge
   module AstMerge
-    PACKAGE_NAME = "structuredmerge-ast-merge"
+    PACKAGE_NAME = "ast-merge"
     REVIEW_TRANSPORT_VERSION = 1
 
     module_function
