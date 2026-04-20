@@ -112,6 +112,21 @@ RSpec.describe Toml::Merge do
     )
   end
 
+  it "resolves TOML paths through the canonical manifest" do
+    expect(Ast::Merge.conformance_family_feature_profile_path(manifest, "toml")).to eq(
+      %w[diagnostics slice-90-toml-family-feature-profile toml-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "analysis")).to eq(
+      %w[toml slice-92-structure table-and-array.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "matching")).to eq(
+      %w[toml slice-93-matching path-equality.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "toml", "merge")).to eq(
+      %w[toml slice-94-merge table-merge.json]
+    )
+  end
+
   it "uses the tree_haver backend context when no explicit TOML backend is given" do
     TreeHaver.with_backend("parslet") do
       fixture = toml_fixture("merge")
