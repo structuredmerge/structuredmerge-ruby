@@ -542,6 +542,41 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
+  it "conforms to the Markdown family suite-definition, named-suite plan, and manifest report fixtures" do
+    suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-200-markdown-family-suite-definitions", "markdown-suite-definitions.json")
+    )
+    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "markdown_portable")).to eq(
+      suite_fixture.dig(:definitions, :markdown_portable)
+    )
+
+    plans_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-201-markdown-family-named-suite-plans",
+        "ruby-markdown-named-suite-plans.json"
+      )
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-202-markdown-family-manifest-report",
+        "ruby-markdown-manifest-report.json"
+      )
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
+
   it "conforms to the backend-aware YAML family named-suite plan and manifest report fixtures" do
     plans_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-173-yaml-family-backend-named-suite-plans", "ruby-yaml-backend-named-suite-plans.json")
