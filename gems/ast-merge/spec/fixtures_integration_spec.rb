@@ -525,6 +525,19 @@ RSpec.describe Ast::Merge do
     expect(json_ready(projected_cases)).to eq(json_ready(projected_cases_fixture[:cases]))
   end
 
+  it "conforms to the slice-227 projected child-review groups fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-227-projected-child-review-groups",
+        "projected-child-review-groups.json"
+      )
+    )
+
+    grouped = described_class.group_projected_child_review_cases(fixture[:cases])
+    expect(json_ready(grouped)).to eq(json_ready(fixture[:expected_groups]))
+  end
+
   it "conforms to the widened source-family manifest and report fixtures" do
     source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
     source_report_fixture = diagnostics_fixture("manifest_backend_report")

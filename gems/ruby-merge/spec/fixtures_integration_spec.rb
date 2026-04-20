@@ -86,5 +86,12 @@ RSpec.describe "Ruby::Merge" do
         )
       )
     ).to eq(json_ready(child_fixture[:expected]))
+
+    grouped_fixture = read_json(
+      fixtures_root.join("ruby", "slice-229-projected-child-review-groups", "yard-example-review-groups.json")
+    )
+    expect(json_ready(Ast::Merge.group_projected_child_review_cases(grouped_fixture[:cases]))).to eq(
+      json_ready(grouped_fixture[:expected_groups])
+    )
   end
 end

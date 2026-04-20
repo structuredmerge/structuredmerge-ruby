@@ -103,6 +103,30 @@ module Ast
       }
     end
 
+    def group_projected_child_review_cases(cases)
+      groups = []
+
+      cases.each do |entry|
+        existing = groups.find { |group| group[:delegated_apply_group] == entry[:delegated_apply_group] }
+        if existing
+          existing[:case_ids] << entry[:case_id]
+          existing[:delegated_case_ids] << entry[:delegated_case_id]
+          next
+        end
+
+        groups << {
+          delegated_apply_group: entry[:delegated_apply_group],
+          parent_operation_id: entry[:parent_operation_id],
+          child_operation_id: entry[:child_operation_id],
+          delegated_runtime_surface_path: entry[:delegated_runtime_surface_path],
+          case_ids: [entry[:case_id]],
+          delegated_case_ids: [entry[:delegated_case_id]]
+        }
+      end
+
+      groups
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|
