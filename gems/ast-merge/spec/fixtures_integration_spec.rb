@@ -663,4 +663,30 @@ RSpec.describe Ast::Merge do
       expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
     end
   end
+
+  it "conforms to the backend-sensitive aggregate fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-167-backend-sensitive-aggregate-suite-plans",
+        "backend-sensitive-aggregate-suite-plans.json"
+      )
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    %w[
+      slice-168-backend-sensitive-aggregate-tree-sitter-report/backend-sensitive-aggregate-tree-sitter-report.json
+      slice-169-backend-sensitive-aggregate-native-report/backend-sensitive-aggregate-native-report.json
+    ].each do |relative_path|
+      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      report = described_class.report_conformance_manifest(
+        fixture[:manifest],
+        fixture[:options],
+        &execute_from(fixture[:executions])
+      )
+      expect(json_ready(report)).to eq(json_ready(fixture[:expected_report]))
+    end
+  end
 end
