@@ -2,13 +2,13 @@
 
 require "pathname"
 
-RSpec.describe StructuredMerge::AstMerge do
+RSpec.describe Ast::Merge do
   def fixtures_root
     Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
   end
 
   def read_json(path)
-    StructuredMerge::AstMerge.normalize_value(JSON.parse(path.read))
+    Ast::Merge.normalize_value(JSON.parse(path.read))
   end
 
   def manifest

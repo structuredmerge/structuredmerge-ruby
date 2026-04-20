@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/structured_merge/ast_merge/version"
+require_relative "lib/ast/merge/version"
 
 Gem::Specification.new do |spec|
   spec.name = "ast-merge"
-  spec.version = StructuredMerge::AstMerge::VERSION
+  spec.version = Ast::Merge::VERSION
   spec.authors = ["Structured Merge Contributors"]
   spec.email = ["opensource@structuredmerge.dev"]
 

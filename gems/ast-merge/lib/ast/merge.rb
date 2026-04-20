@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require "json"
-require_relative "ast_merge/version"
+require_relative "merge/version"
 
-module StructuredMerge
-  module AstMerge
+module Ast
+  module Merge
     PACKAGE_NAME = "ast-merge"
     REVIEW_TRANSPORT_VERSION = 1
 
@@ -216,12 +216,10 @@ module StructuredMerge
       end
 
       if requirements[:dialect]
-        unless family_profile.fetch(:supported_dialects, []).include?(requirements[:dialect])
+        if !family_profile.fetch(:supported_dialects, []).include?(requirements[:dialect])
           messages << "family #{family_profile[:family]} does not support dialect #{requirements[:dialect]}."
-        else
-          if feature_profile && !feature_profile[:supports_dialects] && !default_dialect?(family_profile, requirements[:dialect])
-            messages << "backend #{feature_profile[:backend]} does not support dialect #{requirements[:dialect]} for family #{family_profile[:family]}."
-          end
+        elsif feature_profile && !feature_profile[:supports_dialects] && !default_dialect?(family_profile, requirements[:dialect])
+          messages << "backend #{feature_profile[:backend]} does not support dialect #{requirements[:dialect]} for family #{family_profile[:family]}."
         end
       end
 
@@ -310,7 +308,12 @@ module StructuredMerge
     end
 
     def report_named_conformance_suite_manifest(manifest, contexts, &execute)
-      report_named_conformance_suite_envelope(report_planned_named_conformance_suites(plan_named_conformance_suites(manifest, contexts), &execute))
+      report_named_conformance_suite_envelope(
+        report_planned_named_conformance_suites(
+          plan_named_conformance_suites(manifest, contexts),
+          &execute
+        )
+      )
     end
 
     def report_conformance_manifest(manifest, options, &execute)
@@ -456,12 +459,12 @@ module StructuredMerge
 
     def plan_named_conformance_suites(manifest, contexts)
       conformance_suite_names(manifest).filter_map do |suite_name|
-      definition = conformance_suite_definition(manifest, suite_name)
-      next unless definition
-      family_key = definition[:family].to_sym
-      next unless contexts.key?(family_key) || contexts.key?(definition[:family])
+        definition = conformance_suite_definition(manifest, suite_name)
+        next unless definition
+        family_key = definition[:family].to_sym
+        next unless contexts.key?(family_key) || contexts.key?(definition[:family])
 
-      plan_named_conformance_suite_entry(manifest, suite_name, contexts[family_key] || contexts[definition[:family]])
+        plan_named_conformance_suite_entry(manifest, suite_name, contexts[family_key] || contexts[definition[:family]])
       end
     end
 

@@ -2,7 +2,7 @@
 
 require "json"
 require "pathname"
-require "structured_merge/ast_merge"
+require "ast/merge"
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
