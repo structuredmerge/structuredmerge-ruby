@@ -179,6 +179,52 @@ module Ast
       end
     end
 
+    def review_projected_child_groups(groups, family, decisions)
+      request_ids = groups.map { |group| review_request_id_for_projected_child_group(group) }
+      applied_decisions = []
+      diagnostics = []
+
+      decisions.each do |decision|
+        next unless decision[:action] == "apply_delegated_child_group"
+
+        if request_ids.include?(decision[:request_id])
+          applied_decisions << deep_dup(decision)
+        else
+          diagnostics << diagnostic(
+            "error",
+            "replay_rejected",
+            "review decision #{decision[:request_id]} does not match any current delegated child review request.",
+            review: {
+              request_id: decision[:request_id],
+              action: decision[:action],
+              reason: "request_not_found"
+            }
+          )
+        end
+      end
+
+      accepted_groups = select_projected_child_review_groups_accepted_for_apply(
+        groups,
+        family,
+        applied_decisions
+      )
+      accepted_request_ids = accepted_groups.map do |group|
+        review_request_id_for_projected_child_group(group)
+      end
+      requests = groups.reject do |group|
+        accepted_request_ids.include?(review_request_id_for_projected_child_group(group))
+      end.map do |group|
+        projected_child_group_review_request(group, family)
+      end
+
+      {
+        requests: requests,
+        accepted_groups: accepted_groups,
+        applied_decisions: applied_decisions,
+        diagnostics: diagnostics
+      }
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|

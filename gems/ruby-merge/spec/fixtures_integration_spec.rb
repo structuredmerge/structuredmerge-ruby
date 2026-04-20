@@ -135,5 +135,18 @@ RSpec.describe "Ruby::Merge" do
         )
       )
     ).to eq(json_ready(transport_fixture[:expected_accepted_groups]))
+
+    state_fixture = read_json(
+      fixtures_root.join("ruby", "slice-242-delegated-child-review-state", "yard-example-review-state.json")
+    )
+    expect(
+      json_ready(
+        Ast::Merge.review_projected_child_groups(
+          state_fixture[:groups],
+          state_fixture[:family],
+          state_fixture[:decisions]
+        )
+      )
+    ).to eq(json_ready(state_fixture[:expected_state]))
   end
 end
