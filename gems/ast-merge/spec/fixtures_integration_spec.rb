@@ -585,4 +585,33 @@ RSpec.describe Ast::Merge do
       expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
     end
   end
+
+  it "conforms to the canonical stable-suite planning and review fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-155-canonical-stable-suite-plans", "canonical-stable-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-156-canonical-stable-suite-report", "canonical-stable-suite-report.json")
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+
+    review_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-157-canonical-stable-suite-review-state", "canonical-stable-suite-review-state.json")
+    )
+    state = described_class.review_conformance_manifest(
+      review_fixture[:manifest],
+      review_fixture[:options],
+      &execute_from(review_fixture[:executions])
+    )
+    expect(json_ready(state)).to eq(json_ready(review_fixture[:expected_state]))
+  end
 end
