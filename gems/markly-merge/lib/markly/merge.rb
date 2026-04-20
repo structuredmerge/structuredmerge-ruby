@@ -69,6 +69,10 @@ module Markly
       Markdown::Merge.match_markdown_owners(template, destination)
     end
 
+    def markdown_embedded_families(analysis)
+      Markdown::Merge.markdown_embedded_families(analysis)
+    end
+
     def unsupported_feature_result(message)
       {
         ok: false,
@@ -84,6 +88,7 @@ module Markly
       :markdown_plan_context,
       :parse_markdown,
       :match_markdown_owners,
+      :markdown_embedded_families,
       :unsupported_feature_result
     )
   end

@@ -120,4 +120,16 @@ RSpec.describe Markdown::Merge do
       )
     end
   end
+
+  it "conforms to the slice-208 embedded-family fixture" do
+    fixture = read_json(fixtures_root.join("markdown", "slice-208-embedded-families", "code-fence-families.json"))
+
+    %w[kramdown kreuzberg-language-pack].each do |backend|
+      analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: backend)
+      expect(analysis[:ok]).to be(true)
+      expect(json_ready(markdown_merge.markdown_embedded_families(analysis[:analysis]))).to eq(
+        json_ready(fixture[:expected])
+      )
+    end
+  end
 end

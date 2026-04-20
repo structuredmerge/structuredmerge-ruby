@@ -95,6 +95,24 @@ module Markdown
       }
     end
 
+    def markdown_embedded_families(analysis)
+      analysis[:owners].filter_map do |owner|
+        next unless owner[:owner_kind] == "code_fence"
+        next if owner[:info_string].to_s.empty?
+
+        family = code_fence_family(owner[:info_string])
+        dialect = code_fence_dialect(owner[:info_string], family)
+        next unless family && dialect
+
+        {
+          path: owner[:path],
+          language: owner[:info_string],
+          family: family,
+          dialect: dialect
+        }
+      end
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -163,6 +181,32 @@ module Markdown
       owners
     end
 
+    def code_fence_family(info_string)
+      case info_string.to_s.downcase
+      when "ts", "typescript"
+        "typescript"
+      when "rust", "rs"
+        "rust"
+      when "go"
+        "go"
+      when "json", "jsonc"
+        "json"
+      when "yaml", "yml"
+        "yaml"
+      when "toml"
+        "toml"
+      end
+    end
+
+    def code_fence_dialect(info_string, family)
+      case family
+      when "typescript", "rust", "go", "yaml", "toml"
+        family
+      when "json"
+        info_string.to_s.downcase == "jsonc" ? "jsonc" : "json"
+      end
+    end
+
     def resolve_backend(backend)
       backend.to_s.empty? ? (TreeHaver.current_backend_id || "kramdown") : backend.to_s
     end
@@ -182,9 +226,12 @@ module Markdown
       :markdown_plan_context,
       :parse_markdown,
       :match_markdown_owners,
+      :markdown_embedded_families,
       :normalize_source,
       :slugify,
       :collect_markdown_owners,
+      :code_fence_family,
+      :code_fence_dialect,
       :resolve_backend,
       :unsupported_feature_result
     )

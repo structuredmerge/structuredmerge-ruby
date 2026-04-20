@@ -57,6 +57,15 @@ RSpec.describe Markly::Merge do
     )
   end
 
+  it "conforms to the slice-208 embedded-family fixture" do
+    fixture = read_json(fixtures_root.join("markdown", "slice-208-embedded-families", "code-fence-families.json"))
+    analysis = described_class.parse_markdown(fixture[:source], "markdown")
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(described_class.markdown_embedded_families(analysis[:analysis]))).to eq(
+      json_ready(fixture[:expected])
+    )
+  end
+
   it "conforms to the provider named-suite plan and manifest-report fixtures" do
     plans_fixture = read_json(
       fixtures_root.join(

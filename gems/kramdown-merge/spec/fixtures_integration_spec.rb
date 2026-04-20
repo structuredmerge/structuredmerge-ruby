@@ -71,6 +71,15 @@ RSpec.describe Kramdown::Merge do
     )
   end
 
+  it "conforms to the slice-208 embedded-family fixture" do
+    fixture = read_json(fixtures_root.join("markdown", "slice-208-embedded-families", "code-fence-families.json"))
+    analysis = described_class.parse_markdown(fixture[:source], "markdown")
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(described_class.markdown_embedded_families(analysis[:analysis]))).to eq(
+      json_ready(fixture[:expected])
+    )
+  end
+
   it "rejects unsupported provider backend overrides" do
     result = described_class.parse_markdown("# Title\n", "markdown", backend: "kreuzberg-language-pack")
     expect(result[:ok]).to be(false)
