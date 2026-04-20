@@ -225,6 +225,25 @@ module Ast
       }
     end
 
+    def delegated_child_apply_plan(state, family)
+      entries = state.fetch(:accepted_groups, []).filter_map do |group|
+        request_id = review_request_id_for_projected_child_group(group)
+        decision = state.fetch(:applied_decisions, []).find do |candidate|
+          candidate[:request_id] == request_id
+        end
+        next unless decision
+
+        {
+          request_id: request_id,
+          family: family,
+          delegated_group: deep_dup(group),
+          decision: deep_dup(decision)
+        }
+      end
+
+      { entries: entries }
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|

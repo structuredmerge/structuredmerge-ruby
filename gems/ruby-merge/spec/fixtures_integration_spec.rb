@@ -148,5 +148,17 @@ RSpec.describe "Ruby::Merge" do
         )
       )
     ).to eq(json_ready(state_fixture[:expected_state]))
+
+    apply_plan_fixture = read_json(
+      fixtures_root.join("ruby", "slice-245-delegated-child-apply-plan", "yard-example-apply-plan.json")
+    )
+    expect(
+      json_ready(
+        Ast::Merge.delegated_child_apply_plan(
+          apply_plan_fixture[:review_state],
+          apply_plan_fixture[:family]
+        )
+      )
+    ).to eq(json_ready(apply_plan_fixture[:expected_plan]))
   end
 end

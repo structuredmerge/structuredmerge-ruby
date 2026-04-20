@@ -629,6 +629,25 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_state]))
   end
 
+  it "conforms to the slice-243 delegated child apply-plan fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-243-delegated-child-apply-plan",
+        "delegated-child-apply-plan.json"
+      )
+    )
+
+    expect(
+      json_ready(
+        described_class.delegated_child_apply_plan(
+          fixture[:review_state],
+          fixture[:family]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_plan]))
+  end
+
   it "conforms to the widened source-family manifest and report fixtures" do
     source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
     source_report_fixture = diagnostics_fixture("manifest_backend_report")

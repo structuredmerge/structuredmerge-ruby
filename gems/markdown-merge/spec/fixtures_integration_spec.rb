@@ -248,4 +248,19 @@ RSpec.describe Markdown::Merge do
       )
     ).to eq(json_ready(fixture[:expected_state]))
   end
+
+  it "conforms to the slice-244 delegated child apply-plan fixture" do
+    fixture = read_json(
+      fixtures_root.join("markdown", "slice-244-delegated-child-apply-plan", "fenced-code-apply-plan.json")
+    )
+
+    expect(
+      json_ready(
+        Ast::Merge.delegated_child_apply_plan(
+          fixture[:review_state],
+          fixture[:family]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_plan]))
+  end
 end
