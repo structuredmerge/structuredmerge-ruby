@@ -14,29 +14,36 @@ RSpec.describe Kramdown::Merge do
   end
 
   it "exposes the Markdown family through the Kramdown provider backend" do
-    feature_fixture = read_json(
+    family_fixture = read_json(
       fixtures_root.join(
         "diagnostics",
         "slice-194-markdown-family-feature-profile",
         "markdown-feature-profile.json"
       )
     )
+    feature_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-204-markdown-provider-feature-profiles",
+        "ruby-markdown-provider-feature-profiles.json"
+      )
+    )
     plan_fixture = read_json(
       fixtures_root.join(
         "diagnostics",
-        "slice-196-markdown-family-plan-contexts",
-        "ruby-markdown-plan-contexts.json"
+        "slice-205-markdown-provider-plan-contexts",
+        "ruby-markdown-provider-plan-contexts.json"
       )
     )
 
-    expect(json_ready(described_class.markdown_feature_profile)).to eq(json_ready(feature_fixture[:feature_profile]))
+    expect(json_ready(described_class.markdown_feature_profile)).to eq(json_ready(family_fixture[:feature_profile]))
     expect(json_ready(described_class.available_markdown_backends.map(&:to_h))).to eq(
       json_ready([{ id: "kramdown", family: "native" }])
     )
     expect(json_ready(described_class.markdown_backend_feature_profile)).to eq(
-      json_ready({ family: "markdown", supported_dialects: ["markdown"], supported_policies: [], backend: "kramdown" })
+      json_ready(feature_fixture.dig(:providers, :kramdown, :feature_profile))
     )
-    expect(json_ready(described_class.markdown_plan_context)).to eq(json_ready(plan_fixture[:native]))
+    expect(json_ready(described_class.markdown_plan_context)).to eq(json_ready(plan_fixture.dig(:providers, :kramdown)))
   end
 
   it "conforms to the shared Markdown analysis and matching fixtures" do
