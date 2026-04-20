@@ -630,4 +630,37 @@ RSpec.describe Ast::Merge do
       expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
     end
   end
+
+  it "conforms to the canonical widened-suite fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-162-canonical-widened-suite-plans", "canonical-widened-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-163-canonical-widened-suite-report", "canonical-widened-suite-report.json")
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+
+    %w[
+      slice-164-canonical-widened-suite-review-state/canonical-widened-suite-review-state.json
+      slice-165-canonical-widened-suite-reviewed-default/canonical-widened-suite-reviewed-default.json
+      slice-166-canonical-widened-suite-replay-application/canonical-widened-suite-replay-application.json
+    ].each do |relative_path|
+      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      state = described_class.review_conformance_manifest(
+        fixture[:manifest],
+        fixture[:options],
+        &execute_from(fixture[:executions])
+      )
+      expect(json_ready(state)).to eq(json_ready(fixture[:expected_state]))
+    end
+  end
 end
