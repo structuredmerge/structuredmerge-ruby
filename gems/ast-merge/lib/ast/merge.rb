@@ -50,6 +50,59 @@ module Ast
       }
     end
 
+    def surface_owner_ref(kind:, address:)
+      {
+        kind: kind.to_s,
+        address: address
+      }
+    end
+
+    def surface_span(start_line:, end_line:)
+      {
+        start_line: start_line,
+        end_line: end_line
+      }
+    end
+
+    def discovered_surface(surface_kind:, effective_language:, address:, owner:, declared_language: nil,
+      parent_address: nil, span: nil, reconstruction_strategy:, metadata: nil)
+      surface = {
+        surface_kind: surface_kind.to_s,
+        effective_language: effective_language.to_s,
+        address: address,
+        owner: deep_dup(owner),
+        reconstruction_strategy: reconstruction_strategy.to_s
+      }
+      surface[:declared_language] = declared_language.to_s if declared_language
+      surface[:parent_address] = parent_address if parent_address
+      surface[:span] = deep_dup(span) if span
+      surface[:metadata] = deep_dup(metadata) if metadata
+      surface
+    end
+
+    def delegated_child_operation(operation_id:, parent_operation_id:, requested_strategy:, language_chain:, surface:)
+      {
+        operation_id: operation_id,
+        parent_operation_id: parent_operation_id,
+        requested_strategy: requested_strategy.to_s,
+        language_chain: deep_dup(language_chain),
+        surface: deep_dup(surface)
+      }
+    end
+
+    def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
+      delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
+      {
+        case_id: case_id,
+        parent_operation_id: parent_operation_id,
+        child_operation_id: child_operation_id,
+        surface_path: surface_path,
+        delegated_case_id: delegated_case_id,
+        delegated_apply_group: delegated_apply_group,
+        delegated_runtime_surface_path: delegated_runtime_surface_path
+      }
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|

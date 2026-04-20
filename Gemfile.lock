@@ -48,6 +48,20 @@ PATH
       markly (~> 0.9)
 
 PATH
+  remote: gems/prism-merge
+  specs:
+    prism-merge (0.1.0)
+      prism (~> 1.6)
+      ruby-merge (= 0.1.0)
+
+PATH
+  remote: gems/ruby-merge
+  specs:
+    ruby-merge (0.1.0)
+      ast-merge (= 0.1.0)
+      tree_haver (= 0.1.0)
+
+PATH
   remote: gems/rust-merge
   specs:
     rust-merge (0.1.0)
@@ -102,6 +116,7 @@ GEM
       rexml (>= 3.4.4)
     markly (0.16.0)
     parslet (2.0.0)
+    prism (1.9.0)
     racc (1.8.1)
     rake (13.4.2)
     rexml (3.4.4)
@@ -136,8 +151,10 @@ DEPENDENCIES
   kramdown-merge!
   markdown-merge!
   markly-merge!
+  prism-merge!
   rake
   rspec
+  ruby-merge!
   rust-merge!
   text-merge!
   toml-merge!
@@ -159,6 +176,8 @@ CHECKSUMS
   markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
   markly-merge (0.0.0)
   parslet (2.0.0) sha256=d45130695d39b43d7e6a91f4d2ec66b388a8d822bae38de9b4de9a5fbde1f606
+  prism (1.9.0)
+  prism-merge (0.1.0)
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
@@ -167,6 +186,7 @@ CHECKSUMS
   rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
   rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
   rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
+  ruby-merge (0.1.0)
   rust-merge (0.1.0)
   text-merge (0.1.0)
   toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9

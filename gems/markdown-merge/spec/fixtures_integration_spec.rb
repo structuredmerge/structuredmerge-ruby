@@ -132,4 +132,31 @@ RSpec.describe Markdown::Merge do
       )
     end
   end
+
+  it "conforms to the slice-212 discovered-surfaces fixture" do
+    fixture = read_json(fixtures_root.join("markdown", "slice-212-discovered-surfaces", "fenced-code-surfaces.json"))
+
+    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kramdown")
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(markdown_merge.markdown_discovered_surfaces(analysis[:analysis]))).to eq(
+      json_ready(fixture[:expected])
+    )
+  end
+
+  it "conforms to the slice-213 delegated child-operations fixture" do
+    fixture = read_json(
+      fixtures_root.join("markdown", "slice-213-delegated-child-operations", "fenced-code-child-operations.json")
+    )
+
+    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kramdown")
+    expect(analysis[:ok]).to be(true)
+    expect(
+      json_ready(
+        markdown_merge.markdown_delegated_child_operations(
+          analysis[:analysis],
+          parent_operation_id: fixture[:parent_operation_id]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected]))
+  end
 end

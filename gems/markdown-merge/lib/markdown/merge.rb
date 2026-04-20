@@ -113,6 +113,37 @@ module Markdown
       end
     end
 
+    def markdown_discovered_surfaces(analysis)
+      markdown_embedded_families(analysis).map do |candidate|
+        Ast::Merge.discovered_surface(
+          surface_kind: "markdown_fenced_code_block",
+          declared_language: candidate[:language],
+          effective_language: candidate[:dialect],
+          address: "document[0] > fenced_code_block[#{candidate[:path]}]",
+          parent_address: "document[0]",
+          owner: Ast::Merge.surface_owner_ref(kind: "structural_owner", address: candidate[:path]),
+          reconstruction_strategy: "portable_write",
+          metadata: {
+            family: candidate[:family],
+            dialect: candidate[:dialect],
+            path: candidate[:path]
+          }
+        )
+      end
+    end
+
+    def markdown_delegated_child_operations(analysis, parent_operation_id: "markdown-document-0")
+      markdown_discovered_surfaces(analysis).each_with_index.map do |surface, index|
+        Ast::Merge.delegated_child_operation(
+          operation_id: "markdown-fence-#{index}",
+          parent_operation_id: parent_operation_id,
+          requested_strategy: "delegate_child_surface",
+          language_chain: ["markdown", surface[:effective_language]],
+          surface: surface
+        )
+      end
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -227,6 +258,8 @@ module Markdown
       :parse_markdown,
       :match_markdown_owners,
       :markdown_embedded_families,
+      :markdown_discovered_surfaces,
+      :markdown_delegated_child_operations,
       :normalize_source,
       :slugify,
       :collect_markdown_owners,

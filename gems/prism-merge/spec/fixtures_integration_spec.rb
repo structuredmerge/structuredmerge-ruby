@@ -1,0 +1,103 @@
+# frozen_string_literal: true
+
+require_relative "spec_helper"
+
+PRISM_MERGE = ::Prism::Merge
+
+RSpec.describe "Prism::Merge" do
+  def fixtures_root
+    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+  end
+
+  def read_json(path)
+    Ast::Merge.normalize_value(JSON.parse(path.read))
+  end
+
+  def json_ready(value)
+    Ast::Merge.json_ready(value)
+  end
+
+  it "exposes the Ruby family through the Prism provider backend" do
+    family_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-214-ruby-family-feature-profile", "ruby-feature-profile.json")
+    )
+    feature_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-222-ruby-provider-feature-profiles", "ruby-provider-feature-profiles.json")
+    )
+    plan_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-223-ruby-provider-plan-contexts", "ruby-provider-plan-contexts.json")
+    )
+
+    expect(json_ready(PRISM_MERGE.ruby_feature_profile)).to eq(json_ready(family_fixture[:feature_profile]))
+    expect(json_ready(PRISM_MERGE.available_ruby_backends.map(&:to_h))).to eq(
+      json_ready([{ id: "prism", family: "native" }])
+    )
+    expect(json_ready(PRISM_MERGE.ruby_backend_feature_profile)).to eq(
+      json_ready(feature_fixture.dig(:providers, :prism, :feature_profile))
+    )
+    expect(json_ready(PRISM_MERGE.ruby_plan_context)).to eq(json_ready(plan_fixture.dig(:providers, :prism)))
+  end
+
+  it "conforms to the shared Ruby family fixtures" do
+    analysis_fixture = read_json(fixtures_root.join("ruby", "slice-218-analysis", "module-owners.json"))
+    matching_fixture = read_json(fixtures_root.join("ruby", "slice-219-matching", "path-equality.json"))
+    surfaces_fixture = read_json(
+      fixtures_root.join("ruby", "slice-220-discovered-surfaces", "doc-comment-surfaces.json")
+    )
+    child_fixture = read_json(
+      fixtures_root.join("ruby", "slice-221-delegated-child-operations", "yard-example-child-operations.json")
+    )
+
+    analysis = PRISM_MERGE.parse_ruby(analysis_fixture[:source], analysis_fixture[:dialect])
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(analysis.dig(:analysis, :owners))).to eq(json_ready(analysis_fixture.dig(:expected, :owners)))
+
+    template = PRISM_MERGE.parse_ruby(matching_fixture[:template], matching_fixture[:dialect])
+    destination = PRISM_MERGE.parse_ruby(matching_fixture[:destination], matching_fixture[:dialect])
+    result = PRISM_MERGE.match_ruby_owners(template[:analysis], destination[:analysis])
+    expect(json_ready(result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
+      json_ready(matching_fixture.dig(:expected, :matched))
+    )
+
+    surfaces_analysis = PRISM_MERGE.parse_ruby(surfaces_fixture[:source], "ruby")
+    expect(json_ready(PRISM_MERGE.ruby_discovered_surfaces(surfaces_analysis[:analysis]))).to eq(
+      json_ready(surfaces_fixture[:expected])
+    )
+
+    child_analysis = PRISM_MERGE.parse_ruby(child_fixture[:source], "ruby")
+    expect(
+      json_ready(
+        PRISM_MERGE.ruby_delegated_child_operations(
+          child_analysis[:analysis],
+          parent_operation_id: child_fixture[:parent_operation_id]
+        )
+      )
+    ).to eq(json_ready(child_fixture[:expected]))
+  end
+
+  it "conforms to the provider named-suite plan and manifest-report fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-224-ruby-provider-named-suite-plans", "ruby-provider-named-suite-plans.json")
+    )
+    report_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-225-ruby-provider-manifest-report", "ruby-provider-manifest-report.json")
+    )
+
+    contexts = plans_fixture.dig(:contexts, :prism)
+    expect(json_ready(Ast::Merge.plan_named_conformance_suites(plans_fixture[:manifest], contexts))).to eq(
+      json_ready(plans_fixture.dig(:expected_entries, :prism))
+    )
+
+    executions = report_fixture[:executions]
+    entries = Ast::Merge.report_planned_named_conformance_suites(
+      Ast::Merge.plan_named_conformance_suites(report_fixture[:manifest], report_fixture.dig(:options, :prism, :contexts))
+    ) do |run|
+      key = "#{run[:ref][:family]}:#{run[:ref][:role]}:#{run[:ref][:case]}"
+      executions[key.to_sym] || executions[key] || { outcome: "failed", messages: ["missing execution"] }
+    end
+
+    expect(json_ready(Ast::Merge.report_named_conformance_suite_envelope(entries))).to eq(
+      json_ready(report_fixture.dig(:expected_reports, :prism))
+    )
+  end
+end

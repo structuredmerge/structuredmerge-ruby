@@ -348,6 +348,9 @@ RSpec.describe Ast::Merge do
     explicit_bundle_fixture = diagnostics_fixture("explicit_review_replay_bundle_application")
     missing_context_fixture = diagnostics_fixture("explicit_review_decision_missing_context")
     family_mismatch_fixture = diagnostics_fixture("explicit_review_decision_family_mismatch")
+    surface_fixture = diagnostics_fixture("surface_ownership")
+    delegated_operation_fixture = diagnostics_fixture("delegated_child_operation")
+    projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
       review_state_fixture[:manifest],
@@ -463,6 +466,63 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(mismatch_diagnostics.first)).to eq(json_ready(family_mismatch_fixture[:expected_diagnostic]))
     expect(json_ready(mismatch_requests.first)).to eq(json_ready(family_mismatch_fixture[:expected_request]))
+
+    surface = described_class.discovered_surface(
+      surface_kind: surface_fixture.dig(:surface, :surface_kind),
+      declared_language: surface_fixture.dig(:surface, :declared_language),
+      effective_language: surface_fixture.dig(:surface, :effective_language),
+      address: surface_fixture.dig(:surface, :address),
+      parent_address: surface_fixture.dig(:surface, :parent_address),
+      span: described_class.surface_span(
+        start_line: surface_fixture.dig(:surface, :span, :start_line),
+        end_line: surface_fixture.dig(:surface, :span, :end_line)
+      ),
+      owner: described_class.surface_owner_ref(
+        kind: surface_fixture.dig(:surface, :owner, :kind),
+        address: surface_fixture.dig(:surface, :owner, :address)
+      ),
+      reconstruction_strategy: surface_fixture.dig(:surface, :reconstruction_strategy),
+      metadata: surface_fixture.dig(:surface, :metadata)
+    )
+    expect(json_ready(surface)).to eq(json_ready(surface_fixture[:surface]))
+
+    delegated_operation = described_class.delegated_child_operation(
+      operation_id: delegated_operation_fixture.dig(:operation, :operation_id),
+      parent_operation_id: delegated_operation_fixture.dig(:operation, :parent_operation_id),
+      requested_strategy: delegated_operation_fixture.dig(:operation, :requested_strategy),
+      language_chain: delegated_operation_fixture.dig(:operation, :language_chain),
+      surface: described_class.discovered_surface(
+        surface_kind: delegated_operation_fixture.dig(:operation, :surface, :surface_kind),
+        declared_language: delegated_operation_fixture.dig(:operation, :surface, :declared_language),
+        effective_language: delegated_operation_fixture.dig(:operation, :surface, :effective_language),
+        address: delegated_operation_fixture.dig(:operation, :surface, :address),
+        parent_address: delegated_operation_fixture.dig(:operation, :surface, :parent_address),
+        span: described_class.surface_span(
+          start_line: delegated_operation_fixture.dig(:operation, :surface, :span, :start_line),
+          end_line: delegated_operation_fixture.dig(:operation, :surface, :span, :end_line)
+        ),
+        owner: described_class.surface_owner_ref(
+          kind: delegated_operation_fixture.dig(:operation, :surface, :owner, :kind),
+          address: delegated_operation_fixture.dig(:operation, :surface, :owner, :address)
+        ),
+        reconstruction_strategy: delegated_operation_fixture.dig(:operation, :surface, :reconstruction_strategy),
+        metadata: delegated_operation_fixture.dig(:operation, :surface, :metadata)
+      )
+    )
+    expect(json_ready(delegated_operation)).to eq(json_ready(delegated_operation_fixture[:operation]))
+
+    projected_cases = projected_cases_fixture[:cases].map do |entry|
+      described_class.projected_child_review_case(
+        case_id: entry[:case_id],
+        parent_operation_id: entry[:parent_operation_id],
+        child_operation_id: entry[:child_operation_id],
+        surface_path: entry[:surface_path],
+        delegated_case_id: entry[:delegated_case_id],
+        delegated_apply_group: entry[:delegated_apply_group],
+        delegated_runtime_surface_path: entry[:delegated_runtime_surface_path]
+      )
+    end
+    expect(json_ready(projected_cases)).to eq(json_ready(projected_cases_fixture[:cases]))
   end
 
   it "conforms to the widened source-family manifest and report fixtures" do
