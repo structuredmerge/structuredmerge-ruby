@@ -139,4 +139,17 @@ RSpec.describe TreeHaver do
 
     expect(described_class.current_backend_id).to be_nil
   end
+
+  it "provides PEG framework parsing helpers" do
+    require "toml"
+    require "toml-rb"
+
+    citrus = described_class.parse_with_citrus("title = \"x\"\n", grammar_module: TomlRB::Document)
+    expect(citrus[:ok]).to be(true)
+    expect(json_ready(citrus[:backend_ref].to_h)).to eq(json_ready({ id: "citrus", family: "peg" }))
+
+    parslet = described_class.parse_with_parslet("title = \"x\"\n", grammar_class: TOML::Parslet)
+    expect(parslet[:ok]).to be(true)
+    expect(json_ready(parslet[:backend_ref].to_h)).to eq(json_ready({ id: "parslet", family: "peg" }))
+  end
 end

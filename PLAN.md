@@ -113,3 +113,7 @@ before deeper Ruby-specific extensions are considered.
   type-shaped today.
 - Use Bundler path gems for monorepo isolation, and prefer `nomono` when
   sibling workspace overrides become necessary outside the monorepo itself.
+- Keep `tree-haver` focused on reusable parser frameworks such as tree-sitter
+  and PEG-style parsers.
+- Keep one-trick parser integrations inside merge-family gems while still
+  emitting `tree-haver`-shaped contracts.

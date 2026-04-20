@@ -44,7 +44,11 @@ module Toml
     def parse_toml(source, dialect, backend: nil)
       return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
 
-      parsed = load_toml_document(source, resolve_backend(backend))
+      resolved_backend = resolve_backend(backend)
+      syntax_result = parse_toml_syntax(source, resolved_backend)
+      return { ok: false, diagnostics: syntax_result[:diagnostics] } unless syntax_result[:ok]
+
+      parsed = load_toml_document(source, resolved_backend)
       validated = validate_toml_node(parsed, "")
       return { ok: false, diagnostics: [validated[:diagnostic]] } unless validated[:ok]
       return parse_error_result("TOML documents must parse to a table root.") unless validated[:value].is_a?(Hash)
@@ -134,6 +138,18 @@ module Toml
       end
     end
     private_class_method :load_toml_document
+
+    def parse_toml_syntax(source, backend)
+      case backend.to_s
+      when "citrus"
+        TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)
+      when "parslet"
+        TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)
+      else
+        { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: "Unsupported TOML backend #{backend}." }] }
+      end
+    end
+    private_class_method :parse_toml_syntax
 
     def normalize_toml_value(value)
       case value

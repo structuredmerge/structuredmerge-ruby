@@ -33,4 +33,44 @@ module TreeHaver
       supported_policies: []
     )
   end
+
+  def parse_with_citrus(source, grammar_module:)
+    raw = grammar_module.parse(source)
+    if raw&.respond_to?(:captures)
+      {
+        ok: true,
+        backend_ref: CITRUS_BACKEND,
+        raw: raw,
+        diagnostics: []
+      }
+    else
+      {
+        ok: false,
+        backend_ref: CITRUS_BACKEND,
+        diagnostics: [{ severity: "error", category: "parse_error", message: "Citrus parse failed." }]
+      }
+    end
+  rescue StandardError => e
+    {
+      ok: false,
+      backend_ref: CITRUS_BACKEND,
+      diagnostics: [{ severity: "error", category: "parse_error", message: e.message }]
+    }
+  end
+
+  def parse_with_parslet(source, grammar_class:)
+    raw = grammar_class.new.parse(source)
+    {
+      ok: true,
+      backend_ref: PARSLET_BACKEND,
+      raw: raw,
+      diagnostics: []
+    }
+  rescue StandardError => e
+    {
+      ok: false,
+      backend_ref: PARSLET_BACKEND,
+      diagnostics: [{ severity: "error", category: "parse_error", message: e.message }]
+    }
+  end
 end
