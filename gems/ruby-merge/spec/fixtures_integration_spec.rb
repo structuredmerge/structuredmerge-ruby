@@ -93,5 +93,17 @@ RSpec.describe "Ruby::Merge" do
     expect(json_ready(Ast::Merge.group_projected_child_review_cases(grouped_fixture[:cases]))).to eq(
       json_ready(grouped_fixture[:expected_groups])
     )
+
+    progress_fixture = read_json(
+      fixtures_root.join("ruby", "slice-232-projected-child-review-group-progress", "yard-example-review-progress.json")
+    )
+    expect(
+      json_ready(
+        Ast::Merge.summarize_projected_child_review_group_progress(
+          progress_fixture[:groups],
+          progress_fixture[:resolved_case_ids]
+        )
+      )
+    ).to eq(json_ready(progress_fixture[:expected_progress]))
   end
 end

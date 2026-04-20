@@ -127,6 +127,23 @@ module Ast
       groups
     end
 
+    def summarize_projected_child_review_group_progress(groups, resolved_case_ids)
+      groups.map do |group|
+        resolved = group[:case_ids].select { |case_id| resolved_case_ids.include?(case_id) }
+        pending = group[:case_ids].reject { |case_id| resolved_case_ids.include?(case_id) }
+
+        {
+          delegated_apply_group: group[:delegated_apply_group],
+          parent_operation_id: group[:parent_operation_id],
+          child_operation_id: group[:child_operation_id],
+          delegated_runtime_surface_path: group[:delegated_runtime_surface_path],
+          resolved_case_ids: resolved,
+          pending_case_ids: pending,
+          complete: pending.empty?
+        }
+      end
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_names(manifest).filter_map do |suite_name|
