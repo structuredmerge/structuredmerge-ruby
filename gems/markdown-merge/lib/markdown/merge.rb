@@ -25,7 +25,10 @@ module Markdown
       resolved_backend = resolve_backend(backend)
       return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.") unless BACKEND_REFERENCES.key?(resolved_backend)
 
-      markdown_feature_profile.merge(backend: resolved_backend)
+      markdown_feature_profile.merge(
+        backend: resolved_backend,
+        backend_ref: BACKEND_REFERENCES.fetch(resolved_backend).to_h
+      )
     end
 
     def markdown_plan_context(backend: nil)

@@ -35,7 +35,11 @@ module Ruby
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
 
-      ruby_feature_profile.merge(backend: requested, supports_dialects: true)
+      ruby_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h,
+        supports_dialects: true
+      )
     end
 
     def ruby_plan_context(backend: nil)
