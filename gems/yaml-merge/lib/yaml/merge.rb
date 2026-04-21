@@ -11,11 +11,7 @@ module Yaml
       surface: "array",
       name: "destination_wins_array"
     }.freeze
-    PSYCH_BACKEND = TreeHaver::BackendReference.new(id: "psych", family: "native").freeze
-    BACKEND_REFERENCES = {
-      "psych" => PSYCH_BACKEND,
-      "kreuzberg-language-pack" => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
-    }.freeze
+    BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
 
     module_function
 
@@ -28,17 +24,16 @@ module Yaml
     end
 
     def available_yaml_backends
-      BACKEND_REFERENCES.values
+      [BACKEND_REFERENCE]
     end
 
     def yaml_backend_feature_profile(backend: nil)
       resolved_backend = resolve_backend(backend)
-      backend_ref = backend_reference_for(resolved_backend)
-      return unsupported_feature_result("Unsupported YAML backend #{resolved_backend}.") unless backend_ref
+      return unsupported_feature_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
 
       yaml_feature_profile.merge(
-        backend: backend_ref.id,
-        backend_ref: backend_ref.to_h
+        backend: BACKEND_REFERENCE.id,
+        backend_ref: BACKEND_REFERENCE.to_h
       )
     end
 
@@ -50,24 +45,35 @@ module Yaml
         family_profile: yaml_feature_profile,
         feature_profile: {
           backend: profile[:backend],
-          supports_dialects: profile[:backend] == "psych",
+          supports_dialects: false,
           supported_policies: profile[:supported_policies]
         }
       }
     end
 
     def parse_yaml(source, dialect, backend: nil)
-      return unsupported_feature_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
+      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
 
       resolved_backend = resolve_backend(backend)
-      syntax_result = parse_yaml_syntax(source, resolved_backend)
-      return { ok: false, diagnostics: syntax_result[:diagnostics] } unless syntax_result[:ok]
+      return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
 
-      parsed = load_yaml_document(source, resolved_backend)
+      syntax_result = TreeHaver.parse_with_language_pack(
+        TreeHaver::ParserRequest.new(source: source, language: "yaml")
+      )
+      return { ok: false, diagnostics: syntax_result[:diagnostics], policies: [] } unless syntax_result[:ok]
+
+      parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)
+      analyze_yaml_document(parsed, dialect)
+    rescue StandardError => e
+      parse_error_result(e.message)
+    end
+
+    def analyze_yaml_document(parsed, dialect)
+      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
       return parse_error_result("YAML documents must parse to a mapping root.") unless parsed.is_a?(Hash)
 
       validated = validate_yaml_node(parsed, "")
-      return { ok: false, diagnostics: [validated[:diagnostic]] } unless validated[:ok]
+      return { ok: false, diagnostics: [validated[:diagnostic]], policies: [] } unless validated[:ok]
 
       {
         ok: true,
@@ -81,8 +87,6 @@ module Yaml
         },
         policies: []
       }
-    rescue StandardError => e
-      parse_error_result(e.message)
     end
 
     def match_yaml_owners(template, destination)
@@ -100,10 +104,18 @@ module Yaml
 
     def merge_yaml(template_source, destination_source, dialect, backend: nil)
       resolved_backend = resolve_backend(backend)
-      template = parse_yaml(template_source, dialect, backend: resolved_backend)
+      return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
+
+      merge_yaml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
+        parse_yaml(source, parse_dialect, backend: resolved_backend)
+      end
+    end
+
+    def merge_yaml_with_parser(template_source, destination_source, dialect)
+      template = yield(template_source, dialect)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
-      destination = parse_yaml(destination_source, dialect, backend: resolved_backend)
+      destination = yield(destination_source, dialect)
       unless destination[:ok]
         return {
           ok: false,
@@ -114,15 +126,16 @@ module Yaml
         }
       end
 
+      template_document = YAML.safe_load(template.dig(:analysis, :normalized_source), permitted_classes: [], aliases: false)
+      destination_document = YAML.safe_load(destination.dig(:analysis, :normalized_source), permitted_classes: [], aliases: false)
+      unless template_document.is_a?(Hash) && destination_document.is_a?(Hash)
+        return parse_error_merge_result("YAML documents must parse to a mapping root.")
+      end
+
       {
         ok: true,
         diagnostics: [],
-        output: canonical_yaml(
-          merge_yaml_mappings(
-            load_yaml_document(template.dig(:analysis, :normalized_source), resolved_backend),
-            load_yaml_document(destination.dig(:analysis, :normalized_source), resolved_backend)
-          )
-        ),
+        output: canonical_yaml(merge_yaml_mappings(template_document, destination_document)),
         policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     rescue StandardError => e
@@ -133,40 +146,10 @@ module Yaml
       }
     end
 
-    def backend_reference_for(name)
-      BACKEND_REFERENCES[name.to_s]
-    end
-    private_class_method :backend_reference_for
-
     def resolve_backend(backend)
-      backend.to_s.empty? ? (TreeHaver.current_backend_id || "psych") : backend.to_s
+      backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
     end
     private_class_method :resolve_backend
-
-    def parse_yaml_syntax(source, backend)
-      case backend.to_s
-      when "psych"
-        load_yaml_document(source, backend)
-        { ok: true, diagnostics: [] }
-      when "kreuzberg-language-pack"
-        TreeHaver.parse_with_language_pack(
-          TreeHaver::ParserRequest.new(source: source, language: "yaml")
-        )
-      else
-        { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: "Unsupported YAML backend #{backend}." }] }
-      end
-    end
-    private_class_method :parse_yaml_syntax
-
-    def load_yaml_document(source, backend)
-      case backend.to_s
-      when "psych", "kreuzberg-language-pack"
-        Psych.safe_load(source, permitted_classes: [], aliases: false)
-      else
-        raise ArgumentError, "Unsupported YAML backend #{backend}."
-      end
-    end
-    private_class_method :load_yaml_document
 
     def validate_yaml_node(value, path)
       if scalar?(value)
@@ -267,9 +250,24 @@ module Yaml
     private_class_method :merge_yaml_mappings
 
     def parse_error_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "parse_error", message: message }] }
+      { ok: false, diagnostics: [{ severity: "error", category: "parse_error", message: message }], policies: [] }
     end
     private_class_method :parse_error_result
+
+    def unsupported_feature_parse_result(message)
+      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }], policies: [] }
+    end
+    private_class_method :unsupported_feature_parse_result
+
+    def unsupported_feature_merge_result(message)
+      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }], policies: [] }
+    end
+    private_class_method :unsupported_feature_merge_result
+
+    def parse_error_merge_result(message)
+      { ok: false, diagnostics: [{ severity: "error", category: "parse_error", message: message }], policies: [] }
+    end
+    private_class_method :parse_error_merge_result
 
     def unsupported_feature_result(message)
       { ok: false, diagnostic: { severity: "error", category: "unsupported_feature", message: message } }

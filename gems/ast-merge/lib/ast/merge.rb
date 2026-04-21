@@ -276,7 +276,7 @@ module Ast
 
       {
         surface: "conformance_manifest",
-        families: families,
+        families: families.sort,
         require_explicit_contexts: options.fetch(:require_explicit_contexts, false)
       }
     end
