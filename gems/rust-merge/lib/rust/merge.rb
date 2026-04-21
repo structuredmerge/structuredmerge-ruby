@@ -5,12 +5,42 @@ require "tree_haver"
 module Rust
   module Merge
     PACKAGE_NAME = "rust-merge"
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
 
     module_function
 
     def rust_feature_profile
       { family: "rust", supported_dialects: ["rust"], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
+    end
+
+    def available_rust_backends
+      [TREE_SITTER_BACKEND]
+    end
+
+    def rust_backend_feature_profile(backend: nil)
+      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
+      return unsupported_feature_result("Unsupported Rust backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
+
+      rust_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h,
+        supports_dialects: true
+      )
+    end
+
+    def rust_plan_context(backend: nil)
+      profile = rust_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: rust_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: true,
+          supported_policies: profile[:supported_policies]
+        }
+      }
     end
 
     def parse_rust(source, dialect)

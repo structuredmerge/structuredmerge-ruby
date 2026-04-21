@@ -24,5 +24,13 @@ RSpec.describe Rust::Merge do
     merge = described_class.merge_rust(merge_fixture[:template], merge_fixture[:destination], "rust")
     expect(merge[:ok]).to eq(merge_fixture.dig(:expected, :ok))
     expect(merge[:output]).to eq(merge_fixture.dig(:expected, :output))
+
+    backend_profiles = read_json(fixtures_root.join("diagnostics", "slice-122-source-family-backend-feature-profiles", "rust-backend-feature-profiles.json"))
+    expect(json_ready(described_class.rust_backend_feature_profile)).to eq(
+      json_ready(backend_profiles[:tree_sitter].merge(family: "rust", supported_dialects: ["rust"]))
+    )
+
+    plan_contexts = read_json(fixtures_root.join("diagnostics", "slice-123-source-family-plan-contexts", "rust-plan-contexts.json"))
+    expect(json_ready(described_class.rust_plan_context)).to eq(json_ready(plan_contexts[:tree_sitter]))
   end
 end
