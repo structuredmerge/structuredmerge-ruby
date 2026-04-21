@@ -32,5 +32,33 @@ RSpec.describe Rust::Merge do
 
     plan_contexts = read_json(fixtures_root.join("diagnostics", "slice-123-source-family-plan-contexts", "rust-plan-contexts.json"))
     expect(json_ready(described_class.rust_plan_context)).to eq(json_ready(plan_contexts[:tree_sitter]))
+
+    source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
+    expect(Ast::Merge.conformance_family_feature_profile_path(source_manifest, "rust")).to eq(
+      %w[diagnostics slice-105-rust-family-feature-profile rust-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(source_manifest, "rust", "analysis")).to eq(
+      %w[rust slice-106-analysis module-owners.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(source_manifest, "rust", "matching")).to eq(
+      %w[rust slice-107-matching path-equality.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(source_manifest, "rust", "merge")).to eq(
+      %w[rust slice-108-merge module-merge.json]
+    )
+
+    canonical_manifest = read_json(fixtures_root.join("conformance", "slice-24-manifest", "family-feature-profiles.json"))
+    expect(Ast::Merge.conformance_family_feature_profile_path(canonical_manifest, "rust")).to eq(
+      %w[diagnostics slice-105-rust-family-feature-profile rust-feature-profile.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(canonical_manifest, "rust", "analysis")).to eq(
+      %w[rust slice-106-analysis module-owners.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(canonical_manifest, "rust", "matching")).to eq(
+      %w[rust slice-107-matching path-equality.json]
+    )
+    expect(Ast::Merge.conformance_fixture_path(canonical_manifest, "rust", "merge")).to eq(
+      %w[rust slice-108-merge module-merge.json]
+    )
   end
 end
