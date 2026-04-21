@@ -67,6 +67,20 @@ RSpec.describe Ast::Merge do
     expect(json_ready(policies.reverse)).to eq(json_ready(reporting_fixture[:merge_policies]))
   end
 
+  it "conforms to the slice-22 shared family feature profile fixture" do
+    fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-22-shared-family-feature-profile", "family-feature-profile.json")
+    )
+
+    feature_profile = {
+      family: "example",
+      supported_dialects: %w[alpha beta],
+      supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+    }
+
+    expect(json_ready(feature_profile)).to eq(json_ready(fixture[:feature_profile]))
+  end
+
   it "resolves canonical manifest paths, including widened source-family entries" do
     expect(described_class.conformance_family_feature_profile_path(manifest, "json")).to eq(
       %w[diagnostics slice-21-family-feature-profile json-feature-profile.json]
@@ -186,6 +200,7 @@ RSpec.describe Ast::Merge do
   it "conforms to named suite planning and reporting fixtures" do
     suite_definitions_fixture = diagnostics_fixture("suite_definitions")
     named_suite_report_fixture = diagnostics_fixture("named_suite_report")
+    named_suite_runner_fixture = diagnostics_fixture("named_suite_runner")
     suite_names_fixture = diagnostics_fixture("suite_names")
     named_suite_entry_fixture = diagnostics_fixture("named_suite_entry")
     named_suite_plan_entry_fixture = diagnostics_fixture("named_suite_plan_entry")
@@ -216,6 +231,19 @@ RSpec.describe Ast::Merge do
       &execute_from(named_suite_entry_fixture[:executions])
     )
     expect(json_ready(named_entry)).to eq(json_ready(named_suite_entry_fixture[:expected_entry]))
+
+    named_runner = described_class.run_named_conformance_suite(
+      manifest,
+      named_suite_runner_fixture[:suite_selector],
+      named_suite_runner_fixture[:family_profile],
+      {
+        backend: "kreuzberg-language-pack",
+        supports_dialects: false,
+        supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+      },
+      &execute_from(named_suite_runner_fixture[:executions])
+    )
+    expect(json_ready(named_runner)).to eq(json_ready(named_suite_runner_fixture[:expected_results]))
 
     named_plan_entry = described_class.plan_named_conformance_suite_entry(
       manifest,
