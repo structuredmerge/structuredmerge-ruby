@@ -75,6 +75,14 @@ RSpec.describe Markly::Merge do
     )
   end
 
+  it "rejects unsupported provider backend overrides" do
+    result = described_class.parse_markdown("# Title\n", "markdown", backend: "kreuzberg-language-pack")
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to eq(
+      [{ severity: "error", category: "unsupported_feature", message: "Unsupported Markdown backend kreuzberg-language-pack." }]
+    )
+  end
+
   it "conforms to the provider named-suite plan and manifest-report fixtures" do
     plans_fixture = read_json(
       fixtures_root.join(

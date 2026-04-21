@@ -109,4 +109,12 @@ RSpec.describe "Prism::Merge" do
       json_ready(report_fixture.dig(:expected_reports, :prism))
     )
   end
+
+  it "rejects unsupported provider backend overrides" do
+    result = PRISM_MERGE.parse_ruby("module Demo\nend\n", "ruby", backend: "kreuzberg-language-pack")
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to eq(
+      [{ severity: "error", category: "unsupported_feature", message: "Unsupported Ruby backend kreuzberg-language-pack." }]
+    )
+  end
 end
