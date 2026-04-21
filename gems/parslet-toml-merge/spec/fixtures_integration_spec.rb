@@ -50,6 +50,9 @@ RSpec.describe Parslet::Toml::Merge do
     expect(json_ready(described_class.available_toml_backends.map(&:to_h))).to eq(
       json_ready([{ id: "parslet", family: "peg" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("parslet")&.to_h)).to eq(
+      json_ready({ id: "parslet", family: "peg" })
+    )
     expect(json_ready(described_class.toml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :parslet, :feature_profile))
     )

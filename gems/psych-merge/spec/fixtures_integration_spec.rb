@@ -40,6 +40,9 @@ RSpec.describe Psych::Merge do
     expect(json_ready(::Psych::Merge.available_yaml_backends.map(&:to_h))).to eq(
       json_ready([{ id: "psych", family: "native" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("psych")&.to_h)).to eq(
+      json_ready({ id: "psych", family: "native" })
+    )
     expect(json_ready(::Psych::Merge.yaml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :psych, :feature_profile))
     )
