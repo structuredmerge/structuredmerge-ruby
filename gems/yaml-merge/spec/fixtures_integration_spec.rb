@@ -75,6 +75,9 @@ RSpec.describe Yaml::Merge do
     expect(json_ready(described_class.available_yaml_backends.map(&:to_h))).to eq(
       json_ready([{ id: "kreuzberg-language-pack", family: "tree-sitter" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("kreuzberg-language-pack")&.to_h)).to eq(
+      json_ready({ id: "kreuzberg-language-pack", family: "tree-sitter" })
+    )
     expect(json_ready(described_class.yaml_backend_feature_profile(backend: "kreuzberg-language-pack"))).to eq(
       json_ready(fixture[:tree_sitter])
     )

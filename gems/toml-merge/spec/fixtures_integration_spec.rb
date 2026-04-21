@@ -58,6 +58,9 @@ RSpec.describe Toml::Merge do
     expect(json_ready(described_class.available_toml_backends.map(&:to_h))).to eq(
       json_ready([{ id: "kreuzberg-language-pack", family: "tree-sitter" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("kreuzberg-language-pack")&.to_h)).to eq(
+      json_ready({ id: "kreuzberg-language-pack", family: "tree-sitter" })
+    )
   end
 
   it "conforms to the slice-135 TOML backend feature profile fixtures" do

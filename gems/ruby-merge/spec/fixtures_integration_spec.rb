@@ -47,6 +47,9 @@ RSpec.describe "Ruby::Merge" do
     expect(json_ready(RUBY_MERGE.available_ruby_backends.map(&:to_h))).to eq(
       json_ready([{ id: "kreuzberg-language-pack", family: "tree-sitter" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("kreuzberg-language-pack")&.to_h)).to eq(
+      json_ready({ id: "kreuzberg-language-pack", family: "tree-sitter" })
+    )
     expect(json_ready(RUBY_MERGE.ruby_backend_feature_profile)).to eq(
       json_ready(backend_fixture[:tree_sitter].merge(family: "ruby", supported_dialects: ["ruby"]))
     )
