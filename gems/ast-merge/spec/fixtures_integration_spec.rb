@@ -731,6 +731,33 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(native_plans_fixture[:expected_entries]))
   end
 
+  it "conforms to the source-family backend-restricted plan and report fixtures" do
+    plans_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-129-source-family-backend-restricted-plans",
+        "source-backend-restricted-plans.json"
+      )
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    report_fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-130-source-family-backend-restricted-report",
+        "source-backend-restricted-report.json"
+      )
+    )
+    report = described_class.report_conformance_manifest(
+      report_fixture[:manifest],
+      report_fixture[:options],
+      &execute_from(report_fixture[:executions])
+    )
+    expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
+  end
+
   it "conforms to the TOML family suite-definition, named-suite plan, and manifest report fixtures" do
     suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-138-toml-family-suite-definitions", "toml-suite-definitions.json")
