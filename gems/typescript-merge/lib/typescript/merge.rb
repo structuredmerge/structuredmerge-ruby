@@ -1,19 +1,52 @@
 # frozen_string_literal: true
 
 require "tree_haver"
+require "ast/merge"
 
 module TypeScript
   module Merge
-    PACKAGE_NAME = "typescript-merge"
-    DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
+    extend self
 
-    module_function
+    PACKAGE_NAME = "typescript-merge"
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
+    DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
 
     def type_script_feature_profile
       { family: "typescript", supported_dialects: ["typescript"], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end
 
+    def available_type_script_backends
+      [TREE_SITTER_BACKEND]
+    end
+
+    def type_script_backend_feature_profile(backend: nil)
+      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
+      return unsupported_feature_result("Unsupported TypeScript backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
+
+      type_script_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h,
+        supports_dialects: true
+      )
+    end
+
+    def type_script_plan_context(backend: nil)
+      profile = type_script_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: type_script_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: true,
+          supported_policies: profile[:supported_policies]
+        }
+      }
+    end
+
     def parse_type_script(source, dialect)
+      requested = TREE_SITTER_BACKEND.id
+      return unsupported_feature_result("Unsupported TypeScript backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
       return analyze_type_script_module(source) if dialect == "typescript"
 
       { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: "Unsupported TypeScript dialect #{dialect}." }], policies: [] }
@@ -103,5 +136,10 @@ module TypeScript
       source[line_start...span.end_byte].strip
     end
     private_class_method :line_anchored_slice
+
+    def unsupported_feature_result(message)
+      Ast::Merge.unsupported_feature_result(message)
+    end
+    private_class_method :unsupported_feature_result
   end
 end
