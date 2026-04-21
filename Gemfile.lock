@@ -5,6 +5,13 @@ PATH
       tree_haver (= 0.1.0)
 
 PATH
+  remote: gems/citrus-toml-merge
+  specs:
+    citrus-toml-merge (0.1.0)
+      toml-merge (= 0.1.0)
+      toml-rb (~> 4.1)
+
+PATH
   remote: gems/commonmarker-merge
   specs:
     commonmarker-merge (0.0.0)
@@ -47,6 +54,13 @@ PATH
       markly (~> 0.9)
 
 PATH
+  remote: gems/parslet-toml-merge
+  specs:
+    parslet-toml-merge (0.1.0)
+      toml (~> 0.3)
+      toml-merge (= 0.1.0)
+
+PATH
   remote: gems/prism-merge
   specs:
     prism-merge (0.1.0)
@@ -79,8 +93,6 @@ PATH
   specs:
     toml-merge (0.1.0)
       ast-merge (= 0.1.0)
-      toml (~> 0.3)
-      toml-rb (~> 4.1)
       tree_haver (= 0.1.0)
 
 PATH
@@ -144,12 +156,14 @@ PLATFORMS
 
 DEPENDENCIES
   ast-merge!
+  citrus-toml-merge!
   commonmarker-merge!
   go-merge!
   json-merge!
   kramdown-merge!
   markdown-merge!
   markly-merge!
+  parslet-toml-merge!
   prism-merge!
   rake
   rspec
@@ -164,6 +178,7 @@ DEPENDENCIES
 CHECKSUMS
   ast-merge (0.1.0)
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
+  citrus-toml-merge (0.1.0)
   commonmarker (2.8.1-x86_64-linux) sha256=c8f2e903c6ee4e2c7e280aa8b49ef37c53202d388e3a2ee06dfdccc8c6fb634f
   commonmarker-merge (0.0.0)
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
@@ -175,7 +190,8 @@ CHECKSUMS
   markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
   markly-merge (0.0.0)
   parslet (2.0.0) sha256=d45130695d39b43d7e6a91f4d2ec66b388a8d822bae38de9b4de9a5fbde1f606
-  prism (1.9.0)
+  parslet-toml-merge (0.1.0)
+  prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
   prism-merge (0.1.0)
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701

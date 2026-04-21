@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors = ["Structured Merge Contributors"]
   spec.email = ["opensource@structuredmerge.dev"]
 
-  spec.summary = "Structured Merge TOML analysis and merge for Ruby"
-  spec.description = "Portable TOML analysis, owner matching, and merge behavior for Structured Merge."
+  spec.summary = "Structured Merge TOML substrate analysis and merge for Ruby"
+  spec.description = "Tree-sitter-backed TOML substrate behavior for the Structured Merge TOML family."
   spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
   spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
   spec.required_ruby_version = ">= 4.0.0"
@@ -24,7 +24,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "ast-merge", "= #{Toml::Merge::VERSION}"
-  spec.add_dependency "toml", "~> 0.3"
-  spec.add_dependency "toml-rb", "~> 4.1"
   spec.add_dependency "tree_haver", "= #{Toml::Merge::VERSION}"
 end

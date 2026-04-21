@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require "toml"
-require "toml-rb"
+require "json"
 require "tree_haver"
 
 module Toml
@@ -11,10 +10,8 @@ module Toml
       surface: "array",
       name: "destination_wins_array"
     }.freeze
-    BACKEND_REFERENCES = {
-      "citrus" => TreeHaver::CITRUS_BACKEND,
-      "parslet" => TreeHaver::PARSLET_BACKEND
-    }.freeze
+
+    class ParseError < StandardError; end
 
     module_function
 
@@ -26,19 +23,18 @@ module Toml
       }
     end
 
-    def toml_backend_feature_profile(backend: nil)
-      resolved_backend = resolve_backend(backend)
-      backend_ref = backend_reference_for(resolved_backend)
-      return unsupported_feature_result("Unsupported TOML backend #{resolved_backend}.") unless backend_ref
-
-      toml_feature_profile.merge(
-        backend: backend_ref.id,
-        backend_ref: backend_ref.to_h
-      )
+    def available_toml_backends
+      [TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND]
     end
 
-    def available_toml_backends
-      BACKEND_REFERENCES.values
+    def toml_backend_feature_profile(backend: nil)
+      resolved_backend = resolve_backend(backend)
+      return unsupported_feature_result("Unsupported TOML backend #{resolved_backend}.") unless resolved_backend == TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.id
+
+      toml_feature_profile.merge(
+        backend: TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.id,
+        backend_ref: TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.to_h
+      )
     end
 
     def toml_plan_context(backend: nil)
@@ -49,38 +45,44 @@ module Toml
         family_profile: toml_feature_profile,
         feature_profile: {
           backend: profile[:backend],
-          supports_dialects: profile[:backend] != "citrus" && profile[:backend] != "parslet" ? true : false,
+          supports_dialects: false,
           supported_policies: profile[:supported_policies]
         }
       }
     end
 
-    def parse_toml(source, dialect, backend: nil)
+    def analyze_toml_source(source, dialect)
       return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
 
-      resolved_backend = resolve_backend(backend)
-      syntax_result = parse_toml_syntax(source, resolved_backend)
-      return { ok: false, diagnostics: syntax_result[:diagnostics] } unless syntax_result[:ok]
-
-      parsed = load_toml_document(source, resolved_backend)
-      validated = validate_toml_node(parsed, "")
-      return { ok: false, diagnostics: [validated[:diagnostic]] } unless validated[:ok]
-      return parse_error_result("TOML documents must parse to a table root.") unless validated[:value].is_a?(Hash)
-
+      parsed = parse_toml_document(source)
       {
         ok: true,
         diagnostics: [],
         analysis: {
           kind: "toml",
           dialect: "toml",
-          normalized_source: canonical_toml(validated[:value]),
+          normalized_source: canonical_toml(parsed),
           root_kind: "table",
-          owners: collect_toml_owners(validated[:value])
+          owners: collect_toml_owners(parsed)
         },
         policies: []
       }
     rescue StandardError => e
       parse_error_result(e.message)
+    end
+
+    def parse_toml(source, dialect, backend: nil)
+      return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
+
+      resolved_backend = resolve_backend(backend)
+      return unsupported_feature_result("Unsupported TOML backend #{resolved_backend}.") unless resolved_backend == TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.id
+
+      syntax_result = TreeHaver.parse_with_language_pack(
+        TreeHaver::ParserRequest.new(source: source, language: "toml", dialect: dialect)
+      )
+      return { ok: false, diagnostics: syntax_result[:diagnostics] } unless syntax_result[:ok]
+
+      analyze_toml_source(source, dialect)
     end
 
     def match_toml_owners(template, destination)
@@ -96,12 +98,11 @@ module Toml
       }
     end
 
-    def merge_toml(template_source, destination_source, dialect, backend: nil)
-      resolved_backend = resolve_backend(backend)
-      template = parse_toml(template_source, dialect, backend: resolved_backend)
+    def merge_toml_with_parser(template_source, destination_source, dialect, &parser)
+      template = parser.call(template_source, dialect)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
-      destination = parse_toml(destination_source, dialect, backend: resolved_backend)
+      destination = parser.call(destination_source, dialect)
       unless destination[:ok]
         return {
           ok: false,
@@ -113,8 +114,8 @@ module Toml
       end
 
       merged = merge_toml_tables(
-        load_toml_document(template.dig(:analysis, :normalized_source), resolved_backend),
-        load_toml_document(destination.dig(:analysis, :normalized_source), resolved_backend)
+        parse_toml_document(template.dig(:analysis, :normalized_source)),
+        parse_toml_document(destination.dig(:analysis, :normalized_source))
       )
 
       {
@@ -131,85 +132,210 @@ module Toml
       }
     end
 
-    def backend_reference_for(name)
-      BACKEND_REFERENCES[name.to_s]
+    def merge_toml(template_source, destination_source, dialect, backend: nil)
+      resolved_backend = resolve_backend(backend)
+      return unsupported_feature_result("Unsupported TOML backend #{resolved_backend}.") unless resolved_backend == TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.id
+
+      merge_toml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
+        parse_toml(source, parse_dialect, backend: resolved_backend)
+      end
     end
-    private_class_method :backend_reference_for
 
     def resolve_backend(backend)
-      backend.to_s.empty? ? (TreeHaver.current_backend_id || "citrus") : backend.to_s
+      backend.to_s.empty? ? TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND.id : backend.to_s
     end
     private_class_method :resolve_backend
 
-    def load_toml_document(source, backend)
-      case backend.to_s
-      when "citrus"
-        normalize_toml_value(TomlRB.parse(source))
-      when "parslet"
-        normalize_toml_value(TOML.load(source))
-      else
-        raise ArgumentError, "Unsupported TOML backend #{backend}."
-      end
+    def normalize_toml_source(source)
+      source.gsub(/\r\n?/, "\n")
     end
-    private_class_method :load_toml_document
+    private_class_method :normalize_toml_source
 
-    def parse_toml_syntax(source, backend)
-      case backend.to_s
-      when "citrus"
-        TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)
-      when "parslet"
-        TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)
-      else
-        { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: "Unsupported TOML backend #{backend}." }] }
-      end
-    end
-    private_class_method :parse_toml_syntax
+    def strip_toml_comment(line)
+      result = +""
+      in_string = false
+      escaped = false
 
-    def normalize_toml_value(value)
-      case value
-      when Hash
-        value.each_with_object({}) do |(key, child), memo|
-          memo[key.to_s] = normalize_toml_value(child)
+      line.each_char do |char|
+        if in_string
+          result << char
+          if escaped
+            escaped = false
+          elsif char == "\\"
+            escaped = true
+          elsif char == '"'
+            in_string = false
+          end
+          next
         end
-      when Array
-        value.map { |child| normalize_toml_value(child) }
-      else
-        value
-      end
-    end
-    private_class_method :normalize_toml_value
 
-    def validate_toml_node(value, path)
-      if scalar?(value)
-        { ok: true, value: value }
-      elsif value.is_a?(Array)
-        if value.all? { |item| scalar?(item) }
-          { ok: true, value: value }
+        if char == '"'
+          in_string = true
+          result << char
+          next
+        end
+
+        break if char == "#"
+
+        result << char
+      end
+
+      raise ParseError, "Unterminated TOML string." if in_string
+
+      result.strip
+    end
+    private_class_method :strip_toml_comment
+
+    def split_outside_quotes(value, separator)
+      parts = []
+      current = +""
+      in_string = false
+      escaped = false
+      depth = 0
+
+      value.each_char do |char|
+        if in_string
+          current << char
+          if escaped
+            escaped = false
+          elsif char == "\\"
+            escaped = true
+          elsif char == '"'
+            in_string = false
+          end
+          next
+        end
+
+        case char
+        when '"'
+          in_string = true
+          current << char
+        when "["
+          depth += 1
+          current << char
+        when "]"
+          depth -= 1
+          current << char
         else
-          unsupported_feature_result("Unsupported TOML array value at #{display_path(path)}. Only scalar arrays are supported.")
+          if char == separator && depth.zero?
+            parts << current.strip
+            current = +""
+          else
+            current << char
+          end
         end
-      elsif value.is_a?(Hash)
-        value.keys.sort.each_with_object({ ok: true, value: {} }) do |key, memo|
-          validated = validate_toml_node(value[key], "#{path}/#{key}")
-          return validated unless validated[:ok]
+      end
 
-          memo[:value][key] = validated[:value]
-        end
+      raise ParseError, "Unterminated TOML string or array." if in_string || !depth.zero?
+
+      parts << current.strip
+      parts
+    end
+    private_class_method :split_outside_quotes
+
+    def parse_toml_key_path(value)
+      trimmed = value.strip
+      raise ParseError, "Missing TOML key path." if trimmed.empty?
+
+      parts = trimmed.split(".").map(&:strip)
+      raise ParseError, "Unsupported TOML key path #{trimmed}." unless parts.all? { |part| part.match?(/\A[A-Za-z0-9_-]+\z/) }
+
+      parts
+    end
+    private_class_method :parse_toml_key_path
+
+    def parse_toml_scalar_value(value)
+      case value
+      when /\A".*"\z/m
+        JSON.parse(value)
+      when "true"
+        true
+      when "false"
+        false
+      when /\A-?\d+\z/
+        value.to_i
+      when /\A-?\d+\.\d+\z/
+        value.to_f
       else
-        unsupported_feature_result("Unsupported TOML value at #{display_path(path)}. Only tables, scalar values, and scalar arrays are supported.")
+        raise ParseError, "Unsupported TOML value #{value}."
+      end
+    rescue JSON::ParserError
+      raise ParseError, "Invalid TOML string #{value}."
+    end
+    private_class_method :parse_toml_scalar_value
+
+    def parse_toml_value(value)
+      stripped = value.strip
+      if stripped.start_with?("[")
+        raise ParseError, "Invalid TOML array #{value}." unless stripped.end_with?("]")
+
+        inner = stripped[1..-2].strip
+        return [] if inner.empty?
+
+        split_outside_quotes(inner, ",").map { |entry| parse_toml_scalar_value(entry) }
+      else
+        parse_toml_scalar_value(stripped)
       end
     end
-    private_class_method :validate_toml_node
+    private_class_method :parse_toml_value
 
-    def scalar?(value)
-      value.is_a?(String) || value.is_a?(Numeric) || value == true || value == false
+    def ensure_toml_table(root, path)
+      current = root
+      path.each do |segment|
+        existing = current[segment]
+        if existing.nil?
+          current[segment] = {}
+          current = current[segment]
+        elsif existing.is_a?(Hash)
+          current = existing
+        else
+          raise ParseError, "TOML table path /#{path.join('/')} conflicts with a value."
+        end
+      end
+      current
     end
-    private_class_method :scalar?
+    private_class_method :ensure_toml_table
 
-    def display_path(path)
-      path.empty? ? "/" : path
+    def assign_toml_value(root, path, value)
+      raise ParseError, "Missing TOML assignment path." if path.empty?
+
+      table = ensure_toml_table(root, path[0..-2])
+      key = path[-1]
+      existing = table[key]
+      raise ParseError, "TOML key /#{path.join('/')} conflicts with a table." if existing.is_a?(Hash)
+
+      table[key] = value
     end
-    private_class_method :display_path
+    private_class_method :assign_toml_value
+
+    def parse_toml_document(source)
+      lines = normalize_toml_source(source).split("\n")
+      root = {}
+      current_table_path = []
+
+      lines.each do |raw_line|
+        line = strip_toml_comment(raw_line)
+        next if line.empty?
+
+        if line.start_with?("[")
+          raise ParseError, "Invalid TOML table header #{line}." unless line.end_with?("]")
+
+          current_table_path = parse_toml_key_path(line[1..-2])
+          ensure_toml_table(root, current_table_path)
+          next
+        end
+
+        parts = split_outside_quotes(line, "=")
+        raise ParseError, "Invalid TOML assignment #{line}." unless parts.length == 2
+
+        key_path = parse_toml_key_path(parts[0])
+        value = parse_toml_value(parts[1])
+        assign_toml_value(root, current_table_path + key_path, value)
+      end
+
+      root
+    end
+    private_class_method :parse_toml_document
 
     def render_toml_scalar(value)
       if value.is_a?(String)
@@ -232,7 +358,7 @@ module Toml
     def render_toml_table(table, path = [])
       lines = []
       keys = table.keys.sort
-      value_keys = keys.select { |key| !table[key].is_a?(Hash) }
+      value_keys = keys.reject { |key| table[key].is_a?(Hash) }
       table_keys = keys.select { |key| table[key].is_a?(Hash) }
 
       lines << "[#{path.join('.')}]" unless path.empty?
@@ -289,7 +415,7 @@ module Toml
     private_class_method :parse_error_result
 
     def unsupported_feature_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }] }
+      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }], policies: [] }
     end
     private_class_method :unsupported_feature_result
   end
