@@ -24,7 +24,8 @@ module Citrus
         return unsupported_feature_result("Unsupported TOML backend #{requested}.") unless requested == BACKEND.id
 
         toml_feature_profile.merge(
-          backend: BACKEND.id
+          backend: BACKEND.id,
+          backend_ref: BACKEND.to_h
         )
       end
 

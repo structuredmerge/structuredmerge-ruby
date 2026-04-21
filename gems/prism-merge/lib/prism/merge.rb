@@ -23,7 +23,7 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      ruby_feature_profile.merge(backend: BACKEND_REFERENCE.id)
+      ruby_feature_profile.merge(backend: BACKEND_REFERENCE.id, backend_ref: BACKEND_REFERENCE.to_h)
     end
 
     def ruby_plan_context(backend: nil)
