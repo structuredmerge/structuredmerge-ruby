@@ -111,6 +111,39 @@ RSpec.describe Yaml::Merge do
     )
   end
 
+  it "conforms to the slice-173 YAML family backend named-suite plan fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-173-yaml-family-backend-named-suite-plans",
+        "ruby-yaml-backend-named-suite-plans.json"
+      )
+    )
+
+    expect(
+      json_ready(Ast::Merge.plan_named_conformance_suites(fixture[:manifest], fixture[:contexts]))
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
+  it "conforms to the slice-174 YAML family backend manifest report fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-174-yaml-family-backend-manifest-report",
+        "ruby-yaml-backend-manifest-report.json"
+      )
+    )
+
+    report = Ast::Merge.report_conformance_manifest(
+      fixture[:manifest],
+      fixture[:options]
+    ) do |run|
+      key = "#{run.dig(:ref, :family)}:#{run.dig(:ref, :role)}:#{run.dig(:ref, :case)}"
+      fixture[:executions][key.to_sym] || fixture[:executions][key] || { outcome: "failed", messages: ["missing execution"] }
+    end
+    expect(json_ready(report)).to eq(json_ready(fixture[:expected_report]))
+  end
+
   it "resolves YAML paths through the canonical manifest" do
     expect(Ast::Merge.conformance_family_feature_profile_path(manifest, "yaml")).to eq(
       %w[diagnostics slice-95-yaml-family-feature-profile yaml-feature-profile.json]
