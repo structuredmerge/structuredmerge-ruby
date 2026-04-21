@@ -1,19 +1,52 @@
 # frozen_string_literal: true
 
 require "tree_haver"
+require "ast/merge"
 
 module Go
   module Merge
-    PACKAGE_NAME = "go-merge"
-    DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
+    extend self
 
-    module_function
+    PACKAGE_NAME = "go-merge"
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
+    DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
 
     def go_feature_profile
       { family: "go", supported_dialects: ["go"], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end
 
+    def available_go_backends
+      [TREE_SITTER_BACKEND]
+    end
+
+    def go_backend_feature_profile(backend: nil)
+      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
+      return unsupported_feature_result("Unsupported Go backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
+
+      go_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h,
+        supports_dialects: true
+      )
+    end
+
+    def go_plan_context(backend: nil)
+      profile = go_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: go_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: true,
+          supported_policies: profile[:supported_policies]
+        }
+      }
+    end
+
     def parse_go(source, dialect)
+      requested = TREE_SITTER_BACKEND.id
+      return unsupported_feature_result("Unsupported Go backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
       return analyze_go_module(source) if dialect == "go"
 
       { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: "Unsupported Go dialect #{dialect}." }], policies: [] }
@@ -101,5 +134,10 @@ module Go
       source[line_start...span.end_byte].strip
     end
     private_class_method :import_text, :declaration_text, :slice_span, :line_anchored_slice
+
+    def unsupported_feature_result(message)
+      Ast::Merge.unsupported_feature_result(message)
+    end
+    private_class_method :unsupported_feature_result
   end
 end
