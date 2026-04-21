@@ -198,15 +198,15 @@ RSpec.describe Ast::Merge do
     named_suite_report_envelope_fixture = diagnostics_fixture("named_suite_report_envelope")
     named_suite_report_manifest_fixture = diagnostics_fixture("named_suite_report_manifest")
 
-    expect(json_ready(described_class.conformance_suite_definition(manifest, suite_definitions_fixture[:suite_name]))).to eq(
+    expect(json_ready(described_class.conformance_suite_definition(manifest, suite_definitions_fixture[:suite_selector]))).to eq(
       json_ready(suite_definitions_fixture[:expected])
     )
-    expect(described_class.conformance_suite_names(manifest)).to eq(suite_names_fixture[:suite_names])
+    expect(json_ready(described_class.conformance_suite_selectors(manifest))).to eq(json_ready(suite_names_fixture[:suite_selectors]))
     expect(json_ready(named_suite_plan_entry_fixture[:context])).to eq(json_ready(family_plan_context_fixture[:context]))
 
     named_entry = described_class.report_named_conformance_suite_entry(
       manifest,
-      named_suite_entry_fixture[:suite_name],
+      named_suite_entry_fixture[:suite_selector],
       named_suite_entry_fixture[:family_profile],
       {
         backend: "kreuzberg-language-pack",
@@ -219,7 +219,7 @@ RSpec.describe Ast::Merge do
 
     named_plan_entry = described_class.plan_named_conformance_suite_entry(
       manifest,
-      named_suite_plan_entry_fixture[:suite_name],
+      named_suite_plan_entry_fixture[:suite_selector],
       named_suite_plan_entry_fixture[:context]
     )
     expect(json_ready(named_plan_entry)).to eq(json_ready(named_suite_plan_entry_fixture[:expected_entry]))
@@ -232,7 +232,7 @@ RSpec.describe Ast::Merge do
 
     named_results = described_class.run_named_conformance_suite_entry(
       manifest,
-      named_suite_results_fixture[:suite_name],
+      named_suite_results_fixture[:suite_selector],
       named_suite_results_fixture[:family_profile],
       {
         backend: "kreuzberg-language-pack",
@@ -251,7 +251,7 @@ RSpec.describe Ast::Merge do
 
     report = described_class.report_named_conformance_suite(
       manifest,
-      named_suite_report_fixture[:suite_name],
+      named_suite_report_fixture[:suite_selector],
       named_suite_report_fixture[:family_profile],
       {
         backend: "kreuzberg-language-pack",
@@ -298,7 +298,7 @@ RSpec.describe Ast::Merge do
     expect(json_ready(context)).to eq(json_ready(default_context_fixture[:expected_context]))
     expect(json_ready(diagnostics.first)).to eq(json_ready(default_context_fixture[:expected_diagnostic]))
 
-    explicit_family = explicit_mode_fixture.dig(:manifest, :suites)&.values&.first&.dig(:family)
+    explicit_family = explicit_mode_fixture.dig(:manifest, :suite_descriptors)&.first&.dig(:subject, :grammar)
     missing_context, explicit_diagnostics = described_class.resolve_conformance_family_context(
       explicit_family,
       explicit_mode_fixture[:options]
@@ -675,9 +675,9 @@ RSpec.describe Ast::Merge do
     suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-138-toml-family-suite-definitions", "toml-suite-definitions.json")
     )
-    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "toml_portable")).to eq(
-      suite_fixture.dig(:definitions, :toml_portable)
+    expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
+      suite_fixture[:suite_definitions].first
     )
 
     plans_fixture = read_json(
@@ -702,9 +702,9 @@ RSpec.describe Ast::Merge do
     suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-144-yaml-family-suite-definitions", "yaml-suite-definitions.json")
     )
-    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "yaml_portable")).to eq(
-      suite_fixture.dig(:definitions, :yaml_portable)
+    expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
+      suite_fixture[:suite_definitions].first
     )
 
     plans_fixture = read_json(
@@ -729,9 +729,9 @@ RSpec.describe Ast::Merge do
     suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-200-markdown-family-suite-definitions", "markdown-suite-definitions.json")
     )
-    expect(described_class.conformance_suite_names(suite_fixture[:manifest])).to eq(suite_fixture[:suite_names])
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], "markdown_portable")).to eq(
-      suite_fixture.dig(:definitions, :markdown_portable)
+    expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
+      suite_fixture[:suite_definitions].first
     )
 
     plans_fixture = read_json(
@@ -783,9 +783,9 @@ RSpec.describe Ast::Merge do
     markdown_suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-246-markdown-nested-suite-definitions", "markdown-nested-suite-definitions.json")
     )
-    expect(described_class.conformance_suite_names(markdown_suite_fixture[:manifest])).to eq(markdown_suite_fixture[:suite_names])
-    expect(described_class.conformance_suite_definition(markdown_suite_fixture[:manifest], "markdown_nested_portable")).to eq(
-      markdown_suite_fixture.dig(:definitions, :markdown_nested_portable)
+    expect(json_ready(described_class.conformance_suite_selectors(markdown_suite_fixture[:manifest]))).to eq(json_ready(markdown_suite_fixture[:suite_selectors]))
+    expect(described_class.conformance_suite_definition(markdown_suite_fixture[:manifest], markdown_suite_fixture[:suite_selectors].first)).to eq(
+      markdown_suite_fixture[:suite_definitions].first
     )
 
     markdown_plans_fixture = read_json(
@@ -808,9 +808,9 @@ RSpec.describe Ast::Merge do
     ruby_suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-249-ruby-nested-suite-definitions", "ruby-nested-suite-definitions.json")
     )
-    expect(described_class.conformance_suite_names(ruby_suite_fixture[:manifest])).to eq(ruby_suite_fixture[:suite_names])
-    expect(described_class.conformance_suite_definition(ruby_suite_fixture[:manifest], "ruby_nested_portable")).to eq(
-      ruby_suite_fixture.dig(:definitions, :ruby_nested_portable)
+    expect(json_ready(described_class.conformance_suite_selectors(ruby_suite_fixture[:manifest]))).to eq(json_ready(ruby_suite_fixture[:suite_selectors]))
+    expect(described_class.conformance_suite_definition(ruby_suite_fixture[:manifest], ruby_suite_fixture[:suite_selectors].first)).to eq(
+      ruby_suite_fixture[:suite_definitions].first
     )
 
     ruby_plans_fixture = read_json(
@@ -854,7 +854,7 @@ RSpec.describe Ast::Merge do
     manifest_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-148-config-family-aggregate-manifest", "config-family-aggregate.json")
     )
-    expect(described_class.conformance_suite_names(manifest_fixture[:manifest])).to eq(manifest_fixture[:suite_names])
+    expect(json_ready(described_class.conformance_suite_selectors(manifest_fixture[:manifest]))).to eq(json_ready(manifest_fixture[:suite_selectors]))
 
     plans_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-149-config-family-aggregate-suite-plans", "config-family-aggregate-suite-plans.json")

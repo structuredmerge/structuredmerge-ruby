@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "markdown-merge"
+require "kramdown"
 
 module Kramdown
   module Merge
@@ -42,7 +43,28 @@ module Kramdown
       requested = backend.to_s.empty? ? BACKEND : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND
 
-      Markdown::Merge.parse_markdown(source, dialect, backend: BACKEND)
+      return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == "markdown"
+
+      ::Kramdown::Document.new(source)
+      normalized = Markdown::Merge.normalize_source(source)
+      {
+        ok: true,
+        diagnostics: [],
+        analysis: {
+          kind: "markdown",
+          dialect: dialect,
+          normalized_source: normalized,
+          root_kind: "document",
+          owners: Markdown::Merge.collect_markdown_owners(normalized)
+        },
+        policies: []
+      }
+    rescue StandardError => e
+      {
+        ok: false,
+        diagnostics: [{ severity: "error", category: "parse_error", message: e.message }],
+        policies: []
+      }
     end
 
     def match_markdown_owners(template, destination)

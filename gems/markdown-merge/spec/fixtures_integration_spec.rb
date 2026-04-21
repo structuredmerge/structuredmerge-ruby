@@ -37,12 +37,8 @@ RSpec.describe Markdown::Merge do
 
     expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(
       json_ready([
-        { id: "kramdown", family: "native" },
         { id: "kreuzberg-language-pack", family: "tree-sitter" }
       ])
-    )
-    expect(json_ready(markdown_merge.markdown_backend_feature_profile(backend: "kramdown"))).to eq(
-      json_ready(fixture[:native].merge(family: "markdown", supported_dialects: ["markdown"]))
     )
     expect(json_ready(markdown_merge.markdown_backend_feature_profile(backend: "kreuzberg-language-pack"))).to eq(
       json_ready(fixture[:tree_sitter].merge(family: "markdown", supported_dialects: ["markdown"]))
@@ -58,7 +54,6 @@ RSpec.describe Markdown::Merge do
       )
     )
 
-    expect(json_ready(markdown_merge.markdown_plan_context(backend: "kramdown"))).to eq(json_ready(fixture[:native]))
     expect(json_ready(markdown_merge.markdown_plan_context(backend: "kreuzberg-language-pack"))).to eq(
       json_ready(fixture[:tree_sitter])
     )
@@ -83,60 +78,54 @@ RSpec.describe Markdown::Merge do
   it "conforms to the slice-198 Markdown analysis fixture" do
     fixture = read_json(fixtures_root.join("markdown", "slice-198-analysis", "headings-and-code-fences.json"))
 
-    %w[kramdown kreuzberg-language-pack].each do |backend|
-      result = markdown_merge.parse_markdown(fixture[:source], fixture[:dialect], backend: backend)
-      expect(result[:ok]).to be(true)
-      expect(result.dig(:analysis, :root_kind)).to eq(fixture.dig(:expected, :root_kind))
-      expect(json_ready(result.dig(:analysis, :owners))).to eq(
-        json_ready(
-          fixture.dig(:expected, :owners).map do |owner|
-            {
-              path: owner[:path],
-              owner_kind: owner[:owner_kind],
-              match_key: owner[:match_key],
-              **(owner[:level] ? { level: owner[:level] } : {}),
-              **(owner[:info_string] ? { info_string: owner[:info_string] } : {})
-            }
-          end
-        )
+    result = markdown_merge.parse_markdown(fixture[:source], fixture[:dialect], backend: "kreuzberg-language-pack")
+    expect(result[:ok]).to be(true)
+    expect(result.dig(:analysis, :root_kind)).to eq(fixture.dig(:expected, :root_kind))
+    expect(json_ready(result.dig(:analysis, :owners))).to eq(
+      json_ready(
+        fixture.dig(:expected, :owners).map do |owner|
+          {
+            path: owner[:path],
+            owner_kind: owner[:owner_kind],
+            match_key: owner[:match_key],
+            **(owner[:level] ? { level: owner[:level] } : {}),
+            **(owner[:info_string] ? { info_string: owner[:info_string] } : {})
+          }
+        end
       )
-    end
+    )
   end
 
   it "conforms to the slice-199 Markdown matching fixture" do
     fixture = read_json(fixtures_root.join("markdown", "slice-199-matching", "path-equality.json"))
 
-    %w[kramdown kreuzberg-language-pack].each do |backend|
-      template = markdown_merge.parse_markdown(fixture[:template], fixture[:dialect], backend: backend)
-      destination = markdown_merge.parse_markdown(fixture[:destination], fixture[:dialect], backend: backend)
-      result = markdown_merge.match_markdown_owners(template[:analysis], destination[:analysis])
+    template = markdown_merge.parse_markdown(fixture[:template], fixture[:dialect], backend: "kreuzberg-language-pack")
+    destination = markdown_merge.parse_markdown(fixture[:destination], fixture[:dialect], backend: "kreuzberg-language-pack")
+    result = markdown_merge.match_markdown_owners(template[:analysis], destination[:analysis])
 
-      expect(json_ready(result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
-        json_ready(fixture.dig(:expected, :matched))
-      )
-      expect(json_ready(result[:unmatched_template])).to eq(json_ready(fixture.dig(:expected, :unmatched_template)))
-      expect(json_ready(result[:unmatched_destination])).to eq(
-        json_ready(fixture.dig(:expected, :unmatched_destination))
-      )
-    end
+    expect(json_ready(result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
+      json_ready(fixture.dig(:expected, :matched))
+    )
+    expect(json_ready(result[:unmatched_template])).to eq(json_ready(fixture.dig(:expected, :unmatched_template)))
+    expect(json_ready(result[:unmatched_destination])).to eq(
+      json_ready(fixture.dig(:expected, :unmatched_destination))
+    )
   end
 
   it "conforms to the slice-208 embedded-family fixture" do
     fixture = read_json(fixtures_root.join("markdown", "slice-208-embedded-families", "code-fence-families.json"))
 
-    %w[kramdown kreuzberg-language-pack].each do |backend|
-      analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: backend)
-      expect(analysis[:ok]).to be(true)
-      expect(json_ready(markdown_merge.markdown_embedded_families(analysis[:analysis]))).to eq(
-        json_ready(fixture[:expected])
-      )
-    end
+    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(markdown_merge.markdown_embedded_families(analysis[:analysis]))).to eq(
+      json_ready(fixture[:expected])
+    )
   end
 
   it "conforms to the slice-212 discovered-surfaces fixture" do
     fixture = read_json(fixtures_root.join("markdown", "slice-212-discovered-surfaces", "fenced-code-surfaces.json"))
 
-    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kramdown")
+    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
     expect(analysis[:ok]).to be(true)
     expect(json_ready(markdown_merge.markdown_discovered_surfaces(analysis[:analysis]))).to eq(
       json_ready(fixture[:expected])
@@ -148,7 +137,7 @@ RSpec.describe Markdown::Merge do
       fixtures_root.join("markdown", "slice-213-delegated-child-operations", "fenced-code-child-operations.json")
     )
 
-    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kramdown")
+    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
     expect(analysis[:ok]).to be(true)
     expect(
       json_ready(

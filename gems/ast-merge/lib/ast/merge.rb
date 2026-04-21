@@ -25,14 +25,32 @@ module Ast
       entry && deep_dup(entry[:path])
     end
 
-    def conformance_suite_definition(manifest, suite_name)
-      suites = manifest.fetch(:suites, {})
-      definition = suites[suite_name.to_sym] || suites[suite_name.to_s]
-      definition && deep_dup(definition)
+    def conformance_suite_definition(manifest, selector)
+      manifest.fetch(:suite_descriptors, []).find do |definition|
+        conformance_suite_selectors_equal?(
+          { kind: definition[:kind], subject: deep_dup(definition[:subject]) },
+          selector
+        )
+      end&.then { |definition| deep_dup(definition) }
     end
 
-    def conformance_suite_names(manifest)
-      manifest.fetch(:suites, {}).keys.map(&:to_s).sort
+    def conformance_suite_selectors(manifest)
+      manifest.fetch(:suite_descriptors, []).map do |definition|
+        {
+          kind: definition[:kind],
+          subject: deep_dup(definition[:subject])
+        }
+      end.sort_by do |selector|
+        [
+          selector[:kind].to_s,
+          selector.dig(:subject, :grammar).to_s,
+          selector.dig(:subject, :variant).to_s
+        ]
+      end
+    end
+
+    def conformance_suite_descriptor_string(definition)
+      JSON.generate(json_ready(definition))
     end
 
     def default_conformance_family_context(family_profile)
@@ -246,10 +264,10 @@ module Ast
 
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
-      families = conformance_suite_names(manifest).filter_map do |suite_name|
-        definition = conformance_suite_definition(manifest, suite_name)
+      families = conformance_suite_selectors(manifest).filter_map do |selector|
+        definition = conformance_suite_definition(manifest, selector)
         next unless definition
-        family = definition[:family]
+        family = definition.dig(:subject, :grammar)
         next if seen[family]
 
         seen[family] = true
@@ -275,10 +293,10 @@ module Ast
       return [] unless options.fetch(:require_explicit_contexts, false)
 
       seen = {}
-      conformance_suite_names(manifest).filter_map do |suite_name|
-        definition = conformance_suite_definition(manifest, suite_name)
+      conformance_suite_selectors(manifest).filter_map do |selector|
+        definition = conformance_suite_definition(manifest, selector)
         next unless definition
-        family = definition[:family]
+        family = definition.dig(:subject, :grammar)
         next if seen[family]
 
         seen[family] = true
@@ -455,14 +473,15 @@ module Ast
       plan[:entries].map { |entry| run_conformance_case(entry[:run], &execute) }
     end
 
-    def run_named_conformance_suite(manifest, suite_name, family_profile, feature_profile = nil, &execute)
-      plan = plan_named_conformance_suite(manifest, suite_name, family_profile, feature_profile)
+    def run_named_conformance_suite(manifest, selector, family_profile, feature_profile = nil, &execute)
+      plan = plan_named_conformance_suite(manifest, selector, family_profile, feature_profile)
       plan && run_planned_conformance_suite(plan, &execute)
     end
 
-    def run_named_conformance_suite_entry(manifest, suite_name, family_profile, feature_profile = nil, &execute)
-      results = run_named_conformance_suite(manifest, suite_name, family_profile, feature_profile, &execute)
-      results && { suite: suite_name, results: results }
+    def run_named_conformance_suite_entry(manifest, selector, family_profile, feature_profile = nil, &execute)
+      results = run_named_conformance_suite(manifest, selector, family_profile, feature_profile, &execute)
+      definition = conformance_suite_definition(manifest, selector)
+      results && definition && { suite: definition, results: results }
     end
 
     def run_planned_named_conformance_suites(entries, &execute)
@@ -473,14 +492,15 @@ module Ast
       report_conformance_suite(run_planned_conformance_suite(plan, &execute))
     end
 
-    def report_named_conformance_suite(manifest, suite_name, family_profile, feature_profile = nil, &execute)
-      plan = plan_named_conformance_suite(manifest, suite_name, family_profile, feature_profile)
+    def report_named_conformance_suite(manifest, selector, family_profile, feature_profile = nil, &execute)
+      plan = plan_named_conformance_suite(manifest, selector, family_profile, feature_profile)
       plan && report_planned_conformance_suite(plan, &execute)
     end
 
-    def report_named_conformance_suite_entry(manifest, suite_name, family_profile, feature_profile = nil, &execute)
-      report = report_named_conformance_suite(manifest, suite_name, family_profile, feature_profile, &execute)
-      report && { suite: suite_name, report: report }
+    def report_named_conformance_suite_entry(manifest, selector, family_profile, feature_profile = nil, &execute)
+      report = report_named_conformance_suite(manifest, selector, family_profile, feature_profile, &execute)
+      definition = conformance_suite_definition(manifest, selector)
+      report && definition && { suite: definition, report: report }
     end
 
     def report_planned_named_conformance_suites(entries, &execute)
@@ -566,31 +586,30 @@ module Ast
       end
 
       resolved_contexts = {}
-      resolved_families = {}
 
-      conformance_suite_names(manifest).each do |suite_name|
-        definition = conformance_suite_definition(manifest, suite_name)
+      conformance_suite_selectors(manifest).each do |selector|
+        definition = conformance_suite_definition(manifest, selector)
         next unless definition
+        family = definition.dig(:subject, :grammar)
 
         context =
-          if resolved_families[definition[:family]]
-            resolved_contexts[definition[:family]]
+          if resolved_contexts.key?(family)
+            resolved_contexts[family]
           else
-            resolved_context, resolved_diagnostics, resolved_requests, resolved_applied_decisions = review_conformance_family_context(definition[:family], effective_options)
+            resolved_context, resolved_diagnostics, resolved_requests, resolved_applied_decisions = review_conformance_family_context(family, effective_options)
             diagnostics.concat(resolved_diagnostics)
             requests.concat(resolved_requests)
             applied_decisions.concat(resolved_applied_decisions)
-            resolved_families[definition[:family]] = true
-            resolved_contexts[definition[:family]] = resolved_context
+            resolved_contexts[family] = resolved_context
             resolved_context
           end
         next unless context
 
-        entry = plan_named_conformance_suite_entry(manifest, suite_name, context)
+        entry = plan_named_conformance_suite_entry(manifest, selector, context)
         next unless entry
 
         if entry[:plan][:missing_roles].any?
-          diagnostics << diagnostic("error", "configuration_error", "suite #{suite_name} declares missing roles: #{join_comma(entry[:plan][:missing_roles])}.")
+          diagnostics << diagnostic("error", "configuration_error", "suite #{conformance_suite_descriptor_string(entry[:suite])} declares missing roles: #{join_comma(entry[:plan][:missing_roles])}.")
           next
         end
 
@@ -639,26 +658,28 @@ module Ast
       { family: family, entries: entries, missing_roles: missing_roles }
     end
 
-    def plan_named_conformance_suite(manifest, suite_name, family_profile, feature_profile = nil)
-      definition = conformance_suite_definition(manifest, suite_name)
+    def plan_named_conformance_suite(manifest, selector, family_profile, feature_profile = nil)
+      definition = conformance_suite_definition(manifest, selector)
       return nil unless definition
 
-      plan_conformance_suite(manifest, definition[:family], definition[:roles], family_profile, feature_profile)
+      plan_conformance_suite(manifest, definition.dig(:subject, :grammar), definition[:roles], family_profile, feature_profile)
     end
 
-    def plan_named_conformance_suite_entry(manifest, suite_name, context)
-      plan = plan_named_conformance_suite(manifest, suite_name, context[:family_profile], context[:feature_profile])
-      plan && { suite: suite_name, plan: plan }
+    def plan_named_conformance_suite_entry(manifest, selector, context)
+      plan = plan_named_conformance_suite(manifest, selector, context[:family_profile], context[:feature_profile])
+      definition = conformance_suite_definition(manifest, selector)
+      plan && definition && { suite: definition, plan: plan }
     end
 
     def plan_named_conformance_suites(manifest, contexts)
-      conformance_suite_names(manifest).filter_map do |suite_name|
-        definition = conformance_suite_definition(manifest, suite_name)
+      conformance_suite_selectors(manifest).filter_map do |selector|
+        definition = conformance_suite_definition(manifest, selector)
         next unless definition
-        family_key = definition[:family].to_sym
-        next unless contexts.key?(family_key) || contexts.key?(definition[:family])
+        family = definition.dig(:subject, :grammar)
+        family_key = family.to_sym
+        next unless contexts.key?(family_key) || contexts.key?(family)
 
-        plan_named_conformance_suite_entry(manifest, suite_name, contexts[family_key] || contexts[definition[:family]])
+        plan_named_conformance_suite_entry(manifest, selector, contexts[family_key] || contexts[family])
       end
     end
 
@@ -666,29 +687,28 @@ module Ast
       entries = []
       diagnostics = []
       resolved_contexts = {}
-      resolved_families = {}
 
-      conformance_suite_names(manifest).each do |suite_name|
-        definition = conformance_suite_definition(manifest, suite_name)
+      conformance_suite_selectors(manifest).each do |selector|
+        definition = conformance_suite_definition(manifest, selector)
         next unless definition
+        family = definition.dig(:subject, :grammar)
 
         context =
-          if resolved_families[definition[:family]]
-            resolved_contexts[definition[:family]]
+          if resolved_contexts.key?(family)
+            resolved_contexts[family]
           else
-            resolved_context, resolved_diagnostics = resolve_conformance_family_context(definition[:family], options)
+            resolved_context, resolved_diagnostics = resolve_conformance_family_context(family, options)
             diagnostics.concat(resolved_diagnostics)
-            resolved_families[definition[:family]] = true
-            resolved_contexts[definition[:family]] = resolved_context
+            resolved_contexts[family] = resolved_context
             resolved_context
           end
         next unless context
 
-        entry = plan_named_conformance_suite_entry(manifest, suite_name, context)
+        entry = plan_named_conformance_suite_entry(manifest, selector, context)
         next unless entry
 
         if entry[:plan][:missing_roles].any?
-          diagnostics << diagnostic("error", "configuration_error", "suite #{suite_name} declares missing roles: #{join_comma(entry[:plan][:missing_roles])}.")
+          diagnostics << diagnostic("error", "configuration_error", "suite #{conformance_suite_descriptor_string(entry[:suite])} declares missing roles: #{join_comma(entry[:plan][:missing_roles])}.")
           next
         end
 
@@ -832,5 +852,12 @@ module Ast
       values.join(", ")
     end
     private_class_method :join_comma
+
+    def conformance_suite_selectors_equal?(left, right)
+      left[:kind] == right[:kind] &&
+        left.dig(:subject, :grammar) == right.dig(:subject, :grammar) &&
+        left.dig(:subject, :variant) == right.dig(:subject, :variant)
+    end
+    private_class_method :conformance_suite_selectors_equal?
   end
 end

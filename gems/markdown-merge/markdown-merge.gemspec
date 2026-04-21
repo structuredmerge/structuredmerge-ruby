@@ -19,5 +19,4 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.add_dependency "ast-merge", "= #{Markdown::Merge::VERSION}"
   spec.add_dependency "tree_haver", "= #{Markdown::Merge::VERSION}"
-  spec.add_dependency "kramdown", "~> 2.5"
 end

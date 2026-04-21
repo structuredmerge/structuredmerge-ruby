@@ -1,14 +1,11 @@
 # frozen_string_literal: true
 
-require "kramdown"
 require "tree_haver"
 
 module Markdown
   module Merge
     PACKAGE_NAME = "markdown-merge"
-    KRAMDOWN_BACKEND = TreeHaver::BackendReference.new(id: "kramdown", family: "native").freeze
     BACKEND_REFERENCES = {
-      "kramdown" => KRAMDOWN_BACKEND,
       "kreuzberg-language-pack" => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     }.freeze
 
@@ -39,7 +36,7 @@ module Markdown
         family_profile: markdown_feature_profile,
         feature_profile: {
           backend: profile[:backend],
-          supports_dialects: profile[:backend] != "kreuzberg-language-pack",
+          supports_dialects: false,
           supported_policies: profile[:supported_policies]
         }
       }
@@ -49,17 +46,14 @@ module Markdown
       return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == "markdown"
 
       resolved_backend = resolve_backend(backend)
-      case resolved_backend
-      when "kramdown"
-        Kramdown::Document.new(source)
-      when "kreuzberg-language-pack"
-        syntax = TreeHaver.parse_with_language_pack(
-          TreeHaver::ParserRequest.new(source: source, language: "markdown", dialect: dialect)
-        )
-        return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
-      else
+      unless resolved_backend == "kreuzberg-language-pack"
         return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
       end
+
+      syntax = TreeHaver.parse_with_language_pack(
+        TreeHaver::ParserRequest.new(source: source, language: "markdown", dialect: dialect)
+      )
+      return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
 
       normalized_source = normalize_source(source)
       {
@@ -239,7 +233,7 @@ module Markdown
     end
 
     def resolve_backend(backend)
-      backend.to_s.empty? ? (TreeHaver.current_backend_id || "kramdown") : backend.to_s
+      backend.to_s.empty? ? "kreuzberg-language-pack" : backend.to_s
     end
 
     def unsupported_feature_result(message)
