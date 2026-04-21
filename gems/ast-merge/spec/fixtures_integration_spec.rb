@@ -68,9 +68,7 @@ RSpec.describe Ast::Merge do
   end
 
   it "conforms to the slice-22 shared family feature profile fixture" do
-    fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-22-shared-family-feature-profile", "family-feature-profile.json")
-    )
+    fixture = diagnostics_fixture("shared_family_feature_profile")
 
     feature_profile = {
       family: "example",
