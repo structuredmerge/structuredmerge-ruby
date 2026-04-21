@@ -697,6 +697,40 @@ RSpec.describe Ast::Merge do
     expect(source_report_fixture).not_to be_nil
   end
 
+  it "conforms to the source-family suite-definition and named-suite plan fixtures" do
+    suite_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-125-source-family-suite-definitions", "source-suite-definitions.json")
+    )
+    expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(
+      json_ready(suite_fixture[:suite_selectors])
+    )
+    expect(
+      described_class.conformance_suite_definition(
+        suite_fixture[:manifest],
+        suite_fixture[:suite_selectors].first
+      )
+    ).to eq(suite_fixture[:suite_definitions].first)
+
+    plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-126-source-family-named-suite-plans", "source-named-suite-plans.json")
+    )
+    expect(
+      json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
+    ).to eq(json_ready(plans_fixture[:expected_entries]))
+
+    native_plans_fixture = read_json(
+      fixtures_root.join("diagnostics", "slice-127-source-family-native-suite-plans", "source-native-named-suite-plans.json")
+    )
+    expect(
+      json_ready(
+        described_class.plan_named_conformance_suites(
+          native_plans_fixture[:manifest],
+          native_plans_fixture[:contexts]
+        )
+      )
+    ).to eq(json_ready(native_plans_fixture[:expected_entries]))
+  end
+
   it "conforms to the TOML family suite-definition, named-suite plan, and manifest report fixtures" do
     suite_fixture = read_json(
       fixtures_root.join("diagnostics", "slice-138-toml-family-suite-definitions", "toml-suite-definitions.json")
