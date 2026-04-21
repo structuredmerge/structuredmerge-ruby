@@ -97,6 +97,37 @@ RSpec.describe Yaml::Merge do
     )
   end
 
+  it "conforms to the slice-183 YAML polyglot backend feature profile fixtures" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-183-yaml-family-polyglot-backend-feature-profiles",
+        "ruby-yaml-polyglot-backend-feature-profiles.json"
+      )
+    )
+
+    expect(json_ready(described_class.yaml_backend_feature_profile(backend: "kreuzberg-language-pack"))).to include(
+      json_ready(
+        backend: fixture.dig(:tree_sitter, :backend),
+        supported_policies: fixture.dig(:tree_sitter, :supported_policies)
+      )
+    )
+  end
+
+  it "conforms to the slice-184 YAML polyglot backend plan-context fixtures" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-184-yaml-family-polyglot-backend-plan-contexts",
+        "ruby-yaml-polyglot-plan-contexts.json"
+      )
+    )
+
+    expect(json_ready(described_class.yaml_plan_context(backend: "kreuzberg-language-pack"))).to eq(
+      json_ready(fixture[:tree_sitter])
+    )
+  end
+
   it "conforms to the slice-143 YAML family manifest fixture" do
     yaml_manifest = read_json(fixtures_root.join("conformance", "slice-143-yaml-family-manifest", "yaml-family-manifest.json"))
 
