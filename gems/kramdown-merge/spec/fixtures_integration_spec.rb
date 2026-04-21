@@ -40,6 +40,9 @@ RSpec.describe Kramdown::Merge do
     expect(json_ready(described_class.available_markdown_backends.map(&:to_h))).to eq(
       json_ready([{ id: "kramdown", family: "native" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("kramdown")&.to_h)).to eq(
+      json_ready({ id: "kramdown", family: "native" })
+    )
     expect(json_ready(described_class.markdown_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :kramdown, :feature_profile))
     )

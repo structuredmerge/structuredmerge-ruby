@@ -32,6 +32,9 @@ RSpec.describe "Prism::Merge" do
     expect(json_ready(PRISM_MERGE.available_ruby_backends.map(&:to_h))).to eq(
       json_ready([{ id: "prism", family: "native" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("prism")&.to_h)).to eq(
+      json_ready({ id: "prism", family: "native" })
+    )
     expect(json_ready(PRISM_MERGE.ruby_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :prism, :feature_profile))
     )

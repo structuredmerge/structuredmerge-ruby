@@ -8,21 +8,22 @@ module Kramdown
     extend self
 
     PACKAGE_NAME = "kramdown-merge"
-    BACKEND = "kramdown"
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: "kramdown", family: "native").freeze
+    TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
 
     def markdown_feature_profile
       Markdown::Merge.markdown_feature_profile
     end
 
     def available_markdown_backends
-      [TreeHaver::BackendReference.new(id: BACKEND, family: "native")]
+      [BACKEND_REFERENCE]
     end
 
     def markdown_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? BACKEND : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      markdown_feature_profile.merge(backend: BACKEND)
+      markdown_feature_profile.merge(backend: BACKEND_REFERENCE.id)
     end
 
     def markdown_plan_context(backend: nil)
@@ -40,8 +41,8 @@ module Kramdown
     end
 
     def parse_markdown(source, dialect, backend: nil)
-      requested = backend.to_s.empty? ? BACKEND : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
       return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == "markdown"
 

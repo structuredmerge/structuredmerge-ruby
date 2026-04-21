@@ -8,21 +8,22 @@ module Prism
     extend self
 
     PACKAGE_NAME = "prism-merge"
-    BACKEND = "prism"
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: "prism", family: "native").freeze
+    TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
 
     def ruby_feature_profile
       Ruby::Merge.ruby_feature_profile
     end
 
     def available_ruby_backends
-      [TreeHaver::BackendReference.new(id: BACKEND, family: "native")]
+      [BACKEND_REFERENCE]
     end
 
     def ruby_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? BACKEND : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      ruby_feature_profile.merge(backend: BACKEND)
+      ruby_feature_profile.merge(backend: BACKEND_REFERENCE.id)
     end
 
     def ruby_plan_context(backend: nil)
@@ -40,9 +41,9 @@ module Prism
     end
 
     def parse_ruby(source, dialect, backend: nil)
-      requested = backend.to_s.empty? ? BACKEND : backend.to_s
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
       result = ::Prism.parse(source)
       unless result.success?

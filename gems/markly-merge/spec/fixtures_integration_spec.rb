@@ -36,6 +36,9 @@ RSpec.describe Markly::Merge do
     expect(json_ready(described_class.available_markdown_backends.map(&:to_h))).to eq(
       json_ready([{ id: "markly", family: "native" }])
     )
+    expect(json_ready(TreeHaver::BackendRegistry.fetch("markly")&.to_h)).to eq(
+      json_ready({ id: "markly", family: "native" })
+    )
     expect(json_ready(described_class.markdown_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :markly, :feature_profile))
     )
