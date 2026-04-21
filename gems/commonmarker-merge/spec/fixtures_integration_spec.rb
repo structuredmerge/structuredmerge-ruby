@@ -60,6 +60,12 @@ RSpec.describe Commonmarker::Merge do
     expect(json_ready(result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
       json_ready(matching_fixture.dig(:expected, :matched))
     )
+    expect(json_ready(result[:unmatched_template])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_template))
+    )
+    expect(json_ready(result[:unmatched_destination])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_destination))
+    )
   end
 
   it "conforms to the slice-208 embedded-family fixture" do

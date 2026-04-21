@@ -80,6 +80,12 @@ RSpec.describe Citrus::Toml::Merge do
     expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
       json_ready(matching_fixture.dig(:expected, :matched))
     )
+    expect(json_ready(matching_result[:unmatched_template])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_template))
+    )
+    expect(json_ready(matching_result[:unmatched_destination])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_destination))
+    )
 
     merge_fixture = toml_fixture("merge")
     merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], "toml")

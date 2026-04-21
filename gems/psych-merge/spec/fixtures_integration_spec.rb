@@ -66,6 +66,12 @@ RSpec.describe Psych::Merge do
     expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
       json_ready(matching_fixture.dig(:expected, :matched))
     )
+    expect(json_ready(matching_result[:unmatched_template])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_template))
+    )
+    expect(json_ready(matching_result[:unmatched_destination])).to eq(
+      json_ready(matching_fixture.dig(:expected, :unmatched_destination))
+    )
 
     merge_fixture = read_json(fixtures_root.join("yaml", "slice-99-merge", "mapping-merge.json"))
     merge_result = ::Psych::Merge.merge_yaml(merge_fixture[:template], merge_fixture[:destination], "yaml")
