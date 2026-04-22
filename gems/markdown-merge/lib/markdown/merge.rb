@@ -92,6 +92,35 @@ module Markdown
       }
     end
 
+    def merge_markdown(template_source, destination_source, dialect, backend: nil)
+      template = parse_markdown(template_source, dialect, backend: backend)
+      return template unless template[:ok]
+
+      destination = parse_markdown(destination_source, dialect, backend: backend)
+      return destination unless destination[:ok]
+
+      destination_sections = collect_markdown_sections(
+        destination.dig(:analysis, :normalized_source),
+        destination.dig(:analysis, :owners)
+      )
+      template_sections = collect_markdown_sections(
+        template.dig(:analysis, :normalized_source),
+        template.dig(:analysis, :owners)
+      )
+      destination_paths = destination_sections.to_h { |section| [section[:path], true] }
+      merged_sections = destination_sections.map { |section| section[:text] }.reject(&:empty?) +
+        template_sections
+          .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
+          .map { |section| section[:text] }
+
+      {
+        ok: true,
+        diagnostics: [],
+        output: "#{merged_sections.join("\n\n").strip}\n",
+        policies: []
+      }
+    end
+
     def markdown_embedded_families(analysis)
       analysis[:owners].filter_map do |owner|
         next unless owner[:owner_kind] == "code_fence"
@@ -209,6 +238,66 @@ module Markdown
       owners
     end
 
+    def markdown_owner_start_indices(source)
+      starts = {}
+      lines = normalize_source(source).split("\n")
+      heading_index = 0
+      code_fence_index = 0
+      index = 0
+
+      while index < lines.length
+        line = lines[index]
+        if (heading = line.match(/^(#+)\s+(.+?)\s*#*\s*$/)) && heading[1].length.between?(1, 6)
+          starts["/heading/#{heading_index}"] = index
+          heading_index += 1
+          index += 1
+          next
+        end
+
+        if (fence = line.match(/^\s*(`{3,}|~{3,})\s*(.*?)\s*$/))
+          starts["/code_fence/#{code_fence_index}"] = index
+          code_fence_index += 1
+          marker = fence[1]
+          marker_char = marker[0]
+          marker_length = marker.length
+          index += 1
+          while index < lines.length
+            trimmed = lines[index].strip
+            break if trimmed.length >= marker_length &&
+              trimmed.start_with?(marker_char * marker_length) &&
+              trimmed.delete(marker_char).empty?
+
+            index += 1
+          end
+          index += 1
+          next
+        end
+
+        index += 1
+      end
+
+      starts
+    end
+
+    def collect_markdown_sections(source, owners)
+      lines = normalize_source(source).split("\n")
+      starts = markdown_owner_start_indices(source)
+      ordered = owners.filter_map do |owner|
+        start = starts[owner[:path]]
+        next if start.nil?
+
+        { owner: owner, start: start }
+      end.sort_by { |entry| entry[:start] }
+
+      ordered.each_with_index.map do |entry, index|
+        finish = ordered[index + 1]&.dig(:start) || lines.length
+        {
+          path: entry.dig(:owner, :path),
+          text: lines[entry[:start]...finish].join("\n").strip
+        }
+      end
+    end
+
     def code_fence_family(info_string)
       case info_string.to_s.downcase
       when "ts", "typescript"
@@ -254,12 +343,15 @@ module Markdown
       :markdown_plan_context,
       :parse_markdown,
       :match_markdown_owners,
+      :merge_markdown,
       :markdown_embedded_families,
       :markdown_discovered_surfaces,
       :markdown_delegated_child_operations,
       :normalize_source,
       :slugify,
       :collect_markdown_owners,
+      :markdown_owner_start_indices,
+      :collect_markdown_sections,
       :code_fence_family,
       :code_fence_dialect,
       :resolve_backend,

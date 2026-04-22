@@ -86,6 +86,40 @@ module Ruby
       }
     end
 
+    def merge_ruby(template_source, destination_source, dialect)
+      template = parse_ruby(template_source, dialect)
+      return template unless template[:ok]
+
+      destination = parse_ruby(destination_source, dialect)
+      unless destination[:ok]
+        return {
+          ok: false,
+          diagnostics: destination[:diagnostics].map do |diagnostic|
+            diagnostic[:category] == "parse_error" ? diagnostic.merge(category: "destination_parse_error") : diagnostic
+          end,
+          policies: []
+        }
+      end
+
+      require_block = collect_ruby_require_entries(destination.dig(:analysis, :source)).map { |entry| entry[:text] }.join("\n").strip
+      destination_declarations = collect_ruby_declaration_entries(destination.dig(:analysis, :source))
+      template_declarations = collect_ruby_declaration_entries(template.dig(:analysis, :source))
+      destination_paths = destination_declarations.to_h { |entry| [entry[:path], true] }
+      sections = []
+      sections << require_block unless require_block.empty?
+      sections.concat(destination_declarations.map { |entry| entry[:text] })
+      sections.concat(
+        template_declarations.reject { |entry| destination_paths[entry[:path]] }.map { |entry| entry[:text] }
+      )
+
+      {
+        ok: true,
+        diagnostics: [],
+        output: "#{sections.join("\n\n").strip}\n",
+        policies: [DESTINATION_WINS_ARRAY_POLICY]
+      }
+    end
+
     def ruby_discovered_surfaces(analysis)
       analysis[:discovered_surfaces] || []
     end
@@ -184,6 +218,76 @@ module Ruby
         owners: (requires + declarations).sort_by { |owner| owner[:path] },
         discovered_surfaces: discovered_surfaces
       }
+    end
+
+    def collect_ruby_require_entries(source)
+      normalize_source(source).split("\n").filter_map do |line|
+        next unless REQUIRE_PATTERN.match?(line)
+
+        { text: line.rstrip }
+      end
+    end
+
+    def collect_ruby_declaration_entries(source)
+      lines = normalize_source(source).split("\n")
+      entries = []
+      pending_comments = []
+      index = 0
+
+      while index < lines.length
+        line = lines[index]
+        stripped = line.strip
+
+        if comment_line?(line)
+          pending_comments << index
+          index += 1
+          next
+        end
+
+        if stripped.empty?
+          pending_comments = []
+          index += 1
+          next
+        end
+
+        if REQUIRE_PATTERN.match?(line)
+          pending_comments = []
+          index += 1
+          next
+        end
+
+        declaration = declaration_for_line(line)
+        unless declaration
+          pending_comments = []
+          index += 1
+          next
+        end
+
+        start_index = pending_comments.first || index
+        depth = 1
+        cursor = index + 1
+        while cursor < lines.length
+          candidate = lines[cursor].strip
+          depth += 1 if declaration_for_line(candidate)
+          if candidate == "end"
+            depth -= 1
+            if depth.zero?
+              cursor += 1
+              break
+            end
+          end
+          cursor += 1
+        end
+
+        entries << {
+          path: "/declarations/#{declaration[:name]}",
+          text: lines[start_index...cursor].join("\n").strip
+        }
+        pending_comments = []
+        index = cursor
+      end
+
+      entries
     end
 
     def unsupported_feature_result(message)
@@ -314,9 +418,12 @@ module Ruby
       :ruby_plan_context,
       :parse_ruby,
       :match_ruby_owners,
+      :merge_ruby,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :analyze_ruby_document,
+      :collect_ruby_require_entries,
+      :collect_ruby_declaration_entries,
       :unsupported_feature_result
     )
   end

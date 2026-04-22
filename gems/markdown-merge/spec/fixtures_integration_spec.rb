@@ -76,6 +76,9 @@ RSpec.describe Markdown::Merge do
     expect(Ast::Merge.conformance_fixture_path(manifest, "markdown", "matching")).to eq(
       %w[markdown slice-199-matching path-equality.json]
     )
+    expect(Ast::Merge.conformance_fixture_path(manifest, "markdown", "merge")).to eq(
+      %w[markdown slice-286-merge section-merge.json]
+    )
   end
 
   it "conforms to the slice-198 Markdown analysis fixture" do
@@ -113,6 +116,19 @@ RSpec.describe Markdown::Merge do
     expect(json_ready(result[:unmatched_destination])).to eq(
       json_ready(fixture.dig(:expected, :unmatched_destination))
     )
+  end
+
+  it "conforms to the slice-286 Markdown merge fixture" do
+    fixture = read_json(fixtures_root.join("markdown", "slice-286-merge", "section-merge.json"))
+
+    result = markdown_merge.merge_markdown(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      backend: "kreuzberg-language-pack"
+    )
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
   it "conforms to the slice-208 embedded-family fixture" do

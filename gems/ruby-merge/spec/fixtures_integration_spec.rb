@@ -57,6 +57,9 @@ RSpec.describe "Ruby::Merge" do
     expect(Ast::Merge.conformance_fixture_path(manifest_fixture, "ruby", "analysis")).to eq(
       %w[ruby slice-218-analysis module-owners.json]
     )
+    expect(Ast::Merge.conformance_fixture_path(manifest_fixture, "ruby", "merge")).to eq(
+      %w[ruby slice-287-merge module-merge.json]
+    )
 
     analysis = RUBY_MERGE.parse_ruby(analysis_fixture[:source], analysis_fixture[:dialect])
     expect(analysis[:ok]).to be(true)
@@ -72,6 +75,37 @@ RSpec.describe "Ruby::Merge" do
     expect(json_ready(matching[:unmatched_destination])).to eq(
       json_ready(matching_fixture.dig(:expected, :unmatched_destination))
     )
+
+    merge_fixture = read_json(fixtures_root.join("ruby", "slice-287-merge", "module-merge.json"))
+    merge_result = RUBY_MERGE.merge_ruby(merge_fixture[:template], merge_fixture[:destination], "ruby")
+    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+
+    invalid_template_fixture = read_json(fixtures_root.join("ruby", "slice-287-merge", "invalid-template.json"))
+    invalid_template_result = RUBY_MERGE.merge_ruby(
+      invalid_template_fixture[:template],
+      invalid_template_fixture[:destination],
+      "ruby"
+    )
+    expect(invalid_template_result[:ok]).to be(false)
+    expect(
+      json_ready(
+        invalid_template_result[:diagnostics].map { |entry| entry.slice(:severity, :category) }
+      )
+    ).to eq(json_ready(invalid_template_fixture.dig(:expected, :diagnostics)))
+
+    invalid_destination_fixture = read_json(fixtures_root.join("ruby", "slice-287-merge", "invalid-destination.json"))
+    invalid_destination_result = RUBY_MERGE.merge_ruby(
+      invalid_destination_fixture[:template],
+      invalid_destination_fixture[:destination],
+      "ruby"
+    )
+    expect(invalid_destination_result[:ok]).to be(false)
+    expect(
+      json_ready(
+        invalid_destination_result[:diagnostics].map { |entry| entry.slice(:severity, :category) }
+      )
+    ).to eq(json_ready(invalid_destination_fixture.dig(:expected, :diagnostics)))
 
     surfaces_analysis = RUBY_MERGE.parse_ruby(surfaces_fixture[:source], "ruby")
     expect(surfaces_analysis[:ok]).to be(true)
