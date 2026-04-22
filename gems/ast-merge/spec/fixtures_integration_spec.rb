@@ -674,6 +674,36 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_plan]))
   end
 
+  it "conforms to the slice-292 delegated child nested-output resolution fixture" do
+    fixture = diagnostics_fixture("delegated_child_nested_output_resolution")
+
+    expect(
+      json_ready(
+        described_class.resolve_delegated_child_outputs(
+          fixture[:operations],
+          fixture[:nested_outputs],
+          default_family: fixture[:default_family],
+          request_id_prefix: fixture[:request_id_prefix]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected]))
+  end
+
+  it "conforms to the slice-293 delegated child nested-output rejection fixture" do
+    fixture = diagnostics_fixture("delegated_child_nested_output_rejection")
+
+    expect(
+      json_ready(
+        described_class.resolve_delegated_child_outputs(
+          fixture[:operations],
+          fixture[:nested_outputs],
+          default_family: fixture[:default_family],
+          request_id_prefix: fixture[:request_id_prefix]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected]))
+  end
+
   it "conforms to the widened source-family manifest and report fixtures" do
     source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
     source_report_fixture = diagnostics_fixture("manifest_backend_report")
