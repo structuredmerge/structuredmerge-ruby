@@ -318,6 +318,30 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(convergence_fixture[:expected]))
   end
 
+  it "conforms to the mini template tree run fixture" do
+    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
+    run_fixture = diagnostics_fixture("mini_template_tree_run")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    run_result = described_class.run_template_tree_execution(
+      template_contents.keys.sort,
+      template_contents,
+      destination_contents,
+      plan_fixture[:context],
+      plan_fixture[:default_strategy],
+      plan_fixture[:overrides],
+      plan_fixture[:replacements]
+    ) do |entry|
+      destination_path = entry[:destination_path] || entry["destination_path"]
+      run_fixture[:merge_results][destination_path] || run_fixture[:merge_results][destination_path.to_sym]
+    end
+
+    expect(json_ready(run_result)).to eq(json_ready(run_fixture[:expected]))
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 

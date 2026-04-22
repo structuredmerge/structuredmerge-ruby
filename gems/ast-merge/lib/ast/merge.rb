@@ -418,6 +418,26 @@ module Ast
       }
     end
 
+    def run_template_tree_execution(template_source_paths, template_contents, destination_contents,
+      context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil, &merge_prepared_content)
+      execution_plan = plan_template_tree_execution(
+        template_source_paths,
+        template_contents,
+        destination_contents.keys.sort,
+        destination_contents,
+        context,
+        default_strategy,
+        overrides,
+        replacements,
+        config
+      )
+
+      {
+        execution_plan: execution_plan,
+        apply_result: apply_template_execution(execution_plan, &merge_prepared_content)
+      }
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
