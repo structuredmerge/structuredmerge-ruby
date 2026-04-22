@@ -72,6 +72,11 @@ RSpec.describe Kramdown::Merge do
     expect(json_ready(result[:unmatched_destination])).to eq(
       json_ready(matching_fixture.dig(:expected, :unmatched_destination))
     )
+
+    merge_fixture = read_json(fixtures_root.join("markdown", "slice-286-merge", "section-merge.json"))
+    merge_result = described_class.merge_markdown(merge_fixture[:template], merge_fixture[:destination], "markdown")
+    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
   end
 
   it "conforms to the slice-208 embedded-family fixture" do

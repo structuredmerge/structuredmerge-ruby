@@ -70,6 +70,13 @@ module Commonmarker
       Markdown::Merge.match_markdown_owners(template, destination)
     end
 
+    def merge_markdown(template_source, destination_source, dialect, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown(template_source, destination_source, dialect, backend: "kreuzberg-language-pack")
+    end
+
     def markdown_embedded_families(analysis)
       Markdown::Merge.markdown_embedded_families(analysis)
     end
@@ -89,6 +96,7 @@ module Commonmarker
       :markdown_plan_context,
       :parse_markdown,
       :match_markdown_owners,
+      :merge_markdown,
       :markdown_embedded_families,
       :unsupported_feature_result
     )

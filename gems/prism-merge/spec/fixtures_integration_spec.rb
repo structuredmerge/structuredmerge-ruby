@@ -68,6 +68,11 @@ RSpec.describe "Prism::Merge" do
       json_ready(matching_fixture.dig(:expected, :unmatched_destination))
     )
 
+    merge_fixture = read_json(fixtures_root.join("ruby", "slice-287-merge", "module-merge.json"))
+    merge_result = PRISM_MERGE.merge_ruby(merge_fixture[:template], merge_fixture[:destination], "ruby")
+    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+
     surfaces_analysis = PRISM_MERGE.parse_ruby(surfaces_fixture[:source], "ruby")
     expect(json_ready(PRISM_MERGE.ruby_discovered_surfaces(surfaces_analysis[:analysis]))).to eq(
       json_ready(surfaces_fixture[:expected])

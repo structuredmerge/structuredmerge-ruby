@@ -68,6 +68,13 @@ module Prism
       Ruby::Merge.match_ruby_owners(template, destination)
     end
 
+    def merge_ruby(template_source, destination_source, dialect, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby(template_source, destination_source, dialect)
+    end
+
     def ruby_discovered_surfaces(analysis)
       Ruby::Merge.ruby_discovered_surfaces(analysis)
     end
@@ -87,6 +94,7 @@ module Prism
       :ruby_plan_context,
       :parse_ruby,
       :match_ruby_owners,
+      :merge_ruby,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :unsupported_feature_result
