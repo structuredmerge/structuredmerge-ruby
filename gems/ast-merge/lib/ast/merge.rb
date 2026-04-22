@@ -114,6 +114,29 @@ module Ast
       end
     end
 
+    def enrich_template_plan_entries(entries, existing_destination_paths)
+      existing = existing_destination_paths.each_with_object({}) { |path, memo| memo[path] = true }
+      entries.map do |entry|
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        strategy = (entry[:strategy] || entry["strategy"]).to_s
+        destination_exists = destination_path ? existing.fetch(destination_path, false) : false
+        write_action = if destination_path.nil?
+          "omit"
+        elsif strategy == "keep_destination"
+          "keep"
+        elsif destination_exists
+          "update"
+        else
+          "create"
+        end
+
+        deep_dup(entry).merge(
+          destination_exists: destination_exists,
+          write_action: write_action
+        )
+      end
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(

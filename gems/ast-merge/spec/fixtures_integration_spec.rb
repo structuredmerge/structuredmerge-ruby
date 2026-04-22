@@ -141,6 +141,19 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
+  it "conforms to the template entry plan state fixture" do
+    fixture = diagnostics_fixture("template_entry_plan_state")
+
+    expect(
+      json_ready(
+        described_class.enrich_template_plan_entries(
+          fixture[:planned_entries],
+          fixture[:existing_destination_paths]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
   it "resolves canonical manifest paths, including widened source-family entries" do
     expect(described_class.conformance_family_feature_profile_path(manifest, "json")).to eq(
       %w[diagnostics slice-21-family-feature-profile json-feature-profile.json]
