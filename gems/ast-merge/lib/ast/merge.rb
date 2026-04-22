@@ -254,6 +254,65 @@ module Ast
       end
     end
 
+    def plan_template_tree_execution(template_source_paths, template_contents, existing_destination_paths,
+      destination_contents, context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil)
+      planned_entries = plan_template_entries(template_source_paths, context, default_strategy, overrides)
+      stateful_entries = enrich_template_plan_entries(planned_entries, existing_destination_paths)
+      token_state_entries = enrich_template_plan_entries_with_token_state(
+        stateful_entries,
+        template_contents,
+        replacements,
+        config
+      )
+      prepared_entries = prepare_template_entries(token_state_entries, template_contents, replacements, config)
+
+      plan_template_execution(prepared_entries, destination_contents)
+    end
+
+    def preview_template_execution(entries)
+      result = {
+        result_files: {},
+        created_paths: [],
+        updated_paths: [],
+        kept_paths: [],
+        blocked_paths: [],
+        omitted_paths: []
+      }
+
+      entries.each do |entry|
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        execution_action = (entry[:execution_action] || entry["execution_action"]).to_s
+        destination_exists = entry[:destination_exists]
+        destination_exists = entry["destination_exists"] if destination_exists.nil?
+        prepared_template_content = entry[:prepared_template_content] || entry["prepared_template_content"]
+        destination_content = entry[:destination_content] || entry["destination_content"]
+
+        case execution_action
+        when "blocked"
+          result[:blocked_paths] << destination_path if destination_path
+        when "omit"
+          result[:omitted_paths] << (entry[:logical_destination_path] || entry["logical_destination_path"])
+        when "keep"
+          next unless destination_path && !destination_content.nil?
+
+          result[:result_files][destination_path] = destination_content
+          result[:kept_paths] << destination_path
+        when "raw_copy", "write_prepared_content"
+          next unless destination_path && !prepared_template_content.nil?
+
+          result[:result_files][destination_path] = prepared_template_content
+          (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+        when "merge_prepared_content"
+          next unless destination_path && !prepared_template_content.nil? && destination_content.nil?
+
+          result[:result_files][destination_path] = prepared_template_content
+          (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+        end
+      end
+
+      result
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(

@@ -26,6 +26,16 @@ RSpec.describe Ast::Merge do
     described_class.json_ready(value)
   end
 
+  def read_relative_file_tree(root)
+    root = root.expand_path
+    root.find.each_with_object({}) do |path, files|
+      next if path.directory?
+
+      rel = path.relative_path_from(root).to_s
+      files[rel] = path.read
+    end
+  end
+
   def execution_key(ref)
     "#{ref[:family]}:#{ref[:role]}:#{ref[:case]}"
   end
@@ -193,6 +203,53 @@ RSpec.describe Ast::Merge do
         )
       )
     ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
+  it "conforms to the mini template tree plan fixture" do
+    fixture = diagnostics_fixture("mini_template_tree_plan")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    expect(
+      json_ready(
+        described_class.plan_template_tree_execution(
+          template_contents.keys.sort,
+          template_contents,
+          destination_contents.keys.sort,
+          destination_contents,
+          fixture[:context],
+          fixture[:default_strategy],
+          fixture[:overrides],
+          fixture[:replacements]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
+  it "conforms to the mini template tree preview fixture" do
+    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
+    preview_fixture = diagnostics_fixture("mini_template_tree_preview")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    execution_plan = described_class.plan_template_tree_execution(
+      template_contents.keys.sort,
+      template_contents,
+      destination_contents.keys.sort,
+      destination_contents,
+      plan_fixture[:context],
+      plan_fixture[:default_strategy],
+      plan_fixture[:overrides],
+      plan_fixture[:replacements]
+    )
+
+    expect(json_ready(described_class.preview_template_execution(execution_plan))).to eq(
+      json_ready(preview_fixture[:expected_preview])
+    )
   end
 
   it "conforms to the template entry plan state fixture" do
