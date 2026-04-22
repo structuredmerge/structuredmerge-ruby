@@ -215,6 +215,33 @@ module Ruby
       )
     end
 
+    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children)
+      Ast::Merge.execute_reviewed_nested_merge(
+        review_state,
+        "ruby",
+        applied_children,
+        merge_parent: -> { merge_ruby(template_source, destination_source, dialect) },
+        discover_operations: lambda { |merged_output|
+          analysis = parse_ruby(merged_output, dialect)
+          next({ ok: false, diagnostics: analysis[:diagnostics] || [] }) unless analysis[:ok]
+
+          {
+            ok: true,
+            diagnostics: [],
+            operations: ruby_delegated_child_operations(analysis[:analysis])
+          }
+        },
+        apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, resolved_children|
+          apply_ruby_delegated_child_outputs(
+            merged_output,
+            operations,
+            apply_plan,
+            resolved_children
+          )
+        }
+      )
+    end
+
     def analyze_ruby_document(source)
       lines = normalize_source(source).split("\n", -1)
       requires = []
@@ -477,6 +504,7 @@ module Ruby
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :apply_ruby_delegated_child_outputs,
+      :merge_ruby_with_reviewed_nested_outputs,
       :merge_ruby_with_nested_outputs,
       :analyze_ruby_document,
       :collect_ruby_require_entries,

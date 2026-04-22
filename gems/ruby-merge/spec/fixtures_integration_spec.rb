@@ -221,5 +221,18 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(nested_merge_result[:ok]).to eq(nested_merge_fixture.dig(:expected, :ok))
     expect(nested_merge_result[:output]).to eq(nested_merge_fixture.dig(:expected, :output))
+
+    reviewed_nested_merge_fixture = read_json(
+      fixtures_root.join("ruby", "slice-299-reviewed-nested-merge", "yard-example-reviewed-nested-merge.json")
+    )
+    reviewed_nested_merge_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs(
+      reviewed_nested_merge_fixture[:template],
+      reviewed_nested_merge_fixture[:destination],
+      "ruby",
+      reviewed_nested_merge_fixture[:review_state],
+      reviewed_nested_merge_fixture[:applied_children]
+    )
+    expect(reviewed_nested_merge_result[:ok]).to eq(reviewed_nested_merge_fixture.dig(:expected, :ok))
+    expect(reviewed_nested_merge_result[:output]).to eq(reviewed_nested_merge_fixture.dig(:expected, :output))
   end
 end

@@ -232,6 +232,33 @@ module Markdown
       )
     end
 
+    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+      Ast::Merge.execute_reviewed_nested_merge(
+        review_state,
+        "markdown",
+        applied_children,
+        merge_parent: -> { merge_markdown(template_source, destination_source, dialect, backend: backend) },
+        discover_operations: lambda { |merged_output|
+          analysis = parse_markdown(merged_output, dialect, backend: backend)
+          next({ ok: false, diagnostics: analysis[:diagnostics] || [] }) unless analysis[:ok]
+
+          {
+            ok: true,
+            diagnostics: [],
+            operations: markdown_delegated_child_operations(analysis[:analysis])
+          }
+        },
+        apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, resolved_children|
+          apply_markdown_delegated_child_outputs(
+            merged_output,
+            operations,
+            apply_plan,
+            resolved_children
+          )
+        }
+      )
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -448,6 +475,7 @@ module Markdown
       :markdown_discovered_surfaces,
       :markdown_delegated_child_operations,
       :apply_markdown_delegated_child_outputs,
+      :merge_markdown_with_reviewed_nested_outputs,
       :merge_markdown_with_nested_outputs,
       :normalize_source,
       :slugify,
