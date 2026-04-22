@@ -123,14 +123,17 @@ RSpec.describe Markly::Merge do
     expect(state_result[:output]).to eq(expected[:output])
   end
 
-  it "conforms to the slice-311 reviewed nested review artifact rejection fixture" do
-    fixture = read_json(
+  it "conforms to the slice-327 markdown provider reviewed nested review artifact rejection fixture" do
+    provider_fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-311-reviewed-nested-review-artifact-rejection",
-        "fenced-code-reviewed-nested-review-artifact-rejection.json"
+        "diagnostics",
+        "slice-327-markdown-provider-reviewed-nested-review-artifact-rejection",
+        "ruby-markdown-provider-reviewed-nested-review-artifact-rejection.json"
       )
     )
+    fixture = read_json(fixtures_root.join(*provider_fixture[:shared_fixture_path]))
+    expected_replay_bundle = provider_fixture.dig(:providers, :markly, :expected_replay_bundle)
+    expected_review_state = provider_fixture.dig(:providers, :markly, :expected_review_state)
     expect(
       json_ready(described_class.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
         fixture[:template],
@@ -138,7 +141,7 @@ RSpec.describe Markly::Merge do
         "markdown",
         fixture[:replay_bundle]
       ))
-    ).to eq(json_ready(fixture[:expected].merge(policies: [])))
+    ).to eq(json_ready(expected_replay_bundle.merge(policies: [])))
     expect(
       json_ready(described_class.merge_markdown_with_reviewed_nested_outputs_from_review_state(
         fixture[:template],
@@ -146,7 +149,7 @@ RSpec.describe Markly::Merge do
         "markdown",
         fixture[:review_state]
       ))
-    ).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
+    ).to eq(json_ready(expected_review_state.merge(policies: [])))
   end
 
   it "conforms to the slice-313 reviewed nested review artifact envelope application fixture" do
