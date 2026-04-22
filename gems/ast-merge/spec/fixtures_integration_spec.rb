@@ -99,6 +99,33 @@ RSpec.describe Ast::Merge do
     end
   end
 
+  it "conforms to the template destination mapping fixture" do
+    fixture = diagnostics_fixture("template_destination_mapping")
+
+    fixture[:cases].each do |test_case|
+      expect(
+        described_class.resolve_template_destination_path(
+          test_case[:logical_destination_path],
+          test_case[:context]
+        )
+      ).to eq(test_case[:expected_destination_path])
+    end
+  end
+
+  it "conforms to the template strategy selection fixture" do
+    fixture = diagnostics_fixture("template_strategy_selection")
+
+    fixture[:cases].each do |test_case|
+      expect(
+        described_class.select_template_strategy(
+          test_case[:destination_path],
+          test_case[:default_strategy],
+          test_case[:overrides]
+        )
+      ).to eq(test_case[:expected_strategy])
+    end
+  end
+
   it "resolves canonical manifest paths, including widened source-family entries" do
     expect(described_class.conformance_family_feature_profile_path(manifest, "json")).to eq(
       %w[diagnostics slice-21-family-feature-profile json-feature-profile.json]

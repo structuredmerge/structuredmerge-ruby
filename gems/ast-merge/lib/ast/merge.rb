@@ -71,6 +71,33 @@ module Ast
       template_target_classification(path, "text", "text", "text")
     end
 
+    def resolve_template_destination_path(path, context = {})
+      case path.to_s
+      when ".kettle-jem.yml"
+        nil
+      when ".env.local"
+        ".env.local.example"
+      when "gem.gemspec"
+        project_name = context[:project_name] || context["project_name"]
+        return "#{project_name.to_s.strip}.gemspec" unless project_name.to_s.strip.empty?
+
+        path
+      else
+        path
+      end
+    end
+
+    def select_template_strategy(path, default_strategy = "merge", overrides = [])
+      normalized_path = path.to_s.delete_prefix("./")
+      override = overrides.find do |entry|
+        candidate = entry[:path] || entry["path"]
+        candidate.to_s.delete_prefix("./") == normalized_path
+      end
+      return (override[:strategy] || override["strategy"]).to_s if override
+
+      default_strategy.to_s
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
