@@ -160,6 +160,34 @@ module Ruby
       operations
     end
 
+    def apply_ruby_delegated_child_outputs(source, delegated_operations, apply_plan, applied_children)
+      lines = normalize_source(source).split("\n")
+      operations_by_id = delegated_operations.to_h { |operation| [operation[:operation_id], operation] }
+      outputs_by_id = applied_children.to_h { |entry| [entry[:operation_id], entry[:output]] }
+
+      replacements = apply_plan[:entries].filter_map do |entry|
+        operation = operations_by_id[entry.dig(:delegated_group, :child_operation_id)]
+        output = outputs_by_id[entry.dig(:delegated_group, :child_operation_id)]
+        span = operation&.dig(:surface, :span)
+        next if operation.nil? || output.nil? || span.nil?
+
+        { start: span[:start_line] - 1, finish: span[:end_line] - 1, output: output }
+      end
+
+      replacements.sort_by { |entry| -entry[:start] }.each do |entry|
+        prefix = comment_prefix_for(lines[entry[:start]])
+        replacement_lines = entry[:output].empty? ? [] : entry[:output].sub(/\n\z/, "").split("\n").map { |line| "#{prefix}#{line}" }
+        lines[entry[:start]..entry[:finish]] = replacement_lines
+      end
+
+      {
+        ok: true,
+        diagnostics: [],
+        output: "#{lines.join("\n").sub(/\n+\z/, "")}\n",
+        policies: [DESTINATION_WINS_ARRAY_POLICY]
+      }
+    end
+
     def analyze_ruby_document(source)
       lines = normalize_source(source).split("\n", -1)
       requires = []
@@ -400,7 +428,7 @@ module Ruby
     end
 
     def comment_prefix_for(raw)
-      raw.to_s[/\A\s*#\s?/] || "# "
+      raw.to_s[/\A\s*#\s*/] || "# "
     end
 
     def declared_example_language(rest)
@@ -421,6 +449,7 @@ module Ruby
       :merge_ruby,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
+      :apply_ruby_delegated_child_outputs,
       :analyze_ruby_document,
       :collect_ruby_require_entries,
       :collect_ruby_declaration_entries,

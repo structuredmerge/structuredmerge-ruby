@@ -170,6 +170,41 @@ module Markdown
       end
     end
 
+    def apply_markdown_delegated_child_outputs(source, delegated_operations, apply_plan, applied_children)
+      lines = normalize_source(source).split("\n")
+      ranges = markdown_fence_ranges(source)
+      operations_by_id = delegated_operations.to_h { |operation| [operation[:operation_id], operation] }
+      outputs_by_id = applied_children.to_h { |entry| [entry[:operation_id], entry[:output]] }
+
+      replacements = apply_plan[:entries].filter_map do |entry|
+        operation = operations_by_id[entry.dig(:delegated_group, :child_operation_id)]
+        output = outputs_by_id[entry.dig(:delegated_group, :child_operation_id)]
+        next if operation.nil? || output.nil?
+
+        owner_path = operation.dig(:surface, :owner, :address)
+        range = ranges[owner_path]
+        return {
+          ok: false,
+          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing fenced-code range for #{owner_path}" }],
+          policies: []
+        } if range.nil?
+
+        { range: range, output: output }
+      end
+
+      replacements.sort_by { |entry| -entry[:range][:start] }.each do |entry|
+        body_lines = entry[:output].empty? ? [] : entry[:output].sub(/\n\z/, "").split("\n")
+        lines[entry[:range][:start] + 1...entry[:range][:end]] = body_lines
+      end
+
+      {
+        ok: true,
+        diagnostics: [],
+        output: "#{lines.join("\n").sub(/\n+\z/, "")}\n",
+        policies: []
+      }
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -298,6 +333,44 @@ module Markdown
       end
     end
 
+    def markdown_fence_ranges(source)
+      ranges = {}
+      code_fence_index = 0
+      lines = normalize_source(source).split("\n")
+      index = 0
+
+      while index < lines.length
+        line = lines[index]
+        if (fence = line.match(/^\s*(`{3,}|~{3,})\s*(.*?)\s*$/))
+          marker = fence[1]
+          marker_char = marker[0]
+          marker_length = marker.length
+          closing_index = index
+          cursor = index + 1
+          while cursor < lines.length
+            trimmed = lines[cursor].strip
+            if trimmed.length >= marker_length &&
+                trimmed.start_with?(marker_char * marker_length) &&
+                trimmed.delete(marker_char).empty?
+              closing_index = cursor
+              break
+            end
+            closing_index = cursor if cursor == lines.length - 1
+            cursor += 1
+          end
+
+          ranges["/code_fence/#{code_fence_index}"] = { start: index, end: closing_index }
+          code_fence_index += 1
+          index = closing_index + 1
+          next
+        end
+
+        index += 1
+      end
+
+      ranges
+    end
+
     def code_fence_family(info_string)
       case info_string.to_s.downcase
       when "ts", "typescript"
@@ -347,11 +420,13 @@ module Markdown
       :markdown_embedded_families,
       :markdown_discovered_surfaces,
       :markdown_delegated_child_operations,
+      :apply_markdown_delegated_child_outputs,
       :normalize_source,
       :slugify,
       :collect_markdown_owners,
       :markdown_owner_start_indices,
       :collect_markdown_sections,
+      :markdown_fence_ranges,
       :code_fence_family,
       :code_fence_dialect,
       :resolve_backend,

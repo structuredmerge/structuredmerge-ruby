@@ -197,5 +197,17 @@ RSpec.describe "Ruby::Merge" do
         )
       )
     ).to eq(json_ready(apply_plan_fixture[:expected_plan]))
+
+    apply_output_fixture = read_json(
+      fixtures_root.join("ruby", "slice-289-delegated-child-apply-output", "yard-example-applied-output.json")
+    )
+    apply_output_result = RUBY_MERGE.apply_ruby_delegated_child_outputs(
+      apply_output_fixture[:source],
+      apply_output_fixture[:delegated_operations],
+      apply_output_fixture[:apply_plan],
+      apply_output_fixture[:applied_children]
+    )
+    expect(apply_output_result[:ok]).to eq(apply_output_fixture.dig(:expected, :ok))
+    expect(apply_output_result[:output]).to eq(apply_output_fixture.dig(:expected, :output))
   end
 end
