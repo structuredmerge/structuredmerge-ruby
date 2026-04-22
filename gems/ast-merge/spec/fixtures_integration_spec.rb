@@ -79,6 +79,26 @@ RSpec.describe Ast::Merge do
     expect(json_ready(feature_profile)).to eq(json_ready(fixture[:feature_profile]))
   end
 
+  it "conforms to the template source path mapping fixture" do
+    fixture = diagnostics_fixture("template_source_path_mapping")
+
+    fixture[:cases].each do |test_case|
+      expect(described_class.normalize_template_source_path(test_case[:template_source_path])).to eq(
+        test_case[:expected_destination_path]
+      )
+    end
+  end
+
+  it "conforms to the template target classification fixture" do
+    fixture = diagnostics_fixture("template_target_classification")
+
+    fixture[:cases].each do |test_case|
+      expect(json_ready(described_class.classify_template_target_path(test_case[:destination_path]))).to eq(
+        json_ready(test_case[:expected])
+      )
+    end
+  end
+
   it "resolves canonical manifest paths, including widened source-family entries" do
     expect(described_class.conformance_family_feature_profile_path(manifest, "json")).to eq(
       %w[diagnostics slice-21-family-feature-profile json-feature-profile.json]

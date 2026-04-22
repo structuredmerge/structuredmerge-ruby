@@ -25,6 +25,52 @@ module Ast
       entry && deep_dup(entry[:path])
     end
 
+    def normalize_template_source_path(path)
+      return path.delete_suffix(".no-osc.example") if path.end_with?(".no-osc.example")
+      return path.delete_suffix(".example") if path.end_with?(".example")
+
+      path
+    end
+
+    def classify_template_target_path(path)
+      normalized_path = path.to_s.delete_prefix("./")
+      base = File.basename(normalized_path)
+      lower_path = normalized_path.downcase
+      lower_base = base.downcase
+
+      return template_target_classification(path, "ruby", "ruby", "ruby") if normalized_path == ".git-hooks/commit-msg"
+      return template_target_classification(path, "bash", "bash", "bash") if normalized_path == ".git-hooks/prepare-commit-msg"
+
+      case base
+      when "Gemfile", "Appraisal.root.gemfile"
+        return template_target_classification(path, "gemfile", "ruby", "ruby")
+      when "Appraisals"
+        return template_target_classification(path, "appraisals", "ruby", "ruby")
+      when "Rakefile", ".simplecov"
+        return template_target_classification(path, "ruby", "ruby", "ruby")
+      when ".envrc"
+        return template_target_classification(path, "bash", "bash", "bash")
+      when ".tool-versions"
+        return template_target_classification(path, "tool_versions", "text", "tool_versions")
+      when "CITATION.cff"
+        return template_target_classification(path, "yaml", "yaml", "yaml")
+      end
+
+      return template_target_classification(path, "gemspec", "ruby", "ruby") if lower_base.end_with?(".gemspec")
+      return template_target_classification(path, "gemfile", "ruby", "ruby") if lower_base.end_with?(".gemfile")
+      return template_target_classification(path, "ruby", "ruby", "ruby") if lower_base.end_with?(".rb", ".rake")
+      return template_target_classification(path, "yaml", "yaml", "yaml") if lower_path.end_with?(".yml", ".yaml")
+      return template_target_classification(path, "markdown", "markdown", "markdown") if lower_path.end_with?(".md", ".markdown")
+      return template_target_classification(path, "bash", "bash", "bash") if lower_path.end_with?(".sh", ".bash")
+      return template_target_classification(path, "dotenv", "dotenv", "dotenv") if lower_base == ".env" || lower_base.start_with?(".env.")
+      return template_target_classification(path, "json", "json", "jsonc") if lower_path.end_with?(".jsonc")
+      return template_target_classification(path, "json", "json", "json") if lower_path.end_with?(".json")
+      return template_target_classification(path, "toml", "toml", "toml") if lower_path.end_with?(".toml")
+      return template_target_classification(path, "rbs", "rbs", "rbs") if lower_path.end_with?(".rbs")
+
+      template_target_classification(path, "text", "text", "text")
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
@@ -947,6 +993,15 @@ module Ast
 
     def deep_dup(value)
       Marshal.load(Marshal.dump(value))
+    end
+
+    def template_target_classification(path, file_type, family, dialect)
+      {
+        destination_path: path,
+        file_type: file_type,
+        family: family,
+        dialect: dialect
+      }
     end
 
     def deep_symbolize(value)
