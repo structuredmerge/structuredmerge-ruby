@@ -377,4 +377,62 @@ RSpec.describe Markdown::Merge do
     )
     expect(json_ready(review_state_result)).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
   end
+
+  it "conforms to the slice-313 reviewed nested review artifact envelope application fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "markdown",
+        "slice-313-reviewed-nested-review-artifact-envelope-application",
+        "fenced-code-reviewed-nested-review-artifact-envelope-application.json"
+      )
+    )
+
+    replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:replay_bundle_envelope],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(replay_result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(replay_result[:output]).to eq(fixture.dig(:expected, :output))
+
+    review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:review_state_envelope],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(review_state_result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(review_state_result[:output]).to eq(fixture.dig(:expected, :output))
+  end
+
+  it "conforms to the slice-315 reviewed nested review artifact envelope rejection fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "markdown",
+        "slice-315-reviewed-nested-review-artifact-envelope-rejection",
+        "fenced-code-reviewed-nested-review-artifact-envelope-rejection.json"
+      )
+    )
+
+    replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:replay_bundle_envelope],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(json_ready(replay_result)).to eq(json_ready(fixture[:expected_replay_bundle].merge(policies: [])))
+
+    review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:review_state_envelope],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(json_ready(review_state_result)).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
+  end
 end

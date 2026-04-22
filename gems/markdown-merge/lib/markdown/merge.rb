@@ -287,6 +287,32 @@ module Markdown
       )
     end
 
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
+        template_source,
+        destination_source,
+        dialect,
+        replay_bundle,
+        backend: backend
+      )
+    end
+
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_markdown_with_reviewed_nested_outputs_from_review_state(
+        template_source,
+        destination_source,
+        dialect,
+        review_state,
+        backend: backend
+      )
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -505,7 +531,9 @@ module Markdown
       :apply_markdown_delegated_child_outputs,
       :merge_markdown_with_reviewed_nested_outputs,
       :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope,
       :merge_markdown_with_reviewed_nested_outputs_from_review_state,
+      :merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope,
       :merge_markdown_with_nested_outputs,
       :normalize_source,
       :slugify,

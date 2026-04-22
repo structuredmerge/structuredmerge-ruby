@@ -268,6 +268,30 @@ module Ruby
       )
     end
 
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope)
+      replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+        template_source,
+        destination_source,
+        dialect,
+        replay_bundle
+      )
+    end
+
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope)
+      review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_ruby_with_reviewed_nested_outputs_from_review_state(
+        template_source,
+        destination_source,
+        dialect,
+        review_state
+      )
+    end
+
     def analyze_ruby_document(source)
       lines = normalize_source(source).split("\n", -1)
       requires = []
@@ -532,7 +556,9 @@ module Ruby
       :apply_ruby_delegated_child_outputs,
       :merge_ruby_with_reviewed_nested_outputs,
       :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope,
       :merge_ruby_with_reviewed_nested_outputs_from_review_state,
+      :merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope,
       :merge_ruby_with_nested_outputs,
       :analyze_ruby_document,
       :collect_ruby_require_entries,

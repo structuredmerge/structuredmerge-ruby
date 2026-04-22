@@ -100,6 +100,18 @@ module Prism
       )
     end
 
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+        template_source,
+        destination_source,
+        dialect,
+        envelope
+      )
+    end
+
     def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -109,6 +121,18 @@ module Prism
         destination_source,
         dialect,
         review_state
+      )
+    end
+
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
+        template_source,
+        destination_source,
+        dialect,
+        envelope
       )
     end
 
@@ -134,7 +158,9 @@ module Prism
       :merge_ruby,
       :merge_ruby_with_reviewed_nested_outputs,
       :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope,
       :merge_ruby_with_reviewed_nested_outputs_from_review_state,
+      :merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :unsupported_feature_result

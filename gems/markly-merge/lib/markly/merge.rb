@@ -104,6 +104,19 @@ module Markly
       )
     end
 
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+        template_source,
+        destination_source,
+        dialect,
+        envelope,
+        backend: "kreuzberg-language-pack"
+      )
+    end
+
     def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -113,6 +126,19 @@ module Markly
         destination_source,
         dialect,
         review_state,
+        backend: "kreuzberg-language-pack"
+      )
+    end
+
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
+        template_source,
+        destination_source,
+        dialect,
+        envelope,
         backend: "kreuzberg-language-pack"
       )
     end
@@ -139,7 +165,9 @@ module Markly
       :merge_markdown,
       :merge_markdown_with_reviewed_nested_outputs,
       :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope,
       :merge_markdown_with_reviewed_nested_outputs_from_review_state,
+      :merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope,
       :markdown_embedded_families,
       :unsupported_feature_result
     )

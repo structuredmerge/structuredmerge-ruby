@@ -280,5 +280,51 @@ RSpec.describe "Ruby::Merge" do
       rejection_fixture[:review_state]
     )
     expect(json_ready(state_rejection)).to eq(json_ready(rejection_fixture[:expected_review_state].merge(policies: [])))
+
+    envelope_fixture = read_json(
+      fixtures_root.join(
+        "ruby",
+        "slice-314-reviewed-nested-review-artifact-envelope-application",
+        "yard-example-reviewed-nested-review-artifact-envelope-application.json"
+      )
+    )
+    replay_envelope_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      envelope_fixture[:template],
+      envelope_fixture[:destination],
+      "ruby",
+      envelope_fixture[:replay_bundle_envelope]
+    )
+    expect(replay_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
+    expect(replay_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+    state_envelope_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
+      envelope_fixture[:template],
+      envelope_fixture[:destination],
+      "ruby",
+      envelope_fixture[:review_state_envelope]
+    )
+    expect(state_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
+    expect(state_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+
+    envelope_rejection_fixture = read_json(
+      fixtures_root.join(
+        "ruby",
+        "slice-316-reviewed-nested-review-artifact-envelope-rejection",
+        "yard-example-reviewed-nested-review-artifact-envelope-rejection.json"
+      )
+    )
+    replay_envelope_rejection = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      envelope_rejection_fixture[:template],
+      envelope_rejection_fixture[:destination],
+      "ruby",
+      envelope_rejection_fixture[:replay_bundle_envelope]
+    )
+    expect(json_ready(replay_envelope_rejection)).to eq(json_ready(envelope_rejection_fixture[:expected_replay_bundle].merge(policies: [])))
+    state_envelope_rejection = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
+      envelope_rejection_fixture[:template],
+      envelope_rejection_fixture[:destination],
+      "ruby",
+      envelope_rejection_fixture[:review_state_envelope]
+    )
+    expect(json_ready(state_envelope_rejection)).to eq(json_ready(envelope_rejection_fixture[:expected_review_state].merge(policies: [])))
   end
 end
