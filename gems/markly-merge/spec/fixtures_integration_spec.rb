@@ -121,6 +121,32 @@ RSpec.describe Markly::Merge do
     expect(state_result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
+  it "conforms to the slice-311 reviewed nested review artifact rejection fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "markdown",
+        "slice-311-reviewed-nested-review-artifact-rejection",
+        "fenced-code-reviewed-nested-review-artifact-rejection.json"
+      )
+    )
+    expect(
+      json_ready(described_class.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
+        fixture[:template],
+        fixture[:destination],
+        "markdown",
+        fixture[:replay_bundle]
+      ))
+    ).to eq(json_ready(fixture[:expected].merge(policies: [])))
+    expect(
+      json_ready(described_class.merge_markdown_with_reviewed_nested_outputs_from_review_state(
+        fixture[:template],
+        fixture[:destination],
+        "markdown",
+        fixture[:review_state]
+      ))
+    ).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
+  end
+
   it "rejects unsupported provider backend overrides" do
     result = described_class.parse_markdown("# Title\n", "markdown", backend: "kreuzberg-language-pack")
     expect(result[:ok]).to be(false)

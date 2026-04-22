@@ -349,4 +349,32 @@ RSpec.describe Markdown::Merge do
     expect(review_state_result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(review_state_result[:output]).to eq(fixture.dig(:expected, :output))
   end
+
+  it "conforms to the slice-311 reviewed nested review artifact rejection fixture" do
+    fixture = read_json(
+      fixtures_root.join(
+        "markdown",
+        "slice-311-reviewed-nested-review-artifact-rejection",
+        "fenced-code-reviewed-nested-review-artifact-rejection.json"
+      )
+    )
+
+    replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:replay_bundle],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(json_ready(replay_result)).to eq(json_ready(fixture[:expected].merge(policies: [])))
+
+    review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:review_state],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(json_ready(review_state_result)).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
+  end
 end

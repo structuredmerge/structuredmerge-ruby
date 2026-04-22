@@ -258,5 +258,27 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(state_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
     expect(state_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+
+    rejection_fixture = read_json(
+      fixtures_root.join(
+        "ruby",
+        "slice-312-reviewed-nested-review-artifact-rejection",
+        "yard-example-reviewed-nested-review-artifact-rejection.json"
+      )
+    )
+    replay_rejection = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+      rejection_fixture[:template],
+      rejection_fixture[:destination],
+      "ruby",
+      rejection_fixture[:replay_bundle]
+    )
+    expect(json_ready(replay_rejection)).to eq(json_ready(rejection_fixture[:expected].merge(policies: [])))
+    state_rejection = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state(
+      rejection_fixture[:template],
+      rejection_fixture[:destination],
+      "ruby",
+      rejection_fixture[:review_state]
+    )
+    expect(json_ready(state_rejection)).to eq(json_ready(rejection_fixture[:expected_review_state].merge(policies: [])))
   end
 end

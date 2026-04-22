@@ -124,6 +124,30 @@ RSpec.describe "Prism::Merge" do
     )
     expect(state_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
     expect(state_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+
+    rejection_fixture = read_json(
+      fixtures_root.join(
+        "ruby",
+        "slice-312-reviewed-nested-review-artifact-rejection",
+        "yard-example-reviewed-nested-review-artifact-rejection.json"
+      )
+    )
+    expect(
+      json_ready(PRISM_MERGE.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+        rejection_fixture[:template],
+        rejection_fixture[:destination],
+        "ruby",
+        rejection_fixture[:replay_bundle]
+      ))
+    ).to eq(json_ready(rejection_fixture[:expected].merge(policies: [])))
+    expect(
+      json_ready(PRISM_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state(
+        rejection_fixture[:template],
+        rejection_fixture[:destination],
+        "ruby",
+        rejection_fixture[:review_state]
+      ))
+    ).to eq(json_ready(rejection_fixture[:expected_review_state].merge(policies: [])))
   end
 
   it "conforms to the provider named-suite plan and manifest-report fixtures" do
