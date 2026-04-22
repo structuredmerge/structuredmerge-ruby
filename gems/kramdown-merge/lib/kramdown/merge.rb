@@ -79,6 +79,20 @@ module Kramdown
       Markdown::Merge.merge_markdown(template_source, destination_source, dialect, backend: "kreuzberg-language-pack")
     end
 
+    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        review_state,
+        applied_children,
+        backend: "kreuzberg-language-pack"
+      )
+    end
+
     def markdown_embedded_families(analysis)
       Markdown::Merge.markdown_embedded_families(analysis)
     end
@@ -99,6 +113,7 @@ module Kramdown
       :parse_markdown,
       :match_markdown_owners,
       :merge_markdown,
+      :merge_markdown_with_reviewed_nested_outputs,
       :markdown_embedded_families,
       :unsupported_feature_result
     )

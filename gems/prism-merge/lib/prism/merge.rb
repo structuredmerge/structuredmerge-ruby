@@ -75,6 +75,19 @@ module Prism
       Ruby::Merge.merge_ruby(template_source, destination_source, dialect)
     end
 
+    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        review_state,
+        applied_children
+      )
+    end
+
     def ruby_discovered_surfaces(analysis)
       Ruby::Merge.ruby_discovered_surfaces(analysis)
     end
@@ -95,6 +108,7 @@ module Prism
       :parse_ruby,
       :match_ruby_owners,
       :merge_ruby,
+      :merge_ruby_with_reviewed_nested_outputs,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :unsupported_feature_result

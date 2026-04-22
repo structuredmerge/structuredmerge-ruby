@@ -88,6 +88,21 @@ RSpec.describe Kramdown::Merge do
     )
   end
 
+  it "conforms to the slice-298 reviewed nested merge fixture" do
+    fixture = read_json(
+      fixtures_root.join("markdown", "slice-298-reviewed-nested-merge", "fenced-code-reviewed-nested-merge.json")
+    )
+    result = described_class.merge_markdown_with_reviewed_nested_outputs(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:review_state],
+      fixture[:applied_children]
+    )
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(result[:output]).to eq(fixture.dig(:expected, :output))
+  end
+
   it "rejects unsupported provider backend overrides" do
     result = described_class.parse_markdown("# Title\n", "markdown", backend: "kreuzberg-language-pack")
     expect(result[:ok]).to be(false)
