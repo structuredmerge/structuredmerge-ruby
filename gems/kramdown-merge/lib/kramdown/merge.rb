@@ -76,7 +76,7 @@ module Kramdown
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Markdown::Merge.merge_markdown(template_source, destination_source, dialect, backend: "kreuzberg-language-pack")
+      Markdown::Merge.merge_markdown(template_source, destination_source, dialect)
     end
 
     def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
@@ -88,8 +88,7 @@ module Kramdown
         destination_source,
         dialect,
         review_state,
-        applied_children,
-        backend: "kreuzberg-language-pack"
+        applied_children
       )
     end
 
@@ -101,8 +100,7 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        replay_bundle,
-        backend: "kreuzberg-language-pack"
+        replay_bundle
       )
     end
 
@@ -114,8 +112,7 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        envelope,
-        backend: "kreuzberg-language-pack"
+        envelope
       )
     end
 
@@ -127,8 +124,7 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        review_state,
-        backend: "kreuzberg-language-pack"
+        review_state
       )
     end
 
@@ -140,8 +136,7 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        envelope,
-        backend: "kreuzberg-language-pack"
+        envelope
       )
     end
 

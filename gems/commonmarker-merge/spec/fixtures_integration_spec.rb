@@ -214,6 +214,30 @@ RSpec.describe Commonmarker::Merge do
     expect(result[:diagnostics]).to eq(
       [{ severity: "error", category: "unsupported_feature", message: "Unsupported Markdown backend kreuzberg-language-pack." }]
     )
+
+    replay_envelope_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      "# Title\n",
+      "# Title\n",
+      "markdown",
+      {},
+      backend: "kreuzberg-language-pack"
+    )
+    expect(replay_envelope_result[:ok]).to be(false)
+    expect(replay_envelope_result[:diagnostics]).to eq(
+      [{ severity: "error", category: "unsupported_feature", message: "Unsupported Markdown backend kreuzberg-language-pack." }]
+    )
+
+    state_envelope_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
+      "# Title\n",
+      "# Title\n",
+      "markdown",
+      {},
+      backend: "kreuzberg-language-pack"
+    )
+    expect(state_envelope_result[:ok]).to be(false)
+    expect(state_envelope_result[:diagnostics]).to eq(
+      [{ severity: "error", category: "unsupported_feature", message: "Unsupported Markdown backend kreuzberg-language-pack." }]
+    )
   end
 
   it "conforms to the provider named-suite plan and manifest-report fixtures" do
