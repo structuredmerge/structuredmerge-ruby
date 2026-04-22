@@ -384,6 +384,29 @@ module Ast
       )
     end
 
+    def execute_reviewed_nested_executions(executions, &callbacks_for_execution)
+      executions.each_with_index.map do |execution, index|
+        callbacks = callbacks_for_execution.call(execution, index)
+        {
+          execution: deep_dup(execution),
+          result: execute_reviewed_nested_execution(
+            execution,
+            merge_parent: callbacks.fetch(:merge_parent),
+            discover_operations: callbacks.fetch(:discover_operations),
+            apply_resolved_outputs: callbacks.fetch(:apply_resolved_outputs)
+          )
+        }
+      end
+    end
+
+    def execute_review_replay_bundle_reviewed_nested_executions(bundle, &callbacks_for_execution)
+      execute_reviewed_nested_executions(bundle.fetch(:reviewed_nested_executions, []), &callbacks_for_execution)
+    end
+
+    def execute_review_state_reviewed_nested_executions(state, &callbacks_for_execution)
+      execute_reviewed_nested_executions(state.fetch(:reviewed_nested_executions, []), &callbacks_for_execution)
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_selectors(manifest).filter_map do |selector|

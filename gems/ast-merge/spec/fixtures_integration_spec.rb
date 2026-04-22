@@ -374,6 +374,8 @@ RSpec.describe Ast::Merge do
     reviewed_nested_execution_roundtrip_fixture = diagnostics_fixture("reviewed_nested_execution_json_roundtrip")
     reviewed_nested_execution_envelope_fixture = diagnostics_fixture("reviewed_nested_execution_envelope")
     reviewed_nested_execution_envelope_rejection_fixture = diagnostics_fixture("reviewed_nested_execution_envelope_rejection")
+    reviewed_nested_execution_replay_application_fixture = diagnostics_fixture("review_replay_bundle_reviewed_nested_execution_application")
+    reviewed_nested_execution_state_application_fixture = diagnostics_fixture("review_state_reviewed_nested_execution_application")
     review_proposal_fixture = diagnostics_fixture("family_context_review_proposal")
     explicit_decision_fixture = diagnostics_fixture("family_context_explicit_review_decision")
     explicit_bundle_fixture = diagnostics_fixture("explicit_review_replay_bundle_application")
@@ -448,6 +450,120 @@ RSpec.describe Ast::Merge do
       &execute_from(review_state_reviewed_nested_fixture[:executions])
     )
     expect(json_ready(replay_with_nested_applied)).to eq(json_ready(review_state_reviewed_nested_fixture[:expected_state]))
+
+    replay_nested_runs = described_class.execute_review_replay_bundle_reviewed_nested_executions(
+      reviewed_nested_execution_replay_application_fixture[:replay_bundle]
+    ) do |execution, index|
+      expected_output = reviewed_nested_execution_replay_application_fixture[:expected_results][index][:result][:output]
+      {
+        merge_parent: lambda {
+          { ok: true, diagnostics: [], output: "#{execution[:family]}-merged-parent", policies: [] }
+        },
+        discover_operations: lambda { |_merged_output|
+          {
+            ok: true,
+            diagnostics: [],
+            operations: execution[:review_state][:accepted_groups].map do |group|
+              if execution[:family] == "markdown"
+                {
+                  operation_id: group[:child_operation_id],
+                  parent_operation_id: group[:parent_operation_id],
+                  requested_strategy: "delegate_child_surface",
+                  language_chain: %w[markdown typescript],
+                  surface: {
+                    surface_kind: "fenced_code_block",
+                    effective_language: "typescript",
+                    address: group[:delegated_runtime_surface_path],
+                    owner: { kind: "owned_region", address: "/code_fence/0" },
+                    reconstruction_strategy: "portable_write",
+                    metadata: { family: "typescript" }
+                  }
+                }
+              else
+                {
+                  operation_id: group[:child_operation_id],
+                  parent_operation_id: group[:parent_operation_id],
+                  requested_strategy: "delegate_child_surface",
+                  language_chain: %w[ruby ruby],
+                  surface: {
+                    surface_kind: "yard_example",
+                    effective_language: "ruby",
+                    address: group[:delegated_runtime_surface_path],
+                    owner: { kind: "owned_region", address: "/yard_example/1" },
+                    reconstruction_strategy: "portable_write",
+                    metadata: { family: "ruby" }
+                  }
+                }
+              end
+            end
+          }
+        },
+        apply_resolved_outputs: lambda { |_merged_output, _operations, _apply_plan, applied_children|
+          expect(json_ready(applied_children)).to eq(json_ready(execution[:applied_children]))
+          { ok: true, diagnostics: [], output: expected_output, policies: [] }
+        }
+      }
+    end
+    expect(json_ready(replay_nested_runs.map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+      json_ready(reviewed_nested_execution_replay_application_fixture[:expected_results])
+    )
+
+    review_state_nested_runs = described_class.execute_review_state_reviewed_nested_executions(
+      reviewed_nested_execution_state_application_fixture[:review_state]
+    ) do |execution, index|
+      expected_output = reviewed_nested_execution_state_application_fixture[:expected_results][index][:result][:output]
+      {
+        merge_parent: lambda {
+          { ok: true, diagnostics: [], output: "#{execution[:family]}-merged-parent", policies: [] }
+        },
+        discover_operations: lambda { |_merged_output|
+          {
+            ok: true,
+            diagnostics: [],
+            operations: execution[:review_state][:accepted_groups].map do |group|
+              if execution[:family] == "markdown"
+                {
+                  operation_id: group[:child_operation_id],
+                  parent_operation_id: group[:parent_operation_id],
+                  requested_strategy: "delegate_child_surface",
+                  language_chain: %w[markdown typescript],
+                  surface: {
+                    surface_kind: "fenced_code_block",
+                    effective_language: "typescript",
+                    address: group[:delegated_runtime_surface_path],
+                    owner: { kind: "owned_region", address: "/code_fence/0" },
+                    reconstruction_strategy: "portable_write",
+                    metadata: { family: "typescript" }
+                  }
+                }
+              else
+                {
+                  operation_id: group[:child_operation_id],
+                  parent_operation_id: group[:parent_operation_id],
+                  requested_strategy: "delegate_child_surface",
+                  language_chain: %w[ruby ruby],
+                  surface: {
+                    surface_kind: "yard_example",
+                    effective_language: "ruby",
+                    address: group[:delegated_runtime_surface_path],
+                    owner: { kind: "owned_region", address: "/yard_example/1" },
+                    reconstruction_strategy: "portable_write",
+                    metadata: { family: "ruby" }
+                  }
+                }
+              end
+            end
+          }
+        },
+        apply_resolved_outputs: lambda { |_merged_output, _operations, _apply_plan, applied_children|
+          expect(json_ready(applied_children)).to eq(json_ready(execution[:applied_children]))
+          { ok: true, diagnostics: [], output: expected_output, policies: [] }
+        }
+      }
+    end
+    expect(json_ready(review_state_nested_runs.map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+      json_ready(reviewed_nested_execution_state_application_fixture[:expected_results])
+    )
 
     review_state_envelope = described_class.conformance_manifest_review_state_envelope(review_state_roundtrip_fixture[:state])
     roundtrip_state, roundtrip_error = described_class.import_conformance_manifest_review_state_envelope(review_state_envelope)
