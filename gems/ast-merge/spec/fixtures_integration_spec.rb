@@ -252,6 +252,72 @@ RSpec.describe Ast::Merge do
     )
   end
 
+  it "conforms to the mini template tree apply fixture" do
+    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
+    apply_fixture = diagnostics_fixture("mini_template_tree_apply")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    execution_plan = described_class.plan_template_tree_execution(
+      template_contents.keys.sort,
+      template_contents,
+      destination_contents.keys.sort,
+      destination_contents,
+      plan_fixture[:context],
+      plan_fixture[:default_strategy],
+      plan_fixture[:overrides],
+      plan_fixture[:replacements]
+    )
+
+    apply_result = described_class.apply_template_execution(execution_plan) do |entry|
+      destination_path = entry[:destination_path] || entry["destination_path"]
+      apply_fixture[:merge_results][destination_path] || apply_fixture[:merge_results][destination_path.to_sym]
+    end
+
+    expect(json_ready(apply_result)).to eq(json_ready(apply_fixture[:expected_result]))
+  end
+
+  it "conforms to the mini template tree convergence fixture" do
+    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
+    apply_fixture = diagnostics_fixture("mini_template_tree_apply")
+    convergence_fixture = diagnostics_fixture("mini_template_tree_convergence")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    execution_plan = described_class.plan_template_tree_execution(
+      template_contents.keys.sort,
+      template_contents,
+      destination_contents.keys.sort,
+      destination_contents,
+      plan_fixture[:context],
+      plan_fixture[:default_strategy],
+      plan_fixture[:overrides],
+      plan_fixture[:replacements]
+    )
+    apply_result = described_class.apply_template_execution(execution_plan) do |entry|
+      destination_path = entry[:destination_path] || entry["destination_path"]
+      apply_fixture[:merge_results][destination_path] || apply_fixture[:merge_results][destination_path.to_sym]
+    end
+
+    expect(
+      json_ready(
+        described_class.evaluate_template_tree_convergence(
+          template_contents.keys.sort,
+          template_contents,
+          apply_result[:result_files],
+          plan_fixture[:context],
+          plan_fixture[:default_strategy],
+          plan_fixture[:overrides],
+          convergence_fixture[:replacements]
+        )
+      )
+    ).to eq(json_ready(convergence_fixture[:expected]))
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 
