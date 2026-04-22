@@ -1,4 +1,11 @@
 PATH
+  remote: ../archive/ruby-dog-food/token-resolver
+  specs:
+    token-resolver (1.0.2)
+      parslet (~> 2.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
   remote: gems/ast-merge
   specs:
     ast-merge (0.1.0)
@@ -156,6 +163,7 @@ GEM
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
     tree_sitter_language_pack (1.6.2-x86_64-linux)
+    version_gem (1.1.9)
 
 PLATFORMS
   x86_64-linux
@@ -177,6 +185,7 @@ DEPENDENCIES
   ruby-merge!
   rust-merge!
   text-merge!
+  token-resolver!
   toml-merge!
   tree_haver!
   typescript-merge!
@@ -212,12 +221,14 @@ CHECKSUMS
   ruby-merge (0.1.0)
   rust-merge (0.1.0)
   text-merge (0.1.0)
+  token-resolver (1.0.2)
   toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9
   toml-merge (0.1.0)
   toml-rb (4.1.0) sha256=14456ec4549e4703881bf04b83a56f3264ef99884880092d83c98a2058d95846
   tree_haver (0.1.0)
   tree_sitter_language_pack (1.6.2-x86_64-linux) sha256=eeeebb26902af7930838fb9817ca79182b3d80ecadf4b197b65bb290de9b95cc
   typescript-merge (0.1.0)
+  version_gem (1.1.9) sha256=0c1a0962ae543c84a00889bb018d9f14d8f8af6029d26b295d98774e3d2eb9a4
   yaml-merge (0.1.0)
 
 BUNDLED WITH

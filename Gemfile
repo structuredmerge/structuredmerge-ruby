@@ -21,3 +21,4 @@ gemspec path: "gems/go-merge"
 
 gem "rake"
 gem "rspec"
+gem "token-resolver", path: "../archive/ruby-dog-food/token-resolver"

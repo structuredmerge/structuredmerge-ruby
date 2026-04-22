@@ -1,12 +1,14 @@
 # frozen_string_literal: true
 
 require "json"
+require "token/resolver"
 require_relative "merge/version"
 
 module Ast
   module Merge
     PACKAGE_NAME = "ast-merge"
     REVIEW_TRANSPORT_VERSION = 1
+    TEMPLATE_TOKEN_CONFIG = Token::Resolver::Config.new(separators: ["|", ":"]).freeze
 
     module_function
 
@@ -87,6 +89,27 @@ module Ast
       end
     end
 
+    def default_template_token_config
+      {
+        pre: TEMPLATE_TOKEN_CONFIG.pre,
+        post: TEMPLATE_TOKEN_CONFIG.post,
+        separators: TEMPLATE_TOKEN_CONFIG.separators,
+        min_segments: TEMPLATE_TOKEN_CONFIG.min_segments,
+        max_segments: TEMPLATE_TOKEN_CONFIG.max_segments,
+        segment_pattern: TEMPLATE_TOKEN_CONFIG.segment_pattern
+      }
+    end
+
+    def template_token_keys(content, config = nil)
+      document = Token::Resolver::Document.new(content.to_s, config: token_resolver_config(config))
+      document.token_keys
+    end
+
+    def unresolved_template_token_keys(content, replacements = {}, config = nil)
+      replacement_keys = normalize_template_replacements(replacements)
+      template_token_keys(content, config).reject { |key| replacement_keys.key?(key) }
+    end
+
     def select_template_strategy(path, default_strategy = "merge", overrides = [])
       normalized_path = path.to_s.delete_prefix("./")
       override = overrides.find do |entry|
@@ -137,6 +160,30 @@ module Ast
       end
     end
 
+    def enrich_template_plan_entries_with_token_state(entries, template_contents, replacements, config = nil)
+      normalized_replacements = normalize_template_replacements(replacements)
+
+      entries.map do |entry|
+        source_path = entry[:template_source_path] || entry["template_source_path"]
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        strategy = (entry[:strategy] || entry["strategy"]).to_s
+        content = template_contents[source_path] || template_contents[source_path.to_s] ||
+          template_contents[source_path.to_sym] || ""
+        token_keys = template_token_keys(content, config)
+        unresolved_token_keys = token_keys.reject { |key| normalized_replacements.key?(key) }
+        token_resolution_required = !destination_path.nil? && strategy != "keep_destination" && strategy != "raw_copy"
+        blocked = token_resolution_required && !unresolved_token_keys.empty?
+
+        deep_dup(entry).merge(
+          token_keys: token_keys,
+          unresolved_token_keys: unresolved_token_keys,
+          token_resolution_required: token_resolution_required,
+          blocked: blocked,
+          block_reason: blocked ? "unresolved_tokens" : nil
+        )
+      end
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
@@ -144,6 +191,24 @@ module Ast
           selector
         )
       end&.then { |definition| deep_dup(definition) }
+    end
+
+    def token_resolver_config(config)
+      normalized = default_template_token_config.merge(normalize_value(config || {}))
+      Token::Resolver::Config.new(
+        pre: normalized[:pre],
+        post: normalized[:post],
+        separators: normalized[:separators],
+        min_segments: normalized[:min_segments],
+        max_segments: normalized[:max_segments],
+        segment_pattern: normalized[:segment_pattern]
+      )
+    end
+
+    def normalize_template_replacements(replacements)
+      (replacements || {}).each_with_object({}) do |(key, value), memo|
+        memo[key.to_s] = value
+      end
     end
 
     def conformance_suite_selectors(manifest)

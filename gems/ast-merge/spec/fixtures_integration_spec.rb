@@ -126,6 +126,19 @@ RSpec.describe Ast::Merge do
     end
   end
 
+  it "conforms to the template token keys fixture" do
+    fixture = diagnostics_fixture("template_token_keys")
+
+    fixture[:cases].each do |test_case|
+      expect(
+        described_class.template_token_keys(
+          test_case[:content],
+          test_case[:config]
+        )
+      ).to eq(test_case[:expected_token_keys])
+    end
+  end
+
   it "conforms to the template entry plan fixture" do
     fixture = diagnostics_fixture("template_entry_plan")
 
@@ -136,6 +149,20 @@ RSpec.describe Ast::Merge do
           fixture[:context],
           fixture[:default_strategy],
           fixture[:overrides]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
+  it "conforms to the template entry token state fixture" do
+    fixture = diagnostics_fixture("template_entry_token_state")
+
+    expect(
+      json_ready(
+        described_class.enrich_template_plan_entries_with_token_state(
+          fixture[:planned_entries],
+          fixture[:template_contents],
+          fixture[:replacements]
         )
       )
     ).to eq(json_ready(fixture[:expected_entries]))
