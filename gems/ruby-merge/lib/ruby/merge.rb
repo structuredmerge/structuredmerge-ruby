@@ -242,6 +242,32 @@ module Ruby
       )
     end
 
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle)
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+
+      merge_ruby_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        execution[:review_state],
+        execution[:applied_children]
+      )
+    end
+
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state)
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+
+      merge_ruby_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        execution[:review_state],
+        execution[:applied_children]
+      )
+    end
+
     def analyze_ruby_document(source)
       lines = normalize_source(source).split("\n", -1)
       requires = []
@@ -505,6 +531,8 @@ module Ruby
       :ruby_delegated_child_operations,
       :apply_ruby_delegated_child_outputs,
       :merge_ruby_with_reviewed_nested_outputs,
+      :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_ruby_with_reviewed_nested_outputs_from_review_state,
       :merge_ruby_with_nested_outputs,
       :analyze_ruby_document,
       :collect_ruby_require_entries,

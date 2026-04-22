@@ -234,5 +234,29 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(reviewed_nested_merge_result[:ok]).to eq(reviewed_nested_merge_fixture.dig(:expected, :ok))
     expect(reviewed_nested_merge_result[:output]).to eq(reviewed_nested_merge_fixture.dig(:expected, :output))
+
+    review_artifact_fixture = read_json(
+      fixtures_root.join(
+        "ruby",
+        "slice-310-reviewed-nested-review-artifact-application",
+        "yard-example-reviewed-nested-review-artifact-application.json"
+      )
+    )
+    replay_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+      review_artifact_fixture[:template],
+      review_artifact_fixture[:destination],
+      "ruby",
+      review_artifact_fixture[:replay_bundle]
+    )
+    expect(replay_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
+    expect(replay_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+    state_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state(
+      review_artifact_fixture[:template],
+      review_artifact_fixture[:destination],
+      "ruby",
+      review_artifact_fixture[:review_state]
+    )
+    expect(state_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
+    expect(state_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
   end
 end

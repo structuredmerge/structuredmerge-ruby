@@ -259,6 +259,34 @@ module Markdown
       )
     end
 
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "markdown" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for markdown." }], policies: [] } unless execution
+
+      merge_markdown_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        execution[:review_state],
+        execution[:applied_children],
+        backend: backend
+      )
+    end
+
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "markdown" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for markdown." }], policies: [] } unless execution
+
+      merge_markdown_with_reviewed_nested_outputs(
+        template_source,
+        destination_source,
+        dialect,
+        execution[:review_state],
+        execution[:applied_children],
+        backend: backend
+      )
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -476,6 +504,8 @@ module Markdown
       :markdown_delegated_child_operations,
       :apply_markdown_delegated_child_outputs,
       :merge_markdown_with_reviewed_nested_outputs,
+      :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_markdown_with_reviewed_nested_outputs_from_review_state,
       :merge_markdown_with_nested_outputs,
       :normalize_source,
       :slugify,
