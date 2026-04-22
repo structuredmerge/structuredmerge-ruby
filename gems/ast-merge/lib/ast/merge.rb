@@ -438,6 +438,50 @@ module Ast
       }
     end
 
+    def report_template_tree_run(result)
+      created = Array(result.dig(:apply_result, :created_paths) || result.dig("apply_result", "created_paths"))
+      updated = Array(result.dig(:apply_result, :updated_paths) || result.dig("apply_result", "updated_paths"))
+      kept = Array(result.dig(:apply_result, :kept_paths) || result.dig("apply_result", "kept_paths"))
+      blocked = Array(result.dig(:apply_result, :blocked_paths) || result.dig("apply_result", "blocked_paths"))
+      omitted = Array(result.dig(:apply_result, :omitted_paths) || result.dig("apply_result", "omitted_paths"))
+
+      entries = Array(result[:execution_plan] || result["execution_plan"]).map do |entry|
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        logical_destination_path = entry[:logical_destination_path] || entry["logical_destination_path"]
+        execution_action = (entry[:execution_action] || entry["execution_action"]).to_s
+        status = if execution_action == "omit" || omitted.include?(logical_destination_path)
+          "omitted"
+        elsif destination_path && blocked.include?(destination_path)
+          "blocked"
+        elsif destination_path && kept.include?(destination_path)
+          "kept"
+        elsif destination_path && updated.include?(destination_path)
+          "updated"
+        else
+          "created"
+        end
+
+        {
+          template_source_path: entry[:template_source_path] || entry["template_source_path"],
+          logical_destination_path: logical_destination_path,
+          destination_path: destination_path,
+          execution_action: execution_action,
+          status: status
+        }
+      end
+
+      {
+        entries: entries,
+        summary: {
+          created: entries.count { |entry| entry[:status] == "created" },
+          updated: entries.count { |entry| entry[:status] == "updated" },
+          kept: entries.count { |entry| entry[:status] == "kept" },
+          blocked: entries.count { |entry| entry[:status] == "blocked" },
+          omitted: entries.count { |entry| entry[:status] == "omitted" }
+        }
+      }
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
