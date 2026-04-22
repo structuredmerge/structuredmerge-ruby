@@ -365,6 +365,25 @@ module Ast
       )
     end
 
+    def reviewed_nested_execution(family, review_state, applied_children)
+      {
+        family: family,
+        review_state: deep_dup(review_state),
+        applied_children: deep_dup(applied_children)
+      }
+    end
+
+    def execute_reviewed_nested_execution(execution, merge_parent:, discover_operations:, apply_resolved_outputs:)
+      execute_reviewed_nested_merge(
+        execution[:review_state],
+        execution[:family],
+        execution[:applied_children],
+        merge_parent: merge_parent,
+        discover_operations: discover_operations,
+        apply_resolved_outputs: apply_resolved_outputs
+      )
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_selectors(manifest).filter_map do |selector|

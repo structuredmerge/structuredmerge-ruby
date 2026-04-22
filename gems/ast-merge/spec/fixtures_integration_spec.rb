@@ -724,6 +724,20 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected]))
   end
 
+  it "conforms to the slice-303 reviewed nested execution payload fixture" do
+    fixture = diagnostics_fixture("reviewed_nested_execution_payload")
+
+    expect(
+      json_ready(
+        described_class.reviewed_nested_execution(
+          fixture[:family],
+          fixture[:review_state],
+          fixture[:applied_children]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_execution]))
+  end
+
   it "executes nested merge through merge, discovery, resolution, and apply" do
     nested_outputs = [
       {
@@ -918,6 +932,69 @@ RSpec.describe Ast::Merge do
       },
       apply_resolved_outputs: lambda { |_merged_output, _operations, apply_plan, _applied_children|
         expect(apply_plan.dig(:entries, 0, :request_id)).to eq("projected_child_group:markdown:fence:typescript")
+        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+      }
+    )
+
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
+  end
+
+  it "executes reviewed nested execution payload directly" do
+    address = "document[0] > fenced_code_block[/code_fence/0]"
+
+    result = described_class.execute_reviewed_nested_execution(
+      described_class.reviewed_nested_execution(
+        "markdown",
+        {
+          requests: [],
+          accepted_groups: [
+            {
+              delegated_apply_group: "markdown:fence:typescript",
+              parent_operation_id: "parent:merge",
+              child_operation_id: "operation:#{address}",
+              delegated_runtime_surface_path: address,
+              case_ids: [],
+              delegated_case_ids: []
+            }
+          ],
+          applied_decisions: [
+            {
+              request_id: "projected_child_group:markdown:fence:typescript",
+              action: "apply_delegated_child_group"
+            }
+          ],
+          diagnostics: []
+        },
+        [{ operation_id: "operation:#{address}", output: "child-output\n" }]
+      ),
+      merge_parent: lambda {
+        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+      },
+      discover_operations: lambda { |_merged_output|
+        {
+          ok: true,
+          diagnostics: [],
+          operations: [
+            {
+              operation_id: "operation:#{address}",
+              parent_operation_id: "parent:merge",
+              requested_strategy: "delegate_child_surface",
+              language_chain: %w[markdown typescript],
+              surface: {
+                surface_kind: "fenced_code_block",
+                effective_language: "typescript",
+                address: address,
+                owner: { kind: "owned_region", address: "/code_fence/0" },
+                reconstruction_strategy: "portable_write",
+                metadata: { family: "typescript" }
+              }
+            }
+          ]
+        }
+      },
+      apply_resolved_outputs: lambda { |_merged_output, _operations, apply_plan, applied_children|
+        expect(apply_plan.dig(:entries, 0, :request_id)).to eq("projected_child_group:markdown:fence:typescript")
+        expect(applied_children).to eq([{ operation_id: "operation:#{address}", output: "child-output\n" }])
         { ok: true, diagnostics: [], output: "final-parent", policies: [] }
       }
     )
