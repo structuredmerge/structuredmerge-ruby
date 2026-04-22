@@ -152,30 +152,32 @@ RSpec.describe Markly::Merge do
     ).to eq(json_ready(expected_review_state.merge(policies: [])))
   end
 
-  it "conforms to the slice-313 reviewed nested review artifact envelope application fixture" do
-    fixture = read_json(
+  it "conforms to the slice-328 markdown provider reviewed nested review artifact envelope application fixture" do
+    provider_fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-313-reviewed-nested-review-artifact-envelope-application",
-        "fenced-code-reviewed-nested-review-artifact-envelope-application.json"
+        "diagnostics",
+        "slice-328-markdown-provider-reviewed-nested-review-artifact-envelope-application",
+        "ruby-markdown-provider-reviewed-nested-review-artifact-envelope-application.json"
       )
     )
+    fixture = read_json(fixtures_root.join(*provider_fixture[:shared_fixture_path]))
+    expected = provider_fixture.dig(:providers, :markly, :expected)
     replay_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
       fixture[:template],
       fixture[:destination],
       "markdown",
       fixture[:replay_bundle_envelope]
     )
-    expect(replay_result[:ok]).to eq(fixture.dig(:expected, :ok))
-    expect(replay_result[:output]).to eq(fixture.dig(:expected, :output))
+    expect(replay_result[:ok]).to eq(expected[:ok])
+    expect(replay_result[:output]).to eq(expected[:output])
     state_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
       fixture[:template],
       fixture[:destination],
       "markdown",
       fixture[:review_state_envelope]
     )
-    expect(state_result[:ok]).to eq(fixture.dig(:expected, :ok))
-    expect(state_result[:output]).to eq(fixture.dig(:expected, :output))
+    expect(state_result[:ok]).to eq(expected[:ok])
+    expect(state_result[:output]).to eq(expected[:output])
   end
 
   it "conforms to the slice-315 reviewed nested review artifact envelope rejection fixture" do
