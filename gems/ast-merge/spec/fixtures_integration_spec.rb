@@ -403,6 +403,54 @@ RSpec.describe Ast::Merge do
     expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
   end
 
+  it "conforms to the mini template tree multi-family merge callback fixture" do
+    fixture = diagnostics_fixture("mini_template_tree_multi_family_merge_callback")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_multi_family_merge_callback")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    template_contents = read_relative_file_tree(fixture_dir.join("template"))
+    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+
+    run_result = described_class.run_template_tree_execution(
+      template_contents.keys.sort,
+      template_contents,
+      destination_contents,
+      fixture[:context],
+      fixture[:default_strategy],
+      fixture[:overrides],
+      fixture[:replacements]
+    ) do |entry|
+      family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+      case family
+      when "markdown"
+        Markdown::Merge.merge_markdown(
+          entry[:prepared_template_content] || entry["prepared_template_content"],
+          entry[:destination_content] || entry["destination_content"],
+          "markdown"
+        )
+      when "toml"
+        Toml::Merge.merge_toml(
+          entry[:prepared_template_content] || entry["prepared_template_content"],
+          entry[:destination_content] || entry["destination_content"],
+          "toml"
+        )
+      when "ruby"
+        Ruby::Merge.merge_ruby(
+          entry[:prepared_template_content] || entry["prepared_template_content"],
+          entry[:destination_content] || entry["destination_content"],
+          "ruby"
+        )
+      else
+        {
+          ok: false,
+          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing family merge adapter for #{family}" }],
+          policies: []
+        }
+      end
+    end
+
+    expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 

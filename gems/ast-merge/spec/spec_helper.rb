@@ -4,6 +4,8 @@ require "json"
 require "pathname"
 require "ast/merge"
 require "markdown-merge"
+require "toml-merge"
+require "ruby-merge"
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
