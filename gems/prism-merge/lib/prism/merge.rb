@@ -88,6 +88,30 @@ module Prism
       )
     end
 
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+        template_source,
+        destination_source,
+        dialect,
+        replay_bundle
+      )
+    end
+
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_review_state(
+        template_source,
+        destination_source,
+        dialect,
+        review_state
+      )
+    end
+
     def ruby_discovered_surfaces(analysis)
       Ruby::Merge.ruby_discovered_surfaces(analysis)
     end
@@ -109,6 +133,8 @@ module Prism
       :match_ruby_owners,
       :merge_ruby,
       :merge_ruby_with_reviewed_nested_outputs,
+      :merge_ruby_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_ruby_with_reviewed_nested_outputs_from_review_state,
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :unsupported_feature_result

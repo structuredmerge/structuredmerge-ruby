@@ -91,6 +91,32 @@ module Commonmarker
       )
     end
 
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
+        template_source,
+        destination_source,
+        dialect,
+        replay_bundle,
+        backend: "kreuzberg-language-pack"
+      )
+    end
+
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+      requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+
+      Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
+        template_source,
+        destination_source,
+        dialect,
+        review_state,
+        backend: "kreuzberg-language-pack"
+      )
+    end
+
     def markdown_embedded_families(analysis)
       Markdown::Merge.markdown_embedded_families(analysis)
     end
@@ -112,6 +138,8 @@ module Commonmarker
       :match_markdown_owners,
       :merge_markdown,
       :merge_markdown_with_reviewed_nested_outputs,
+      :merge_markdown_with_reviewed_nested_outputs_from_replay_bundle,
+      :merge_markdown_with_reviewed_nested_outputs_from_review_state,
       :markdown_embedded_families,
       :unsupported_feature_result
     )
