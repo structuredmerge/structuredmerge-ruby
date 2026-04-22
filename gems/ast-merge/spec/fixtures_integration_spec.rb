@@ -704,6 +704,87 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected]))
   end
 
+  it "executes nested merge through merge, discovery, resolution, and apply" do
+    nested_outputs = [
+      {
+        surface_address: "document[0] > fenced_code_block[/code_fence/0]",
+        output: "export const feature = true;\n"
+      }
+    ]
+    calls = []
+
+    result = described_class.execute_nested_merge(
+      nested_outputs,
+      default_family: "markdown",
+      request_id_prefix: "nested_markdown_child",
+      merge_parent: lambda {
+        calls << "merge"
+        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+      },
+      discover_operations: lambda { |merged_output|
+        calls << "discover:#{merged_output}"
+        {
+          ok: true,
+          diagnostics: [],
+          operations: [
+            {
+              operation_id: "operation:#{nested_outputs.first[:surface_address]}",
+              parent_operation_id: "parent:merge",
+              requested_strategy: "delegate_child_surface",
+              language_chain: %w[markdown typescript],
+              surface: {
+                surface_kind: "fenced_code_block",
+                effective_language: "typescript",
+                address: nested_outputs.first[:surface_address],
+                owner: { kind: "owned_region", address: "/code_fence/0" },
+                reconstruction_strategy: "portable_write",
+                metadata: { family: "typescript" }
+              }
+            }
+          ]
+        }
+      },
+      apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, applied_children|
+        calls << "apply:#{merged_output}"
+        expect(operations.first[:operation_id]).to eq("operation:#{nested_outputs.first[:surface_address]}")
+        expect(apply_plan.dig(:entries, 0, :family)).to eq("typescript")
+        expect(applied_children.first[:operation_id]).to eq("operation:#{nested_outputs.first[:surface_address]}")
+        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+      }
+    )
+
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
+    expect(calls).to eq(["merge", "discover:merged-parent", "apply:merged-parent"])
+  end
+
+  it "returns nested parent-merge failure unchanged and skips later stages" do
+    called = false
+
+    result = described_class.execute_nested_merge(
+      [],
+      default_family: "markdown",
+      request_id_prefix: "nested",
+      merge_parent: lambda {
+        {
+          ok: false,
+          diagnostics: [{ severity: "error", category: "parse_error", message: "parent failed" }],
+          policies: []
+        }
+      },
+      discover_operations: lambda {
+        called = true
+        { ok: true, diagnostics: [], operations: [] }
+      },
+      apply_resolved_outputs: lambda {
+        called = true
+        { ok: true, diagnostics: [], output: "unused", policies: [] }
+      }
+    )
+
+    expect(result[:ok]).to eq(false)
+    expect(called).to eq(false)
+  end
+
   it "conforms to the widened source-family manifest and report fixtures" do
     source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
     source_report_fixture = diagnostics_fixture("manifest_backend_report")

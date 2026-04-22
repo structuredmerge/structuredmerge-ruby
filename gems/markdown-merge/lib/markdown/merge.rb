@@ -206,26 +206,29 @@ module Markdown
     end
 
     def merge_markdown_with_nested_outputs(template_source, destination_source, dialect, nested_outputs, backend: nil)
-      merged = merge_markdown(template_source, destination_source, dialect, backend: backend)
-      return merged unless merged[:ok]
-
-      analysis = parse_markdown(merged[:output], dialect, backend: backend)
-      return analysis unless analysis[:ok]
-
-      operations = markdown_delegated_child_operations(analysis[:analysis])
-      resolution = Ast::Merge.resolve_delegated_child_outputs(
-        operations,
+      Ast::Merge.execute_nested_merge(
         nested_outputs,
         default_family: "markdown",
-        request_id_prefix: "nested_markdown_child"
-      )
-      return resolution.merge(policies: []) unless resolution[:ok]
+        request_id_prefix: "nested_markdown_child",
+        merge_parent: -> { merge_markdown(template_source, destination_source, dialect, backend: backend) },
+        discover_operations: lambda { |merged_output|
+          analysis = parse_markdown(merged_output, dialect, backend: backend)
+          next { ok: false, diagnostics: analysis[:diagnostics] || [] } unless analysis[:ok]
 
-      apply_markdown_delegated_child_outputs(
-        merged[:output],
-        operations,
-        resolution[:apply_plan],
-        resolution[:applied_children]
+          {
+            ok: true,
+            diagnostics: [],
+            operations: markdown_delegated_child_operations(analysis[:analysis])
+          }
+        },
+        apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, applied_children|
+          apply_markdown_delegated_child_outputs(
+            merged_output,
+            operations,
+            apply_plan,
+            applied_children
+          )
+        }
       )
     end
 

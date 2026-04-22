@@ -189,26 +189,29 @@ module Ruby
     end
 
     def merge_ruby_with_nested_outputs(template_source, destination_source, dialect, nested_outputs)
-      merged = merge_ruby(template_source, destination_source, dialect)
-      return merged unless merged[:ok]
-
-      analysis = parse_ruby(merged[:output], dialect)
-      return analysis unless analysis[:ok]
-
-      operations = ruby_delegated_child_operations(analysis[:analysis])
-      resolution = Ast::Merge.resolve_delegated_child_outputs(
-        operations,
+      Ast::Merge.execute_nested_merge(
         nested_outputs,
         default_family: "ruby",
-        request_id_prefix: "nested_ruby_child"
-      )
-      return resolution.merge(policies: []) unless resolution[:ok]
+        request_id_prefix: "nested_ruby_child",
+        merge_parent: -> { merge_ruby(template_source, destination_source, dialect) },
+        discover_operations: lambda { |merged_output|
+          analysis = parse_ruby(merged_output, dialect)
+          next { ok: false, diagnostics: analysis[:diagnostics] || [] } unless analysis[:ok]
 
-      apply_ruby_delegated_child_outputs(
-        merged[:output],
-        operations,
-        resolution[:apply_plan],
-        resolution[:applied_children]
+          {
+            ok: true,
+            diagnostics: [],
+            operations: ruby_delegated_child_operations(analysis[:analysis])
+          }
+        },
+        apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, applied_children|
+          apply_ruby_delegated_child_outputs(
+            merged_output,
+            operations,
+            apply_plan,
+            applied_children
+          )
+        }
       )
     end
 
