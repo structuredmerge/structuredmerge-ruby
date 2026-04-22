@@ -403,8 +403,28 @@ module Ast
       execute_reviewed_nested_executions(bundle.fetch(:reviewed_nested_executions, []), &callbacks_for_execution)
     end
 
+    def execute_review_replay_bundle_envelope_reviewed_nested_executions(envelope, &callbacks_for_execution)
+      bundle, import_error = import_review_replay_bundle_envelope(envelope)
+      return { diagnostics: [diagnostic("error", import_error[:category], import_error[:message])], results: [] } if import_error
+
+      {
+        diagnostics: [],
+        results: execute_review_replay_bundle_reviewed_nested_executions(bundle, &callbacks_for_execution)
+      }
+    end
+
     def execute_review_state_reviewed_nested_executions(state, &callbacks_for_execution)
       execute_reviewed_nested_executions(state.fetch(:reviewed_nested_executions, []), &callbacks_for_execution)
+    end
+
+    def execute_review_state_envelope_reviewed_nested_executions(envelope, &callbacks_for_execution)
+      state, import_error = import_conformance_manifest_review_state_envelope(envelope)
+      return { diagnostics: [diagnostic("error", import_error[:category], import_error[:message])], results: [] } if import_error
+
+      {
+        diagnostics: [],
+        results: execute_review_state_reviewed_nested_executions(state, &callbacks_for_execution)
+      }
     end
 
     def conformance_manifest_replay_context(manifest, options)
