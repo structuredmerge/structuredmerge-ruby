@@ -340,6 +340,31 @@ module Ast
       )
     end
 
+    def execute_delegated_child_apply_plan(apply_plan, applied_children, merge_parent:, discover_operations:, apply_resolved_outputs:)
+      merged = merge_parent.call
+      return merged unless merged[:ok] && merged.key?(:output)
+
+      discovery = discover_operations.call(merged[:output])
+      return { ok: false, diagnostics: discovery[:diagnostics] || [], policies: [] } unless discovery[:ok] && discovery[:operations]
+
+      apply_resolved_outputs.call(
+        merged[:output],
+        discovery[:operations],
+        apply_plan,
+        applied_children
+      )
+    end
+
+    def execute_reviewed_nested_merge(review_state, family, applied_children, merge_parent:, discover_operations:, apply_resolved_outputs:)
+      execute_delegated_child_apply_plan(
+        delegated_child_apply_plan(review_state, family),
+        applied_children,
+        merge_parent: merge_parent,
+        discover_operations: discover_operations,
+        apply_resolved_outputs: apply_resolved_outputs
+      )
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_selectors(manifest).filter_map do |selector|
