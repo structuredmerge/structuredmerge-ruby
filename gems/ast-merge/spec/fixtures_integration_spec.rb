@@ -369,6 +369,9 @@ RSpec.describe Ast::Merge do
     replay_bundle_envelope_fixture = diagnostics_fixture("review_replay_bundle_envelope")
     review_state_envelope_rejection_fixture = diagnostics_fixture("review_state_envelope_rejection")
     replay_bundle_envelope_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_rejection")
+    reviewed_nested_execution_roundtrip_fixture = diagnostics_fixture("reviewed_nested_execution_json_roundtrip")
+    reviewed_nested_execution_envelope_fixture = diagnostics_fixture("reviewed_nested_execution_envelope")
+    reviewed_nested_execution_envelope_rejection_fixture = diagnostics_fixture("reviewed_nested_execution_envelope_rejection")
     review_proposal_fixture = diagnostics_fixture("family_context_review_proposal")
     explicit_decision_fixture = diagnostics_fixture("family_context_explicit_review_decision")
     explicit_bundle_fixture = diagnostics_fixture("explicit_review_replay_bundle_application")
@@ -440,11 +443,23 @@ RSpec.describe Ast::Merge do
     expect(bundle_error).to be_nil
     expect(json_ready(roundtrip_bundle)).to eq(json_ready(replay_bundle_roundtrip_fixture[:replay_bundle]))
 
+    reviewed_nested_execution_envelope = described_class.reviewed_nested_execution_envelope(
+      reviewed_nested_execution_roundtrip_fixture[:execution]
+    )
+    roundtrip_execution, execution_error = described_class.import_reviewed_nested_execution_envelope(
+      reviewed_nested_execution_envelope
+    )
+    expect(execution_error).to be_nil
+    expect(json_ready(roundtrip_execution)).to eq(json_ready(reviewed_nested_execution_roundtrip_fixture[:execution]))
+
     expect(json_ready(described_class.conformance_manifest_review_state_envelope(review_state_envelope_fixture[:state]))).to eq(
       json_ready(review_state_envelope_fixture[:expected_envelope])
     )
     expect(json_ready(described_class.review_replay_bundle_envelope(replay_bundle_envelope_fixture[:replay_bundle]))).to eq(
       json_ready(replay_bundle_envelope_fixture[:expected_envelope])
+    )
+    expect(json_ready(described_class.reviewed_nested_execution_envelope(reviewed_nested_execution_envelope_fixture[:execution]))).to eq(
+      json_ready(reviewed_nested_execution_envelope_fixture[:expected_envelope])
     )
 
     review_state_envelope_rejection_fixture[:cases].each do |test_case|
@@ -455,6 +470,11 @@ RSpec.describe Ast::Merge do
     replay_bundle_envelope_rejection_fixture[:cases].each do |test_case|
       _bundle, bundle_rejection_error = described_class.import_review_replay_bundle_envelope(test_case[:envelope])
       expect(json_ready(bundle_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    reviewed_nested_execution_envelope_rejection_fixture[:cases].each do |test_case|
+      _execution, execution_rejection_error = described_class.import_reviewed_nested_execution_envelope(test_case[:envelope])
+      expect(json_ready(execution_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     _proposal_context, _proposal_diagnostics, proposal_requests, = described_class.review_conformance_family_context(

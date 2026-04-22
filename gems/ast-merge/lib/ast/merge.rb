@@ -437,6 +437,14 @@ module Ast
       }
     end
 
+    def reviewed_nested_execution_envelope(execution)
+      {
+        kind: "reviewed_nested_execution",
+        version: REVIEW_TRANSPORT_VERSION,
+        execution: deep_dup(execution)
+      }
+    end
+
     def import_conformance_manifest_review_state_envelope(envelope)
       return [nil, { category: "kind_mismatch", message: "expected conformance_manifest_review_state envelope kind." }] unless envelope[:kind] == "conformance_manifest_review_state"
       return [nil, { category: "unsupported_version", message: "unsupported conformance_manifest_review_state envelope version #{envelope[:version]}." }] unless envelope[:version] == REVIEW_TRANSPORT_VERSION
@@ -449,6 +457,13 @@ module Ast
       return [nil, { category: "unsupported_version", message: "unsupported review_replay_bundle envelope version #{envelope[:version]}." }] unless envelope[:version] == REVIEW_TRANSPORT_VERSION
 
       [deep_dup(envelope[:replay_bundle]), nil]
+    end
+
+    def import_reviewed_nested_execution_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected reviewed_nested_execution envelope kind." }] unless envelope[:kind] == "reviewed_nested_execution"
+      return [nil, { category: "unsupported_version", message: "unsupported reviewed_nested_execution envelope version #{envelope[:version]}." }] unless envelope[:version] == REVIEW_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:execution]), nil]
     end
 
     def resolve_conformance_family_context(family, options)
