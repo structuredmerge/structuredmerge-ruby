@@ -98,6 +98,22 @@ module Ast
       default_strategy.to_s
     end
 
+    def plan_template_entries(template_source_paths, context = {}, default_strategy = "merge", overrides = [])
+      template_source_paths.map do |template_source_path|
+        logical_destination_path = normalize_template_source_path(template_source_path)
+        destination_path = resolve_template_destination_path(logical_destination_path, context)
+        strategy = select_template_strategy(logical_destination_path, default_strategy, overrides)
+        {
+          template_source_path: template_source_path,
+          logical_destination_path: logical_destination_path,
+          destination_path: destination_path,
+          classification: classify_template_target_path(logical_destination_path),
+          strategy: strategy,
+          action: destination_path.nil? ? "omit" : strategy
+        }
+      end
+    end
+
     def conformance_suite_definition(manifest, selector)
       manifest.fetch(:suite_descriptors, []).find do |definition|
         conformance_suite_selectors_equal?(
