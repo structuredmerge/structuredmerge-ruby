@@ -209,5 +209,17 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(apply_output_result[:ok]).to eq(apply_output_fixture.dig(:expected, :ok))
     expect(apply_output_result[:output]).to eq(apply_output_fixture.dig(:expected, :output))
+
+    nested_merge_fixture = read_json(
+      fixtures_root.join("ruby", "slice-291-nested-merge", "yard-example-nested-merge.json")
+    )
+    nested_merge_result = RUBY_MERGE.merge_ruby_with_nested_outputs(
+      nested_merge_fixture[:template],
+      nested_merge_fixture[:destination],
+      "ruby",
+      nested_merge_fixture[:nested_outputs]
+    )
+    expect(nested_merge_result[:ok]).to eq(nested_merge_fixture.dig(:expected, :ok))
+    expect(nested_merge_result[:output]).to eq(nested_merge_fixture.dig(:expected, :output))
   end
 end

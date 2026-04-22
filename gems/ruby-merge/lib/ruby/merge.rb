@@ -188,6 +188,58 @@ module Ruby
       }
     end
 
+    def merge_ruby_with_nested_outputs(template_source, destination_source, dialect, nested_outputs)
+      merged = merge_ruby(template_source, destination_source, dialect)
+      return merged unless merged[:ok]
+
+      analysis = parse_ruby(merged[:output], dialect)
+      return analysis unless analysis[:ok]
+
+      operations = ruby_delegated_child_operations(analysis[:analysis])
+      operations_by_surface_address = operations.to_h { |operation| [operation.dig(:surface, :address), operation] }
+
+      nested_outputs.each do |entry|
+        unless operations_by_surface_address.key?(entry[:surface_address])
+          return {
+            ok: false,
+            diagnostics: [{ severity: "error", category: "configuration_error", message: "missing delegated child surface #{entry[:surface_address]}." }],
+            policies: []
+          }
+        end
+      end
+
+      apply_ruby_delegated_child_outputs(
+        merged[:output],
+        operations,
+        {
+          entries: nested_outputs.each_with_index.map do |entry, index|
+            operation = operations_by_surface_address.fetch(entry[:surface_address])
+            request_id = "nested_ruby_child:#{index}"
+            {
+              request_id: request_id,
+              family: "ruby",
+              delegated_group: {
+                delegated_apply_group: request_id,
+                parent_operation_id: operation[:parent_operation_id],
+                child_operation_id: operation[:operation_id],
+                delegated_runtime_surface_path: entry[:surface_address],
+                case_ids: [],
+                delegated_case_ids: []
+              },
+              decision: {
+                request_id: request_id,
+                action: "apply_delegated_child_group"
+              }
+            }
+          end
+        },
+        nested_outputs.map do |entry|
+          operation = operations_by_surface_address.fetch(entry[:surface_address])
+          { operation_id: operation[:operation_id], output: entry[:output] }
+        end
+      )
+    end
+
     def analyze_ruby_document(source)
       lines = normalize_source(source).split("\n", -1)
       requires = []
@@ -450,6 +502,7 @@ module Ruby
       :ruby_discovered_surfaces,
       :ruby_delegated_child_operations,
       :apply_ruby_delegated_child_outputs,
+      :merge_ruby_with_nested_outputs,
       :analyze_ruby_document,
       :collect_ruby_require_entries,
       :collect_ruby_declaration_entries,

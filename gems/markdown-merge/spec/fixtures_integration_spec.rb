@@ -286,4 +286,20 @@ RSpec.describe Markdown::Merge do
     expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
+
+  it "conforms to the slice-290 nested merge fixture" do
+    fixture = read_json(
+      fixtures_root.join("markdown", "slice-290-nested-merge", "fenced-code-nested-merge.json")
+    )
+
+    result = markdown_merge.merge_markdown_with_nested_outputs(
+      fixture[:template],
+      fixture[:destination],
+      "markdown",
+      fixture[:nested_outputs],
+      backend: "kreuzberg-language-pack"
+    )
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(result[:output]).to eq(fixture.dig(:expected, :output))
+  end
 end

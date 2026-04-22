@@ -205,6 +205,58 @@ module Markdown
       }
     end
 
+    def merge_markdown_with_nested_outputs(template_source, destination_source, dialect, nested_outputs, backend: nil)
+      merged = merge_markdown(template_source, destination_source, dialect, backend: backend)
+      return merged unless merged[:ok]
+
+      analysis = parse_markdown(merged[:output], dialect, backend: backend)
+      return analysis unless analysis[:ok]
+
+      operations = markdown_delegated_child_operations(analysis[:analysis])
+      operations_by_surface_address = operations.to_h { |operation| [operation.dig(:surface, :address), operation] }
+
+      nested_outputs.each do |entry|
+        unless operations_by_surface_address.key?(entry[:surface_address])
+          return {
+            ok: false,
+            diagnostics: [{ severity: "error", category: "configuration_error", message: "missing delegated child surface #{entry[:surface_address]}." }],
+            policies: []
+          }
+        end
+      end
+
+      apply_markdown_delegated_child_outputs(
+        merged[:output],
+        operations,
+        {
+          entries: nested_outputs.each_with_index.map do |entry, index|
+            operation = operations_by_surface_address.fetch(entry[:surface_address])
+            request_id = "nested_markdown_child:#{index}"
+            {
+              request_id: request_id,
+              family: operation.dig(:surface, :metadata, :family) || "markdown",
+              delegated_group: {
+                delegated_apply_group: request_id,
+                parent_operation_id: operation[:parent_operation_id],
+                child_operation_id: operation[:operation_id],
+                delegated_runtime_surface_path: entry[:surface_address],
+                case_ids: [],
+                delegated_case_ids: []
+              },
+              decision: {
+                request_id: request_id,
+                action: "apply_delegated_child_group"
+              }
+            }
+          end
+        },
+        nested_outputs.map do |entry|
+          operation = operations_by_surface_address.fetch(entry[:surface_address])
+          { operation_id: operation[:operation_id], output: entry[:output] }
+        end
+      )
+    end
+
     def normalize_source(source)
       source.gsub(/\r\n?/, "\n")
     end
@@ -421,6 +473,7 @@ module Markdown
       :markdown_discovered_surfaces,
       :markdown_delegated_child_operations,
       :apply_markdown_delegated_child_outputs,
+      :merge_markdown_with_nested_outputs,
       :normalize_source,
       :slugify,
       :collect_markdown_owners,
