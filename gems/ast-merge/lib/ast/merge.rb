@@ -110,6 +110,12 @@ module Ast
       template_token_keys(content, config).reject { |key| replacement_keys.key?(key) }
     end
 
+    def resolve_template_tokens(content, replacements = {}, config = nil)
+      resolver = Token::Resolver::Resolve.new(on_missing: :keep)
+      document = Token::Resolver::Document.new(content.to_s, config: token_resolver_config(config))
+      resolver.resolve(document, normalize_template_replacements(replacements))
+    end
+
     def select_template_strategy(path, default_strategy = "merge", overrides = [])
       normalized_path = path.to_s.delete_prefix("./")
       override = overrides.find do |entry|
@@ -180,6 +186,70 @@ module Ast
           token_resolution_required: token_resolution_required,
           blocked: blocked,
           block_reason: blocked ? "unresolved_tokens" : nil
+        )
+      end
+    end
+
+    def prepare_template_entries(entries, template_contents, replacements, config = nil)
+      entries.map do |entry|
+        source_path = entry[:template_source_path] || entry["template_source_path"]
+        template_content = template_contents[source_path] || template_contents[source_path.to_s] ||
+          template_contents[source_path.to_sym] || ""
+
+        if entry[:blocked] || entry["blocked"]
+          next deep_dup(entry).merge(
+            template_content: template_content,
+            prepared_template_content: nil,
+            preparation_action: "blocked"
+          )
+        end
+
+        token_resolution_required = entry[:token_resolution_required]
+        token_resolution_required = entry["token_resolution_required"] if token_resolution_required.nil?
+        prepared_template_content = if token_resolution_required
+          resolve_template_tokens(template_content, replacements, config)
+        else
+          template_content
+        end
+
+        deep_dup(entry).merge(
+          template_content: template_content,
+          prepared_template_content: prepared_template_content,
+          preparation_action: token_resolution_required ? "resolve_tokens" : "pass_through"
+        )
+      end
+    end
+
+    def plan_template_execution(entries, destination_contents)
+      entries.map do |entry|
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        strategy = (entry[:strategy] || entry["strategy"]).to_s
+        write_action = (entry[:write_action] || entry["write_action"]).to_s
+        blocked = entry[:blocked]
+        blocked = entry["blocked"] if blocked.nil?
+        destination_content = if destination_path
+          destination_contents[destination_path] || destination_contents[destination_path.to_s] ||
+            destination_contents[destination_path.to_sym]
+        end
+
+        execution_action = if blocked
+          "blocked"
+        elsif destination_path.nil?
+          "omit"
+        elsif write_action == "keep"
+          "keep"
+        elsif strategy == "raw_copy"
+          "raw_copy"
+        elsif strategy == "accept_template"
+          "write_prepared_content"
+        else
+          "merge_prepared_content"
+        end
+
+        deep_dup(entry).merge(
+          execution_action: execution_action,
+          ready: !%w[blocked omit keep].include?(execution_action),
+          destination_content: destination_content
         )
       end
     end

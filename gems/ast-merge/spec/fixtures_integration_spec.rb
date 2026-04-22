@@ -168,6 +168,33 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
+  it "conforms to the template entry prepared content fixture" do
+    fixture = diagnostics_fixture("template_entry_prepared_content")
+
+    expect(
+      json_ready(
+        described_class.prepare_template_entries(
+          fixture[:planned_entries],
+          fixture[:template_contents],
+          fixture[:replacements]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
+  it "conforms to the template execution plan fixture" do
+    fixture = diagnostics_fixture("template_execution_plan")
+
+    expect(
+      json_ready(
+        described_class.plan_template_execution(
+          fixture[:prepared_entries],
+          fixture[:destination_contents]
+        )
+      )
+    ).to eq(json_ready(fixture[:expected_entries]))
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 
