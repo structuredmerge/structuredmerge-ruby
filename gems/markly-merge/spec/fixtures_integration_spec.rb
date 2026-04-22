@@ -95,30 +95,32 @@ RSpec.describe Markly::Merge do
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-309 reviewed nested review artifact application fixture" do
-    fixture = read_json(
+  it "conforms to the slice-326 markdown provider reviewed nested review artifact application fixture" do
+    provider_fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-309-reviewed-nested-review-artifact-application",
-        "fenced-code-reviewed-nested-review-artifact-application.json"
+        "diagnostics",
+        "slice-326-markdown-provider-reviewed-nested-review-artifact-application",
+        "ruby-markdown-provider-reviewed-nested-review-artifact-application.json"
       )
     )
+    fixture = read_json(fixtures_root.join(*provider_fixture[:shared_fixture_path]))
+    expected = provider_fixture.dig(:providers, :markly, :expected)
     replay_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
       fixture[:template],
       fixture[:destination],
       "markdown",
       fixture[:replay_bundle]
     )
-    expect(replay_result[:ok]).to eq(fixture.dig(:expected, :ok))
-    expect(replay_result[:output]).to eq(fixture.dig(:expected, :output))
+    expect(replay_result[:ok]).to eq(expected[:ok])
+    expect(replay_result[:output]).to eq(expected[:output])
     state_result = described_class.merge_markdown_with_reviewed_nested_outputs_from_review_state(
       fixture[:template],
       fixture[:destination],
       "markdown",
       fixture[:review_state]
     )
-    expect(state_result[:ok]).to eq(fixture.dig(:expected, :ok))
-    expect(state_result[:output]).to eq(fixture.dig(:expected, :output))
+    expect(state_result[:ok]).to eq(expected[:ok])
+    expect(state_result[:output]).to eq(expected[:output])
   end
 
   it "conforms to the slice-311 reviewed nested review artifact rejection fixture" do
