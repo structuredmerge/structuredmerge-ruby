@@ -631,6 +631,37 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(explicit_applied)).to eq(json_ready(explicit_bundle_fixture[:expected_state]))
 
+    replay_bundle_envelope_application_fixture = diagnostics_fixture("review_replay_bundle_envelope_application")
+    replay_bundle_envelope_applied = described_class.review_conformance_manifest_with_replay_bundle_envelope(
+      replay_bundle_envelope_application_fixture[:manifest],
+      replay_bundle_envelope_application_fixture[:options],
+      replay_bundle_envelope_application_fixture[:review_replay_bundle_envelope],
+      &execute_from(replay_bundle_envelope_application_fixture[:executions])
+    )
+    expect(json_ready(replay_bundle_envelope_applied)).to eq(
+      json_ready(replay_bundle_envelope_application_fixture[:expected_state])
+    )
+
+    explicit_bundle_envelope_fixture = diagnostics_fixture("explicit_review_replay_bundle_envelope_application")
+    explicit_envelope_applied = described_class.review_conformance_manifest_with_replay_bundle_envelope(
+      explicit_bundle_envelope_fixture[:manifest],
+      explicit_bundle_envelope_fixture[:options],
+      explicit_bundle_envelope_fixture[:review_replay_bundle_envelope],
+      &execute_from(explicit_bundle_envelope_fixture[:executions])
+    )
+    expect(json_ready(explicit_envelope_applied)).to eq(json_ready(explicit_bundle_envelope_fixture[:expected_state]))
+
+    replay_bundle_envelope_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_review_rejection")
+    replay_bundle_envelope_rejection_fixture[:cases].each do |test_case|
+      rejected_state = described_class.review_conformance_manifest_with_replay_bundle_envelope(
+        replay_bundle_envelope_rejection_fixture[:manifest],
+        replay_bundle_envelope_rejection_fixture[:options],
+        test_case[:review_replay_bundle_envelope],
+        &execute_from(replay_bundle_envelope_rejection_fixture[:executions])
+      )
+      expect(json_ready(rejected_state)).to eq(json_ready(test_case[:expected_state]))
+    end
+
     _missing_context, missing_diagnostics, missing_requests, = described_class.review_conformance_family_context(
       missing_context_fixture[:family],
       missing_context_fixture[:options]

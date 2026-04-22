@@ -790,6 +790,25 @@ module Ast
       end
     end
 
+    def review_conformance_manifest_with_replay_bundle_envelope(manifest, options, replay_bundle_envelope, &execute)
+      replay_bundle, import_error = import_review_replay_bundle_envelope(replay_bundle_envelope)
+      if import_error.nil?
+        return review_conformance_manifest(
+          manifest,
+          deep_dup(options).merge(review_replay_bundle: replay_bundle),
+          &execute
+        )
+      end
+
+      state = review_conformance_manifest(
+        manifest,
+        deep_dup(options).merge(review_replay_bundle: nil),
+        &execute
+      )
+      state[:diagnostics] << diagnostic("error", import_error[:category], import_error[:message])
+      state
+    end
+
     def report_conformance_suite(results)
       { results: deep_dup(results), summary: summarize_conformance_results(results) }
     end
