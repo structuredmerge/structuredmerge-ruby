@@ -565,9 +565,7 @@ RSpec.describe Ast::Merge do
       json_ready(reviewed_nested_execution_state_application_fixture[:expected_results])
     )
 
-    replay_bundle_envelope_reviewed_nested_fixture = diagnostics_fixture(
-      "review_replay_bundle_envelope_reviewed_nested_execution_application"
-    )
+    replay_bundle_envelope_reviewed_nested_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_execution_application")
     replay_bundle_envelope_nested_application = described_class.execute_review_replay_bundle_envelope_reviewed_nested_executions(
       replay_bundle_envelope_reviewed_nested_fixture[:replay_bundle_envelope]
     ) do |execution, index|
@@ -589,9 +587,7 @@ RSpec.describe Ast::Merge do
       json_ready(replay_bundle_envelope_reviewed_nested_fixture[:expected_application][:results])
     )
 
-    review_state_envelope_reviewed_nested_fixture = diagnostics_fixture(
-      "review_state_envelope_reviewed_nested_execution_application"
-    )
+    review_state_envelope_reviewed_nested_fixture = diagnostics_fixture("review_state_envelope_reviewed_nested_execution_application")
     review_state_envelope_nested_application = described_class.execute_review_state_envelope_reviewed_nested_executions(
       review_state_envelope_reviewed_nested_fixture[:review_state_envelope]
     ) do |execution, index|
@@ -613,9 +609,7 @@ RSpec.describe Ast::Merge do
       json_ready(review_state_envelope_reviewed_nested_fixture[:expected_application][:results])
     )
 
-    replay_bundle_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture(
-      "review_replay_bundle_envelope_reviewed_nested_execution_rejection"
-    )
+    replay_bundle_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_execution_rejection")
     replay_bundle_envelope_reviewed_nested_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.execute_review_replay_bundle_envelope_reviewed_nested_executions(
         test_case[:replay_bundle_envelope]
@@ -625,9 +619,7 @@ RSpec.describe Ast::Merge do
       expect(json_ready(rejected_application)).to eq(json_ready(test_case[:expected_application]))
     end
 
-    review_state_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture(
-      "review_state_envelope_reviewed_nested_execution_rejection"
-    )
+    review_state_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture("review_state_envelope_reviewed_nested_execution_rejection")
     review_state_envelope_reviewed_nested_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.execute_review_state_envelope_reviewed_nested_executions(
         test_case[:review_state_envelope]
@@ -637,9 +629,7 @@ RSpec.describe Ast::Merge do
       expect(json_ready(rejected_application)).to eq(json_ready(test_case[:expected_application]))
     end
 
-    reviewed_nested_manifest_application_fixture = diagnostics_fixture(
-      "review_replay_bundle_envelope_reviewed_nested_manifest_application"
-    )
+    reviewed_nested_manifest_application_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_manifest_application")
     reviewed_nested_manifest_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
       reviewed_nested_manifest_application_fixture[:manifest],
       reviewed_nested_manifest_application_fixture[:options],
@@ -667,9 +657,7 @@ RSpec.describe Ast::Merge do
       json_ready(reviewed_nested_manifest_application_fixture[:expected_application][:results])
     )
 
-    reviewed_nested_manifest_rejection_fixture = diagnostics_fixture(
-      "review_replay_bundle_envelope_reviewed_nested_manifest_rejection"
-    )
+    reviewed_nested_manifest_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_manifest_rejection")
     reviewed_nested_manifest_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
         reviewed_nested_manifest_rejection_fixture[:manifest],
