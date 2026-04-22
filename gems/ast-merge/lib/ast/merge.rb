@@ -434,9 +434,9 @@ module Ast
     def review_replay_bundle_inputs(options)
       if options[:review_replay_bundle]
         bundle = options[:review_replay_bundle]
-        [bundle[:replay_context], bundle[:decisions] || []]
+        [bundle[:replay_context], bundle[:decisions] || [], bundle[:reviewed_nested_executions] || []]
       else
-        [options[:review_replay_context], options[:review_decisions] || []]
+        [options[:review_replay_context], options[:review_decisions] || [], []]
       end
     end
 
@@ -682,7 +682,7 @@ module Ast
       requests = []
       applied_decisions = []
       effective_options = deep_dup(options)
-      replay_input_context, replay_input_decisions = review_replay_bundle_inputs(options)
+      replay_input_context, replay_input_decisions, reviewed_nested_executions = review_replay_bundle_inputs(options)
 
       if replay_input_decisions.any?
         if replay_input_context.nil?
@@ -690,11 +690,13 @@ module Ast
           effective_options[:review_replay_bundle] = nil
           effective_options[:review_replay_context] = nil
           effective_options[:review_decisions] = []
+          reviewed_nested_executions = []
         elsif !review_replay_context_compatible(replay_context, replay_input_context)
           diagnostics << diagnostic("error", "replay_rejected", "review replay context does not match the current conformance manifest state.")
           effective_options[:review_replay_bundle] = nil
           effective_options[:review_replay_context] = nil
           effective_options[:review_decisions] = []
+          reviewed_nested_executions = []
         else
           allowed_request_ids = conformance_manifest_review_request_ids(manifest, options).to_h { |request_id| [request_id, true] }
           accepted_decisions = []
@@ -760,7 +762,9 @@ module Ast
         applied_decisions: applied_decisions,
         host_hints: conformance_review_host_hints(options),
         replay_context: replay_context
-      }
+      }.tap do |state|
+        state[:reviewed_nested_executions] = deep_dup(reviewed_nested_executions) unless reviewed_nested_executions.empty?
+      end
     end
 
     def report_conformance_suite(results)

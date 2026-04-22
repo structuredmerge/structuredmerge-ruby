@@ -362,7 +362,9 @@ RSpec.describe Ast::Merge do
     replay_rejection_fixture = diagnostics_fixture("review_replay_rejection")
     stale_decision_fixture = diagnostics_fixture("stale_review_decision")
     replay_bundle_fixture = diagnostics_fixture("review_replay_bundle")
+    replay_bundle_reviewed_nested_fixture = diagnostics_fixture("review_replay_bundle_reviewed_nested_executions")
     replay_bundle_application_fixture = diagnostics_fixture("review_replay_bundle_application")
+    review_state_reviewed_nested_fixture = diagnostics_fixture("review_state_reviewed_nested_executions")
     review_state_roundtrip_fixture = diagnostics_fixture("review_state_json_roundtrip")
     replay_bundle_roundtrip_fixture = diagnostics_fixture("review_replay_bundle_json_roundtrip")
     review_state_envelope_fixture = diagnostics_fixture("review_state_envelope")
@@ -422,9 +424,16 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(stale_state)).to eq(json_ready(stale_decision_fixture[:expected_state]))
 
-    replay_context, replay_decisions = described_class.review_replay_bundle_inputs(review_replay_bundle: replay_bundle_fixture[:replay_bundle])
+    replay_context, replay_decisions, replay_reviewed_nested = described_class.review_replay_bundle_inputs(review_replay_bundle: replay_bundle_fixture[:replay_bundle])
     expect(json_ready(replay_context)).to eq(json_ready(replay_bundle_fixture[:replay_bundle][:replay_context]))
     expect(json_ready(replay_decisions)).to eq(json_ready(replay_bundle_fixture[:replay_bundle][:decisions]))
+    expect(json_ready(replay_reviewed_nested)).to eq(json_ready([]))
+
+    replay_context_with_nested, replay_decisions_with_nested, replay_reviewed_nested_with_nested =
+      described_class.review_replay_bundle_inputs(review_replay_bundle: replay_bundle_reviewed_nested_fixture[:replay_bundle])
+    expect(json_ready(replay_context_with_nested)).to eq(json_ready(replay_bundle_reviewed_nested_fixture[:replay_bundle][:replay_context]))
+    expect(json_ready(replay_decisions_with_nested)).to eq(json_ready(replay_bundle_reviewed_nested_fixture[:replay_bundle][:decisions]))
+    expect(json_ready(replay_reviewed_nested_with_nested)).to eq(json_ready(replay_bundle_reviewed_nested_fixture[:replay_bundle][:reviewed_nested_executions]))
 
     replay_applied = described_class.review_conformance_manifest(
       replay_bundle_application_fixture[:manifest],
@@ -432,6 +441,13 @@ RSpec.describe Ast::Merge do
       &execute_from(replay_bundle_application_fixture[:executions])
     )
     expect(json_ready(replay_applied)).to eq(json_ready(replay_bundle_application_fixture[:expected_state]))
+
+    replay_with_nested_applied = described_class.review_conformance_manifest(
+      review_state_reviewed_nested_fixture[:manifest],
+      review_state_reviewed_nested_fixture[:options],
+      &execute_from(review_state_reviewed_nested_fixture[:executions])
+    )
+    expect(json_ready(replay_with_nested_applied)).to eq(json_ready(review_state_reviewed_nested_fixture[:expected_state]))
 
     review_state_envelope = described_class.conformance_manifest_review_state_envelope(review_state_roundtrip_fixture[:state])
     roundtrip_state, roundtrip_error = described_class.import_conformance_manifest_review_state_envelope(review_state_envelope)
