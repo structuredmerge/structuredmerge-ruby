@@ -637,6 +637,57 @@ RSpec.describe Ast::Merge do
       expect(json_ready(rejected_application)).to eq(json_ready(test_case[:expected_application]))
     end
 
+    reviewed_nested_manifest_application_fixture = diagnostics_fixture(
+      "review_replay_bundle_envelope_reviewed_nested_manifest_application"
+    )
+    reviewed_nested_manifest_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
+      reviewed_nested_manifest_application_fixture[:manifest],
+      reviewed_nested_manifest_application_fixture[:options],
+      reviewed_nested_manifest_application_fixture[:review_replay_bundle_envelope],
+      execute: execute_from(reviewed_nested_manifest_application_fixture[:executions]),
+      reviewed_nested_execution: lambda do |execution, index|
+        expected_output = reviewed_nested_manifest_application_fixture[:expected_application][:results][index][:result][:output]
+        {
+          merge_parent: lambda {
+            { ok: true, diagnostics: [], output: "#{execution[:family]}-merged-parent", policies: [] }
+          },
+          discover_operations: lambda { |_merged_output|
+            { ok: true, diagnostics: [], operations: [] }
+          },
+          apply_resolved_outputs: lambda { |_merged_output, _operations, _apply_plan, _applied_children|
+            { ok: true, diagnostics: [], output: expected_output, policies: [] }
+          }
+        }
+      end
+    )
+    expect(json_ready(reviewed_nested_manifest_application[:state])).to eq(
+      json_ready(reviewed_nested_manifest_application_fixture[:expected_state])
+    )
+    expect(json_ready(reviewed_nested_manifest_application[:results].map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+      json_ready(reviewed_nested_manifest_application_fixture[:expected_application][:results])
+    )
+
+    reviewed_nested_manifest_rejection_fixture = diagnostics_fixture(
+      "review_replay_bundle_envelope_reviewed_nested_manifest_rejection"
+    )
+    reviewed_nested_manifest_rejection_fixture[:cases].each do |test_case|
+      rejected_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
+        reviewed_nested_manifest_rejection_fixture[:manifest],
+        reviewed_nested_manifest_rejection_fixture[:options],
+        test_case[:review_replay_bundle_envelope],
+        execute: execute_from(reviewed_nested_manifest_rejection_fixture[:executions]),
+        reviewed_nested_execution: lambda do
+          raise "callbacks should not run for rejected replay bundle envelopes"
+        end
+      )
+      expect(json_ready(rejected_application)).to eq(
+        json_ready(
+          state: test_case[:expected_state],
+          results: test_case[:expected_application][:results]
+        )
+      )
+    end
+
     review_state_envelope = described_class.conformance_manifest_review_state_envelope(review_state_roundtrip_fixture[:state])
     roundtrip_state, roundtrip_error = described_class.import_conformance_manifest_review_state_envelope(review_state_envelope)
     expect(roundtrip_error).to be_nil

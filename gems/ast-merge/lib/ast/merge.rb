@@ -427,6 +427,26 @@ module Ast
       }
     end
 
+    def review_and_execute_conformance_manifest_with_replay_bundle_envelope(
+      manifest,
+      options,
+      replay_bundle_envelope,
+      execute:,
+      reviewed_nested_execution:
+    )
+      state = review_conformance_manifest_with_replay_bundle_envelope(
+        manifest,
+        options,
+        replay_bundle_envelope,
+        &execute
+      )
+
+      {
+        state: state,
+        results: execute_review_state_reviewed_nested_executions(state, &reviewed_nested_execution)
+      }
+    end
+
     def conformance_manifest_replay_context(manifest, options)
       seen = {}
       families = conformance_suite_selectors(manifest).filter_map do |selector|
