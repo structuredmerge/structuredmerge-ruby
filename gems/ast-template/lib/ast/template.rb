@@ -301,6 +301,95 @@ module Ast
         }
       end
 
+      def report_template_directory_session_diagnostics(mode, entries, adapter_capabilities, result = nil)
+        missing_families = Array(
+          adapter_capabilities[:missing_families] || adapter_capabilities["missing_families"]
+        ).map(&:to_s)
+        blocked_apply_paths = Array(
+          result&.dig(:apply_report, :entries) || result&.dig("apply_report", "entries")
+        ).filter_map do |entry|
+          destination_path = entry[:destination_path] || entry["destination_path"]
+          status = entry[:status] || entry["status"]
+          destination_path if status.to_s == "blocked" && destination_path
+        end
+
+        diagnostics = Array(entries).flat_map do |entry|
+          path = entry[:destination_path] || entry["destination_path"] ||
+            entry[:logical_destination_path] || entry["logical_destination_path"]
+          family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+          result_entries = []
+          block_reason = entry[:block_reason] || entry["block_reason"]
+          if (entry[:blocked] || entry["blocked"]) && block_reason.to_s == "unresolved_tokens"
+            result_entries << {
+              severity: "error",
+              category: "configuration_error",
+              reason: "unresolved_tokens",
+              path: path,
+              message: "unresolved template tokens block #{path}"
+            }
+          end
+          if (entry[:execution_action] || entry["execution_action"]).to_s == "merge_prepared_content" &&
+              missing_families.include?(family.to_s) &&
+              (result.nil? || blocked_apply_paths.empty? || blocked_apply_paths.include?(path))
+            result_entries << {
+              severity: "error",
+              category: "configuration_error",
+              reason: "missing_family_adapter",
+              path: path,
+              family: family.to_s,
+              message: "missing family adapter for #{family} blocks #{path}"
+            }
+          end
+          result_entries
+        end.sort_by { |entry| [entry[:path].to_s, entry[:reason].to_s, entry[:family].to_s] }
+
+        {
+          mode: mode.to_s,
+          ready: diagnostics.empty?,
+          diagnostics: diagnostics
+        }
+      end
+
+      def plan_template_directory_session_diagnostics_from_directories(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        entries = Ast::Merge.plan_template_tree_execution_from_directories(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        )
+        report_template_directory_session_diagnostics(
+          :plan,
+          entries,
+          report_adapter_capabilities(entries, default_family_merge_adapter_registry(allowed_families))
+        )
+      end
+
+      def apply_template_directory_session_diagnostics_with_default_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        registry = default_family_merge_adapter_registry(allowed_families)
+        result = Ast::Merge.apply_template_tree_execution_to_directory(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        ) do |entry|
+          merge_prepared_content_from_registry(registry, entry)
+        end
+        report_template_directory_session_diagnostics(
+          :apply,
+          result[:execution_plan],
+          report_adapter_capabilities(result[:execution_plan], registry),
+          result
+        )
+      end
+
       private
 
       def deep_dup(value)
