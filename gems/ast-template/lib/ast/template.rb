@@ -271,6 +271,36 @@ module Ast
         )
       end
 
+      def report_template_directory_session_status(envelope)
+        session_report = envelope[:session_report] || envelope["session_report"] || {}
+        adapter_capabilities = envelope[:adapter_capabilities] || envelope["adapter_capabilities"] || {}
+        runner_report = session_report[:runner_report] || session_report["runner_report"] || {}
+        plan_report = runner_report[:plan_report] || runner_report["plan_report"] || {}
+        entries = Array(plan_report[:entries] || plan_report["entries"])
+        plan_summary = plan_report[:summary] || plan_report["summary"] || {}
+        apply_report = runner_report[:apply_report] || runner_report["apply_report"] || {}
+        apply_entries = Array(apply_report[:entries] || apply_report["entries"])
+        apply_summary = apply_report[:summary] || apply_report["summary"] || {}
+        blocked_paths = (entries + apply_entries).filter_map do |entry|
+          status = entry[:status] || entry["status"]
+          destination_path = entry[:destination_path] || entry["destination_path"]
+          destination_path if status.to_s == "blocked" && destination_path
+        end.uniq.sort
+        missing_families = Array(
+          adapter_capabilities[:missing_families] || adapter_capabilities["missing_families"]
+        ).map(&:to_s).sort
+
+        {
+          mode: (session_report[:mode] || session_report["mode"]).to_s,
+          ready: !!(adapter_capabilities[:ready] || adapter_capabilities["ready"]) && blocked_paths.empty?,
+          missing_families: missing_families,
+          blocked_paths: blocked_paths,
+          planned_write_count: plan_summary.fetch(:create, plan_summary.fetch("create", 0)) +
+            plan_summary.fetch(:update, plan_summary.fetch("update", 0)),
+          written_count: apply_summary.fetch(:written, apply_summary.fetch("written", 0))
+        }
+      end
+
       private
 
       def deep_dup(value)
