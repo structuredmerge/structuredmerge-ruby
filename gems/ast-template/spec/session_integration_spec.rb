@@ -431,6 +431,43 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session options report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-362-template-directory-session-options-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-options-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_options(
+          fixture.dig(:plan_run, :options).merge(
+            template_root: fixture_dir.join("dry-run", "template"),
+            destination_root: fixture_dir.join("dry-run", "destination")
+          )
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:plan_run, :expected)))
+
+    temp_dir = repo_temp_dir("options")
+    destination_root = temp_dir.join("destination")
+    begin
+      Ast::Merge.write_relative_file_tree(
+        destination_root,
+        Ast::Merge.read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+      )
+
+      %i[apply_run reapply_run].each do |key|
+        actual = described_class.run_template_directory_session_with_options(
+          fixture.dig(key, :options).merge(
+            template_root: fixture_dir.join("apply-run", "template"),
+            destination_root: destination_root
+          )
+        )
+        expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
+      end
+    ensure
+      temp_dir.rmtree if temp_dir.exist?
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end

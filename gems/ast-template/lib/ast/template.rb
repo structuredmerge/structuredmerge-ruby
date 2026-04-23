@@ -536,6 +536,21 @@ module Ast
         end
       end
 
+      def run_template_directory_session_with_options(options)
+        normalized = deep_dup(options)
+        run_template_directory_session_with_default_registry_to_directory(
+          normalized[:mode] || normalized["mode"],
+          normalized[:template_root] || normalized["template_root"],
+          normalized[:destination_root] || normalized["destination_root"],
+          normalized[:context] || normalized["context"] || {},
+          normalized[:default_strategy] || normalized["default_strategy"],
+          normalized[:overrides] || normalized["overrides"] || [],
+          normalized[:replacements] || normalized["replacements"] || {},
+          normalized[:allowed_families] || normalized["allowed_families"],
+          normalized[:config] || normalized["config"]
+        )
+      end
+
       private
 
       def deep_dup(value)
