@@ -576,6 +576,32 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_missing_roots, :expected)))
   end
 
+  it "conforms to the template directory session profile configuration outcome report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-365-template-directory-session-profile-configuration-outcome-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-profile-configuration-outcome-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_profile(
+          profiles,
+          fixture.dig(:missing_profile, :profile),
+          fixture.dig(:missing_profile, :overrides)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:missing_profile, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_profile(
+          profiles,
+          fixture.dig(:missing_roots, :profile),
+          fixture.dig(:missing_roots, :overrides)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:missing_roots, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end

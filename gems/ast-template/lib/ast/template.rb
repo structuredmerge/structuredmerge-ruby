@@ -602,6 +602,21 @@ module Ast
         }
       end
 
+      def report_template_directory_session_configuration_outcome(mode, diagnostics)
+        report_template_directory_session_outcome(
+          report_template_directory_session(mode, []),
+          {
+            mode: mode,
+            ready: false,
+            missing_families: [],
+            blocked_paths: [],
+            planned_write_count: 0,
+            written_count: 0
+          },
+          diagnostics
+        )
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
@@ -629,8 +644,23 @@ module Ast
       end
 
       def run_template_directory_session_with_profile(profiles, profile_name, overrides)
+        configuration = report_template_directory_session_profile_configuration(profiles, profile_name, overrides)
+        return report_template_directory_session_configuration_outcome(configuration[:mode], configuration) unless configuration[:ready]
+
         options = resolve_template_directory_session_options(profiles, profile_name, overrides)
-        return nil unless options
+        return report_template_directory_session_configuration_outcome(
+          normalize_session_mode(overrides[:mode] || overrides["mode"]),
+          {
+            mode: normalize_session_mode(overrides[:mode] || overrides["mode"]),
+            ready: false,
+            diagnostics: [{
+              severity: "error",
+              category: "configuration_error",
+              reason: "missing_profile",
+              message: "unknown template session profile: #{profile_name}"
+            }]
+          }
+        ) unless options
 
         run_template_directory_session_with_options(options)
       end
