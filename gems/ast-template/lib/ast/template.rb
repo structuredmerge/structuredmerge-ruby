@@ -8,6 +8,40 @@ module Ast
     MODES = %w[plan apply reapply].freeze
 
     class << self
+      def merge_prepared_content_from_registry(registry, entry)
+        family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+        adapter = registry[family.to_s]
+        unless adapter
+          return {
+            ok: false,
+            diagnostics: [{
+              severity: "error",
+              category: "configuration_error",
+              message: "missing family adapter for #{family}"
+            }],
+            policies: []
+          }
+        end
+
+        adapter.call(deep_dup(entry))
+      end
+
+      def registered_adapter_families(registry)
+        registry.keys.map(&:to_s).sort
+      end
+
+      def report_template_directory_registry_session(mode, entries, registry, result = nil)
+        normalized_mode = mode.to_s
+        raise ArgumentError, "unsupported template session mode: #{mode}" unless MODES.include?(normalized_mode)
+
+        {
+          mode: normalized_mode,
+          adapter_families: registered_adapter_families(registry),
+          diagnostics: Array(result&.dig(:apply_result, :diagnostics) || result&.dig("apply_result", "diagnostics")),
+          runner_report: Ast::Merge.report_template_directory_runner(entries, result)
+        }
+      end
+
       def report_template_directory_session(mode, entries, result = nil)
         normalized_mode = mode.to_s
         raise ArgumentError, "unsupported template session mode: #{mode}" unless MODES.include?(normalized_mode)
@@ -60,6 +94,28 @@ module Ast
           &merge_callback
         )
         report_template_directory_session(:reapply, result[:execution_plan], result)
+      end
+
+      def apply_template_directory_session_with_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, registry, config = nil)
+        result = Ast::Merge.apply_template_tree_execution_to_directory(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        ) do |entry|
+          merge_prepared_content_from_registry(registry, entry)
+        end
+        report_template_directory_registry_session(:apply, result[:execution_plan], registry, result)
+      end
+
+      private
+
+      def deep_dup(value)
+        Ast::Merge.deep_dup(value)
       end
     end
   end
