@@ -781,6 +781,43 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_blocked, :expected)))
   end
 
+  it "conforms to the template directory session runner payload report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-371-template-directory-session-runner-payload-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-payload-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_runner_payload(
+          fixture.dig(:options_explicit, :input)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_explicit, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_runner_payload(
+          fixture.dig(:options_inferred, :input)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_inferred, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_runner_payload(
+          fixture.dig(:profile_default_name, :input)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_default_name, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_runner_payload(
+          fixture.dig(:profile_explicit_name, :input)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_explicit_name, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end

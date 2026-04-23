@@ -724,6 +724,37 @@ module Ast
         }
       end
 
+      def report_template_directory_session_runner_payload(payload)
+        normalized = deep_dup(payload)
+        request_kind = normalized[:request_kind] || normalized["request_kind"]
+        request_kind = if request_kind.to_s.empty?
+          (normalized.key?(:profile_name) || normalized.key?("profile_name") ||
+            normalized.key?(:default_profile_name) || normalized.key?("default_profile_name")) ? "profile" : "options"
+        else
+          request_kind.to_s
+        end
+
+        result = {
+          request_kind: request_kind,
+          mode: normalized[:mode] || normalized["mode"],
+          template_root: normalized[:template_root] || normalized["template_root"],
+          destination_root: normalized[:destination_root] || normalized["destination_root"],
+          context: normalized[:context] || normalized["context"] || {},
+          default_strategy: normalized[:default_strategy] || normalized["default_strategy"] || "merge",
+          overrides: normalized[:overrides] || normalized["overrides"] || [],
+          replacements: normalized[:replacements] || normalized["replacements"] || {},
+          allowed_families: if normalized.key?(:allowed_families) || normalized.key?("allowed_families")
+            normalized.key?(:allowed_families) ? normalized[:allowed_families] : normalized["allowed_families"]
+          else
+            nil
+          end
+        }
+        profile_name = normalized[:profile_name] || normalized["profile_name"] ||
+          normalized[:default_profile_name] || normalized["default_profile_name"]
+        result[:profile_name] = profile_name if profile_name
+        result
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
