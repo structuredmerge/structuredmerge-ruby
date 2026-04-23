@@ -42,6 +42,44 @@ module Ast
         }
       end
 
+      def default_family_merge_adapter_registry(allowed_families = nil)
+        allowed = Array(allowed_families).map(&:to_s)
+        include_family = lambda do |family|
+          allowed.empty? || allowed.include?(family)
+        end
+
+        registry = {}
+        if include_family.call("markdown")
+          begin
+            require "markdown-merge"
+            registry["markdown"] = lambda do |entry|
+              Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+            end
+          rescue LoadError
+          end
+        end
+        if include_family.call("toml")
+          begin
+            require "toml-merge"
+            registry["toml"] = lambda do |entry|
+              Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
+            end
+          rescue LoadError
+          end
+        end
+        if include_family.call("ruby")
+          begin
+            require "ruby-merge"
+            registry["ruby"] = lambda do |entry|
+              Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+            end
+          rescue LoadError
+          end
+        end
+
+        registry
+      end
+
       def report_template_directory_session(mode, entries, result = nil)
         normalized_mode = mode.to_s
         raise ArgumentError, "unsupported template session mode: #{mode}" unless MODES.include?(normalized_mode)
@@ -110,6 +148,21 @@ module Ast
           merge_prepared_content_from_registry(registry, entry)
         end
         report_template_directory_registry_session(:apply, result[:execution_plan], registry, result)
+      end
+
+      def apply_template_directory_session_with_default_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        registry = default_family_merge_adapter_registry(allowed_families)
+        apply_template_directory_session_with_registry_to_directory(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          registry,
+          config
+        )
       end
 
       private

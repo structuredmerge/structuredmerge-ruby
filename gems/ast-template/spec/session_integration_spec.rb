@@ -124,6 +124,35 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory default adapter discovery report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-355-template-directory-default-adapter-discovery-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-default-adapter-discovery-report.json").read, symbolize_names: true)
+
+    %i[default_discovery filtered_discovery].each do |key|
+      temp_dir = repo_temp_dir("discovery")
+      destination_root = temp_dir.join("destination")
+      begin
+        Ast::Merge.write_relative_file_tree(
+          destination_root,
+          Ast::Merge.read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+        )
+
+        actual = described_class.apply_template_directory_session_with_default_registry_to_directory(
+          fixture_dir.join("apply-run", "template"),
+          destination_root,
+          fixture.dig(key, :context),
+          fixture.dig(key, :default_strategy),
+          fixture.dig(key, :overrides),
+          fixture.dig(key, :replacements),
+          fixture.dig(key, :allowed_families)
+        )
+        expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
+      ensure
+        temp_dir.rmtree if temp_dir.exist?
+      end
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
