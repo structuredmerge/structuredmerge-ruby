@@ -12,6 +12,12 @@ PATH
       tree_haver (= 0.1.0)
 
 PATH
+  remote: gems/ast-template
+  specs:
+    ast-template (0.0.0)
+      ast-merge (= 0.0.0)
+
+PATH
   remote: gems/citrus-toml-merge
   specs:
     citrus-toml-merge (0.1.0)
@@ -170,6 +176,7 @@ PLATFORMS
 
 DEPENDENCIES
   ast-merge!
+  ast-template!
   citrus-toml-merge!
   commonmarker-merge!
   go-merge!
@@ -193,6 +200,7 @@ DEPENDENCIES
 
 CHECKSUMS
   ast-merge (0.1.0)
+  ast-template (0.0.0)
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (0.1.0)
   commonmarker (2.8.1-x86_64-linux) sha256=c8f2e903c6ee4e2c7e280aa8b49ef37c53202d388e3a2ee06dfdccc8c6fb634f
