@@ -301,7 +301,11 @@ module Ast
           next unless destination_path && !prepared_template_content.nil?
 
           result[:result_files][destination_path] = prepared_template_content
-          (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+          if destination_exists && destination_content == prepared_template_content
+            result[:kept_paths] << destination_path
+          else
+            (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+          end
         when "merge_prepared_content"
           next unless destination_path && !prepared_template_content.nil? && destination_content.nil?
 
@@ -345,14 +349,14 @@ module Ast
         when "raw_copy", "write_prepared_content"
           next unless destination_path && !prepared_template_content.nil?
 
-          result[:result_files][destination_path] = prepared_template_content
-          (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+          record_template_apply_output(result, destination_path, destination_exists, destination_content,
+            prepared_template_content)
         when "merge_prepared_content"
           next unless destination_path && !prepared_template_content.nil?
 
           if destination_content.nil?
-            result[:result_files][destination_path] = prepared_template_content
-            (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+            record_template_apply_output(result, destination_path, destination_exists, destination_content,
+              prepared_template_content)
             next
           end
 
@@ -367,8 +371,7 @@ module Ast
             next
           end
 
-          result[:result_files][destination_path] = output
-          (destination_exists ? result[:updated_paths] : result[:created_paths]) << destination_path
+          record_template_apply_output(result, destination_path, destination_exists, destination_content, output)
         end
       end
 
@@ -438,6 +441,74 @@ module Ast
       }
     end
 
+    def read_relative_file_tree(root)
+      root = Pathname(root).expand_path
+      return {} unless root.exist?
+      raise ArgumentError, "#{root} is not a directory" unless root.directory?
+
+      root.find.each_with_object({}) do |path, files|
+        next if path.directory?
+
+        files[path.relative_path_from(root).to_s] = path.read
+      end
+    end
+
+    def write_relative_file_tree(root, files)
+      root = Pathname(root).expand_path
+      root.mkpath
+
+      files.keys.sort.each do |relative_path|
+        path = root.join(*relative_path.split("/"))
+        path.dirname.mkpath
+        path.write(files.fetch(relative_path))
+      end
+    end
+
+    def run_template_tree_execution_from_directories(template_root, destination_root,
+      context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil, &merge_prepared_content)
+      template_contents = read_relative_file_tree(template_root)
+      destination_contents = read_relative_file_tree(destination_root)
+
+      run_template_tree_execution(
+        template_contents.keys.sort,
+        template_contents,
+        destination_contents,
+        context,
+        default_strategy,
+        overrides,
+        replacements,
+        config,
+        &merge_prepared_content
+      )
+    end
+
+    def apply_template_tree_execution_to_directory(template_root, destination_root,
+      context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil, &merge_prepared_content)
+      run_result = run_template_tree_execution_from_directories(
+        template_root,
+        destination_root,
+        context,
+        default_strategy,
+        overrides,
+        replacements,
+        config,
+        &merge_prepared_content
+      )
+
+      files_to_write = {}
+      Array(run_result.dig(:apply_result, :created_paths) || run_result.dig("apply_result", "created_paths")).each do |path|
+        files_to_write[path] = run_result.dig(:apply_result, :result_files, path) ||
+          run_result.dig("apply_result", "result_files", path)
+      end
+      Array(run_result.dig(:apply_result, :updated_paths) || run_result.dig("apply_result", "updated_paths")).each do |path|
+        files_to_write[path] = run_result.dig(:apply_result, :result_files, path) ||
+          run_result.dig("apply_result", "result_files", path)
+      end
+      write_relative_file_tree(destination_root, files_to_write)
+
+      run_result
+    end
+
     def report_template_tree_run(result)
       created = Array(result.dig(:apply_result, :created_paths) || result.dig("apply_result", "created_paths"))
       updated = Array(result.dig(:apply_result, :updated_paths) || result.dig("apply_result", "updated_paths"))
@@ -480,6 +551,17 @@ module Ast
           omitted: entries.count { |entry| entry[:status] == "omitted" }
         }
       }
+    end
+
+    def record_template_apply_output(result, destination_path, destination_exists, destination_content, output)
+      result[:result_files][destination_path] = output
+      if destination_exists && destination_content == output
+        result[:kept_paths] << destination_path
+      elsif destination_exists
+        result[:updated_paths] << destination_path
+      else
+        result[:created_paths] << destination_path
+      end
     end
 
     def conformance_suite_definition(manifest, selector)
@@ -1468,6 +1550,8 @@ module Ast
       dialect == family_profile[:family]
     end
     private_class_method :default_dialect?
+
+    private_class_method :record_template_apply_output
 
     def review_decision_for_family_context(family, options)
       request_id = review_request_id_for_family_context(family)
