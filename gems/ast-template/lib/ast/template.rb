@@ -390,6 +390,81 @@ module Ast
         )
       end
 
+      def report_template_directory_session_outcome(session_report, status, diagnostics)
+        {
+          session_report: session_report,
+          status: status,
+          diagnostics: diagnostics
+        }
+      end
+
+      def plan_template_directory_session_outcome_from_directories(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        report_template_directory_session_outcome(
+          plan_template_directory_session_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            config
+          ),
+          report_template_directory_session_status(
+            plan_template_directory_session_envelope_from_directories(
+              template_root,
+              destination_root,
+              context,
+              default_strategy,
+              overrides,
+              replacements,
+              allowed_families,
+              config
+            )
+          ),
+          plan_template_directory_session_diagnostics_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        )
+      end
+
+      def apply_template_directory_session_outcome_with_default_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        registry = default_family_merge_adapter_registry(allowed_families)
+        result = Ast::Merge.apply_template_tree_execution_to_directory(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        ) do |entry|
+          merge_prepared_content_from_registry(registry, entry)
+        end
+        session_report = report_template_directory_registry_session(:apply, result[:execution_plan], registry, result)
+        capabilities = report_adapter_capabilities(result[:execution_plan], registry)
+        report_template_directory_session_outcome(
+          session_report,
+          report_template_directory_session_status(
+            report_template_directory_session_envelope(session_report, capabilities)
+          ),
+          report_template_directory_session_diagnostics(
+            :apply,
+            result[:execution_plan],
+            capabilities,
+            result
+          )
+        )
+      end
+
       private
 
       def deep_dup(value)
