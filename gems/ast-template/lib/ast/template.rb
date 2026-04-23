@@ -666,6 +666,26 @@ module Ast
         )
       end
 
+      def run_template_directory_session_runner_request(request, profiles = {})
+        normalized = deep_dup(request)
+        request_kind = normalized[:request_kind] || normalized["request_kind"]
+        if request_kind.to_s == "profile"
+          return run_template_directory_session_request(
+            report_template_directory_session_profile_request(
+              profiles,
+              normalized[:profile_name] || normalized["profile_name"],
+              normalized[:overrides] || normalized["overrides"] || {}
+            )
+          )
+        end
+
+        run_template_directory_session_request(
+          report_template_directory_session_options_request(
+            normalized[:options] || normalized["options"] || {}
+          )
+        )
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
