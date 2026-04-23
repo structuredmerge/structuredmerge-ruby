@@ -553,6 +553,38 @@ module Ast
       }
     end
 
+    def report_template_directory_apply(result)
+      run_report = report_template_tree_run(result)
+      created = Array(result.dig(:apply_result, :created_paths) || result.dig("apply_result", "created_paths"))
+      updated = Array(result.dig(:apply_result, :updated_paths) || result.dig("apply_result", "updated_paths"))
+
+      entries = run_report[:entries].map do |entry|
+        destination_path = entry[:destination_path] || entry["destination_path"]
+        written = destination_path && (created.include?(destination_path) || updated.include?(destination_path))
+
+        {
+          template_source_path: entry[:template_source_path] || entry["template_source_path"],
+          logical_destination_path: entry[:logical_destination_path] || entry["logical_destination_path"],
+          destination_path: destination_path,
+          execution_action: entry[:execution_action] || entry["execution_action"],
+          status: entry[:status] || entry["status"],
+          written: !!written
+        }
+      end
+
+      {
+        entries: entries,
+        summary: {
+          created: entries.count { |entry| entry[:status] == "created" },
+          updated: entries.count { |entry| entry[:status] == "updated" },
+          kept: entries.count { |entry| entry[:status] == "kept" },
+          blocked: entries.count { |entry| entry[:status] == "blocked" },
+          omitted: entries.count { |entry| entry[:status] == "omitted" },
+          written: entries.count { |entry| entry[:written] }
+        }
+      }
+    end
+
     def record_template_apply_output(result, destination_path, destination_exists, destination_content, output)
       result[:result_files][destination_path] = output
       if destination_exists && destination_content == output

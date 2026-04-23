@@ -613,6 +613,76 @@ RSpec.describe Ast::Merge do
     end
   end
 
+  it "conforms to the mini template tree directory apply report fixture" do
+    fixture = diagnostics_fixture("mini_template_tree_directory_apply_report")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_apply_report")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+    temp_dir = repo_temp_dir
+    destination_root = temp_dir.join("destination")
+
+    begin
+      described_class.write_relative_file_tree(destination_root, read_relative_file_tree(fixture_dir.join("destination")))
+
+      first_run = described_class.apply_template_tree_execution_to_directory(
+        fixture_dir.join("template"),
+        destination_root,
+        fixture[:context],
+        fixture[:default_strategy],
+        fixture[:overrides],
+        fixture[:replacements]
+      ) do |entry|
+        case entry[:classification][:family]
+        when "markdown"
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+        when "toml"
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
+        when "ruby"
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        else
+          {
+            ok: false,
+            diagnostics: [{ severity: "error", category: "configuration_error",
+                            message: "missing family merge adapter for #{entry[:classification][:family]}" }]
+          }
+        end
+      end
+
+      expect(json_ready(described_class.report_template_directory_apply(first_run))).to eq(
+        json_ready(fixture[:expected_first_report])
+      )
+
+      second_run = described_class.apply_template_tree_execution_to_directory(
+        fixture_dir.join("template"),
+        destination_root,
+        fixture[:context],
+        fixture[:default_strategy],
+        fixture[:overrides],
+        fixture[:replacements]
+      ) do |entry|
+        case entry[:classification][:family]
+        when "markdown"
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+        when "toml"
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
+        when "ruby"
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        else
+          {
+            ok: false,
+            diagnostics: [{ severity: "error", category: "configuration_error",
+                            message: "missing family merge adapter for #{entry[:classification][:family]}" }]
+          }
+        end
+      end
+
+      expect(json_ready(described_class.report_template_directory_apply(second_run))).to eq(
+        json_ready(fixture[:expected_second_report])
+      )
+    ensure
+      temp_dir.rmtree if temp_dir.exist?
+    end
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 
