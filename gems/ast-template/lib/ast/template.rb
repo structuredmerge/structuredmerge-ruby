@@ -551,6 +551,57 @@ module Ast
         )
       end
 
+      def report_template_directory_session_options_configuration(options)
+        normalized = deep_dup(options)
+        diagnostics = []
+        unless (normalized[:destination_root] || normalized["destination_root"]).to_s.length.positive?
+          diagnostics << {
+            severity: "error",
+            category: "configuration_error",
+            reason: "missing_destination_root",
+            message: "missing destination_root for template session"
+          }
+        end
+        unless (normalized[:template_root] || normalized["template_root"]).to_s.length.positive?
+          diagnostics << {
+            severity: "error",
+            category: "configuration_error",
+            reason: "missing_template_root",
+            message: "missing template_root for template session"
+          }
+        end
+        diagnostics.sort_by! { |entry| entry[:reason] }
+        {
+          mode: normalize_session_mode(normalized[:mode] || normalized["mode"]),
+          ready: diagnostics.empty?,
+          diagnostics: diagnostics
+        }
+      end
+
+      def report_template_directory_session_profile_configuration(profiles, profile_name, overrides)
+        normalized_profiles = deep_dup(profiles)
+        normalized_overrides = deep_dup(overrides)
+        diagnostics = report_template_directory_session_options_configuration(normalized_overrides)[:diagnostics]
+        profile = normalized_profiles[profile_name.to_s] || normalized_profiles[profile_name.to_sym]
+        mode = normalize_session_mode(
+          normalized_overrides[:mode] || normalized_overrides["mode"] || profile&.[](:mode) || profile&.[]("mode")
+        )
+        unless profile
+          diagnostics << {
+            severity: "error",
+            category: "configuration_error",
+            reason: "missing_profile",
+            message: "unknown template session profile: #{profile_name}"
+          }
+        end
+        diagnostics.sort_by! { |entry| entry[:reason] }
+        {
+          mode: mode,
+          ready: diagnostics.empty?,
+          diagnostics: diagnostics
+        }
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
@@ -588,6 +639,11 @@ module Ast
 
       def deep_dup(value)
         Ast::Merge.deep_dup(value)
+      end
+
+      def normalize_session_mode(mode)
+        normalized_mode = mode.to_s
+        MODES.include?(normalized_mode) ? normalized_mode : "plan"
       end
     end
   end
