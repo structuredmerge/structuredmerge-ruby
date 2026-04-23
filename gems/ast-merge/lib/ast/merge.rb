@@ -644,6 +644,20 @@ module Ast
       }
     end
 
+    def report_template_directory_runner(entries, result = nil)
+      report = {
+        plan_report: report_template_directory_plan(entries),
+        preview: preview_template_execution(entries),
+        run_report: nil,
+        apply_report: nil
+      }
+      return report if result.nil?
+
+      report[:run_report] = report_template_tree_run(result)
+      report[:apply_report] = report_template_directory_apply(result)
+      report
+    end
+
     def record_template_apply_output(result, destination_path, destination_exists, destination_content, output)
       result[:result_files][destination_path] = output
       if destination_exists && destination_content == output

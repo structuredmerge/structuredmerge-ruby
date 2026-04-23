@@ -702,6 +702,71 @@ RSpec.describe Ast::Merge do
     )
   end
 
+  it "conforms to the mini template tree directory runner report fixture" do
+    fixture = diagnostics_fixture("mini_template_tree_directory_runner_report")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_runner_report")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+
+    dry_run_plan = described_class.plan_template_tree_execution_from_directories(
+      fixture_dir.join("dry-run", "template"),
+      fixture_dir.join("dry-run", "destination"),
+      fixture.dig(:dry_run, :context),
+      fixture.dig(:dry_run, :default_strategy),
+      fixture.dig(:dry_run, :overrides),
+      fixture.dig(:dry_run, :replacements)
+    )
+    expect(json_ready(described_class.report_template_directory_runner(dry_run_plan))).to eq(
+      json_ready(fixture.dig(:dry_run, :expected))
+    )
+
+    temp_dir = repo_temp_dir
+    destination_root = temp_dir.join("destination")
+    begin
+      described_class.write_relative_file_tree(
+        destination_root,
+        read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+      )
+
+      apply_plan = described_class.plan_template_tree_execution_from_directories(
+        fixture_dir.join("apply-run", "template"),
+        destination_root,
+        fixture.dig(:apply_run, :context),
+        fixture.dig(:apply_run, :default_strategy),
+        fixture.dig(:apply_run, :overrides),
+        fixture.dig(:apply_run, :replacements)
+      )
+      apply_run = described_class.apply_template_tree_execution_to_directory(
+        fixture_dir.join("apply-run", "template"),
+        destination_root,
+        fixture.dig(:apply_run, :context),
+        fixture.dig(:apply_run, :default_strategy),
+        fixture.dig(:apply_run, :overrides),
+        fixture.dig(:apply_run, :replacements)
+      ) do |entry|
+        case entry[:classification][:family]
+        when "markdown"
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+        when "toml"
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
+        when "ruby"
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        else
+          {
+            ok: false,
+            diagnostics: [{ severity: "error", category: "configuration_error",
+                            message: "missing family merge adapter for #{entry[:classification][:family]}" }]
+          }
+        end
+      end
+
+      expect(json_ready(described_class.report_template_directory_runner(apply_plan, apply_run))).to eq(
+        json_ready(fixture.dig(:apply_run, :expected))
+      )
+    ensure
+      temp_dir.rmtree if temp_dir.exist?
+    end
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 
