@@ -650,6 +650,22 @@ module Ast
         )
       end
 
+      def run_template_directory_session_request(request)
+        normalized = deep_dup(request)
+        unless normalized[:ready] || normalized["ready"]
+          mode = normalized[:mode] || normalized["mode"]
+          diagnostics = normalized[:diagnostics] || normalized["diagnostics"] || []
+          return report_template_directory_session_configuration_outcome(
+            mode,
+            { mode: mode, ready: false, diagnostics: diagnostics }
+          )
+        end
+
+        run_template_directory_session_with_options(
+          normalized[:resolved_options] || normalized["resolved_options"]
+        )
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile

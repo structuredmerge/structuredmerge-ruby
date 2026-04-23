@@ -665,6 +665,43 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_invalid, :expected)))
   end
 
+  it "conforms to the template directory session request outcome report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-368-template-directory-session-request-outcome-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-request-outcome-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_request(
+          request_with_resolved_fixture_paths(fixture.dig(:options_ready, :request), fixture_dir)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_request(
+          request_with_resolved_fixture_paths(fixture.dig(:options_blocked, :request), fixture_dir)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_blocked, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_request(
+          request_with_resolved_fixture_paths(fixture.dig(:profile_ready, :request), fixture_dir)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_request(
+          request_with_resolved_fixture_paths(fixture.dig(:profile_blocked, :request), fixture_dir)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_blocked, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -675,5 +712,15 @@ RSpec.describe Ast::Template do
 
   def ruby_adapter(entry)
     Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+  end
+
+  def request_with_resolved_fixture_paths(request, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(request))
+    resolved = normalized[:resolved_options]
+    return normalized unless resolved
+
+    resolved[:template_root] = fixture_dir.join(resolved[:template_root]).to_s
+    resolved[:destination_root] = fixture_dir.join(resolved[:destination_root]).to_s
+    normalized
   end
 end
