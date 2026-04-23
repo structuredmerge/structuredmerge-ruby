@@ -210,6 +210,49 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:filtered_discovery, :expected)))
   end
 
+  it "conforms to the template directory session envelope report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-357-template-directory-session-envelope-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-envelope-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.plan_template_directory_session_envelope_from_directories(
+          fixture_dir.join("dry-run", "template"),
+          fixture_dir.join("dry-run", "destination"),
+          fixture.dig(:dry_run, :context),
+          fixture.dig(:dry_run, :default_strategy),
+          fixture.dig(:dry_run, :overrides),
+          fixture.dig(:dry_run, :replacements),
+          fixture.dig(:dry_run, :allowed_families)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:dry_run, :expected)))
+
+    %i[apply_run filtered_discovery].each do |key|
+      temp_dir = repo_temp_dir("envelope")
+      destination_root = temp_dir.join("destination")
+      begin
+        Ast::Merge.write_relative_file_tree(
+          destination_root,
+          Ast::Merge.read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+        )
+
+        actual = described_class.apply_template_directory_session_envelope_with_default_registry_to_directory(
+          fixture_dir.join("apply-run", "template"),
+          destination_root,
+          fixture.dig(key, :context),
+          fixture.dig(key, :default_strategy),
+          fixture.dig(key, :overrides),
+          fixture.dig(key, :replacements),
+          fixture.dig(key, :allowed_families)
+        )
+        expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
+      ensure
+        temp_dir.rmtree if temp_dir.exist?
+      end
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end

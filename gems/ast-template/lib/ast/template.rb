@@ -213,6 +213,64 @@ module Ast
         )
       end
 
+      def report_template_directory_session_envelope(session_report, adapter_capabilities)
+        {
+          session_report: session_report,
+          adapter_capabilities: adapter_capabilities
+        }
+      end
+
+      def plan_template_directory_session_envelope_from_directories(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        report_template_directory_session_envelope(
+          plan_template_directory_session_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            config
+          ),
+          report_default_adapter_capabilities_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        )
+      end
+
+      def apply_template_directory_session_envelope_with_default_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        report_template_directory_session_envelope(
+          apply_template_directory_session_with_default_registry_to_directory(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          ),
+          report_default_adapter_capabilities_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        )
+      end
+
       private
 
       def deep_dup(value)
