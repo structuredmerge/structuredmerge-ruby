@@ -165,6 +165,54 @@ module Ast
         )
       end
 
+      def required_families(entries)
+        Array(entries).filter_map do |entry|
+          next unless (entry[:execution_action] || entry["execution_action"]).to_s == "merge_prepared_content"
+
+          entry.dig(:classification, :family) || entry.dig("classification", "family")
+        end.uniq.sort
+      end
+
+      def report_adapter_capabilities(entries, registry)
+        available = registered_adapter_families(registry)
+        required = required_families(entries)
+        missing = required - available
+        {
+          required_families: required,
+          adapter_families: available,
+          missing_families: missing,
+          ready: missing.empty?
+        }
+      end
+
+      def report_adapter_capabilities_from_directories(template_root, destination_root,
+        context, default_strategy, overrides, replacements, registry, config = nil)
+        entries = Ast::Merge.plan_template_tree_execution_from_directories(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        )
+        report_adapter_capabilities(entries, registry)
+      end
+
+      def report_default_adapter_capabilities_from_directories(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        report_adapter_capabilities_from_directories(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          default_family_merge_adapter_registry(allowed_families),
+          config
+        )
+      end
+
       private
 
       def deep_dup(value)

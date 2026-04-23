@@ -153,6 +153,63 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory adapter capability report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-356-template-directory-adapter-capability-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-adapter-capability-report.json").read, symbolize_names: true)
+
+    full_registry = {
+      "markdown" => method(:markdown_adapter).to_proc,
+      "ruby" => method(:ruby_adapter).to_proc,
+      "toml" => method(:toml_adapter).to_proc
+    }
+    partial_registry = {
+      "markdown" => method(:markdown_adapter).to_proc,
+      "toml" => method(:toml_adapter).to_proc
+    }
+
+    expect(
+      json_ready(
+        described_class.report_adapter_capabilities_from_directories(
+          fixture_dir.join("apply-run", "template"),
+          fixture_dir.join("apply-run", "destination"),
+          fixture.dig(:full_registry, :context),
+          fixture.dig(:full_registry, :default_strategy),
+          fixture.dig(:full_registry, :overrides),
+          fixture.dig(:full_registry, :replacements),
+          full_registry
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:full_registry, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_adapter_capabilities_from_directories(
+          fixture_dir.join("apply-run", "template"),
+          fixture_dir.join("apply-run", "destination"),
+          fixture.dig(:partial_registry, :context),
+          fixture.dig(:partial_registry, :default_strategy),
+          fixture.dig(:partial_registry, :overrides),
+          fixture.dig(:partial_registry, :replacements),
+          partial_registry
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:partial_registry, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_default_adapter_capabilities_from_directories(
+          fixture_dir.join("apply-run", "template"),
+          fixture_dir.join("apply-run", "destination"),
+          fixture.dig(:filtered_discovery, :context),
+          fixture.dig(:filtered_discovery, :default_strategy),
+          fixture.dig(:filtered_discovery, :overrides),
+          fixture.dig(:filtered_discovery, :replacements),
+          fixture.dig(:filtered_discovery, :allowed_families)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:filtered_discovery, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
