@@ -860,6 +860,48 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_blocked, :expected)))
   end
 
+  it "conforms to the template directory session entrypoint outcome report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-373-template-directory-session-entrypoint-outcome-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-entrypoint-outcome-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_entrypoint(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:payload_ready, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:payload_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_entrypoint(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:request_blocked, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:request_blocked, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_entrypoint(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:request_ready, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:request_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_entrypoint(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:payload_blocked, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:payload_blocked, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -912,6 +954,17 @@ RSpec.describe Ast::Template do
     end
     if normalized[:destination_root].to_s.length.positive?
       normalized[:destination_root] = fixture_dir.join(normalized[:destination_root]).to_s
+    end
+    normalized
+  end
+
+  def entrypoint_with_resolved_fixture_paths(entrypoint, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(entrypoint))
+    if normalized[:payload]
+      normalized[:payload] = runner_payload_with_resolved_fixture_paths(normalized[:payload], fixture_dir)
+    end
+    if normalized[:request]
+      normalized[:request] = runner_request_with_resolved_fixture_paths(normalized[:request], fixture_dir)
     end
     normalized
   end

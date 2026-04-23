@@ -769,6 +769,24 @@ module Ast
         )
       end
 
+      def run_template_directory_session_entrypoint(entrypoint, profiles = {})
+        normalized = deep_dup(entrypoint)
+        return run_template_directory_session_runner_payload(
+          normalized[:payload] || normalized["payload"],
+          profiles
+        ) if normalized[:payload] || normalized["payload"]
+
+        return run_template_directory_session_runner_request(
+          normalized[:request] || normalized["request"],
+          profiles
+        ) if normalized[:request] || normalized["request"]
+
+        report_template_directory_session_configuration_outcome(
+          "plan",
+          { mode: "plan", ready: false, diagnostics: [] }
+        )
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
