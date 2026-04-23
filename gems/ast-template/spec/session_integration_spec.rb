@@ -1023,6 +1023,25 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(resolve_session_inspection_expected_paths(fixture.dig(:payload_blocked, :expected), fixture_dir)))
   end
 
+  it "conforms to the template directory session dispatch report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-377-template-directory-session-dispatch-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-dispatch-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    %i[inspect_payload_ready inspect_request_blocked run_request_ready run_payload_blocked].each do |key|
+      input = fixture.dig(key, :input)
+      expect(
+        json_ready(
+          described_class.run_template_directory_session_dispatch(
+            input[:operation],
+            entrypoint_with_resolved_fixture_paths(input[:entrypoint], fixture_dir),
+            profiles
+          )
+        )
+      ).to eq(json_ready(resolve_session_dispatch_expected_paths(fixture.dig(key, :expected), fixture_dir)))
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -1116,6 +1135,14 @@ RSpec.describe Ast::Template do
           normalized[:session_resolution][:session_request][:resolved_options],
           fixture_dir
         )
+    end
+    normalized
+  end
+
+  def resolve_session_dispatch_expected_paths(report, fixture_dir)
+    normalized = Ast::Merge.deep_dup(report)
+    if normalized[:inspection]
+      normalized[:inspection] = resolve_session_inspection_expected_paths(normalized[:inspection], fixture_dir)
     end
     normalized
   end

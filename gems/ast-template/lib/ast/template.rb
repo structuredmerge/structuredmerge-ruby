@@ -897,6 +897,23 @@ module Ast
         }
       end
 
+      def run_template_directory_session_dispatch(operation, entrypoint, profiles = {})
+        case operation.to_s
+        when "inspect"
+          {
+            operation: operation.to_s,
+            inspection: report_template_directory_session_inspection(entrypoint, profiles),
+            outcome: nil
+          }
+        else
+          {
+            operation: operation.to_s,
+            inspection: nil,
+            outcome: run_template_directory_session_entrypoint(entrypoint, profiles)
+          }
+        end
+      end
+
       def report_session_request_from_runner_request(request, profiles = {})
         normalized = deep_dup(request)
         if (normalized[:request_kind] || normalized["request_kind"]).to_s == "profile"
