@@ -465,6 +465,77 @@ module Ast
         )
       end
 
+      def reapply_template_directory_session_outcome_with_default_registry_to_directory(template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        registry = default_family_merge_adapter_registry(allowed_families)
+        result = Ast::Merge.apply_template_tree_execution_to_directory(
+          template_root,
+          destination_root,
+          context,
+          default_strategy,
+          overrides,
+          replacements,
+          config
+        ) do |entry|
+          merge_prepared_content_from_registry(registry, entry)
+        end
+        session_report = report_template_directory_registry_session(:reapply, result[:execution_plan], registry, result)
+        capabilities = report_adapter_capabilities(result[:execution_plan], registry)
+        report_template_directory_session_outcome(
+          session_report,
+          report_template_directory_session_status(
+            report_template_directory_session_envelope(session_report, capabilities)
+          ),
+          report_template_directory_session_diagnostics(
+            :reapply,
+            result[:execution_plan],
+            capabilities,
+            result
+          )
+        )
+      end
+
+      def run_template_directory_session_with_default_registry_to_directory(mode, template_root, destination_root,
+        context, default_strategy, overrides, replacements, allowed_families = nil, config = nil)
+        case mode.to_s
+        when "plan"
+          plan_template_directory_session_outcome_from_directories(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        when "apply"
+          apply_template_directory_session_outcome_with_default_registry_to_directory(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        when "reapply"
+          reapply_template_directory_session_outcome_with_default_registry_to_directory(
+            template_root,
+            destination_root,
+            context,
+            default_strategy,
+            overrides,
+            replacements,
+            allowed_families,
+            config
+          )
+        else
+          raise ArgumentError, "unsupported template session mode: #{mode}"
+        end
+      end
+
       private
 
       def deep_dup(value)

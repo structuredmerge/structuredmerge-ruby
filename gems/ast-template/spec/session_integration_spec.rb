@@ -386,6 +386,51 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session runner report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-361-template-directory-session-runner-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_default_registry_to_directory(
+          fixture.dig(:plan_run, :mode),
+          fixture_dir.join("dry-run", "template"),
+          fixture_dir.join("dry-run", "destination"),
+          fixture.dig(:plan_run, :context),
+          fixture.dig(:plan_run, :default_strategy),
+          fixture.dig(:plan_run, :overrides),
+          fixture.dig(:plan_run, :replacements),
+          fixture.dig(:plan_run, :allowed_families)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:plan_run, :expected)))
+
+    temp_dir = repo_temp_dir("runner")
+    destination_root = temp_dir.join("destination")
+    begin
+      Ast::Merge.write_relative_file_tree(
+        destination_root,
+        Ast::Merge.read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+      )
+
+      %i[apply_run reapply_run].each do |key|
+        actual = described_class.run_template_directory_session_with_default_registry_to_directory(
+          fixture.dig(key, :mode),
+          fixture_dir.join("apply-run", "template"),
+          destination_root,
+          fixture.dig(key, :context),
+          fixture.dig(key, :default_strategy),
+          fixture.dig(key, :overrides),
+          fixture.dig(key, :replacements),
+          fixture.dig(key, :allowed_families)
+        )
+        expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
+      end
+    ensure
+      temp_dir.rmtree if temp_dir.exist?
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
