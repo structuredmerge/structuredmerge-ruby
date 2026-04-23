@@ -709,11 +709,16 @@ module Ast
               template_root: normalized[:template_root] || normalized["template_root"],
               destination_root: normalized[:destination_root] || normalized["destination_root"]
             }
-            sparse[:context] = normalized[:context] || normalized["context"] if normalized.key?(:context) || normalized.key?("context")
-            sparse[:default_strategy] = normalized[:default_strategy] || normalized["default_strategy"] if normalized.key?(:default_strategy) || normalized.key?("default_strategy")
-            sparse[:overrides] = normalized[:overrides] || normalized["overrides"] if normalized.key?(:overrides) || normalized.key?("overrides")
-            sparse[:replacements] = normalized[:replacements] || normalized["replacements"] if normalized.key?(:replacements) || normalized.key?("replacements")
-            sparse[:allowed_families] = normalized.key?(:allowed_families) ? normalized[:allowed_families] : normalized["allowed_families"] if normalized.key?(:allowed_families) || normalized.key?("allowed_families")
+            context = normalized[:context] || normalized["context"]
+            sparse[:context] = context if context.is_a?(Hash) && (context[:project_name] || context["project_name"])
+            strategy = normalized[:default_strategy] || normalized["default_strategy"]
+            sparse[:default_strategy] = strategy if strategy && strategy != "merge"
+            overrides = normalized[:overrides] || normalized["overrides"]
+            sparse[:overrides] = overrides if overrides.is_a?(Array) && !overrides.empty?
+            replacements = normalized[:replacements] || normalized["replacements"]
+            sparse[:replacements] = replacements if replacements.is_a?(Hash) && !replacements.empty?
+            allowed_families = normalized.key?(:allowed_families) ? normalized[:allowed_families] : normalized["allowed_families"]
+            sparse[:allowed_families] = allowed_families unless allowed_families.nil?
             sparse
           end
         } if request_kind == "profile"
@@ -753,6 +758,15 @@ module Ast
           normalized[:default_profile_name] || normalized["default_profile_name"]
         result[:profile_name] = profile_name if profile_name
         result
+      end
+
+      def run_template_directory_session_runner_payload(payload, profiles = {})
+        run_template_directory_session_runner_request(
+          report_template_directory_session_runner_input(
+            report_template_directory_session_runner_payload(payload)
+          ),
+          profiles
+        )
       end
 
       def resolve_template_directory_session_options(profiles, profile_name, overrides)

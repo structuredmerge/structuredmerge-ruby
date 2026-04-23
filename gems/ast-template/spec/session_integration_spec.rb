@@ -818,6 +818,48 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_explicit_name, :expected)))
   end
 
+  it "conforms to the template directory session runner payload outcome report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-372-template-directory-session-runner-payload-outcome-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-payload-outcome-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_runner_payload(
+          runner_payload_with_resolved_fixture_paths(fixture.dig(:options_ready, :payload), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_runner_payload(
+          runner_payload_with_resolved_fixture_paths(fixture.dig(:options_blocked, :payload), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_blocked, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_runner_payload(
+          runner_payload_with_resolved_fixture_paths(fixture.dig(:profile_ready, :payload), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_ready, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_runner_payload(
+          runner_payload_with_resolved_fixture_paths(fixture.dig(:profile_blocked, :payload), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_blocked, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -859,6 +901,17 @@ RSpec.describe Ast::Template do
       if overrides[:destination_root].to_s.length.positive?
         overrides[:destination_root] = fixture_dir.join(overrides[:destination_root]).to_s
       end
+    end
+    normalized
+  end
+
+  def runner_payload_with_resolved_fixture_paths(payload, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(payload))
+    if normalized[:template_root].to_s.length.positive?
+      normalized[:template_root] = fixture_dir.join(normalized[:template_root]).to_s
+    end
+    if normalized[:destination_root].to_s.length.positive?
+      normalized[:destination_root] = fixture_dir.join(normalized[:destination_root]).to_s
     end
     normalized
   end
