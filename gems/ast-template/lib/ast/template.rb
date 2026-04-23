@@ -787,6 +787,32 @@ module Ast
         )
       end
 
+      def report_template_directory_session_entrypoint(entrypoint)
+        normalized = deep_dup(entrypoint)
+        if normalized[:payload] || normalized["payload"]
+          return {
+            source_kind: "payload",
+            runner_request: report_template_directory_session_runner_input(
+              report_template_directory_session_runner_payload(
+                normalized[:payload] || normalized["payload"]
+              )
+            )
+          }
+        end
+
+        if normalized[:request] || normalized["request"]
+          return {
+            source_kind: "request",
+            runner_request: normalized[:request] || normalized["request"]
+          }
+        end
+
+        {
+          source_kind: "",
+          runner_request: { request_kind: "options" }
+        }
+      end
+
       def resolve_template_directory_session_options(profiles, profile_name, overrides)
         profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
         return nil unless profile
