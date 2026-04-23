@@ -537,10 +537,14 @@ module Ast
       end
 
       def run_template_directory_session_with_options(options)
-        normalized = deep_dup(options)
-        configuration = report_template_directory_session_options_configuration(normalized)
-        return report_template_directory_session_configuration_outcome(configuration[:mode], configuration) unless configuration[:ready]
-
+        request = report_template_directory_session_options_request(options)
+        unless request[:ready]
+          return report_template_directory_session_configuration_outcome(
+            request[:mode],
+            { mode: request[:mode], ready: request[:ready], diagnostics: request[:diagnostics] }
+          )
+        end
+        normalized = deep_dup(request[:resolved_options])
         run_template_directory_session_with_default_registry_to_directory(
           normalized[:mode] || normalized["mode"],
           normalized[:template_root] || normalized["template_root"],
@@ -581,6 +585,18 @@ module Ast
         }
       end
 
+      def report_template_directory_session_options_request(options)
+        normalized = deep_dup(options)
+        configuration = report_template_directory_session_options_configuration(normalized)
+        {
+          request_kind: "options",
+          mode: configuration[:mode],
+          ready: configuration[:ready],
+          diagnostics: deep_dup(configuration[:diagnostics]),
+          resolved_options: configuration[:ready] ? compact_session_request_options(normalized) : nil
+        }
+      end
+
       def report_template_directory_session_profile_configuration(profiles, profile_name, overrides)
         normalized_profiles = deep_dup(profiles)
         normalized_overrides = deep_dup(overrides)
@@ -602,6 +618,20 @@ module Ast
           mode: mode,
           ready: diagnostics.empty?,
           diagnostics: diagnostics
+        }
+      end
+
+      def report_template_directory_session_profile_request(profiles, profile_name, overrides)
+        configuration = report_template_directory_session_profile_configuration(profiles, profile_name, overrides)
+        {
+          request_kind: "profile",
+          profile_name: profile_name.to_s,
+          mode: configuration[:mode],
+          ready: configuration[:ready],
+          diagnostics: deep_dup(configuration[:diagnostics]),
+          resolved_options: configuration[:ready] ? compact_session_request_options(
+            resolve_template_directory_session_options(profiles, profile_name, overrides)
+          ) : nil
         }
       end
 
@@ -647,25 +677,15 @@ module Ast
       end
 
       def run_template_directory_session_with_profile(profiles, profile_name, overrides)
-        configuration = report_template_directory_session_profile_configuration(profiles, profile_name, overrides)
-        return report_template_directory_session_configuration_outcome(configuration[:mode], configuration) unless configuration[:ready]
+        request = report_template_directory_session_profile_request(profiles, profile_name, overrides)
+        unless request[:ready]
+          return report_template_directory_session_configuration_outcome(
+            request[:mode],
+            { mode: request[:mode], ready: request[:ready], diagnostics: request[:diagnostics] }
+          )
+        end
 
-        options = resolve_template_directory_session_options(profiles, profile_name, overrides)
-        return report_template_directory_session_configuration_outcome(
-          normalize_session_mode(overrides[:mode] || overrides["mode"]),
-          {
-            mode: normalize_session_mode(overrides[:mode] || overrides["mode"]),
-            ready: false,
-            diagnostics: [{
-              severity: "error",
-              category: "configuration_error",
-              reason: "missing_profile",
-              message: "unknown template session profile: #{profile_name}"
-            }]
-          }
-        ) unless options
-
-        run_template_directory_session_with_options(options)
+        run_template_directory_session_with_options(request[:resolved_options])
       end
 
       private
@@ -677,6 +697,13 @@ module Ast
       def normalize_session_mode(mode)
         normalized_mode = mode.to_s
         MODES.include?(normalized_mode) ? normalized_mode : "plan"
+      end
+
+      def compact_session_request_options(options)
+        normalized = deep_dup(options)
+        normalized.delete(:config)
+        normalized.delete("config")
+        normalized
       end
     end
   end

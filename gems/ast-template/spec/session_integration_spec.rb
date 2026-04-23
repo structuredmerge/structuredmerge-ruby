@@ -623,6 +623,48 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:missing_destination_root, :expected)))
   end
 
+  it "conforms to the template directory session request report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-367-template-directory-session-request-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-request-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_options_request(
+          fixture.dig(:options_valid, :options)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_valid, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_options_request(
+          fixture.dig(:options_invalid, :options)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:options_invalid, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_profile_request(
+          profiles,
+          fixture.dig(:profile_valid, :profile),
+          fixture.dig(:profile_valid, :overrides)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_valid, :expected)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_profile_request(
+          profiles,
+          fixture.dig(:profile_invalid, :profile),
+          fixture.dig(:profile_invalid, :overrides)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:profile_invalid, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
