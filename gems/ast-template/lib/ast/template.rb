@@ -825,6 +825,78 @@ module Ast
         }
       end
 
+      def report_template_directory_session_inspection(entrypoint, profiles = {})
+        entrypoint_report = report_template_directory_session_entrypoint(entrypoint)
+        session_resolution = report_template_directory_session_resolution(entrypoint, profiles)
+        session_request = session_resolution[:session_request]
+
+        unless session_request[:ready] && session_request[:resolved_options]
+          return {
+            entrypoint_report: entrypoint_report,
+            session_resolution: session_resolution,
+            adapter_capabilities: {
+              required_families: [],
+              adapter_families: [],
+              missing_families: [],
+              ready: false
+            },
+            status: {
+              mode: session_request[:mode],
+              ready: false,
+              missing_families: [],
+              blocked_paths: [],
+              planned_write_count: 0,
+              written_count: 0
+            },
+            diagnostics: {
+              mode: session_request[:mode],
+              ready: false,
+              diagnostics: session_request[:diagnostics]
+            }
+          }
+        end
+
+        resolved = session_request[:resolved_options]
+        adapter_capabilities = report_default_adapter_capabilities_from_directories(
+          resolved[:template_root],
+          resolved[:destination_root],
+          resolved[:context],
+          resolved[:default_strategy],
+          resolved[:overrides],
+          resolved[:replacements],
+          resolved[:allowed_families],
+          resolved[:config]
+        )
+        session_report = plan_template_directory_session_from_directories(
+          resolved[:template_root],
+          resolved[:destination_root],
+          resolved[:context],
+          resolved[:default_strategy],
+          resolved[:overrides],
+          resolved[:replacements],
+          resolved[:config]
+        )
+
+        {
+          entrypoint_report: entrypoint_report,
+          session_resolution: session_resolution,
+          adapter_capabilities: adapter_capabilities,
+          status: report_template_directory_session_status(
+            report_template_directory_session_envelope(session_report, adapter_capabilities)
+          ),
+          diagnostics: plan_template_directory_session_diagnostics_from_directories(
+            resolved[:template_root],
+            resolved[:destination_root],
+            resolved[:context],
+            resolved[:default_strategy],
+            resolved[:overrides],
+            resolved[:replacements],
+            resolved[:allowed_families],
+            resolved[:config]
+          )
+        }
+      end
+
       def report_session_request_from_runner_request(request, profiles = {})
         normalized = deep_dup(request)
         if (normalized[:request_kind] || normalized["request_kind"]).to_s == "profile"

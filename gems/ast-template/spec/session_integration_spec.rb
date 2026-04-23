@@ -981,6 +981,48 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:payload_blocked, :expected)))
   end
 
+  it "conforms to the template directory session inspection report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-376-template-directory-session-inspection-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-inspection-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_inspection(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:payload_ready, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(resolve_session_inspection_expected_paths(fixture.dig(:payload_ready, :expected), fixture_dir)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_inspection(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:request_blocked, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(resolve_session_inspection_expected_paths(fixture.dig(:request_blocked, :expected), fixture_dir)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_inspection(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:request_ready, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(resolve_session_inspection_expected_paths(fixture.dig(:request_ready, :expected), fixture_dir)))
+
+    expect(
+      json_ready(
+        described_class.report_template_directory_session_inspection(
+          entrypoint_with_resolved_fixture_paths(fixture.dig(:payload_blocked, :input), fixture_dir),
+          profiles
+        )
+      )
+    ).to eq(json_ready(resolve_session_inspection_expected_paths(fixture.dig(:payload_blocked, :expected), fixture_dir)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -998,8 +1040,18 @@ RSpec.describe Ast::Template do
     resolved = normalized[:resolved_options]
     return normalized unless resolved
 
-    resolved[:template_root] = fixture_dir.join(resolved[:template_root]).to_s
-    resolved[:destination_root] = fixture_dir.join(resolved[:destination_root]).to_s
+    normalized[:resolved_options] = options_with_resolved_fixture_paths(resolved, fixture_dir)
+    normalized
+  end
+
+  def options_with_resolved_fixture_paths(options, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(options))
+    if normalized[:template_root].to_s.length.positive?
+      normalized[:template_root] = fixture_dir.join(normalized[:template_root]).to_s
+    end
+    if normalized[:destination_root].to_s.length.positive?
+      normalized[:destination_root] = fixture_dir.join(normalized[:destination_root]).to_s
+    end
     normalized
   end
 
@@ -1044,6 +1096,26 @@ RSpec.describe Ast::Template do
     end
     if normalized[:request]
       normalized[:request] = runner_request_with_resolved_fixture_paths(normalized[:request], fixture_dir)
+    end
+    normalized
+  end
+
+  def resolve_session_inspection_expected_paths(report, fixture_dir)
+    normalized = Ast::Merge.deep_dup(report)
+    if normalized[:entrypoint_report]&.dig(:runner_request)
+      normalized[:entrypoint_report][:runner_request] =
+        runner_request_with_resolved_fixture_paths(normalized[:entrypoint_report][:runner_request], fixture_dir)
+    end
+    if normalized[:session_resolution]&.dig(:runner_request)
+      normalized[:session_resolution][:runner_request] =
+        runner_request_with_resolved_fixture_paths(normalized[:session_resolution][:runner_request], fixture_dir)
+    end
+    if normalized[:session_resolution]&.dig(:session_request, :resolved_options)
+      normalized[:session_resolution][:session_request][:resolved_options] =
+        options_with_resolved_fixture_paths(
+          normalized[:session_resolution][:session_request][:resolved_options],
+          fixture_dir
+        )
     end
     normalized
   end
