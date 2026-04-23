@@ -926,6 +926,29 @@ module Ast
         )
       end
 
+      def run_template_directory_session_command_payload(command, profiles = {})
+        normalized = deep_dup(command)
+        run_template_directory_session_command(
+          {
+            operation: normalized[:operation] || normalized["operation"],
+            payload: {
+              request_kind: normalized[:request_kind] || normalized["request_kind"],
+              default_profile_name: normalized[:default_profile_name] || normalized["default_profile_name"],
+              profile_name: normalized[:profile_name] || normalized["profile_name"],
+              mode: normalized[:mode] || normalized["mode"],
+              template_root: normalized[:template_root] || normalized["template_root"],
+              destination_root: normalized[:destination_root] || normalized["destination_root"],
+              context: normalized[:context] || normalized["context"],
+              default_strategy: normalized[:default_strategy] || normalized["default_strategy"],
+              overrides: normalized[:overrides] || normalized["overrides"],
+              replacements: normalized[:replacements] || normalized["replacements"],
+              allowed_families: normalized.key?(:allowed_families) ? normalized[:allowed_families] : normalized["allowed_families"]
+            }
+          },
+          profiles
+        )
+      end
+
       def report_session_request_from_runner_request(request, profiles = {})
         normalized = deep_dup(request)
         if (normalized[:request_kind] || normalized["request_kind"]).to_s == "profile"

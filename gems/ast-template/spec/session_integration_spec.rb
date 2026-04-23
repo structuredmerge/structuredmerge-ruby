@@ -1059,6 +1059,23 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session command payload report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-379-template-directory-session-command-payload-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-command-payload-report.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    %i[inspect_ready run_profile_ready run_profile_blocked].each do |key|
+      expect(
+        json_ready(
+          described_class.run_template_directory_session_command_payload(
+            command_payload_with_resolved_fixture_paths(fixture.dig(key, :input), fixture_dir),
+            profiles
+          )
+        )
+      ).to eq(json_ready(resolve_session_dispatch_expected_paths(fixture.dig(key, :expected), fixture_dir)))
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -1173,6 +1190,10 @@ RSpec.describe Ast::Template do
       normalized[:request] = runner_request_with_resolved_fixture_paths(normalized[:request], fixture_dir)
     end
     normalized
+  end
+
+  def command_payload_with_resolved_fixture_paths(command, fixture_dir)
+    runner_payload_with_resolved_fixture_paths(command, fixture_dir)
   end
 
 end
