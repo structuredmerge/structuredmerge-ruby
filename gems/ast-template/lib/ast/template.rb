@@ -551,6 +551,39 @@ module Ast
         )
       end
 
+      def resolve_template_directory_session_options(profiles, profile_name, overrides)
+        profile = profiles[profile_name.to_s] || profiles[profile_name.to_sym]
+        return nil unless profile
+
+        normalized_profile = deep_dup(profile)
+        normalized_overrides = deep_dup(overrides)
+        {
+          mode: normalized_overrides[:mode] || normalized_overrides["mode"] ||
+            normalized_profile[:mode] || normalized_profile["mode"],
+          template_root: normalized_overrides[:template_root] || normalized_overrides["template_root"],
+          destination_root: normalized_overrides[:destination_root] || normalized_overrides["destination_root"],
+          context: normalized_overrides[:context] || normalized_overrides["context"] ||
+            normalized_profile[:context] || normalized_profile["context"] || {},
+          default_strategy: normalized_overrides[:default_strategy] || normalized_overrides["default_strategy"] ||
+            normalized_profile[:default_strategy] || normalized_profile["default_strategy"],
+          overrides: normalized_overrides[:overrides] || normalized_overrides["overrides"] ||
+            normalized_profile[:overrides] || normalized_profile["overrides"] || [],
+          replacements: normalized_overrides[:replacements] || normalized_overrides["replacements"] ||
+            normalized_profile[:replacements] || normalized_profile["replacements"] || {},
+          allowed_families: normalized_overrides[:allowed_families] || normalized_overrides["allowed_families"] ||
+            normalized_profile[:allowed_families] || normalized_profile["allowed_families"],
+          config: normalized_overrides[:config] || normalized_overrides["config"] ||
+            normalized_profile[:config] || normalized_profile["config"]
+        }
+      end
+
+      def run_template_directory_session_with_profile(profiles, profile_name, overrides)
+        options = resolve_template_directory_session_options(profiles, profile_name, overrides)
+        return nil unless options
+
+        run_template_directory_session_with_options(options)
+      end
+
       private
 
       def deep_dup(value)
