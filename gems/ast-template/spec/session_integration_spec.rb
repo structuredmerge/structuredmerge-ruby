@@ -602,6 +602,27 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:missing_roots, :expected)))
   end
 
+  it "conforms to the template directory session options configuration outcome report fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-366-template-directory-session-options-configuration-outcome-report")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-options-configuration-outcome-report.json").read, symbolize_names: true)
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_options(
+          fixture.dig(:missing_both_roots, :options)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:missing_both_roots, :expected)))
+
+    expect(
+      json_ready(
+        described_class.run_template_directory_session_with_options(
+          fixture.dig(:missing_destination_root, :options)
+        )
+      )
+    ).to eq(json_ready(fixture.dig(:missing_destination_root, :expected)))
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end

@@ -538,6 +538,9 @@ module Ast
 
       def run_template_directory_session_with_options(options)
         normalized = deep_dup(options)
+        configuration = report_template_directory_session_options_configuration(normalized)
+        return report_template_directory_session_configuration_outcome(configuration[:mode], configuration) unless configuration[:ready]
+
         run_template_directory_session_with_default_registry_to_directory(
           normalized[:mode] || normalized["mode"],
           normalized[:template_root] || normalized["template_root"],
