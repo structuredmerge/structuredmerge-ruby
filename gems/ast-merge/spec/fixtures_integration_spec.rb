@@ -683,6 +683,25 @@ RSpec.describe Ast::Merge do
     end
   end
 
+  it "conforms to the mini template tree directory plan report fixture" do
+    fixture = diagnostics_fixture("mini_template_tree_directory_plan_report")
+    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_plan_report")
+    fixture_dir = fixtures_root.join(*fixture_path[0...-1])
+
+    execution_plan = described_class.plan_template_tree_execution_from_directories(
+      fixture_dir.join("template"),
+      fixture_dir.join("destination"),
+      fixture[:context],
+      fixture[:default_strategy],
+      fixture[:overrides],
+      fixture[:replacements]
+    )
+
+    expect(json_ready(described_class.report_template_directory_plan(execution_plan))).to eq(
+      json_ready(fixture[:expected])
+    )
+  end
+
   it "conforms to the template entry plan state fixture" do
     fixture = diagnostics_fixture("template_entry_plan_state")
 

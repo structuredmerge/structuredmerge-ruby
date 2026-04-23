@@ -482,6 +482,24 @@ module Ast
       )
     end
 
+    def plan_template_tree_execution_from_directories(template_root, destination_root,
+      context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil)
+      template_contents = read_relative_file_tree(template_root)
+      destination_contents = read_relative_file_tree(destination_root)
+
+      plan_template_tree_execution(
+        template_contents.keys.sort,
+        template_contents,
+        destination_contents.keys.sort,
+        destination_contents,
+        context,
+        default_strategy,
+        overrides,
+        replacements,
+        config
+      )
+    end
+
     def apply_template_tree_execution_to_directory(template_root, destination_root,
       context = {}, default_strategy = "merge", overrides = [], replacements = {}, config = nil, &merge_prepared_content)
       run_result = run_template_tree_execution_from_directories(
@@ -581,6 +599,47 @@ module Ast
           blocked: entries.count { |entry| entry[:status] == "blocked" },
           omitted: entries.count { |entry| entry[:status] == "omitted" },
           written: entries.count { |entry| entry[:written] }
+        }
+      }
+    end
+
+    def report_template_directory_plan(entries)
+      report_entries = Array(entries).map do |entry|
+        execution_action = (entry[:execution_action] || entry["execution_action"]).to_s
+        write_action = (entry[:write_action] || entry["write_action"]).to_s
+        status, previewable =
+          case execution_action
+          when "blocked"
+            ["blocked", false]
+          when "omit"
+            ["omitted", true]
+          when "keep"
+            ["keep", true]
+          when "raw_copy", "write_prepared_content"
+            [write_action == "create" ? "create" : "update", true]
+          else
+            [write_action == "create" ? "create" : "update", write_action == "create"]
+          end
+
+        {
+          template_source_path: entry[:template_source_path] || entry["template_source_path"],
+          logical_destination_path: entry[:logical_destination_path] || entry["logical_destination_path"],
+          destination_path: entry[:destination_path] || entry["destination_path"],
+          execution_action: execution_action,
+          write_action: write_action,
+          status: status,
+          previewable: previewable
+        }
+      end
+
+      {
+        entries: report_entries,
+        summary: {
+          create: report_entries.count { |entry| entry[:status] == "create" },
+          update: report_entries.count { |entry| entry[:status] == "update" },
+          keep: report_entries.count { |entry| entry[:status] == "keep" },
+          blocked: report_entries.count { |entry| entry[:status] == "blocked" },
+          omitted: report_entries.count { |entry| entry[:status] == "omitted" }
         }
       }
     end
