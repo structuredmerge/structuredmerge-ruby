@@ -951,6 +951,15 @@ module Ast
         )
       end
 
+      def run_template_directory_session(invocation, profiles = {})
+        normalized = deep_dup(invocation)
+        if normalized[:payload] || normalized["payload"] || normalized[:request] || normalized["request"]
+          return run_template_directory_session_command(normalized, profiles)
+        end
+
+        run_template_directory_session_command_payload(normalized, profiles)
+      end
+
       def report_session_request_from_runner_request(request, profiles = {})
         normalized = deep_dup(request)
         if (normalized[:request_kind] || normalized["request_kind"]).to_s == "profile"
