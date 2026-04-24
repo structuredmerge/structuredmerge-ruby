@@ -905,12 +905,14 @@ module Ast
             inspection: report_template_directory_session_inspection(entrypoint, profiles),
             outcome: nil
           }
-        else
+        when "run"
           {
             operation: operation.to_s,
             inspection: nil,
             outcome: run_template_directory_session_entrypoint(entrypoint, profiles)
           }
+        else
+          raise ArgumentError, "unsupported template directory session operation: #{operation}"
         end
       end
 
