@@ -1137,6 +1137,20 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session invocation rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-384-template-directory-session-invocation-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      expect do
+        described_class.run_template_directory_session(
+          invocation_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir),
+          {}
+        )
+      end.to raise_error(ArgumentError, test_case.fetch(:expected_error))
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
