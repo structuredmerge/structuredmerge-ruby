@@ -384,6 +384,19 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session diagnostics transport envelope fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-416-template-directory-session-diagnostics-transport-envelope")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-diagnostics-envelope.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = test_case.fetch(:input)
+      expected = test_case.fetch(:expected_envelope)
+
+      expect(json_ready(described_class.template_directory_session_diagnostics_envelope(input))).to eq(json_ready(expected))
+      expect(described_class.import_template_directory_session_diagnostics_envelope(expected)).to eq([input, nil])
+    end
+  end
+
   it "conforms to the template directory session outcome report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-360-template-directory-session-outcome-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-outcome-report.json").read, symbolize_names: true)

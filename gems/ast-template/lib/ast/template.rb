@@ -7,6 +7,7 @@ module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
     SESSION_STATUS_TRANSPORT_VERSION = 1
+    SESSION_DIAGNOSTICS_TRANSPORT_VERSION = 1
     SESSION_OUTCOME_TRANSPORT_VERSION = 1
     SESSION_INSPECTION_TRANSPORT_VERSION = 1
     SESSION_REQUEST_TRANSPORT_VERSION = 1
@@ -373,6 +374,21 @@ module Ast
           ready: diagnostics.empty?,
           diagnostics: diagnostics
         }
+      end
+
+      def template_directory_session_diagnostics_envelope(diagnostics)
+        {
+          kind: "template_directory_session_diagnostics",
+          version: SESSION_DIAGNOSTICS_TRANSPORT_VERSION,
+          diagnostics: deep_dup(diagnostics)
+        }
+      end
+
+      def import_template_directory_session_diagnostics_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_diagnostics envelope kind." }] unless envelope[:kind] == "template_directory_session_diagnostics"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_diagnostics envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_DIAGNOSTICS_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:diagnostics]), nil]
       end
 
       def plan_template_directory_session_diagnostics_from_directories(template_root, destination_root,
