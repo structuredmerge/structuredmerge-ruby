@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_ENTRYPOINT_TRANSPORT_VERSION = 1
     SESSION_COMMAND_TRANSPORT_VERSION = 1
     SESSION_COMMAND_PAYLOAD_TRANSPORT_VERSION = 1
     SESSION_INVOCATION_TRANSPORT_VERSION = 1
@@ -961,6 +962,21 @@ module Ast
         end
 
         run_template_directory_session_command_payload(normalized, profiles)
+      end
+
+      def template_directory_session_entrypoint_envelope(entrypoint)
+        {
+          kind: "template_directory_session_entrypoint",
+          version: SESSION_ENTRYPOINT_TRANSPORT_VERSION,
+          entrypoint: deep_dup(entrypoint)
+        }
+      end
+
+      def import_template_directory_session_entrypoint_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_entrypoint envelope kind." }] unless envelope[:kind] == "template_directory_session_entrypoint"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_entrypoint envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_ENTRYPOINT_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:entrypoint]), nil]
       end
 
       def template_directory_session_command_envelope(command)

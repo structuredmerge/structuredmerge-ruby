@@ -1186,6 +1186,19 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session entrypoint transport envelope fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-395-template-directory-session-entrypoint-transport-envelope")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-entrypoint-envelope.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = entrypoint_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir)
+      expected = entrypoint_envelope_with_resolved_fixture_paths(test_case.fetch(:expected_envelope), fixture_dir)
+
+      expect(json_ready(described_class.template_directory_session_entrypoint_envelope(input))).to eq(json_ready(expected))
+      expect(described_class.import_template_directory_session_entrypoint_envelope(expected)).to eq([input, nil])
+    end
+  end
+
   it "conforms to the template directory session command payload envelope application fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-394-template-directory-session-command-payload-envelope-application")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-command-payload-envelope-application.json").read, symbolize_names: true)
@@ -1365,6 +1378,14 @@ RSpec.describe Ast::Template do
     end
     if normalized[:request]
       normalized[:request] = runner_request_with_resolved_fixture_paths(normalized[:request], fixture_dir)
+    end
+    normalized
+  end
+
+  def entrypoint_envelope_with_resolved_fixture_paths(envelope, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(envelope))
+    if normalized[:entrypoint]
+      normalized[:entrypoint] = entrypoint_with_resolved_fixture_paths(normalized[:entrypoint], fixture_dir)
     end
     normalized
   end
