@@ -1199,6 +1199,37 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session entrypoint transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-396-template-directory-session-entrypoint-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-entrypoint-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = entrypoint_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_entrypoint_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
+  it "conforms to the template directory session entrypoint envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-397-template-directory-session-entrypoint-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-entrypoint-envelope-application.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = entrypoint_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      entrypoint, error = described_class.import_template_directory_session_entrypoint_envelope(envelope)
+
+      expect(error).to be_nil
+      expect(
+        json_ready(described_class.run_template_directory_session_entrypoint(entrypoint, profiles))
+      ).to eq(json_ready(resolve_session_outcome_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = entrypoint_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_entrypoint_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session command payload envelope application fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-394-template-directory-session-command-payload-envelope-application")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-command-payload-envelope-application.json").read, symbolize_names: true)
@@ -1415,6 +1446,12 @@ RSpec.describe Ast::Template do
     if normalized[:inspection]
       normalized[:inspection] = resolve_session_inspection_expected_paths(normalized[:inspection], fixture_dir)
     end
+    normalized
+  end
+
+  def resolve_session_outcome_expected_paths(report, fixture_dir)
+    normalized = Ast::Merge.deep_dup(report)
+    fixture_dir
     normalized
   end
 
