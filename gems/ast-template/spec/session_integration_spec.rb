@@ -917,6 +917,37 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session runner payload transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-402-template-directory-session-runner-payload-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-payload-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = runner_payload_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_runner_payload_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
+  it "conforms to the template directory session runner payload envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-403-template-directory-session-runner-payload-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-payload-envelope-application.json").read, symbolize_names: true)
+    profiles = fixture[:profiles].transform_keys(&:to_s)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = runner_payload_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      payload, error = described_class.import_template_directory_session_runner_payload_envelope(envelope)
+
+      expect(error).to be_nil
+      expect(
+        json_ready(described_class.run_template_directory_session_runner_payload(payload, profiles))
+      ).to eq(json_ready(resolve_session_outcome_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = runner_payload_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_runner_payload_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session entrypoint outcome report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-373-template-directory-session-entrypoint-outcome-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-entrypoint-outcome-report.json").read, symbolize_names: true)
