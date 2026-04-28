@@ -757,6 +757,36 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session request transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-405-template-directory-session-request-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-request-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = request_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_request_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
+  it "conforms to the template directory session request envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-406-template-directory-session-request-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-request-envelope-application.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = request_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      request, error = described_class.import_template_directory_session_request_envelope(envelope)
+
+      expect(error).to be_nil
+      expect(
+        json_ready(described_class.run_template_directory_session_request(request))
+      ).to eq(json_ready(resolve_session_outcome_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = request_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_request_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session runner request transport envelope fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-398-template-directory-session-runner-request-transport-envelope")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-request-envelope.json").read, symbolize_names: true)
