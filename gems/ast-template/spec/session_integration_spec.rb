@@ -1205,6 +1205,34 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session inspection transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-411-template-directory-session-inspection-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-inspection-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = inspection_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_inspection_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
+  it "conforms to the template directory session inspection envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-412-template-directory-session-inspection-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-inspection-envelope-application.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = inspection_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      inspection, error = described_class.import_template_directory_session_inspection_envelope(envelope)
+
+      expect(error).to be_nil
+      expect(json_ready(inspection)).to eq(json_ready(resolve_session_inspection_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = inspection_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_inspection_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session dispatch report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-377-template-directory-session-dispatch-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-dispatch-report.json").read, symbolize_names: true)
