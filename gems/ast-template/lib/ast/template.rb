@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_STATUS_TRANSPORT_VERSION = 1
     SESSION_OUTCOME_TRANSPORT_VERSION = 1
     SESSION_INSPECTION_TRANSPORT_VERSION = 1
     SESSION_REQUEST_TRANSPORT_VERSION = 1
@@ -308,6 +309,21 @@ module Ast
             plan_summary.fetch(:update, plan_summary.fetch("update", 0)),
           written_count: apply_summary.fetch(:written, apply_summary.fetch("written", 0))
         }
+      end
+
+      def template_directory_session_status_envelope(status)
+        {
+          kind: "template_directory_session_status",
+          version: SESSION_STATUS_TRANSPORT_VERSION,
+          status: deep_dup(status)
+        }
+      end
+
+      def import_template_directory_session_status_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_status envelope kind." }] unless envelope[:kind] == "template_directory_session_status"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_status envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_STATUS_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:status]), nil]
       end
 
       def report_template_directory_session_diagnostics(mode, entries, adapter_capabilities, result = nil)
