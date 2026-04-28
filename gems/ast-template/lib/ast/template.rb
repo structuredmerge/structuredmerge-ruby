@@ -7,6 +7,7 @@ module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
     SESSION_OUTCOME_TRANSPORT_VERSION = 1
+    SESSION_INSPECTION_TRANSPORT_VERSION = 1
     SESSION_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_PAYLOAD_TRANSPORT_VERSION = 1
@@ -963,6 +964,21 @@ module Ast
             resolved[:config]
           )
         }
+      end
+
+      def template_directory_session_inspection_envelope(inspection)
+        {
+          kind: "template_directory_session_inspection",
+          version: SESSION_INSPECTION_TRANSPORT_VERSION,
+          inspection: deep_dup(inspection)
+        }
+      end
+
+      def import_template_directory_session_inspection_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_inspection envelope kind." }] unless envelope[:kind] == "template_directory_session_inspection"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_inspection envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_INSPECTION_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:inspection]), nil]
       end
 
       def run_template_directory_session_dispatch(operation, entrypoint, profiles = {})
