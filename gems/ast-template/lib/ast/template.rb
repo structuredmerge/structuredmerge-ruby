@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_OUTCOME_TRANSPORT_VERSION = 1
     SESSION_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_PAYLOAD_TRANSPORT_VERSION = 1
@@ -655,6 +656,21 @@ module Ast
           },
           diagnostics
         )
+      end
+
+      def template_directory_session_outcome_envelope(outcome)
+        {
+          kind: "template_directory_session_outcome",
+          version: SESSION_OUTCOME_TRANSPORT_VERSION,
+          outcome: deep_dup(outcome)
+        }
+      end
+
+      def import_template_directory_session_outcome_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_outcome envelope kind." }] unless envelope[:kind] == "template_directory_session_outcome"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_outcome envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_OUTCOME_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:outcome]), nil]
       end
 
       def run_template_directory_session_request(request)
