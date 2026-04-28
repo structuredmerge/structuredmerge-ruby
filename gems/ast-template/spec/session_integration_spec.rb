@@ -356,6 +356,34 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session status transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-414-template-directory-session-status-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-status-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = test_case.fetch(:envelope)
+      expect(described_class.import_template_directory_session_status_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
+  it "conforms to the template directory session status envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-415-template-directory-session-status-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-status-envelope-application.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = test_case.fetch(:envelope)
+      status, error = described_class.import_template_directory_session_status_envelope(envelope)
+
+      expect(error).to be_nil
+      expect(json_ready(status)).to eq(json_ready(test_case.fetch(:expected)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = test_case.fetch(:envelope)
+      expect(described_class.import_template_directory_session_status_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session outcome report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-360-template-directory-session-outcome-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-outcome-report.json").read, symbolize_names: true)
