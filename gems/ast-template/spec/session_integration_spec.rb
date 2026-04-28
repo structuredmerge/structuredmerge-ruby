@@ -1185,6 +1185,26 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session invocation envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-388-template-directory-session-invocation-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-envelope-application.json").read, symbolize_names: true)
+    profiles = fixture.fetch(:profiles).transform_keys(&:to_s)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = invocation_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      invocation, error = described_class.import_template_directory_session_invocation_envelope(envelope)
+      expect(error).to be_nil
+      expect(
+        json_ready(described_class.run_template_directory_session(invocation, profiles))
+      ).to eq(json_ready(resolve_session_dispatch_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = invocation_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_invocation_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
