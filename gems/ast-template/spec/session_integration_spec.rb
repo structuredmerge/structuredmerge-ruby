@@ -1151,6 +1151,17 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session invocation JSON roundtrip fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-385-template-directory-session-invocation-json-roundtrip")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-json-roundtrip.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = invocation_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir)
+      round_tripped = JSON.parse(JSON.generate(input), symbolize_names: true)
+      expect(json_ready(round_tripped)).to eq(json_ready(input))
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
