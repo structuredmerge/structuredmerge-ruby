@@ -1143,6 +1143,26 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session command envelope application fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-391-template-directory-session-command-envelope-application")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-command-envelope-application.json").read, symbolize_names: true)
+    profiles = fixture.fetch(:profiles).transform_keys(&:to_s)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = command_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      command, error = described_class.import_template_directory_session_command_envelope(envelope)
+      expect(error).to be_nil
+      expect(
+        json_ready(described_class.run_template_directory_session_command(command, profiles))
+      ).to eq(json_ready(resolve_session_dispatch_expected_paths(test_case.fetch(:expected), fixture_dir)))
+    end
+
+    fixture.fetch(:rejections).each do |test_case|
+      envelope = command_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_command_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session invocation report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-383-template-directory-session-invocation-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-report.json").read, symbolize_names: true)
