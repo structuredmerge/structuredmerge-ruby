@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_INVOCATION_TRANSPORT_VERSION = 1
 
     class << self
       def merge_prepared_content_from_registry(registry, entry)
@@ -958,6 +959,21 @@ module Ast
         end
 
         run_template_directory_session_command_payload(normalized, profiles)
+      end
+
+      def template_directory_session_invocation_envelope(invocation)
+        {
+          kind: "template_directory_session_invocation",
+          version: SESSION_INVOCATION_TRANSPORT_VERSION,
+          invocation: deep_dup(invocation)
+        }
+      end
+
+      def import_template_directory_session_invocation_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_invocation envelope kind." }] unless envelope[:kind] == "template_directory_session_invocation"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_invocation envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_INVOCATION_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:invocation]), nil]
       end
 
       def report_session_request_from_runner_request(request, profiles = {})

@@ -1162,6 +1162,19 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session invocation transport envelope fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-386-template-directory-session-invocation-transport-envelope")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-envelope.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = invocation_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir)
+      expected = invocation_envelope_with_resolved_fixture_paths(test_case.fetch(:expected_envelope), fixture_dir)
+
+      expect(json_ready(described_class.template_directory_session_invocation_envelope(input))).to eq(json_ready(expected))
+      expect(described_class.import_template_directory_session_invocation_envelope(expected)).to eq([input, nil])
+    end
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -1296,6 +1309,12 @@ RSpec.describe Ast::Template do
     if normalized[:destination_root]
       normalized[:destination_root] = fixture_dir.join(normalized[:destination_root]).to_s
     end
+    normalized
+  end
+
+  def invocation_envelope_with_resolved_fixture_paths(envelope, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(envelope))
+    normalized[:invocation] = invocation_with_resolved_fixture_paths(normalized.fetch(:invocation), fixture_dir)
     normalized
   end
 
