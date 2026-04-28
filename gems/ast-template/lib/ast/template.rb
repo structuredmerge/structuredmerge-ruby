@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_REQUEST_TRANSPORT_VERSION = 1
     SESSION_RUNNER_PAYLOAD_TRANSPORT_VERSION = 1
     SESSION_ENTRYPOINT_TRANSPORT_VERSION = 1
@@ -670,6 +671,21 @@ module Ast
         run_template_directory_session_with_options(
           normalized[:resolved_options] || normalized["resolved_options"]
         )
+      end
+
+      def template_directory_session_request_envelope(request)
+        {
+          kind: "template_directory_session_request",
+          version: SESSION_REQUEST_TRANSPORT_VERSION,
+          request: deep_dup(request)
+        }
+      end
+
+      def import_template_directory_session_request_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_request envelope kind." }] unless envelope[:kind] == "template_directory_session_request"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_request envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_REQUEST_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:request]), nil]
       end
 
       def run_template_directory_session_runner_request(request, profiles = {})

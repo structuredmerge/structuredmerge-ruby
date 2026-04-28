@@ -744,6 +744,19 @@ RSpec.describe Ast::Template do
     ).to eq(json_ready(fixture.dig(:profile_blocked, :expected)))
   end
 
+  it "conforms to the template directory session request transport envelope fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-404-template-directory-session-request-transport-envelope")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-request-envelope.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = request_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir)
+      expected = request_envelope_with_resolved_fixture_paths(test_case.fetch(:expected_envelope), fixture_dir)
+
+      expect(json_ready(described_class.template_directory_session_request_envelope(input))).to eq(json_ready(expected))
+      expect(described_class.import_template_directory_session_request_envelope(expected)).to eq([input, nil])
+    end
+  end
+
   it "conforms to the template directory session runner request transport envelope fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-398-template-directory-session-runner-request-transport-envelope")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-runner-request-envelope.json").read, symbolize_names: true)
@@ -1442,6 +1455,14 @@ RSpec.describe Ast::Template do
     return normalized unless resolved
 
     normalized[:resolved_options] = options_with_resolved_fixture_paths(resolved, fixture_dir)
+    normalized
+  end
+
+  def request_envelope_with_resolved_fixture_paths(envelope, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(envelope))
+    if normalized[:request]
+      normalized[:request] = request_with_resolved_fixture_paths(normalized[:request], fixture_dir)
+    end
     normalized
   end
 
