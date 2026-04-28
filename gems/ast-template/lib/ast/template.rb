@@ -6,6 +6,7 @@ require_relative "template/version"
 module Ast
   module Template
     MODES = %w[plan apply reapply].freeze
+    SESSION_COMMAND_TRANSPORT_VERSION = 1
     SESSION_INVOCATION_TRANSPORT_VERSION = 1
 
     class << self
@@ -959,6 +960,21 @@ module Ast
         end
 
         run_template_directory_session_command_payload(normalized, profiles)
+      end
+
+      def template_directory_session_command_envelope(command)
+        {
+          kind: "template_directory_session_command",
+          version: SESSION_COMMAND_TRANSPORT_VERSION,
+          command: deep_dup(command)
+        }
+      end
+
+      def import_template_directory_session_command_envelope(envelope)
+        return [nil, { category: "kind_mismatch", message: "expected template_directory_session_command envelope kind." }] unless envelope[:kind] == "template_directory_session_command"
+        return [nil, { category: "unsupported_version", message: "unsupported template_directory_session_command envelope version #{envelope[:version]}." }] unless envelope[:version] == SESSION_COMMAND_TRANSPORT_VERSION
+
+        [deep_dup(envelope[:command]), nil]
       end
 
       def template_directory_session_invocation_envelope(invocation)

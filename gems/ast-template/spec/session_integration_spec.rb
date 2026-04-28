@@ -1120,6 +1120,19 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session command transport envelope fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-389-template-directory-session-command-transport-envelope")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-command-envelope.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      input = command_with_resolved_fixture_paths(test_case.fetch(:input), fixture_dir)
+      expected = command_envelope_with_resolved_fixture_paths(test_case.fetch(:expected_envelope), fixture_dir)
+
+      expect(json_ready(described_class.template_directory_session_command_envelope(input))).to eq(json_ready(expected))
+      expect(described_class.import_template_directory_session_command_envelope(expected)).to eq([input, nil])
+    end
+  end
+
   it "conforms to the template directory session invocation report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-383-template-directory-session-invocation-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-report.json").read, symbolize_names: true)
@@ -1323,6 +1336,12 @@ RSpec.describe Ast::Template do
 
   def command_payload_with_resolved_fixture_paths(command, fixture_dir)
     runner_payload_with_resolved_fixture_paths(command, fixture_dir)
+  end
+
+  def command_envelope_with_resolved_fixture_paths(envelope, fixture_dir)
+    normalized = Marshal.load(Marshal.dump(envelope))
+    normalized[:command] = command_with_resolved_fixture_paths(normalized.fetch(:command), fixture_dir)
+    normalized
   end
 
   def invocation_with_resolved_fixture_paths(invocation, fixture_dir)
