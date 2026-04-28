@@ -1133,6 +1133,16 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "conforms to the template directory session command transport rejection fixture" do
+    fixture_dir = repo_root.join("fixtures/diagnostics/slice-390-template-directory-session-command-transport-rejection")
+    fixture = JSON.parse(fixture_dir.join("template-directory-session-command-envelope-rejection.json").read, symbolize_names: true)
+
+    fixture.fetch(:cases).each do |test_case|
+      envelope = command_envelope_with_resolved_fixture_paths(test_case.fetch(:envelope), fixture_dir)
+      expect(described_class.import_template_directory_session_command_envelope(envelope)).to eq([nil, test_case.fetch(:expected_error)])
+    end
+  end
+
   it "conforms to the template directory session invocation report fixture" do
     fixture_dir = repo_root.join("fixtures/diagnostics/slice-383-template-directory-session-invocation-report")
     fixture = JSON.parse(fixture_dir.join("template-directory-session-invocation-report.json").read, symbolize_names: true)
