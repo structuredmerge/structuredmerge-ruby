@@ -73,6 +73,20 @@ RSpec.describe Markly::Merge do
     )
   end
 
+  it "projects the structured-edit result through Markly" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-431-markdown-structured-edit-result-projection",
+        "markdown-structured-edit-result-projection.json"
+      )
+    )
+
+    expect(json_ready(described_class.markdown_structured_edit_result_projection)).to eq(
+      json_ready(fixture.dig(:providers, :markly))
+    )
+  end
+
   it "conforms to the shared Markdown analysis and matching fixtures" do
     analysis_fixture = read_json(fixtures_root.join("markdown", "slice-198-analysis", "headings-and-code-fences.json"))
     matching_fixture = read_json(fixtures_root.join("markdown", "slice-199-matching", "path-equality.json"))

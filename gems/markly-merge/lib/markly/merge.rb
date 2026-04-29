@@ -102,6 +102,43 @@ module Markly
       }
     end
 
+    def markdown_structured_edit_result_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_result: Ast::Merge.structured_edit_result(
+          operation_kind: "insert",
+          updated_content: "# Title\n\n## Usage\n\nExisting text.\n### Managed\n\nInserted text.\n",
+          changed: true,
+          operation_profile: Ast::Merge.structured_edit_operation_profile(
+            operation_kind: "insert",
+            operation_family: "insertion",
+            known_operation_kind: true,
+            source_requirement: "none",
+            destination_requirement: "optional",
+            replacement_source: "explicit_text",
+            captures_source_text: false,
+            supports_if_missing: true,
+            metadata: { source: "legacy_crispr_reference" }
+          ),
+          destination_profile: Ast::Merge.structured_edit_destination_profile(
+            resolution_kind: "append_fallback",
+            resolution_source: "none",
+            anchor_boundary: "none",
+            resolution_family: "append",
+            resolution_source_family: "implicit",
+            anchor_boundary_family: "none",
+            known_resolution_kind: true,
+            known_resolution_source: true,
+            known_anchor_boundary: true,
+            used_if_missing: true,
+            metadata: { family: "shared", source: "legacy_crispr_reference" }
+          ),
+          metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -219,6 +256,7 @@ module Markly
       :markdown_plan_context,
       :markdown_structured_edit_provider_profile,
       :markdown_structured_edit_request_projection,
+      :markdown_structured_edit_result_projection,
       :parse_markdown,
       :match_markdown_owners,
       :merge_markdown,
