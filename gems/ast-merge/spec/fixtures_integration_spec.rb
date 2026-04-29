@@ -1084,6 +1084,7 @@ RSpec.describe Ast::Merge do
     family_mismatch_fixture = diagnostics_fixture("explicit_review_decision_family_mismatch")
     surface_fixture = diagnostics_fixture("surface_ownership")
     delegated_operation_fixture = diagnostics_fixture("delegated_child_operation")
+    structured_edit_structure_profile_fixture = diagnostics_fixture("structured_edit_structure_profile")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1531,6 +1532,18 @@ RSpec.describe Ast::Merge do
       )
     )
     expect(json_ready(delegated_operation)).to eq(json_ready(delegated_operation_fixture[:operation]))
+
+    structured_edit_structure_profile_fixture[:cases].each do |entry|
+      profile = described_class.structured_edit_structure_profile(
+        owner_scope: entry.dig(:profile, :owner_scope),
+        owner_selector: entry.dig(:profile, :owner_selector),
+        owner_selector_family: entry.dig(:profile, :owner_selector_family),
+        known_owner_selector: entry.dig(:profile, :known_owner_selector),
+        supported_comment_regions: entry.dig(:profile, :supported_comment_regions),
+        metadata: entry.dig(:profile, :metadata)
+      )
+      expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
+    end
 
     projected_cases = projected_cases_fixture[:cases].map do |entry|
       described_class.projected_child_review_case(

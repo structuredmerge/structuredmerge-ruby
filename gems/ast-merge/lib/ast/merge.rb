@@ -770,6 +770,19 @@ module Ast
       }
     end
 
+    def structured_edit_structure_profile(owner_scope:, owner_selector:, known_owner_selector:,
+      supported_comment_regions:, owner_selector_family: nil, metadata: nil)
+      profile = {
+        owner_scope: owner_scope.to_s,
+        owner_selector: owner_selector.to_s,
+        known_owner_selector: known_owner_selector ? true : false,
+        supported_comment_regions: deep_dup(supported_comment_regions).map(&:to_s)
+      }
+      profile[:owner_selector_family] = owner_selector_family.to_s if owner_selector_family
+      profile[:metadata] = deep_dup(metadata) if metadata
+      profile
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
