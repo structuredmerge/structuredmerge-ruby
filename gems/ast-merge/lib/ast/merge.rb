@@ -952,6 +952,30 @@ module Ast
       [deep_dup(envelope[:execution_request]), nil]
     end
 
+    def structured_edit_provider_execution_application(execution_request:, report:, metadata: nil)
+      application = {
+        execution_request: deep_dup(execution_request),
+        report: deep_dup(report)
+      }
+      application[:metadata] = deep_dup(metadata) if metadata
+      application
+    end
+
+    def structured_edit_provider_execution_application_envelope(provider_execution_application)
+      {
+        kind: "structured_edit_provider_execution_application",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        provider_execution_application: deep_dup(provider_execution_application)
+      }
+    end
+
+    def import_structured_edit_provider_execution_application_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_application envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_application"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_application envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:provider_execution_application]), nil]
+    end
+
     def structured_edit_execution_report_envelope(report)
       {
         kind: "structured_edit_execution_report",
@@ -996,6 +1020,30 @@ module Ast
       return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_request envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
 
       [deep_dup(envelope[:batch_execution_request]), nil]
+    end
+
+    def structured_edit_provider_batch_execution_report(applications:, diagnostics:, metadata: nil)
+      batch = {
+        applications: deep_dup(applications),
+        diagnostics: deep_dup(diagnostics)
+      }
+      batch[:metadata] = deep_dup(metadata) if metadata
+      batch
+    end
+
+    def structured_edit_provider_batch_execution_report_envelope(batch_report)
+      {
+        kind: "structured_edit_provider_batch_execution_report",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_report: deep_dup(batch_report)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_report_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_report envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_report"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_report envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_report]), nil]
     end
 
     def structured_edit_batch_report(reports:, diagnostics:, metadata: nil)

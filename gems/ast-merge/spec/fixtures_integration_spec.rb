@@ -1100,6 +1100,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope")
     structured_edit_provider_execution_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_rejection")
     structured_edit_provider_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_application")
+    structured_edit_provider_execution_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application")
+    structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
+    structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
+    structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
     structured_edit_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_execution_report_envelope")
     structured_edit_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_rejection")
     structured_edit_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_application")
@@ -1108,6 +1112,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope")
     structured_edit_provider_batch_execution_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope_rejection")
     structured_edit_provider_batch_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope_application")
+    structured_edit_provider_batch_execution_report_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report")
+    structured_edit_provider_batch_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope")
+    structured_edit_provider_batch_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope_rejection")
+    structured_edit_provider_batch_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope_application")
     structured_edit_batch_report_fixture = diagnostics_fixture("structured_edit_batch_report")
     structured_edit_batch_report_envelope_fixture = diagnostics_fixture("structured_edit_batch_report_envelope")
     structured_edit_batch_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_batch_report_envelope_rejection")
@@ -1773,6 +1781,53 @@ RSpec.describe Ast::Merge do
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
+    structured_edit_provider_execution_application_fixture[:cases].each do |entry|
+      provider_execution_application = described_class.structured_edit_provider_execution_application(
+        execution_request: entry.dig(:application, :execution_request),
+        report: entry.dig(:application, :report),
+        metadata: entry.dig(:application, :metadata)
+      )
+      expect(json_ready(provider_execution_application)).to eq(json_ready(entry[:application]))
+    end
+
+    structured_edit_provider_execution_application_envelope =
+      described_class.structured_edit_provider_execution_application_envelope(
+        structured_edit_provider_execution_application_envelope_fixture[:structured_edit_provider_execution_application]
+      )
+    expect(json_ready(structured_edit_provider_execution_application_envelope)).to eq(
+      json_ready(structured_edit_provider_execution_application_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_execution_application, structured_edit_provider_execution_application_error =
+      described_class.import_structured_edit_provider_execution_application_envelope(
+        structured_edit_provider_execution_application_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_execution_application_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_execution_application)).to eq(
+      json_ready(structured_edit_provider_execution_application_envelope_fixture[:structured_edit_provider_execution_application])
+    )
+
+    structured_edit_provider_execution_application_envelope_rejection_fixture[:cases].each do |test_case|
+      _provider_execution_application, import_error =
+        described_class.import_structured_edit_provider_execution_application_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_execution_application, applied_structured_edit_provider_execution_application_error =
+      described_class.import_structured_edit_provider_execution_application_envelope(
+        structured_edit_provider_execution_application_envelope_application_fixture[:structured_edit_provider_execution_application_envelope]
+      )
+    expect(applied_structured_edit_provider_execution_application_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_execution_application)).to eq(
+      json_ready(structured_edit_provider_execution_application_envelope_application_fixture[:expected_application])
+    )
+
+    structured_edit_provider_execution_application_envelope_application_fixture[:cases].each do |test_case|
+      _provider_execution_application, application_rejection_error =
+        described_class.import_structured_edit_provider_execution_application_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
     structured_edit_execution_report_envelope = described_class.structured_edit_execution_report_envelope(
       structured_edit_execution_report_envelope_fixture[:structured_edit_execution_report]
     )
@@ -1860,6 +1915,53 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_request_envelope_application_fixture[:cases].each do |test_case|
       _batch_execution_request, application_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_request_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_report_fixture[:cases].each do |entry|
+      provider_batch_execution_report = described_class.structured_edit_provider_batch_execution_report(
+        applications: entry.dig(:batch_report, :applications),
+        diagnostics: entry.dig(:batch_report, :diagnostics),
+        metadata: entry.dig(:batch_report, :metadata)
+      )
+      expect(json_ready(provider_batch_execution_report)).to eq(json_ready(entry[:batch_report]))
+    end
+
+    structured_edit_provider_batch_execution_report_envelope =
+      described_class.structured_edit_provider_batch_execution_report_envelope(
+        structured_edit_provider_batch_execution_report_envelope_fixture[:structured_edit_provider_batch_execution_report]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_report_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_report_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_report, structured_edit_provider_batch_execution_report_error =
+      described_class.import_structured_edit_provider_batch_execution_report_envelope(
+        structured_edit_provider_batch_execution_report_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_report_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_report)).to eq(
+      json_ready(structured_edit_provider_batch_execution_report_envelope_fixture[:structured_edit_provider_batch_execution_report])
+    )
+
+    structured_edit_provider_batch_execution_report_envelope_rejection_fixture[:cases].each do |test_case|
+      _provider_batch_execution_report, import_error =
+        described_class.import_structured_edit_provider_batch_execution_report_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_report, applied_structured_edit_provider_batch_execution_report_error =
+      described_class.import_structured_edit_provider_batch_execution_report_envelope(
+        structured_edit_provider_batch_execution_report_envelope_application_fixture[:structured_edit_provider_batch_execution_report_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_report_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_report)).to eq(
+      json_ready(structured_edit_provider_batch_execution_report_envelope_application_fixture[:expected_batch_report])
+    )
+
+    structured_edit_provider_batch_execution_report_envelope_application_fixture[:cases].each do |test_case|
+      _provider_batch_execution_report, application_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_report_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
