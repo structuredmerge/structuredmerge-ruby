@@ -876,6 +876,21 @@ module Ast
       request
     end
 
+    def structured_edit_result(operation_kind:, updated_content:, changed:, operation_profile:,
+      captured_text: nil, match_count: nil, destination_profile: nil, metadata: nil)
+      result = {
+        operation_kind: operation_kind.to_s,
+        updated_content: updated_content.to_s,
+        changed: changed ? true : false,
+        operation_profile: deep_dup(operation_profile)
+      }
+      result[:captured_text] = captured_text.to_s unless captured_text.nil?
+      result[:match_count] = match_count.to_i unless match_count.nil?
+      result[:destination_profile] = deep_dup(destination_profile) if destination_profile
+      result[:metadata] = deep_dup(metadata) if metadata
+      result
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
