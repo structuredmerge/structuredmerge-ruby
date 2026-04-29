@@ -839,6 +839,25 @@ module Ast
       profile
     end
 
+    def structured_edit_destination_profile(resolution_kind:, resolution_source:, anchor_boundary:,
+      resolution_family:, resolution_source_family:, anchor_boundary_family:, known_resolution_kind:,
+      known_resolution_source:, known_anchor_boundary:, used_if_missing:, metadata: nil)
+      profile = {
+        resolution_kind: resolution_kind.to_s,
+        resolution_source: resolution_source.to_s,
+        anchor_boundary: anchor_boundary.to_s,
+        resolution_family: resolution_family.to_s,
+        resolution_source_family: resolution_source_family.to_s,
+        anchor_boundary_family: anchor_boundary_family.to_s,
+        known_resolution_kind: known_resolution_kind ? true : false,
+        known_resolution_source: known_resolution_source ? true : false,
+        known_anchor_boundary: known_anchor_boundary ? true : false,
+        used_if_missing: used_if_missing ? true : false
+      }
+      profile[:metadata] = deep_dup(metadata) if metadata
+      profile
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {

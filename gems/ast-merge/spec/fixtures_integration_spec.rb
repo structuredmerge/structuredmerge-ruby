@@ -1088,6 +1088,7 @@ RSpec.describe Ast::Merge do
     structured_edit_selection_profile_fixture = diagnostics_fixture("structured_edit_selection_profile")
     structured_edit_match_profile_fixture = diagnostics_fixture("structured_edit_match_profile")
     structured_edit_operation_profile_fixture = diagnostics_fixture("structured_edit_operation_profile")
+    structured_edit_destination_profile_fixture = diagnostics_fixture("structured_edit_destination_profile")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1593,6 +1594,23 @@ RSpec.describe Ast::Merge do
         replacement_source: entry.dig(:profile, :replacement_source),
         captures_source_text: entry.dig(:profile, :captures_source_text),
         supports_if_missing: entry.dig(:profile, :supports_if_missing),
+        metadata: entry.dig(:profile, :metadata)
+      )
+      expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
+    end
+
+    structured_edit_destination_profile_fixture[:cases].each do |entry|
+      profile = described_class.structured_edit_destination_profile(
+        resolution_kind: entry.dig(:profile, :resolution_kind),
+        resolution_source: entry.dig(:profile, :resolution_source),
+        anchor_boundary: entry.dig(:profile, :anchor_boundary),
+        resolution_family: entry.dig(:profile, :resolution_family),
+        resolution_source_family: entry.dig(:profile, :resolution_source_family),
+        anchor_boundary_family: entry.dig(:profile, :anchor_boundary_family),
+        known_resolution_kind: entry.dig(:profile, :known_resolution_kind),
+        known_resolution_source: entry.dig(:profile, :known_resolution_source),
+        known_anchor_boundary: entry.dig(:profile, :known_anchor_boundary),
+        used_if_missing: entry.dig(:profile, :used_if_missing),
         metadata: entry.dig(:profile, :metadata)
       )
       expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
