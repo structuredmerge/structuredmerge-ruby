@@ -959,6 +959,21 @@ module Ast
       batch
     end
 
+    def structured_edit_batch_report_envelope(batch_report)
+      {
+        kind: "structured_edit_batch_report",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_report: deep_dup(batch_report)
+      }
+    end
+
+    def import_structured_edit_batch_report_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_batch_report envelope kind." }] unless envelope[:kind] == "structured_edit_batch_report"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_batch_report envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_report]), nil]
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
