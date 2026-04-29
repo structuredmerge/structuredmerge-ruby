@@ -1085,6 +1085,7 @@ RSpec.describe Ast::Merge do
     surface_fixture = diagnostics_fixture("surface_ownership")
     delegated_operation_fixture = diagnostics_fixture("delegated_child_operation")
     structured_edit_structure_profile_fixture = diagnostics_fixture("structured_edit_structure_profile")
+    structured_edit_selection_profile_fixture = diagnostics_fixture("structured_edit_selection_profile")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1540,6 +1541,23 @@ RSpec.describe Ast::Merge do
         owner_selector_family: entry.dig(:profile, :owner_selector_family),
         known_owner_selector: entry.dig(:profile, :known_owner_selector),
         supported_comment_regions: entry.dig(:profile, :supported_comment_regions),
+        metadata: entry.dig(:profile, :metadata)
+      )
+      expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
+    end
+
+    structured_edit_selection_profile_fixture[:cases].each do |entry|
+      profile = described_class.structured_edit_selection_profile(
+        owner_scope: entry.dig(:profile, :owner_scope),
+        owner_selector: entry.dig(:profile, :owner_selector),
+        owner_selector_family: entry.dig(:profile, :owner_selector_family),
+        selector_kind: entry.dig(:profile, :selector_kind),
+        selection_intent: entry.dig(:profile, :selection_intent),
+        selection_intent_family: entry.dig(:profile, :selection_intent_family),
+        known_selection_intent: entry.dig(:profile, :known_selection_intent),
+        comment_region: entry.dig(:profile, :comment_region),
+        include_trailing_gap: entry.dig(:profile, :include_trailing_gap),
+        comment_anchored: entry.dig(:profile, :comment_anchored),
         metadata: entry.dig(:profile, :metadata)
       )
       expect(json_ready(profile)).to eq(json_ready(entry[:profile]))

@@ -783,6 +783,25 @@ module Ast
       profile
     end
 
+    def structured_edit_selection_profile(owner_scope:, owner_selector:, selector_kind:, selection_intent:,
+      known_selection_intent:, include_trailing_gap:, comment_anchored:, owner_selector_family: nil,
+      selection_intent_family: nil, comment_region: nil, metadata: nil)
+      profile = {
+        owner_scope: owner_scope.to_s,
+        owner_selector: owner_selector.to_s,
+        selector_kind: selector_kind.to_s,
+        selection_intent: selection_intent.to_s,
+        known_selection_intent: known_selection_intent ? true : false,
+        include_trailing_gap: include_trailing_gap ? true : false,
+        comment_anchored: comment_anchored ? true : false
+      }
+      profile[:owner_selector_family] = owner_selector_family.to_s if owner_selector_family
+      profile[:selection_intent_family] = selection_intent_family.to_s if selection_intent_family
+      profile[:comment_region] = comment_region.nil? ? nil : comment_region.to_s
+      profile[:metadata] = deep_dup(metadata) if metadata
+      profile
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
