@@ -40,6 +40,51 @@ module Markly
       }
     end
 
+    def markdown_structured_edit_provider_profile
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_profile: {
+          family: "markdown",
+          structure_profile: Ast::Merge.structured_edit_structure_profile(
+            owner_scope: "heading_sections",
+            owner_selector: "heading_sections",
+            owner_selector_family: "section_branch",
+            known_owner_selector: true,
+            supported_comment_regions: [],
+            metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          ),
+          selection_profile: Ast::Merge.structured_edit_selection_profile(
+            owner_scope: "heading_sections",
+            owner_selector: "heading_sections",
+            owner_selector_family: "section_branch",
+            selector_kind: "heading_section",
+            selection_intent: "section_branch",
+            selection_intent_family: "section_branch",
+            known_selection_intent: true,
+            comment_region: nil,
+            include_trailing_gap: false,
+            comment_anchored: false,
+            metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          ),
+          match_profile: Ast::Merge.structured_edit_match_profile(
+            start_boundary: "owner_start",
+            start_boundary_family: "structural_owner",
+            known_start_boundary: true,
+            end_boundary: "owner_end",
+            end_boundary_family: "structural_owner",
+            known_end_boundary: true,
+            payload_kind: "section_branch",
+            payload_family: "section_branch",
+            known_payload_kind: true,
+            comment_anchored: false,
+            trailing_gap_extended: false,
+            metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          )
+        }
+      }
+    end
+
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -155,6 +200,7 @@ module Markly
       :available_markdown_backends,
       :markdown_backend_feature_profile,
       :markdown_plan_context,
+      :markdown_structured_edit_provider_profile,
       :parse_markdown,
       :match_markdown_owners,
       :merge_markdown,
