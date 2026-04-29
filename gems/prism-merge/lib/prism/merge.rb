@@ -40,6 +40,51 @@ module Prism
       }
     end
 
+    def ruby_structured_edit_provider_profile
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_profile: {
+          family: "ruby",
+          structure_profile: Ast::Merge.structured_edit_structure_profile(
+            owner_scope: "shared_default",
+            owner_selector: "line_bound_statements",
+            owner_selector_family: "line_oriented",
+            known_owner_selector: true,
+            supported_comment_regions: ["leading"],
+            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          ),
+          selection_profile: Ast::Merge.structured_edit_selection_profile(
+            owner_scope: "shared_default",
+            owner_selector: "line_bound_statements",
+            owner_selector_family: "line_oriented",
+            selector_kind: "comment_region_owned_owner",
+            selection_intent: "comment_anchored_owner",
+            selection_intent_family: "comment_anchor",
+            known_selection_intent: true,
+            comment_region: "leading",
+            include_trailing_gap: true,
+            comment_anchored: true,
+            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          ),
+          match_profile: Ast::Merge.structured_edit_match_profile(
+            start_boundary: "comment_region_start",
+            start_boundary_family: "comment_anchor",
+            known_start_boundary: true,
+            end_boundary: "owner_end_plus_trailing_gap",
+            end_boundary_family: "gap_extension",
+            known_end_boundary: true,
+            payload_kind: "comment_owned_body",
+            payload_family: "comment_owned",
+            known_payload_kind: true,
+            comment_anchored: true,
+            trailing_gap_extended: true,
+            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          )
+        }
+      }
+    end
+
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
@@ -153,6 +198,7 @@ module Prism
       :available_ruby_backends,
       :ruby_backend_feature_profile,
       :ruby_plan_context,
+      :ruby_structured_edit_provider_profile,
       :parse_ruby,
       :match_ruby_owners,
       :merge_ruby,
