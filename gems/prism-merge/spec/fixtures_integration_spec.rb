@@ -53,6 +53,20 @@ RSpec.describe "Prism::Merge" do
     expect(json_ready(PRISM_MERGE.ruby_structured_edit_provider_profile)).to eq(json_ready(fixture.dig(:providers, :prism)))
   end
 
+  it "projects the structured-edit request through Prism" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-428-ruby-structured-edit-request-projection",
+        "ruby-structured-edit-request-projection.json"
+      )
+    )
+
+    expect(json_ready(PRISM_MERGE.ruby_structured_edit_request_projection)).to eq(
+      json_ready(fixture.dig(:providers, :prism))
+    )
+  end
+
   it "conforms to the shared Ruby family fixtures" do
     analysis_fixture = read_json(fixtures_root.join("ruby", "slice-218-analysis", "module-owners.json"))
     matching_fixture = read_json(fixtures_root.join("ruby", "slice-219-matching", "path-equality.json"))
