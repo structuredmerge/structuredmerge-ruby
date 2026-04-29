@@ -891,6 +891,15 @@ module Ast
       result
     end
 
+    def structured_edit_application(request:, result:, metadata: nil)
+      application = {
+        request: deep_dup(request),
+        result: deep_dup(result)
+      }
+      application[:metadata] = deep_dup(metadata) if metadata
+      application
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
