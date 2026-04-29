@@ -822,6 +822,23 @@ module Ast
       profile
     end
 
+    def structured_edit_operation_profile(operation_kind:, known_operation_kind:, source_requirement:,
+      destination_requirement:, replacement_source:, captures_source_text:, supports_if_missing:,
+      operation_family: nil, metadata: nil)
+      profile = {
+        operation_kind: operation_kind.to_s,
+        known_operation_kind: known_operation_kind ? true : false,
+        source_requirement: source_requirement.to_s,
+        destination_requirement: destination_requirement.to_s,
+        replacement_source: replacement_source.to_s,
+        captures_source_text: captures_source_text ? true : false,
+        supports_if_missing: supports_if_missing ? true : false
+      }
+      profile[:operation_family] = operation_family.to_s if operation_family
+      profile[:metadata] = deep_dup(metadata) if metadata
+      profile
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {

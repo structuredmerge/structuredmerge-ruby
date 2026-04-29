@@ -1087,6 +1087,7 @@ RSpec.describe Ast::Merge do
     structured_edit_structure_profile_fixture = diagnostics_fixture("structured_edit_structure_profile")
     structured_edit_selection_profile_fixture = diagnostics_fixture("structured_edit_selection_profile")
     structured_edit_match_profile_fixture = diagnostics_fixture("structured_edit_match_profile")
+    structured_edit_operation_profile_fixture = diagnostics_fixture("structured_edit_operation_profile")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1577,6 +1578,21 @@ RSpec.describe Ast::Merge do
         known_payload_kind: entry.dig(:profile, :known_payload_kind),
         comment_anchored: entry.dig(:profile, :comment_anchored),
         trailing_gap_extended: entry.dig(:profile, :trailing_gap_extended),
+        metadata: entry.dig(:profile, :metadata)
+      )
+      expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
+    end
+
+    structured_edit_operation_profile_fixture[:cases].each do |entry|
+      profile = described_class.structured_edit_operation_profile(
+        operation_kind: entry.dig(:profile, :operation_kind),
+        operation_family: entry.dig(:profile, :operation_family),
+        known_operation_kind: entry.dig(:profile, :known_operation_kind),
+        source_requirement: entry.dig(:profile, :source_requirement),
+        destination_requirement: entry.dig(:profile, :destination_requirement),
+        replacement_source: entry.dig(:profile, :replacement_source),
+        captures_source_text: entry.dig(:profile, :captures_source_text),
+        supports_if_missing: entry.dig(:profile, :supports_if_missing),
         metadata: entry.dig(:profile, :metadata)
       )
       expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
