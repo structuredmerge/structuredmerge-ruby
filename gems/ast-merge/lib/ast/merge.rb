@@ -858,6 +858,24 @@ module Ast
       profile
     end
 
+    def structured_edit_request(operation_kind:, content:, source_label:, target_selector: nil,
+      target_selector_family: nil, destination_selector: nil, destination_selector_family: nil,
+      payload_text: nil, if_missing: nil, metadata: nil)
+      request = {
+        operation_kind: operation_kind.to_s,
+        content: content.to_s,
+        source_label: source_label.to_s
+      }
+      request[:target_selector] = target_selector.to_s if target_selector
+      request[:target_selector_family] = target_selector_family.to_s if target_selector_family
+      request[:destination_selector] = destination_selector.to_s if destination_selector
+      request[:destination_selector_family] = destination_selector_family.to_s if destination_selector_family
+      request[:payload_text] = payload_text.to_s unless payload_text.nil?
+      request[:if_missing] = if_missing.to_s unless if_missing.nil?
+      request[:metadata] = deep_dup(metadata) if metadata
+      request
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
