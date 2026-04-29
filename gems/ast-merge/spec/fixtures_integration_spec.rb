@@ -1096,6 +1096,9 @@ RSpec.describe Ast::Merge do
     structured_edit_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_application_envelope_rejection")
     structured_edit_application_envelope_application_fixture = diagnostics_fixture("structured_edit_application_envelope_application")
     structured_edit_execution_report_fixture = diagnostics_fixture("structured_edit_execution_report")
+    structured_edit_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_execution_report_envelope")
+    structured_edit_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_rejection")
+    structured_edit_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_application")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1707,6 +1710,42 @@ RSpec.describe Ast::Merge do
         metadata: entry.dig(:report, :metadata)
       )
       expect(json_ready(report)).to eq(json_ready(entry[:report]))
+    end
+
+    structured_edit_execution_report_envelope = described_class.structured_edit_execution_report_envelope(
+      structured_edit_execution_report_envelope_fixture[:structured_edit_execution_report]
+    )
+    expect(json_ready(structured_edit_execution_report_envelope)).to eq(
+      json_ready(structured_edit_execution_report_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_execution_report, structured_edit_execution_report_error =
+      described_class.import_structured_edit_execution_report_envelope(
+        structured_edit_execution_report_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_execution_report_error).to be_nil
+    expect(json_ready(imported_structured_edit_execution_report)).to eq(
+      json_ready(structured_edit_execution_report_envelope_fixture[:structured_edit_execution_report])
+    )
+
+    structured_edit_execution_report_envelope_rejection_fixture[:cases].each do |test_case|
+      _report, import_error = described_class.import_structured_edit_execution_report_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_execution_report, applied_structured_edit_execution_report_error =
+      described_class.import_structured_edit_execution_report_envelope(
+        structured_edit_execution_report_envelope_application_fixture[:structured_edit_execution_report_envelope]
+      )
+    expect(applied_structured_edit_execution_report_error).to be_nil
+    expect(json_ready(applied_structured_edit_execution_report)).to eq(
+      json_ready(structured_edit_execution_report_envelope_application_fixture[:expected_report])
+    )
+
+    structured_edit_execution_report_envelope_application_fixture[:cases].each do |test_case|
+      _report, application_rejection_error =
+        described_class.import_structured_edit_execution_report_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     projected_cases = projected_cases_fixture[:cases].map do |entry|

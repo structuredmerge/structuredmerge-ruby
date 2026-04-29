@@ -927,6 +927,21 @@ module Ast
       report
     end
 
+    def structured_edit_execution_report_envelope(report)
+      {
+        kind: "structured_edit_execution_report",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        report: deep_dup(report)
+      }
+    end
+
+    def import_structured_edit_execution_report_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_execution_report envelope kind." }] unless envelope[:kind] == "structured_edit_execution_report"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_execution_report envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:report]), nil]
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
