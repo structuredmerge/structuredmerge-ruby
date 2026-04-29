@@ -802,6 +802,26 @@ module Ast
       profile
     end
 
+    def structured_edit_match_profile(start_boundary:, end_boundary:, payload_kind:, known_start_boundary:,
+      known_end_boundary:, known_payload_kind:, comment_anchored:, trailing_gap_extended:,
+      start_boundary_family: nil, end_boundary_family: nil, payload_family: nil, metadata: nil)
+      profile = {
+        start_boundary: start_boundary.to_s,
+        known_start_boundary: known_start_boundary ? true : false,
+        end_boundary: end_boundary.to_s,
+        known_end_boundary: known_end_boundary ? true : false,
+        payload_kind: payload_kind.to_s,
+        known_payload_kind: known_payload_kind ? true : false,
+        comment_anchored: comment_anchored ? true : false,
+        trailing_gap_extended: trailing_gap_extended ? true : false
+      }
+      profile[:start_boundary_family] = start_boundary_family.to_s if start_boundary_family
+      profile[:end_boundary_family] = end_boundary_family.to_s if end_boundary_family
+      profile[:payload_family] = payload_family.to_s if payload_family
+      profile[:metadata] = deep_dup(metadata) if metadata
+      profile
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {

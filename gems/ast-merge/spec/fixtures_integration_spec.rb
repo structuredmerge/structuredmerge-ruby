@@ -1086,6 +1086,7 @@ RSpec.describe Ast::Merge do
     delegated_operation_fixture = diagnostics_fixture("delegated_child_operation")
     structured_edit_structure_profile_fixture = diagnostics_fixture("structured_edit_structure_profile")
     structured_edit_selection_profile_fixture = diagnostics_fixture("structured_edit_selection_profile")
+    structured_edit_match_profile_fixture = diagnostics_fixture("structured_edit_match_profile")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1558,6 +1559,24 @@ RSpec.describe Ast::Merge do
         comment_region: entry.dig(:profile, :comment_region),
         include_trailing_gap: entry.dig(:profile, :include_trailing_gap),
         comment_anchored: entry.dig(:profile, :comment_anchored),
+        metadata: entry.dig(:profile, :metadata)
+      )
+      expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
+    end
+
+    structured_edit_match_profile_fixture[:cases].each do |entry|
+      profile = described_class.structured_edit_match_profile(
+        start_boundary: entry.dig(:profile, :start_boundary),
+        start_boundary_family: entry.dig(:profile, :start_boundary_family),
+        known_start_boundary: entry.dig(:profile, :known_start_boundary),
+        end_boundary: entry.dig(:profile, :end_boundary),
+        end_boundary_family: entry.dig(:profile, :end_boundary_family),
+        known_end_boundary: entry.dig(:profile, :known_end_boundary),
+        payload_kind: entry.dig(:profile, :payload_kind),
+        payload_family: entry.dig(:profile, :payload_family),
+        known_payload_kind: entry.dig(:profile, :known_payload_kind),
+        comment_anchored: entry.dig(:profile, :comment_anchored),
+        trailing_gap_extended: entry.dig(:profile, :trailing_gap_extended),
         metadata: entry.dig(:profile, :metadata)
       )
       expect(json_ready(profile)).to eq(json_ready(entry[:profile]))
