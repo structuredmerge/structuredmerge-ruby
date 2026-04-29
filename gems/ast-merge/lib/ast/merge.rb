@@ -950,6 +950,15 @@ module Ast
       batch
     end
 
+    def structured_edit_batch_report(reports:, diagnostics:, metadata: nil)
+      batch = {
+        reports: deep_dup(reports),
+        diagnostics: deep_dup(diagnostics)
+      }
+      batch[:metadata] = deep_dup(metadata) if metadata
+      batch
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
