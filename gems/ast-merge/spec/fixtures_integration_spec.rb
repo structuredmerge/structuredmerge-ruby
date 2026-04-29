@@ -1099,6 +1099,7 @@ RSpec.describe Ast::Merge do
     structured_edit_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_execution_report_envelope")
     structured_edit_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_rejection")
     structured_edit_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_application")
+    structured_edit_batch_request_fixture = diagnostics_fixture("structured_edit_batch_request")
     projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
 
     state = described_class.review_conformance_manifest(
@@ -1746,6 +1747,14 @@ RSpec.describe Ast::Merge do
       _report, application_rejection_error =
         described_class.import_structured_edit_execution_report_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_batch_request_fixture[:cases].each do |entry|
+      batch_request = described_class.structured_edit_batch_request(
+        requests: entry.dig(:batch_request, :requests),
+        metadata: entry.dig(:batch_request, :metadata)
+      )
+      expect(json_ready(batch_request)).to eq(json_ready(entry[:batch_request]))
     end
 
     projected_cases = projected_cases_fixture[:cases].map do |entry|
