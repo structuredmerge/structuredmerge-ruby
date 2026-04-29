@@ -916,6 +916,17 @@ module Ast
       [deep_dup(envelope[:application]), nil]
     end
 
+    def structured_edit_execution_report(application:, provider_family:, diagnostics:, provider_backend: nil, metadata: nil)
+      report = {
+        application: deep_dup(application),
+        provider_family: provider_family.to_s,
+        diagnostics: deep_dup(diagnostics)
+      }
+      report[:provider_backend] = provider_backend.to_s if provider_backend
+      report[:metadata] = deep_dup(metadata) if metadata
+      report
+    end
+
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
       delegated_case_id:, delegated_apply_group:, delegated_runtime_surface_path:)
       {
