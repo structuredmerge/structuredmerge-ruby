@@ -139,6 +139,18 @@ module Markly
       }
     end
 
+    def markdown_structured_edit_application_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_application: Ast::Merge.structured_edit_application(
+          request: markdown_structured_edit_request_projection[:structured_edit_request],
+          result: markdown_structured_edit_result_projection[:structured_edit_result],
+          metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -257,6 +269,7 @@ module Markly
       :markdown_structured_edit_provider_profile,
       :markdown_structured_edit_request_projection,
       :markdown_structured_edit_result_projection,
+      :markdown_structured_edit_application_projection,
       :parse_markdown,
       :match_markdown_owners,
       :merge_markdown,

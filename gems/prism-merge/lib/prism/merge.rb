@@ -127,6 +127,18 @@ module Prism
       }
     end
 
+    def ruby_structured_edit_application_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_application: Ast::Merge.structured_edit_application(
+          request: ruby_structured_edit_request_projection[:structured_edit_request],
+          result: ruby_structured_edit_result_projection[:structured_edit_result],
+          metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
@@ -243,6 +255,7 @@ module Prism
       :ruby_structured_edit_provider_profile,
       :ruby_structured_edit_request_projection,
       :ruby_structured_edit_result_projection,
+      :ruby_structured_edit_application_projection,
       :parse_ruby,
       :match_ruby_owners,
       :merge_ruby,
