@@ -8,6 +8,7 @@ module Ast
   module Merge
     PACKAGE_NAME = "ast-merge"
     REVIEW_TRANSPORT_VERSION = 1
+    STRUCTURED_EDIT_TRANSPORT_VERSION = 1
     TEMPLATE_TOKEN_CONFIG = Token::Resolver::Config.new(separators: ["|", ":"]).freeze
 
     module_function
@@ -898,6 +899,21 @@ module Ast
       }
       application[:metadata] = deep_dup(metadata) if metadata
       application
+    end
+
+    def structured_edit_application_envelope(application)
+      {
+        kind: "structured_edit_application",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        application: deep_dup(application)
+      }
+    end
+
+    def import_structured_edit_application_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_application envelope kind." }] unless envelope[:kind] == "structured_edit_application"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_application envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:application]), nil]
     end
 
     def projected_child_review_case(case_id:, parent_operation_id:, child_operation_id:, surface_path:,
