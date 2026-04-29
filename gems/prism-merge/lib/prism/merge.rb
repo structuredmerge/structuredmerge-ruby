@@ -139,6 +139,113 @@ module Prism
       }
     end
 
+    def ruby_structured_edit_execution_report_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_execution_report: Ast::Merge.structured_edit_execution_report(
+          application: ruby_structured_edit_application_projection[:structured_edit_application],
+          provider_family: "ruby",
+          provider_backend: BACKEND_REFERENCE.id,
+          diagnostics: [
+            {
+              severity: "warning",
+              category: "assumed_default",
+              message: "using managed snippet fallback selection."
+            }
+          ],
+          metadata: { source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
+    def ruby_structured_edit_batch_request_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_batch_request: Ast::Merge.structured_edit_batch_request(
+          requests: [
+            Ast::Merge.structured_edit_request(
+              operation_kind: "replace",
+              content: "class App\n  # managed snippet\n  old_call\n\n  # managed setup\n  setup_call\nend\n",
+              source_label: "source",
+              target_selector: "managed_snippet",
+              target_selector_family: "comment_anchor",
+              payload_text: "new_call\n",
+              metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            ),
+            Ast::Merge.structured_edit_request(
+              operation_kind: "replace",
+              content: "class App\n  # managed snippet\n  old_call\n\n  # managed setup\n  setup_call\nend\n",
+              source_label: "source",
+              target_selector: "managed_setup",
+              target_selector_family: "comment_anchor",
+              payload_text: "configured_call\n",
+              metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            )
+          ],
+          metadata: { batch_label: "ruby_prism_pair", source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
+    def ruby_structured_edit_batch_report_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_batch_report: Ast::Merge.structured_edit_batch_report(
+          reports: [
+            ruby_structured_edit_execution_report_projection[:structured_edit_execution_report],
+            Ast::Merge.structured_edit_execution_report(
+              application: Ast::Merge.structured_edit_application(
+                request: Ast::Merge.structured_edit_request(
+                  operation_kind: "replace",
+                  content: "class App\n  # managed setup\n  setup_call\nend\n",
+                  source_label: "source",
+                  target_selector: "managed_setup",
+                  target_selector_family: "comment_anchor",
+                  payload_text: "configured_call\n",
+                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                result: Ast::Merge.structured_edit_result(
+                  operation_kind: "replace",
+                  updated_content: "class App\n  # managed setup\n  configured_call\nend\n",
+                  changed: true,
+                  captured_text: "setup_call\n",
+                  match_count: 1,
+                  operation_profile: Ast::Merge.structured_edit_operation_profile(
+                    operation_kind: "replace",
+                    operation_family: "rewrite",
+                    known_operation_kind: true,
+                    source_requirement: "required",
+                    destination_requirement: "none",
+                    replacement_source: "explicit_text",
+                    captures_source_text: true,
+                    supports_if_missing: false,
+                    metadata: { source: "legacy_crispr_reference" }
+                  ),
+                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              ),
+              provider_family: "ruby",
+              provider_backend: BACKEND_REFERENCE.id,
+              diagnostics: [],
+              metadata: { source: "legacy_crispr_reference" }
+            )
+          ],
+          diagnostics: [
+            {
+              severity: "info",
+              category: "assumed_default",
+              message: "ruby batch preserved request ordering."
+            }
+          ],
+          metadata: { batch_label: "ruby_prism_pair", source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
@@ -256,6 +363,9 @@ module Prism
       :ruby_structured_edit_request_projection,
       :ruby_structured_edit_result_projection,
       :ruby_structured_edit_application_projection,
+      :ruby_structured_edit_execution_report_projection,
+      :ruby_structured_edit_batch_request_projection,
+      :ruby_structured_edit_batch_report_projection,
       :parse_ruby,
       :match_ruby_owners,
       :merge_ruby,

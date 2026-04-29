@@ -101,6 +101,48 @@ RSpec.describe Markly::Merge do
     )
   end
 
+  it "projects the structured-edit execution report through Markly" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-448-markdown-structured-edit-execution-report-projection",
+        "markdown-structured-edit-execution-report-projection.json"
+      )
+    )
+
+    expect(json_ready(described_class.markdown_structured_edit_execution_report_projection)).to eq(
+      json_ready(fixture.dig(:providers, :markly))
+    )
+  end
+
+  it "projects the structured-edit batch request through Markly" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-450-markdown-structured-edit-batch-request-projection",
+        "markdown-structured-edit-batch-request-projection.json"
+      )
+    )
+
+    expect(json_ready(described_class.markdown_structured_edit_batch_request_projection)).to eq(
+      json_ready(fixture.dig(:providers, :markly))
+    )
+  end
+
+  it "projects the structured-edit batch report through Markly" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-452-markdown-structured-edit-batch-report-projection",
+        "markdown-structured-edit-batch-report-projection.json"
+      )
+    )
+
+    expect(json_ready(described_class.markdown_structured_edit_batch_report_projection)).to eq(
+      json_ready(fixture.dig(:providers, :markly))
+    )
+  end
+
   it "conforms to the shared Markdown analysis and matching fixtures" do
     analysis_fixture = read_json(fixtures_root.join("markdown", "slice-198-analysis", "headings-and-code-fences.json"))
     matching_fixture = read_json(fixtures_root.join("markdown", "slice-199-matching", "path-equality.json"))

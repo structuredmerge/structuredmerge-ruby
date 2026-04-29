@@ -95,6 +95,48 @@ RSpec.describe "Prism::Merge" do
     )
   end
 
+  it "projects the structured-edit execution report through Prism" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-447-ruby-structured-edit-execution-report-projection",
+        "ruby-structured-edit-execution-report-projection.json"
+      )
+    )
+
+    expect(json_ready(PRISM_MERGE.ruby_structured_edit_execution_report_projection)).to eq(
+      json_ready(fixture.dig(:providers, :prism))
+    )
+  end
+
+  it "projects the structured-edit batch request through Prism" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-449-ruby-structured-edit-batch-request-projection",
+        "ruby-structured-edit-batch-request-projection.json"
+      )
+    )
+
+    expect(json_ready(PRISM_MERGE.ruby_structured_edit_batch_request_projection)).to eq(
+      json_ready(fixture.dig(:providers, :prism))
+    )
+  end
+
+  it "projects the structured-edit batch report through Prism" do
+    fixture = read_json(
+      fixtures_root.join(
+        "diagnostics",
+        "slice-451-ruby-structured-edit-batch-report-projection",
+        "ruby-structured-edit-batch-report-projection.json"
+      )
+    )
+
+    expect(json_ready(PRISM_MERGE.ruby_structured_edit_batch_report_projection)).to eq(
+      json_ready(fixture.dig(:providers, :prism))
+    )
+  end
+
   it "conforms to the shared Ruby family fixtures" do
     analysis_fixture = read_json(fixtures_root.join("ruby", "slice-218-analysis", "module-owners.json"))
     matching_fixture = read_json(fixtures_root.join("ruby", "slice-219-matching", "path-equality.json"))

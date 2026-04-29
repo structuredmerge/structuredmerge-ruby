@@ -151,6 +151,169 @@ module Markly
       }
     end
 
+    def markdown_structured_edit_execution_report_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_execution_report: Ast::Merge.structured_edit_execution_report(
+          application: markdown_structured_edit_application_projection[:structured_edit_application],
+          provider_family: "markdown",
+          provider_backend: BACKEND_REFERENCE.id,
+          diagnostics: [],
+          metadata: { source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
+    def markdown_structured_edit_batch_request_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_batch_request: Ast::Merge.structured_edit_batch_request(
+          requests: [
+            Ast::Merge.structured_edit_request(
+              operation_kind: "insert",
+              content: "# Title\n\n## Usage\n\nExisting text.\n\n## Install\n\nInstall text.\n",
+              source_label: "source",
+              destination_selector: "/heading/usage",
+              destination_selector_family: "section_branch",
+              payload_text: "### Managed Usage\n\nInserted usage text.\n",
+              if_missing: "append",
+              metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            ),
+            Ast::Merge.structured_edit_request(
+              operation_kind: "insert",
+              content: "# Title\n\n## Usage\n\nExisting text.\n\n## Install\n\nInstall text.\n",
+              source_label: "source",
+              destination_selector: "/heading/install",
+              destination_selector_family: "section_branch",
+              payload_text: "### Managed Install\n\nInserted install text.\n",
+              if_missing: "append",
+              metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            )
+          ],
+          metadata: { batch_label: "markdown_markly_pair", source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
+    def markdown_structured_edit_batch_report_projection
+      {
+        package: PACKAGE_NAME,
+        backend: BACKEND_REFERENCE.id,
+        structured_edit_batch_report: Ast::Merge.structured_edit_batch_report(
+          reports: [
+            Ast::Merge.structured_edit_execution_report(
+              application: Ast::Merge.structured_edit_application(
+                request: Ast::Merge.structured_edit_request(
+                  operation_kind: "insert",
+                  content: "# Title\n\n## Usage\n\nExisting text.\n",
+                  source_label: "source",
+                  destination_selector: "/heading/usage",
+                  destination_selector_family: "section_branch",
+                  payload_text: "### Managed Usage\n\nInserted usage text.\n",
+                  if_missing: "append",
+                  metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                result: Ast::Merge.structured_edit_result(
+                  operation_kind: "insert",
+                  updated_content: "# Title\n\n## Usage\n\nExisting text.\n### Managed Usage\n\nInserted usage text.\n",
+                  changed: true,
+                  operation_profile: Ast::Merge.structured_edit_operation_profile(
+                    operation_kind: "insert",
+                    operation_family: "insertion",
+                    known_operation_kind: true,
+                    source_requirement: "none",
+                    destination_requirement: "optional",
+                    replacement_source: "explicit_text",
+                    captures_source_text: false,
+                    supports_if_missing: true,
+                    metadata: { source: "legacy_crispr_reference" }
+                  ),
+                  destination_profile: Ast::Merge.structured_edit_destination_profile(
+                    resolution_kind: "append_fallback",
+                    resolution_source: "none",
+                    anchor_boundary: "none",
+                    resolution_family: "append",
+                    resolution_source_family: "implicit",
+                    anchor_boundary_family: "none",
+                    known_resolution_kind: true,
+                    known_resolution_source: true,
+                    known_anchor_boundary: true,
+                    used_if_missing: true,
+                    metadata: { family: "shared", source: "legacy_crispr_reference" }
+                  ),
+                  metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              ),
+              provider_family: "markdown",
+              provider_backend: BACKEND_REFERENCE.id,
+              diagnostics: [],
+              metadata: { source: "legacy_crispr_reference" }
+            ),
+            Ast::Merge.structured_edit_execution_report(
+              application: Ast::Merge.structured_edit_application(
+                request: Ast::Merge.structured_edit_request(
+                  operation_kind: "insert",
+                  content: "# Title\n\n## Install\n\nInstall text.\n",
+                  source_label: "source",
+                  destination_selector: "/heading/install",
+                  destination_selector_family: "section_branch",
+                  payload_text: "### Managed Install\n\nInserted install text.\n",
+                  if_missing: "append",
+                  metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                result: Ast::Merge.structured_edit_result(
+                  operation_kind: "insert",
+                  updated_content: "# Title\n\n## Install\n\nInstall text.\n### Managed Install\n\nInserted install text.\n",
+                  changed: true,
+                  operation_profile: Ast::Merge.structured_edit_operation_profile(
+                    operation_kind: "insert",
+                    operation_family: "insertion",
+                    known_operation_kind: true,
+                    source_requirement: "none",
+                    destination_requirement: "optional",
+                    replacement_source: "explicit_text",
+                    captures_source_text: false,
+                    supports_if_missing: true,
+                    metadata: { source: "legacy_crispr_reference" }
+                  ),
+                  destination_profile: Ast::Merge.structured_edit_destination_profile(
+                    resolution_kind: "append_fallback",
+                    resolution_source: "none",
+                    anchor_boundary: "none",
+                    resolution_family: "append",
+                    resolution_source_family: "implicit",
+                    anchor_boundary_family: "none",
+                    known_resolution_kind: true,
+                    known_resolution_source: true,
+                    known_anchor_boundary: true,
+                    used_if_missing: true,
+                    metadata: { family: "shared", source: "legacy_crispr_reference" }
+                  ),
+                  metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                ),
+                metadata: { family: "markdown", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              ),
+              provider_family: "markdown",
+              provider_backend: BACKEND_REFERENCE.id,
+              diagnostics: [],
+              metadata: { source: "legacy_crispr_reference" }
+            )
+          ],
+          diagnostics: [
+            {
+              severity: "info",
+              category: "assumed_default",
+              message: "markdown batch preserved request ordering."
+            }
+          ],
+          metadata: { batch_label: "markdown_markly_pair", source: "legacy_crispr_reference" }
+        )
+      }
+    end
+
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
@@ -270,6 +433,9 @@ module Markly
       :markdown_structured_edit_request_projection,
       :markdown_structured_edit_result_projection,
       :markdown_structured_edit_application_projection,
+      :markdown_structured_edit_execution_report_projection,
+      :markdown_structured_edit_batch_request_projection,
+      :markdown_structured_edit_batch_report_projection,
       :parse_markdown,
       :match_markdown_owners,
       :merge_markdown,
