@@ -1102,6 +1102,9 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_application")
     structured_edit_provider_execution_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application")
     structured_edit_provider_execution_dispatch_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch")
+    structured_edit_provider_execution_dispatch_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope")
+    structured_edit_provider_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_rejection")
+    structured_edit_provider_execution_dispatch_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -1800,6 +1803,44 @@ RSpec.describe Ast::Merge do
         metadata: entry.dig(:dispatch, :metadata)
       )
       expect(json_ready(provider_execution_dispatch)).to eq(json_ready(entry[:dispatch]))
+    end
+
+    structured_edit_provider_execution_dispatch_envelope =
+      described_class.structured_edit_provider_execution_dispatch_envelope(
+        structured_edit_provider_execution_dispatch_envelope_fixture[:structured_edit_provider_execution_dispatch]
+      )
+    expect(json_ready(structured_edit_provider_execution_dispatch_envelope)).to eq(
+      json_ready(structured_edit_provider_execution_dispatch_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_execution_dispatch, structured_edit_provider_execution_dispatch_error =
+      described_class.import_structured_edit_provider_execution_dispatch_envelope(
+        structured_edit_provider_execution_dispatch_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_execution_dispatch_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_execution_dispatch)).to eq(
+      json_ready(structured_edit_provider_execution_dispatch_envelope_fixture[:structured_edit_provider_execution_dispatch])
+    )
+
+    structured_edit_provider_execution_dispatch_envelope_rejection_fixture[:cases].each do |test_case|
+      _provider_execution_dispatch, dispatch_rejection_error =
+        described_class.import_structured_edit_provider_execution_dispatch_envelope(test_case[:envelope])
+      expect(json_ready(dispatch_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_execution_dispatch, applied_structured_edit_provider_execution_dispatch_error =
+      described_class.import_structured_edit_provider_execution_dispatch_envelope(
+        structured_edit_provider_execution_dispatch_envelope_application_fixture[:structured_edit_provider_execution_dispatch_envelope]
+      )
+    expect(applied_structured_edit_provider_execution_dispatch_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_execution_dispatch)).to eq(
+      json_ready(structured_edit_provider_execution_dispatch_envelope_application_fixture[:expected_dispatch])
+    )
+
+    structured_edit_provider_execution_dispatch_envelope_application_fixture[:cases].each do |test_case|
+      _provider_execution_dispatch, dispatch_application_rejection_error =
+        described_class.import_structured_edit_provider_execution_dispatch_envelope(test_case[:envelope])
+      expect(json_ready(dispatch_application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     structured_edit_provider_execution_application_envelope =
