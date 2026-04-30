@@ -988,6 +988,15 @@ module Ast
       [deep_dup(envelope[:provider_execution_dispatch]), nil]
     end
 
+    def structured_edit_provider_execution_outcome(dispatch:, application:, metadata: nil)
+      outcome = {
+        dispatch: deep_dup(dispatch),
+        application: deep_dup(application)
+      }
+      outcome[:metadata] = deep_dup(metadata) if metadata
+      outcome
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",

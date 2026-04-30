@@ -1105,6 +1105,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_dispatch_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope")
     structured_edit_provider_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_rejection")
     structured_edit_provider_execution_dispatch_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_application")
+    structured_edit_provider_execution_outcome_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -1845,6 +1846,15 @@ RSpec.describe Ast::Merge do
       _provider_execution_dispatch, dispatch_application_rejection_error =
         described_class.import_structured_edit_provider_execution_dispatch_envelope(test_case[:envelope])
       expect(json_ready(dispatch_application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_outcome_fixture[:cases].each do |entry|
+      provider_execution_outcome = described_class.structured_edit_provider_execution_outcome(
+        dispatch: entry.dig(:outcome, :dispatch),
+        application: entry.dig(:outcome, :application),
+        metadata: entry.dig(:outcome, :metadata)
+      )
+      expect(json_ready(provider_execution_outcome)).to eq(json_ready(entry[:outcome]))
     end
 
     structured_edit_provider_execution_application_envelope =
