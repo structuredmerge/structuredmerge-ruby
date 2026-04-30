@@ -1049,6 +1049,29 @@ module Ast
       [deep_dup(envelope[:batch_execution_request]), nil]
     end
 
+    def structured_edit_provider_batch_execution_dispatch(dispatches:, metadata: nil)
+      batch = {
+        dispatches: deep_dup(dispatches)
+      }
+      batch[:metadata] = deep_dup(metadata) if metadata
+      batch
+    end
+
+    def structured_edit_provider_batch_execution_dispatch_envelope(batch_dispatch)
+      {
+        kind: "structured_edit_provider_batch_execution_dispatch",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_dispatch: deep_dup(batch_dispatch)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_dispatch_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_dispatch envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_dispatch"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_dispatch envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_dispatch]), nil]
+    end
+
     def structured_edit_provider_batch_execution_report(applications:, diagnostics:, metadata: nil)
       batch = {
         applications: deep_dup(applications),
