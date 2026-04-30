@@ -961,6 +961,18 @@ module Ast
       application
     end
 
+    def structured_edit_provider_execution_dispatch(execution_request:, resolved_provider_family:,
+      resolved_provider_backend:, executor_label: nil, metadata: nil)
+      dispatch = {
+        execution_request: deep_dup(execution_request),
+        resolved_provider_family: resolved_provider_family.to_s,
+        resolved_provider_backend: resolved_provider_backend.to_s
+      }
+      dispatch[:executor_label] = executor_label.to_s if executor_label
+      dispatch[:metadata] = deep_dup(metadata) if metadata
+      dispatch
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",

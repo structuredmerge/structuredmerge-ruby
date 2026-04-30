@@ -1101,6 +1101,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_rejection")
     structured_edit_provider_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_application")
     structured_edit_provider_execution_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application")
+    structured_edit_provider_execution_dispatch_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -1788,6 +1789,17 @@ RSpec.describe Ast::Merge do
         metadata: entry.dig(:application, :metadata)
       )
       expect(json_ready(provider_execution_application)).to eq(json_ready(entry[:application]))
+    end
+
+    structured_edit_provider_execution_dispatch_fixture[:cases].each do |entry|
+      provider_execution_dispatch = described_class.structured_edit_provider_execution_dispatch(
+        execution_request: entry.dig(:dispatch, :execution_request),
+        resolved_provider_family: entry.dig(:dispatch, :resolved_provider_family),
+        resolved_provider_backend: entry.dig(:dispatch, :resolved_provider_backend),
+        executor_label: entry.dig(:dispatch, :executor_label),
+        metadata: entry.dig(:dispatch, :metadata)
+      )
+      expect(json_ready(provider_execution_dispatch)).to eq(json_ready(entry[:dispatch]))
     end
 
     structured_edit_provider_execution_application_envelope =
