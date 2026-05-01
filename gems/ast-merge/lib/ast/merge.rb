@@ -1162,6 +1162,29 @@ module Ast
       [deep_dup(envelope[:executor_profile]), nil]
     end
 
+    def structured_edit_provider_executor_registry(executor_profiles:, metadata: nil)
+      executor_registry = {
+        executor_profiles: deep_dup(executor_profiles)
+      }
+      executor_registry[:metadata] = deep_dup(metadata) if metadata
+      executor_registry
+    end
+
+    def structured_edit_provider_executor_registry_envelope(executor_registry)
+      {
+        kind: "structured_edit_provider_executor_registry",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        executor_registry: deep_dup(executor_registry)
+      }
+    end
+
+    def import_structured_edit_provider_executor_registry_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_executor_registry envelope kind." }] unless envelope[:kind] == "structured_edit_provider_executor_registry"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_executor_registry envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:executor_registry]), nil]
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",

@@ -1133,6 +1133,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_executor_profile_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope")
     structured_edit_provider_executor_profile_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_rejection")
     structured_edit_provider_executor_profile_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_application")
+    structured_edit_provider_executor_registry_fixture = diagnostics_fixture("structured_edit_provider_executor_registry")
+    structured_edit_provider_executor_registry_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope")
+    structured_edit_provider_executor_registry_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_rejection")
+    structured_edit_provider_executor_registry_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -2205,6 +2209,52 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_executor_profile_envelope_application_fixture[:cases].each do |test_case|
       _executor_profile, application_rejection_error =
         described_class.import_structured_edit_provider_executor_profile_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_executor_registry_fixture[:cases].each do |entry|
+      executor_registry = described_class.structured_edit_provider_executor_registry(
+        executor_profiles: entry.dig(:executor_registry, :executor_profiles),
+        metadata: entry.dig(:executor_registry, :metadata)
+      )
+      expect(json_ready(executor_registry)).to eq(json_ready(entry[:executor_registry]))
+    end
+
+    structured_edit_provider_executor_registry_envelope =
+      described_class.structured_edit_provider_executor_registry_envelope(
+        structured_edit_provider_executor_registry_envelope_fixture[:structured_edit_provider_executor_registry]
+      )
+    expect(json_ready(structured_edit_provider_executor_registry_envelope)).to eq(
+      json_ready(structured_edit_provider_executor_registry_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_executor_registry, structured_edit_provider_executor_registry_error =
+      described_class.import_structured_edit_provider_executor_registry_envelope(
+        structured_edit_provider_executor_registry_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_executor_registry_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_executor_registry)).to eq(
+      json_ready(structured_edit_provider_executor_registry_envelope_fixture[:structured_edit_provider_executor_registry])
+    )
+
+    structured_edit_provider_executor_registry_envelope_rejection_fixture[:cases].each do |test_case|
+      _executor_registry, import_error =
+        described_class.import_structured_edit_provider_executor_registry_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_executor_registry, applied_structured_edit_provider_executor_registry_error =
+      described_class.import_structured_edit_provider_executor_registry_envelope(
+        structured_edit_provider_executor_registry_envelope_application_fixture[:structured_edit_provider_executor_registry_envelope]
+      )
+    expect(applied_structured_edit_provider_executor_registry_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_executor_registry)).to eq(
+      json_ready(structured_edit_provider_executor_registry_envelope_application_fixture[:expected_executor_registry])
+    )
+
+    structured_edit_provider_executor_registry_envelope_application_fixture[:cases].each do |test_case|
+      _executor_registry, application_rejection_error =
+        described_class.import_structured_edit_provider_executor_registry_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
