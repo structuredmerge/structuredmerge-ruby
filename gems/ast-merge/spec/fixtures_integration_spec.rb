@@ -1109,6 +1109,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope")
     structured_edit_provider_execution_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope_rejection")
     structured_edit_provider_execution_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope_application")
+    structured_edit_provider_batch_execution_outcome_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome")
+    structured_edit_provider_batch_execution_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope")
+    structured_edit_provider_batch_execution_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_rejection")
+    structured_edit_provider_batch_execution_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -1895,6 +1899,52 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_outcome_envelope_application_fixture[:cases].each do |test_case|
       _provider_execution_outcome, application_rejection_error =
         described_class.import_structured_edit_provider_execution_outcome_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_outcome_fixture[:cases].each do |entry|
+      batch_outcome = described_class.structured_edit_provider_batch_execution_outcome(
+        outcomes: entry.dig(:batch_outcome, :outcomes),
+        metadata: entry.dig(:batch_outcome, :metadata)
+      )
+      expect(json_ready(batch_outcome)).to eq(json_ready(entry[:batch_outcome]))
+    end
+
+    structured_edit_provider_batch_execution_outcome_envelope =
+      described_class.structured_edit_provider_batch_execution_outcome_envelope(
+        structured_edit_provider_batch_execution_outcome_envelope_fixture[:structured_edit_provider_batch_execution_outcome]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_outcome_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_outcome_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_outcome, structured_edit_provider_batch_execution_outcome_error =
+      described_class.import_structured_edit_provider_batch_execution_outcome_envelope(
+        structured_edit_provider_batch_execution_outcome_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_outcome_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_outcome)).to eq(
+      json_ready(structured_edit_provider_batch_execution_outcome_envelope_fixture[:structured_edit_provider_batch_execution_outcome])
+    )
+
+    structured_edit_provider_batch_execution_outcome_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_outcome, import_error =
+        described_class.import_structured_edit_provider_batch_execution_outcome_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_outcome, applied_structured_edit_provider_batch_execution_outcome_error =
+      described_class.import_structured_edit_provider_batch_execution_outcome_envelope(
+        structured_edit_provider_batch_execution_outcome_envelope_application_fixture[:structured_edit_provider_batch_execution_outcome_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_outcome_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_outcome)).to eq(
+      json_ready(structured_edit_provider_batch_execution_outcome_envelope_application_fixture[:expected_batch_outcome])
+    )
+
+    structured_edit_provider_batch_execution_outcome_envelope_application_fixture[:cases].each do |test_case|
+      _batch_outcome, application_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_outcome_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
