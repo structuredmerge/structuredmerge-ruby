@@ -1170,6 +1170,19 @@ module Ast
       executor_registry
     end
 
+    def structured_edit_provider_executor_selection_policy(provider_family:, selection_mode:,
+      allow_registry_fallback:, provider_backend: nil, executor_label: nil, metadata: nil)
+      selection_policy = {
+        provider_family: provider_family.to_s,
+        selection_mode: selection_mode.to_s,
+        allow_registry_fallback: allow_registry_fallback ? true : false
+      }
+      selection_policy[:provider_backend] = provider_backend.to_s if provider_backend
+      selection_policy[:executor_label] = executor_label.to_s if executor_label
+      selection_policy[:metadata] = deep_dup(metadata) if metadata
+      selection_policy
+    end
+
     def structured_edit_provider_executor_registry_envelope(executor_registry)
       {
         kind: "structured_edit_provider_executor_registry",

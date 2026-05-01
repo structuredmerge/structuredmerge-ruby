@@ -1137,6 +1137,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_executor_registry_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope")
     structured_edit_provider_executor_registry_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_rejection")
     structured_edit_provider_executor_registry_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_application")
+    structured_edit_provider_executor_selection_policy_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -2256,6 +2257,18 @@ RSpec.describe Ast::Merge do
       _executor_registry, application_rejection_error =
         described_class.import_structured_edit_provider_executor_registry_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_executor_selection_policy_fixture[:cases].each do |entry|
+      selection_policy = described_class.structured_edit_provider_executor_selection_policy(
+        provider_family: entry.dig(:selection_policy, :provider_family),
+        provider_backend: entry.dig(:selection_policy, :provider_backend),
+        executor_label: entry.dig(:selection_policy, :executor_label),
+        selection_mode: entry.dig(:selection_policy, :selection_mode),
+        allow_registry_fallback: entry.dig(:selection_policy, :allow_registry_fallback),
+        metadata: entry.dig(:selection_policy, :metadata)
+      )
+      expect(json_ready(selection_policy)).to eq(json_ready(entry[:selection_policy]))
     end
 
     structured_edit_provider_execution_application_envelope =
