@@ -1129,6 +1129,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_replay_bundle_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope")
     structured_edit_provider_batch_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_rejection")
     structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_application")
+    structured_edit_provider_executor_profile_fixture = diagnostics_fixture("structured_edit_provider_executor_profile")
+    structured_edit_provider_executor_profile_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope")
+    structured_edit_provider_executor_profile_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_rejection")
+    structured_edit_provider_executor_profile_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -2148,6 +2152,59 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture[:cases].each do |test_case|
       _batch_replay_bundle, application_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_replay_bundle_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_executor_profile_fixture[:cases].each do |entry|
+      executor_profile = described_class.structured_edit_provider_executor_profile(
+        provider_family: entry.dig(:executor_profile, :provider_family),
+        provider_backend: entry.dig(:executor_profile, :provider_backend),
+        executor_label: entry.dig(:executor_profile, :executor_label),
+        structure_profile: entry.dig(:executor_profile, :structure_profile),
+        selection_profile: entry.dig(:executor_profile, :selection_profile),
+        match_profile: entry.dig(:executor_profile, :match_profile),
+        operation_profiles: entry.dig(:executor_profile, :operation_profiles),
+        destination_profile: entry.dig(:executor_profile, :destination_profile),
+        metadata: entry.dig(:executor_profile, :metadata)
+      )
+      expect(json_ready(executor_profile)).to eq(json_ready(entry[:executor_profile]))
+    end
+
+    structured_edit_provider_executor_profile_envelope =
+      described_class.structured_edit_provider_executor_profile_envelope(
+        structured_edit_provider_executor_profile_envelope_fixture[:structured_edit_provider_executor_profile]
+      )
+    expect(json_ready(structured_edit_provider_executor_profile_envelope)).to eq(
+      json_ready(structured_edit_provider_executor_profile_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_executor_profile, structured_edit_provider_executor_profile_error =
+      described_class.import_structured_edit_provider_executor_profile_envelope(
+        structured_edit_provider_executor_profile_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_executor_profile_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_executor_profile)).to eq(
+      json_ready(structured_edit_provider_executor_profile_envelope_fixture[:structured_edit_provider_executor_profile])
+    )
+
+    structured_edit_provider_executor_profile_envelope_rejection_fixture[:cases].each do |test_case|
+      _executor_profile, import_error =
+        described_class.import_structured_edit_provider_executor_profile_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_executor_profile, applied_structured_edit_provider_executor_profile_error =
+      described_class.import_structured_edit_provider_executor_profile_envelope(
+        structured_edit_provider_executor_profile_envelope_application_fixture[:structured_edit_provider_executor_profile_envelope]
+      )
+    expect(applied_structured_edit_provider_executor_profile_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_executor_profile)).to eq(
+      json_ready(structured_edit_provider_executor_profile_envelope_application_fixture[:expected_executor_profile])
+    )
+
+    structured_edit_provider_executor_profile_envelope_application_fixture[:cases].each do |test_case|
+      _executor_profile, application_rejection_error =
+        described_class.import_structured_edit_provider_executor_profile_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 

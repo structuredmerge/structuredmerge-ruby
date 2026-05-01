@@ -1130,6 +1130,38 @@ module Ast
       [deep_dup(envelope[:batch_replay_bundle]), nil]
     end
 
+    def structured_edit_provider_executor_profile(provider_family:, provider_backend:, executor_label:,
+      structure_profile:, selection_profile:, match_profile:, operation_profiles:,
+      destination_profile:, metadata: nil)
+      executor_profile = {
+        provider_family: provider_family.to_s,
+        provider_backend: provider_backend.to_s,
+        executor_label: executor_label.to_s,
+        structure_profile: deep_dup(structure_profile),
+        selection_profile: deep_dup(selection_profile),
+        match_profile: deep_dup(match_profile),
+        operation_profiles: deep_dup(operation_profiles),
+        destination_profile: deep_dup(destination_profile)
+      }
+      executor_profile[:metadata] = deep_dup(metadata) if metadata
+      executor_profile
+    end
+
+    def structured_edit_provider_executor_profile_envelope(executor_profile)
+      {
+        kind: "structured_edit_provider_executor_profile",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        executor_profile: deep_dup(executor_profile)
+      }
+    end
+
+    def import_structured_edit_provider_executor_profile_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_executor_profile envelope kind." }] unless envelope[:kind] == "structured_edit_provider_executor_profile"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_executor_profile envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:executor_profile]), nil]
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",
