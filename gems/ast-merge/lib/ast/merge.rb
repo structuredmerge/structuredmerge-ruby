@@ -997,6 +997,21 @@ module Ast
       outcome
     end
 
+    def structured_edit_provider_execution_outcome_envelope(provider_execution_outcome)
+      {
+        kind: "structured_edit_provider_execution_outcome",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        provider_execution_outcome: deep_dup(provider_execution_outcome)
+      }
+    end
+
+    def import_structured_edit_provider_execution_outcome_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_outcome envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_outcome"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_outcome envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:provider_execution_outcome]), nil]
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",
