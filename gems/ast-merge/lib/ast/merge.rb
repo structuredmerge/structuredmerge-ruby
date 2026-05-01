@@ -1183,6 +1183,21 @@ module Ast
       selection_policy
     end
 
+    def structured_edit_provider_executor_selection_policy_envelope(selection_policy)
+      {
+        kind: "structured_edit_provider_executor_selection_policy",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        selection_policy: deep_dup(selection_policy)
+      }
+    end
+
+    def import_structured_edit_provider_executor_selection_policy_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_executor_selection_policy envelope kind." }] unless envelope[:kind] == "structured_edit_provider_executor_selection_policy"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_executor_selection_policy envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:selection_policy]), nil]
+    end
+
     def structured_edit_provider_executor_registry_envelope(executor_registry)
       {
         kind: "structured_edit_provider_executor_registry",
