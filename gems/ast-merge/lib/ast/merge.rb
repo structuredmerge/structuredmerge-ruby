@@ -1083,6 +1083,53 @@ module Ast
       [deep_dup(envelope[:batch_provenance]), nil]
     end
 
+    def structured_edit_provider_execution_replay_bundle(execution_request:, provenance:, metadata: nil)
+      replay_bundle = {
+        execution_request: deep_dup(execution_request),
+        provenance: deep_dup(provenance)
+      }
+      replay_bundle[:metadata] = deep_dup(metadata) if metadata
+      replay_bundle
+    end
+
+    def structured_edit_provider_execution_replay_bundle_envelope(replay_bundle)
+      {
+        kind: "structured_edit_provider_execution_replay_bundle",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        replay_bundle: deep_dup(replay_bundle)
+      }
+    end
+
+    def import_structured_edit_provider_execution_replay_bundle_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_replay_bundle envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_replay_bundle"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_replay_bundle envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:replay_bundle]), nil]
+    end
+
+    def structured_edit_provider_batch_execution_replay_bundle(replay_bundles:, metadata: nil)
+      batch = {
+        replay_bundles: deep_dup(replay_bundles)
+      }
+      batch[:metadata] = deep_dup(metadata) if metadata
+      batch
+    end
+
+    def structured_edit_provider_batch_execution_replay_bundle_envelope(batch_replay_bundle)
+      {
+        kind: "structured_edit_provider_batch_execution_replay_bundle",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_replay_bundle: deep_dup(batch_replay_bundle)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_replay_bundle_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_replay_bundle envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_replay_bundle"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_replay_bundle envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_replay_bundle]), nil]
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",

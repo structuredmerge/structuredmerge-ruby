@@ -1121,6 +1121,14 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_provenance_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope")
     structured_edit_provider_batch_execution_provenance_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_rejection")
     structured_edit_provider_batch_execution_provenance_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_application")
+    structured_edit_provider_execution_replay_bundle_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle")
+    structured_edit_provider_execution_replay_bundle_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope")
+    structured_edit_provider_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope_rejection")
+    structured_edit_provider_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope_application")
+    structured_edit_provider_batch_execution_replay_bundle_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle")
+    structured_edit_provider_batch_execution_replay_bundle_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope")
+    structured_edit_provider_batch_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_rejection")
+    structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -2047,6 +2055,99 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_provenance_envelope_application_fixture[:cases].each do |test_case|
       _batch_provenance, application_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_provenance_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_replay_bundle_fixture[:cases].each do |entry|
+      replay_bundle = described_class.structured_edit_provider_execution_replay_bundle(
+        execution_request: entry.dig(:replay_bundle, :execution_request),
+        provenance: entry.dig(:replay_bundle, :provenance),
+        metadata: entry.dig(:replay_bundle, :metadata)
+      )
+      expect(json_ready(replay_bundle)).to eq(json_ready(entry[:replay_bundle]))
+    end
+
+    structured_edit_provider_execution_replay_bundle_envelope =
+      described_class.structured_edit_provider_execution_replay_bundle_envelope(
+        structured_edit_provider_execution_replay_bundle_envelope_fixture[:structured_edit_provider_execution_replay_bundle]
+      )
+    expect(json_ready(structured_edit_provider_execution_replay_bundle_envelope)).to eq(
+      json_ready(structured_edit_provider_execution_replay_bundle_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_execution_replay_bundle, structured_edit_provider_execution_replay_bundle_error =
+      described_class.import_structured_edit_provider_execution_replay_bundle_envelope(
+        structured_edit_provider_execution_replay_bundle_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_execution_replay_bundle_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_execution_replay_bundle)).to eq(
+      json_ready(structured_edit_provider_execution_replay_bundle_envelope_fixture[:structured_edit_provider_execution_replay_bundle])
+    )
+
+    structured_edit_provider_execution_replay_bundle_envelope_rejection_fixture[:cases].each do |test_case|
+      _replay_bundle, import_error =
+        described_class.import_structured_edit_provider_execution_replay_bundle_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_execution_replay_bundle, applied_structured_edit_provider_execution_replay_bundle_error =
+      described_class.import_structured_edit_provider_execution_replay_bundle_envelope(
+        structured_edit_provider_execution_replay_bundle_envelope_application_fixture[:structured_edit_provider_execution_replay_bundle_envelope]
+      )
+    expect(applied_structured_edit_provider_execution_replay_bundle_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_execution_replay_bundle)).to eq(
+      json_ready(structured_edit_provider_execution_replay_bundle_envelope_application_fixture[:expected_replay_bundle])
+    )
+
+    structured_edit_provider_execution_replay_bundle_envelope_application_fixture[:cases].each do |test_case|
+      _replay_bundle, application_rejection_error =
+        described_class.import_structured_edit_provider_execution_replay_bundle_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_replay_bundle_fixture[:cases].each do |entry|
+      batch_replay_bundle = described_class.structured_edit_provider_batch_execution_replay_bundle(
+        replay_bundles: entry.dig(:batch_replay_bundle, :replay_bundles),
+        metadata: entry.dig(:batch_replay_bundle, :metadata)
+      )
+      expect(json_ready(batch_replay_bundle)).to eq(json_ready(entry[:batch_replay_bundle]))
+    end
+
+    structured_edit_provider_batch_execution_replay_bundle_envelope =
+      described_class.structured_edit_provider_batch_execution_replay_bundle_envelope(
+        structured_edit_provider_batch_execution_replay_bundle_envelope_fixture[:structured_edit_provider_batch_execution_replay_bundle]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_replay_bundle_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_replay_bundle_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_replay_bundle, structured_edit_provider_batch_execution_replay_bundle_error =
+      described_class.import_structured_edit_provider_batch_execution_replay_bundle_envelope(
+        structured_edit_provider_batch_execution_replay_bundle_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_replay_bundle_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_replay_bundle)).to eq(
+      json_ready(structured_edit_provider_batch_execution_replay_bundle_envelope_fixture[:structured_edit_provider_batch_execution_replay_bundle])
+    )
+
+    structured_edit_provider_batch_execution_replay_bundle_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_replay_bundle, import_error =
+        described_class.import_structured_edit_provider_batch_execution_replay_bundle_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_replay_bundle, applied_structured_edit_provider_batch_execution_replay_bundle_error =
+      described_class.import_structured_edit_provider_batch_execution_replay_bundle_envelope(
+        structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture[:structured_edit_provider_batch_execution_replay_bundle_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_replay_bundle_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_replay_bundle)).to eq(
+      json_ready(structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture[:expected_batch_replay_bundle])
+    )
+
+    structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture[:cases].each do |test_case|
+      _batch_replay_bundle, application_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_replay_bundle_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
