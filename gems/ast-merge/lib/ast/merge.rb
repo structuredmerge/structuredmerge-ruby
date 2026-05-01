@@ -1035,6 +1035,54 @@ module Ast
       [deep_dup(envelope[:batch_outcome]), nil]
     end
 
+    def structured_edit_provider_execution_provenance(dispatch:, outcome:, diagnostics:, metadata: nil)
+      provenance = {
+        dispatch: deep_dup(dispatch),
+        outcome: deep_dup(outcome),
+        diagnostics: deep_dup(diagnostics)
+      }
+      provenance[:metadata] = deep_dup(metadata) if metadata
+      provenance
+    end
+
+    def structured_edit_provider_execution_provenance_envelope(provenance)
+      {
+        kind: "structured_edit_provider_execution_provenance",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        provenance: deep_dup(provenance)
+      }
+    end
+
+    def import_structured_edit_provider_execution_provenance_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_provenance envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_provenance"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_provenance envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:provenance]), nil]
+    end
+
+    def structured_edit_provider_batch_execution_provenance(provenances:, metadata: nil)
+      batch = {
+        provenances: deep_dup(provenances)
+      }
+      batch[:metadata] = deep_dup(metadata) if metadata
+      batch
+    end
+
+    def structured_edit_provider_batch_execution_provenance_envelope(batch_provenance)
+      {
+        kind: "structured_edit_provider_batch_execution_provenance",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_provenance: deep_dup(batch_provenance)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_provenance_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_provenance envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_provenance"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_provenance envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_provenance]), nil]
+    end
+
     def structured_edit_provider_execution_application_envelope(provider_execution_application)
       {
         kind: "structured_edit_provider_execution_application",

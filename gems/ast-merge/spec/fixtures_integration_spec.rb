@@ -1113,6 +1113,14 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope")
     structured_edit_provider_batch_execution_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_rejection")
     structured_edit_provider_batch_execution_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_application")
+    structured_edit_provider_execution_provenance_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance")
+    structured_edit_provider_execution_provenance_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope")
+    structured_edit_provider_execution_provenance_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope_rejection")
+    structured_edit_provider_execution_provenance_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope_application")
+    structured_edit_provider_batch_execution_provenance_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance")
+    structured_edit_provider_batch_execution_provenance_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope")
+    structured_edit_provider_batch_execution_provenance_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_rejection")
+    structured_edit_provider_batch_execution_provenance_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -1945,6 +1953,100 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_outcome_envelope_application_fixture[:cases].each do |test_case|
       _batch_outcome, application_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_outcome_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_provenance_fixture[:cases].each do |entry|
+      provenance = described_class.structured_edit_provider_execution_provenance(
+        dispatch: entry.dig(:provenance, :dispatch),
+        outcome: entry.dig(:provenance, :outcome),
+        diagnostics: entry.dig(:provenance, :diagnostics),
+        metadata: entry.dig(:provenance, :metadata)
+      )
+      expect(json_ready(provenance)).to eq(json_ready(entry[:provenance]))
+    end
+
+    structured_edit_provider_execution_provenance_envelope =
+      described_class.structured_edit_provider_execution_provenance_envelope(
+        structured_edit_provider_execution_provenance_envelope_fixture[:structured_edit_provider_execution_provenance]
+      )
+    expect(json_ready(structured_edit_provider_execution_provenance_envelope)).to eq(
+      json_ready(structured_edit_provider_execution_provenance_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_execution_provenance, structured_edit_provider_execution_provenance_error =
+      described_class.import_structured_edit_provider_execution_provenance_envelope(
+        structured_edit_provider_execution_provenance_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_execution_provenance_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_execution_provenance)).to eq(
+      json_ready(structured_edit_provider_execution_provenance_envelope_fixture[:structured_edit_provider_execution_provenance])
+    )
+
+    structured_edit_provider_execution_provenance_envelope_rejection_fixture[:cases].each do |test_case|
+      _provenance, import_error =
+        described_class.import_structured_edit_provider_execution_provenance_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_execution_provenance, applied_structured_edit_provider_execution_provenance_error =
+      described_class.import_structured_edit_provider_execution_provenance_envelope(
+        structured_edit_provider_execution_provenance_envelope_application_fixture[:structured_edit_provider_execution_provenance_envelope]
+      )
+    expect(applied_structured_edit_provider_execution_provenance_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_execution_provenance)).to eq(
+      json_ready(structured_edit_provider_execution_provenance_envelope_application_fixture[:expected_provenance])
+    )
+
+    structured_edit_provider_execution_provenance_envelope_application_fixture[:cases].each do |test_case|
+      _provenance, application_rejection_error =
+        described_class.import_structured_edit_provider_execution_provenance_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_provenance_fixture[:cases].each do |entry|
+      batch_provenance = described_class.structured_edit_provider_batch_execution_provenance(
+        provenances: entry.dig(:batch_provenance, :provenances),
+        metadata: entry.dig(:batch_provenance, :metadata)
+      )
+      expect(json_ready(batch_provenance)).to eq(json_ready(entry[:batch_provenance]))
+    end
+
+    structured_edit_provider_batch_execution_provenance_envelope =
+      described_class.structured_edit_provider_batch_execution_provenance_envelope(
+        structured_edit_provider_batch_execution_provenance_envelope_fixture[:structured_edit_provider_batch_execution_provenance]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_provenance_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_provenance_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_provenance, structured_edit_provider_batch_execution_provenance_error =
+      described_class.import_structured_edit_provider_batch_execution_provenance_envelope(
+        structured_edit_provider_batch_execution_provenance_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_provenance_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_provenance)).to eq(
+      json_ready(structured_edit_provider_batch_execution_provenance_envelope_fixture[:structured_edit_provider_batch_execution_provenance])
+    )
+
+    structured_edit_provider_batch_execution_provenance_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_provenance, import_error =
+        described_class.import_structured_edit_provider_batch_execution_provenance_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_provenance, applied_structured_edit_provider_batch_execution_provenance_error =
+      described_class.import_structured_edit_provider_batch_execution_provenance_envelope(
+        structured_edit_provider_batch_execution_provenance_envelope_application_fixture[:structured_edit_provider_batch_execution_provenance_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_provenance_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_provenance)).to eq(
+      json_ready(structured_edit_provider_batch_execution_provenance_envelope_application_fixture[:expected_batch_provenance])
+    )
+
+    structured_edit_provider_batch_execution_provenance_envelope_application_fixture[:cases].each do |test_case|
+      _batch_provenance, application_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_provenance_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
