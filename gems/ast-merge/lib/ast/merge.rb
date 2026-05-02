@@ -961,6 +961,15 @@ module Ast
       execution_plan
     end
 
+    def structured_edit_provider_execution_handoff(execution_plan:, execution_dispatch:, metadata: nil)
+      execution_handoff = {
+        execution_plan: deep_dup(execution_plan),
+        execution_dispatch: deep_dup(execution_dispatch)
+      }
+      execution_handoff[:metadata] = deep_dup(metadata) if metadata
+      execution_handoff
+    end
+
     def structured_edit_provider_execution_plan_envelope(execution_plan)
       {
         kind: "structured_edit_provider_execution_plan",
