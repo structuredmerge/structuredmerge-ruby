@@ -1103,6 +1103,29 @@ module Ast
       [deep_dup(envelope[:execution_receipt]), nil]
     end
 
+    def structured_edit_provider_batch_execution_receipt(receipts:, metadata: nil)
+      batch_execution_receipt = {
+        receipts: deep_dup(receipts)
+      }
+      batch_execution_receipt[:metadata] = deep_dup(metadata) if metadata
+      batch_execution_receipt
+    end
+
+    def structured_edit_provider_batch_execution_receipt_envelope(batch_execution_receipt)
+      {
+        kind: "structured_edit_provider_batch_execution_receipt",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_execution_receipt: deep_dup(batch_execution_receipt)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_receipt_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_receipt envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_receipt"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_receipt envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_execution_receipt]), nil]
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)

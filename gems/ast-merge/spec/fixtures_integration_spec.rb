@@ -1170,6 +1170,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope")
     structured_edit_provider_execution_receipt_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope_rejection")
     structured_edit_provider_execution_receipt_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope_application")
+    structured_edit_provider_batch_execution_receipt_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt")
+    structured_edit_provider_batch_execution_receipt_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope")
+    structured_edit_provider_batch_execution_receipt_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope_rejection")
+    structured_edit_provider_batch_execution_receipt_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope_application")
     structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
     structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
     structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
@@ -2687,6 +2691,52 @@ RSpec.describe Ast::Merge do
       _execution_receipt, execution_receipt_rejection_error =
         described_class.import_structured_edit_provider_execution_receipt_envelope(test_case[:envelope])
       expect(json_ready(execution_receipt_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_receipt_fixture[:cases].each do |entry|
+      batch_execution_receipt = described_class.structured_edit_provider_batch_execution_receipt(
+        receipts: entry.dig(:batch_execution_receipt, :receipts),
+        metadata: entry.dig(:batch_execution_receipt, :metadata)
+      )
+      expect(json_ready(batch_execution_receipt)).to eq(json_ready(entry[:batch_execution_receipt]))
+    end
+
+    structured_edit_provider_batch_execution_receipt_envelope =
+      described_class.structured_edit_provider_batch_execution_receipt_envelope(
+        structured_edit_provider_batch_execution_receipt_envelope_fixture[:structured_edit_provider_batch_execution_receipt]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_receipt_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_receipt, structured_edit_provider_batch_execution_receipt_error =
+      described_class.import_structured_edit_provider_batch_execution_receipt_envelope(
+        structured_edit_provider_batch_execution_receipt_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_receipt_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_receipt)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_envelope_fixture[:structured_edit_provider_batch_execution_receipt])
+    )
+
+    structured_edit_provider_batch_execution_receipt_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_execution_receipt, import_error =
+        described_class.import_structured_edit_provider_batch_execution_receipt_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_receipt, applied_structured_edit_provider_batch_execution_receipt_error =
+      described_class.import_structured_edit_provider_batch_execution_receipt_envelope(
+        structured_edit_provider_batch_execution_receipt_envelope_application_fixture[:structured_edit_provider_batch_execution_receipt_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_receipt_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_receipt)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_envelope_application_fixture[:expected_batch_execution_receipt])
+    )
+
+    structured_edit_provider_batch_execution_receipt_envelope_application_fixture[:cases].each do |test_case|
+      _batch_execution_receipt, batch_execution_receipt_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_receipt_envelope(test_case[:envelope])
+      expect(json_ready(batch_execution_receipt_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     structured_edit_provider_batch_execution_handoff_fixture[:cases].each do |entry|
