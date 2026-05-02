@@ -1126,6 +1126,15 @@ module Ast
       [deep_dup(envelope[:batch_execution_receipt]), nil]
     end
 
+    def structured_edit_provider_execution_receipt_replay_request(execution_receipt:, replay_mode:, metadata: nil)
+      replay_request = {
+        execution_receipt: deep_dup(execution_receipt),
+        replay_mode: replay_mode
+      }
+      replay_request[:metadata] = deep_dup(metadata) if metadata
+      replay_request
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
