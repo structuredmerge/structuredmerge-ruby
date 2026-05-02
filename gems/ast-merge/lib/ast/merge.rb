@@ -970,6 +970,21 @@ module Ast
       execution_handoff
     end
 
+    def structured_edit_provider_execution_handoff_envelope(execution_handoff)
+      {
+        kind: "structured_edit_provider_execution_handoff",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        execution_handoff: deep_dup(execution_handoff)
+      }
+    end
+
+    def import_structured_edit_provider_execution_handoff_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_handoff envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_handoff"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_handoff envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:execution_handoff]), nil]
+    end
+
     def structured_edit_provider_execution_plan_envelope(execution_plan)
       {
         kind: "structured_edit_provider_execution_plan",
