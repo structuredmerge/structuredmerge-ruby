@@ -22,4 +22,4 @@ gemspec path: "gems/go-merge"
 
 gem "rake"
 gem "rspec"
-gem "token-resolver", path: "../archive/ruby-dog-food/token-resolver"
+gem "token-resolver", "~> 1.0", ">= 1.0.2"
