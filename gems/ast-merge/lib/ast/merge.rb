@@ -1008,6 +1008,29 @@ module Ast
       [deep_dup(envelope[:execution_invocation]), nil]
     end
 
+    def structured_edit_provider_batch_execution_invocation(invocations:, metadata: nil)
+      batch_execution_invocation = {
+        invocations: deep_dup(invocations)
+      }
+      batch_execution_invocation[:metadata] = deep_dup(metadata) if metadata
+      batch_execution_invocation
+    end
+
+    def structured_edit_provider_batch_execution_invocation_envelope(batch_execution_invocation)
+      {
+        kind: "structured_edit_provider_batch_execution_invocation",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_execution_invocation: deep_dup(batch_execution_invocation)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_invocation_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_invocation envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_invocation"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_invocation envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_execution_invocation]), nil]
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
