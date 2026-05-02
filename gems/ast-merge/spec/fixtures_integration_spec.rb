@@ -1150,6 +1150,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope")
     structured_edit_provider_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_rejection")
     structured_edit_provider_execution_handoff_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_application")
+    structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
+    structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
+    structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
+    structured_edit_provider_batch_execution_handoff_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_application")
     structured_edit_provider_execution_plan_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope")
     structured_edit_provider_execution_plan_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope_rejection")
     structured_edit_provider_execution_plan_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope_application")
@@ -2430,6 +2434,52 @@ RSpec.describe Ast::Merge do
       _execution_handoff, application_rejection_error =
         described_class.import_structured_edit_provider_execution_handoff_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_handoff_fixture[:cases].each do |entry|
+      batch_execution_handoff = described_class.structured_edit_provider_batch_execution_handoff(
+        handoffs: entry.dig(:batch_execution_handoff, :handoffs),
+        metadata: entry.dig(:batch_execution_handoff, :metadata)
+      )
+      expect(json_ready(batch_execution_handoff)).to eq(json_ready(entry[:batch_execution_handoff]))
+    end
+
+    structured_edit_provider_batch_execution_handoff_envelope =
+      described_class.structured_edit_provider_batch_execution_handoff_envelope(
+        structured_edit_provider_batch_execution_handoff_envelope_fixture[:structured_edit_provider_batch_execution_handoff]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_handoff_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_handoff_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_handoff, structured_edit_provider_batch_execution_handoff_error =
+      described_class.import_structured_edit_provider_batch_execution_handoff_envelope(
+        structured_edit_provider_batch_execution_handoff_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_handoff_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_handoff)).to eq(
+      json_ready(structured_edit_provider_batch_execution_handoff_envelope_fixture[:structured_edit_provider_batch_execution_handoff])
+    )
+
+    structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_execution_handoff, import_error =
+        described_class.import_structured_edit_provider_batch_execution_handoff_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_handoff, applied_structured_edit_provider_batch_execution_handoff_error =
+      described_class.import_structured_edit_provider_batch_execution_handoff_envelope(
+        structured_edit_provider_batch_execution_handoff_envelope_application_fixture[:structured_edit_provider_batch_execution_handoff_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_handoff_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_handoff)).to eq(
+      json_ready(structured_edit_provider_batch_execution_handoff_envelope_application_fixture[:expected_batch_execution_handoff])
+    )
+
+    structured_edit_provider_batch_execution_handoff_envelope_application_fixture[:cases].each do |test_case|
+      _batch_execution_handoff, batch_execution_handoff_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_handoff_envelope(test_case[:envelope])
+      expect(json_ready(batch_execution_handoff_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     structured_edit_provider_execution_plan_envelope =
