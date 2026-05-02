@@ -1158,6 +1158,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_invocation_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope")
     structured_edit_provider_batch_execution_invocation_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope_rejection")
     structured_edit_provider_batch_execution_invocation_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope_application")
+    structured_edit_provider_execution_run_result_fixture = diagnostics_fixture("structured_edit_provider_execution_run_result")
     structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
     structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
     structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
@@ -2534,6 +2535,15 @@ RSpec.describe Ast::Merge do
       _batch_execution_invocation, batch_execution_invocation_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_invocation_envelope(test_case[:envelope])
       expect(json_ready(batch_execution_invocation_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_run_result_fixture[:cases].each do |entry|
+      execution_run_result = described_class.structured_edit_provider_execution_run_result(
+        execution_invocation: entry.dig(:execution_run_result, :execution_invocation),
+        outcome: entry.dig(:execution_run_result, :outcome),
+        metadata: entry.dig(:execution_run_result, :metadata)
+      )
+      expect(json_ready(execution_run_result)).to eq(json_ready(entry[:execution_run_result]))
     end
 
     structured_edit_provider_batch_execution_handoff_fixture[:cases].each do |entry|

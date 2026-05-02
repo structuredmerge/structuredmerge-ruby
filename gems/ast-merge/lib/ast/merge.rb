@@ -1031,6 +1031,15 @@ module Ast
       [deep_dup(envelope[:batch_execution_invocation]), nil]
     end
 
+    def structured_edit_provider_execution_run_result(execution_invocation:, outcome:, metadata: nil)
+      execution_run_result = {
+        execution_invocation: deep_dup(execution_invocation),
+        outcome: deep_dup(outcome)
+      }
+      execution_run_result[:metadata] = deep_dup(metadata) if metadata
+      execution_run_result
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
