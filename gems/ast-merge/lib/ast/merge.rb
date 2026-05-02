@@ -1078,6 +1078,16 @@ module Ast
       [deep_dup(envelope[:batch_execution_run_result]), nil]
     end
 
+    def structured_edit_provider_execution_receipt(run_result:, provenance: nil, replay_bundle: nil, metadata: nil)
+      execution_receipt = {
+        run_result: deep_dup(run_result)
+      }
+      execution_receipt[:provenance] = deep_dup(provenance) if provenance
+      execution_receipt[:replay_bundle] = deep_dup(replay_bundle) if replay_bundle
+      execution_receipt[:metadata] = deep_dup(metadata) if metadata
+      execution_receipt
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
