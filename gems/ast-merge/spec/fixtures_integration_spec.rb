@@ -1150,6 +1150,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope")
     structured_edit_provider_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_rejection")
     structured_edit_provider_execution_handoff_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_application")
+    structured_edit_provider_execution_invocation_fixture = diagnostics_fixture("structured_edit_provider_execution_invocation")
     structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
     structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
     structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
@@ -2434,6 +2435,14 @@ RSpec.describe Ast::Merge do
       _execution_handoff, application_rejection_error =
         described_class.import_structured_edit_provider_execution_handoff_envelope(test_case[:envelope])
       expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_invocation_fixture[:cases].each do |entry|
+      execution_invocation = described_class.structured_edit_provider_execution_invocation(
+        execution_handoff: entry.dig(:execution_invocation, :execution_handoff),
+        metadata: entry.dig(:execution_invocation, :metadata)
+      )
+      expect(json_ready(execution_invocation)).to eq(json_ready(entry[:execution_invocation]))
     end
 
     structured_edit_provider_batch_execution_handoff_fixture[:cases].each do |entry|
