@@ -1183,6 +1183,17 @@ module Ast
       selection_policy
     end
 
+    def structured_edit_provider_executor_resolution(executor_registry:, selection_policy:,
+      selected_executor_profile:, metadata: nil)
+      executor_resolution = {
+        executor_registry: deep_dup(executor_registry),
+        selection_policy: deep_dup(selection_policy),
+        selected_executor_profile: deep_dup(selected_executor_profile)
+      }
+      executor_resolution[:metadata] = deep_dup(metadata) if metadata
+      executor_resolution
+    end
+
     def structured_edit_provider_executor_selection_policy_envelope(selection_policy)
       {
         kind: "structured_edit_provider_executor_selection_policy",
