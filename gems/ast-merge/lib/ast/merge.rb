@@ -976,6 +976,29 @@ module Ast
       [deep_dup(envelope[:execution_plan]), nil]
     end
 
+    def structured_edit_provider_batch_execution_plan(plans:, metadata: nil)
+      batch_execution_plan = {
+        plans: deep_dup(plans)
+      }
+      batch_execution_plan[:metadata] = deep_dup(metadata) if metadata
+      batch_execution_plan
+    end
+
+    def structured_edit_provider_batch_execution_plan_envelope(batch_execution_plan)
+      {
+        kind: "structured_edit_provider_batch_execution_plan",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_execution_plan: deep_dup(batch_execution_plan)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_plan_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_plan envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_plan"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_plan envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_execution_plan]), nil]
+    end
+
     def structured_edit_provider_execution_application(execution_request:, report:, metadata: nil)
       application = {
         execution_request: deep_dup(execution_request),
