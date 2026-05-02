@@ -1040,6 +1040,29 @@ module Ast
       execution_run_result
     end
 
+    def structured_edit_provider_execution_run_result_envelope(execution_run_result)
+      {
+        kind: "structured_edit_provider_execution_run_result",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        execution_run_result: deep_dup(execution_run_result)
+      }
+    end
+
+    def import_structured_edit_provider_execution_run_result_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_run_result envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_run_result"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_run_result envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:execution_run_result]), nil]
+    end
+
+    def structured_edit_provider_batch_execution_run_result(run_results:, metadata: nil)
+      batch_execution_run_result = {
+        run_results: deep_dup(run_results)
+      }
+      batch_execution_run_result[:metadata] = deep_dup(metadata) if metadata
+      batch_execution_run_result
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
