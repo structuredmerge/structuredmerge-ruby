@@ -1142,6 +1142,9 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_executor_selection_policy_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy_envelope_rejection")
     structured_edit_provider_executor_selection_policy_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy_envelope_application")
     structured_edit_provider_executor_resolution_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution")
+    structured_edit_provider_executor_resolution_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope")
+    structured_edit_provider_executor_resolution_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope_rejection")
+    structured_edit_provider_executor_resolution_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope_application")
     structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
     structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
     structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
@@ -2321,6 +2324,44 @@ RSpec.describe Ast::Merge do
         metadata: entry.dig(:executor_resolution, :metadata)
       )
       expect(json_ready(executor_resolution)).to eq(json_ready(entry[:executor_resolution]))
+    end
+
+    structured_edit_provider_executor_resolution_envelope =
+      described_class.structured_edit_provider_executor_resolution_envelope(
+        structured_edit_provider_executor_resolution_envelope_fixture[:structured_edit_provider_executor_resolution]
+      )
+    expect(json_ready(structured_edit_provider_executor_resolution_envelope)).to eq(
+      json_ready(structured_edit_provider_executor_resolution_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_executor_resolution, structured_edit_provider_executor_resolution_error =
+      described_class.import_structured_edit_provider_executor_resolution_envelope(
+        structured_edit_provider_executor_resolution_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_executor_resolution_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_executor_resolution)).to eq(
+      json_ready(structured_edit_provider_executor_resolution_envelope_fixture[:structured_edit_provider_executor_resolution])
+    )
+
+    structured_edit_provider_executor_resolution_envelope_rejection_fixture[:cases].each do |test_case|
+      _executor_resolution, import_error =
+        described_class.import_structured_edit_provider_executor_resolution_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_executor_resolution, applied_structured_edit_provider_executor_resolution_error =
+      described_class.import_structured_edit_provider_executor_resolution_envelope(
+        structured_edit_provider_executor_resolution_envelope_application_fixture[:structured_edit_provider_executor_resolution_envelope]
+      )
+    expect(applied_structured_edit_provider_executor_resolution_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_executor_resolution)).to eq(
+      json_ready(structured_edit_provider_executor_resolution_envelope_application_fixture[:expected_executor_resolution])
+    )
+
+    structured_edit_provider_executor_resolution_envelope_application_fixture[:cases].each do |test_case|
+      _executor_resolution, application_rejection_error =
+        described_class.import_structured_edit_provider_executor_resolution_envelope(test_case[:envelope])
+      expect(json_ready(application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     structured_edit_provider_execution_application_envelope =

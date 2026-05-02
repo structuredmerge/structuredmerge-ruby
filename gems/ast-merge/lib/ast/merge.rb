@@ -1209,6 +1209,21 @@ module Ast
       [deep_dup(envelope[:selection_policy]), nil]
     end
 
+    def structured_edit_provider_executor_resolution_envelope(executor_resolution)
+      {
+        kind: "structured_edit_provider_executor_resolution",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        executor_resolution: deep_dup(executor_resolution)
+      }
+    end
+
+    def import_structured_edit_provider_executor_resolution_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_executor_resolution envelope kind." }] unless envelope[:kind] == "structured_edit_provider_executor_resolution"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_executor_resolution envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:executor_resolution]), nil]
+    end
+
     def structured_edit_provider_executor_registry_envelope(executor_registry)
       {
         kind: "structured_edit_provider_executor_registry",
