@@ -1182,14 +1182,22 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_receipt_replay_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope")
     structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection")
     structured_edit_provider_batch_execution_receipt_replay_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope_application")
-structured_edit_provider_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application")
-structured_edit_provider_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope")
-structured_edit_provider_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_rejection")
-structured_edit_provider_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_application")
-structured_edit_provider_batch_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application")
-structured_edit_provider_batch_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope")
-structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection")
-structured_edit_provider_batch_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_application")
+    structured_edit_provider_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application")
+    structured_edit_provider_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope")
+    structured_edit_provider_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_rejection")
+    structured_edit_provider_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_application")
+    structured_edit_provider_batch_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application")
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope")
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection")
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_application")
+    structured_edit_provider_execution_receipt_replay_session_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session")
+    structured_edit_provider_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope")
+    structured_edit_provider_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope_rejection")
+    structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope_application")
+    structured_edit_provider_batch_execution_receipt_replay_session_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session")
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope")
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection")
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope_application")
     structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
     structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
     structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
@@ -2939,6 +2947,99 @@ structured_edit_provider_batch_execution_receipt_replay_application_envelope_app
       _batch_receipt_replay_application, batch_receipt_replay_application_rejection_error =
         described_class.import_structured_edit_provider_batch_execution_receipt_replay_application_envelope(test_case[:envelope])
       expect(json_ready(batch_receipt_replay_application_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_execution_receipt_replay_session_fixture[:cases].each do |entry|
+      receipt_replay_session = described_class.structured_edit_provider_execution_receipt_replay_session(
+        receipt_replay_application: entry.dig(:receipt_replay_session, :receipt_replay_application),
+        execution_receipt: entry.dig(:receipt_replay_session, :execution_receipt),
+        metadata: entry.dig(:receipt_replay_session, :metadata)
+      )
+      expect(json_ready(receipt_replay_session)).to eq(json_ready(entry[:receipt_replay_session]))
+    end
+
+    structured_edit_provider_execution_receipt_replay_session_envelope =
+      described_class.structured_edit_provider_execution_receipt_replay_session_envelope(
+        structured_edit_provider_execution_receipt_replay_session_envelope_fixture[:structured_edit_provider_execution_receipt_replay_session]
+      )
+    expect(json_ready(structured_edit_provider_execution_receipt_replay_session_envelope)).to eq(
+      json_ready(structured_edit_provider_execution_receipt_replay_session_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_execution_receipt_replay_session, structured_edit_provider_execution_receipt_replay_session_error =
+      described_class.import_structured_edit_provider_execution_receipt_replay_session_envelope(
+        structured_edit_provider_execution_receipt_replay_session_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_execution_receipt_replay_session_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_execution_receipt_replay_session)).to eq(
+      json_ready(structured_edit_provider_execution_receipt_replay_session_envelope_fixture[:structured_edit_provider_execution_receipt_replay_session])
+    )
+
+    structured_edit_provider_execution_receipt_replay_session_envelope_rejection_fixture[:cases].each do |test_case|
+      _receipt_replay_session, import_error =
+        described_class.import_structured_edit_provider_execution_receipt_replay_session_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_execution_receipt_replay_session, applied_structured_edit_provider_execution_receipt_replay_session_error =
+      described_class.import_structured_edit_provider_execution_receipt_replay_session_envelope(
+        structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture[:structured_edit_provider_execution_receipt_replay_session_envelope]
+      )
+    expect(applied_structured_edit_provider_execution_receipt_replay_session_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_execution_receipt_replay_session)).to eq(
+      json_ready(structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture[:expected_receipt_replay_session])
+    )
+
+    structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture[:cases].each do |test_case|
+      _receipt_replay_session, receipt_replay_session_rejection_error =
+        described_class.import_structured_edit_provider_execution_receipt_replay_session_envelope(test_case[:envelope])
+      expect(json_ready(receipt_replay_session_rejection_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    structured_edit_provider_batch_execution_receipt_replay_session_fixture[:cases].each do |entry|
+      batch_receipt_replay_session = described_class.structured_edit_provider_batch_execution_receipt_replay_session(
+        sessions: entry.dig(:batch_receipt_replay_session, :sessions),
+        metadata: entry.dig(:batch_receipt_replay_session, :metadata)
+      )
+      expect(json_ready(batch_receipt_replay_session)).to eq(json_ready(entry[:batch_receipt_replay_session]))
+    end
+
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope =
+      described_class.structured_edit_provider_batch_execution_receipt_replay_session_envelope(
+        structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture[:structured_edit_provider_batch_execution_receipt_replay_session]
+      )
+    expect(json_ready(structured_edit_provider_batch_execution_receipt_replay_session_envelope)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture[:expected_envelope])
+    )
+
+    imported_structured_edit_provider_batch_execution_receipt_replay_session, structured_edit_provider_batch_execution_receipt_replay_session_error =
+      described_class.import_structured_edit_provider_batch_execution_receipt_replay_session_envelope(
+        structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture[:expected_envelope]
+      )
+    expect(structured_edit_provider_batch_execution_receipt_replay_session_error).to be_nil
+    expect(json_ready(imported_structured_edit_provider_batch_execution_receipt_replay_session)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture[:structured_edit_provider_batch_execution_receipt_replay_session])
+    )
+
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection_fixture[:cases].each do |test_case|
+      _batch_receipt_replay_session, import_error =
+        described_class.import_structured_edit_provider_batch_execution_receipt_replay_session_envelope(test_case[:envelope])
+      expect(json_ready(import_error)).to eq(json_ready(test_case[:expected_error]))
+    end
+
+    applied_structured_edit_provider_batch_execution_receipt_replay_session, applied_structured_edit_provider_batch_execution_receipt_replay_session_error =
+      described_class.import_structured_edit_provider_batch_execution_receipt_replay_session_envelope(
+        structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture[:structured_edit_provider_batch_execution_receipt_replay_session_envelope]
+      )
+    expect(applied_structured_edit_provider_batch_execution_receipt_replay_session_error).to be_nil
+    expect(json_ready(applied_structured_edit_provider_batch_execution_receipt_replay_session)).to eq(
+      json_ready(structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture[:expected_batch_receipt_replay_session])
+    )
+
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture[:cases].each do |test_case|
+      _batch_receipt_replay_session, batch_receipt_replay_session_rejection_error =
+        described_class.import_structured_edit_provider_batch_execution_receipt_replay_session_envelope(test_case[:envelope])
+      expect(json_ready(batch_receipt_replay_session_rejection_error)).to eq(json_ready(test_case[:expected_error]))
     end
 
     structured_edit_provider_batch_execution_handoff_fixture[:cases].each do |entry|

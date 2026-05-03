@@ -1220,6 +1220,53 @@ module Ast
       [deep_dup(envelope[:batch_receipt_replay_application]), nil]
     end
 
+    def structured_edit_provider_execution_receipt_replay_session(receipt_replay_application:, execution_receipt:, metadata: nil)
+      replay_session = {
+        receipt_replay_application: deep_dup(receipt_replay_application),
+        execution_receipt: deep_dup(execution_receipt)
+      }
+      replay_session[:metadata] = deep_dup(metadata) if metadata
+      replay_session
+    end
+
+    def structured_edit_provider_execution_receipt_replay_session_envelope(receipt_replay_session)
+      {
+        kind: "structured_edit_provider_execution_receipt_replay_session",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        receipt_replay_session: deep_dup(receipt_replay_session)
+      }
+    end
+
+    def import_structured_edit_provider_execution_receipt_replay_session_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_execution_receipt_replay_session envelope kind." }] unless envelope[:kind] == "structured_edit_provider_execution_receipt_replay_session"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_execution_receipt_replay_session envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:receipt_replay_session]), nil]
+    end
+
+    def structured_edit_provider_batch_execution_receipt_replay_session(sessions:, metadata: nil)
+      batch_receipt_replay_session = {
+        sessions: deep_dup(sessions)
+      }
+      batch_receipt_replay_session[:metadata] = deep_dup(metadata) if metadata
+      batch_receipt_replay_session
+    end
+
+    def structured_edit_provider_batch_execution_receipt_replay_session_envelope(batch_receipt_replay_session)
+      {
+        kind: "structured_edit_provider_batch_execution_receipt_replay_session",
+        version: STRUCTURED_EDIT_TRANSPORT_VERSION,
+        batch_receipt_replay_session: deep_dup(batch_receipt_replay_session)
+      }
+    end
+
+    def import_structured_edit_provider_batch_execution_receipt_replay_session_envelope(envelope)
+      return [nil, { category: "kind_mismatch", message: "expected structured_edit_provider_batch_execution_receipt_replay_session envelope kind." }] unless envelope[:kind] == "structured_edit_provider_batch_execution_receipt_replay_session"
+      return [nil, { category: "unsupported_version", message: "unsupported structured_edit_provider_batch_execution_receipt_replay_session envelope version #{envelope[:version]}." }] unless envelope[:version] == STRUCTURED_EDIT_TRANSPORT_VERSION
+
+      [deep_dup(envelope[:batch_receipt_replay_session]), nil]
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
