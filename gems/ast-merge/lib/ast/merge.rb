@@ -1337,6 +1337,14 @@ module Ast
       [deep_dup(envelope[:receipt_replay_workflow_result]), nil]
     end
 
+    def structured_edit_provider_execution_receipt_replay_workflow_review_request(receipt_replay_workflow_result:, metadata: nil)
+      review_request = {
+        receipt_replay_workflow_result: deep_dup(receipt_replay_workflow_result)
+      }
+      review_request[:metadata] = deep_dup(metadata) if metadata
+      review_request
+    end
+
     def structured_edit_provider_batch_execution_receipt_replay_workflow_result(receipt_replay_workflow_results:, metadata: nil)
       batch_replay_workflow_result = {
         receipt_replay_workflow_results: deep_dup(receipt_replay_workflow_results)
