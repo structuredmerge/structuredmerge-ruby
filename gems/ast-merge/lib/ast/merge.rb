@@ -1345,6 +1345,14 @@ module Ast
       review_request
     end
 
+    def structured_edit_provider_execution_receipt_replay_workflow_apply_request(receipt_replay_workflow_review_request:, metadata: nil)
+      apply_request = {
+        receipt_replay_workflow_review_request: deep_dup(receipt_replay_workflow_review_request)
+      }
+      apply_request[:metadata] = deep_dup(metadata) if metadata
+      apply_request
+    end
+
     def structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope(receipt_replay_workflow_review_request)
       {
         kind: "structured_edit_provider_execution_receipt_replay_workflow_review_request",

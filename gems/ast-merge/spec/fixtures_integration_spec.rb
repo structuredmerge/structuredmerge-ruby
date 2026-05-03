@@ -1211,6 +1211,7 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection")
     structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application")
     structured_edit_provider_execution_receipt_replay_workflow_review_request_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request")
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_request")
     structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope")
     structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection")
     structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application")
@@ -3214,6 +3215,17 @@ RSpec.describe Ast::Merge do
         )
       expect(json_ready(receipt_replay_workflow_review_request)).to eq(
         json_ready(entry[:receipt_replay_workflow_review_request])
+      )
+    end
+
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_fixture[:cases].each do |entry|
+      receipt_replay_workflow_apply_request =
+        described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_request(
+          receipt_replay_workflow_review_request: entry.dig(:receipt_replay_workflow_apply_request, :receipt_replay_workflow_review_request),
+          metadata: entry.dig(:receipt_replay_workflow_apply_request, :metadata)
+        )
+      expect(json_ready(receipt_replay_workflow_apply_request)).to eq(
+        json_ready(entry[:receipt_replay_workflow_apply_request])
       )
     end
 
