@@ -1353,6 +1353,15 @@ module Ast
       apply_request
     end
 
+    def structured_edit_provider_execution_receipt_replay_workflow_apply_session(receipt_replay_workflow_apply_request:, receipt_replay_session:, metadata: nil)
+      apply_session = {
+        receipt_replay_workflow_apply_request: deep_dup(receipt_replay_workflow_apply_request),
+        receipt_replay_session: deep_dup(receipt_replay_session)
+      }
+      apply_session[:metadata] = deep_dup(metadata) if metadata
+      apply_session
+    end
+
     def structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope(receipt_replay_workflow_apply_request)
       {
         kind: "structured_edit_provider_execution_receipt_replay_workflow_apply_request",
