@@ -1313,6 +1313,15 @@ module Ast
       [deep_dup(envelope[:batch_receipt_replay_workflow]), nil]
     end
 
+    def structured_edit_provider_execution_receipt_replay_workflow_result(receipt_replay_workflow:, receipt_replay_application:, metadata: nil)
+      replay_workflow_result = {
+        receipt_replay_workflow: deep_dup(receipt_replay_workflow),
+        receipt_replay_application: deep_dup(receipt_replay_application)
+      }
+      replay_workflow_result[:metadata] = deep_dup(metadata) if metadata
+      replay_workflow_result
+    end
+
     def structured_edit_provider_batch_execution_handoff(handoffs:, metadata: nil)
       batch_execution_handoff = {
         handoffs: deep_dup(handoffs)
