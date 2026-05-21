@@ -1683,8 +1683,11 @@ module Kettle
     end
 
     def appraisal_x_stdlib_exclusions(template_content)
-      gems = template_content.to_s.lines.filter_map do |line|
-        line[%r{eval_gemfile\s+["']\.\./([\w-]+)/}, 1]
+      gems = ruby_call_records(template_content, :eval_gemfile).filter_map do |call|
+        path = ruby_string_argument(call).to_s
+        next unless path.start_with?("../")
+
+        path.delete_prefix("../").split("/").first
       end
       (gems + APPRAISAL_ALWAYS_EXCLUDED_GEMS).uniq.sort
     end
