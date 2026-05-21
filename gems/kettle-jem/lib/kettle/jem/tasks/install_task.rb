@@ -59,9 +59,7 @@ module Kettle
         end
 
         def development_dependency_names(content)
-          content.to_s.lines.filter_map do |line|
-            line[/^\s*\w+\.add_development_dependency\s*(?:\(|\s)\s*["']([^"']+)["']/, 1]
-          end.uniq
+          Kettle::Jem.extract_gemspec_development_dependencies(content).map { |dependency| dependency.fetch(:name) }.uniq
         end
 
         def version_gem_bootstrap_step(project_root, report)
