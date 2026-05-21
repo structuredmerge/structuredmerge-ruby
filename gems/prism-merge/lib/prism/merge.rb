@@ -608,11 +608,89 @@ module Prism
       Ruby::Merge.match_ruby_owners(template, destination)
     end
 
-    def merge_ruby(template_source, destination_source, dialect, backend: nil)
+    def merge_ruby(
+      template_source,
+      destination_source,
+      dialect,
+      backend: nil,
+      preference: :destination,
+      add_template_only_nodes: true,
+      signature_generator: nil,
+      **options
+    )
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
 
-      Ruby::Merge.merge_ruby(template_source, destination_source, dialect)
+      merger = SmartMerger.new(
+        template_source,
+        destination_source,
+        preference: preference,
+        add_template_only_nodes: add_template_only_nodes,
+        signature_generator: signature_generator,
+        **options
+      )
+      {
+        ok: true,
+        diagnostics: [],
+        output: merger.merge.to_s,
+        policies: Ruby::Merge.ruby_feature_profile.fetch(:supported_policies),
+      }
+    rescue Prism::Merge::ParseError => e
+      {
+        ok: false,
+        diagnostics: [
+          {
+            severity: "error",
+            category: e.is_a?(Prism::Merge::DestinationParseError) ? "destination_parse_error" : "parse_error",
+            message: e.message,
+          },
+        ],
+        policies: [],
+      }
+    end
+
+    def ruby_dsl_signature_generator
+      @ruby_dsl_signature_generator ||= lambda do |node|
+        ruby_dsl_signature_for(node) || node
+      end
+    end
+
+    def ruby_dsl_signature_for(node)
+      call = ruby_dsl_call_node(node)
+      return unless call
+
+      case call.name
+      when :source, :gemspec
+        [:ruby_dsl_singleton, call.name]
+      when :git_source, :gem, :eval_gemfile, :platform, :group, :task
+        [:ruby_dsl_call, call.name, ruby_dsl_first_argument(call)]
+      when :desc
+        [:ruby_dsl_desc, call.slice]
+      end
+    end
+
+    def ruby_dsl_call_node(node)
+      return node if node.is_a?(::Prism::CallNode)
+
+      if node.is_a?(::Prism::IfNode) || node.is_a?(::Prism::UnlessNode)
+        body = node.statements&.body
+        return body.first if body&.length == 1 && body.first.is_a?(::Prism::CallNode)
+      end
+
+      nil
+    end
+
+    def ruby_dsl_first_argument(call)
+      argument = call.arguments&.arguments&.first
+      case argument
+      when ::Prism::StringNode
+        argument.unescaped
+      when ::Prism::SymbolNode
+        argument.unescaped.to_sym
+      else
+        argument&.slice
+      end
     end
 
     def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)

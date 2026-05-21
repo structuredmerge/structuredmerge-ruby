@@ -14,6 +14,7 @@ require "set"
 require "time"
 require "uri"
 require "ruby/merge"
+require "prism/merge"
 require "bash/merge"
 require "json/merge"
 require "dotenv/merge"
@@ -3166,9 +3167,7 @@ module Kettle
     end
 
     def gemfile_dependency_names(content)
-      content.to_s.lines.filter_map do |line|
-        line[/^\s*gem\s+["']([^"']+)["']/, 1]
-      end
+      gemfile_gem_call_records(content).map { |record| record.fetch(:name) }
     end
 
     def appraisal_names(content)
@@ -3580,12 +3579,7 @@ module Kettle
       when :appraisals
         return merge_appraisals_template_source(template_content, destination_content, facts: facts)
       when :ruby, :gemfile, :rakefile
-        merge_result = Ruby::Merge.merge_ruby(
-          template_content,
-          destination_content,
-          "ruby",
-          **ruby_merge_options(recipe, merge_template_requires: file_type == :rakefile)
-        )
+        merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content)
       when :yaml
         merge_result = Psych::Merge.merge_yaml(
           template_content,
@@ -3609,7 +3603,6 @@ module Kettle
       if merge_result[:ok]
         output = merge_result.fetch(:output)
         if file_type == :gemfile
-          output = merge_gemfile_eval_gemfile_statements(template_content, output)
           output = merge_gemfile_eval_bucket_entries(template_content, output)
           return finalize_gemfile_template_source(recipe, output, destination_content, facts: facts, template_content: template_content)
         end
@@ -3765,6 +3758,28 @@ module Kettle
       options
     end
 
+    def merge_ruby_template_source(file_type, recipe, template_content, destination_content)
+      return merge_prism_gemfile_template_source(template_content, destination_content) if file_type == :gemfile
+
+      Ruby::Merge.merge_ruby(
+        template_content,
+        destination_content,
+        "ruby",
+        **ruby_merge_options(recipe, merge_template_requires: file_type == :rakefile)
+      )
+    end
+
+    def merge_prism_gemfile_template_source(template_content, destination_content)
+      Prism::Merge.merge_ruby(
+        template_content,
+        destination_content,
+        "ruby",
+        preference: :template,
+        add_template_only_nodes: true,
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator
+      )
+    end
+
     def merge_gemfile_template_policy(content, facts:, template_content: nil)
       package_name = facts.dig(:package, :name).to_s if facts
       removable_gems = ["appraisal"]
@@ -3816,33 +3831,64 @@ module Kettle
       commented_blocks = commented_gem_dependency_blocks(template_content)
       return content if commented_blocks.empty?
 
+      active_records_by_line = gemfile_gem_call_records(content)
+        .select { |record| commented_blocks.key?(record.fetch(:name)) }
+        .to_h { |record| [record.fetch(:start_line), record] }
+      comment_blocks_by_line = commented_gem_dependency_block_records(content)
+        .select { |record| commented_blocks.key?(record.fetch(:name)) }
+        .to_h { |record| [record.fetch(:block_start_line), record] }
       inserted = Set.new
-      lines = content.to_s.lines.flat_map do |line|
-        gem_name = line[/^\s*gem\s+["']([^"']+)["']/, 1]
-        block = commented_blocks[gem_name]
-        unless block
-          line
-        else
-          next [] if inserted.include?(gem_name)
+      skip_until = 0
+      lines = []
+      content.to_s.lines.each_with_index do |line, index|
+        line_number = index + 1
+        next if line_number < skip_until
 
+        if (record = comment_blocks_by_line[line_number])
+          gem_name = record.fetch(:name)
+          append_gemfile_comment_block(lines, commented_blocks.fetch(gem_name)) unless inserted.include?(gem_name)
           inserted << gem_name
-          block
+          skip_until = record.fetch(:block_end_line) + 1
+          next
         end
+
+        if (record = active_records_by_line[line_number])
+          gem_name = record.fetch(:name)
+          append_gemfile_comment_block(lines, commented_blocks.fetch(gem_name)) unless inserted.include?(gem_name)
+          inserted << gem_name
+          skip_until = record.fetch(:end_line) + 1
+          next
+        end
+
+        lines << line
       end
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
     end
 
-    def commented_gem_dependency_blocks(content)
-      lines = content.to_s.lines
-      lines.each_with_index.with_object({}) do |(line, index), blocks|
-        gem_name = line[/^\s*#\s*gem\s+["']([^"']+)["']/, 1]
-        next unless gem_name
+    def append_gemfile_comment_block(lines, block)
+      first_line = block.first
+      lines.pop while first_line && lines.last == first_line
+      lines.concat(block)
+    end
 
-        start_index = index
-        while start_index.positive? && lines[start_index - 1].match?(/^\s*#/)
+    def commented_gem_dependency_blocks(content)
+      commented_gem_dependency_block_records(content).to_h do |record|
+        [record.fetch(:name), record.fetch(:source_lines)]
+      end
+    end
+
+    def commented_gem_dependency_block_records(content)
+      lines = content.to_s.lines
+      commented_gem_dependency_records(content).map do |record|
+        start_index = record.fetch(:start_line) - 1
+        while start_index.positive? && gemfile_comment_line?(lines[start_index - 1])
           start_index -= 1
         end
-        blocks[gem_name] ||= lines[start_index..index]
+        record.merge(
+          block_start_line: start_index + 1,
+          block_end_line: record.fetch(:end_line),
+          source_lines: lines[start_index..(record.fetch(:end_line) - 1)] || []
+        )
       end
     end
 
@@ -3850,11 +3896,80 @@ module Kettle
       names = gem_names.map(&:to_s).reject(&:empty?).uniq
       return content if names.empty?
 
-      lines = content.to_s.lines.reject do |line|
-        match = line.match(/^\s*gem\s+["']([^"']+)["']/)
-        match && names.include?(match[1])
+      remove_indexes = Set.new
+      gemfile_gem_call_records(content).each do |record|
+        next unless names.include?(record.fetch(:name))
+
+        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
       end
+      lines = content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def gemfile_gem_call_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all { |node| node.is_a?(::Prism::CallNode) && node.name == :gem }.filter_map do |call|
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          name: name,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
+      end
+    end
+
+    def commented_gem_dependency_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.comments.filter_map do |comment|
+        call = commented_gem_call(comment.location.slice)
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          name: name,
+          start_line: comment.location.start_line,
+          end_line: comment.location.end_line,
+        }
+      end
+    end
+
+    def commented_gem_call(comment_source)
+      source = uncomment_ruby_comment_line(comment_source)
+      return unless source
+
+      result = prism_parse_success(source)
+      body = result&.value&.statements&.body
+      call = body&.one? ? body.first : nil
+      call if call.is_a?(::Prism::CallNode) && call.name == :gem
+    end
+
+    def uncomment_ruby_comment_line(comment_source)
+      text = comment_source.to_s
+      return unless text.start_with?("#")
+
+      uncommented = text[1..].to_s
+      uncommented = uncommented[1..].to_s if uncommented.start_with?(" ")
+      uncommented
+    end
+
+    def ruby_string_argument(call)
+      argument = call&.arguments&.arguments&.first
+      argument.unescaped if argument.is_a?(::Prism::StringNode)
+    end
+
+    def prism_parse_success(content)
+      result = ::Prism.parse(content.to_s)
+      result if result.success?
+    end
+
+    def gemfile_comment_line?(line)
+      line.to_s.lstrip.start_with?("#")
     end
 
     def remove_gemfile_percent_w_entries(content, gem_names)
@@ -3902,64 +4017,6 @@ module Kettle
       insert_at ||= lines.length
       lines[insert_at, 0] = missing_lines
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
-    end
-
-    def merge_gemfile_eval_gemfile_statements(template_content, merged_content)
-      template_entries = gemfile_eval_gemfile_statement_entries(template_content)
-      return merged_content if template_entries.empty?
-
-      template_by_path = template_entries.to_h { |entry| [entry.fetch(:path), entry] }
-      merged_entries = gemfile_eval_gemfile_statement_entries(merged_content).select do |entry|
-        template_by_path.key?(entry.fetch(:path))
-      end
-      return merged_content if merged_entries.empty?
-
-      lines = merged_content.to_s.lines
-      merged_entries.sort_by { |entry| entry.fetch(:start_line) }.reverse_each do |entry|
-        template_entry = template_by_path.fetch(entry.fetch(:path))
-        lines[(entry.fetch(:start_line) - 1)..(entry.fetch(:end_line) - 1)] = template_entry.fetch(:source_lines)
-      end
-      ensure_trailing_newline(lines.join)
-    end
-
-    def gemfile_eval_gemfile_statement_entries(content)
-      parse_result = ::Prism.parse(content.to_s)
-      return [] unless parse_result.success?
-
-      statements = parse_result.value.statements&.body || []
-      statements.filter_map do |statement|
-        call = eval_gemfile_call_from_statement(statement)
-        path = string_literal_content(call&.arguments&.arguments&.first)
-        next unless path
-
-        {
-          path: path,
-          start_line: statement.location.start_line,
-          end_line: statement.location.end_line,
-          source_lines: content.to_s.lines[(statement.location.start_line - 1)..(statement.location.end_line - 1)] || [],
-        }
-      end
-    end
-
-    def eval_gemfile_call_from_statement(statement)
-      return statement if eval_gemfile_call?(statement)
-
-      if statement.is_a?(::Prism::IfNode)
-        body = statement.statements&.body
-        return body.first if body&.length == 1 && eval_gemfile_call?(body.first)
-      end
-
-      nil
-    end
-
-    def eval_gemfile_call?(node)
-      node.is_a?(::Prism::CallNode) && node.name == :eval_gemfile
-    end
-
-    def string_literal_content(node)
-      return unless node.is_a?(::Prism::StringNode)
-
-      node.unescaped
     end
 
     def gemfile_eval_bucket_entries(content)

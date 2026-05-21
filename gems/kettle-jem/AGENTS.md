@@ -185,7 +185,7 @@ cd /path/to/gem && rm -rf *.gem && SKIP_GEM_SIGNING=true gem build *.gemspec && 
 ```
 
 - `SKIP_GEM_SIGNING=true` bypasses the PEM passphrase prompt for signed gemspecs.
-- `--force` overwrites the installed version.
+- `--force` overwrites the currently installed version.
 - Always rebuild **and** reinstall before verifying cross-repo behaviour.
 
 ### Coverage Reports
@@ -230,6 +230,14 @@ Template updates preserve custom code wrapped in freeze blocks:
 ### Modular Gemfile Architecture
 
 Gemfiles are split into modular components under `gemfiles/modular/`. Each component handles a specific concern (coverage, style, debug, etc.). The main `Gemfile` loads these modular components via `eval_gemfile`.
+
+### AST-First Merge Logic
+
+StructuredMerge exists to replace brittle text and regex templating with parser-backed merge logic. For source files, use the implementation's native parser path first; in Ruby that means Prism-backed APIs such as `prism-merge` and `ast-crispr-ruby-prism`.
+
+Do not add regular expressions for source classification, node discovery, require/import/dependency detection, block boundary detection, or merge ownership when an AST-backed API can answer the question. If a regular expression is unavoidable, document inline why the parser-backed path is unavailable or inappropriate for that exact use.
+
+Avoid mixing parser representations for one document unless the code is explicitly comparing backends or performing a documented fallback. `tree-sitter-language-pack` remains a supported backend, but kettle-* templating should default to the native Ruby parser path for Ruby, Gemfile, gemspec, and Rakefile content.
 
 ### Forward Compatibility with `**options`
 

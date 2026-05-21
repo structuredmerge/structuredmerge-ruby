@@ -41,6 +41,33 @@ RSpec.describe "Prism::Merge" do
     expect(json_ready(PRISM_MERGE.ruby_plan_context)).to eq(json_ready(plan_fixture.dig(:providers, :prism)))
   end
 
+  it "merges Gemfile DSL with Prism-native signatures" do
+    result = PRISM_MERGE.merge_ruby(
+      <<~RUBY,
+        source "https://gem.coop"
+        gemspec
+        eval_gemfile "gemfiles/modular/style.gemfile" if ENV.fetch("K_JEM_STYLE", "false").casecmp("true").zero?
+        gem "rake"
+      RUBY
+      <<~RUBY,
+        source "https://rubygems.org"
+        gem "rspec"
+        eval_gemfile "gemfiles/modular/style.gemfile"
+      RUBY
+      "ruby",
+      preference: :template,
+      signature_generator: PRISM_MERGE.ruby_dsl_signature_generator
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include('source "https://gem.coop"')
+    expect(result[:output]).not_to include('source "https://rubygems.org"')
+    expect(result[:output]).to include('eval_gemfile "gemfiles/modular/style.gemfile" if ENV.fetch("K_JEM_STYLE", "false").casecmp("true").zero?')
+    expect(result[:output].split('eval_gemfile "gemfiles/modular/style.gemfile"', -1).size).to eq(2)
+    expect(result[:output]).to include('gem "rspec"')
+    expect(result[:output]).to include('gem "rake"')
+  end
+
   it "projects the structured-edit provider profile through Prism" do
     fixture = read_json(
       fixtures_root.join(
