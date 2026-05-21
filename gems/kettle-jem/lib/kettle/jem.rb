@@ -4042,8 +4042,14 @@ module Kettle
       emitted_paths = Set.new
       insert_at = nil
       lines = []
-      merged_content.to_s.lines.each do |line|
-        entry = gemfile_eval_bucket_entry(line)
+      merged_lines = merged_content.to_s.lines
+      merged_entries_by_line = gemfile_eval_bucket_entries(merged_content).to_h { |entry| [entry.fetch(:start_line), entry] }
+      skip_until = 0
+      merged_lines.each_with_index do |line, index|
+        line_number = index + 1
+        next if line_number < skip_until
+
+        entry = merged_entries_by_line[line_number]
         unless entry && template_by_key.key?(entry.fetch(:key))
           lines << line
           next
@@ -4051,11 +4057,12 @@ module Kettle
 
         template_entry = template_by_key.fetch(entry.fetch(:key))
         if entry.fetch(:path) == template_entry.fetch(:path)
-          lines << line unless emitted_paths.include?(entry.fetch(:path))
+          lines << entry.fetch(:line) unless emitted_paths.include?(entry.fetch(:path))
           emitted_paths << entry.fetch(:path)
         else
           insert_at ||= lines.length
         end
+        skip_until = entry.fetch(:end_line) + 1
       end
 
       missing_lines = template_entries.reject { |entry| emitted_paths.include?(entry.fetch(:path)) }.map { |entry| entry.fetch(:line) }
@@ -4067,17 +4074,40 @@ module Kettle
     end
 
     def gemfile_eval_bucket_entries(content)
-      content.to_s.lines.filter_map { |line| gemfile_eval_bucket_entry(line) }
+      lines = content.to_s.lines
+      ruby_call_records(content, :eval_gemfile).filter_map do |call|
+        path = ruby_string_argument(call)
+        next unless path
+
+        key = normalize_eval_gemfile_ruby_bucket(path)
+        next unless key
+
+        {
+          path: path,
+          key: key,
+          line: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
+      end
     end
 
-    def gemfile_eval_bucket_entry(line)
-      path = line[/^\s*eval_gemfile\s+["']([^"']+)["']/, 1]
-      return unless path
+    def normalize_eval_gemfile_ruby_bucket(path)
+      segments = path.to_s.split("/", -1)
+      bucket_index = segments.index { |segment| ruby_bucket_path_segment?(segment) }
+      return unless bucket_index
 
-      key = path.sub(%r{/r\d+(?:\.\d+)?/}, "/{ruby}/")
-      return if key == path
+      segments[bucket_index] = "{ruby}"
+      segments.join("/")
+    end
 
-      { path: path, key: key, line: line }
+    def ruby_bucket_path_segment?(segment)
+      return false unless segment.to_s.start_with?("r")
+
+      version = segment.to_s[1..].to_s
+      return false if version.empty?
+
+      version.split(".", -1).all? { |part| !part.empty? && part.each_char.all? { |char| char >= "0" && char <= "9" } }
     end
 
     def merge_appraisals_template_policy(content, facts:)
