@@ -4376,7 +4376,7 @@ module Kettle
     end
 
     def gemspec_preserved_assignments(source, receiver:)
-      %w[
+      preserved_fields = %w[
         name
         authors
         email
@@ -4386,14 +4386,14 @@ module Kettle
         licenses
         required_ruby_version
         executables
-      ].each_with_object({}) do |field, assignments|
-        line = source.to_s.lines.find do |candidate|
-          candidate.match?(/^\s*#{Regexp.escape(receiver)}\.#{Regexp.escape(field)}\s*=/)
-        end
-        next unless line
-        next if line.include?("TODO:")
+      ]
+      gemspec_assignment_records(source, receiver: receiver).each_with_object({}) do |record, assignments|
+        field = record.fetch(:field)
+        next unless preserved_fields.include?(field)
+        next if assignments.key?(field)
+        next if record.fetch(:source).include?("TODO:")
 
-        assignments[field] = line
+        assignments[field] = record.fetch(:source)
       end
     end
 
@@ -4549,6 +4549,68 @@ module Kettle
 
     def gemspec_dependency_record_key(record)
       [record.fetch(:kind), record.fetch(:name)]
+    end
+
+    def gemspec_assignment_records(source, receiver: nil)
+      lines = source.to_s.lines
+      ruby_call_records(source, nil).filter_map do |call|
+        field = gemspec_assignment_field(call)
+        next unless field
+        next if receiver && call.receiver&.slice != receiver.to_s
+
+        {
+          field: field,
+          value: gemspec_assignment_value(call),
+          receiver: call.receiver&.slice,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+        }
+      end
+    end
+
+    def gemspec_assignment_field(call)
+      name = call.name.to_s
+      return unless name.end_with?("=")
+      return if name == "[]="
+
+      name.delete_suffix("=")
+    end
+
+    def gemspec_assignment_value(call)
+      argument = call.arguments&.arguments&.first
+      case argument
+      when ::Prism::StringNode
+        argument.unescaped
+      when ::Prism::ArrayNode
+        argument.elements.filter_map { |element| element.unescaped if element.is_a?(::Prism::StringNode) }
+      else
+        argument&.slice
+      end
+    end
+
+    def gemspec_assignment_record(source, field)
+      receiver, assignment_field = gemspec_field_receiver_and_name(field)
+      gemspec_assignment_records(source, receiver: receiver).find { |record| record.fetch(:field) == assignment_field }
+    end
+
+    def gemspec_field_receiver_and_name(field)
+      parts = field.to_s.split(".")
+      return [nil, field.to_s] if parts.length == 1
+
+      [parts[0...-1].join("."), parts.last]
+    end
+
+    def gemspec_metadata_records(source)
+      ruby_call_records(source, :[]=).filter_map do |call|
+        next unless call.receiver&.slice.to_s.end_with?(".metadata")
+
+        key = ruby_string_argument_at(call, 0)
+        value = ruby_string_argument_at(call, 1)
+        next unless key
+
+        { key: key, value: value, receiver: call.receiver&.slice }
+      end
     end
 
     def gemspec_dependency_records(source, receiver: nil)
@@ -5022,15 +5084,13 @@ module Kettle
     end
 
     def extract_gemspec_assignment(source, field)
-      match = source.match(/#{Regexp.escape(field)}\s*=\s*["']([^"']*)["']/)
-      match && match[1]
+      value = gemspec_assignment_record(source, field)&.fetch(:value)
+      value if value.is_a?(String)
     end
 
     def extract_gemspec_array(source, field)
-      match = source.match(/#{Regexp.escape(field)}\s*=\s*\[([^\]]*)\]/m)
-      return [] unless match
-
-      match[1].scan(/["']([^"']+)["']/).flatten
+      value = gemspec_assignment_record(source, field)&.fetch(:value)
+      value.is_a?(Array) ? value : []
     end
 
     def ruby_engines_config(config)
@@ -5041,8 +5101,7 @@ module Kettle
     end
 
     def extract_metadata_value(source, key)
-      match = source.match(/spec\.metadata\[\s*["']#{Regexp.escape(key)}["']\s*\]\s*=\s*["']([^"']*)["']/)
-      match && match[1]
+      gemspec_metadata_records(source).find { |record| record.fetch(:key) == key.to_s }&.fetch(:value)
     end
 
     def funding_urls(project_root, gemspec_source, package_name, opencollective_disabled: false, open_collective_org: nil)
