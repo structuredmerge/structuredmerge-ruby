@@ -77,15 +77,17 @@ module Ruby
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
 
-      syntax = TreeHaver.parse_with_language_pack(
-        TreeHaver::ParserRequest.new(source: source, language: "ruby", dialect: dialect)
-      )
+      request = TreeHaver::ParserRequest.new(source: source, language: "ruby", dialect: dialect)
+      syntax = TreeHaver.parse_with_language_pack(request)
       return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
+
+      process = TreeHaver.process_with_language_pack(request)
+      return { ok: false, diagnostics: process[:diagnostics], policies: [] } unless process[:ok]
 
       {
         ok: true,
         diagnostics: [],
-        analysis: analyze_ruby_document(source),
+        analysis: analyze_ruby_document(source, process_analysis: process[:analysis]),
         policies: []
       }
     end
@@ -160,8 +162,14 @@ module Ruby
 
       destination_requires = collect_ruby_require_entries(destination.dig(:analysis, :source))
       template_requires = collect_ruby_require_entries(template.dig(:analysis, :source))
-      destination_declarations = collect_ruby_declaration_entries(destination.dig(:analysis, :source))
-      template_declarations = collect_ruby_declaration_entries(template.dig(:analysis, :source))
+      destination_declarations = collect_ruby_declaration_entries(
+        destination.dig(:analysis, :source),
+        process_analysis: destination.dig(:analysis, :tree_haver_process_analysis)
+      )
+      template_declarations = collect_ruby_declaration_entries(
+        template.dig(:analysis, :source),
+        process_analysis: template.dig(:analysis, :tree_haver_process_analysis)
+      )
       template_declaration_candidates = template_declarations + qualified_nested_declaration_entries(template_declarations)
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       template_declarations_by_path = template_declaration_candidates.to_h { |entry| [entry[:merge_key], entry] }
@@ -1098,10 +1106,9 @@ module Ruby
       )
     end
 
-    def analyze_ruby_document(source)
+    def analyze_ruby_document(source, process_analysis: nil)
       lines = normalize_source(source).split("\n", -1)
       requires = []
-      declarations = []
       discovered_surfaces = []
       pending_comments = []
 
@@ -1129,13 +1136,9 @@ module Ruby
           next
         end
 
-        declaration = declaration_for_line(line)
+        declaration = ruby_process_structure_item_at_line(process_analysis, line_number)
+        declaration ||= declaration_for_line(line) if Array(process_analysis&.structure).empty?
         if declaration
-          declarations << {
-            path: "/declarations/#{declaration[:name]}",
-            owner_kind: "declaration",
-            match_key: declaration[:name]
-          }
           surfaces = surfaces_for_owner(
             owner_name: declaration[:name],
             comment_entries: pending_comments
@@ -1148,11 +1151,24 @@ module Ruby
         pending_comments = []
       end
 
+      declaration_entries = ruby_process_owner_entries(process_analysis)
+      legacy_owner_entries = legacy_ruby_analysis_owner_entries(source)
+      declaration_keys = declaration_entries.to_h { |entry| [entry[:path], true] }
+      declaration_entries += legacy_owner_entries.reject { |entry| declaration_keys[entry[:path]] }
+      declarations = declaration_entries.map do |entry|
+        {
+          path: entry[:path],
+          owner_kind: "declaration",
+          match_key: entry[:name]
+        }
+      end
+
       {
         kind: "ruby",
         dialect: "ruby",
         root_kind: "document",
         source: normalize_source(source),
+        tree_haver_process_analysis: process_analysis,
         owners: (requires + declarations).sort_by { |owner| owner[:path] },
         discovered_surfaces: discovered_surfaces,
         method_shadowing: ruby_method_shadowing(source),
@@ -1293,7 +1309,26 @@ module Ruby
       destination_requires + template_requires.reject { |entry| destination_paths[entry[:path]] }
     end
 
-    def collect_ruby_declaration_entries(source)
+    def collect_ruby_declaration_entries(source, process_analysis: nil)
+      process_entries = ruby_process_declaration_entries(source, process_analysis: process_analysis)
+      legacy_entries = legacy_collect_ruby_declaration_entries(source)
+      return legacy_entries if process_entries.empty?
+
+      legacy_candidates = legacy_entries + qualified_nested_declaration_entries(legacy_entries)
+      process_entries = process_entries.reject do |process_entry|
+        legacy_candidates.any? do |legacy_entry|
+          legacy_entry[:kind] == process_entry[:kind] &&
+            (legacy_entry[:name] == process_entry[:name] || legacy_entry[:name].to_s.end_with?("::#{process_entry[:name]}"))
+        end
+      end
+      process_keys = process_entries.to_h { |entry| [entry[:merge_key], true] }
+      return process_entries + legacy_entries.reject { |entry| process_keys[entry[:merge_key]] }
+    end
+
+    def legacy_collect_ruby_declaration_entries(source)
+      # TSLP process records are the preferred substrate. This legacy scanner only
+      # fills current TreeHaver adapter gaps such as Ruby module owners that the
+      # process API does not consistently expose yet.
       lines = normalize_source(source).split("\n")
       entries = []
       pending_comments = []
@@ -1356,6 +1391,107 @@ module Ruby
       end
 
       entries
+    end
+
+    def legacy_ruby_analysis_owner_entries(source)
+      normalize_source(source).split("\n").filter_map do |line|
+        declaration = declaration_for_line(line)
+        next unless declaration
+
+        {
+          path: "/declarations/#{declaration[:name]}",
+          name: declaration[:name],
+          kind: declaration[:kind],
+          merge_key: "#{declaration[:kind]}:#{declaration[:name]}"
+        }
+      end
+    end
+
+    def ruby_process_owner_entries(process_analysis)
+      Array(process_analysis&.structure).filter_map do |item|
+        kind = ruby_process_owner_kind(item)
+        name = item.name.to_s
+        next if kind.to_s.empty? || name.empty?
+
+        {
+          path: "/declarations/#{name}",
+          name: name,
+          kind: kind,
+          merge_key: "#{kind}:#{name}"
+        }
+      end
+    end
+
+    def ruby_process_declaration_entries(source, process_analysis: nil)
+      items = ruby_top_level_process_structure_items(process_analysis)
+      return [] if items.empty?
+
+      lines = normalize_source(source).split("\n")
+      items.map do |item|
+        start_index = attached_comment_start_index(lines, item.span.start_row)
+        finish_index = item.span.end_row
+        kind = ruby_process_structure_kind(item)
+        name = item.name.to_s
+        {
+          path: "/declarations/#{name}",
+          name: name,
+          kind: kind,
+          merge_key: "#{kind}:#{name}",
+          text: lines[start_index..finish_index].to_a.join("\n").strip
+        }
+      end
+    end
+
+    def ruby_top_level_process_structure_items(process_analysis)
+      items = Array(process_analysis&.structure).select do |item|
+        ruby_process_structure_kind(item) && !item.name.to_s.empty?
+      end
+      items.reject do |item|
+        items.any? do |candidate|
+          next false if candidate.equal?(item)
+
+          candidate.span.start_row <= item.span.start_row &&
+            candidate.span.end_row >= item.span.end_row &&
+            (candidate.span.start_row < item.span.start_row || candidate.span.end_row > item.span.end_row)
+        end
+      end.sort_by { |item| [item.span.start_row, item.span.start_col] }
+    end
+
+    def ruby_process_structure_item_at_line(process_analysis, line_number)
+      Array(process_analysis&.structure).find do |item|
+        ruby_process_owner_kind(item) &&
+        item.span.start_row == line_number - 1
+      end&.then do |item|
+        { kind: ruby_process_owner_kind(item), name: item.name.to_s }
+      end
+    end
+
+    def ruby_process_owner_kind(item)
+      case item.kind.to_s
+      when "class"
+        "class"
+      when "module"
+        "module"
+      when "method", "function"
+        "def"
+      end
+    end
+
+    def ruby_process_structure_kind(item)
+      case item.kind.to_s
+      when "class"
+        "class"
+      when "module"
+        "module"
+      end
+    end
+
+    def attached_comment_start_index(lines, declaration_index)
+      index = declaration_index.to_i
+      while index.positive? && comment_line?(lines[index - 1])
+        index -= 1
+      end
+      index
     end
 
     def merge_ruby_declaration_entry(template_entry, destination_entry)
