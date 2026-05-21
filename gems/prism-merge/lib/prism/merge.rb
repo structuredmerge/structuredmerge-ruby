@@ -461,8 +461,23 @@ module Prism
       {
         ok: true,
         diagnostics: [],
-        analysis: Ruby::Merge.analyze_ruby_document(source),
+        analysis: analyze_ruby_document(source, result),
         policies: []
+      }
+    end
+
+    def analyze_ruby_document(source, parse_result)
+      normalized_source = prism_ruby_normalize_source(source)
+      body = parse_result.value.statements&.body || []
+      {
+        kind: "ruby",
+        dialect: "ruby",
+        root_kind: "document",
+        source: normalized_source,
+        owners: prism_ruby_analysis_owners(body),
+        discovered_surfaces: prism_ruby_discovered_surfaces(normalized_source, body),
+        method_shadowing: [],
+        diagnostics: []
       }
     end
 
@@ -764,6 +779,188 @@ module Prism
 
     def unsupported_feature_result(message)
       Ruby::Merge.unsupported_feature_result(message)
+    end
+
+    def prism_ruby_analysis_owners(body)
+      require_index = 0
+      body.filter_map do |node|
+        if (require_path = prism_ruby_require_path(node))
+          owner = {
+            path: "/requires/#{require_index}",
+            owner_kind: "require",
+            match_key: require_path
+          }
+          require_index += 1
+          next owner
+        end
+
+        declaration_name = prism_ruby_declaration_name(node)
+        next unless declaration_name
+
+        {
+          path: "/declarations/#{declaration_name}",
+          owner_kind: "declaration",
+          match_key: declaration_name
+        }
+      end.sort_by { |owner| owner[:path] }
+    end
+
+    def prism_ruby_discovered_surfaces(source, body)
+      owners_by_line = body.filter_map do |node|
+        name = prism_ruby_declaration_name(node)
+        next unless name
+
+        [node.location.start_line, name]
+      end.to_h
+      surfaces = []
+      pending_comments = []
+
+      source.lines.each_with_index do |line, index|
+        line_number = index + 1
+        if prism_ruby_comment_line?(line)
+          pending_comments << { line: line_number, raw: line.chomp }
+          next
+        end
+
+        owner_name = owners_by_line[line_number]
+        if owner_name
+          owner_surfaces = prism_ruby_surfaces_for_owner(owner_name, pending_comments)
+          surfaces.concat(owner_surfaces)
+          pending_comments = []
+          next
+        end
+
+        pending_comments = [] unless line.strip.empty?
+      end
+
+      surfaces
+    end
+
+    def prism_ruby_surfaces_for_owner(owner_name, comment_entries)
+      filtered_entries = comment_entries.filter { |entry| prism_ruby_doc_comment_content?(entry.fetch(:raw)) }
+      return [] if filtered_entries.empty?
+
+      start_line = filtered_entries.first.fetch(:line)
+      end_line = filtered_entries.last.fetch(:line)
+      doc_surface = Ast::Merge.discovered_surface(
+        surface_kind: "ruby_doc_comment",
+        declared_language: "yard",
+        effective_language: "yard",
+        address: "document[0] > ruby_doc_comment[#{owner_name}]",
+        parent_address: "document[0]",
+        owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: "/declarations/#{owner_name}"),
+        span: Ast::Merge.surface_span(start_line: start_line, end_line: end_line),
+        reconstruction_strategy: "rewrite_with_prefix_preservation",
+        metadata: {
+          owner_signature: owner_name,
+          comment_prefix: prism_ruby_comment_prefix(filtered_entries.first.fetch(:raw)),
+          entries: filtered_entries.map { |entry| { line: entry.fetch(:line), raw: entry.fetch(:raw) } }
+        }
+      )
+
+      [doc_surface] + prism_ruby_example_surfaces(doc_surface)
+    end
+
+    def prism_ruby_example_surfaces(surface)
+      entries = Array(surface.dig(:metadata, :entries))
+      normalized = entries.map { |entry| prism_ruby_normalize_comment_content(entry.fetch(:raw)) }
+      normalized.each_with_index.filter_map do |content, tag_index|
+        next unless content.start_with?("@example")
+
+        body_start = tag_index + 1
+        body_end = prism_ruby_next_yard_tag_index(normalized, body_start) || normalized.length
+        next if body_start >= body_end
+
+        body_entries = entries[body_start...body_end]
+        next if body_entries.nil? || body_entries.empty?
+
+        declared_language = prism_ruby_declared_example_language(content) || "ruby"
+        Ast::Merge.discovered_surface(
+          surface_kind: "yard_example_block",
+          declared_language: declared_language,
+          effective_language: declared_language,
+          address: "#{surface.fetch(:address)} > yard_example[#{tag_index}]",
+          parent_address: surface.fetch(:address),
+          owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: surface.fetch(:address)),
+          span: Ast::Merge.surface_span(start_line: body_entries.first.fetch(:line), end_line: body_entries.last.fetch(:line)),
+          reconstruction_strategy: "rewrite_with_prefix_preservation",
+          metadata: {
+            tag_kind: "example",
+            tag_index: tag_index,
+            tag_text: content,
+            comment_prefix: surface.dig(:metadata, :comment_prefix)
+          }
+        )
+      end
+    end
+
+    def prism_ruby_declaration_name(node)
+      case node
+      when ::Prism::ClassNode, ::Prism::ModuleNode
+        node.constant_path.slice
+      when ::Prism::DefNode
+        node.name.to_s
+      end
+    end
+
+    def prism_ruby_require_path(node)
+      return unless node.is_a?(::Prism::CallNode)
+      return unless %i[require require_relative].include?(node.name)
+
+      argument = node.arguments&.arguments&.first
+      return unless argument.is_a?(::Prism::StringNode)
+
+      argument.unescaped
+    end
+
+    def prism_ruby_doc_comment_content?(raw)
+      content = prism_ruby_normalize_comment_content(raw)
+      return false if content.empty?
+      return false if content.start_with?(":nocov:")
+      return false if %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].any? { |prefix| content.start_with?("#{prefix}:") }
+
+      true
+    end
+
+    def prism_ruby_normalize_comment_content(raw)
+      stripped = raw.to_s.lstrip
+      return stripped unless stripped.start_with?("#")
+
+      stripped.delete_prefix("#").delete_prefix(" ").strip
+    end
+
+    def prism_ruby_comment_prefix(raw)
+      raw_text = raw.to_s
+      hash_index = raw_text.index("#")
+      return "# " unless hash_index
+
+      raw_text[0..hash_index] + (raw_text[hash_index + 1] == " " ? " " : "")
+    end
+
+    def prism_ruby_next_yard_tag_index(lines, start_index)
+      lines.each_with_index do |content, index|
+        next if index < start_index
+        return index if content.start_with?("@")
+      end
+      nil
+    end
+
+    def prism_ruby_declared_example_language(content)
+      marker = "@example ["
+      return unless content.start_with?(marker)
+
+      closing_index = content.index("]", marker.length)
+      return unless closing_index
+
+      content[marker.length...closing_index]
+    end
+
+    def prism_ruby_normalize_source(source)
+      source.to_s.gsub("\r\n", "\n").gsub("\r", "\n")
+    end
+
+    def prism_ruby_comment_line?(line)
+      line.lstrip.start_with?("#")
     end
 
     def edit_projection_rejection(source, path, code, message)

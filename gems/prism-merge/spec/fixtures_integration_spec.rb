@@ -252,6 +252,22 @@ RSpec.describe "Prism::Merge" do
     expect(json_ready(result)).to eq(json_ready(fixture[:expected_result]))
   end
 
+  it "builds the shared Ruby analysis from Prism nodes" do
+    analysis_fixture = read_json(fixtures_root.join("ruby", "slice-218-analysis", "module-owners.json"))
+    surfaces_fixture = read_json(
+      fixtures_root.join("ruby", "slice-220-discovered-surfaces", "doc-comment-surfaces.json")
+    )
+
+    analysis = PRISM_MERGE.parse_ruby(analysis_fixture[:source], analysis_fixture[:dialect])
+    surfaces_analysis = PRISM_MERGE.parse_ruby(surfaces_fixture[:source], "ruby")
+
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(analysis.dig(:analysis, :owners))).to eq(json_ready(analysis_fixture.dig(:expected, :owners)))
+    expect(json_ready(PRISM_MERGE.ruby_discovered_surfaces(surfaces_analysis[:analysis]))).to eq(
+      json_ready(surfaces_fixture[:expected])
+    )
+  end
+
   it "conforms to the shared Ruby family fixtures" do
     analysis_fixture = read_json(fixtures_root.join("ruby", "slice-218-analysis", "module-owners.json"))
     matching_fixture = read_json(fixtures_root.join("ruby", "slice-219-matching", "path-equality.json"))
