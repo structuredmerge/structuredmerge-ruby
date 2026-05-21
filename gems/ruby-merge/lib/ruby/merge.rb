@@ -24,9 +24,6 @@ module Ruby
     DIRECTIVE_LINE = /\A(?::nocov:|[\w-]+:(?:freeze|unfreeze))\z/
     MAGIC_COMMENT_PREFIXES = %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].freeze
     REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/.freeze
-    DSL_CALL_PATTERN = /^(?<name>source|gemspec|git_source|gem|eval_gemfile|platform|group|desc|task)\b/.freeze
-    RAKEFILE_DEFAULT_TASK_COMMENT = "# Define a base default task early so other files can enhance it."
-    RAKEFILE_DEFAULT_TASK_DESC = 'desc "Default tasks aggregator"'
     CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/.freeze
     MODULE_PATTERN = /^\s*module\s+([A-Z]\w*(?:::\w+)*)/.freeze
     DEF_PATTERN = /^\s*def\s+((?:self\.)?)([a-zA-Z_]\w*[!?=]?|\[\]=?|\+@|-@|\*\*|<<|>>|<=>|===|==|=~|!~|!=|[+\-*\/%&|^<>]=?|[!~`])/.freeze
@@ -1180,83 +1177,6 @@ module Ruby
         preamble << line.rstrip
       end
       preamble.join("\n").strip
-    end
-
-    def collect_top_level_dsl_entries(source)
-      lines = normalize_source(source).split("\n")
-      entries = []
-      pending_comments = []
-      index = 0
-
-      while index < lines.length
-        line = lines[index]
-        stripped = line.strip
-        if comment_line?(line)
-          pending_comments << index
-          index += 1
-          next
-        end
-        if stripped.empty?
-          pending_comments = []
-          index += 1
-          next
-        end
-        if REQUIRE_PATTERN.match?(line) || declaration_for_line(line)
-          pending_comments = []
-          index += 1
-          next
-        end
-
-        if line.match?(/\Abegin\b/)
-          start_index = pending_comments.first || index
-          finish_index = ruby_block_finish_index(lines, index)
-          text = lines[start_index..finish_index].join("\n").strip
-          signature = begin_block_signature(text)
-          entries << { path: "/dsl/#{signature}", name: "begin", signature: signature, text: text }
-          pending_comments = []
-          index = finish_index + 1
-          next
-        end
-
-        match = DSL_CALL_PATTERN.match(line)
-        unless match
-          pending_comments = []
-          index += 1
-          next
-        end
-
-        name = match[:name]
-        if name == "desc" && next_code_line_is_task?(lines, index + 1)
-          pending_comments << index
-          index += 1
-          next
-        end
-
-        start_index = pending_comments.first || index
-        finish_index = dsl_entry_finish_index(lines, index)
-        text = lines[start_index..finish_index].join("\n").strip
-        signature = dsl_entry_signature(name, line)
-        entries << { path: "/dsl/#{signature}", name: name, signature: signature, text: text } if signature
-        pending_comments = []
-        index = finish_index + 1
-      end
-
-      entries
-    end
-
-    def merge_top_level_dsl_entries(destination_entries, template_entries)
-      destination_by_signature = destination_entries.to_h { |entry| [entry[:signature], entry] }
-      template_singletons = template_entries.select { |entry| dsl_singleton_entry?(entry) }
-      template_singleton_signatures = template_singletons.map { |entry| entry[:signature] }.to_h { |signature| [signature, true] }
-      result = []
-      result.concat(template_singletons)
-      result.concat(destination_entries.reject { |entry| template_singleton_signatures[entry[:signature]] })
-      result.concat(
-        template_entries.reject do |entry|
-          dsl_singleton_entry?(entry) || destination_by_signature[entry[:signature]]
-        end
-      )
-      result
     end
 
     def ruby_file_footer_text(source)
@@ -2736,22 +2656,6 @@ module Ruby
       end
     end
 
-    def next_code_line_is_task?(lines, start_index)
-      lines[start_index..].to_a.each do |line|
-        next if line.strip.empty? || comment_line?(line)
-
-        match = DSL_CALL_PATTERN.match(line)
-        return match && match[:name] == "task"
-      end
-      false
-    end
-
-    def dsl_entry_finish_index(lines, start_index)
-      return start_index unless lines[start_index].match?(/\bdo\b/)
-
-      ruby_block_finish_index(lines, start_index)
-    end
-
     def ruby_block_finish_index(lines, start_index)
       depth = 0
       cursor = start_index
@@ -2765,95 +2669,6 @@ module Ruby
         cursor += 1
       end
       lines.length - 1
-    end
-
-    def begin_block_signature(text)
-      require_path = text[/^\s*require(?:_relative)?\s+["']([^"']+)["']/, 1]
-      return "begin:require:#{require_path}" if require_path
-
-      "begin:#{text.lines.first.to_s.strip}"
-    end
-
-    def dsl_entry_signature(name, line)
-      case name
-      when "source", "gemspec"
-        name
-      when "git_source", "gem", "eval_gemfile", "platform", "group", "task"
-        first_argument = line[/\b#{Regexp.escape(name)}\s*(?:\(|\s)\s*["']([^"']+)["']/, 1] ||
-          line[/\b#{Regexp.escape(name)}\s*(?:\(|\s)\s*:([a-zA-Z_]\w*[!?=]?)/, 1]
-        first_argument ? "#{name}:#{normalize_dsl_argument(name, first_argument)}" : "#{name}:#{line.strip}"
-      when "desc"
-        "desc:#{line.strip}"
-      end
-    end
-
-    def normalize_dsl_argument(name, argument)
-      return argument.gsub(%r{/r\d+/}, "/") if name == "eval_gemfile"
-
-      argument
-    end
-
-    def dsl_singleton_entry?(entry)
-      %w[source gemspec].include?(entry[:name])
-    end
-
-    def normalize_rakefile_default_task_scaffold(content)
-      lines = normalize_source(content).split("\n")
-      desc_index = lines.find_index { |line| line.strip == RAKEFILE_DEFAULT_TASK_DESC }
-      return content unless desc_index
-
-      comment_index = preceding_code_line_index(lines, desc_index - 1)
-      return content unless comment_index && lines[comment_index].strip == RAKEFILE_DEFAULT_TASK_COMMENT
-
-      next_code_index = next_code_line_index(lines, desc_index + 1)
-      return content if next_code_index && lines[next_code_index].match?(/\Atask\s+:default\b/)
-
-      task_index = lines.each_index.find { |index| lines[index].match?(/\Atask\s+:default\b/) }
-      return content unless task_index
-
-      finish_index = dsl_entry_finish_index(lines, task_index)
-      task_block = lines[task_index..finish_index]
-      lines[task_index..finish_index] = []
-      insertion_index = lines.find_index { |line| line.strip == RAKEFILE_DEFAULT_TASK_DESC } + 1
-      insertion = task_block.dup
-      insertion << "" unless lines[insertion_index].to_s.strip.empty?
-      lines.insert(insertion_index, *insertion)
-      "#{lines.join("\n").sub(/\n+\z/, "")}\n"
-    end
-
-    def normalize_nocov_require_blocks(content)
-      lines = normalize_source(content).split("\n")
-      index = 0
-
-      while index < lines.length
-        unless lines[index].match?(/\Arequire(?:_relative)?\s+["']/)
-          index += 1
-          next
-        end
-
-        opening_index = preceding_code_line_index(lines, index - 1)
-        unless opening_index && lines[opening_index].strip == "# :nocov:"
-          index += 1
-          next
-        end
-
-        if opening_index + 1 < index
-          lines.slice!(opening_index + 1, index - opening_index - 1)
-          index = opening_index + 1
-        end
-
-        closing_index = next_code_line_index(lines, index + 1)
-        if closing_index && lines[closing_index].strip == "# :nocov:"
-          lines.slice!(index + 1, closing_index - index - 1) if closing_index > index + 1
-        else
-          lines.insert(index + 1, "# :nocov:")
-        end
-        lines.slice!(index + 2) while lines[index + 2]&.strip == "# :nocov:"
-
-        index += 1
-      end
-
-      "#{lines.join("\n").sub(/\n+\z/, "")}\n"
     end
 
     def preceding_code_line_index(lines, start_index)
