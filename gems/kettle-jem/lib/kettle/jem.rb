@@ -3171,9 +3171,7 @@ module Kettle
     end
 
     def appraisal_names(content)
-      content.to_s.lines.filter_map do |line|
-        line[/^\s*appraise\s+["']([^"']+)["']\s+do\b/, 1]
-      end
+      appraisal_call_records(content).map { |record| record.fetch(:name) }
     end
 
     def ruby_appraisal_names_below(content, min_ruby)
@@ -3181,8 +3179,8 @@ module Kettle
 
       minimum = Gem::Version.new(min_ruby.to_s)
       appraisal_names(content).select do |name|
-        match = name.match(/\Aruby-(\d+)-(\d+)\z/)
-        match && Gem::Version.new("#{match[1]}.#{match[2]}") < minimum
+        version = ruby_appraisal_name_version(name)
+        version && version < minimum
       end
     rescue ArgumentError
       []
@@ -4251,71 +4249,62 @@ module Kettle
 
     def appraisal_blocks(content)
       lines = content.to_s.lines
-      prelude = []
       blocks = {}
       order = []
-      index = 0
-      while index < lines.length
-        line = lines[index]
-        match = line.match(/^\s*appraise\s+["']([^"']+)["']\s+do\b/)
-        unless match
-          prelude << line if blocks.empty?
-          index += 1
-          next
-        end
-
-        stop_index = skip_ruby_do_block(lines, index)
-        name = match[1]
+      records = appraisal_call_records(content)
+      records.each do |record|
+        name = record.fetch(:name)
         unless blocks.key?(name)
-          blocks[name] = lines[index...stop_index].join
+          blocks[name] = record.fetch(:source)
           order << name
         end
-        index = stop_index
       end
-      { prelude: prelude.join, blocks: blocks, order: order }
+      prelude_end = records.empty? ? lines.length : records.first.fetch(:start_line) - 1
+      prelude = lines[0...prelude_end].join
+      { prelude: prelude, blocks: blocks, order: order }
     end
 
     def prune_appraisals_below_min_ruby(content, min_ruby)
       return content if min_ruby.to_s.empty?
 
       minimum = Gem::Version.new(min_ruby.to_s)
-      lines = content.to_s.lines
-      kept = []
-      index = 0
-      while index < lines.length
-        line = lines[index]
-        match = line.match(/^\s*appraise\s+["']ruby-(\d+)-(\d+)["']\s+do\b/)
-        unless match
-          kept << line
-          index += 1
-          next
-        end
+      remove_indexes = Set.new
+      appraisal_call_records(content).each do |record|
+        version = ruby_appraisal_name_version(record.fetch(:name))
+        next unless version && version < minimum
 
-        appraisal_version = Gem::Version.new("#{match[1]}.#{match[2]}")
-        if appraisal_version >= minimum
-          kept << line
-          index += 1
-          next
-        end
-
-        index = skip_ruby_do_block(lines, index)
+        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
       end
+      kept = content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
       ensure_trailing_newline(kept.join.gsub(/\n{3,}/, "\n\n"))
     rescue ArgumentError
       content
     end
 
-    def skip_ruby_do_block(lines, start_index)
-      depth = 0
-      index = start_index
-      while index < lines.length
-        line = lines[index]
-        depth += line.scan(/\bdo\b/).length
-        depth -= 1 if line.match?(/^\s*end\b/)
-        index += 1
-        break if depth <= 0
+    def appraisal_call_records(content)
+      lines = content.to_s.lines
+      ruby_call_records(content, :appraise).filter_map do |call|
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          name: name,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+        }
       end
-      index
+    end
+
+    def ruby_appraisal_name_version(name)
+      text = name.to_s
+      return unless text.start_with?("ruby-")
+
+      major, minor, extra = text.delete_prefix("ruby-").split("-", -1)
+      return if extra || major.to_s.empty? || minor.to_s.empty?
+      return unless [major, minor].all? { |part| part.each_char.all? { |char| char >= "0" && char <= "9" } }
+
+      Gem::Version.new("#{major}.#{minor}")
     end
 
     def merge_gemspec_template_source(template_content, destination_content, facts: nil)
