@@ -2490,12 +2490,10 @@ module Kettle
     end
 
     def extract_gemspec_development_dependencies(gemspec)
-      gemspec.to_s.lines.filter_map do |line|
-        match = line.match(/^\s*\w+\.add_development_dependency\s*\(?\s*["']([^"']+)["'](.*)$/)
-        next unless match
+      gemspec_dependency_records(gemspec).filter_map do |record|
+        next unless record.fetch(:kind) == "add_development_dependency"
 
-        requirement = match[2].to_s[/,\s*["']([^"']+)["']/, 1]
-        { name: match[1], requirement: requirement }
+        { name: record.fetch(:name), requirement: record[:requirement] }
       end.uniq { |dependency| dependency.fetch(:name) }
     end
 
@@ -2624,7 +2622,7 @@ module Kettle
     end
 
     def gemspec_declares_version_gem?(content)
-      content.to_s.match?(/add_(?:runtime_)?dependency\s*(?:\(|\s)\s*["']version_gem["']/)
+      gemspec_dependency_records(content).any? { |record| record.fetch(:name) == "version_gem" && record.fetch(:kind) != "add_development_dependency" }
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -3964,7 +3962,9 @@ module Kettle
       result = prism_parse_success(content)
       return [] unless result
 
-      result.value.breadth_first_search_all { |node| node.is_a?(::Prism::CallNode) && node.name == call_name }
+      result.value.breadth_first_search_all do |node|
+        node.is_a?(::Prism::CallNode) && (call_name.nil? || node.name == call_name)
+      end
     end
 
     def commented_gem_dependency_records(content)
@@ -4004,7 +4004,11 @@ module Kettle
     end
 
     def ruby_string_argument(call)
-      argument = call&.arguments&.arguments&.first
+      ruby_string_argument_at(call, 0)
+    end
+
+    def ruby_string_argument_at(call, index)
+      argument = call&.arguments&.arguments&.[](index)
       argument.unescaped if argument.is_a?(::Prism::StringNode)
     end
 
@@ -4344,13 +4348,19 @@ module Kettle
     end
 
     def gemspec_block_param(source)
-      source.to_s[/Gem::Specification\.new\s+do\s+\|([^|]+)\|/, 1]&.strip
+      call = gemspec_new_call(source)
+      required = call&.block&.parameters&.parameters&.requireds&.first
+      required&.name&.to_s
     end
 
     def normalize_gemspec_receiver(line, from:, to:)
       return line if from.to_s.empty? || to.to_s.empty? || from == to
 
-      line.sub(/^(\s*)#{Regexp.escape(from)}\./, "\\1#{to}.")
+      leading = line.to_s.length - line.to_s.lstrip.length
+      stripped = line.to_s[leading..].to_s
+      return line unless stripped.start_with?("#{from}.")
+
+      "#{line.to_s[0...leading]}#{to}#{stripped[from.to_s.length..]}"
     end
 
     def normalize_gemspec_project_emoji(line, facts, receiver:, field:)
@@ -4388,8 +4398,8 @@ module Kettle
     end
 
     def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:)
-      destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver).transform_values do |line|
-        normalize_gemspec_receiver(line, from: destination_receiver, to: template_receiver)
+      destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver).transform_values do |source|
+        normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
       end
       return template_content if destination_dependencies.empty?
 
@@ -4436,9 +4446,22 @@ module Kettle
     end
 
     def replace_matching_gemspec_dependency_lines(content, destination_dependencies, receiver:)
-      content.to_s.lines.map do |line|
-        key = gemspec_dependency_line_key(line, receiver: receiver)
-        key && destination_dependencies[key] ? destination_dependencies[key] : line
+      replacements_by_line = gemspec_dependency_records(content, receiver: receiver).to_h do |record|
+        [record.fetch(:start_line), destination_dependencies[gemspec_dependency_record_key(record)]]
+      end.compact
+      skip_until = 0
+      content.to_s.lines.each_with_index.flat_map do |line, index|
+        line_number = index + 1
+        next [] if line_number < skip_until
+
+        replacement = replacements_by_line[line_number]
+        unless replacement
+          line
+        else
+          record = gemspec_dependency_records(content, receiver: receiver).find { |candidate| candidate.fetch(:start_line) == line_number }
+          skip_until = record.fetch(:end_line) + 1
+          replacement
+        end
       end.join
     end
 
@@ -4488,16 +4511,14 @@ module Kettle
     end
 
     def gemspec_dependency_line_index(source, receiver:)
-      source.to_s.lines.each_with_object({}) do |line, dependencies|
-        key = gemspec_dependency_line_key(line, receiver: receiver)
-        dependencies[key] ||= line if key
+      gemspec_dependency_records(source, receiver: receiver).each_with_object({}) do |record, dependencies|
+        key = gemspec_dependency_record_key(record)
+        dependencies[key] ||= record.fetch(:source)
       end
     end
 
     def gemspec_dependency_names(source)
-      source.to_s.lines.filter_map do |line|
-        line[/^\s*\w+\.add_(?:development_|runtime_)?dependency\s*(?:\(|\s)\s*["']([^"']+)["']/, 1]
-      end
+      gemspec_dependency_records(source).map { |record| record.fetch(:name) }
     end
 
     def gemspec_self_dependency_names(request, package_name)
@@ -4511,15 +4532,56 @@ module Kettle
       name = package_name.to_s
       return content if name.empty?
 
-      lines = content.to_s.lines.reject do |line|
-        line.match?(/^\s*#{Regexp.escape(receiver)}\.add_(?:development_|runtime_)?dependency\s*(?:\(|\s)\s*["']#{Regexp.escape(name)}["']/)
+      remove_indexes = Set.new
+      gemspec_dependency_records(content, receiver: receiver).each do |record|
+        next unless record.fetch(:name) == name
+
+        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
       end
+      lines = content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
     end
 
     def gemspec_dependency_line_key(line, receiver:)
-      match = line.to_s.match(/^\s*#{Regexp.escape(receiver)}\.(add_(?:development_|runtime_)?dependency)\s*\(?\s*["']([^"']+)["']/)
-      match && [match[1], match[2]]
+      record = gemspec_dependency_records(line, receiver: receiver).first
+      gemspec_dependency_record_key(record) if record
+    end
+
+    def gemspec_dependency_record_key(record)
+      [record.fetch(:kind), record.fetch(:name)]
+    end
+
+    def gemspec_dependency_records(source, receiver: nil)
+      lines = source.to_s.lines
+      ruby_call_records(source, nil).filter_map do |call|
+        kind = gemspec_dependency_call_kind(call)
+        next unless kind
+        next if receiver && call.receiver&.slice != receiver.to_s
+
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          kind: kind,
+          name: name,
+          requirement: ruby_string_argument_at(call, 1),
+          receiver: call.receiver&.slice,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+        }
+      end
+    end
+
+    def gemspec_dependency_call_kind(call)
+      case call.name
+      when :add_dependency, :add_runtime_dependency, :add_development_dependency
+        call.name.to_s
+      end
+    end
+
+    def gemspec_new_call(source)
+      ruby_call_records(source, :new).find { |call| call.receiver&.slice == "Gem::Specification" }
     end
 
     def template_file_type(recipe)
