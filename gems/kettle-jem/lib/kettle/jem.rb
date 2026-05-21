@@ -7130,39 +7130,19 @@ module Kettle
 
     def markdown_sections(content)
       lines = content.to_s.split("\n", -1)
-      headings = []
-      in_fence = false
-      fence_marker = nil
-      lines.each_with_index do |line, index|
-        stripped = line.lstrip
-        if in_fence
-          if stripped.match?(/\A#{Regexp.escape(fence_marker)}\s*\z/)
-            in_fence = false
-            fence_marker = nil
-          end
-          next
-        end
-        if (fence = stripped.match(/\A(`{3,}|~{3,})/))
-          in_fence = true
-          fence_marker = fence[1]
-          next
-        end
-        next unless (heading = line.match(/\A(\#{1,6})\s+(.+?)\s*#*\s*\z/))
-
-        headings << {
-          start: index,
-          level: heading[1].length,
-          heading: line,
-          heading_text: heading[2],
-          base: normalize_readme_heading(heading[2]),
+      markdown_heading_owners(content, source_label: "README.md").map do |owner|
+        start = owner.location.start_line - 1
+        branch_end = owner.location.end_line - 1
+        body = (lines[(start + 1)..branch_end] || []).join("\n")
+        {
+          start: start,
+          level: owner.level,
+          heading: owner.heading_source,
+          heading_text: owner.heading_text,
+          base: owner.base,
+          end: branch_end,
+          body: body,
         }
-      end
-
-      headings.each_with_index.map do |heading, index|
-        following = headings[(index + 1)..].to_a.find { |candidate| candidate.fetch(:level) <= heading.fetch(:level) }
-        branch_end = following ? following.fetch(:start) - 1 : lines.length - 1
-        body = (lines[(heading.fetch(:start) + 1)..branch_end] || []).join("\n")
-        heading.merge(end: branch_end, body: body)
       end
     end
 
