@@ -7452,81 +7452,121 @@ module Kettle
     end
 
     def rakefile_scaffold_delete_selectors(content)
-      lines = content.to_s.lines
       selectors = []
-      lines.each_with_index do |line, index|
-        case line
-        when /\A\s*require\s+["']bundler\/gem_tasks["']\s*(?:#.*)?\n?\z/
-          selectors << rakefile_selector(
-            "rakefile_scaffold_require_bundler_gem_tasks",
-            index + 1,
-            index + 1,
-            "wrapper_selected_scaffold_require"
-          )
-        when /\A\s*require\s+["']rspec\/core\/rake_task["']\s*(?:#.*)?\n?\z/
-          selectors << rakefile_selector(
-            "rakefile_scaffold_require_rspec_core_rake_task",
-            index + 1,
-            index + 1,
-            "wrapper_selected_scaffold_require"
-          )
-        when /\A\s*require\s+["']rubocop\/rake_task["']\s*(?:#.*)?\n?\z/
-          selectors << rakefile_selector(
-            "rakefile_scaffold_require_rubocop_rake_task",
-            index + 1,
-            index + 1,
-            "wrapper_selected_scaffold_require"
-          )
-        when /\A\s*RSpec::Core::RakeTask\.new\b/
-          selectors << rakefile_selector("rakefile_scaffold_rspec_task", index + 1, index + 1,
-            "wrapper_selected_scaffold_task")
-        when /\A\s*RuboCop::RakeTask\.new\b/
-          selectors << rakefile_selector("rakefile_scaffold_rubocop_task", index + 1, index + 1,
-            "wrapper_selected_scaffold_task")
+
+      rakefile_require_records(content).each do |record|
+        selector_id = case record.fetch(:name)
+        when "bundler/gem_tasks"
+          "rakefile_scaffold_require_bundler_gem_tasks"
+        when "rspec/core/rake_task"
+          "rakefile_scaffold_require_rspec_core_rake_task"
+        when "rubocop/rake_task"
+          "rakefile_scaffold_require_rubocop_rake_task"
         end
+        next unless selector_id
+
+        selectors << rakefile_selector(selector_id, record.fetch(:start_line), record.fetch(:end_line), "wrapper_selected_scaffold_require")
       end
-      selectors.concat(rakefile_task_block_selectors(lines))
+
+      rakefile_task_class_records(content).each do |record|
+        selector_id = case record.fetch(:receiver)
+        when "RSpec::Core::RakeTask"
+          "rakefile_scaffold_rspec_task"
+        when "RuboCop::RakeTask"
+          "rakefile_scaffold_rubocop_task"
+        end
+        next unless selector_id
+
+        selectors << rakefile_selector(selector_id, record.fetch(:start_line), record.fetch(:end_line), "wrapper_selected_scaffold_task")
+      end
+
+      selectors.concat(rakefile_task_block_selectors(content))
       selectors.sort_by { |selector| [selector.fetch(:start_line), selector.fetch(:end_line)] }
     end
 
-    def rakefile_task_block_selectors(lines)
-      selectors = []
-      index = 0
-      while index < lines.length
-        line = lines[index]
-        if line.match?(/\A\s*task\s+default:/) || line.match?(/\A\s*task\s+:default\b/)
-          unless rakefile_template_default_task?(lines, index)
-            end_index = rakefile_block_end(lines, index)
-            selectors << rakefile_selector("rakefile_scaffold_task_default", index + 1, end_index + 1,
-              "wrapper_selected_scaffold_task")
-            index = end_index + 1
-            next
-          end
-        end
-        index += 1
+    def rakefile_require_records(content)
+      top_level_ruby_call_records(content, :require).filter_map do |call|
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          name: name,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
       end
-      selectors
     end
 
-    def rakefile_template_default_task?(lines, task_index)
-      cursor = task_index - 1
+    def rakefile_task_class_records(content)
+      top_level_ruby_call_records(content, :new).filter_map do |call|
+        receiver = call.receiver&.slice
+        next unless %w[RSpec::Core::RakeTask RuboCop::RakeTask].include?(receiver)
+
+        {
+          receiver: receiver,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
+      end
+    end
+
+    def rakefile_task_block_selectors(content)
+      rakefile_default_task_records(content).filter_map do |record|
+        next if rakefile_template_default_task?(content, record)
+
+        rakefile_selector(
+          "rakefile_scaffold_task_default",
+          record.fetch(:start_line),
+          record.fetch(:end_line),
+          "wrapper_selected_scaffold_task"
+        )
+      end
+    end
+
+    def rakefile_default_task_records(content)
+      top_level_ruby_call_records(content, :task).filter_map do |call|
+        next unless rakefile_default_task_call?(call)
+
+        {
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
+      end
+    end
+
+    def rakefile_default_task_call?(call)
+      argument = call.arguments&.arguments&.first
+      case argument
+      when ::Prism::SymbolNode
+        argument.unescaped.to_s == "default"
+      when ::Prism::KeywordHashNode
+        argument.elements.any? { |element| element.key.is_a?(::Prism::SymbolNode) && element.key.unescaped.to_s == "default" }
+      else
+        false
+      end
+    end
+
+    def rakefile_template_default_task?(content, record)
+      desc_lines = top_level_ruby_call_records(content, :desc).filter_map do |call|
+        next unless ruby_string_argument(call) == "Default tasks aggregator"
+
+        call.location.start_line
+      end
+      desc_lines.include?(previous_nonblank_line_number(content, record.fetch(:start_line)))
+    end
+
+    def top_level_ruby_call_records(content, call_name)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.statements&.body.to_a.select { |node| node.is_a?(::Prism::CallNode) && node.name == call_name }
+    end
+
+    def previous_nonblank_line_number(content, line_number)
+      lines = content.to_s.lines
+      cursor = line_number - 2
       cursor -= 1 while cursor >= 0 && lines[cursor].strip.empty?
-      return false unless cursor >= 0
-
-      lines[cursor].strip == 'desc "Default tasks aggregator"'
-    end
-
-    def rakefile_block_end(lines, start_index)
-      return start_index unless lines[start_index].match?(/\bdo\b/)
-
-      depth = 0
-      (start_index...lines.length).each do |index|
-        stripped = lines[index].strip
-        depth += 1 if stripped.match?(/\bdo\b/)
-        return index if depth.positive? && stripped == "end" && (depth -= 1).zero?
-        return index if depth.zero? && index > start_index && !stripped.empty?
-      end
-      lines.length - 1
+      cursor >= 0 ? cursor + 1 : nil
     end
 
     def rakefile_selector(selector_id, start_line, end_line, reason)
