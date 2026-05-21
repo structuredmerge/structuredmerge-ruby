@@ -1490,6 +1490,25 @@ RSpec.describe Ast::Merge do
     expect(contracts.providers.fetch(0).parser_name).to eq(fixture.dig(:expected, :first_provider_parser))
   end
 
+  it "conforms to the slice-1010 native parser defaults fixture" do
+    fixture = read_json(fixtures_root.join("diagnostics", "slice-1010-native-parser-defaults", "native-parser-defaults.json"))
+    raw = fixture[:native_parser_defaults]
+    contract = described_class::NativeParserDefaultsContract.new(
+      contract_id: raw[:contract_id],
+      version: raw[:version],
+      defaults: raw[:defaults].map { |entry| described_class::NativeParserDefault.new(**entry) },
+      diagnostics: raw[:diagnostics]
+    )
+    ruby_defaults = contract.defaults.select { |entry| entry.implementation == "ruby" }
+    markdown_default = ruby_defaults.find { |entry| entry.family == "markdown" }
+
+    expect(contract.contract_id).to eq(fixture.dig(:expected, :contract_id))
+    expect(contract.defaults.length).to eq(fixture.dig(:expected, :default_count))
+    expect(ruby_defaults.map(&:default_provider_id)).to eq(fixture.dig(:expected, :ruby_defaults))
+    expect(markdown_default.default_backend).to eq(fixture.dig(:expected, :markdown_default_backend))
+    expect(contract.defaults.map(&:generic_substrate_backend).uniq).to eq([fixture.dig(:expected, :fallback_backend)])
+  end
+
   it "conforms to the slice-824 Go native proving ground fixture" do
     fixture = read_json(fixtures_root.join("diagnostics", "slice-824-go-native-proving-ground", "go-native-proving-ground.json"))
     report = described_class::NativeProviderProvingGroundReport.new(**fixture[:proving_ground])

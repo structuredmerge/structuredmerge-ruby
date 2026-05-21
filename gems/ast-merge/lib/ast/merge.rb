@@ -763,6 +763,8 @@ module Ast
     NativeProviderMetadataReport = Struct.new(:provider_id, :family, :host_language, :target_language, :parser_name, :parser_version, :language_version, :dialect, :parse_error_behavior, :source_span_support, :render_support, :semantic_role_support, :retains_native_tree, :native_tree_visibility, :metadata_policy, :diagnostics, keyword_init: true)
     HostLanguageNativeProviderContract = Struct.new(:provider_id, :host_language, :target_language, :parser_name, keyword_init: true)
     HostLanguageNativeProviderContracts = Struct.new(:suite_id, :version, :providers, :diagnostics, keyword_init: true)
+    NativeParserDefault = Struct.new(:implementation, :family, :default_provider_id, :default_backend, :default_parser, :generic_substrate_provider_id, :generic_substrate_backend, :fallback_behavior, :scope, keyword_init: true)
+    NativeParserDefaultsContract = Struct.new(:contract_id, :version, :defaults, :diagnostics, keyword_init: true)
     NativeProviderProvingGroundReport = Struct.new(:report_id, :version, :language, :providers, :checks, :diagnostics, keyword_init: true)
     GoDSTProviderStackReport = Struct.new(:provider_id, :module, :backend_family, :language, :role, :compares_with, :diagnostics, keyword_init: true)
     GoProviderComparisonReport = Struct.new(:comparison_id, :version, :language, :providers, :dimensions, :diagnostics, keyword_init: true)
