@@ -55,7 +55,7 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ### Removal Mode Scope
 
-`remove_template_missing_nodes: true` in `markly-merge` currently follows the shared `markdown-merge` full-document contract:
+`remove_template_missing_nodes: true` in `markly-merge` follows the shared `markdown-merge` full-document contract:
 
 - removes **top-level destination-only structural blocks**
 - preserves **standalone HTML comment-only fragments**, **link reference definitions**, and **freeze blocks**

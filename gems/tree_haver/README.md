@@ -690,7 +690,7 @@ TreeHaver.backend = :mri     # Use ruby_tree_sitter (MRI only, C extension)
 TreeHaver.backend = :rust    # Use tree_stump (MRI, Rust extension with precompiled binaries)
                              # Note: Use tree_stump v0.2.0 or newer (fixes are released).
 TreeHaver.backend = :ffi     # Use FFI bindings (works on MRI and JRuby)
-TreeHaver.backend = :java    # Use Java bindings (JRuby only, coming soon)
+TreeHaver.backend = :java    # Use Java bindings (JRuby only)
 TreeHaver.backend = :citrus  # Use Citrus pure Ruby parser
                              # NOTE: Portable, all Ruby implementations
                              # CAVEAT: few major language grammars, but many esoteric grammars
@@ -1353,7 +1353,7 @@ tree.edit(
 new_tree = parser.parse_string(tree, "x = 42")
 ```
 
-**Note:** Incremental parsing requires the MRI (`ruby_tree_sitter`), Rust (`tree_stump`), or Java (`java-tree-sitter` / `jtreesitter`) backend. The FFI, Citrus, and Parslet backends do not currently support incremental parsing. You can check support with:
+**Note:** Incremental parsing requires the MRI (`ruby_tree_sitter`), Rust (`tree_stump`), or Java (`java-tree-sitter` / `jtreesitter`) backend. The FFI, Citrus, and Parslet backends do not support incremental parsing. You can check support with:
 
 ```ruby
 tree.supports_editing?  # => true if edit() is available

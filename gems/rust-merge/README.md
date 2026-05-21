@@ -145,7 +145,7 @@ context = Rust::Merge.rust_plan_context
 backends = Rust::Merge.available_rust_backends
 ```
 
-The Ruby implementation currently uses the shared language-pack backend and returns diagnostics for unsupported dialects or unavailable parsers.
+The Ruby implementation uses the shared language-pack backend and returns diagnostics for unsupported dialects or unavailable parsers.
 
 ## 🔧 Basic Usage
 

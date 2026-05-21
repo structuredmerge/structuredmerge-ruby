@@ -185,7 +185,7 @@ cd /path/to/gem && rm -rf *.gem && SKIP_GEM_SIGNING=true gem build *.gemspec && 
 ```
 
 - `SKIP_GEM_SIGNING=true` bypasses the PEM passphrase prompt for signed gemspecs.
-- `--force` overwrites the currently installed version.
+- `--force` overwrites the installed version.
 - Always rebuild **and** reinstall before verifying cross-repo behaviour.
 
 ### Coverage Reports

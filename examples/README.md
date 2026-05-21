@@ -27,7 +27,5 @@ mutation, so dependency resolution stays under Bundler and the root Gemfile.
 ## Shared Scenarios
 
 The cross-language scenario runner lives in `structuredmerge/spec/examples`.
-For now it delegates the Ruby implementation to `examples/bin/run-scenario`.
-When Go, Rust, and TypeScript adapters are ready, the shared runner can invoke
-them against the same scenario directories.
-
+It delegates the Ruby implementation to `examples/bin/run-scenario`.
+Go, Rust, and TypeScript adapters use the same scenario directory contract.

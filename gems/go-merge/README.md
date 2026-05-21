@@ -146,7 +146,7 @@ context = Go::Merge.go_plan_context
 backends = Go::Merge.available_go_backends
 ```
 
-The Ruby implementation currently uses the shared language-pack backend. Unsupported dialects or backends return structured diagnostics.
+The Ruby implementation uses the shared language-pack backend. Unsupported dialects or backends return structured diagnostics.
 
 ## 🔧 Basic Usage
 
