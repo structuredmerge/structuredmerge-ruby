@@ -347,14 +347,14 @@ module Kettle
           return nil unless gemspec_path
 
           content = File.read(gemspec_path)
-          homepage_line = content.lines.find { |line| line.match?(/\bspec\.homepage\s*=/) }
+          homepage_record = Kettle::Jem.gemspec_assignment_record(content, "spec.homepage")
           return {
             name: "gemspec_homepage_literal",
             status: "skipped",
             reason: "missing_homepage",
-          } unless homepage_line
+          } unless homepage_record
 
-          assigned = homepage_line.split("=", 2).last.to_s.strip
+          assigned = homepage_record[:value]
           return {
             name: "gemspec_homepage_literal",
             path: File.basename(gemspec_path),
@@ -371,7 +371,15 @@ module Kettle
           } if org.to_s.empty? || gem_name.to_s.empty?
 
           homepage = "https://github.com/#{org}/#{gem_name}"
-          updated = content.sub(homepage_line, homepage_line.sub(/=.*/, "= #{homepage.dump}\n"))
+          receiver = homepage_record.fetch(:receiver)
+          field = homepage_record.fetch(:field)
+          indent = Kettle::Jem.leading_whitespace(homepage_record.fetch(:source))
+          updated = Kettle::Jem.replace_source_range_lines(
+            content,
+            homepage_record.fetch(:start_line),
+            homepage_record.fetch(:end_line),
+            "#{indent}#{receiver}.#{field} = #{homepage.dump}\n"
+          )
           File.write(gemspec_path, updated) if updated != content
           {
             name: "gemspec_homepage_literal",
