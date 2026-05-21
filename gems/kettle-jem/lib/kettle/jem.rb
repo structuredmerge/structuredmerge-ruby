@@ -3208,28 +3208,18 @@ module Kettle
     end
 
     def normalize_generated_rakefile(content)
-      strip_orphaned_rake_task_requires(content.to_s).gsub(
-        /^require "kettle\/dev"\n/,
-        <<~RUBY
-          begin
-            require "kettle/dev"
-          rescue LoadError
-            warn("NOTE: kettle-dev isn't installed, or is disabled for \#{RUBY_VERSION} in the current environment")
-          end
-        RUBY
-      )
+      strip_orphaned_rake_task_requires(content.to_s)
     end
 
     def strip_orphaned_rake_task_requires(content)
       guarded_requires = %w[kettle/dev kettle/jem stone_checksums]
-      previous_significant = nil
-      content.to_s.lines.filter_map do |line|
-        required = line[/^\s*require\s+["']([^"']+)["']\s*$/, 1]
-        orphaned_task_require = required && guarded_requires.include?(required) && previous_significant != "begin"
-        stripped = line.strip
-        previous_significant = stripped unless stripped.empty? || stripped.start_with?("#")
-        orphaned_task_require ? nil : line
-      end.join
+      remove_indexes = Set.new
+      ruby_top_level_require_records(content).each do |record|
+        next unless guarded_requires.include?(record.fetch(:name))
+
+        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
+      end
+      content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join
     end
 
     def apply_template_source(project_root, recipe, original, facts: nil)
@@ -3987,6 +3977,22 @@ module Kettle
           name: name,
           start_line: call.location.start_line,
           end_line: call.location.end_line,
+        }
+      end
+    end
+
+    def ruby_top_level_require_records(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      body.filter_map do |node|
+        next unless node.is_a?(::Prism::CallNode) && node.name == :require
+
+        name = ruby_string_argument(node)
+        next unless name
+
+        {
+          name: name,
+          start_line: node.location.start_line,
+          end_line: node.location.end_line,
         }
       end
     end
