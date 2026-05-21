@@ -3195,7 +3195,7 @@ RSpec.describe Kettle::Jem do
         "template/Gemfile.example" => <<~RUBY,
           source "https://gem.coop"
           gemspec
-          eval_gemfile "gemfiles/modular/style.gemfile"
+          eval_gemfile "gemfiles/modular/style.gemfile" if ENV.fetch("K_JEM_STYLE", "false").casecmp?("true").zero?
           gem "appraisal"
           gem "example", path: "."
           gem "rake"
@@ -3250,7 +3250,7 @@ RSpec.describe Kettle::Jem do
       gemfile_content = gemfile_report.fetch(:final_content)
       expect(gemfile_content).to include('source "https://gem.coop"')
       expect(gemfile_content).to include("gemspec")
-      expect(gemfile_content.scan('eval_gemfile "gemfiles/modular/style.gemfile"').size).to eq(1)
+      expect(gemfile_content).to include('eval_gemfile "gemfiles/modular/style.gemfile" if ENV.fetch("K_JEM_STYLE", "false").casecmp?("true").zero?')
       expect(gemfile_content).to include('gem "rspec"')
       expect(gemfile_content).to include('gem "rake"')
       expect(gemfile_content).not_to include('gem "appraisal"')

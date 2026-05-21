@@ -3609,6 +3609,7 @@ module Kettle
       if merge_result[:ok]
         output = merge_result.fetch(:output)
         if file_type == :gemfile
+          output = merge_gemfile_eval_gemfile_statements(template_content, output)
           output = merge_gemfile_eval_bucket_entries(template_content, output)
           return finalize_gemfile_template_source(recipe, output, destination_content, facts: facts, template_content: template_content)
         end
@@ -3901,6 +3902,64 @@ module Kettle
       insert_at ||= lines.length
       lines[insert_at, 0] = missing_lines
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def merge_gemfile_eval_gemfile_statements(template_content, merged_content)
+      template_entries = gemfile_eval_gemfile_statement_entries(template_content)
+      return merged_content if template_entries.empty?
+
+      template_by_path = template_entries.to_h { |entry| [entry.fetch(:path), entry] }
+      merged_entries = gemfile_eval_gemfile_statement_entries(merged_content).select do |entry|
+        template_by_path.key?(entry.fetch(:path))
+      end
+      return merged_content if merged_entries.empty?
+
+      lines = merged_content.to_s.lines
+      merged_entries.sort_by { |entry| entry.fetch(:start_line) }.reverse_each do |entry|
+        template_entry = template_by_path.fetch(entry.fetch(:path))
+        lines[(entry.fetch(:start_line) - 1)..(entry.fetch(:end_line) - 1)] = template_entry.fetch(:source_lines)
+      end
+      ensure_trailing_newline(lines.join)
+    end
+
+    def gemfile_eval_gemfile_statement_entries(content)
+      parse_result = ::Prism.parse(content.to_s)
+      return [] unless parse_result.success?
+
+      statements = parse_result.value.statements&.body || []
+      statements.filter_map do |statement|
+        call = eval_gemfile_call_from_statement(statement)
+        path = string_literal_content(call&.arguments&.arguments&.first)
+        next unless path
+
+        {
+          path: path,
+          start_line: statement.location.start_line,
+          end_line: statement.location.end_line,
+          source_lines: content.to_s.lines[(statement.location.start_line - 1)..(statement.location.end_line - 1)] || [],
+        }
+      end
+    end
+
+    def eval_gemfile_call_from_statement(statement)
+      return statement if eval_gemfile_call?(statement)
+
+      if statement.is_a?(::Prism::IfNode)
+        body = statement.statements&.body
+        return body.first if body&.length == 1 && eval_gemfile_call?(body.first)
+      end
+
+      nil
+    end
+
+    def eval_gemfile_call?(node)
+      node.is_a?(::Prism::CallNode) && node.name == :eval_gemfile
+    end
+
+    def string_literal_content(node)
+      return unless node.is_a?(::Prism::StringNode)
+
+      node.unescaped
     end
 
     def gemfile_eval_bucket_entries(content)
