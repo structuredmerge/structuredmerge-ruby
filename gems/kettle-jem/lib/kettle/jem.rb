@@ -3676,23 +3676,10 @@ module Kettle
       minimum = Gem::Version.new(min_ruby)
       lines = content.to_s.lines
       remove_indexes = Set.new
-      index = 0
-      while index < lines.length
-        line = lines[index]
-        match = line.match(/^(\s*)-\s+/)
-        unless match
-          index += 1
-          next
-        end
+      yaml_mapping_nodes(content).each do |mapping|
+        next unless prune_workflow_matrix_item?(mapping, minimum)
 
-        start_index = index
-        item_indent = match[1].length
-        index += 1
-        index += 1 while index < lines.length && !matrix_item_boundary?(lines[index], item_indent)
-        block = lines[start_index...index]
-        next unless prune_workflow_matrix_item?(block, minimum)
-
-        (start_index...index).each { |line_index| remove_indexes << line_index }
+        (mapping.start_line...mapping.end_line).each { |line_index| remove_indexes << line_index }
       end
 
       return content if remove_indexes.empty?
@@ -3702,25 +3689,47 @@ module Kettle
       content
     end
 
-    def matrix_item_boundary?(line, item_indent)
-      return false if line.strip.empty?
-
-      indent = line[/\A */].length
-      indent <= item_indent && line.match?(/^\s*-\s+/)
+    def yaml_mapping_nodes(content)
+      root = Psych.parse_stream(content.to_s)
+      nodes = []
+      stack = [root]
+      until stack.empty?
+        node = stack.pop
+        nodes << node if node.is_a?(Psych::Nodes::Mapping)
+        stack.concat(Array(node.respond_to?(:children) ? node.children : nil))
+      end
+      nodes
     end
 
-    def prune_workflow_matrix_item?(lines, minimum)
-      lines.any? do |line|
-        ruby = line[/^\s*(?:-\s*)?ruby:\s*["']?([^"'\s]+)["']?/, 1]
-        ruby && Gem::Version.new(ruby) < minimum
-      rescue ArgumentError
-        false
-      end || lines.any? do |line|
-        match = line.match(/^\s*(?:-\s*)?appraisal:\s*["']?ruby-(\d+)-(\d+)["']?/)
-        match && Gem::Version.new("#{match[1]}.#{match[2]}") < minimum
-      rescue ArgumentError
-        false
+    def prune_workflow_matrix_item?(mapping, minimum)
+      ruby = yaml_mapping_scalar_value(mapping, "ruby")
+      return true if ruby && Gem::Version.new(ruby) < minimum
+
+      appraisal_ruby_version = appraisal_ruby_version(yaml_mapping_scalar_value(mapping, "appraisal"))
+      appraisal_ruby_version && Gem::Version.new(appraisal_ruby_version) < minimum
+    rescue ArgumentError
+      false
+    end
+
+    def yaml_mapping_scalar_value(mapping, key)
+      mapping.children.each_slice(2) do |key_node, value_node|
+        next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+        next unless value_node.is_a?(Psych::Nodes::Scalar)
+
+        return value_node.value.to_s
       end
+      nil
+    end
+
+    def appraisal_ruby_version(value)
+      parts = value.to_s.split("-")
+      return nil unless parts.length == 3 && parts.first == "ruby"
+
+      major = Integer(parts[1], exception: false)
+      minor = Integer(parts[2], exception: false)
+      return nil unless major && minor
+
+      "#{major}.#{minor}"
     end
 
     def ruby_method_move_policy(recipe)
