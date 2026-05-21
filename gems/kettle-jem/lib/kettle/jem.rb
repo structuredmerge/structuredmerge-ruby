@@ -3640,20 +3640,34 @@ module Kettle
     end
 
     def local_gems_assignment(content)
-      match = content.to_s.match(/^\s*local_gems\s*=\s*%w\[(.*?)^\s*\]/m)
-      return [] unless match
-
-      match[1].split(/\s+/).reject(&:empty?)
+      local_gems_assignment_record(content)&.fetch(:names) || []
     end
 
     def replace_local_gems_assignment(content, gems)
       replacement = ["local_gems = %w["]
       gems.each { |gem_name| replacement << "  #{gem_name}" }
       replacement << "]"
-      if content.to_s.match?(/^\s*local_gems\s*=\s*%w\[.*?^\s*\]/m)
-        content.to_s.sub(/^\s*local_gems\s*=\s*%w\[.*?^\s*\]/m, replacement.join("\n"))
+      if (record = local_gems_assignment_record(content))
+        replace_source_range_lines(content, record.fetch(:start_line), record.fetch(:end_line), ensure_trailing_newline(replacement.join("\n")))
       else
         ensure_trailing_newline([content.to_s.rstrip, replacement.join("\n")].reject(&:empty?).join("\n\n"))
+      end
+    end
+
+    def local_gems_assignment_record(content)
+      result = prism_parse_success(content)
+      return unless result
+
+      result.value.breadth_first_search_all do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) &&
+          node.name == :local_gems &&
+          ruby_word_array_node?(node.value)
+      end.first&.then do |node|
+        {
+          names: ruby_word_array_names(node.value),
+          start_line: node.location.start_line,
+          end_line: node.location.end_line,
+        }
       end
     end
 
@@ -3820,20 +3834,39 @@ module Kettle
     end
 
     def gemfile_percent_w_names(content)
-      content.to_s.scan(/%w\[(.*?)^\s*\]/m).flat_map do |match|
-        match.first.split(/\s+/)
-      end.reject(&:empty?)
+      ruby_word_array_records(content).flat_map { |record| record.fetch(:names) }.reject(&:empty?)
     end
 
     def insert_gemfile_dependency_blocks(content, blocks)
       lines = content.to_s.lines
-      insert_at = lines.index { |line| line.match?(/^\s*(?:gem|group|platforms|if|unless)\b/) } || lines.length
+      insert_at = gemfile_dependency_insertion_line(content)
       while insert_at.positive? && lines[insert_at - 1].strip.empty?
         insert_at -= 1
       end
       insertion = blocks.map { |block| block.strip }.join("\n\n")
       lines.insert(insert_at, "#{insertion}\n\n")
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def gemfile_dependency_insertion_line(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      node = body.find do |statement|
+        gemfile_dependency_statement?(statement)
+      end
+      return content.to_s.lines.length unless node
+
+      node.location.start_line - 1
+    end
+
+    def gemfile_dependency_statement?(node)
+      case node
+      when ::Prism::CallNode
+        %i[gem group platforms].include?(node.name)
+      when ::Prism::IfNode, ::Prism::UnlessNode
+        true
+      else
+        false
+      end
     end
 
     def apply_commented_gem_dependency_policy(template_content, content)
@@ -4025,15 +4058,68 @@ module Kettle
       names = gem_names.map(&:to_s).reject(&:empty?).uniq
       return content if names.empty?
 
-      replaced = content.to_s.gsub(/%w\[(.*?)^\s*\]/m) do |block|
-        if block.lines.one?
-          words = block[/\A%w\[(.*)\]\z/, 1].to_s.split(/\s+/).reject { |word| names.include?(word) }
-          "%w[#{words.join(" ")}]"
+      replacements = ruby_word_array_records(content).filter_map do |record|
+        kept = record.fetch(:names).reject { |word| names.include?(word) }
+        next if kept == record.fetch(:names)
+
+        replacement = if record.fetch(:source).lines.one?
+          "%w[#{kept.join(" ")}]"
         else
-          block.lines.reject { |line| names.include?(line.strip) }.join
+          ruby_multiline_word_array_source(kept, indent: record.fetch(:start_column))
         end
+        { start_offset: record.fetch(:start_offset), end_offset: record.fetch(:end_offset), replacement: replacement }
       end
+      return content if replacements.empty?
+
+      replaced = replace_source_offsets(content, replacements)
       ensure_trailing_newline(replaced.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def ruby_word_array_records(content)
+      ruby_word_array_nodes(content).map do |node|
+        {
+          names: ruby_word_array_names(node),
+          source: node.location.slice,
+          start_line: node.location.start_line,
+          end_line: node.location.end_line,
+          start_column: node.location.start_column,
+          start_offset: node.location.start_offset,
+          end_offset: node.location.end_offset,
+        }
+      end
+    end
+
+    def ruby_word_array_nodes(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        ruby_word_array_node?(node)
+      end
+    end
+
+    def ruby_word_array_node?(node)
+      node.is_a?(::Prism::ArrayNode) && node.opening_loc&.slice.to_s.start_with?("%w[")
+    end
+
+    def ruby_word_array_names(node)
+      node.elements.filter_map do |element|
+        element.unescaped if element.is_a?(::Prism::StringNode)
+      end
+    end
+
+    def ruby_multiline_word_array_source(names, indent:)
+      prefix = " " * indent.to_i
+      element_prefix = "#{prefix}  "
+      ([ "#{prefix}%w[" ] + names.map { |name| "#{element_prefix}#{name}" } + [ "#{prefix}]" ]).join("\n")
+    end
+
+    def replace_source_offsets(content, replacements)
+      output = content.to_s.dup
+      replacements.sort_by { |replacement| -replacement.fetch(:start_offset) }.each do |replacement|
+        output[replacement.fetch(:start_offset)...replacement.fetch(:end_offset)] = replacement.fetch(:replacement)
+      end
+      output
     end
 
     def merge_gemfile_eval_bucket_entries(template_content, merged_content)

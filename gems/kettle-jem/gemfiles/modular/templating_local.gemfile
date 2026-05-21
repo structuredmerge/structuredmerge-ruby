@@ -4,6 +4,7 @@
 # Loaded by the associated non-local gemfile when SMORG_RB_DEV != "false".
 
 require "nomono/bundler" unless defined?(Nomono)
+
 local_gems = %w[
   tree_haver
   ast-merge
