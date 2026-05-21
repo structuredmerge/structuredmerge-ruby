@@ -36,7 +36,7 @@ RSpec.describe Ast::Template do
     when "toml"
       Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
     when "ruby"
-      Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+      Prism::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
     else
       {
         ok: false,
@@ -1679,6 +1679,30 @@ RSpec.describe Ast::Template do
     end
   end
 
+  it "prefers the native Prism adapter for Ruby template sessions" do
+    registry = described_class.default_family_merge_adapter_registry(["ruby"])
+    result = registry.fetch("ruby").call(
+      prepared_template_content: <<~RUBY,
+        module Demo
+          def template_added
+            true
+          end
+        end
+      RUBY
+      destination_content: <<~RUBY
+        module Demo
+          def destination_owned
+            true
+          end
+        end
+      RUBY
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include("def destination_owned")
+    expect(result[:output]).to include("def template_added")
+  end
+
   def markdown_adapter(entry)
     Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
   end
@@ -1688,7 +1712,7 @@ RSpec.describe Ast::Template do
   end
 
   def ruby_adapter(entry)
-    Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+    Prism::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
   end
 
   def request_with_resolved_fixture_paths(request, fixture_dir)

@@ -220,11 +220,18 @@ module Ast
         end
         if include_family.call("ruby")
           begin
-            require "ruby-merge"
+            require "prism-merge"
             registry["ruby"] = lambda do |entry|
-              Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+              Prism::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
             end
           rescue LoadError
+            begin
+              require "ruby-merge"
+              registry["ruby"] = lambda do |entry|
+                Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+              end
+            rescue LoadError
+            end
           end
         end
 

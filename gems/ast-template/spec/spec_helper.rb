@@ -7,7 +7,7 @@ require "tmpdir"
 require "ast-template"
 require "markdown-merge"
 require "toml-merge"
-require "ruby-merge"
+require "prism-merge"
 
 RSpec.configure do |config|
   config.disable_monkey_patching!
