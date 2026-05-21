@@ -3761,12 +3761,19 @@ module Kettle
     def merge_ruby_template_source(file_type, recipe, template_content, destination_content)
       return merge_prism_gemfile_template_source(template_content, destination_content) if file_type == :gemfile
 
-      Ruby::Merge.merge_ruby(
+      result = Prism::Merge.merge_ruby(
         template_content,
         destination_content,
         "ruby",
-        **ruby_merge_options(recipe, merge_template_requires: file_type == :rakefile)
+        preference: :destination,
+        add_template_only_nodes: true,
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator,
+        **prism_ruby_merge_options(recipe)
       )
+      if file_type == :ruby && result[:ok]
+        result = result.merge(output: remove_template_only_require_calls(template_content, destination_content, result.fetch(:output)))
+      end
+      result
     end
 
     def merge_prism_gemfile_template_source(template_content, destination_content)
@@ -3778,6 +3785,12 @@ module Kettle
         add_template_only_nodes: true,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator
       )
+    end
+
+    def prism_ruby_merge_options(recipe)
+      {
+        method_move_policy: ruby_method_move_policy(recipe),
+      }
     end
 
     def merge_gemfile_template_policy(content, facts:, template_content: nil)
@@ -3907,10 +3920,7 @@ module Kettle
     end
 
     def gemfile_gem_call_records(content)
-      result = prism_parse_success(content)
-      return [] unless result
-
-      result.value.breadth_first_search_all { |node| node.is_a?(::Prism::CallNode) && node.name == :gem }.filter_map do |call|
+      ruby_call_records(content, :gem).filter_map do |call|
         name = ruby_string_argument(call)
         next unless name
 
@@ -3920,6 +3930,43 @@ module Kettle
           end_line: call.location.end_line,
         }
       end
+    end
+
+    def remove_template_only_require_calls(template_content, destination_content, merged_content)
+      template_requires = ruby_require_call_records(template_content).map { |record| record.fetch(:name) }
+      destination_requires = ruby_require_call_records(destination_content).map { |record| record.fetch(:name) }
+      removable = template_requires - destination_requires
+      return merged_content if removable.empty?
+
+      remove_indexes = Set.new
+      ruby_require_call_records(merged_content).each do |record|
+        next unless removable.include?(record.fetch(:name))
+
+        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
+      end
+      ensure_trailing_newline(
+        merged_content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n")
+      )
+    end
+
+    def ruby_require_call_records(content)
+      ruby_call_records(content, :require).filter_map do |call|
+        name = ruby_string_argument(call)
+        next unless name
+
+        {
+          name: name,
+          start_line: call.location.start_line,
+          end_line: call.location.end_line,
+        }
+      end
+    end
+
+    def ruby_call_records(content, call_name)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all { |node| node.is_a?(::Prism::CallNode) && node.name == call_name }
     end
 
     def commented_gem_dependency_records(content)
