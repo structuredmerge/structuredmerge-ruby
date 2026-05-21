@@ -7,6 +7,7 @@ RUBY_MERGE = ::Ruby::Merge
 RSpec.describe "Ruby::Merge" do
   RubyMergeSpecSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
   RubyMergeSpecStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
+  RubyMergeSpecImportItem = Struct.new(:source, :span, keyword_init: true)
   RubyMergeSpecProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
 
   def fixtures_root
@@ -26,6 +27,13 @@ RSpec.describe "Ruby::Merge" do
       kind: kind,
       name: name,
       span: RubyMergeSpecSpan.new(start_row: start_row, start_col: 0, end_row: end_row, end_col: 3)
+    )
+  end
+
+  def import_item(source:, start_row:, end_row:)
+    RubyMergeSpecImportItem.new(
+      source: source,
+      span: RubyMergeSpecSpan.new(start_row: start_row, start_col: 0, end_row: end_row, end_col: 14)
     )
   end
 
@@ -65,6 +73,33 @@ RSpec.describe "Ruby::Merge" do
         path: "/declarations/TemplateOwned",
         owner_kind: "declaration",
         match_key: "TemplateOwned"
+      }
+    )
+  end
+
+  it "uses TSLP import records for parser-backed Ruby require owners" do
+    source = <<~RUBY
+      require "json"
+      require "set"
+    RUBY
+    process_analysis = RubyMergeSpecProcessAnalysis.new(
+      structure: [],
+      imports: [
+        import_item(source: "json", start_row: 0, end_row: 0),
+        import_item(source: "set", start_row: 1, end_row: 1)
+      ]
+    )
+
+    expect(RUBY_MERGE.analyze_ruby_document(source, process_analysis: process_analysis).fetch(:owners)).to contain_exactly(
+      {
+        path: "/requires/0",
+        owner_kind: "require",
+        match_key: "json"
+      },
+      {
+        path: "/requires/1",
+        owner_kind: "require",
+        match_key: "set"
       }
     )
   end

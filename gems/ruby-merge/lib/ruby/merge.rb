@@ -1093,7 +1093,7 @@ module Ruby
 
     def analyze_ruby_document(source, process_analysis: nil)
       lines = normalize_source(source).split("\n", -1)
-      requires = []
+      requires = ruby_analysis_require_owners(source, process_analysis)
       discovered_surfaces = []
       pending_comments = []
 
@@ -1111,12 +1111,7 @@ module Ruby
           next
         end
 
-        if (match = REQUIRE_PATTERN.match(line))
-          requires << {
-            path: "/requires/#{requires.length}",
-            owner_kind: "require",
-            match_key: match[1]
-          }
+        if ruby_process_import_item_at_line(process_analysis, line_number) || legacy_require_line?(line, process_analysis)
           pending_comments = []
           next
         end
@@ -1157,15 +1152,6 @@ module Ruby
         method_shadowing: ruby_method_shadowing(source),
         diagnostics: ruby_method_shadowing_diagnostics(source)
       }
-    end
-
-    def collect_ruby_require_entries(source)
-      normalize_source(source).split("\n").filter_map do |line|
-        match = REQUIRE_PATTERN.match(line)
-        next unless match
-
-        { path: "/requires/#{match[1]}", text: line.rstrip }
-      end
     end
 
     def collect_ruby_preamble(source)
@@ -1267,6 +1253,51 @@ module Ruby
           text: text
         }
       end
+    end
+
+    def ruby_analysis_require_owners(source, process_analysis)
+      imports = Array(process_analysis&.imports)
+      unless imports.empty?
+        return imports.each_with_index.map do |item, index|
+          {
+            path: "/requires/#{index}",
+            owner_kind: "require",
+            match_key: item.source.to_s
+          }
+        end
+      end
+
+      return [] if process_analysis
+
+      legacy_ruby_require_owners(source)
+    end
+
+    def legacy_ruby_require_owners(source)
+      requires = []
+      normalize_source(source).split("\n").each do |line|
+        match = REQUIRE_PATTERN.match(line)
+        next unless match
+
+        requires << {
+          path: "/requires/#{requires.length}",
+          owner_kind: "require",
+          match_key: match[1]
+        }
+      end
+      requires
+    end
+
+    def ruby_process_import_item_at_line(process_analysis, line_number)
+      index = line_number.to_i - 1
+      Array(process_analysis&.imports).find do |item|
+        item.span.start_row <= index && item.span.end_row >= index
+      end
+    end
+
+    def legacy_require_line?(line, process_analysis)
+      return false if process_analysis
+
+      REQUIRE_PATTERN.match?(line)
     end
 
     def ruby_tslp_file_footer_text(source, process_analysis)
@@ -2805,7 +2836,6 @@ module Ruby
       :merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope,
       :merge_ruby_with_nested_outputs,
       :analyze_ruby_document,
-      :collect_ruby_require_entries,
       :collect_ruby_declaration_entries,
       :unsupported_feature_result
     )
