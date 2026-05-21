@@ -712,12 +712,29 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs(
-        template_source,
-        destination_source,
-        dialect,
+      Ast::Merge.execute_reviewed_nested_merge(
         review_state,
-        applied_children
+        "ruby",
+        applied_children,
+        merge_parent: -> { merge_ruby(template_source, destination_source, dialect, backend: backend) },
+        discover_operations: lambda { |merged_output|
+          analysis = parse_ruby(merged_output, dialect, backend: backend)
+          next({ ok: false, diagnostics: analysis[:diagnostics] || [] }) unless analysis[:ok]
+
+          {
+            ok: true,
+            diagnostics: [],
+            operations: ruby_delegated_child_operations(analysis[:analysis])
+          }
+        },
+        apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, resolved_children|
+          Ruby::Merge.apply_ruby_delegated_child_outputs(
+            merged_output,
+            operations,
+            apply_plan,
+            resolved_children
+          )
+        }
       )
     end
 
@@ -725,11 +742,16 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+
+      merge_ruby_with_reviewed_nested_outputs(
         template_source,
         destination_source,
         dialect,
-        replay_bundle
+        execution[:review_state],
+        execution[:applied_children],
+        backend: backend
       )
     end
 
@@ -737,11 +759,15 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(
+      replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
         destination_source,
         dialect,
-        envelope
+        replay_bundle,
+        backend: backend
       )
     end
 
@@ -749,11 +775,16 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_review_state(
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
+      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+
+      merge_ruby_with_reviewed_nested_outputs(
         template_source,
         destination_source,
         dialect,
-        review_state
+        execution[:review_state],
+        execution[:applied_children],
+        backend: backend
       )
     end
 
@@ -761,11 +792,15 @@ module Prism
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Ruby::Merge.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
+      review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
+      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+
+      merge_ruby_with_reviewed_nested_outputs_from_review_state(
         template_source,
         destination_source,
         dialect,
-        envelope
+        review_state,
+        backend: backend
       )
     end
 
