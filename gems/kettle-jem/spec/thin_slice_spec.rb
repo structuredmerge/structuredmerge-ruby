@@ -515,7 +515,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.fetch(:changed)).to be(true)
       expect(plan.fetch(:final_content)).to include("# 💎 Example")
       expect(plan.fetch(:final_content)).to include("## 🌻 Synopsis")
-      expect(plan.fetch(:final_content)).to include("StructuredMerge packages provide fixture-backed merge behavior")
+      expect(plan.fetch(:final_content)).to include("root package-family guide")
       expect(plan.fetch(:final_content)).not_to include("Tokens to Remember")
 
       apply = described_class.apply_readme_style(root, env: {})
@@ -800,7 +800,8 @@ RSpec.describe Kettle::Jem do
       expect(readme).not_to include("OpenCollective Sponsors")
       expect(readme).not_to include("opencollective")
       expect(readme).not_to include("Apache SkyWalking Eyes License Compatibility Check")
-      expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge")
+      expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby#package-family")
+      expect(readme).to include("root package-family guide")
       expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml")
       expect(readme).not_to include("https://github.com/structuredmerge/ast-merge/actions/workflows/current.yml")
       expect(readme).not_to include("actions/workflows/heads.yml")
@@ -4908,16 +4909,10 @@ RSpec.describe Kettle::Jem do
         "License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0_OR_LicenseRef--Big--Time--Public--License"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "tree_haver"
+        "https://github.com/structuredmerge/structuredmerge-ruby#package-family"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "bash-merge"
-      )
-      expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "ruby-signature"
-      )
-      expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "template application"
+        "StructuredMerge Ruby package family"
       )
     end
   end
