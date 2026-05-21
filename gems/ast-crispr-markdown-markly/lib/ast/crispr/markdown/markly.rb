@@ -46,6 +46,12 @@ module Ast
             :labels,
             keyword_init: true,
           )
+          TableRowOwner = Struct.new(
+            :location,
+            :source,
+            :text,
+            keyword_init: true,
+          )
 
           def read_ast(document)
             analysis = ::Markly::Merge::FileAnalysis.new(document.content)
@@ -65,6 +71,8 @@ module Ast
               build_html_comments(analysis)
             when :inline_references
               build_inline_references(analysis)
+            when :table_rows
+              build_table_rows(analysis)
             else
               raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
             end
@@ -110,6 +118,13 @@ module Ast
                 owner_selector: :inline_references,
                 supported_comment_regions: [],
                 metadata: {adapter: :markly, markdown_owner: :inline_reference},
+              )
+            when :table_rows
+              Ast::Crispr::StructureProfile.new(
+                owner_scope: owner_scope,
+                owner_selector: :table_rows,
+                supported_comment_regions: [],
+                metadata: {adapter: :markly, markdown_owner: :table_row},
               )
             else
               raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
@@ -168,6 +183,50 @@ module Ast
             analysis.source.to_s.lines.each_with_index.flat_map do |line, index|
               inline_references_for_line(line.chomp, index + 1)
             end
+          end
+
+          def build_table_rows(analysis)
+            ast_table_lines = {}
+            ast_rows = Array(analysis.statements).flat_map do |statement|
+              node = unwrap_markdown_statement(statement)
+              next [] unless node.respond_to?(:type) && node.type.to_s == "table"
+
+              table_position = node.source_position
+              (table_position[:start_line]..table_position[:end_line]).each { |line| ast_table_lines[line] = true } if table_position
+              Array(node.children).filter_map do |child|
+                next unless child.respond_to?(:type) && child.type.to_s == "table_row"
+
+                position = child.source_position
+                next unless position
+
+                TableRowOwner.new(
+                  location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
+                  source: analysis.source_range(position[:start_line], position[:end_line]),
+                  text: child.to_plaintext.to_s,
+                )
+              end
+            end
+            ast_lines = ast_rows.map { |owner| owner.location.start_line }.to_h { |line| [line, true] }
+            loose_rows = analysis.source.to_s.lines.each_with_index.filter_map do |line, index|
+              line_number = index + 1
+              next if ast_lines[line_number]
+              next if ast_table_lines[line_number]
+              next unless loose_table_row_line?(line)
+
+              TableRowOwner.new(
+                location: Location.new(start_line: line_number, end_line: line_number),
+                source: line,
+                text: line,
+              )
+            end
+            ast_rows + loose_rows
+          end
+
+          def loose_table_row_line?(line)
+            stripped = line.to_s.lstrip
+            return false unless stripped.start_with?("|")
+
+            stripped.include?(" |") || stripped.include?("| ")
           end
 
           def heading_statement?(statement)

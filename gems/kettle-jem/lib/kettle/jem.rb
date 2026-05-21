@@ -434,16 +434,15 @@ module Kettle
           "33.0" => Gem::Version.new("3.3"),
         }.freeze,
       }.freeze
-      COMPATIBILITY_ROW_PREFIX_RE = /\A\| Works with (?:MRI Ruby|JRuby|Truffle Ruby)/
       COMPATIBILITY_REFERENCE_LABEL_RE = /\A(?:💎(?:ruby|jruby|truby)-|🚎)/
       ENGINE_ROW_PATTERNS = {
         "jruby" => {
-          row_re: /\A\| Works with JRuby/,
+          row_prefix: "| Works with JRuby",
           badge_prefixes: %w[💎jruby-],
           ref_prefixes: [/\A🚎jruby-/, /\A🚎\d+-j-/],
         }.freeze,
         "truffleruby" => {
-          row_re: /\A\| Works with Truffle Ruby/,
+          row_prefix: "| Works with Truffle Ruby",
           badge_prefixes: %w[💎truby-],
           ref_prefixes: [/\A🚎truby-/, /\A🚎\d+-t-/],
         }.freeze,
@@ -467,8 +466,10 @@ module Kettle
         ENGINE_ROW_PATTERNS.each do |engine, patterns|
           next if enabled.include?(engine)
 
-          processed = processed.lines.reject { |line| patterns.fetch(:row_re).match?(line) }.join
-          labels = processed.scan(/\[(💎(?:ruby|jruby|truby)-[^\]]+)\]/).flatten.uniq
+          processed = remove_markdown_table_rows(processed) do |owner|
+            owner.source.to_s.lstrip.start_with?(patterns.fetch(:row_prefix))
+          end
+          labels = markdown_inline_reference_owners(processed).flat_map(&:labels).uniq
           labels.each do |label|
             next unless patterns.fetch(:badge_prefixes).any? { |prefix| label.start_with?(prefix) }
 
@@ -512,7 +513,7 @@ module Kettle
       end
 
       def remove_incompatible_compatibility_badges(content, min_ruby)
-        content.scan(/\[(💎(?:ruby|jruby|truby)-[^\]]+)\]/).flatten.uniq.each do |label|
+        markdown_inline_reference_owners(content).flat_map(&:labels).uniq.each do |label|
           badge_min_mri = compatibility_badge_min_mri(label)
           next unless badge_min_mri && badge_min_mri < min_ruby
 
@@ -537,16 +538,22 @@ module Kettle
       end
 
       def normalize_compatibility_rows(content)
-        content.lines.filter_map do |line|
-          next line unless COMPATIBILITY_ROW_PREFIX_RE.match?(line)
+        lines = content.lines
+        markdown_table_row_owners(content).each do |owner|
+          line = lines[owner.location.start_line - 1]
+          next unless compatibility_row?(line)
 
           cells = line.split("|", -1)
           badge_cell = normalize_compatibility_badge_cell(cells[2])
-          next if badge_cell.empty?
+          if badge_cell.empty?
+            lines[owner.location.start_line - 1] = nil
+            next
+          end
 
           cells[2] = " #{badge_cell}"
-          cells.join("|")
-        end.join
+          lines[owner.location.start_line - 1] = cells.join("|")
+        end
+        lines.compact.join
       end
 
       def normalize_compatibility_badge_cell(cell)
@@ -583,6 +590,18 @@ module Kettle
         []
       end
 
+      def markdown_table_row_owners(content)
+        context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
+        context.structural_owners(owner_scope: :table_rows)
+      rescue Ast::Crispr::Error
+        []
+      end
+
+      def compatibility_row?(line)
+        text = line.to_s.lstrip
+        text.start_with?("| Works with MRI Ruby", "| Works with JRuby", "| Works with Truffle Ruby")
+      end
+
       def delete_markdown_link_definitions(content, labels)
         labels.uniq.reduce(content.to_s) do |processed, label|
           Ast::Crispr::Delete.call(
@@ -612,6 +631,14 @@ module Kettle
             end
             lines[index] = line
           end
+        lines.join
+      end
+
+      def remove_markdown_table_rows(content)
+        lines = content.to_s.lines
+        markdown_table_row_owners(content).select { |owner| yield owner }.reverse_each do |owner|
+          lines.delete_at(owner.location.start_line - 1)
+        end
         lines.join
       end
     end

@@ -116,6 +116,41 @@ RSpec.describe Ast::Crispr::Markdown::Markly do
       expect(match.metadata[:end_column]).to eq(35)
     end
 
+    it "finds markdown table rows" do
+      content = <<~MARKDOWN
+        | Feature | Badge |
+        | --- | --- |
+        | Works with MRI Ruby | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |
+        | Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |
+      MARKDOWN
+
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "README.md")
+      owners = context.structural_owners(owner_scope: :table_rows)
+
+      expect(owners.map { |owner| [owner.location.start_line, owner.text] }).to eq([
+        [3, "| Works with MRI Ruby | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |\n"],
+        [4, "| Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |\n"],
+      ])
+      expect(owners.last.source).to include("Works with JRuby")
+    end
+
+    it "finds loose pipe rows that Markly does not classify as tables" do
+      content = <<~MARKDOWN
+        # Title
+
+        | Works with MRI Ruby 3 | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |
+        | Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |
+      MARKDOWN
+
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "README.md")
+      owners = context.structural_owners(owner_scope: :table_rows)
+
+      expect(owners.map { |owner| [owner.location.start_line, owner.source] }).to eq([
+        [3, "| Works with MRI Ruby 3 | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |\n"],
+        [4, "| Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |\n"],
+      ])
+    end
+
     it "finds exact HTML comments and marker-bounded HTML comment blocks" do
       content = <<~MARKDOWN
         # Title
