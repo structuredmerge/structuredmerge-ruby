@@ -1152,9 +1152,7 @@ module Ruby
       end
 
       declaration_entries = ruby_process_owner_entries(process_analysis)
-      legacy_owner_entries = legacy_ruby_analysis_owner_entries(source)
-      declaration_keys = declaration_entries.to_h { |entry| [entry[:path], true] }
-      declaration_entries += legacy_owner_entries.reject { |entry| declaration_keys[entry[:path]] }
+      declaration_entries = legacy_ruby_analysis_owner_entries(source) if declaration_entries.empty?
       declarations = declaration_entries.map do |entry|
         {
           path: entry[:path],
@@ -1311,24 +1309,16 @@ module Ruby
 
     def collect_ruby_declaration_entries(source, process_analysis: nil)
       process_entries = ruby_process_declaration_entries(source, process_analysis: process_analysis)
-      legacy_entries = legacy_collect_ruby_declaration_entries(source)
-      return legacy_entries if process_entries.empty?
+      return process_entries unless process_entries.empty?
 
-      legacy_candidates = legacy_entries + qualified_nested_declaration_entries(legacy_entries)
-      process_entries = process_entries.reject do |process_entry|
-        legacy_candidates.any? do |legacy_entry|
-          legacy_entry[:kind] == process_entry[:kind] &&
-            (legacy_entry[:name] == process_entry[:name] || legacy_entry[:name].to_s.end_with?("::#{process_entry[:name]}"))
-        end
-      end
-      process_keys = process_entries.to_h { |entry| [entry[:merge_key], true] }
-      return process_entries + legacy_entries.reject { |entry| process_keys[entry[:merge_key]] }
+      legacy_collect_ruby_declaration_entries(source)
     end
 
     def legacy_collect_ruby_declaration_entries(source)
-      # TSLP process records are the preferred substrate. This legacy scanner only
-      # fills current TreeHaver adapter gaps such as Ruby module owners that the
-      # process API does not consistently expose yet.
+      # TSLP process records are the preferred substrate. This legacy scanner is
+      # retained only for direct helper calls that do not have parser analysis.
+      # Main merge paths must pass process_analysis and fail closed when TSLP
+      # cannot provide readable structure records.
       lines = normalize_source(source).split("\n")
       entries = []
       pending_comments = []

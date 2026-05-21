@@ -5,6 +5,10 @@ require_relative "spec_helper"
 RUBY_MERGE = ::Ruby::Merge
 
 RSpec.describe "Ruby::Merge" do
+  RubyMergeSpecSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
+  RubyMergeSpecStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
+  RubyMergeSpecProcessAnalysis = Struct.new(:structure, keyword_init: true)
+
   def fixtures_root
     Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
   end
@@ -15,6 +19,45 @@ RSpec.describe "Ruby::Merge" do
 
   def json_ready(value)
     Ast::Merge.json_ready(value)
+  end
+
+  def process_item(kind:, name:, start_row:, end_row:)
+    RubyMergeSpecStructureItem.new(
+      kind: kind,
+      name: name,
+      span: RubyMergeSpecSpan.new(start_row: start_row, start_col: 0, end_row: end_row, end_col: 3)
+    )
+  end
+
+  it "does not mix legacy declaration discovery into parser-backed Ruby structure" do
+    source = <<~RUBY
+      class TemplateOwned
+      end
+
+      module LegacyOnly
+      end
+    RUBY
+    process_analysis = RubyMergeSpecProcessAnalysis.new(
+      structure: [
+        process_item(kind: "class", name: "TemplateOwned", start_row: 0, end_row: 1)
+      ]
+    )
+
+    expect(RUBY_MERGE.collect_ruby_declaration_entries(source, process_analysis: process_analysis)).to contain_exactly(
+      hash_including(
+        path: "/declarations/TemplateOwned",
+        name: "TemplateOwned",
+        kind: "class",
+        merge_key: "class:TemplateOwned"
+      )
+    )
+    expect(RUBY_MERGE.analyze_ruby_document(source, process_analysis: process_analysis).fetch(:owners)).to contain_exactly(
+      {
+        path: "/declarations/TemplateOwned",
+        owner_kind: "declaration",
+        match_key: "TemplateOwned"
+      }
+    )
   end
 
   it "conforms to the Ruby family substrate fixtures" do
