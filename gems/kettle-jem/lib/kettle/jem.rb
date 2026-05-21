@@ -3469,11 +3469,19 @@ module Kettle
       return content if namespace.empty? || emoji.empty?
 
       lines = content.to_s.split("\n", -1)
-      index = lines.index { |line| line.match?(/\A#\s+/) }
-      return content unless index
+      h1 = markdown_heading_owners(content, source_label: "README.md").find { |owner| owner.level == 1 }
+      return content unless h1
 
+      index = h1.location.start_line - 1
       lines[index] = "# #{emoji} #{namespace}"
       lines.join("\n")
+    end
+
+    def markdown_heading_owners(content, source_label: "README.md")
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: source_label)
+      context.structural_owners(owner_scope: :heading_sections)
+    rescue Ast::Crispr::Error
+      []
     end
 
     def prepare_readme_template(content, readme_style)

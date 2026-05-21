@@ -270,19 +270,20 @@ module Kettle
         end
 
         def readme_h1_grapheme(content)
-          h1 = content.to_s.lines.find { |line| line.match?(/\A#\s+/) }
+          h1 = Kettle::Jem.markdown_heading_owners(content, source_label: "README.md").find { |owner| owner.level == 1 }
           return nil unless h1
 
-          first = first_grapheme(h1.sub(/\A#\s+/, ""))
+          first = first_grapheme(h1.heading_text)
           decorative_grapheme?(first) ? first : nil
         end
 
         def normalize_readme_h1_grapheme(content, grapheme)
           lines = content.to_s.split("\n", -1)
-          index = lines.index { |line| line.match?(/\A#\s+/) }
-          return content unless index
+          h1 = Kettle::Jem.markdown_heading_owners(content, source_label: "README.md").find { |owner| owner.level == 1 }
+          return content unless h1
 
-          rest = lines.fetch(index).sub(/\A#\s+/, "")
+          index = h1.location.start_line - 1
+          rest = h1.heading_text
           lines[index] = "# #{grapheme} #{strip_leading_decorative_graphemes(rest)}".rstrip
           lines.join("\n")
         end
