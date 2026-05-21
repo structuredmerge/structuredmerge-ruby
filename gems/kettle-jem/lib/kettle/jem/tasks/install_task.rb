@@ -288,10 +288,35 @@ module Kettle
         end
 
         def normalize_gemspec_grapheme(content, grapheme)
-          %w[spec.summary spec.description].reduce(content.to_s) do |text, field|
-            text.gsub(/(\b#{Regexp.escape(field)}\s*=\s*)(["'])([^"']*)(\2)/) do
-              "#{Regexp.last_match(1)}#{Regexp.last_match(2)}#{grapheme} #{strip_leading_decorative_graphemes(Regexp.last_match(3))}#{Regexp.last_match(4)}"
-            end
+          replacements = gemspec_grapheme_assignment_replacements(content, grapheme)
+          replace_character_ranges(content.to_s, replacements)
+        end
+
+        def gemspec_grapheme_assignment_replacements(content, grapheme)
+          Kettle::Jem.ruby_call_records(content, nil).filter_map do |call|
+            next unless %i[summary= description=].include?(call.name)
+            next unless call.receiver&.slice == "spec"
+
+            argument = call.arguments&.arguments&.first
+            next unless argument.is_a?(::Prism::StringNode) && argument.content_loc
+
+            replacement = "#{grapheme} #{strip_leading_decorative_graphemes(argument.unescaped)}"
+            [
+              argument.content_loc.start_character_offset,
+              argument.content_loc.end_character_offset,
+              ruby_string_literal_content(replacement, argument.opening_loc&.slice),
+            ]
+          end
+        end
+
+        def ruby_string_literal_content(value, quote)
+          escaped = value.to_s.gsub("\\", "\\\\\\\\")
+          quote.to_s.empty? ? escaped : escaped.gsub(quote.to_s, "\\#{quote}")
+        end
+
+        def replace_character_ranges(content, replacements)
+          replacements.sort_by(&:first).reverse.reduce(content.to_s) do |updated, (start_offset, end_offset, replacement)|
+            "#{updated[0...start_offset]}#{replacement}#{updated[end_offset..]}"
           end
         end
 
