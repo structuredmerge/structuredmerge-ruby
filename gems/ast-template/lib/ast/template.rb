@@ -202,11 +202,27 @@ module Ast
         registry = {}
         if include_family.call("markdown")
           begin
-            require "markdown-merge"
+            require "markly-merge"
             registry["markdown"] = lambda do |entry|
-              Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+              {
+                ok: true,
+                output: Markly::Merge::SmartMerger.new(
+                  entry[:prepared_template_content],
+                  entry[:destination_content],
+                  add_template_only_nodes: true,
+                ).merge,
+                diagnostics: [],
+                policies: []
+              }
             end
           rescue LoadError
+            begin
+              require "markdown-merge"
+              registry["markdown"] = lambda do |entry|
+                Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+              end
+            rescue LoadError
+            end
           end
         end
         if include_family.call("toml")

@@ -32,7 +32,7 @@ RSpec.describe Ast::Template do
     family = entry.dig(:classification, :family)
     case family
     when "markdown"
-      Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+      markdown_adapter(entry)
     when "toml"
       Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
     when "ruby"
@@ -1703,8 +1703,59 @@ RSpec.describe Ast::Template do
     expect(result[:output]).to include("def template_added")
   end
 
+  it "prefers the native Markly adapter for Markdown template sessions" do
+    registry = described_class.default_family_merge_adapter_registry(["markdown"])
+    result = registry.fetch("markdown").call(
+      prepared_template_content: <<~MARKDOWN,
+        # Title
+
+        ```ruby
+        puts 'template'
+        ```
+
+        ## Details
+
+        Template details.
+      MARKDOWN
+      destination_content: <<~MARKDOWN
+        # Title
+
+        ## Details
+
+        Destination details.
+      MARKDOWN
+    )
+    reapplied = registry.fetch("markdown").call(
+      prepared_template_content: <<~MARKDOWN,
+        # Title
+
+        ```ruby
+        puts 'template'
+        ```
+
+        ## Details
+
+        Template details.
+      MARKDOWN
+      destination_content: result[:output],
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include("Destination details.\n\nTemplate details.")
+    expect(reapplied[:output]).to eq(result[:output])
+  end
+
   def markdown_adapter(entry)
-    Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
+    {
+      ok: true,
+      output: Markly::Merge::SmartMerger.new(
+        entry[:prepared_template_content],
+        entry[:destination_content],
+        add_template_only_nodes: true,
+      ).merge,
+      diagnostics: [],
+      policies: []
+    }
   end
 
   def toml_adapter(entry)

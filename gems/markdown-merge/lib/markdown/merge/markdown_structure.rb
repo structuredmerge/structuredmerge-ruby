@@ -24,6 +24,7 @@ module Markdown
       # (when preceded by other content)
       NEEDS_BLANK_BEFORE = %i[
         heading
+        paragraph
         table
         code_block
         thematic_break
@@ -35,6 +36,7 @@ module Markdown
       # (when followed by other content)
       NEEDS_BLANK_AFTER = %i[
         heading
+        paragraph
         table
         code_block
         thematic_break

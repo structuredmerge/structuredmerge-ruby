@@ -21,4 +21,43 @@ RSpec.describe "Markly reproducible merge" do
       it_behaves_like "a reproducible merge", "03_content_changed"
     end
   end
+
+  it "keeps template-only paragraphs and inner-merged code fences reproducible" do
+    template = <<~MARKDOWN
+      # Title
+
+      ```ruby
+      puts 'template'
+      ```
+
+      ## Details
+
+      Template details.
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # Title
+
+      ## Details
+
+      Destination details.
+    MARKDOWN
+
+    first_merge = merger_class.new(template, destination, add_template_only_nodes: true).merge
+    second_merge = merger_class.new(template, first_merge, add_template_only_nodes: true).merge
+
+    expect(first_merge).to eq(<<~MARKDOWN)
+      # Title
+
+      ```ruby
+      puts 'template'
+      ```
+
+      ## Details
+
+      Destination details.
+
+      Template details.
+    MARKDOWN
+    expect(second_merge).to eq(first_merge)
+  end
 end

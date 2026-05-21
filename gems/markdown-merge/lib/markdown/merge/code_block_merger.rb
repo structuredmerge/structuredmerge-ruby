@@ -545,7 +545,7 @@ module Markdown
         # Use backticks as default fence
         fence = "```"
 
-        "#{fence}#{language}\n#{content}#{fence}"
+        "#{fence}#{language}\n#{content}#{fence}\n"
       end
 
       # Return a not-merged result.

@@ -5,7 +5,7 @@ require "fileutils"
 require "pathname"
 require "tmpdir"
 require "ast-template"
-require "markdown-merge"
+require "markly-merge"
 require "toml-merge"
 require "prism-merge"
 
