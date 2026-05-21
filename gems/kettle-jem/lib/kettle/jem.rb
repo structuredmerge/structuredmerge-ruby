@@ -4846,7 +4846,7 @@ module Kettle
     end
 
     def replace_kettle_config_bootstrap_project_emoji(content, emoji)
-      updated = content.sub(/^project_emoji:\s*.*$/, "project_emoji: #{emoji}")
+      updated = replace_yaml_scalar_line(content, "project_emoji", emoji.to_s)
       return updated unless updated == content
 
       raise Error, "Could not replace project_emoji in .kettle-jem.yml bootstrap template"
@@ -4854,10 +4854,40 @@ module Kettle
 
     def replace_kettle_config_bootstrap_licenses(content, licenses)
       license_block = ["licenses:", *licenses.map { |license_id| "  - #{license_id}" }].join("\n")
-      updated = content.sub(/^licenses:\n(?:  - .+\n?)+/, "#{license_block}\n")
+      updated = replace_yaml_node_lines(content, "licenses", "#{license_block}\n")
       return updated unless updated == content
 
       raise Error, "Could not replace licenses block in .kettle-jem.yml bootstrap template"
+    end
+
+    def replace_yaml_scalar_line(content, key, value)
+      lines = content.to_s.lines
+      yaml_scalar_pairs(content).each do |key_node, value_node|
+        next unless key_node.value.to_s == key.to_s
+
+        line_index = key_node.start_line
+        line = lines[line_index].to_s
+        key_index = line.index("#{key}:")
+        next unless key_index
+
+        lines[line_index] = "#{line[0...key_index]}#{key}: #{value}\n"
+        return lines.join
+      end
+      content
+    end
+
+    def replace_yaml_node_lines(content, key, replacement)
+      lines = content.to_s.lines
+      yaml_mapping_nodes(content).each do |mapping|
+        mapping.children.each_slice(2) do |key_node, value_node|
+          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+
+          start_line = key_node.start_line
+          end_line = value_node.end_line
+          return [*lines[0...start_line], replacement, *lines[end_line..].to_a].join
+        end
+      end
+      content
     end
 
     def apply_kettle_config_bootstrap_profile(content, profile, gemspec_path)
