@@ -1111,13 +1111,30 @@ module Kettle
 
         content = File.read(config_path.to_s)
         new_block = build_yaml_block(checksums: checksums, version: version)
-        updated =
-          if content.match?(/^#{Regexp.escape(YAML_KEY)}:\s*(?:#[^\n]*)?\n/)
-            content.gsub(/^#{Regexp.escape(YAML_KEY)}:[^\n]*\n(?:[ \t][^\n]*\n)*/, "#{new_block}\n")
-          else
-            "#{content.rstrip}\n\n#{new_block}\n"
-          end
+        updated = replace_top_level_yaml_block(content, YAML_KEY, "#{new_block}\n")
+        updated = "#{content.rstrip}\n\n#{new_block}\n" if updated == content
         File.write(config_path.to_s, updated)
+      end
+
+      def replace_top_level_yaml_block(content, key, replacement)
+        lines = content.to_s.lines
+        document = Psych.parse_stream(content.to_s).children.first
+        root = document&.root
+        return content unless root.is_a?(Psych::Nodes::Mapping)
+
+        pairs = root.children.each_slice(2).to_a
+        pairs.each_with_index do |(key_node, value_node), index|
+          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+
+          next_key = pairs[index + 1]&.first
+          end_line = next_key&.start_line || value_node.end_line
+          end_line += 1 if end_line <= key_node.start_line
+          return [*lines[0...key_node.start_line], replacement, *lines[end_line..].to_a].join
+        end
+
+        content
+      rescue Psych::Exception
+        content
       end
     end
 
