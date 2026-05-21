@@ -35,6 +35,17 @@ module Ast
             :source,
             keyword_init: true,
           )
+          InlineReferenceOwner = Struct.new(
+            :location,
+            :line,
+            :start_column,
+            :end_column,
+            :source,
+            :reference_kind,
+            :label,
+            :labels,
+            keyword_init: true,
+          )
 
           def read_ast(document)
             analysis = ::Markly::Merge::FileAnalysis.new(document.content)
@@ -52,6 +63,8 @@ module Ast
               build_link_definitions(analysis)
             when :html_comments
               build_html_comments(analysis)
+            when :inline_references
+              build_inline_references(analysis)
             else
               raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
             end
@@ -90,6 +103,13 @@ module Ast
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [],
                 metadata: {adapter: :markly, markdown_owner: :html_comment},
+              )
+            when :inline_references
+              Ast::Crispr::StructureProfile.new(
+                owner_scope: owner_scope,
+                owner_selector: :inline_references,
+                supported_comment_regions: [],
+                metadata: {adapter: :markly, markdown_owner: :inline_reference},
               )
             else
               raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
@@ -141,6 +161,12 @@ module Ast
                 text: comment.content,
                 source: comment.text,
               )
+            end
+          end
+
+          def build_inline_references(analysis)
+            analysis.source.to_s.lines.each_with_index.flat_map do |line, index|
+              inline_references_for_line(line.chomp, index + 1)
             end
           end
 
@@ -196,6 +222,104 @@ module Ast
 
           def normalize_heading_base(text)
             text.to_s.sub(/\A(?:\d\uFE0F?\u20E3|[^[:alnum:][:space:]])+[ \t]*/u, "").strip.downcase
+          end
+
+          def inline_references_for_line(line, line_number)
+            owners = []
+            index = 0
+            while index < line.length
+              image = inline_image_reference_at(line, index, line_number)
+              if image
+                owners << image
+                index = image.end_column
+                next
+              end
+
+              link = inline_link_reference_at(line, index, line_number)
+              if link
+                owners << link
+                index = link.end_column
+                next
+              end
+
+              index += 1
+            end
+            owners
+          end
+
+          def inline_image_reference_at(line, index, line_number)
+            return unless line[index] == "!" && line[index + 1] == "["
+
+            alt_end = closing_bracket_index(line, index + 1)
+            return unless alt_end && line[alt_end + 1] == "["
+
+            label_end = closing_bracket_index(line, alt_end + 1)
+            return unless label_end
+
+            label = line[(alt_end + 2)...label_end]
+            inline_reference_owner(
+              line: line,
+              line_number: line_number,
+              start_column: index,
+              end_column: label_end + 1,
+              reference_kind: :image_reference,
+              label: label,
+              labels: [label],
+            )
+          end
+
+          def inline_link_reference_at(line, index, line_number)
+            return unless line[index] == "["
+
+            text_end = closing_bracket_index(line, index)
+            return unless text_end && line[text_end + 1] == "["
+
+            label_end = closing_bracket_index(line, text_end + 1)
+            return unless label_end
+
+            text = line[(index + 1)...text_end]
+            label = line[(text_end + 2)...label_end]
+            image_owner = inline_image_reference_at(text, 0, line_number)
+            labels = [label]
+            labels.unshift(image_owner.label) if image_owner && image_owner.source == text
+            inline_reference_owner(
+              line: line,
+              line_number: line_number,
+              start_column: index,
+              end_column: label_end + 1,
+              reference_kind: labels.length > 1 ? :linked_image_reference : :link_reference,
+              label: label,
+              labels: labels,
+            )
+          end
+
+          def inline_reference_owner(line:, line_number:, start_column:, end_column:, reference_kind:, label:, labels:)
+            InlineReferenceOwner.new(
+              location: Location.new(start_line: line_number, end_line: line_number),
+              line: line_number,
+              start_column: start_column,
+              end_column: end_column,
+              source: line[start_column...end_column],
+              reference_kind: reference_kind,
+              label: label,
+              labels: labels.compact.uniq,
+            )
+          end
+
+          def closing_bracket_index(text, opening_index)
+            depth = 0
+            index = opening_index
+            while index < text.length
+              case text[index]
+              when "["
+                depth += 1
+              when "]"
+                depth -= 1
+                return index if depth.zero?
+              end
+              index += 1
+            end
+            nil
           end
         end
 
@@ -293,6 +417,42 @@ module Ast
                       end_boundary: :owner_end,
                       payload_kind: :structural_owner_body,
                       text: owner.text,
+                    },
+                  )
+                end
+              end,
+            )
+          end
+
+          def inline_reference(label: nil, reference_kind: nil, id: nil, limit: nil, metadata: {}, **options)
+            Ast::Crispr::OwnerSelector.new(
+              id: id || ["inline_reference", label, reference_kind].compact.join(":"),
+              limit: limit,
+              metadata: metadata.merge(
+                adapter: Ast::Crispr::Markdown::Markly.adapter,
+                owner_scope: :inline_references,
+                selector_kind: :inline_reference,
+                selection_intent: :predicate_filter,
+                include_trailing_gap: false,
+              ).merge(options),
+              locate: lambda do |context|
+                context.structural_owners(owner_scope: :inline_references).filter_map do |owner|
+                  next if label && !owner.labels.include?(label.to_s)
+                  next if reference_kind && owner.reference_kind != reference_kind.to_sym
+
+                  Ast::Crispr::Match.new(
+                    node: owner,
+                    start_line: owner.location.start_line,
+                    end_line: owner.location.end_line,
+                    metadata: {
+                      start_boundary: :owner_start,
+                      end_boundary: :owner_end,
+                      payload_kind: :structural_owner_body,
+                      label: owner.label,
+                      labels: owner.labels,
+                      reference_kind: owner.reference_kind,
+                      start_column: owner.start_column,
+                      end_column: owner.end_column,
                     },
                   )
                 end

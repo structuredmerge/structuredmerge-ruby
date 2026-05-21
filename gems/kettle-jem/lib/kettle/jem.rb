@@ -508,8 +508,7 @@ module Kettle
       end
 
       def remove_workflow_badge_occurrences(content, workflow_label)
-        label_re = Regexp.escape(workflow_label)
-        content.gsub(/[ \t]*\[!\[[^\]]*?\]\s*\[[^\]]+\]\]\s*\[#{label_re}\][ \t]*/, " ")
+        remove_markdown_inline_references(content, workflow_label)
       end
 
       def remove_incompatible_compatibility_badges(content, min_ruby)
@@ -534,9 +533,7 @@ module Kettle
       end
 
       def remove_badge_occurrences(content, label)
-        label_re = Regexp.escape(label)
-        content = content.gsub(/\s*\[!\[[^\]]*?\]\s*\[#{label_re}\]\s*\]\s*\[[^\]]+\]\s*/, " ")
-        content.gsub(/\s*!\[[^\]]*?\]\s*\[#{label_re}\]\s*/, " ")
+        remove_markdown_inline_references(content, label)
       end
 
       def normalize_compatibility_rows(content)
@@ -563,15 +560,7 @@ module Kettle
       end
 
       def prune_unused_compatibility_reference_definitions(content)
-        referenced_labels = {}
-        content.lines.each do |line|
-          next if line.match?(/^\[[^\]]+\]:/)
-
-          # Markly exposes link definition owners, but not inline reference-label
-          # owners. Keep this bounded text scan until the adapter grows inline
-          # link/image reference ownership.
-          line.scan(/\]\[([^\]]+)\]/) { |match| referenced_labels[match.first] = true }
-        end
+        referenced_labels = markdown_inline_reference_owners(content).flat_map(&:labels).to_h { |label| [label, true] }
 
         labels = markdown_link_definition_owners(content).filter_map do |owner|
           label = owner.label.to_s
@@ -587,6 +576,13 @@ module Kettle
         []
       end
 
+      def markdown_inline_reference_owners(content)
+        context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
+        context.structural_owners(owner_scope: :inline_references)
+      rescue Ast::Crispr::Error
+        []
+      end
+
       def delete_markdown_link_definitions(content, labels)
         labels.uniq.reduce(content.to_s) do |processed, label|
           Ast::Crispr::Delete.call(
@@ -595,6 +591,28 @@ module Kettle
             source_label: "README.md"
           ).updated_content
         end
+      end
+
+      def remove_markdown_inline_references(content, label)
+        lines = content.to_s.lines
+        markdown_inline_reference_owners(content).select { |owner| owner.labels.include?(label.to_s) }
+          .group_by(&:line)
+          .each do |line_number, owners|
+            index = line_number - 1
+            line = lines[index].to_s
+            owners.sort_by(&:start_column).reverse_each do |owner|
+              start_column = owner.start_column
+              end_column = owner.end_column
+              if start_column.positive? && line[start_column - 1] == " "
+                start_column -= 1
+              elsif line[end_column] == " "
+                end_column += 1
+              end
+              line = "#{line[0...start_column]}#{line[end_column..]}"
+            end
+            lines[index] = line
+          end
+        lines.join
       end
     end
 

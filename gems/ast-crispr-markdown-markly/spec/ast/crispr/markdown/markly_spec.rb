@@ -90,6 +90,32 @@ RSpec.describe Ast::Crispr::Markdown::Markly do
       expect(url_target.locate_matches(context).first.node.label).to eq("policy")
     end
 
+    it "finds inline reference links, images, and linked images" do
+      content = <<~MARKDOWN
+        [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] ![JRuby][💎jruby-9.4i] [Docs][docs]
+
+        [💎ruby-3.2i]: https://img.shields.io/badge/Ruby-3.2-red.svg
+        [🚎ruby-3.2-wf]: https://github.com/example/project/actions/workflows/current.yml
+        [💎jruby-9.4i]: https://img.shields.io/badge/JRuby-9.4-red.svg
+        [docs]: README.md
+      MARKDOWN
+
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "README.md")
+      owners = context.structural_owners(owner_scope: :inline_references)
+      target = described_class.inline_reference(label: "💎ruby-3.2i")
+      match = target.locate_matches(context).first
+
+      expect(owners.map(&:reference_kind)).to eq(%i[linked_image_reference image_reference link_reference])
+      expect(owners.map(&:labels)).to eq([
+        ["💎ruby-3.2i", "🚎ruby-3.2-wf"],
+        ["💎jruby-9.4i"],
+        ["docs"],
+      ])
+      expect(match.node.source).to eq("[![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf]")
+      expect(match.metadata[:start_column]).to eq(0)
+      expect(match.metadata[:end_column]).to eq(35)
+    end
+
     it "finds exact HTML comments and marker-bounded HTML comment blocks" do
       content = <<~MARKDOWN
         # Title
