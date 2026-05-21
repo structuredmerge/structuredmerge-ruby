@@ -8196,10 +8196,11 @@ module Kettle
     end
 
     def ensure_workflow_top_level_section(content, key, section, before:)
-      return content if content.match?(/^#{Regexp.escape(key)}:/)
+      top_level_keys = yaml_top_level_key_lines(content)
+      return content if top_level_keys.key?(key.to_s)
 
       lines = content.lines
-      index = lines.index { |line| line.match?(/^#{Regexp.escape(before)}:/) }
+      index = top_level_keys[before.to_s]
       if index
         prepared_section = index.zero? || lines[index - 1].strip.empty? ? section : "\n#{section}"
         lines.insert(index, prepared_section)
@@ -8208,6 +8209,20 @@ module Kettle
         lines << section
       end
       lines.join
+    end
+
+    def yaml_top_level_key_lines(content)
+      document = Psych.parse_stream(content.to_s).children.first
+      root = document&.root
+      return {} unless root.is_a?(Psych::Nodes::Mapping)
+
+      root.children.each_slice(2).each_with_object({}) do |(key_node, _value_node), keys|
+        next unless key_node.is_a?(Psych::Nodes::Scalar)
+
+        keys[key_node.value.to_s] = key_node.start_line
+      end
+    rescue Psych::Exception
+      {}
     end
 
     def update_github_actions_pins(content)
