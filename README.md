@@ -101,7 +101,7 @@ tags are capability names, not package preferences.
 
 | Backend or provider path | Used by | Notes |
 | --- | --- | --- |
-| `:TSLP` / `:kLP` | source-family gems | Uses `tree-sitter-language-pack` / Kreuzberg-language-pack style parser aggregation where available. This is the preferred tree-sitter provider path for broad language coverage. |
+| `:TSLP` | source-family gems | Uses `tree-sitter-language-pack` / Kreuzberg-language-pack style parser aggregation where available. This is the preferred tree-sitter provider path for broad language coverage. |
 | `:MRI` | source-family gems | Uses `ruby_tree_sitter`; retained as the MRI-native tree-sitter backend name. |
 | `:rust` | source-family gems | Uses `tree_stump` where that native Rust-backed parser path is selected. |
 | `:ffi` | source-family gems | Uses FFI bindings to libtree-sitter; suitable where the runtime and native library support the needed ABI. |
