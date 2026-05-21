@@ -8128,18 +8128,10 @@ module Kettle
       return content if content.include?("Upload coverage to Coveralls") || content.include?("Upload coverage to CodeCov")
 
       lines = content.lines
-      steps_index = lines.index { |line| line.match?(/^    steps:\s*$/) }
-      return content unless steps_index
+      steps_sequence = yaml_mapping_value_node(content, "steps", Psych::Nodes::Sequence)
+      return content unless steps_sequence
 
-      insert_index = lines.length
-      ((steps_index + 1)...lines.length).each do |index|
-        line = lines[index]
-        next if line.strip.empty?
-        next unless line.match?(/^\S|^  \S|^    \S/) && !line.match?(/^      /)
-
-        insert_index = index
-        break
-      end
+      insert_index = steps_sequence.end_line
       lines.insert(insert_index, github_actions_coverage_steps)
       lines.join
     end
@@ -8253,6 +8245,17 @@ module Kettle
           [key_node, value_node] if key_node.is_a?(Psych::Nodes::Scalar) && value_node.is_a?(Psych::Nodes::Scalar)
         end
       end
+    end
+
+    def yaml_mapping_value_node(content, key, node_class)
+      yaml_mapping_nodes(content).each do |mapping|
+        mapping.children.each_slice(2) do |key_node, value_node|
+          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+
+          return value_node if value_node.is_a?(node_class)
+        end
+      end
+      nil
     end
 
     def github_actions_step_pins
