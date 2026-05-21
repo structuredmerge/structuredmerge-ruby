@@ -6217,7 +6217,7 @@ module Kettle
       end
 
       updated = lines.join
-      unless updated.include?("#{namespace}::Version.class_eval do")
+      unless ruby_version_class_eval_namespaces(updated).include?(namespace.to_s)
         updated += "\n" unless updated.end_with?("\n")
         updated += "\n#{version_gem_class_eval_block(namespace)}"
       end
@@ -6287,22 +6287,65 @@ module Kettle
     end
 
     def existing_version_file_value(project_root, relative_path)
-      read_project_file(project_root, relative_path)[/^\s*VERSION\s*=\s*["']([^"']+)["']/, 1].to_s
+      ruby_version_constant_value(read_project_file(project_root, relative_path)).to_s
     end
 
     def existing_version_namespace(project_root, relative_path)
-      content = read_project_file(project_root, relative_path)
-      modules = content.scan(/^\s*module\s+([A-Z][A-Za-z0-9_]*)\s*$/).flatten
-      version_index = modules.index("Version")
-      return nil unless version_index && version_index.positive?
+      ruby_version_module_namespace(read_project_file(project_root, relative_path))
+    end
 
-      modules.take(version_index).join("::")
+    def ruby_version_constant_value(content)
+      result = prism_parse_success(content)
+      return unless result
+
+      node = result.value.breadth_first_search_all do |candidate|
+        candidate.is_a?(::Prism::ConstantWriteNode) &&
+          candidate.name == :VERSION &&
+          candidate.value.is_a?(::Prism::StringNode)
+      end.first
+      node&.value&.unescaped
+    end
+
+    def ruby_version_module_namespace(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      body.each do |node|
+        namespace = ruby_version_module_namespace_for(node, [])
+        return namespace if namespace
+      end
+      nil
+    end
+
+    def ruby_version_module_namespace_for(node, namespace)
+      return unless node.is_a?(::Prism::ModuleNode)
+
+      current = namespace + ruby_constant_path_segments(node.constant_path)
+      if current.last == "Version" && current.length > 1
+        return current[0...-1].join("::")
+      end
+
+      node.body&.body&.each do |child|
+        child_namespace = ruby_version_module_namespace_for(child, current)
+        return child_namespace if child_namespace
+      end
+      nil
+    end
+
+    def ruby_constant_path_segments(node)
+      node&.slice.to_s.split("::").reject(&:empty?)
     end
 
     def existing_entrypoint_version_namespace(project_root, relative_path)
-      content = read_project_file(project_root, relative_path)
-      match = content.match(/^\s*([A-Z][A-Za-z0-9_]*(?:::[A-Z][A-Za-z0-9_]*)*)::Version\.class_eval\s+do/)
-      match && match[1]
+      ruby_version_class_eval_namespaces(read_project_file(project_root, relative_path)).first
+    end
+
+    def ruby_version_class_eval_namespaces(content)
+      ruby_call_records(content, :class_eval).filter_map do |call|
+        receiver = call.receiver&.slice.to_s
+        next unless receiver.end_with?("::Version")
+        next unless call.block
+
+        receiver.delete_suffix("::Version")
+      end
     end
 
     def read_project_file(project_root, relative_path)
