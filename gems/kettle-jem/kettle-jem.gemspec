@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.version = gem_version
   spec.authors = ["Peter H. Boling"]
   spec.email = ["floss@galtzo.com"]
+
   spec.summary = "🔮 Gem templating engine using AST-based merging and configurable token resolution."
   spec.description = "🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold."
   spec.homepage = "https://github.com/kettle-rb/kettle-jem"

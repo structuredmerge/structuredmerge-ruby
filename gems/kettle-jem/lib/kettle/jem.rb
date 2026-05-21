@@ -4316,12 +4316,11 @@ module Kettle
       destination_receiver = gemspec_block_param(destination_content) || "spec"
       package_name = facts.dig(:package, :name).to_s if facts
       replacements = gemspec_preserved_assignments(destination_content, receiver: destination_receiver)
-      merged = replacements.reduce(template_content.dup) do |content, (field, source_line)|
-        pattern = /^(\s*#{Regexp.escape(template_receiver)}\.#{Regexp.escape(field)}\s*=\s*).*$/
-        replacement = normalize_gemspec_receiver(source_line.rstrip, from: destination_receiver, to: template_receiver)
-        replacement = normalize_gemspec_project_emoji(replacement, facts, receiver: template_receiver, field: field)
-        content.match?(pattern) ? content.sub(pattern, replacement) : content
+      normalized_replacements = replacements.to_h do |field, source|
+        replacement = normalize_gemspec_receiver(source.rstrip, from: destination_receiver, to: template_receiver)
+        [field, normalize_gemspec_project_emoji(replacement, facts, field: field)]
       end
+      merged = replace_gemspec_assignment_sources(template_content, normalized_replacements, receiver: template_receiver)
       merged = preserve_gemspec_dependency_lines(
         merged,
         destination_content,
@@ -4338,13 +4337,13 @@ module Kettle
       return content if licenses.empty?
 
       replacement = "#{receiver}.licenses = #{licenses.inspect}"
-      pattern = /^(\s*)#{Regexp.escape(receiver)}\.licenses\s*=.*$/
-      return content.sub(pattern) { "#{$1}#{replacement}" } if content.match?(pattern)
+      existing = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "licenses" }
+      return replace_source_range_lines(content, existing.fetch(:start_line), existing.fetch(:end_line), "#{leading_whitespace(existing.fetch(:source))}#{replacement}\n") if existing
 
-      content.sub(
-        /^(\s*#{Regexp.escape(receiver)}\.homepage\s*=.*$)/,
-        "\\1\n  #{replacement}"
-      )
+      homepage = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "homepage" }
+      return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
+
+      content
     end
 
     def gemspec_block_param(source)
@@ -4363,16 +4362,18 @@ module Kettle
       "#{line.to_s[0...leading]}#{to}#{stripped[from.to_s.length..]}"
     end
 
-    def normalize_gemspec_project_emoji(line, facts, receiver:, field:)
+    def normalize_gemspec_project_emoji(line, facts, field:)
       return line unless %w[summary description].include?(field.to_s)
       return line unless facts&.dig(:project_runtime, :project_emoji_configured)
 
       project_emoji = facts&.dig(:project_runtime, :project_emoji).to_s
       return line if project_emoji.empty?
 
-      line.sub(/^(\s*#{Regexp.escape(receiver)}\.#{Regexp.escape(field)}\s*=\s*)(["'])([^"']*)(\2)$/) do
-        "#{Regexp.last_match(1)}#{Regexp.last_match(2)}#{project_emoji} #{strip_leading_decorative_graphemes(Regexp.last_match(3))}#{Regexp.last_match(4)}"
-      end
+      record = gemspec_assignment_records(line).find { |candidate| candidate.fetch(:field) == field.to_s }
+      value = record&.fetch(:value)
+      return line unless value.is_a?(String)
+
+      line.sub(value, "#{project_emoji} #{strip_leading_decorative_graphemes(value)}")
     end
 
     def gemspec_preserved_assignments(source, receiver:)
@@ -4397,6 +4398,18 @@ module Kettle
       end
     end
 
+    def replace_gemspec_assignment_sources(content, replacements, receiver:)
+      return content if replacements.empty?
+
+      records_by_line = gemspec_assignment_records(content, receiver: receiver).each_with_object({}) do |record, index|
+        field = record.fetch(:field)
+        next unless replacements.key?(field)
+
+        index[record.fetch(:start_line)] = record.merge(replacement: "#{replacements.fetch(field)}\n")
+      end
+      replace_record_ranges(content, records_by_line)
+    end
+
     def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:)
       destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver).transform_values do |source|
         normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
@@ -4416,10 +4429,11 @@ module Kettle
         next if merged.include?(block.join)
 
         insertion = "\n#{block.join}\n"
-        if merged.match?(/^\s*#{Regexp.escape(receiver)}\.require_paths\s*=/)
-          merged = merged.sub(/^(\s*#{Regexp.escape(receiver)}\.require_paths\s*=.*$)/, "#{insertion}\\1")
+        require_paths = gemspec_assignment_records(merged, receiver: receiver).find { |record| record.fetch(:field) == "require_paths" }
+        merged = if require_paths
+          insert_lines_before(merged, require_paths.fetch(:start_line), insertion)
         else
-          merged = merged.sub(/^end\s*\z/, "#{insertion}end")
+          insert_lines_before(merged, gemspec_end_line(merged), insertion)
         end
       end
       ensure_trailing_newline(merged.gsub(/\n{3,}/, "\n\n"))
@@ -4446,23 +4460,11 @@ module Kettle
     end
 
     def replace_matching_gemspec_dependency_lines(content, destination_dependencies, receiver:)
-      replacements_by_line = gemspec_dependency_records(content, receiver: receiver).to_h do |record|
-        [record.fetch(:start_line), destination_dependencies[gemspec_dependency_record_key(record)]]
-      end.compact
-      skip_until = 0
-      content.to_s.lines.each_with_index.flat_map do |line, index|
-        line_number = index + 1
-        next [] if line_number < skip_until
-
-        replacement = replacements_by_line[line_number]
-        unless replacement
-          line
-        else
-          record = gemspec_dependency_records(content, receiver: receiver).find { |candidate| candidate.fetch(:start_line) == line_number }
-          skip_until = record.fetch(:end_line) + 1
-          replacement
-        end
-      end.join
+      records_by_line = gemspec_dependency_records(content, receiver: receiver).each_with_object({}) do |record, index|
+        replacement = destination_dependencies[gemspec_dependency_record_key(record)]
+        index[record.fetch(:start_line)] = record.merge(replacement: replacement) if replacement
+      end
+      replace_record_ranges(content, records_by_line)
     end
 
     def append_missing_gemspec_dependency_lines(content, destination_dependencies, receiver:)
@@ -4492,22 +4494,19 @@ module Kettle
     def insert_missing_development_gemspec_dependency_lines(content, missing_lines)
       return content if missing_lines.empty?
 
-      content.sub(/^end\s*\z/, "#{missing_lines.join}end")
+      insert_lines_before(content, gemspec_end_line(content), missing_lines.join)
     end
 
     def runtime_gemspec_dependency_insertion_index(lines, receiver:)
-      note_index = lines.find_index do |line|
-        line.match?(/^\s*# NOTE: It is preferable to list development dependencies/)
-      end
+      note_index = lines.find_index { |line| line.lstrip.start_with?("# NOTE: It is preferable to list development dependencies") }
       return note_index - 1 if note_index&.positive? && lines[note_index - 1].strip.empty?
       return note_index if note_index
 
-      development_index = lines.find_index do |line|
-        line.match?(/^\s*#{Regexp.escape(receiver)}\.add_development_dependency\s*(?:\(|\s)/)
-      end
+      development_line = gemspec_dependency_records(lines.join, receiver: receiver).find { |record| record.fetch(:kind) == "add_development_dependency" }&.fetch(:start_line)
+      development_index = development_line && development_line - 1
       return development_index if development_index
 
-      lines.rindex { |line| line.match?(/^end\s*\z/) } || lines.length
+      gemspec_end_line(lines.join) - 1
     end
 
     def gemspec_dependency_line_index(source, receiver:)
@@ -4613,6 +4612,45 @@ module Kettle
       end
     end
 
+    def replace_record_ranges(content, records_by_line)
+      return content if records_by_line.empty?
+
+      skip_until = 0
+      content.to_s.lines.each_with_index.flat_map do |line, index|
+        line_number = index + 1
+        next [] if line_number < skip_until
+
+        record = records_by_line[line_number]
+        unless record
+          line
+        else
+          skip_until = record.fetch(:end_line) + 1
+          record.fetch(:replacement)
+        end
+      end.join
+    end
+
+    def replace_source_range_lines(content, start_line, end_line, replacement)
+      replace_record_ranges(content, { start_line => { end_line: end_line, replacement: replacement } })
+    end
+
+    def insert_lines_before(content, line_number, insertion)
+      lines = content.to_s.lines
+      lines.insert([line_number - 1, 0].max, insertion)
+      lines.join
+    end
+
+    def insert_lines_after(content, line_number, insertion)
+      lines = content.to_s.lines
+      lines.insert(line_number, insertion)
+      lines.join
+    end
+
+    def leading_whitespace(source)
+      text = source.to_s
+      text[0...(text.length - text.lstrip.length)]
+    end
+
     def gemspec_dependency_records(source, receiver: nil)
       lines = source.to_s.lines
       ruby_call_records(source, nil).filter_map do |call|
@@ -4644,6 +4682,10 @@ module Kettle
 
     def gemspec_new_call(source)
       ruby_call_records(source, :new).find { |call| call.receiver&.slice == "Gem::Specification" }
+    end
+
+    def gemspec_end_line(source)
+      gemspec_new_call(source)&.location&.end_line || source.to_s.lines.length + 1
     end
 
     def template_file_type(recipe)
