@@ -2883,11 +2883,15 @@ module Kettle
     def normalize_changelog(content, facts)
       text = content.to_s
       title = "# Changelog"
-      text = "#{title}\n\n#{text}" unless text.lines.first&.start_with?("# ")
-      return ensure_trailing_newline(text) if text.match?(/^##\s+\[?Unreleased\]?/i)
+      headings = markdown_heading_owners(text, source_label: "CHANGELOG.md")
+      unless headings.any? { |heading| heading.level == 1 }
+        text = "#{title}\n\n#{text}"
+        headings = markdown_heading_owners(text, source_label: "CHANGELOG.md")
+      end
+      return ensure_trailing_newline(text) if headings.any? { |heading| heading.level == 2 && changelog_unreleased_heading?(heading.heading_text) }
 
       lines = text.split("\n", -1)
-      insert_at = lines.index { |line| line.start_with?("## ") } || lines.length
+      insert_at = headings.find { |heading| heading.level == 2 }&.location&.start_line&.-(1) || lines.length
       section = [
         "## [Unreleased]",
         "",
@@ -2900,6 +2904,12 @@ module Kettle
       ]
       lines.insert(insert_at, *section)
       ensure_trailing_newline(lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def changelog_unreleased_heading?(heading_text)
+      text = heading_text.to_s.strip
+      text = text[1...-1] if text.start_with?("[") && text.end_with?("]")
+      text.casecmp("Unreleased").zero?
     end
 
     def synchronize_managed_block(content, facts)
