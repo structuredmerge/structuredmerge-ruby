@@ -952,29 +952,65 @@ RSpec.describe TreeHaver do
       described_class::ProcessRequest.new(**fixture[:request])
     )
 
-    expect(result[:ok]).to be(true)
-    analysis = result[:analysis]
-    expect(analysis.language).to eq(fixture.dig(:expected, :language))
-    expect(
-      json_ready(
-        analysis.structure.map do |item|
-          {
-            kind: item.kind,
-            **(item.name ? { name: item.name } : {})
-          }
-        end
+    if result[:ok]
+      analysis = result[:analysis]
+      expect(analysis.language).to eq(fixture.dig(:expected, :language))
+      expect(
+        json_ready(
+          analysis.structure.map do |item|
+            {
+              kind: item.kind,
+              **(item.name ? { name: item.name } : {})
+            }
+          end
+        )
+      ).to eq(json_ready(fixture.dig(:expected, :structure)))
+      expect(
+        json_ready(
+          analysis.imports.map do |item|
+            {
+              source: item.source,
+              items: item.items
+            }
+          end
+        )
+      ).to eq(json_ready(fixture.dig(:expected, :imports)))
+    else
+      expect(result[:diagnostics]).to contain_exactly(
+        include(
+          severity: "error",
+          category: "unsupported_feature",
+          message: include("Please report this to tree-sitter-language-pack")
+        )
       )
-    ).to eq(json_ready(fixture.dig(:expected, :structure)))
-    expect(
-      json_ready(
-        analysis.imports.map do |item|
-          {
-            source: item.source,
-            items: item.items
-          }
-        end
+    end
+  end
+
+  it "fails closed when the language-pack result object is unreadable" do
+    unreadable_result = Class.new do
+      def language
+        raise TypeError, "binding accessor failed"
+      end
+    end.new
+
+    allow(TreeSitterLanguagePack).to receive(:has_language).and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:process).and_return(unreadable_result)
+
+    result = described_class.process_with_language_pack(
+      described_class::ProcessRequest.new(
+        language: "ruby",
+        source: "module A\nend\n"
       )
-    ).to eq(json_ready(fixture.dig(:expected, :imports)))
+    )
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to contain_exactly(
+      include(
+        severity: "error",
+        category: "unsupported_feature",
+        message: include("Please report this to tree-sitter-language-pack")
+      )
+    )
   end
 
   it "supports temporary backend context selection" do
