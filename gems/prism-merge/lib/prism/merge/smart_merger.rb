@@ -58,6 +58,12 @@ module Prism
       # @return [Symbol] How suspected corruption should be handled (:heal, :warn, :error, :skip)
       attr_reader :corruption_handling
 
+      # @return [Boolean] Whether template-only require calls may be emitted
+      attr_reader :merge_template_requires
+
+      # @return [Symbol] Where template-only nodes are emitted
+      attr_reader :template_only_placement
+
       # @return [Ast::Merge::Runtime::Session, nil] Runtime-charter state recorded during merge
       attr_reader :runtime_session
 
@@ -103,6 +109,8 @@ module Prism
         region_placeholder: nil,
         text_merger_options: nil,
         corruption_handling: :heal,
+        merge_template_requires: false,
+        template_only_placement: :after_anchor,
         **options
       )
         @max_recursion_depth = max_recursion_depth
@@ -110,6 +118,8 @@ module Prism
         @text_merger_options = text_merger_options
         @remove_template_missing_nodes = remove_template_missing_nodes
         @corruption_handling = normalize_corruption_handling(corruption_handling)
+        @merge_template_requires = merge_template_requires
+        @template_only_placement = normalize_template_only_placement(template_only_placement)
         @dest_prefix_comment_lines = nil
 
         # Store the raw (unwrapped) signature_generator so that
@@ -134,6 +144,13 @@ module Prism
           node_typing: node_typing,
           **options
         )
+      end
+
+      def normalize_template_only_placement(value)
+        normalized = value.to_s.empty? ? "after_anchor" : value.to_s
+        return normalized.to_sym if %w[after_anchor destination_tail].include?(normalized)
+
+        raise ArgumentError, "Unsupported template-only placement #{value.inspect}"
       end
 
       # Determine whether the given analysis represents a comment-only file.

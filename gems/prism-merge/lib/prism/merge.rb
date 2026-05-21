@@ -631,6 +631,8 @@ module Prism
       preference: :destination,
       add_template_only_nodes: true,
       signature_generator: nil,
+      merge_template_requires: false,
+      template_only_placement: :destination_tail,
       **options
     )
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
@@ -643,6 +645,8 @@ module Prism
         preference: preference,
         add_template_only_nodes: add_template_only_nodes,
         signature_generator: signature_generator,
+        merge_template_requires: merge_template_requires,
+        template_only_placement: template_only_placement,
         **options
       )
       {

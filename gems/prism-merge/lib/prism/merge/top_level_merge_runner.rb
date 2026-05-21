@@ -95,9 +95,10 @@ module Prism
             add_template_only_nodes: merger.add_template_only_nodes,
           )
 
-          # Emit template-only nodes that precede the first matched template node
-          emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
-            merger.send(:add_node_to_result, merger.result, info[:node], merger.template_analysis, :template)
+          unless destination_tail_template_only_placement?
+            emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
+              emit_template_only_node(info, consumed_template_indices)
+            end
           end
 
           merger.dest_analysis.statements.each do |dest_node|
@@ -113,12 +114,15 @@ module Prism
           end
 
           # Safety net: emit any trailing groups whose anchor was never consumed
-          emit_remaining_trailing_groups(
-            trailing_groups: trailing_groups,
-            consumed_indices: consumed_template_indices,
-          ) do |info|
-            merger.send(:add_node_to_result, merger.result, info[:node], merger.template_analysis, :template)
+          unless destination_tail_template_only_placement?
+            emit_remaining_trailing_groups(
+              trailing_groups: trailing_groups,
+              consumed_indices: consumed_template_indices,
+            ) do |info|
+              emit_template_only_node(info, consumed_template_indices)
+            end
           end
+          emit_tail_template_only_nodes(consumed_template_indices) if destination_tail_template_only_placement?
 
           emit_dest_postlude_lines(last_output_dest_line)
 
@@ -869,6 +873,49 @@ module Prism
         )
       end
 
+      def destination_tail_template_only_placement?
+        merger.template_only_placement == :destination_tail
+      end
+
+      def emit_tail_template_only_nodes(consumed_template_indices)
+        return unless merger.add_template_only_nodes
+
+        merger.template_analysis.statements.each_with_index do |node, index|
+          next if consumed_template_indices.include?(index)
+          add_tail_template_separator if template_only_node_allowed?(node)
+
+          emit_template_only_node({ node: node, index: index }, consumed_template_indices)
+        end
+      end
+
+      def add_tail_template_separator
+        return if merger.result.lines.empty?
+        return if merger.result.lines.last.to_s.empty?
+
+        merger.result.add_line(
+          "",
+          decision: Prism::Merge::MergeResult::DECISION_APPENDED,
+          comment: "separator before tail template-only Ruby node"
+        )
+      end
+
+      def emit_template_only_node(info, consumed_template_indices)
+        consumed_template_indices << info[:index]
+        return unless template_only_node_allowed?(info[:node])
+
+        merger.send(:add_node_to_result, merger.result, info[:node], merger.template_analysis, :template)
+      end
+
+      def template_only_node_allowed?(node)
+        return true if merger.merge_template_requires
+
+        !ruby_require_call?(node)
+      end
+
+      def ruby_require_call?(node)
+        node.is_a?(::Prism::CallNode) && %i[require require_relative].include?(node.name)
+      end
+
       def retained_owner_plan(template_by_signature:, dest_by_signature:)
         matched_template_indices = Set.new
         retained_dest_indices = Set.new
@@ -950,11 +997,12 @@ module Prism
             # Emit template-only nodes that follow this matched template node
             matched_template_index = template_info[:index]
             group = trailing_groups[matched_template_index]
-            group&.each do |info|
-              next if consumed_template_indices.include?(info[:index])
+            unless destination_tail_template_only_placement?
+              group&.each do |info|
+                next if consumed_template_indices.include?(info[:index])
 
-              merger.send(:add_node_to_result, merger.result, info[:node], merger.template_analysis, :template)
-              consumed_template_indices << info[:index]
+                emit_template_only_node(info, consumed_template_indices)
+              end
             end
           else
             if merger.remove_template_missing_nodes
