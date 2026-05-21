@@ -5035,8 +5035,8 @@ module Kettle
       readme_path = File.join(project_root, "README.md")
       return nil unless File.exist?(readme_path)
 
-      heading = File.read(readme_path).lines.find { |line| line.match?(/\A#\s+\S+/) }
-      candidate = first_grapheme(heading.to_s.sub(/\A#\s+/, ""))
+      h1 = markdown_heading_owners(File.read(readme_path), source_label: "README.md").find { |owner| owner.level == 1 }
+      candidate = first_grapheme(h1&.heading_text)
       decorative_grapheme?(candidate) ? candidate : nil
     end
 
@@ -7755,30 +7755,37 @@ module Kettle
     end
 
     def synchronize_github_funding_yml(content, facts)
-      output = content.to_s.lines
+      output = content.to_s
       output = remove_top_level_yaml_key_lines(output, "open_collective") if facts.fetch(:funding, {})[:open_collective_disabled]
       tidelift_value = "rubygems/#{facts.fetch(:package).fetch(:name)}"
-      if output.none? { |line| line.match?(/\A\s*tidelift\s*:/) }
-        output << "\n" unless output.empty? || output.last.to_s.strip.empty?
-        output << "tidelift: #{tidelift_value}\n"
+      unless yaml_top_level_key_lines(output).key?("tidelift")
+        lines = output.lines
+        lines << "\n" unless lines.empty? || lines.last.to_s.strip.empty?
+        lines << "tidelift: #{tidelift_value}\n"
+        output = lines.join
       end
-      ensure_trailing_newline(output.join)
+      ensure_trailing_newline(output)
     end
 
-    def remove_top_level_yaml_key_lines(lines, key)
-      result = []
-      index = 0
-      while index < lines.length
-        line = lines[index]
-        if line.match?(/\A#{Regexp.escape(key)}\s*:/)
-          index += 1
-          index += 1 while index < lines.length && lines[index].match?(/\A\s+/)
-          next
-        end
-        result << line
-        index += 1
+    def remove_top_level_yaml_key_lines(content, key)
+      lines = content.to_s.lines
+      document = Psych.parse_stream(content.to_s).children.first
+      root = document&.root
+      return content unless root.is_a?(Psych::Nodes::Mapping)
+
+      pairs = root.children.each_slice(2).to_a
+      pairs.each_with_index do |(key_node, value_node), index|
+        next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+
+        next_key = pairs[index + 1]&.first
+        end_line = next_key&.start_line || value_node.end_line
+        end_line += 1 if end_line <= key_node.start_line
+        return [*lines[0...key_node.start_line], *lines[end_line..].to_a].join
       end
-      result
+
+      content
+    rescue Psych::Exception
+      content
     end
 
     def delete_rakefile_scaffold(content)
