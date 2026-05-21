@@ -474,10 +474,11 @@ module Kettle
 
             processed = remove_badge_occurrences(processed, label)
           end
-          processed = processed.lines.reject do |line|
-            ref_label = line[/^\[([^\]]+)\]:/, 1]
-            ref_label && patterns.fetch(:ref_prefixes).any? { |pattern| pattern.match?(ref_label) }
-          end.join
+          ref_labels = markdown_link_definition_owners(processed).filter_map do |owner|
+            label = owner.label.to_s
+            label if patterns.fetch(:ref_prefixes).any? { |pattern| pattern.match?(label) }
+          end
+          processed = delete_markdown_link_definitions(processed, ref_labels)
         end
 
         processed
@@ -495,15 +496,15 @@ module Kettle
       end
 
       def workflow_references(content)
-        content.to_s.lines.each_with_object({}) do |line, references|
-          label, url = line.match(/^\[([^\]]+)\]:\s+(\S+)/)&.captures
-          next unless label && url
-
-          workflow = url[%r{/actions/workflows/([^/?#]+)}, 1]
+        markdown_link_definition_owners(content).each_with_object({}) do |owner, references|
+          workflow = URI(owner.url.to_s).path.to_s.split("/actions/workflows/", 2).last
           next unless workflow
+          workflow = workflow.split("/", 2).first
 
-          references[label] = ".github/workflows/#{workflow}"
+          references[owner.label.to_s] = ".github/workflows/#{workflow}"
         end
+      rescue URI::InvalidURIError
+        {}
       end
 
       def remove_workflow_badge_occurrences(content, workflow_label)
@@ -566,13 +567,34 @@ module Kettle
         content.lines.each do |line|
           next if line.match?(/^\[[^\]]+\]:/)
 
+          # Markly exposes link definition owners, but not inline reference-label
+          # owners. Keep this bounded text scan until the adapter grows inline
+          # link/image reference ownership.
           line.scan(/\]\[([^\]]+)\]/) { |match| referenced_labels[match.first] = true }
         end
 
-        content.lines.reject do |line|
-          label = line[/^\[([^\]]+)\]:/, 1]
-          label && COMPATIBILITY_REFERENCE_LABEL_RE.match?(label) && !referenced_labels[label]
-        end.join
+        labels = markdown_link_definition_owners(content).filter_map do |owner|
+          label = owner.label.to_s
+          label if COMPATIBILITY_REFERENCE_LABEL_RE.match?(label) && !referenced_labels[label]
+        end
+        delete_markdown_link_definitions(content, labels)
+      end
+
+      def markdown_link_definition_owners(content)
+        context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
+        context.structural_owners(owner_scope: :link_definitions)
+      rescue Ast::Crispr::Error
+        []
+      end
+
+      def delete_markdown_link_definitions(content, labels)
+        labels.uniq.reduce(content.to_s) do |processed, label|
+          Ast::Crispr::Delete.call(
+            content: processed,
+            target: Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0}),
+            source_label: "README.md"
+          ).updated_content
+        end
       end
     end
 
