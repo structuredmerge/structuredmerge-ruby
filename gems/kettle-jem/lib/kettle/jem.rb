@@ -8226,9 +8226,31 @@ module Kettle
     end
 
     def update_github_actions_pins(content)
-      github_actions_step_pins.reduce(content) do |updated, (action_prefix, pinned_value)|
-        updated.gsub(/^(\s*(?:-\s*)?uses:\s*)#{Regexp.escape(action_prefix)}@\S+(?:\s+#.*)?$/) do
-          "#{$1}#{pinned_value}"
+      lines = content.to_s.lines
+      yaml_scalar_pairs(content).each do |key_node, value_node|
+        next unless key_node.value.to_s == "uses"
+
+        pinned_value = github_actions_step_pins.find do |action_prefix, _pin|
+          value_node.value.to_s.start_with?("#{action_prefix}@")
+        end&.last
+        next unless pinned_value
+
+        line_index = key_node.start_line
+        line = lines[line_index].to_s
+        key_index = line.index("uses:")
+        next unless key_index
+
+        lines[line_index] = "#{line[0...key_index]}uses: #{pinned_value}\n"
+      end
+      lines.join
+    rescue Psych::Exception
+      content
+    end
+
+    def yaml_scalar_pairs(content)
+      yaml_mapping_nodes(content).flat_map do |mapping|
+        mapping.children.each_slice(2).filter_map do |key_node, value_node|
+          [key_node, value_node] if key_node.is_a?(Psych::Nodes::Scalar) && value_node.is_a?(Psych::Nodes::Scalar)
         end
       end
     end
