@@ -7,7 +7,7 @@ RUBY_MERGE = ::Ruby::Merge
 RSpec.describe "Ruby::Merge" do
   RubyMergeSpecSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
   RubyMergeSpecStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
-  RubyMergeSpecProcessAnalysis = Struct.new(:structure, keyword_init: true)
+  RubyMergeSpecProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
 
   def fixtures_root
     Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
@@ -27,6 +27,15 @@ RSpec.describe "Ruby::Merge" do
       name: name,
       span: RubyMergeSpecSpan.new(start_row: start_row, start_col: 0, end_row: end_row, end_col: 3)
     )
+  end
+
+  def ruby_parse_result(source, process_analysis)
+    {
+      ok: true,
+      diagnostics: [],
+      analysis: RUBY_MERGE.analyze_ruby_document(source, process_analysis: process_analysis),
+      policies: []
+    }
   end
 
   it "does not mix legacy declaration discovery into parser-backed Ruby structure" do
@@ -57,6 +66,87 @@ RSpec.describe "Ruby::Merge" do
         owner_kind: "declaration",
         match_key: "TemplateOwned"
       }
+    )
+  end
+
+  it "merges the TSLP-backed top-level declaration subset without legacy scanners" do
+    template_source = <<~RUBY
+      class Existing
+        def template_change
+          true
+        end
+      end
+
+      module Added
+      end
+    RUBY
+    destination_source = <<~RUBY
+      class Existing
+        def destination_owned
+          true
+        end
+      end
+    RUBY
+    template_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [
+        process_item(kind: "class", name: "Existing", start_row: 0, end_row: 4),
+        process_item(kind: "module", name: "Added", start_row: 6, end_row: 7)
+      ],
+      imports: []
+    )
+    destination_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [
+        process_item(kind: "class", name: "Existing", start_row: 0, end_row: 4)
+      ],
+      imports: []
+    )
+
+    allow(RUBY_MERGE).to receive(:parse_ruby) do |source, dialect|
+      expect(dialect).to eq("ruby")
+      source == template_source ? ruby_parse_result(source, template_process) : ruby_parse_result(source, destination_process)
+    end
+
+    result = RUBY_MERGE.merge_ruby(template_source, destination_source, "ruby")
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include("def destination_owned")
+    expect(result[:output]).not_to include("def template_change")
+    expect(result[:output]).to include("module Added")
+    expect(result.dig(:merge_planning, :intra_owner_merges, :strategy)).to eq("destination_wins_tslp_owner_body")
+  end
+
+  it "fails closed when the TSLP-backed Ruby merge sees unmodeled top-level content" do
+    template_source = <<~RUBY
+      class Existing
+      end
+    RUBY
+    destination_source = <<~RUBY
+      class Existing
+      end
+
+      puts "unmodeled"
+    RUBY
+    template_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [process_item(kind: "class", name: "Existing", start_row: 0, end_row: 1)],
+      imports: []
+    )
+    destination_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [process_item(kind: "class", name: "Existing", start_row: 0, end_row: 1)],
+      imports: []
+    )
+
+    allow(RUBY_MERGE).to receive(:parse_ruby) do |source, _dialect|
+      source == template_source ? ruby_parse_result(source, template_process) : ruby_parse_result(source, destination_process)
+    end
+
+    result = RUBY_MERGE.merge_ruby(template_source, destination_source, "ruby")
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to contain_exactly(
+      hash_including(
+        category: "unsupported_feature",
+        message: include("destination has unsupported top-level content on line(s) 4")
+      )
     )
   end
 

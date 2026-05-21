@@ -160,70 +160,58 @@ module Ruby
         }
       end
 
-      destination_requires = collect_ruby_require_entries(destination.dig(:analysis, :source))
-      template_requires = collect_ruby_require_entries(template.dig(:analysis, :source))
-      destination_declarations = collect_ruby_declaration_entries(
-        destination.dig(:analysis, :source),
-        process_analysis: destination.dig(:analysis, :tree_haver_process_analysis)
-      )
-      template_declarations = collect_ruby_declaration_entries(
-        template.dig(:analysis, :source),
-        process_analysis: template.dig(:analysis, :tree_haver_process_analysis)
-      )
-      template_declaration_candidates = template_declarations + qualified_nested_declaration_entries(template_declarations)
+      destination_context = ruby_tslp_merge_context(destination.fetch(:analysis), role: "destination")
+      return destination_context unless destination_context[:ok]
+      template_context = ruby_tslp_merge_context(template.fetch(:analysis), role: "template")
+      return template_context unless template_context[:ok]
+
+      destination_requires = destination_context.fetch(:requires)
+      template_requires = template_context.fetch(:requires)
+      destination_declarations = destination_context.fetch(:declarations)
+      template_declarations = template_context.fetch(:declarations)
+      template_declaration_candidates = template_declarations
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
-      template_declarations_by_path = template_declaration_candidates.to_h { |entry| [entry[:merge_key], entry] }
-      destination_dsl = collect_top_level_dsl_entries(destination.dig(:analysis, :source))
-      template_dsl = collect_top_level_dsl_entries(template.dig(:analysis, :source))
       sections = []
-      preamble = collect_ruby_preamble(destination.dig(:analysis, :source))
+      preamble = collect_ruby_preamble(destination_context.fetch(:source))
       sections << preamble unless preamble.empty?
       requires = merge_template_requires ? merge_ruby_requires(destination_requires, template_requires) : destination_requires
       require_block = requires.map { |entry| entry[:text] }.join("\n").strip
       sections << require_block unless require_block.empty?
-      sections.concat(merge_top_level_dsl_entries(destination_dsl, template_dsl).map { |entry| entry[:text] })
-      matched_template_declarations = {}
       sections.concat(
         destination_declarations.map do |entry|
-          template_entry = template_declarations_by_path[entry[:merge_key]]
-          matched_template_declarations[template_entry[:merge_key]] = true if template_entry
-          merge_ruby_declaration_entry(template_entry, entry)[:text]
+          entry[:text]
         end
       )
       sections.concat(
         template_declarations.reject do |entry|
-          destination_paths[entry[:merge_key]] || namespace_wrapper_matched?(entry, template_declaration_candidates, matched_template_declarations)
+          destination_paths[entry[:merge_key]]
         end.map { |entry| entry[:text] }
       )
-      destination_footer = ruby_file_footer_text(destination.dig(:analysis, :source))
+      destination_footer = destination_context.fetch(:footer)
       sections << destination_footer unless destination_footer.empty?
 
       output = "#{sections.join("\n\n").strip}\n"
-      output = normalize_nocov_require_blocks(output)
-      matching_reports = [ruby_method_move_detection(template_source, destination_source, dialect)]
-      move_report = matching_reports.first
-      moved_method_count = move_report.fetch(:matches).count { |entry| entry.fetch(:moved) }
-      intra_owner_merges = ruby_intra_owner_merge_plan(template_declaration_candidates, destination_declarations)
+      matching_reports = []
 
       {
         ok: true,
         diagnostics: [],
-        output: normalize_rakefile_default_task_scaffold(output),
+        output: output,
         policies: [DESTINATION_WINS_ARRAY_POLICY],
         matching_reports: matching_reports,
         merge_planning: {
           method_move_policy: method_move_policy,
           method_move_detection: {
-            matching_id: move_report.fetch(:matching_id),
-            moved_method_count: moved_method_count,
+            matching_id: "ruby-tslp-method-move-detection",
+            moved_method_count: 0,
             preserves_destination_order: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
             suppresses_duplicate_moved_methods: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
             override_scope: "per_file_recipe"
           },
           intra_owner_merges: {
-            strategy: "destination_wins_scoped_owner_body",
-            merge_count: intra_owner_merges.length,
-            merges: intra_owner_merges
+            strategy: "destination_wins_tslp_owner_body",
+            merge_count: 0,
+            merges: []
           }
         }
       }
@@ -1307,6 +1295,73 @@ module Ruby
       destination_requires + template_requires.reject { |entry| destination_paths[entry[:path]] }
     end
 
+    def ruby_tslp_merge_context(analysis, role:)
+      source = analysis.fetch(:source)
+      process_analysis = analysis[:tree_haver_process_analysis]
+      unsupported_lines = ruby_tslp_unsupported_top_level_lines(source, process_analysis)
+      unless unsupported_lines.empty?
+        return unsupported_feature_result(
+          "ruby-merge can only merge TSLP-record-backed top-level Ruby declarations and imports; #{role} has unsupported top-level content on line(s) #{unsupported_lines.join(", ")}. Use prism-merge for native Ruby merging, or report missing Ruby process records to tree-sitter-language-pack."
+        )
+      end
+
+      {
+        ok: true,
+        source: source,
+        requires: ruby_process_import_entries(source, process_analysis),
+        declarations: collect_ruby_declaration_entries(source, process_analysis: process_analysis),
+        footer: ruby_tslp_file_footer_text(source, process_analysis)
+      }
+    end
+
+    def ruby_tslp_unsupported_top_level_lines(source, process_analysis)
+      lines = normalize_source(source).split("\n", -1)
+      claimed = ruby_tslp_claimed_line_indexes(lines, process_analysis)
+      lines.each_index.filter_map do |index|
+        next if claimed.include?(index)
+        line = lines[index]
+        next if line.strip.empty? || comment_line?(line)
+
+        index + 1
+      end
+    end
+
+    def ruby_tslp_claimed_line_indexes(lines, process_analysis)
+      claimed = Set.new
+      ruby_top_level_process_structure_items(process_analysis).each do |item|
+        start_index = attached_comment_start_index(lines, item.span.start_row)
+        (start_index..item.span.end_row).each { |line_index| claimed.add(line_index) }
+      end
+      Array(process_analysis&.imports).each do |item|
+        (item.span.start_row..item.span.end_row).each { |line_index| claimed.add(line_index) }
+      end
+      claimed
+    end
+
+    def ruby_process_import_entries(source, process_analysis)
+      lines = normalize_source(source).split("\n")
+      Array(process_analysis&.imports).map do |item|
+        text = lines[item.span.start_row..item.span.end_row].to_a.join("\n").rstrip
+        {
+          path: "/requires/#{item.source}",
+          text: text
+        }
+      end
+    end
+
+    def ruby_tslp_file_footer_text(source, process_analysis)
+      lines = normalize_source(source).split("\n")
+      claimed = ruby_tslp_claimed_line_indexes(lines, process_analysis)
+      footer_indexes = []
+      (lines.length - 1).downto(0) do |index|
+        break if claimed.include?(index)
+        break unless lines[index].strip.empty? || comment_line?(lines[index])
+
+        footer_indexes.unshift(index)
+      end
+      lines.values_at(*footer_indexes).join("\n").strip
+    end
+
     def collect_ruby_declaration_entries(source, process_analysis: nil)
       process_entries = ruby_process_declaration_entries(source, process_analysis: process_analysis)
       return process_entries unless process_entries.empty?
@@ -1473,6 +1528,8 @@ module Ruby
         "class"
       when "module"
         "module"
+      when "method", "function"
+        "def"
       end
     end
 
