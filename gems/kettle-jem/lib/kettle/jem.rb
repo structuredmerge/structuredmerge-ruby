@@ -609,6 +609,17 @@ module Kettle
         delete_markdown_link_definitions(content, labels)
       end
 
+      def prune_orphaned_workflow_inline_references(content)
+        defined_labels = markdown_link_definition_owners(content).map { |owner| owner.label.to_s }.to_set
+        orphaned_labels = markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).uniq.select do |label|
+          label.start_with?("🚎") && !defined_labels.include?(label)
+        end
+        processed = orphaned_labels.reduce(content.to_s) do |memo, label|
+          remove_markdown_inline_references(memo, label)
+        end
+        normalize_compatibility_rows(processed)
+      end
+
       def markdown_link_definition_owners(content)
         context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         context.structural_owners(owner_scope: :link_definitions)
@@ -3660,6 +3671,7 @@ module Kettle
         workflow_paths: style[:workflow_paths]
       ) if style[:workflow_paths]
       prepared = prune_missing_workflow_link_definitions(prepared, style[:workflow_paths]) if style[:workflow_paths]
+      prepared = ReadmePostProcessor.prune_orphaned_workflow_inline_references(prepared) if style[:workflow_paths]
       omitted_sections = Array(style[:omitted_sections]).map(&:to_s)
       omitted_sections << "security" if style.key?(:security_enabled) && !style[:security_enabled]
       omitted_sections << "floss_funding" if style.key?(:floss_funding_enabled) && !style[:floss_funding_enabled]
