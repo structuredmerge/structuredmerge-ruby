@@ -5262,12 +5262,20 @@ RSpec.describe Kettle::Jem do
           Year: {KJ|TEMPLATE_RUN_YEAR}
           Dev gem: {KJ|KETTLE_DEV_GEM}
           YARD: {KJ|YARD_HOST}
+          Homepage URI: {KJ|HOMEPAGE_URI}
           Emoji: {KJ|PROJECT_EMOJI}
           Divergence: {KJ|MIN_DIVERGENCE_THRESHOLD}
         MARKDOWN
       })
 
-      plan = described_class.plan_project(root, env: { "KJ_MIN_DIVERGENCE_THRESHOLD" => "12" })
+      plan = described_class.plan_project(
+        root,
+        env: {
+          "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
+          "KJ_YARD_HOST" => "docs.example.test",
+          "KJ_HOMEPAGE_URI" => "https://homepage.example.test",
+        }
+      )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
       end
@@ -5282,7 +5290,8 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("Date: #{Time.now.strftime("%Y-%m-%d")}")
       expect(final_content).to include("Year: #{Time.now.year}")
       expect(final_content).to include("Dev gem: kettle-dev")
-      expect(final_content).to include("YARD: example-gem.example.test")
+      expect(final_content).to include("YARD: docs.example.test")
+      expect(final_content).to include("Homepage URI: https://homepage.example.test")
       expect(final_content).to include("Emoji: 🫖")
       expect(final_content).to include("Divergence: 12")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
@@ -5294,7 +5303,48 @@ RSpec.describe Kettle::Jem do
         "KJ|MIN_DIVERGENCE_THRESHOLD" => "12",
         "KJ|NAMESPACE_SHIELD" => "Example%3A%3AGem",
         "KJ|PROJECT_EMOJI" => "🫖",
-        "KJ|YARD_HOST" => "example-gem.example.test"
+        "KJ|HOMEPAGE_URI" => "https://homepage.example.test",
+        "KJ|YARD_HOST" => "docs.example.test"
+      )
+    end
+  end
+
+  it "honors configured project runtime URI tokens when ENV is absent" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-project-runtime-uri-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🫖"
+          yard_host: docs.config.test
+          homepage_uri: https://homepage.config.test
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => "YARD: {KJ|YARD_HOST}\nHomepage URI: {KJ|HOMEPAGE_URI}\n",
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(template_report.fetch(:final_content)).to eq("YARD: docs.config.test\nHomepage URI: https://homepage.config.test\n")
+      expect(template_report.dig(:metadata, :template_tokens)).to include(
+        "KJ|HOMEPAGE_URI" => "https://homepage.config.test",
+        "KJ|YARD_HOST" => "docs.config.test"
       )
     end
   end

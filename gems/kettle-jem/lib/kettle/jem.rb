@@ -2903,6 +2903,7 @@ module Kettle
         "KJ|SOCIAL:DEVTO" => "",
         "KJ|SOCIAL:LINKTREE" => "",
         "KJ|SOCIAL:MASTODON" => "",
+        "KJ|HOMEPAGE_URI" => "https://rubydoc.info",
         "KJ|YARD_HOST" => "rubydoc.info",
       }.merge(template_tokens(facts, facts.fetch(:funding, {})))
     end
@@ -6236,13 +6237,15 @@ module Kettle
     def project_runtime_facts(config, env, package_name:, source_url:, author_domain:, min_ruby:, version:)
       run_timestamp = Time.now
       configured_project_emoji = preferred_template_token_value(nil, config["project_emoji"], env, "KJ_PROJECT_EMOJI")
+      yard_host = project_yard_host(config, env, package_name: package_name, author_domain: author_domain)
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
-        yard_host: "#{package_name.to_s.tr("_", "-")}.#{author_domain.to_s.empty? ? "example.com" : author_domain}",
+        yard_host: yard_host,
+        homepage_uri: project_homepage_uri(config, env, yard_host: yard_host),
         project_emoji: preferred_template_token_value("💎", config["project_emoji"], env, "KJ_PROJECT_EMOJI").to_s,
         project_emoji_configured: !configured_project_emoji.to_s.empty?,
         min_divergence_threshold: preferred_template_token_value(nil, config["min_divergence_threshold"], env, "KJ_MIN_DIVERGENCE_THRESHOLD").to_s,
@@ -6260,9 +6263,29 @@ module Kettle
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
+        "KJ|HOMEPAGE_URI" => project_runtime[:homepage_uri].to_s,
         "KJ|PROJECT_EMOJI" => project_runtime[:project_emoji].to_s,
         "KJ|MIN_DIVERGENCE_THRESHOLD" => project_runtime[:min_divergence_threshold].to_s,
       }
+    end
+
+    def project_yard_host(config, env, package_name:, author_domain:)
+      derived = "#{package_name.to_s.tr("_", "-")}.#{author_domain.to_s.empty? ? "example.com" : author_domain}"
+      preferred_template_token_value(derived, project_runtime_config_value(config, "yard_host"), env, "KJ_YARD_HOST").to_s
+    end
+
+    def project_homepage_uri(config, env, yard_host:)
+      derived = "https://#{yard_host}" if present_template_token_value?(yard_host)
+      preferred_template_token_value(derived, project_runtime_config_value(config, "homepage_uri"), env, "KJ_HOMEPAGE_URI").to_s
+    end
+
+    def project_runtime_config_value(config, key)
+      token_config = token_config_values(config)
+      runtime_config = token_config["project_runtime"].is_a?(Hash) ? token_config["project_runtime"] : {}
+      top_level_value = config[key]
+      return top_level_value if present_template_token_value?(top_level_value)
+
+      runtime_config[key]
     end
 
     def version_gem_bootstrap_step(project_root, facts)

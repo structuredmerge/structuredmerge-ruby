@@ -217,6 +217,16 @@ machine_users:
 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
 min_divergence_threshold: {KJ|MIN_DIVERGENCE_THRESHOLD}
 
+# Hostname used for generated YARD documentation links.
+# Defaults to <gem-name>.<author-email-domain>.
+# ENV override: KJ_YARD_HOST
+yard_host: {KJ|YARD_HOST}
+
+# Full URL used for gemspec metadata["homepage_uri"].
+# Defaults to https://{KJ|YARD_HOST}.
+# ENV override: KJ_HOMEPAGE_URI
+homepage_uri: {KJ|HOMEPAGE_URI}
+
 # Template source inventory.
 # The packaged inventory is the canonical kettle-jem project template. It
 # includes the detailed GitHub Actions workflow set, modular gemfiles,

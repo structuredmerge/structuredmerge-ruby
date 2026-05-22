@@ -1,6 +1,9 @@
 [tools]
 ruby = "4.0.2"
 
+[env]
+KJ_HOMEPAGE_URI = "https://structuredmerge.org"
+
 [tasks.test]
 description = "Run Ruby specs"
 run = "bundle exec rspec"
