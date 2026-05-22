@@ -5498,6 +5498,52 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "syncs ENV-backed values back into .kettle-jem.yml during templating" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-env-config-sync", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🫖"
+          min_divergence_threshold: 5
+          yard_host: docs.config.test
+          homepage_uri: https://homepage.config.test
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .kettle-jem.yml
+        YAML
+      })
+
+      apply = described_class.apply_project(
+        root,
+        env: {
+          "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
+          "KJ_YARD_HOST" => "docs.env.test",
+          "KJ_HOMEPAGE_URI" => "https://homepage.env.test",
+        },
+        run_options: {skip_commit: true}
+      )
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".kettle-jem.yml" }
+      config = YAML.safe_load(report.fetch(:final_content))
+
+      expect(config.fetch("min_divergence_threshold")).to eq(12)
+      expect(config.fetch("yard_host")).to eq("docs.env.test")
+      expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
+      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
+    end
+  end
+
   it "derives source and forge tokens from git origin when gemspec metadata is absent" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

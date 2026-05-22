@@ -102,6 +102,33 @@ module Kettle
       "lib/gem/version.rb",
       "sig/gem/version.rbs",
     ].freeze
+    KETTLE_CONFIG_ENV_SYNC_PATHS = {
+      %w[project_emoji] => "KJ_PROJECT_EMOJI",
+      %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
+      %w[yard_host] => "KJ_YARD_HOST",
+      %w[homepage_uri] => "KJ_HOMEPAGE_URI",
+      %w[tokens forge gh_user] => "KJ_GH_USER",
+      %w[tokens forge gl_user] => "KJ_GL_USER",
+      %w[tokens forge cb_user] => "KJ_CB_USER",
+      %w[tokens forge sh_user] => "KJ_SH_USER",
+      %w[tokens author name] => "KJ_AUTHOR_NAME",
+      %w[tokens author given_names] => "KJ_AUTHOR_GIVEN_NAMES",
+      %w[tokens author family_names] => "KJ_AUTHOR_FAMILY_NAMES",
+      %w[tokens author email] => "KJ_AUTHOR_EMAIL",
+      %w[tokens author domain] => "KJ_AUTHOR_DOMAIN",
+      %w[tokens author orcid] => "KJ_AUTHOR_ORCID",
+      %w[tokens funding patreon] => "KJ_FUNDING_PATREON",
+      %w[tokens funding kofi] => "KJ_FUNDING_KOFI",
+      %w[tokens funding paypal] => "KJ_FUNDING_PAYPAL",
+      %w[tokens funding buymeacoffee] => "KJ_FUNDING_BUYMEACOFFEE",
+      %w[tokens funding polar] => "KJ_FUNDING_POLAR",
+      %w[tokens funding liberapay] => "KJ_FUNDING_LIBERAPAY",
+      %w[tokens funding issuehunt] => "KJ_FUNDING_ISSUEHUNT",
+      %w[tokens social mastodon] => "KJ_SOCIAL_MASTODON",
+      %w[tokens social bluesky] => "KJ_SOCIAL_BLUESKY",
+      %w[tokens social linktree] => "KJ_SOCIAL_LINKTREE",
+      %w[tokens social devto] => "KJ_SOCIAL_DEVTO",
+    }.freeze
     NON_LICENSE_MD_BASENAMES = %w[
       AGENTS
       CHANGELOG
@@ -2620,7 +2647,7 @@ module Kettle
       pack = filter_recipe_pack(pack, template_selection)
       files = read_project_files(project_root, pack)
       recipe_reports = pack.fetch(:recipes).map do |recipe|
-        execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy)
+        execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
       end
       plugin_registry = plugin_registry_for_project(project_root)
       changed_files = recipe_reports.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
@@ -3008,7 +3035,7 @@ module Kettle
       replace_ruby_managed_block(content.to_s, replacement)
     end
 
-    def execute_recipe(project_root:, recipe:, facts:, files:, decision_policy:)
+    def execute_recipe(project_root:, recipe:, facts:, files:, decision_policy:, env: ENV)
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
@@ -3041,11 +3068,11 @@ module Kettle
       when /\Agithub_actions_workflow_snippets_/
         synchronize_github_actions_workflow_snippets(original)
       when "kettle_config_bootstrap"
-        apply_kettle_config_bootstrap(project_root, recipe)
+        apply_kettle_config_bootstrap(project_root, recipe, env: env)
       when /\Atemplate_source_preference_/
         original
       when /\Atemplate_source_application_/
-        apply_template_source(project_root, recipe, original, facts: facts)
+        apply_template_source(project_root, recipe, original, facts: facts, env: env)
       when "rakefile_scaffold_cleanup"
         deletion.fetch(:content)
       else
@@ -3340,7 +3367,7 @@ module Kettle
       content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join
     end
 
-    def apply_template_source(project_root, recipe, original, facts: nil)
+    def apply_template_source(project_root, recipe, original, facts: nil, env: ENV)
       strategy = recipe.dig(:template_preference, :strategy).to_s
       return original if strategy == "keep_destination"
 
@@ -3367,9 +3394,15 @@ module Kettle
           facts
         )
       end
-      return merge_config_template_source(recipe, resolved, original, facts: facts) if strategy.empty? || strategy == "merge"
+      if strategy.empty? || strategy == "merge"
+        merged = merge_config_template_source(recipe, resolved, original, facts: facts)
+        return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
+
+        return merged
+      end
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
+        accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
         return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts) : accepted
       end
 
@@ -5032,14 +5065,15 @@ module Kettle
       :text
     end
 
-    def apply_kettle_config_bootstrap(project_root, recipe)
+    def apply_kettle_config_bootstrap(project_root, recipe, env: ENV)
       content = recipe_template_content(project_root, recipe)
       tokens = stringify_template_tokens(recipe.fetch(:template_tokens, {}))
       content = content.gsub("{KJ|MIN_DIVERGENCE_THRESHOLD}", tokens.fetch("KJ|MIN_DIVERGENCE_THRESHOLD", ""))
       bootstrap_licenses = Array(recipe[:bootstrap_licenses]).map(&:to_s).reject(&:empty?)
       content = replace_kettle_config_bootstrap_licenses(content, bootstrap_licenses) unless bootstrap_licenses.empty?
       content = replace_kettle_config_bootstrap_project_emoji(content, recipe[:bootstrap_project_emoji]) unless recipe[:bootstrap_project_emoji].to_s.empty?
-      apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
+      content = apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
+      sync_kettle_config_env_overrides(content, env)
     end
 
     def replace_kettle_config_bootstrap_project_emoji(content, emoji)
@@ -5071,6 +5105,40 @@ module Kettle
         return lines.join
       end
       content
+    end
+
+    def sync_kettle_config_env_overrides(content, env)
+      KETTLE_CONFIG_ENV_SYNC_PATHS.reduce(content.to_s) do |updated, (path, env_key)|
+        value = env[env_key].to_s.strip
+        next updated unless present_template_token_value?(value)
+
+        replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
+      end
+    end
+
+    def replace_yaml_scalar_path(content, path, value)
+      lines = content.to_s.lines
+      yaml_scalar_path_entries(content).each do |entry|
+        next unless entry.fetch(:path) == path
+
+        line_index = entry.fetch(:line)
+        line = lines[line_index].to_s
+        key = path.last.to_s
+        key_index = line.index("#{key}:")
+        next unless key_index
+
+        lines[line_index] = "#{line[0...key_index]}#{key}: #{value}\n"
+        return lines.join
+      end
+      content
+    end
+
+    def yaml_config_scalar_literal(value, path:)
+      clean = value.to_s.strip
+      return clean if path == ["project_emoji"]
+      return clean if clean.match?(/\A\d+(?:\.\d+)?\z/)
+
+      JSON.generate(clean)
     end
 
     def replace_yaml_node_lines(content, key, replacement)
@@ -8638,6 +8706,33 @@ module Kettle
       yaml_mapping_nodes(content).flat_map do |mapping|
         mapping.children.each_slice(2).filter_map do |key_node, value_node|
           [key_node, value_node] if key_node.is_a?(Psych::Nodes::Scalar) && value_node.is_a?(Psych::Nodes::Scalar)
+        end
+      end
+    end
+
+    def yaml_scalar_path_entries(content)
+      document = Psych.parse_stream(content.to_s)
+      entries = []
+      document.children.each { |node| collect_yaml_scalar_path_entries(node, [], entries) }
+      entries
+    rescue Psych::Exception
+      []
+    end
+
+    def collect_yaml_scalar_path_entries(node, path, entries)
+      unless node.is_a?(Psych::Nodes::Mapping)
+        node.children.each { |child| collect_yaml_scalar_path_entries(child, path, entries) } if node.respond_to?(:children)
+        return
+      end
+
+      node.children.each_slice(2) do |key_node, value_node|
+        next unless key_node.is_a?(Psych::Nodes::Scalar)
+
+        child_path = path + [key_node.value.to_s]
+        if value_node.is_a?(Psych::Nodes::Scalar)
+          entries << {path: child_path, line: key_node.start_line}
+        elsif value_node.is_a?(Psych::Nodes::Mapping)
+          collect_yaml_scalar_path_entries(value_node, child_path, entries)
         end
       end
     end

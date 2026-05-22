@@ -56,17 +56,10 @@
 #
 # Token values:
 #   Precedence is:
-#     1) ENV variables
+#     1) ENV variables. During templating, known ENV-backed values are also
+#        written back into this file so config and runtime agree.
 #     2) tokens: values in this file
 #     3) safe automatic derivation (author fields only, where possible)
-#
-# Important merge note for tokens in THIS file:
-#   Existing destination values are respected.
-#   That means:
-#     - a real value you already set here stays in place on future runs
-#     - an empty string also counts as an explicit destination value
-#   If you want kettle-jem to re-seed a missing value on a later run,
-#   delete that key instead of leaving it blank.
 #
 # Safe automatic derivations currently implemented:
 #   AUTHOR:NAME         <- first author from the gemspec
