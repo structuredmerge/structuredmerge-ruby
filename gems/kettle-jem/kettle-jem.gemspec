@@ -31,7 +31,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "🔮 Gem templating engine using AST-based merging and configurable token resolution."
   spec.description = "🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold."
-  spec.homepage = "https://github.com/kettle-rb/kettle-jem"
+  spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
   spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
   spec.required_ruby_version = ">= 4.0.0"
 

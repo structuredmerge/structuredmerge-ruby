@@ -22,7 +22,7 @@
 #     it_behaves_like "Ast::Merge::ConflictResolverBase"
 #   end
 #
-# @see https://github.com/kettle-rb/tree_haver/blob/main/lib/tree_haver/rspec/README.md
+# @see https://github.com/structuredmerge/structuredmerge-ruby/blob/main/gems/tree_haver/lib/tree_haver/rspec/README.md
 #   TreeHaver RSpec documentation for parser backend tags
 
 # Load TreeHaver dependency tags first (provides parser backend tags like :markly, :prism_backend, etc.)

@@ -40,8 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Added
 - Initial release
 
-[Unreleased]: https://gitlab.com/kettle-rb/kettle-jem/-/compare/v1.0.0...HEAD
-[1.0.0]: https://gitlab.com/kettle-rb/kettle-jem/-/compare/a427c302df09cfe4253a7c8d400333f9a4c1a208...v1.0.0
-[1.0.0t]: https://gitlab.com/kettle-rb/kettle-jem/-/tags/v1.0.0
-[1.0.1]: https://gitlab.com/kettle-rb/kettle-jem/-/compare/v1.0.0...v1.0.1
-[1.0.1t]: https://gitlab.com/kettle-rb/kettle-jem/-/tags/v1.0.1
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/a427c302df09cfe4253a7c8d400333f9a4c1a208...v1.0.0
+[1.0.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v1.0.0
+[1.0.1]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v1.0.0...v1.0.1
+[1.0.1t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v1.0.1

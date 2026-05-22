@@ -124,7 +124,7 @@ RSpec.describe Ast::Merge::DebugLogger do
 
   context "when Benchmark is not available" do
     # Regression test for Ruby 4.0+ where benchmark is a bundled gem (not default).
-    # See: https://github.com/kettle-rb/bash-merge/issues/XX
+    # See: https://github.com/structuredmerge/structuredmerge-ruby/issues/XX
     # When BENCHMARK_AVAILABLE is false, #time must NOT call Benchmark.measure,
     # otherwise LoadError will be raised at runtime.
 

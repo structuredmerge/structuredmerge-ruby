@@ -1,4 +1,4 @@
-[![Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0][🖼️galtzo-i]][🖼️galtzo-discord] [![ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5][🖼️ruby-lang-i]][🖼️ruby-lang] [![structuredmerge Logo by Aboling0, CC BY-SA 4.0][🖼️structuredmerge-i]][🖼️structuredmerge] [![kettle-jem Logo by Aboling0, CC BY-SA 4.0][🖼️kettle-jem-i]][🖼️kettle-jem]
+[![Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0][🖼️galtzo-i]][🖼️galtzo-discord] [![ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5][🖼️ruby-lang-i]][🖼️ruby-lang] [![StructuredMerge Logo by Aboling0, CC BY-SA 4.0][🖼️structuredmerge-i]][🖼️structuredmerge] [![kettle-jem Logo by Aboling0, CC BY-SA 4.0][🖼️kettle-jem-i]][🖼️kettle-jem]
 
 [🖼️galtzo-i]: https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg
 [🖼️galtzo-discord]: https://discord.gg/3qme4XHNKN
@@ -95,14 +95,14 @@ This gem is part of the StructuredMerge Ruby package family. The implementation 
 
 | Federated [DVCS][💎d-in-dvcs] Repository | Status | Issues | PRs | Wiki | CI | Discussions |
 |-------------------------------------------------|-----------------------------------------------------------------------|---------------------------|--------------------------|---------------------------|--------------------------|------------------------------|
-| 🧪 [kettle-rb/kettle-jem on GitLab][📜src-gl] | The Truth | [💚][🤝gl-issues] | [💚][🤝gl-pulls] | [💚][📜gl-wiki] | 🐭 Tiny Matrix | ➖ |
-| 🧊 [kettle-rb/kettle-jem on CodeBerg][📜src-cb] | An Ethical Mirror ([Donate][🤝cb-donate]) | [💚][🤝cb-issues] | [💚][🤝cb-pulls] | ➖ | ⭕️ No Matrix | ➖ |
-| 🐙 [kettle-rb/kettle-jem on GitHub][📜src-gh] | Another Mirror | [💚][🤝gh-issues] | [💚][🤝gh-pulls] | [💚][📜gh-wiki] | 💯 Full Matrix | [💚][gh-discussions] |
+| 🧪 [structuredmerge/structuredmerge-ruby on GitLab][📜src-gl] | The Truth | [💚][🤝gl-issues] | [💚][🤝gl-pulls] | [💚][📜gl-wiki] | 🐭 Tiny Matrix | ➖ |
+| 🧊 [structuredmerge/structuredmerge-ruby on CodeBerg][📜src-cb] | An Ethical Mirror ([Donate][🤝cb-donate]) | [💚][🤝cb-issues] | [💚][🤝cb-pulls] | ➖ | ⭕️ No Matrix | ➖ |
+| 🐙 [structuredmerge/structuredmerge-ruby on GitHub][📜src-gh] | Another Mirror | [💚][🤝gh-issues] | [💚][🤝gh-pulls] | [💚][📜gh-wiki] | 💯 Full Matrix | [💚][gh-discussions] |
 | 🎮️ [Discord Server][✉️discord-invite] | [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite] | [Let's][✉️discord-invite] | [talk][✉️discord-invite] | [about][✉️discord-invite] | [this][✉️discord-invite] | [library!][✉️discord-invite] |
 
 </details>
 
-[gh-discussions]: https://github.com/kettle-rb/kettle-jem/discussions
+[gh-discussions]: https://github.com/structuredmerge/structuredmerge-ruby/discussions
 
 ### Enterprise Support [![Tidelift](https://tidelift.com/badges/package/rubygems/kettle-jem)](https://tidelift.com/subscription/pkg/rubygems-kettle-jem?utm_source=rubygems-kettle-jem&utm_medium=referral&utm_campaign=readme)
 
@@ -528,16 +528,16 @@ chat rooms and mailing lists agrees to follow the [![Contributor Covenant 2.1][�
 
 Made with [contributors-img][🖐contrib-rocks].
 
-Also see GitLab Contributors: [https://gitlab.com/kettle-rb/kettle-jem/-/graphs/main][🚎contributors-gl]
+Also see GitLab Contributors: [https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main][🚎contributors-gl]
 
 <details>
  <summary>⭐️ Star History</summary>
 
-<a href="https://star-history.com/kettle-rb/kettle-jem&Date">
+<a href="https://star-history.com/structuredmerge/structuredmerge-ruby&Date">
  <picture>
- <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=kettle-rb/kettle-jem&type=Date&theme=dark" />
- <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=kettle-rb/kettle-jem&type=Date" />
- <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=kettle-rb/kettle-jem&type=Date" />
+ <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&type=Date&theme=dark" />
+ <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&type=Date" />
+ <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&type=Date" />
  </picture>
 </a>
 
@@ -602,7 +602,7 @@ To join the community or get help 👇️ Join the Discord.
 
 To say "thanks!" ☝️ Join the Discord or 👇️ send money.
 
-[![Sponsor kettle-rb/kettle-jem on Open Source Collective][🖇osc-all-bottom-img]][🖇osc] 💌 [![Sponsor me on GitHub Sponsors][🖇sponsor-bottom-img]][🖇sponsor] 💌 [![Sponsor me on Liberapay][⛳liberapay-bottom-img]][⛳liberapay] 💌 [![Donate on PayPal][🖇paypal-bottom-img]][🖇paypal]
+[![Sponsor structuredmerge/structuredmerge-ruby on Open Source Collective][🖇osc-all-bottom-img]][🖇osc] 💌 [![Sponsor me on GitHub Sponsors][🖇sponsor-bottom-img]][🖇sponsor] 💌 [![Sponsor me on Liberapay][⛳liberapay-bottom-img]][⛳liberapay] 💌 [![Donate on PayPal][🖇paypal-bottom-img]][🖇paypal]
 
 ### Please give the project a star ⭐ ♥.
 
@@ -611,17 +611,17 @@ Thanks for RTFM. ☺️
 [⛳liberapay-img]: https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&color=a51611&style=flat
 [⛳liberapay-bottom-img]: https://img.shields.io/liberapay/goal/pboling.svg?style=for-the-badge&logo=liberapay&color=a51611
 [⛳liberapay]: https://liberapay.com/pboling/donate
-[🖇osc-all-img]: https://img.shields.io/opencollective/all/kettle-rb
-[🖇osc-sponsors-img]: https://img.shields.io/opencollective/sponsors/kettle-rb
-[🖇osc-backers-img]: https://img.shields.io/opencollective/backers/kettle-rb
-[🖇osc-backers]: https://opencollective.com/kettle-rb#backer
-[🖇osc-backers-i]: https://opencollective.com/kettle-rb/backers/badge.svg?style=flat
-[🖇osc-sponsors]: https://opencollective.com/kettle-rb#sponsor
-[🖇osc-sponsors-i]: https://opencollective.com/kettle-rb/sponsors/badge.svg?style=flat
-[🖇osc-all-bottom-img]: https://img.shields.io/opencollective/all/kettle-rb?style=for-the-badge
-[🖇osc-sponsors-bottom-img]: https://img.shields.io/opencollective/sponsors/kettle-rb?style=for-the-badge
-[🖇osc-backers-bottom-img]: https://img.shields.io/opencollective/backers/kettle-rb?style=for-the-badge
-[🖇osc]: https://opencollective.com/kettle-rb
+[🖇osc-all-img]: https://img.shields.io/opencollective/all/structuredmerge
+[🖇osc-sponsors-img]: https://img.shields.io/opencollective/sponsors/structuredmerge
+[🖇osc-backers-img]: https://img.shields.io/opencollective/backers/structuredmerge
+[🖇osc-backers]: https://opencollective.com/structuredmerge#backer
+[🖇osc-backers-i]: https://opencollective.com/structuredmerge/backers/badge.svg?style=flat
+[🖇osc-sponsors]: https://opencollective.com/structuredmerge#sponsor
+[🖇osc-sponsors-i]: https://opencollective.com/structuredmerge/sponsors/badge.svg?style=flat
+[🖇osc-all-bottom-img]: https://img.shields.io/opencollective/all/structuredmerge?style=for-the-badge
+[🖇osc-sponsors-bottom-img]: https://img.shields.io/opencollective/sponsors/structuredmerge?style=for-the-badge
+[🖇osc-backers-bottom-img]: https://img.shields.io/opencollective/backers/structuredmerge?style=for-the-badge
+[🖇osc]: https://opencollective.com/structuredmerge
 [🖇sponsor-img]: https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&logo=github
 [🖇sponsor-bottom-img]: https://img.shields.io/badge/Sponsor_Me!-pboling-blue?style=for-the-badge&logo=github
 [🖇sponsor]: https://github.com/sponsors/pboling
@@ -645,12 +645,12 @@ Thanks for RTFM. ☺️
 [✉️ruby-friends]: https://app.daily.dev/squads/rubyfriends
 
 [✇bundle-group-pattern]: https://gist.github.com/pboling/4564780
-[⛳️gem-namespace]: https://github.com/kettle-rb/kettle-jem
+[⛳️gem-namespace]: https://github.com/structuredmerge/structuredmerge-ruby
 [⛳️namespace-img]: https://img.shields.io/badge/namespace-Kettle::Jem-3C2D2D.svg?style=square&logo=ruby&logoColor=white
 [⛳️gem-name]: https://bestgems.org/gems/kettle-jem
 [⛳️name-img]: https://img.shields.io/badge/name-kettle--jem-3C2D2D.svg?style=square&logo=rubygems&logoColor=red
-[⛳️tag-img]: https://img.shields.io/github/tag/kettle-rb/kettle-jem.svg
-[⛳️tag]: https://github.com/kettle-rb/kettle-jem/releases
+[⛳️tag-img]: https://img.shields.io/github/tag/structuredmerge/structuredmerge-ruby.svg
+[⛳️tag]: https://github.com/structuredmerge/structuredmerge-ruby/releases
 [🚂maint-blog]: http://www.railsbling.com/tags/kettle-jem
 [🚂maint-blog-img]: https://img.shields.io/badge/blog-railsbling-0093D0.svg?style=for-the-badge&logo=rubyonrails&logoColor=orange
 [🚂maint-contact]: http://www.railsbling.com/contact
@@ -685,68 +685,68 @@ Thanks for RTFM. ☺️
 [💁🏼‍♂️peterboling]: http://www.peterboling.com
 [🚂railsbling]: http://www.railsbling.com
 [📜src-gl-img]: https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&logo=Gitlab&logoColor=orange
-[📜src-gl]: https://gitlab.com/kettle-rb/kettle-jem/
+[📜src-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/
 [📜src-cb-img]: https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&logo=CodeBerg&logoColor=blue
-[📜src-cb]: https://codeberg.org/kettle-rb/kettle-jem
+[📜src-cb]: https://codeberg.org/structuredmerge/structuredmerge-ruby
 [📜src-gh-img]: https://img.shields.io/badge/GitHub-238636?style=for-the-badge&logo=Github&logoColor=green
-[📜src-gh]: https://github.com/kettle-rb/kettle-jem
+[📜src-gh]: https://github.com/structuredmerge/structuredmerge-ruby
 [📜docs-cr-rd-img]: https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white
 [📜docs-head-rd-img]: https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white
-[📜gl-wiki]: https://gitlab.com/kettle-rb/kettle-jem/-/wikis/home
-[📜gh-wiki]: https://github.com/kettle-rb/kettle-jem/wiki
+[📜gl-wiki]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/wikis/home
+[📜gh-wiki]: https://github.com/structuredmerge/structuredmerge-ruby/wiki
 [📜gl-wiki-img]: https://img.shields.io/badge/wiki-gitlab-943CD2.svg?style=for-the-badge&logo=gitlab&logoColor=white
 [📜gh-wiki-img]: https://img.shields.io/badge/wiki-github-943CD2.svg?style=for-the-badge&logo=github&logoColor=white
 [👽dl-rank]: https://bestgems.org/gems/kettle-jem
 [👽dl-ranki]: https://img.shields.io/gem/rd/kettle-jem.svg
 [👽version]: https://bestgems.org/gems/kettle-jem
 [👽versioni]: https://img.shields.io/gem/v/kettle-jem.svg
-[🏀qlty-mnt]: https://qlty.sh/gh/kettle-rb/projects/kettle-jem
-[🏀qlty-mnti]: https://qlty.sh/gh/kettle-rb/projects/kettle-jem/maintainability.svg
-[🏀qlty-cov]: https://qlty.sh/gh/kettle-rb/projects/kettle-jem/metrics/code?sort=coverageRating
-[🏀qlty-covi]: https://qlty.sh/gh/kettle-rb/projects/kettle-jem/coverage.svg
-[🏀codecov]: https://codecov.io/gh/kettle-rb/kettle-jem
-[🏀codecovi]: https://codecov.io/gh/kettle-rb/kettle-jem/graph/badge.svg
-[🏀coveralls]: https://coveralls.io/github/kettle-rb/kettle-jem?branch=main
-[🏀coveralls-img]: https://coveralls.io/repos/github/kettle-rb/kettle-jem/badge.svg?branch=main
-[🖐codeQL]: https://github.com/kettle-rb/kettle-jem/security/code-scanning
-[🖐codeQL-img]: https://github.com/kettle-rb/kettle-jem/actions/workflows/codeql-analysis.yml/badge.svg
-[🚎2-cov-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/coverage.yml
-[🚎2-cov-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/coverage.yml/badge.svg
-[🚎3-hd-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/heads.yml
-[🚎3-hd-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/heads.yml/badge.svg
-[🚎5-st-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/style.yml
-[🚎5-st-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/style.yml/badge.svg
-[🚎9-t-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/truffle.yml
-[🚎9-t-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/truffle.yml/badge.svg
-[🚎10-j-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/jruby.yml
-[🚎10-j-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/jruby.yml/badge.svg
-[🚎11-c-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/current.yml
-[🚎11-c-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/current.yml/badge.svg
-[🚎12-crh-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/dep-heads.yml
-[🚎12-crh-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/dep-heads.yml/badge.svg
-[🚎13-🔒️-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/locked_deps.yml
-[🚎13-🔒️-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/locked_deps.yml/badge.svg
-[🚎14-🔓️-wf]: https://github.com/kettle-rb/kettle-jem/actions/workflows/unlocked_deps.yml
-[🚎14-🔓️-wfi]: https://github.com/kettle-rb/kettle-jem/actions/workflows/unlocked_deps.yml/badge.svg
+[🏀qlty-mnt]: https://qlty.sh/gh/structuredmerge/projects/structuredmerge-ruby
+[🏀qlty-mnti]: https://qlty.sh/gh/structuredmerge/projects/structuredmerge-ruby/maintainability.svg
+[🏀qlty-cov]: https://qlty.sh/gh/structuredmerge/projects/structuredmerge-ruby/metrics/code?sort=coverageRating
+[🏀qlty-covi]: https://qlty.sh/gh/structuredmerge/projects/structuredmerge-ruby/coverage.svg
+[🏀codecov]: https://codecov.io/gh/structuredmerge/structuredmerge-ruby
+[🏀codecovi]: https://codecov.io/gh/structuredmerge/structuredmerge-ruby/graph/badge.svg
+[🏀coveralls]: https://coveralls.io/github/structuredmerge/structuredmerge-ruby?branch=main
+[🏀coveralls-img]: https://coveralls.io/repos/github/structuredmerge/structuredmerge-ruby/badge.svg?branch=main
+[🖐codeQL]: https://github.com/structuredmerge/structuredmerge-ruby/security/code-scanning
+[🖐codeQL-img]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/codeql-analysis.yml/badge.svg
+[🚎2-cov-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/coverage.yml
+[🚎2-cov-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/coverage.yml/badge.svg
+[🚎3-hd-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/heads.yml
+[🚎3-hd-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/heads.yml/badge.svg
+[🚎5-st-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/style.yml
+[🚎5-st-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/style.yml/badge.svg
+[🚎9-t-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/truffle.yml
+[🚎9-t-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/truffle.yml/badge.svg
+[🚎10-j-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/jruby.yml
+[🚎10-j-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/jruby.yml/badge.svg
+[🚎11-c-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml
+[🚎11-c-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml/badge.svg
+[🚎12-crh-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/dep-heads.yml
+[🚎12-crh-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/dep-heads.yml/badge.svg
+[🚎13-🔒️-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/locked_deps.yml
+[🚎13-🔒️-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/locked_deps.yml/badge.svg
+[🚎14-🔓️-wf]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/unlocked_deps.yml
+[🚎14-🔓️-wfi]: https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/unlocked_deps.yml/badge.svg
 [💎ruby-4.0i]: https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&logo=ruby&logoColor=white
 [💎ruby-c-i]: https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&logo=ruby&logoColor=green
 [💎ruby-headi]: https://img.shields.io/badge/Ruby-HEAD-CC342D?style=for-the-badge&logo=ruby&logoColor=blue
 [💎truby-c-i]: https://img.shields.io/badge/Truffle_Ruby-current-34BCB1?style=for-the-badge&logo=ruby&logoColor=green
 [💎jruby-c-i]: https://img.shields.io/badge/JRuby-current-FBE742?style=for-the-badge&logo=ruby&logoColor=green
 [💎jruby-headi]: https://img.shields.io/badge/JRuby-HEAD-FBE742?style=for-the-badge&logo=ruby&logoColor=blue
-[🤝gh-issues]: https://github.com/kettle-rb/kettle-jem/issues
-[🤝gh-pulls]: https://github.com/kettle-rb/kettle-jem/pulls
-[🤝gl-issues]: https://gitlab.com/kettle-rb/kettle-jem/-/issues
-[🤝gl-pulls]: https://gitlab.com/kettle-rb/kettle-jem/-/merge_requests
-[🤝cb-issues]: https://codeberg.org/kettle-rb/kettle-jem/issues
-[🤝cb-pulls]: https://codeberg.org/kettle-rb/kettle-jem/pulls
+[🤝gh-issues]: https://github.com/structuredmerge/structuredmerge-ruby/issues
+[🤝gh-pulls]: https://github.com/structuredmerge/structuredmerge-ruby/pulls
+[🤝gl-issues]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/issues
+[🤝gl-pulls]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/merge_requests
+[🤝cb-issues]: https://codeberg.org/structuredmerge/structuredmerge-ruby/issues
+[🤝cb-pulls]: https://codeberg.org/structuredmerge/structuredmerge-ruby/pulls
 [🤝cb-donate]: https://donate.codeberg.org/
 [🤝contributing]: CONTRIBUTING.md
-[🏀codecov-g]: https://codecov.io/gh/kettle-rb/kettle-jem/graphs/tree.svg
+[🏀codecov-g]: https://codecov.io/gh/structuredmerge/structuredmerge-ruby/graphs/tree.svg
 [🖐contrib-rocks]: https://contrib.rocks
-[🖐contributors]: https://github.com/kettle-rb/kettle-jem/graphs/contributors
-[🖐contributors-img]: https://contrib.rocks/image?repo=kettle-rb/kettle-jem
-[🚎contributors-gl]: https://gitlab.com/kettle-rb/kettle-jem/-/graphs/main
+[🖐contributors]: https://github.com/structuredmerge/structuredmerge-ruby/graphs/contributors
+[🖐contributors-img]: https://contrib.rocks/image?repo=structuredmerge/structuredmerge-ruby
+[🚎contributors-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main
 [🪇conduct]: CODE_OF_CONDUCT.md
 [🪇conduct-img]: https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg
 [📌pvc]: http://guides.rubygems.org/patterns/#pessimistic-version-constraint
@@ -774,7 +774,7 @@ Thanks for RTFM. ☺️
 [🚎yard-current]: http://rubydoc.info/gems/kettle-jem
 [🚎yard-head]: https://kettle-jem.galtzo.com
 [💎stone_checksums]: https://github.com/galtzo-floss/stone_checksums
-[💎SHA_checksums]: https://gitlab.com/kettle-rb/kettle-jem/-/tree/main/checksums
+[💎SHA_checksums]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/checksums
 [💎rlts]: https://github.com/rubocop-lts/rubocop-lts
 [💎rlts-img]: https://img.shields.io/badge/code_style_&_linting-rubocop--lts-34495e.svg?plastic&logo=ruby&logoColor=white
 [💎appraisal2]: https://github.com/appraisal-rb/appraisal2
@@ -786,8 +786,8 @@ Thanks for RTFM. ☺️
 |---|---|
 | Package | kettle-jem |
 | Description | 🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold. |
-| Homepage | https://github.com/kettle-rb/kettle-jem |
-| Source | https://github.com/kettle-rb/kettle-jem |
+| Homepage | https://github.com/structuredmerge/structuredmerge-ruby |
+| Source | https://github.com/structuredmerge/structuredmerge-ruby |
 | License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |
 | Funding | https://github.com/sponsors/pboling, https://issuehunt.io/u/pboling, https://ko-fi.com/pboling, https://liberapay.com/pboling/donate, https://patreon.com/galtzo, https://polar.sh/pboling, https://thanks.dev/u/gh/pboling, https://tidelift.com/funding/github/rubygems/kettle-jem, https://www.buymeacoffee.com/pboling |
 <!-- kettle-jem:metadata:end -->

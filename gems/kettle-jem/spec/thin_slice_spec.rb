@@ -4023,7 +4023,7 @@ RSpec.describe Kettle::Jem do
             spec.email = ["maintainer@example.com"]
             spec.summary = "#{contract_case.fetch(:summary)}"
             spec.description = "#{contract_case.fetch(:description)}"
-            spec.homepage = "https://github.com/kettle-rb/#{package_name}"
+            spec.homepage = "https://github.com/structuredmerge/#{package_name}"
             spec.licenses = ["MIT"]
             spec.required_ruby_version = ">= 4.0"
             spec.require_paths = ["lib"]
@@ -4051,7 +4051,7 @@ RSpec.describe Kettle::Jem do
             spec.email = ["template@example.com"]
             spec.summary = "🍲 "
             spec.description = "🍲 "
-            spec.homepage = "https://github.com/kettle-rb/{KJ|GEM_NAME}"
+            spec.homepage = "https://github.com/structuredmerge/{KJ|GEM_NAME}"
             spec.licenses = ["MIT"]
             spec.required_ruby_version = ">= 2.3.0"
             spec.require_paths = ["lib"]

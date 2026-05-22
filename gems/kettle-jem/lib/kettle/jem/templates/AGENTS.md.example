@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-This project is a **RubyGem** managed with the [kettle-rb](https://github.com/kettle-rb) toolchain.
+This project is a **RubyGem** managed with the [StructuredMerge](https://github.com/structuredmerge/structuredmerge-ruby) toolchain.
 
 **Minimum Supported Ruby**: See the gemspec `required_ruby_version` constraint.
 **Local Development Ruby**: See `mise.toml` for the version used in local development (typically the latest stable Ruby).
@@ -81,7 +81,7 @@ When you do run tests, keep the full output visible so you can inspect failures 
 
 ### Toolchain Dependencies
 
-This gem is part of the **kettle-rb** ecosystem. Key development tools:
+This gem is part of the **StructuredMerge** ecosystem. Key development tools:
 
 | Tool | Purpose |
 |------|---------|
