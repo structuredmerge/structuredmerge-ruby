@@ -5631,7 +5631,8 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("ruby-lang Logo")
       expect(final_content).to include("[![acme Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
       expect(final_content).to include("[![example-gem Logo by Aboling0, CC BY-SA 4.0][🖼️acme-example-gem-i]][🖼️acme-example-gem]")
-      expect(final_content).to include("[🖼️acme-i]: https://logos.galtzo.com/assets/images/acme/avatar-192px.svg")
+      expect(final_content).to include("[🖼️acme-i]: https://logos.galtzo.com/assets/images/acme/avatar-128px.svg")
+      expect(final_content).to include("[🖼️acme-example-gem-i]: https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg")
       expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|README:TOP_LOGO_REFS" => a_string_including("https://github.com/acme/example-gem"),
@@ -5725,6 +5726,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("[![acme Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
       expect(final_content).to include("[![example-gem Logo by Aboling0, CC BY-SA 4.0][🖼️acme-example-gem-i]][🖼️acme-example-gem]")
       expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
+      expect(final_content).to include("[🖼️acme-i]: https://logos.galtzo.com/assets/images/acme/avatar-128px.svg")
       expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
       expect(final_content).not_to include("unknown")
     end
@@ -5821,7 +5823,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("[![Acme org Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
       expect(final_content).to include("[![Tree-sitter project Logo by Aboling0, CC BY-SA 4.0][🖼️tree-sitter-tree-sitter-i]][🖼️tree-sitter-tree-sitter]")
       expect(final_content).to include("[![Ignored fourth Logo by Aboling0, CC BY-SA 4.0][🖼️acme-ignored-i]][🖼️acme-ignored]")
-      expect(final_content).to include("[🖼️tree-sitter-tree-sitter-i]: https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/avatar-192px.svg")
+      expect(final_content).to include("[🖼️tree-sitter-tree-sitter-i]: https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/avatar-128px.svg")
     end
   end
 

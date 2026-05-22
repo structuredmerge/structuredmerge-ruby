@@ -7135,11 +7135,20 @@ module Kettle
 
     def readme_top_logo_entries(config, org:, gem_name:, repository: {})
       configured = configured_readme_top_logo_entries(config, org: org, gem_name: gem_name, repository: repository)
-      return configured if configured
+      return readme_top_logo_entries_with_asset_size(configured) if configured
 
-      readme_top_logo_options(config).filter_map do |option|
+      entries = readme_top_logo_options(config).filter_map do |option|
         readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
       end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
+      readme_top_logo_entries_with_asset_size(entries)
+    end
+
+    def readme_top_logo_entries_with_asset_size(entries)
+      size = entries.length == 4 ? 128 : 192
+      entries.map do |entry|
+        image_url = entry.fetch(:image_url).to_s.sub(%r{/avatar-\d+px\.svg\z}, "/avatar-#{size}px.svg")
+        entry.merge(image_url: image_url)
+      end
     end
 
     def configured_readme_top_logo_entries(config, org:, gem_name:, repository: {})
