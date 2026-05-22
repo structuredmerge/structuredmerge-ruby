@@ -32,6 +32,16 @@ Json::Merge intelligently merges two versions of a JSON or JSONC file using the 
 
 JSONC support uses the same `Json::Merge` API as JSON; use `require "json/merge"` for both dialects.
 
+### JSONC Support
+
+The JSON merge provider supports both JSON and JSONC dialects through `Json::Merge`. Pass JSONC content to the same merger API used for JSON.
+
+JSONC-specific behavior:
+
+  - **Single API**: JSON and JSONC both use `Json::Merge`
+  - **Comment-Aware**: Preserves `//` and `/* */` comments when the parser exposes them
+  - **Freeze Blocks**: Uses the `json-merge` freeze token by default, with a custom token available when needed
+
 ### Key Features
 
   - **Tree-Sitter Powered**: Uses tree-sitter-json for accurate AST parsing
@@ -208,6 +218,35 @@ Enable debug logging to see merge decisions:
 export JSON_MERGE_DEBUG=1
 ```
 
+### JSONC Options
+
+JSONC files use the same options as JSON files:
+
+```ruby
+merger = Json::Merge::SmartMerger.new(
+  template_content,
+  dest_content,
+  # Which version to prefer when nodes match
+  # :destination (default) - keep destination values
+  # :template - use template values
+  preference: :destination,
+
+  # Whether to add template-only nodes to the result
+  # false (default) - only include properties that exist in destination
+  # true - include all template properties
+  add_template_only_nodes: false,
+
+  # Token for freeze block markers
+  # Default: "json-merge"
+  # Looks for: // json-merge:freeze / // json-merge:unfreeze
+  freeze_token: "json-merge",
+
+  # Custom signature generator (optional)
+  # Receives a node, returns a signature array or nil
+  signature_generator: ->(node) { [:pair, node.key] if node.type == :pair },
+)
+```
+
 ## 🔧 Basic Usage
 
 ### Merging Two JSON Files
@@ -313,33 +352,7 @@ merger = Json::Merge::SmartMerger.new(
 # Array elements with matching IDs or similar structure are paired
 ```
 
-## 📚 JSONC behavior
-
-JSONC behavior now lives in `json-merge`. The sections below describe JSONC-specific usage through the `Json::Merge` API.
-
-### JSONC Synopsis
-
-The JSON merge provider supports both JSON and JSONC dialects through `Json::Merge`. Use `require "json/merge"` and pass JSONC content to the same merger API used for JSON.
-
-### Key Features
-
-- **Single API**: JSON and JSONC both use `Json::Merge`
-- **Comment-Aware**: Preserves `//` and `/* */` comments when the parser exposes them
-- **Freeze Blocks**: Uses the `json-merge` freeze token by default, with a custom token available when needed
-
-### Supported Node Types
-
-| Node Type | Signature Format               | Matching Behavior                    |
-|-----------|--------------------------------|--------------------------------------|
-| Object    | `[:object, key_signatures...]` | Objects match by their key structure |
-| Array     | `[:array, element_count]`      | Arrays match by position and type    |
-| Pair      | `[:pair, key_name]`            | Key-value pairs match by key name    |
-| String    | `[:string, value]`             | Strings match by value               |
-| Number    | `[:number, value]`             | Numbers match by value               |
-| Boolean   | `[:boolean, value]`            | Booleans match by value              |
-| Null      | `[:null]`                      | Null values always match             |
-
-### Example
+### Merging JSONC Files
 
 ```ruby
 require "json/merge"
@@ -353,94 +366,7 @@ result = merger.merge
 File.write("merged.jsonc", result)
 ```
 
-### JSONC Example with Freeze Blocks
-
-```jsonc
-{
-  // json-merge:freeze Secret configuration
-  "api_key": "my-secret-key",
-  "api_secret": "my-secret-value",
-  // json-merge:unfreeze
-
-  "debug": false,
-  "log_level": "info"
-}
-```
-
-
-### JSONC Configuration
-
-```ruby
-merger = Json::Merge::SmartMerger.new(
-  template_content,
-  dest_content,
-  # Which version to prefer when nodes match
-  # :destination (default) - keep destination values
-  # :template - use template values
-  preference: :destination,
-
-  # Whether to add template-only nodes to the result
-  # false (default) - only include properties that exist in destination
-  # true - include all template properties
-  add_template_only_nodes: false,
-
-  # Token for freeze block markers
-  # Default: "json-merge"
-  # Looks for: // json-merge:freeze / // json-merge:unfreeze
-  freeze_token: "json-merge",
-
-  # Custom signature generator (optional)
-  # Receives a node, returns a signature array or nil
-  signature_generator: ->(node) { [:pair, node.key] if node.type == :pair },
-)
-```
-
-### JSONC Basic Usage
-
-### Simple Merge
-
-```ruby
-require "json/merge"
-
-# Template defines the structure
-template = <<~JSONC
-  {
-    // Application settings
-    "name": "my-app",
-    "version": "1.0.0",
-    "debug": false,
-
-    /* Database configuration */
-    "database": {
-      "host": "localhost",
-      "port": 5432
-    }
-  }
-JSONC
-
-# Destination has customizations
-destination = <<~JSONC
-  {
-    // Application settings
-    "name": "my-app",
-    "version": "2.0.0",
-    "custom_setting": true,
-
-    /* Database configuration */
-    "database": {
-      "host": "production.example.com",
-      "port": 5432,
-      "pool_size": 25
-    }
-  }
-JSONC
-
-merger = Json::Merge::SmartMerger.new(template, destination)
-result = merger.merge
-puts result
-```
-
-### Using Freeze Blocks
+### JSONC Freeze Blocks
 
 Freeze blocks protect sections from being overwritten during merge:
 
@@ -459,7 +385,7 @@ Freeze blocks protect sections from being overwritten during merge:
 
 Content between `// json-merge:freeze` and `// json-merge:unfreeze` markers is preserved from the destination file, regardless of what the template contains.
 
-### Adding Template-Only Properties
+### Adding Template-Only JSONC Properties
 
 ```ruby
 merger = Json::Merge::SmartMerger.new(
@@ -468,9 +394,8 @@ merger = Json::Merge::SmartMerger.new(
   add_template_only_nodes: true,
 )
 result = merger.merge
-# Result includes properties from template that don't exist in destination
+# Result includes properties from template that do not exist in destination
 ```
-
 
 ## 🔐 Security
 

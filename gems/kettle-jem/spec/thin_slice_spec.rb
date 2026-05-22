@@ -5544,13 +5544,96 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("Galtzo FLOSS Logo")
       expect(final_content).to include("ruby-lang Logo")
       expect(final_content).to include("[![acme Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
-      expect(final_content).to include("[![example-gem Logo by Aboling0, CC BY-SA 4.0][🖼️example-gem-i]][🖼️example-gem]")
+      expect(final_content).to include("[![example-gem Logo by Aboling0, CC BY-SA 4.0][🖼️acme-example-gem-i]][🖼️acme-example-gem]")
       expect(final_content).to include("[🖼️acme-i]: https://logos.galtzo.com/assets/images/acme/avatar-192px.svg")
-      expect(final_content).to include("[🖼️example-gem]: https://github.com/acme/example-gem")
+      expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|README:TOP_LOGO_REFS" => a_string_including("https://github.com/acme/example-gem"),
         "KJ|README:TOP_LOGO_ROW" => a_string_including("example-gem Logo by Aboling0")
       )
+    end
+  end
+
+  it "projects README logo row entries from named logo options" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-named-logo-options-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            top_logos: related-org,ruby,org,project,unknown
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN,
+          Row:
+          {KJ|README:TOP_LOGO_ROW}
+          Refs:
+          {KJ|README:TOP_LOGO_REFS}
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = template_report.fetch(:final_content)
+      expect(final_content).to include("[![Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0][🖼️galtzo-floss-i]][🖼️galtzo-floss]")
+      expect(final_content).to include("[![ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5][🖼️ruby-lang-i]][🖼️ruby-lang]")
+      expect(final_content).to include("[![acme Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
+      expect(final_content).to include("[![example-gem Logo by Aboling0, CC BY-SA 4.0][🖼️acme-example-gem-i]][🖼️acme-example-gem]")
+      expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
+      expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
+      expect(final_content).not_to include("unknown")
+    end
+  end
+
+  it "maps legacy README top logo modes to named logo options" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-legacy-logo-mode-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            top_logo_mode: org
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN,
+          Row:
+          {KJ|README:TOP_LOGO_ROW}
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = template_report.fetch(:final_content)
+      expect(final_content).to include("Galtzo FLOSS Logo")
+      expect(final_content).to include("ruby-lang Logo")
+      expect(final_content).to include("acme Logo")
+      expect(final_content).not_to include("example-gem Logo")
     end
   end
 
@@ -5602,11 +5685,11 @@ RSpec.describe Kettle::Jem do
         report.fetch(:recipe_name) == "template_source_application_README_md"
       end
       final_content = template_report.fetch(:final_content)
-      expect(final_content).to include("[![Ruby language Logo by Aboling0, CC BY-SA 4.0][🖼️ruby-lang-i]][🖼️ruby-lang]")
+      expect(final_content).to include("[![Ruby language Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5][🖼️ruby-lang-i]][🖼️ruby-lang]")
       expect(final_content).to include("[![Acme org Logo by Aboling0, CC BY-SA 4.0][🖼️acme-i]][🖼️acme]")
       expect(final_content).to include("[![Tree-sitter project Logo by Aboling0, CC BY-SA 4.0][🖼️tree-sitter-tree-sitter-i]][🖼️tree-sitter-tree-sitter]")
+      expect(final_content).to include("[![Ignored fourth Logo by Aboling0, CC BY-SA 4.0][🖼️acme-ignored-i]][🖼️acme-ignored]")
       expect(final_content).to include("[🖼️tree-sitter-tree-sitter-i]: https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/avatar-192px.svg")
-      expect(final_content).not_to include("Ignored fourth logo")
     end
   end
 

@@ -10,6 +10,7 @@ require "tsort"
 RUBY_REPO = File.expand_path("..", __dir__)
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
 MONOREPO_TEMPLATE_PROFILE = "monorepo-subgem"
+FULL_TEMPLATE_GEMS = %w[kettle-jem].freeze
 
 ORDER_HINT = [
   "tree_haver",
@@ -86,7 +87,7 @@ parser.parse!
 def run_kettle_jem_for_gem(gem_dir, options)
   require "kettle-jem"
 
-  template_run_options = {template_profile: MONOREPO_TEMPLATE_PROFILE}
+  template_run_options = template_run_options_for_gem(gem_dir)
   env = ENV.to_h
 
   bootstrap = nil
@@ -105,6 +106,7 @@ def run_kettle_jem_for_gem(gem_dir, options)
   {
     gem: File.basename(gem_dir),
     root: gem_dir,
+    template_profile: template_run_options.fetch(:template_profile, ""),
     bootstrap_status: bootstrap && bootstrap[:setup_status],
     mode: result.fetch(:mode),
     changed_files: result.fetch(:changed_files, []),
@@ -118,6 +120,22 @@ def gemspec_for(gem_dir)
   raise "Expected one gemspec in #{gem_dir}, found #{candidates.length}" unless candidates.length == 1
 
   candidates.first
+end
+
+def template_profile_for_gem(gem_name)
+  return nil if FULL_TEMPLATE_GEMS.include?(gem_name)
+
+  MONOREPO_TEMPLATE_PROFILE
+end
+
+def template_run_options_for_gem(gem_dir)
+  profile = template_profile_for_gem(File.basename(gem_dir))
+  profile ? {template_profile: profile} : {}
+end
+
+def template_kind_for_gem(gem_name)
+  profile = template_profile_for_gem(gem_name)
+  profile || "full"
 end
 
 def local_gem_dirs
@@ -203,7 +221,7 @@ def render_options_banner(options, gem_dirs)
   lines = [
     "== StructuredMerge Ruby monorepo templating ==",
     "Action: apply kettle-jem templates and write changed files",
-    "Template kind: monorepo sub-project gem (fixed: #{MONOREPO_TEMPLATE_PROFILE})",
+    "Template kind: #{MONOREPO_TEMPLATE_PROFILE} for sub-project gems; full template for #{FULL_TEMPLATE_GEMS.join(", ")}",
     "Missing .kettle-jem.yml: auto-bootstrap before templating",
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
     banner_value("Selection", "#{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})", "limit: --only GEM or --start-at GEM"),
@@ -260,7 +278,7 @@ results = gem_dirs.map do |gem_dir|
   end
 
   changed_files = result.fetch(:changed_files, [])
-  puts "apply: #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
+  puts "apply (#{template_kind_for_gem(gem_name)} template): #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
   changed_files.each { |path| puts "  #{path}" } unless options[:json]
 
   result

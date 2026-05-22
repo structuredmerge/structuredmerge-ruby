@@ -179,9 +179,14 @@ module Kettle
     BOT_NAME_SUFFIX = /\[bot\]\z/i
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
-    README_TOP_LOGO_MODE_DEFAULT = "org_and_project"
-    README_TOP_LOGO_MODES = %w[org project org_and_project].freeze
-    README_TOP_LOGO_TYPES = %w[language org project affiliated_project].freeze
+    README_TOP_LOGO_DEFAULTS = %w[related_org ruby org project].freeze
+    README_TOP_LOGO_OPTIONS = %w[related_org ruby org project].freeze
+    README_TOP_LOGO_LEGACY_MODE_MAP = {
+      "org" => %w[related_org ruby org],
+      "project" => %w[related_org ruby project],
+      "org_and_project" => %w[related_org ruby org project],
+    }.freeze
+    README_TOP_LOGO_TYPES = %w[related_org ruby language org project affiliated_project].freeze
     APPRAISAL_NAME_PREFIX = "kja"
     APPRAISAL_GEM_ABBREVIATIONS = {
       "activerecord" => "ar",
@@ -826,13 +831,6 @@ module Kettle
       "configuration options" => "configuration",
       "setup" => "basic usage",
     }.freeze
-    README_STATIC_TOP_LOGO_ROW = "[![Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0][🖼️galtzo-i]][🖼️galtzo-discord] [![ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5][🖼️ruby-lang-i]][🖼️ruby-lang]"
-    README_STATIC_TOP_LOGO_REFS = [
-      "[🖼️galtzo-i]: https://logos.galtzo.com/assets/images/galtzo-floss/avatar-192px.svg",
-      "[🖼️galtzo-discord]: https://discord.gg/3qme4XHNKN",
-      "[🖼️ruby-lang-i]: https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg",
-      "[🖼️ruby-lang]: https://www.ruby-lang.org/",
-    ].join("\n").freeze
     VAR_HOME_PREFIX = %r{\A/var/home(?=/|\z)}
     VAR_HOME_TEXT = %r{/var/home(?=/|\z)}
     RUBOCOP_VERSION_MAP = [
@@ -6772,27 +6770,48 @@ module Kettle
     def readme_logo_facts(config, package_name:, github_org:)
       entries = readme_top_logo_entries(config, org: github_org.to_s, gem_name: package_name.to_s)
       compact_hash(
-        top_logo_mode: readme_top_logo_mode(config),
-        top_logo_row: [README_STATIC_TOP_LOGO_ROW, readme_top_logo_row(entries)].reject(&:empty?).join(" "),
-        top_logo_refs: [README_STATIC_TOP_LOGO_REFS, readme_top_logo_refs(entries)].reject(&:empty?).join("\n")
+        top_logos: readme_top_logo_options(config).join(","),
+        top_logo_row: readme_top_logo_row(entries),
+        top_logo_refs: readme_top_logo_refs(entries)
       )
     end
 
-    def readme_top_logo_mode(config)
+    def readme_top_logo_options(config)
       raw_config = config.is_a?(Hash) ? config["readme"] : nil
       readme_config = raw_config.is_a?(Hash) ? raw_config : {}
-      normalized = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
-      return README_TOP_LOGO_MODE_DEFAULT if normalized.empty?
-      return normalized if README_TOP_LOGO_MODES.include?(normalized)
+      top_logos = readme_config["top_logos"] || readme_config["top_logo_options"]
+      normalized = normalized_readme_top_logo_options(top_logos)
+      return normalized unless normalized.empty?
 
-      README_TOP_LOGO_MODE_DEFAULT
+      legacy_mode = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
+      legacy_options = README_TOP_LOGO_LEGACY_MODE_MAP[legacy_mode]
+      return legacy_options if legacy_options
+
+      README_TOP_LOGO_DEFAULTS
+    end
+
+    def normalized_readme_top_logo_options(value)
+      raw_values = case value
+      when String
+        value.split(",")
+      when Array
+        value
+      else
+        []
+      end
+      raw_values.filter_map do |raw_value|
+        normalized = raw_value.to_s.strip.downcase.tr("-", "_")
+        normalized if README_TOP_LOGO_OPTIONS.include?(normalized)
+      end.uniq
     end
 
     def readme_top_logo_entries(config, org:, gem_name:)
       configured = configured_readme_top_logo_entries(config, org: org, gem_name: gem_name)
       return configured if configured
 
-      readme_top_logo_mode_entries(readme_top_logo_mode(config), org: org, gem_name: gem_name)
+      readme_top_logo_options(config).filter_map do |option|
+        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name)
+      end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
     end
 
     def configured_readme_top_logo_entries(config, org:, gem_name:)
@@ -6801,7 +6820,7 @@ module Kettle
       return nil unless logo_row.is_a?(Hash)
       return [] if falsey_config?(logo_row["enabled"])
 
-      logos = Array(logo_row["logos"]).first(3)
+      logos = Array(logo_row["logos"]).first(4)
       return [] if logos.empty?
 
       logos.filter_map do |logo|
@@ -6814,6 +6833,7 @@ module Kettle
 
       type = logo["type"].to_s.strip.downcase.tr("-", "_")
       return nil unless README_TOP_LOGO_TYPES.include?(type)
+      type = "ruby" if type == "language"
 
       slug = logo["slug"].to_s.strip
       slug = default_readme_top_logo_slug(type, org: org, gem_name: gem_name) if slug.empty?
@@ -6823,9 +6843,13 @@ module Kettle
       alt = readme_top_logo_default_alt(type, slug) if alt.empty?
       href = logo["href"].to_s.strip
       href = default_readme_top_logo_href(type, slug: slug, org: org, gem_name: gem_name) if href.empty?
+      credit = logo["credit"].to_s.strip
+      credit = default_readme_top_logo_credit(type) if credit.empty?
       ref_slug = slug.tr("/", "-")
       {
         label: alt.sub(/\s+logo\z/i, ""),
+        credit: credit,
+        credit_separator: readme_top_logo_credit_separator(type),
         image_ref: "#{ref_slug}-i",
         link_ref: ref_slug,
         image_url: "#{LOGOS_GALTZO_BASE_URL}/#{slug}/avatar-192px.svg",
@@ -6835,7 +6859,9 @@ module Kettle
 
     def default_readme_top_logo_slug(type, org:, gem_name:)
       case type
-      when "language"
+      when "related_org"
+        "galtzo-floss"
+      when "ruby"
         "ruby-lang"
       when "org"
         org.to_s
@@ -6849,12 +6875,14 @@ module Kettle
     def readme_top_logo_default_alt(type, slug)
       label = slug.split("/").last.to_s
       case type
-      when "language"
-        "#{label} language"
+      when "related_org"
+        "Galtzo FLOSS"
+      when "ruby"
+        "ruby-lang"
       when "org"
-        "#{label} organization"
+        label
       when "project"
-        "#{label} project"
+        label
       else
         "#{label} affiliated project"
       end
@@ -6862,8 +6890,10 @@ module Kettle
 
     def default_readme_top_logo_href(type, slug:, org:, gem_name:)
       case type
-      when "language"
-        slug == "ruby-lang" ? "https://www.ruby-lang.org/" : "#{LOGOS_GALTZO_BASE_URL}/#{slug}/"
+      when "related_org"
+        "https://discord.gg/3qme4XHNKN"
+      when "ruby"
+        "https://www.ruby-lang.org/"
       when "org"
         org.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}"
       when "project"
@@ -6873,34 +6903,29 @@ module Kettle
       end
     end
 
-    def readme_top_logo_mode_entries(mode, org:, gem_name:)
-      return [] if org.empty?
+    def default_readme_top_logo_credit(type)
+      case type
+      when "ruby"
+        "Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"
+      else
+        "Aboling0, CC BY-SA 4.0"
+      end
+    end
 
-      entries = []
-      if mode == "org" || mode == "org_and_project"
-        entries << {
-          label: org,
-          image_ref: "#{org}-i",
-          link_ref: org,
-          image_url: "#{LOGOS_GALTZO_BASE_URL}/#{org}/avatar-192px.svg",
-          href: "https://github.com/#{org}",
-        }
-      end
-      if mode == "project" || mode == "org_and_project"
-        entries << {
-          label: gem_name,
-          image_ref: "#{gem_name}-i",
-          link_ref: gem_name,
-          image_url: "#{LOGOS_GALTZO_BASE_URL}/#{org}/#{gem_name}/avatar-192px.svg",
-          href: "https://github.com/#{org}/#{gem_name}",
-        }
-      end
-      entries.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
+    def readme_top_logo_credit_separator(type)
+      type == "ruby" ? ", " : " by "
+    end
+
+    def readme_top_logo_entry_from_option(option, org:, gem_name:)
+      return nil if option == "org" && org.to_s.empty?
+      return nil if option == "project" && (org.to_s.empty? || gem_name.to_s.empty?)
+
+      readme_top_logo_entry_from_config({"type" => option}, org: org, gem_name: gem_name)
     end
 
     def readme_top_logo_row(entries)
       entries.map do |entry|
-        "[![#{entry[:label]} Logo by Aboling0, CC BY-SA 4.0][🖼️#{entry[:image_ref]}]][🖼️#{entry[:link_ref]}]"
+        "[![#{entry[:label]} Logo#{entry[:credit_separator]}#{entry[:credit]}][🖼️#{entry[:image_ref]}]][🖼️#{entry[:link_ref]}]"
       end.join(" ")
     end
 
