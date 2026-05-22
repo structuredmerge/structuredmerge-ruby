@@ -212,15 +212,15 @@ NOTE: To build without signing the gem set `SKIP_GEM_SIGNING` to any value in th
 14. Run `bundle exec rake release` which will create a git tag for the version,
     push git commits and tags, and push the `.gem` file to the gem host configured in the gemspec.
 
-[📜src-gl]: https://gitlab.com/{KJ|GH_ORG}/{KJ|GEM_NAME}/
-[📜src-cb]: https://codeberg.org/{KJ|GH_ORG}/{KJ|GEM_NAME}
-[📜src-gh]: https://github.com/{KJ|GH_ORG}/{KJ|GEM_NAME}
-[🧪build]: https://github.com/{KJ|GH_ORG}/{KJ|GEM_NAME}/actions
-[🤝conduct]: https://gitlab.com/{KJ|GH_ORG}/{KJ|GEM_NAME}/-/blob/main/CODE_OF_CONDUCT.md
+[📜src-gl]: {KJ|README:GL_PACKAGE_SOURCE_URL}
+[📜src-cb]: {KJ|README:CB_PACKAGE_SOURCE_URL}
+[📜src-gh]: {KJ|README:GH_PACKAGE_SOURCE_URL}
+[🧪build]: {KJ|README:GH_ACTIONS_URL}
+[🤝conduct]: {KJ|README:GH_CODE_OF_CONDUCT_URL}
 [🖐contrib-rocks]: https://contrib.rocks
-[🖐contributors]: https://github.com/{KJ|GH_ORG}/{KJ|GEM_NAME}/graphs/contributors
-[🚎contributors-gl]: https://gitlab.com/{KJ|GH_ORG}/{KJ|GEM_NAME}/-/graphs/main
-[🖐contributors-img]: https://contrib.rocks/image?repo={KJ|GH_ORG}/{KJ|GEM_NAME}
+[🖐contributors]: {KJ|README:GH_CONTRIBUTORS_URL}
+[🚎contributors-gl]: {KJ|README:GL_CONTRIBUTORS_URL}
+[🖐contributors-img]: https://contrib.rocks/image?repo={KJ|README:CONTRIBUTORS_IMAGE_REPO}
 [💎gem-coop]: https://gem.coop
 [🔒️rubygems-security-guide]: https://guides.rubygems.org/security/#building-gems
 [🔒️rubygems-checksums-pr]: https://github.com/rubygems/rubygems/pull/6022

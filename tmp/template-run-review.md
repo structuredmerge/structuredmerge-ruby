@@ -34,12 +34,12 @@ Context: generated diffs from the monorepo `workspace-scripts/template_ruby_gems
 
 ### 4. Consistent monorepo vs standalone repository links
 
-- Status: pending evaluation
-- Type: likely bug or incomplete monorepo-link model
+- Status: accepted for implementation
+- Type: missing feature / incomplete monorepo-link model
 - Current diff: kettle-jem docs mix standalone `structuredmerge/kettle-jem` URLs with monorepo subdirectory URLs under `structuredmerge-ruby/tree/main/gems/kettle-jem`.
 - Question: which generated files should use monorepo root URLs, subdirectory URLs, or standalone mirror URLs?
-- Decision:
-- Implementation notes:
+- Decision: centralize repository resource URL facts so templates choose from named root, package, policy-doc, source-host, and third-party URLs instead of hardcoding standalone GitHub/GitLab forms.
+- Implementation notes: monorepo subgem package source URLs point at `gems/<gem>`; shared policy/documentation URLs such as `CONTRIBUTING.md`, `SECURITY.md`, and `CODE_OF_CONDUCT.md` remain rooted at the monorepo. Changelog compare/tag URLs are exposed as template tokens for generated changelog references.
 
 ### 5. Template commit behavior
 

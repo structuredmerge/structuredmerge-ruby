@@ -1454,6 +1454,35 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "exposes canonical repository URL tokens for monorepo subgem templates" do
+    repository = {
+      url: "https://github.com/structuredmerge/structuredmerge-ruby",
+      name: "structuredmerge-ruby",
+      slug: "structuredmerge/structuredmerge-ruby",
+      package_path: "gems/ast-merge",
+      package_source_url: "https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge",
+      gitlab_package_source_url: "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge",
+      codeberg_package_source_url: "https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/ast-merge",
+      checksums_url: "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/checksums",
+    }
+    tokens = described_class.send(:readme_url_template_tokens, repository, "ast-merge", "structuredmerge")
+
+    expect(tokens.fetch("KJ|README:GH_REPOSITORY_URL")).to eq("https://github.com/structuredmerge/structuredmerge-ruby")
+    expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq(
+      "https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge"
+    )
+    expect(tokens.fetch("KJ|README:GH_CONTRIBUTING_URL")).to eq(
+      "https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md"
+    )
+    expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq(
+      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge"
+    )
+    expect(tokens.fetch("KJ|CHANGELOG:GL_COMPARE_URL")).to eq(
+      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare"
+    )
+    expect(tokens.fetch("KJ|CHANGELOG:GL_TAGS_URL")).to eq("https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tags")
+  end
+
   it "projects monorepo subgem README output to thin form while preserving destination-owned sections" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

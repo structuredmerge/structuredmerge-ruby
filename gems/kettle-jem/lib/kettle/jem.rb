@@ -5999,10 +5999,23 @@ module Kettle
       repo_slug = repository[:slug].to_s
       package_path = repository[:package_path].to_s
       package_source_url = repository[:package_source_url].to_s
-      package_source_url = repo_url if package_source_url.empty?
       repo_url = "https://github.com/#{github_org}/#{package_name}" if repo_url.empty?
       repo_name = package_name if repo_name.empty?
       repo_slug = "#{github_org}/#{repo_name}" if repo_slug.empty?
+      package_source_url = repo_url if package_source_url.empty?
+
+      repository = repository.merge(
+        url: repo_url,
+        name: repo_name,
+        slug: repo_slug,
+        package_path: package_path,
+        package_source_url: package_source_url
+      )
+      resources = repository[:resource_urls].is_a?(Hash) ? repository[:resource_urls] : repository_resource_urls(repository)
+      resource_url = lambda do |key, fallback|
+        value = resources[key].to_s
+        value.empty? ? fallback : value
+      end
 
       gitlab_source = repository[:gitlab_package_source_url].to_s
       codeberg_source = repository[:codeberg_package_source_url].to_s
@@ -6015,36 +6028,50 @@ module Kettle
         "KJ|README:REPO_SLUG" => repo_slug,
         "KJ|README:REPO_NAME" => repo_name,
         "KJ|README:PACKAGE_PATH" => package_path,
-        "KJ|README:GH_REPOSITORY_URL" => repo_url,
-        "KJ|README:GH_PACKAGE_SOURCE_URL" => package_source_url,
-        "KJ|README:GH_RELEASES_URL" => "#{repo_url}/releases",
+        "KJ|README:GH_REPOSITORY_URL" => resource_url.call(:github_repository_url, repo_url),
+        "KJ|README:GH_PACKAGE_SOURCE_URL" => resource_url.call(:github_package_source_url, package_source_url),
+        "KJ|README:GH_RELEASES_URL" => resource_url.call(:github_releases_url, "#{repo_url}/releases"),
         "KJ|README:GH_TAG_BADGE_REPO" => repo_slug,
-        "KJ|README:GH_DISCUSSIONS_URL" => "#{repo_url}/discussions",
-        "KJ|README:GH_ISSUES_URL" => "#{repo_url}/issues",
-        "KJ|README:GH_PULLS_URL" => "#{repo_url}/pulls",
-        "KJ|README:GH_WIKI_URL" => "#{repo_url}/wiki",
-        "KJ|README:GH_CODEQL_URL" => "#{repo_url}/security/code-scanning",
-        "KJ|README:GH_CONTRIBUTORS_URL" => "#{repo_url}/graphs/contributors",
-        "KJ|README:GL_PACKAGE_SOURCE_URL" => gitlab_source,
-        "KJ|README:GL_ISSUES_URL" => gitlab_repo_url(repository, repo_slug, "issues"),
-        "KJ|README:GL_PULLS_URL" => gitlab_repo_url(repository, repo_slug, "merge_requests"),
-        "KJ|README:GL_WIKI_URL" => gitlab_repo_url(repository, repo_slug, "wikis/home"),
-        "KJ|README:GL_CONTRIBUTORS_URL" => gitlab_repo_url(repository, repo_slug, "graphs/main"),
-        "KJ|README:CB_PACKAGE_SOURCE_URL" => codeberg_source,
-        "KJ|README:CB_ISSUES_URL" => codeberg_repo_url(repository, repo_slug, "issues"),
-        "KJ|README:CB_PULLS_URL" => codeberg_repo_url(repository, repo_slug, "pulls"),
-        "KJ|README:CODECOV_URL" => "https://codecov.io/gh/#{repo_slug}",
-        "KJ|README:CODECOV_BADGE_URL" => "https://codecov.io/gh/#{repo_slug}/graph/badge.svg",
-        "KJ|README:CODECOV_GRAPH_URL" => "https://codecov.io/gh/#{repo_slug}/graphs/tree.svg",
-        "KJ|README:COVERALLS_URL" => "https://coveralls.io/github/#{repo_slug}?branch=main",
-        "KJ|README:COVERALLS_BADGE_URL" => "https://coveralls.io/repos/github/#{repo_slug}/badge.svg?branch=main",
-        "KJ|README:QLTY_PROJECT_URL" => "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}",
-        "KJ|README:QLTY_MAINTAINABILITY_URL" => "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/maintainability.svg",
-        "KJ|README:QLTY_COVERAGE_URL" => "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/metrics/code?sort=coverageRating",
-        "KJ|README:QLTY_COVERAGE_BADGE_URL" => "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/coverage.svg",
+        "KJ|README:GH_ACTIONS_URL" => resource_url.call(:github_actions_url, "#{repo_url}/actions"),
+        "KJ|README:GH_DISCUSSIONS_URL" => resource_url.call(:github_discussions_url, "#{repo_url}/discussions"),
+        "KJ|README:GH_ISSUES_URL" => resource_url.call(:github_issues_url, "#{repo_url}/issues"),
+        "KJ|README:GH_PULLS_URL" => resource_url.call(:github_pulls_url, "#{repo_url}/pulls"),
+        "KJ|README:GH_WIKI_URL" => resource_url.call(:github_wiki_url, "#{repo_url}/wiki"),
+        "KJ|README:GH_CODEQL_URL" => resource_url.call(:github_codeql_url, "#{repo_url}/security/code-scanning"),
+        "KJ|README:GH_CONTRIBUTORS_URL" => resource_url.call(:github_contributors_url, "#{repo_url}/graphs/contributors"),
+        "KJ|README:GH_CONTRIBUTING_URL" => resource_url.call(:github_contributing_url, source_blob_url(repo_url, "CONTRIBUTING.md")),
+        "KJ|README:GH_CHANGELOG_URL" => resource_url.call(:github_changelog_url, source_blob_url(repo_url, "CHANGELOG.md")),
+        "KJ|README:GH_SECURITY_URL" => resource_url.call(:github_security_url, source_blob_url(repo_url, "SECURITY.md")),
+        "KJ|README:GH_CODE_OF_CONDUCT_URL" => resource_url.call(:github_code_of_conduct_url, source_blob_url(repo_url, "CODE_OF_CONDUCT.md")),
+        "KJ|README:GH_RUBOCOP_URL" => resource_url.call(:github_rubocop_url, source_blob_url(repo_url, "RUBOCOP.md")),
+        "KJ|README:GH_IRP_URL" => resource_url.call(:github_irp_url, source_blob_url(repo_url, "IRP.md")),
+        "KJ|README:GL_REPOSITORY_URL" => resource_url.call(:gitlab_repository_url, "https://gitlab.com/#{repo_slug}"),
+        "KJ|README:GL_PACKAGE_SOURCE_URL" => resource_url.call(:gitlab_package_source_url, gitlab_source),
+        "KJ|README:GL_ISSUES_URL" => resource_url.call(:gitlab_issues_url, gitlab_repo_url(repository, repo_slug, "issues")),
+        "KJ|README:GL_PULLS_URL" => resource_url.call(:gitlab_pulls_url, gitlab_repo_url(repository, repo_slug, "merge_requests")),
+        "KJ|README:GL_WIKI_URL" => resource_url.call(:gitlab_wiki_url, gitlab_repo_url(repository, repo_slug, "wikis/home")),
+        "KJ|README:GL_CONTRIBUTORS_URL" => resource_url.call(:gitlab_contributors_url, gitlab_repo_url(repository, repo_slug, "graphs/main")),
+        "KJ|README:GL_CONTRIBUTING_URL" => resource_url.call(:gitlab_contributing_url, source_blob_url("https://gitlab.com/#{repo_slug}", "CONTRIBUTING.md")),
+        "KJ|README:GL_CHANGELOG_URL" => resource_url.call(:gitlab_changelog_url, source_blob_url("https://gitlab.com/#{repo_slug}", "CHANGELOG.md")),
+        "KJ|README:GL_CODE_OF_CONDUCT_URL" => resource_url.call(:gitlab_code_of_conduct_url, source_blob_url("https://gitlab.com/#{repo_slug}", "CODE_OF_CONDUCT.md")),
+        "KJ|README:CB_REPOSITORY_URL" => resource_url.call(:codeberg_repository_url, "https://codeberg.org/#{repo_slug}"),
+        "KJ|README:CB_PACKAGE_SOURCE_URL" => resource_url.call(:codeberg_package_source_url, codeberg_source),
+        "KJ|README:CB_ISSUES_URL" => resource_url.call(:codeberg_issues_url, codeberg_repo_url(repository, repo_slug, "issues")),
+        "KJ|README:CB_PULLS_URL" => resource_url.call(:codeberg_pulls_url, codeberg_repo_url(repository, repo_slug, "pulls")),
+        "KJ|README:CODECOV_URL" => resource_url.call(:codecov_url, "https://codecov.io/gh/#{repo_slug}"),
+        "KJ|README:CODECOV_BADGE_URL" => resource_url.call(:codecov_badge_url, "https://codecov.io/gh/#{repo_slug}/graph/badge.svg"),
+        "KJ|README:CODECOV_GRAPH_URL" => resource_url.call(:codecov_graph_url, "https://codecov.io/gh/#{repo_slug}/graphs/tree.svg"),
+        "KJ|README:COVERALLS_URL" => resource_url.call(:coveralls_url, "https://coveralls.io/github/#{repo_slug}?branch=main"),
+        "KJ|README:COVERALLS_BADGE_URL" => resource_url.call(:coveralls_badge_url, "https://coveralls.io/repos/github/#{repo_slug}/badge.svg?branch=main"),
+        "KJ|README:QLTY_PROJECT_URL" => resource_url.call(:qlty_project_url, "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}"),
+        "KJ|README:QLTY_MAINTAINABILITY_URL" => resource_url.call(:qlty_maintainability_url, "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/maintainability.svg"),
+        "KJ|README:QLTY_COVERAGE_URL" => resource_url.call(:qlty_coverage_url, "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/metrics/code?sort=coverageRating"),
+        "KJ|README:QLTY_COVERAGE_BADGE_URL" => resource_url.call(:qlty_coverage_badge_url, "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/coverage.svg"),
+        "KJ|CHANGELOG:GL_COMPARE_URL" => resource_url.call(:gitlab_compare_url, "https://gitlab.com/#{repo_slug}/-/compare"),
+        "KJ|CHANGELOG:GL_TAGS_URL" => resource_url.call(:gitlab_tags_url, "https://gitlab.com/#{repo_slug}/-/tags"),
         "KJ|README:CONTRIBUTORS_IMAGE_REPO" => repo_slug,
         "KJ|README:STAR_HISTORY_REPO" => repo_slug,
-        "KJ|README:SHA_CHECKSUMS_URL" => checksums_url,
+        "KJ|README:SHA_CHECKSUMS_URL" => resource_url.call(:checksums_url, checksums_url),
       }
     end
 
@@ -6701,6 +6728,69 @@ module Kettle
       )
     end
 
+    def repository_resource_urls(repository)
+      repo_url = repository[:url].to_s
+      repo_slug = repository[:slug].to_s
+      github_org = repo_slug.split("/", 2).first.to_s
+      repo_name = repository[:name].to_s
+      gitlab_url = repository[:gitlab_url].to_s
+      gitlab_url = "https://gitlab.com/#{repo_slug}" if gitlab_url.empty?
+      codeberg_url = repository[:codeberg_url].to_s
+      codeberg_url = "https://codeberg.org/#{repo_slug}" if codeberg_url.empty?
+      package_source_url = repository[:package_source_url].to_s
+      package_source_url = repo_url if package_source_url.empty?
+      gitlab_package_source_url = repository[:gitlab_package_source_url].to_s
+      gitlab_package_source_url = gitlab_url if gitlab_package_source_url.empty?
+      codeberg_package_source_url = repository[:codeberg_package_source_url].to_s
+      codeberg_package_source_url = codeberg_url if codeberg_package_source_url.empty?
+      checksums_url = repository[:checksums_url].to_s
+      checksums_url = source_tree_url(gitlab_url, "checksums") if checksums_url.empty?
+
+      {
+        github_repository_url: repo_url,
+        github_package_source_url: package_source_url,
+        github_releases_url: "#{repo_url}/releases",
+        github_actions_url: "#{repo_url}/actions",
+        github_discussions_url: "#{repo_url}/discussions",
+        github_issues_url: "#{repo_url}/issues",
+        github_pulls_url: "#{repo_url}/pulls",
+        github_wiki_url: "#{repo_url}/wiki",
+        github_codeql_url: "#{repo_url}/security/code-scanning",
+        github_contributors_url: "#{repo_url}/graphs/contributors",
+        github_contributing_url: source_blob_url(repo_url, "CONTRIBUTING.md"),
+        github_changelog_url: source_blob_url(repo_url, "CHANGELOG.md"),
+        github_security_url: source_blob_url(repo_url, "SECURITY.md"),
+        github_code_of_conduct_url: source_blob_url(repo_url, "CODE_OF_CONDUCT.md"),
+        github_rubocop_url: source_blob_url(repo_url, "RUBOCOP.md"),
+        github_irp_url: source_blob_url(repo_url, "IRP.md"),
+        gitlab_repository_url: gitlab_url,
+        gitlab_package_source_url: gitlab_package_source_url,
+        gitlab_issues_url: "#{gitlab_url}/-/issues",
+        gitlab_pulls_url: "#{gitlab_url}/-/merge_requests",
+        gitlab_wiki_url: "#{gitlab_url}/-/wikis/home",
+        gitlab_contributors_url: "#{gitlab_url}/-/graphs/main",
+        gitlab_contributing_url: source_blob_url(gitlab_url, "CONTRIBUTING.md"),
+        gitlab_changelog_url: source_blob_url(gitlab_url, "CHANGELOG.md"),
+        gitlab_code_of_conduct_url: source_blob_url(gitlab_url, "CODE_OF_CONDUCT.md"),
+        gitlab_compare_url: "#{gitlab_url}/-/compare",
+        gitlab_tags_url: "#{gitlab_url}/-/tags",
+        codeberg_repository_url: codeberg_url,
+        codeberg_package_source_url: codeberg_package_source_url,
+        codeberg_issues_url: "#{codeberg_url}/issues",
+        codeberg_pulls_url: "#{codeberg_url}/pulls",
+        codecov_url: "https://codecov.io/gh/#{repo_slug}",
+        codecov_badge_url: "https://codecov.io/gh/#{repo_slug}/graph/badge.svg",
+        codecov_graph_url: "https://codecov.io/gh/#{repo_slug}/graphs/tree.svg",
+        coveralls_url: "https://coveralls.io/github/#{repo_slug}?branch=main",
+        coveralls_badge_url: "https://coveralls.io/repos/github/#{repo_slug}/badge.svg?branch=main",
+        qlty_project_url: "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}",
+        qlty_maintainability_url: "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/maintainability.svg",
+        qlty_coverage_url: "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/metrics/code?sort=coverageRating",
+        qlty_coverage_badge_url: "https://qlty.sh/gh/#{github_org}/projects/#{repo_name}/coverage.svg",
+        checksums_url: checksums_url,
+      }
+    end
+
     def repository_root_url(source_url)
       uri = URI.parse(source_url.to_s)
       return source_url.to_s unless uri.host == "github.com"
@@ -6736,12 +6826,22 @@ module Kettle
     end
 
     def gitlab_repo_url(repository, repo_slug, suffix)
+      resources = repository[:resource_urls] || {}
+      return resources[:gitlab_issues_url] if suffix == "issues" && resources[:gitlab_issues_url]
+      return resources[:gitlab_pulls_url] if suffix == "merge_requests" && resources[:gitlab_pulls_url]
+      return resources[:gitlab_wiki_url] if suffix == "wikis/home" && resources[:gitlab_wiki_url]
+      return resources[:gitlab_contributors_url] if suffix == "graphs/main" && resources[:gitlab_contributors_url]
+
       base = repository[:gitlab_url].to_s
       base = "https://gitlab.com/#{repo_slug}" if base.empty?
       "#{base}/-/#{suffix}"
     end
 
     def codeberg_repo_url(repository, repo_slug, suffix)
+      resources = repository[:resource_urls] || {}
+      return resources[:codeberg_issues_url] if suffix == "issues" && resources[:codeberg_issues_url]
+      return resources[:codeberg_pulls_url] if suffix == "pulls" && resources[:codeberg_pulls_url]
+
       base = repository[:codeberg_url].to_s
       base = "https://codeberg.org/#{repo_slug}" if base.empty?
       "#{base}/#{suffix}"
