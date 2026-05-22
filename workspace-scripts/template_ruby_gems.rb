@@ -9,6 +9,7 @@ require "tsort"
 
 RUBY_REPO = File.expand_path("..", __dir__)
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
+MONOREPO_TEMPLATE_PROFILE = "monorepo-subgem"
 
 ORDER_HINT = [
   "tree_haver",
@@ -46,19 +47,11 @@ ORDER_HINT = [
 options = {
   bootstrap_missing_config: false,
   json: false,
-  mode: "converge",
   normalize_lock: true,
-  profile: nil,
 }
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: template_ruby_gems.rb [options]"
-
-  opts.on("--mode MODE", "Run mode: plan, converge, or apply. Default: converge.") do |mode|
-    raise OptionParser::InvalidArgument, "mode must be plan, converge, or apply" unless %w[plan converge apply].include?(mode)
-
-    options[:mode] = mode
-  end
 
   opts.on("--only GEM", "Template only one gem directory.") do |gem_name|
     options[:only] = gem_name
@@ -66,10 +59,6 @@ parser = OptionParser.new do |opts|
 
   opts.on("--start-at GEM", "Start at a gem directory in sorted order.") do |gem_name|
     options[:start_at] = gem_name
-  end
-
-  opts.on("--profile PROFILE", "Template profile to pass to kettle-jem, e.g. monorepo-subgem.") do |profile|
-    options[:profile] = profile
   end
 
   opts.on("--[no-]bootstrap-missing-config", "Write initial .kettle-jem.yml before applying packaged templates. Default: false.") do |value|
@@ -83,14 +72,18 @@ parser = OptionParser.new do |opts|
   opts.on("--[no-]normalize-lock", "After each templating run, run bundle install without templating/local-path env to restore release-compatible lockfiles. Default: true.") do |value|
     options[:normalize_lock] = value
   end
+end
 
-  opts.on("--child", "Run one gem in child mode.") do
-    options[:child] = true
-  end
+if (child_index = ARGV.index("--child"))
+  options[:child] = true
+  ARGV.delete_at(child_index)
+end
 
-  opts.on("--gem-dir DIR", "Gem directory for child mode.") do |dir|
-    options[:gem_dir] = dir
-  end
+if (gem_dir_index = ARGV.index("--gem-dir"))
+  raise OptionParser::MissingArgument, "--gem-dir requires a directory" unless ARGV[gem_dir_index + 1]
+
+  options[:gem_dir] = ARGV[gem_dir_index + 1]
+  ARGV.slice!(gem_dir_index, 2)
 end
 
 parser.parse!
@@ -98,30 +91,21 @@ parser.parse!
 def run_kettle_jem_for_gem(gem_dir, options)
   require "kettle-jem"
 
-  profile_run_options = options[:profile] ? {template_profile: options[:profile]} : {}
+  template_run_options = {template_profile: MONOREPO_TEMPLATE_PROFILE}
   env = ENV.to_h
 
   bootstrap = nil
   config_path = File.join(gem_dir, ".kettle-jem.yml")
-  if options[:mode] == "apply" && options[:bootstrap_missing_config] && !File.exist?(config_path)
+  if options[:bootstrap_missing_config] && !File.exist?(config_path)
     bootstrap = Kettle::Jem.setup_project(
       gem_dir,
       env: env,
-      run_options: {bootstrap_mode: true, skip_commit: true, quiet: true}.merge(profile_run_options)
+      run_options: {bootstrap_mode: true, skip_commit: true, quiet: true}.merge(template_run_options)
     )
   end
 
-  run_options = {accept: true, force: true, skip_commit: true, quiet: true}.merge(profile_run_options)
-  result = if options[:mode] == "plan"
-    Kettle::Jem.plan_project(gem_dir, env: env, run_options: run_options)
-  elsif options[:mode] == "converge"
-    plan = Kettle::Jem.plan_project(gem_dir, env: env, run_options: run_options)
-    post_apply_steps = Kettle::Jem.post_apply_steps(gem_dir, plan)
-    changed_files = post_apply_steps.flat_map { |step| step.fetch(:changed_files, []) }.uniq.sort
-    plan.merge(mode: "converge", changed_files: changed_files, post_apply_steps: post_apply_steps)
-  else
-    Kettle::Jem.apply_project(gem_dir, env: env, run_options: run_options)
-  end
+  run_options = {accept: true, force: true, skip_commit: true, quiet: true}.merge(template_run_options)
+  result = Kettle::Jem.apply_project(gem_dir, env: env, run_options: run_options)
 
   {
     gem: File.basename(gem_dir),
@@ -204,19 +188,6 @@ def normalize_lockfile_for_gem(gem_dir)
   raise "Lock normalization failed for #{File.basename(gem_dir)}: #{command.join(" ")}"
 end
 
-def mode_summary(mode)
-  case mode
-  when "plan"
-    "plan only; does not write template results"
-  when "converge"
-    "plan plus post-apply convergence check; does not write template results"
-  when "apply"
-    "apply templates and write changed files"
-  else
-    mode.to_s
-  end
-end
-
 def option_state(value)
   value ? "enabled" : "disabled"
 end
@@ -234,14 +205,12 @@ def render_options_banner(options, gem_dirs)
     "all gems"
   end
 
-  template_writes = options[:mode] == "apply"
   lines = [
-    "== Ruby gem templating options ==",
-    banner_value("Mode", "#{options[:mode]} (#{mode_summary(options[:mode])})", "change: --mode plan|converge|apply"),
-    banner_value("Template writes", option_state(template_writes), "enable writes: --mode apply"),
+    "== StructuredMerge Ruby monorepo templating ==",
+    "Action: apply kettle-jem templates and write changed files",
+    "Template kind: monorepo sub-project gem (fixed: #{MONOREPO_TEMPLATE_PROFILE})",
     banner_value("Bootstrap missing config", option_state(options[:bootstrap_missing_config]), "toggle: --bootstrap-missing-config / --no-bootstrap-missing-config"),
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
-    banner_value("Template profile", options[:profile] || "default", "set: --profile PROFILE"),
     banner_value("Selection", "#{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})", "limit: --only GEM or --start-at GEM"),
   ]
   lines << "JSON output: enabled" if options[:json]
@@ -280,9 +249,7 @@ results = gem_dirs.map do |gem_dir|
     "bundle", "exec", "ruby", File.expand_path(__FILE__),
     "--child",
     "--gem-dir", gem_dir,
-    "--mode", options[:mode],
   ]
-  command.concat(["--profile", options[:profile]]) if options[:profile]
   command << "--bootstrap-missing-config" if options[:bootstrap_missing_config]
   child_env = ENV.to_h
   child_env["SMORG_RB_DEV"] = GEMS_ROOT unless child_env.key?("SMORG_RB_DEV")
@@ -299,7 +266,7 @@ results = gem_dirs.map do |gem_dir|
   end
 
   changed_files = result.fetch(:changed_files, [])
-  puts "#{options[:mode]}: #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
+  puts "apply: #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
   changed_files.each { |path| puts "  #{path}" } unless options[:json]
 
   result
