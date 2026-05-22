@@ -45,7 +45,6 @@ ORDER_HINT = [
 ].freeze
 
 options = {
-  bootstrap_missing_config: false,
   json: false,
   normalize_lock: true,
 }
@@ -59,10 +58,6 @@ parser = OptionParser.new do |opts|
 
   opts.on("--start-at GEM", "Start at a gem directory in sorted order.") do |gem_name|
     options[:start_at] = gem_name
-  end
-
-  opts.on("--[no-]bootstrap-missing-config", "Write initial .kettle-jem.yml before applying packaged templates. Default: false.") do |value|
-    options[:bootstrap_missing_config] = value
   end
 
   opts.on("--json", "Print a JSON report.") do
@@ -96,7 +91,7 @@ def run_kettle_jem_for_gem(gem_dir, options)
 
   bootstrap = nil
   config_path = File.join(gem_dir, ".kettle-jem.yml")
-  if options[:bootstrap_missing_config] && !File.exist?(config_path)
+  unless File.exist?(config_path)
     bootstrap = Kettle::Jem.setup_project(
       gem_dir,
       env: env,
@@ -209,7 +204,7 @@ def render_options_banner(options, gem_dirs)
     "== StructuredMerge Ruby monorepo templating ==",
     "Action: apply kettle-jem templates and write changed files",
     "Template kind: monorepo sub-project gem (fixed: #{MONOREPO_TEMPLATE_PROFILE})",
-    banner_value("Bootstrap missing config", option_state(options[:bootstrap_missing_config]), "toggle: --bootstrap-missing-config / --no-bootstrap-missing-config"),
+    "Missing .kettle-jem.yml: auto-bootstrap before templating",
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
     banner_value("Selection", "#{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})", "limit: --only GEM or --start-at GEM"),
   ]
@@ -250,7 +245,6 @@ results = gem_dirs.map do |gem_dir|
     "--child",
     "--gem-dir", gem_dir,
   ]
-  command << "--bootstrap-missing-config" if options[:bootstrap_missing_config]
   child_env = ENV.to_h
   child_env["SMORG_RB_DEV"] = GEMS_ROOT unless child_env.key?("SMORG_RB_DEV")
   child_env["K_JEM_TEMPLATING"] = "true"
