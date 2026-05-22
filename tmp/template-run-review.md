@@ -80,12 +80,12 @@ Context: generated diffs from the monorepo `workspace-scripts/template_ruby_gems
 
 ### 9. `kettle-jem` generated `.kettle-jem.yml` additions
 
-- Status: pending evaluation
+- Status: accepted
 - Type: likely correct
 - Current diff: `yard_host: kettle-jem.galtzo.com` and `homepage_uri: https://structuredmerge.org` are added.
 - Question: is this split between generated YARD links and gemspec homepage URI intended?
-- Decision:
-- Implementation notes:
+- Decision: yes, when `homepage_uri` is overridden by ENV. In the normal template path, many open source gems do not have a separate homepage, so `homepage_uri` defaults to `https://{KJ|YARD_HOST}`.
+- Implementation notes: `yard_host` has its own ENV override, `KJ_YARD_HOST`. It feeds `{KJ|YARD_HOST}`, participates in `homepage_uri` derivation when `KJ_HOMEPAGE_URI` is absent, and is synchronized back into `.kettle-jem.yml` during templating.
 
 ### 10. Generated documentation formatting drift
 
