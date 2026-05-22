@@ -46,6 +46,7 @@ ORDER_HINT = [
 ].freeze
 
 options = {
+  commit: true,
   json: false,
   normalize_lock: true,
 }
@@ -63,6 +64,10 @@ parser = OptionParser.new do |opts|
 
   opts.on("--json", "Print a JSON report.") do
     options[:json] = true
+  end
+
+  opts.on("--[no-]commit", "Commit all template results once from the repository root after all selected gems. Default: true.") do |value|
+    options[:commit] = value
   end
 
   opts.on("--[no-]normalize-lock", "After each templating run, run bundle install without templating/local-path env to restore release-compatible lockfiles. Default: true.") do |value|
@@ -201,6 +206,42 @@ def normalize_lockfile_for_gem(gem_dir)
   raise "Lock normalization failed for #{File.basename(gem_dir)}: #{command.join(" ")}"
 end
 
+def git_status_entries
+  stdout, stderr, status = Open3.capture3("git", "-C", RUBY_REPO, "status", "--porcelain")
+  raise "Git status failed: #{stderr}" unless status.success?
+
+  stdout.lines.map(&:chomp).reject(&:empty?)
+end
+
+def ensure_clean_worktree_for_commit!
+  entries = git_status_entries
+  return if entries.empty?
+
+  raise <<~MESSAGE
+    Refusing to template with commit enabled because the repository worktree is not clean.
+    Commit or discard existing changes first, or rerun with --no-commit.
+    Dirty entries:
+    #{entries.join("\n")}
+  MESSAGE
+end
+
+def commit_template_results
+  entries = git_status_entries
+  return {status: "clean_noop"} if entries.empty?
+
+  add_stdout, add_stderr, add_status = Open3.capture3("git", "-C", RUBY_REPO, "add", "-A")
+  raise "Git add failed: #{add_stderr.empty? ? add_stdout : add_stderr}" unless add_status.success?
+
+  message = "chore: apply kettle-jem templates"
+  commit_stdout, commit_stderr, commit_status = Open3.capture3("git", "-C", RUBY_REPO, "commit", "-m", message)
+  raise "Git commit failed: #{commit_stderr.empty? ? commit_stdout : commit_stderr}" unless commit_status.success?
+
+  sha_stdout, sha_stderr, sha_status = Open3.capture3("git", "-C", RUBY_REPO, "rev-parse", "--short", "HEAD")
+  raise "Git rev-parse failed: #{sha_stderr}" unless sha_status.success?
+
+  {status: "committed", message: message, sha: sha_stdout.strip, changed_entries: entries}
+end
+
 def option_state(value)
   value ? "enabled" : "disabled"
 end
@@ -223,6 +264,7 @@ def render_options_banner(options, gem_dirs)
     "Action: apply kettle-jem templates and write changed files",
     "Template kind: #{MONOREPO_TEMPLATE_PROFILE} for sub-project gems; full template for #{FULL_TEMPLATE_GEMS.join(", ")}",
     "Missing .kettle-jem.yml: auto-bootstrap before templating",
+    banner_value("Commit template result", option_state(options[:commit]), "toggle: --commit / --no-commit"),
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
     banner_value("Selection", "#{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})", "limit: --only GEM or --start-at GEM"),
   ]
@@ -252,6 +294,7 @@ if options[:start_at]
 end
 
 render_options_banner(options, gem_dirs) unless options[:json]
+ensure_clean_worktree_for_commit! if options[:commit]
 
 results = gem_dirs.map do |gem_dir|
   gem_name = File.basename(gem_dir)
@@ -284,4 +327,16 @@ results = gem_dirs.map do |gem_dir|
   result
 end
 
-puts JSON.pretty_generate({kind: "ruby_gem_template_report", gems: results}) if options[:json]
+commit_report = options[:commit] ? commit_template_results : {status: "skipped", reason: "no_commit"}
+unless options[:json]
+  case commit_report.fetch(:status)
+  when "committed"
+    puts "\nCommit: #{commit_report.fetch(:sha)} #{commit_report.fetch(:message)}"
+  when "clean_noop"
+    puts "\nCommit: clean noop"
+  else
+    puts "\nCommit: skipped (#{commit_report.fetch(:reason)})"
+  end
+end
+
+puts JSON.pretty_generate({kind: "ruby_gem_template_report", gems: results, commit: commit_report}) if options[:json]

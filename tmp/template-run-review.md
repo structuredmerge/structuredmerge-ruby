@@ -43,31 +43,31 @@ Context: generated diffs from the monorepo `workspace-scripts/template_ruby_gems
 
 ### 5. Template commit behavior
 
-- Status: pending evaluation
+- Status: accepted for implementation
 - Type: missing feature / regression from reference kettle-jem
 - Current behavior: the wrapper passes `skip_commit: true` for bootstrap and apply, and the banner does not mention commit behavior.
 - Reference behavior: reference kettle-jem auto-committed by default unless `KETTLE_JEM_SKIP_COMMIT` or `--skip-commit` was set.
 - Question: should this monorepo wrapper default to one repo-level commit after all gems, with `--no-commit` and a clean-worktree preflight?
-- Decision:
-- Implementation notes:
+- Decision: yes. The monorepo wrapper should own a single repo-level commit after all selected gems finish. Per-gem kettle-jem runs should continue to use `skip_commit: true` internally.
+- Implementation notes: add `--commit` / `--no-commit` to the wrapper, default commit on, require a clean worktree before starting when commit is enabled, and commit all final template results from the monorepo root with one message.
 
 ### 6. README badge and link projection audit
 
-- Status: pending evaluation
-- Type: likely intended template drift, needs audit
+- Status: follow-up needed
+- Type: likely missing feature / retained monorepo-root coverage gap
 - Current diff: many READMEs gain expanded CI/runtime badges and some unused refs are removed.
 - Question: are all generated badges valid for the monorepo, and are removed refs genuinely unused?
-- Decision:
-- Implementation notes:
+- Decision: no. Removed refs are unused, but that may indicate the root monorepo template no longer retains the older complex gemfiles/appraisals/workflow setup. Do not treat the removed refs as proof the coverage is intentionally gone.
+- Implementation notes: add a follow-up feature to restore or explicitly model the monorepo root's complex appraisal/workflow coverage without worsening the already-slow test suite unnecessarily.
 
 ### 7. Homepage URI override result
 
-- Status: pending evaluation
+- Status: accepted
 - Type: likely correct
 - Current diff: gemspecs use `spec.metadata["homepage_uri"] = "https://structuredmerge.org"`.
 - Question: are `.kettle-jem.yml`, ENV, and root `mise.toml` now the correct source chain, and does this apply consistently to all gems?
-- Decision:
-- Implementation notes:
+- Decision: yes, but the source chain is ENV first, then `.kettle-jem.yml`; `mise.toml` is not a kettle-jem input and must not be parsed or inspected by kettle-jem. It only provides ENV to the process.
+- Implementation notes: when `.kettle-jem.yml` is first written, bootstrap may derive initial values from project inspection such as gemspec and README project emoji. After that, explicit ENV overrides have highest precedence and config values apply when no ENV override exists.
 
 ### 8. Minimum Ruby version gemspec version-loader rewrite
 
