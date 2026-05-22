@@ -221,6 +221,10 @@ def option_state(value)
   value ? "enabled" : "disabled"
 end
 
+def banner_value(label, value, flag)
+  "#{label}: #{value} [#{flag}]"
+end
+
 def render_options_banner(options, gem_dirs)
   selected = if options[:only]
     "only #{options[:only]}"
@@ -233,12 +237,12 @@ def render_options_banner(options, gem_dirs)
   template_writes = options[:mode] == "apply"
   lines = [
     "== Ruby gem templating options ==",
-    "Mode: #{options[:mode]} (#{mode_summary(options[:mode])})",
-    "Template writes: #{option_state(template_writes)}",
-    "Bootstrap missing config: #{option_state(options[:bootstrap_missing_config])}",
-    "Normalize lockfiles: #{option_state(options[:normalize_lock])}",
-    "Template profile: #{options[:profile] || "default"}",
-    "Selection: #{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})",
+    banner_value("Mode", "#{options[:mode]} (#{mode_summary(options[:mode])})", "change: --mode plan|converge|apply"),
+    banner_value("Template writes", option_state(template_writes), "enable writes: --mode apply"),
+    banner_value("Bootstrap missing config", option_state(options[:bootstrap_missing_config]), "toggle: --bootstrap-missing-config / --no-bootstrap-missing-config"),
+    banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
+    banner_value("Template profile", options[:profile] || "default", "set: --profile PROFILE"),
+    banner_value("Selection", "#{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})", "limit: --only GEM or --start-at GEM"),
   ]
   lines << "JSON output: enabled" if options[:json]
   puts lines.join("\n")
