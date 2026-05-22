@@ -3950,6 +3950,126 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "inlines gemspec version loading when minimum Ruby is at least 3.1" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-modern-version-loader-slice", tmp_root) do |root|
+      write_tree(root, {
+        "my-gem.gemspec" => <<~RUBY,
+          # coding: utf-8
+          # frozen_string_literal: true
+
+          gem_version =
+            if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+              Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION
+            else
+              lib = File.expand_path("lib", __dir__)
+              $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+              require "my/gem/version"
+              My::Gem::Version::VERSION
+            end
+
+          Gem::Specification.new do |gem|
+            gem.name = "my-gem"
+            gem.version = gem_version
+            gem.summary = "Modern loader"
+            gem.required_ruby_version = ">= 3.2"
+            gem.homepage = "https://github.com/acme/my-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - my-gem.gemspec
+        YAML
+        "template/my-gem.gemspec.example" => <<~RUBY,
+          # coding: utf-8
+          # frozen_string_literal: true
+
+          gem_version =
+            if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+              Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/{KJ|GEM_NAME_PATH}/version.rb", mod) }::{KJ|NAMESPACE}::Version::VERSION
+            else
+              lib = File.expand_path("lib", __dir__)
+              $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+              require "{KJ|GEM_NAME_PATH}/version"
+              {KJ|NAMESPACE}::Version::VERSION
+            end
+
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = gem_version
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_my_gem_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).not_to include("gem_version =")
+      expect(gemspec_content).not_to include('if RUBY_VERSION >= "3.1"')
+      expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
+      expect(gemspec_content).not_to include('require "my/gem/version"')
+      expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
+      expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
+        include(operation: "rewrite_version_loader", min_ruby: "3.2", mode: "modern", legacy_preamble_removed: true)
+      )
+      expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "keeps gemspec legacy version loading when minimum Ruby is below 3.1" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-legacy-version-loader-slice", tmp_root) do |root|
+      write_tree(root, {
+        "my-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "my-gem"
+            gem.version = "0.1.0"
+            gem.summary = "Legacy loader"
+            gem.required_ruby_version = ">= 3.0"
+            gem.homepage = "https://github.com/acme/my-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - my-gem.gemspec
+        YAML
+        "template/my-gem.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_my_gem_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).to include("gem_version =")
+      expect(gemspec_content).to include('if RUBY_VERSION >= "3.1"')
+      expect(gemspec_content).to include('require "my/gem/version"')
+      expect(gemspec_content).to include("My::Gem::Version::VERSION")
+      expect(gemspec_content).to include("spec.version = gem_version")
+      expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
+        include(operation: "rewrite_version_loader", min_ruby: "3.0", mode: "legacy", legacy_preamble_present: true)
+      )
+      expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "preserves missing runtime gemspec dependencies above the development dependency separator" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

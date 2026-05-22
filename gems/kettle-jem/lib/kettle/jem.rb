@@ -211,6 +211,7 @@ module Kettle
     APPRAISAL_ALWAYS_EXCLUDED_GEMS = %w[version_gem].freeze
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
     APPRAISAL_MINIMUM_RUBY_FLOOR = Gem::Version.new("2.3")
+    MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY = Gem::Version.new("3.1").freeze
     APPRAISAL_DEFAULT_FRESHNESS_TTL = 604_800
     DECISION_ACTIONS = %w[create merge replace keep delete skip].freeze
     DECISION_SEVERITIES = %w[advisory warning fatal].freeze
@@ -2334,6 +2335,7 @@ module Kettle
         ),
         rubygems: compact_hash(
           gemspec_path: File.basename(gemspec_path),
+          entrypoint_require: entrypoint_require,
           namespace: namespace,
           min_ruby: extract_gemspec_assignment(gemspec, "spec.required_ruby_version"),
           engines: ruby_engines_config(kettle_config),
@@ -3243,6 +3245,8 @@ module Kettle
           ].max,
         },
       ]
+      version_loader_operation = gemspec_version_loader_policy_operation(original, final, request)
+      operations << version_loader_operation if version_loader_operation
       if template_receiver != destination_receiver
         operations << {
           operation: "normalize_gemspec_receiver",
@@ -3251,6 +3255,24 @@ module Kettle
         }
       end
       operations
+    end
+
+    def gemspec_version_loader_policy_operation(original, final, request)
+      min_ruby = minimum_ruby_token(runtime_context_value(request, :rubygems, :min_ruby))
+      return if min_ruby.to_s.empty?
+
+      modern = Gem::Version.new(min_ruby) >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
+      before_legacy = !gemspec_top_level_gem_version_node(original).nil?
+      after_legacy = !gemspec_top_level_gem_version_node(final).nil?
+      {
+        operation: "rewrite_version_loader",
+        min_ruby: min_ruby,
+        mode: modern ? "modern" : "legacy",
+        legacy_preamble_removed: before_legacy && !after_legacy,
+        legacy_preamble_present: after_legacy,
+      }
+    rescue ArgumentError, Ast::Crispr::Error
+      nil
     end
 
     def runtime_context_value(request, *path)
@@ -3365,7 +3387,8 @@ module Kettle
       when :gemspec
         package_name = facts.dig(:package, :name).to_s if facts
         receiver = gemspec_block_param(content) || "spec"
-        remove_gemspec_self_dependency_lines(content, package_name, receiver: receiver)
+        pruned = remove_gemspec_self_dependency_lines(content, package_name, receiver: receiver)
+        rewrite_gemspec_version_loader(pruned, facts: facts)
       else
         content
       end
@@ -4536,7 +4559,98 @@ module Kettle
       )
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
-      remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
+      merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
+      rewrite_gemspec_version_loader(merged, facts: facts)
+    end
+
+    def rewrite_gemspec_version_loader(content, facts:)
+      min_ruby = minimum_ruby_token(facts.to_h.dig(:rubygems, :min_ruby))
+      return content if min_ruby.to_s.empty?
+
+      namespace = facts.to_h.dig(:rubygems, :namespace).to_s
+      entrypoint_require = facts.to_h.dig(:rubygems, :entrypoint_require).to_s
+      entrypoint_require = facts.to_h.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
+      return content if namespace.empty? || entrypoint_require.empty?
+
+      receiver = gemspec_block_param(content) || "spec"
+      modern = Gem::Version.new(min_ruby) >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
+      rhs = modern ? gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace) : "gem_version"
+      rewritten = replace_gemspec_version_assignment(content, receiver: receiver, rhs: rhs)
+      modern ? remove_gemspec_legacy_version_loader_preamble(rewritten) : ensure_gemspec_legacy_version_loader_preamble(rewritten, entrypoint_require: entrypoint_require, namespace: namespace)
+    rescue ArgumentError, Ast::Crispr::Error
+      content
+    end
+
+    def replace_gemspec_version_assignment(content, receiver:, rhs:)
+      replacement = "#{receiver}.version = #{rhs}"
+      record = gemspec_assignment_records(content, receiver: receiver).find { |candidate| candidate.fetch(:field) == "version" }
+      return replace_source_range_lines(content, record.fetch(:start_line), record.fetch(:end_line), "#{leading_whitespace(record.fetch(:source))}#{replacement}\n") if record
+
+      name = gemspec_assignment_records(content, receiver: receiver).find { |candidate| candidate.fetch(:field) == "name" }
+      return insert_lines_after(content, name.fetch(:end_line), "  #{replacement}\n") if name
+
+      insert_lines_after(content, gemspec_new_call(content)&.location&.start_line || 1, "  #{replacement}\n")
+    end
+
+    def gemspec_modern_version_loader_expression(entrypoint_require:, namespace:)
+      %(Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/#{entrypoint_require}/version.rb", mod) }::#{namespace}::Version::VERSION)
+    end
+
+    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:)
+      <<~RUBY
+        gem_version =
+          if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+            # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
+            # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
+            # See: https://github.com/panorama-ed/memo_wise/pull/397
+            #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace)}
+          else
+            # NOTE: Use __FILE__ or __dir__ until removal of Ruby 1.x support
+            # __dir__ introduced in Ruby 1.9.1
+            # lib = File.expand_path("../lib", __FILE__)
+            lib = File.expand_path("lib", __dir__)
+            $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+            require "#{entrypoint_require}/version"
+            #{namespace}::Version::VERSION
+          end
+      RUBY
+    end
+
+    def remove_gemspec_legacy_version_loader_preamble(content)
+      node = gemspec_top_level_gem_version_node(content)
+      return content unless node
+
+      replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), "")
+    end
+
+    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:)
+      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace)}\n"
+      node = gemspec_top_level_gem_version_node(content)
+      return replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), block) if node
+
+      gemspec_call = gemspec_new_call(content)
+      return content unless gemspec_call
+
+      insert_lines_before(content, gemspec_call.location.start_line, block)
+    end
+
+    def gemspec_top_level_gem_version_node(content)
+      context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "gemspec")
+      gemspec_call = context.structural_owners(owner_scope: :top_level_statements).find do |owner|
+        owner.is_a?(::Prism::CallNode) && owner.name == :new && owner.receiver&.slice == "Gem::Specification"
+      end
+      context.structural_owners(owner_scope: :top_level_statements).find do |owner|
+        owner.is_a?(::Prism::LocalVariableWriteNode) &&
+          owner.name == :gem_version &&
+          (!gemspec_call || owner.location.start_offset < gemspec_call.location.start_offset)
+      end
+    end
+
+    def expand_line_range_through_following_blanks(content, end_line)
+      lines = content.to_s.lines
+      line = end_line
+      line += 1 while lines[line]&.strip == ""
+      line
     end
 
     def apply_configured_gemspec_licenses(content, facts, receiver:)
@@ -5364,11 +5478,13 @@ module Kettle
 
     def extract_gemspec_assignment(source, field)
       value = gemspec_assignment_record(source, field)&.fetch(:value)
+      value ||= gemspec_assignment_record(source, field.to_s.split(".").last)&.fetch(:value)
       value if value.is_a?(String)
     end
 
     def extract_gemspec_array(source, field)
       value = gemspec_assignment_record(source, field)&.fetch(:value)
+      value ||= gemspec_assignment_record(source, field.to_s.split(".").last)&.fetch(:value)
       value.is_a?(Array) ? value : []
     end
 
