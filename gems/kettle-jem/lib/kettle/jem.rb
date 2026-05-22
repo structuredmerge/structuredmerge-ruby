@@ -4630,7 +4630,7 @@ module Kettle
     def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:)
       <<~RUBY
         gem_version =
-          if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+          if Gem.ruby_version >= Gem::Version.new("3.1")
             # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
             # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
             # See: https://github.com/panorama-ed/memo_wise/pull/397

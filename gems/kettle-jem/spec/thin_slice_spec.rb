@@ -3989,7 +3989,7 @@ RSpec.describe Kettle::Jem do
           # frozen_string_literal: true
 
           gem_version =
-            if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+            if Gem.ruby_version >= Gem::Version.new("3.1")
               Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION
             else
               lib = File.expand_path("lib", __dir__)
@@ -4018,7 +4018,7 @@ RSpec.describe Kettle::Jem do
           # frozen_string_literal: true
 
           gem_version =
-            if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+            if Gem.ruby_version >= Gem::Version.new("3.1")
               Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/{KJ|GEM_NAME_PATH}/version.rb", mod) }::{KJ|NAMESPACE}::Version::VERSION
             else
               lib = File.expand_path("lib", __dir__)
@@ -4042,6 +4042,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).not_to include("gem_version =")
       expect(gemspec_content).not_to include('if RUBY_VERSION >= "3.1"')
+      expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
       expect(gemspec_content).not_to include('require "my/gem/version"')
       expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
@@ -4088,7 +4089,8 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
 
       expect(gemspec_content).to include("gem_version =")
-      expect(gemspec_content).to include('if RUBY_VERSION >= "3.1"')
+      expect(gemspec_content).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
+      expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).to include('require "my/gem/version"')
       expect(gemspec_content).to include("My::Gem::Version::VERSION")
       expect(gemspec_content).to include("spec.version = gem_version")

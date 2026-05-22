@@ -71,12 +71,12 @@ Context: generated diffs from the monorepo `workspace-scripts/template_ruby_gems
 
 ### 8. Minimum Ruby version gemspec version-loader rewrite
 
-- Status: pending evaluation
-- Type: likely correct
+- Status: accepted for implementation
+- Type: incomplete behavior / style bug
 - Current diff: affected gemspecs lose the legacy `RUBY_VERSION >= "3.1"` branch and inline the anonymous-module version load.
 - Question: is the ast-crispr-ruby-prism rewrite complete, and do any gems still require lower-Ruby fallback behavior?
-- Decision:
-- Implementation notes:
+- Decision: no, the rewrite is not complete; also no current gems require lower-Ruby fallback behavior.
+- Implementation notes: update the template and legacy rewrite helper to use `if Gem.ruby_version >= Gem::Version.new("3.1")` and keep the SimpleCov coverage comments. This avoids `RUBY_VERSION` and the RuboCop disable while preserving fallback behavior for projects whose configured minimum Ruby is still below 3.1.
 
 ### 9. `kettle-jem` generated `.kettle-jem.yml` additions
 
