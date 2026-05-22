@@ -5516,9 +5516,12 @@ RSpec.describe Kettle::Jem do
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           project_emoji: "🫖"
-          min_divergence_threshold: 5
-          yard_host: docs.config.test
-          homepage_uri: https://homepage.config.test
+          min_divergence_threshold: 5 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
+          yard_host: docs.config.test # ENV override: KJ_YARD_HOST
+          homepage_uri: https://homepage.config.test # ENV override: KJ_HOMEPAGE_URI
+          tokens:
+            forge:
+              gh_user: config-user # GitHub username only. ENV: KJ_GH_USER
           templates:
             root: packaged
             apply: true
@@ -5533,6 +5536,7 @@ RSpec.describe Kettle::Jem do
           "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
           "KJ_YARD_HOST" => "docs.env.test",
           "KJ_HOMEPAGE_URI" => "https://homepage.env.test",
+          "KJ_GH_USER" => "env-user",
         },
         run_options: {skip_commit: true}
       )
@@ -5542,6 +5546,11 @@ RSpec.describe Kettle::Jem do
       expect(config.fetch("min_divergence_threshold")).to eq(12)
       expect(config.fetch("yard_host")).to eq("docs.env.test")
       expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
+      expect(config.dig("tokens", "forge", "gh_user")).to eq("env-user")
+      expect(report.fetch(:final_content)).to include("min_divergence_threshold: 12 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD")
+      expect(report.fetch(:final_content)).to include('yard_host: "docs.env.test" # ENV override: KJ_YARD_HOST')
+      expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
+      expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
       expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
     end
   end

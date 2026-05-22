@@ -5154,10 +5154,49 @@ module Kettle
         key_index = line.index("#{key}:")
         next unless key_index
 
-        lines[line_index] = "#{line[0...key_index]}#{key}: #{value}\n"
+        lines[line_index] = "#{line[0...key_index]}#{key}: #{value}#{yaml_line_comment_suffix(line, key_index)}\n"
         return lines.join
       end
       content
+    end
+
+    def yaml_line_comment_suffix(line, key_index)
+      value_start = line.to_s.index(":", key_index).to_i + 1
+      in_single_quote = false
+      in_double_quote = false
+      escaped = false
+      value_start.upto(line.length - 1) do |index|
+        char = line[index]
+        if in_double_quote
+          if escaped
+            escaped = false
+          elsif char == "\\"
+            escaped = true
+          elsif char == "\""
+            in_double_quote = false
+          end
+          next
+        end
+        if in_single_quote
+          in_single_quote = false if char == "'"
+          next
+        end
+
+        case char
+        when "\""
+          in_double_quote = true
+        when "'"
+          in_single_quote = true
+        when "#"
+          previous = index.zero? ? "" : line[index - 1]
+          next unless previous == " " || previous == "\t"
+
+          before_comment = line[(value_start...index)].to_s
+          trailing_space = before_comment.reverse.each_char.take_while { |space| space == " " || space == "\t" }.join.reverse
+          return "#{trailing_space}#{line[index..].to_s.chomp}"
+        end
+      end
+      ""
     end
 
     def yaml_config_scalar_literal(value, path:)
