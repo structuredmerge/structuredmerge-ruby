@@ -3385,7 +3385,7 @@ module Kettle
       resolved = prepare_readme_template(resolved, recipe[:readme_style]) if recipe.fetch(:target_path) == "README.md"
       resolved = prepare_github_workflow_template(resolved, recipe, facts)
       if recipe.fetch(:target_path) == "README.md" && (strategy.empty? || strategy == "merge")
-        return postprocess_readme_content(
+        processed = postprocess_readme_content(
           merge_readme_template(
             template_content: resolved,
             destination_content: original,
@@ -3393,6 +3393,7 @@ module Kettle
           ),
           facts
         )
+        return append_used_markdown_link_definitions(processed, resolved)
       end
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts)
@@ -3581,6 +3582,20 @@ module Kettle
       return content if missing_sources.empty?
 
       [content.to_s.rstrip, "", missing_sources.join.rstrip, ""].join("\n")
+    end
+
+    def append_used_markdown_link_definitions(content, definition_source)
+      existing = ReadmePostProcessor.markdown_link_definition_owners(content).map { |owner| owner.label.to_s }.to_set
+      referenced = ReadmePostProcessor.markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).to_set
+      available = ReadmePostProcessor.markdown_link_definition_owners(definition_source).to_h do |owner|
+        [owner.label.to_s, owner]
+      end
+      missing = referenced.filter_map do |label|
+        next if existing.include?(label)
+
+        available[label]
+      end
+      append_missing_markdown_link_definitions(content, missing)
     end
 
     def delete_markdown_with_ast_crispr(content, target)

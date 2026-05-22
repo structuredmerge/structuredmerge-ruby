@@ -348,6 +348,20 @@ tree-sitter is a powerful parser generator that creates incremental parsers for 
 - Performance is less critical than portability
 - You don't need TreeHaver's unified API
 
+[citrus]: https://github.com/mjackson/citrus
+[parslet]: https://github.com/kschiess/parslet
+[ruby_tree_sitter]: https://github.com/Faveod/ruby-tree-sitter
+[tree_stump]: https://github.com/joker1007/tree_stump
+[jtreesitter]: https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter
+[prism]: https://github.com/ruby/prism
+[psych]: https://github.com/ruby/psych
+[commonmarker]: https://github.com/gjtorikian/commonmarker
+[markly]: https://github.com/ioquatix/markly
+[ts-toml]: https://github.com/tree-sitter-grammars/tree-sitter-toml
+[ts-json]: https://github.com/tree-sitter/tree-sitter-json
+[ts-jsonc]: https://gitlab.com/WhyNotHugo/tree-sitter-jsonc
+[ts-bash]: https://github.com/tree-sitter/tree-sitter-bash
+
 ## 💡 Info you can shake a stick at
 
 | Tokens to Remember | [![Gem name][⛳️name-img]][⛳️gem-name] [![Gem namespace][⛳️namespace-img]][⛳️gem-namespace] |
@@ -1905,17 +1919,3 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [💎appraisal2]: https://github.com/appraisal-rb/appraisal2
 [💎appraisal2-img]: https://img.shields.io/badge/appraised_by-appraisal2-34495e.svg?plastic&logo=ruby&logoColor=white
 [💎d-in-dvcs]: https://railsbling.com/posts/dvcs/put_the_d_in_dvcs/
-
-[citrus]: https://github.com/mjackson/citrus
-[parslet]: https://github.com/kschiess/parslet
-[ruby_tree_sitter]: https://github.com/Faveod/ruby-tree-sitter
-[tree_stump]: https://github.com/joker1007/tree_stump
-[jtreesitter]: https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter
-[prism]: https://github.com/ruby/prism
-[psych]: https://github.com/ruby/psych
-[commonmarker]: https://github.com/gjtorikian/commonmarker
-[markly]: https://github.com/ioquatix/markly
-[ts-toml]: https://github.com/tree-sitter-grammars/tree-sitter-toml
-[ts-json]: https://github.com/tree-sitter/tree-sitter-json
-[ts-jsonc]: https://gitlab.com/WhyNotHugo/tree-sitter-jsonc
-[ts-bash]: https://github.com/tree-sitter/tree-sitter-bash
