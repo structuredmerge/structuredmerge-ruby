@@ -204,6 +204,46 @@ def normalize_lockfile_for_gem(gem_dir)
   raise "Lock normalization failed for #{File.basename(gem_dir)}: #{command.join(" ")}"
 end
 
+def mode_summary(mode)
+  case mode
+  when "plan"
+    "plan only; does not write template results"
+  when "converge"
+    "plan plus post-apply convergence check; does not write template results"
+  when "apply"
+    "apply templates and write changed files"
+  else
+    mode.to_s
+  end
+end
+
+def option_state(value)
+  value ? "enabled" : "disabled"
+end
+
+def render_options_banner(options, gem_dirs)
+  selected = if options[:only]
+    "only #{options[:only]}"
+  elsif options[:start_at]
+    "from #{options[:start_at]} through end"
+  else
+    "all gems"
+  end
+
+  template_writes = options[:mode] == "apply"
+  lines = [
+    "== Ruby gem templating options ==",
+    "Mode: #{options[:mode]} (#{mode_summary(options[:mode])})",
+    "Template writes: #{option_state(template_writes)}",
+    "Bootstrap missing config: #{option_state(options[:bootstrap_missing_config])}",
+    "Normalize lockfiles: #{option_state(options[:normalize_lock])}",
+    "Template profile: #{options[:profile] || "default"}",
+    "Selection: #{selected} (#{gem_dirs.length} gem#{gem_dirs.length == 1 ? "" : "s"})",
+  ]
+  lines << "JSON output: enabled" if options[:json]
+  puts lines.join("\n")
+end
+
 if options[:child]
   raise OptionParser::MissingArgument, "--gem-dir is required with --child" unless options[:gem_dir]
 
@@ -224,6 +264,8 @@ if options[:start_at]
 
   gem_dirs = gem_dirs.drop(start_index)
 end
+
+render_options_banner(options, gem_dirs) unless options[:json]
 
 results = gem_dirs.map do |gem_dir|
   gem_name = File.basename(gem_dir)
