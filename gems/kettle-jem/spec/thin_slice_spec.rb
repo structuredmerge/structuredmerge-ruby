@@ -5640,6 +5640,52 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "separates full template profile from monorepo sub-project URL topology" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-monorepo-url-topology-slice", tmp_root) do |root|
+      gem_root = File.join(root, "gems", "kettle-jem")
+      write_tree(gem_root, {
+        "kettle-jem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "kettle-jem"
+            spec.summary = "Kettle gem templater"
+            spec.metadata["source_code_uri"] = "https://github.com/structuredmerge/kettle-jem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            top_logos: project
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN,
+          Row:
+          {KJ|README:TOP_LOGO_ROW}
+          Refs:
+          {KJ|README:TOP_LOGO_REFS}
+        MARKDOWN
+      })
+      expect(system("git", "-C", root, "init", "-q")).to be(true)
+      expect(system("git", "-C", root, "remote", "add", "origin", "git@github.com:structuredmerge/structuredmerge-ruby.git")).to be(true)
+
+      plan = described_class.plan_project(
+        gem_root,
+        env: {
+          "KETTLE_JEM_TEMPLATE_PROFILE" => "full",
+          "KJ_REPOSITORY_TOPOLOGY" => "monorepo-subproject",
+        }
+      )
+      expect(plan.dig(:facts, :template_profile)).to eq("full")
+      expect(plan.dig(:facts, :repository, :mode)).to eq("monorepo_subproject")
+      expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to include("[🖼️structuredmerge-structuredmerge-ruby-kettle-jem-i]: https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-192px.svg")
+      expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to include("[🖼️structuredmerge-structuredmerge-ruby-kettle-jem]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem")
+    end
+  end
+
   it "projects README logo row entries from named logo options" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -77,6 +77,9 @@ module Kettle
     COPY_ONLY_WHEN_MISSING_TEMPLATE_PATHS = %w[REEK bin/setup].freeze
     MONOREPO_ROOT_TEMPLATE_PROFILE = "monorepo-root"
     MONOREPO_SUBGEM_TEMPLATE_PROFILE = "monorepo-subgem"
+    FULL_TEMPLATE_PROFILE = "full"
+    REPOSITORY_TOPOLOGY_STANDALONE = "standalone"
+    REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT = "monorepo-subproject"
     MONOREPO_ROOT_TEMPLATE_ENTRIES = [
       "CHANGELOG.md",
       "CODE_OF_CONDUCT.md",
@@ -104,9 +107,11 @@ module Kettle
     ].freeze
     KETTLE_CONFIG_ENV_SYNC_PATHS = {
       %w[project_emoji] => "KJ_PROJECT_EMOJI",
+      %w[repository topology] => "KJ_REPOSITORY_TOPOLOGY",
       %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
+      %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
       %w[tokens forge gh_user] => "KJ_GH_USER",
       %w[tokens forge gl_user] => "KJ_GL_USER",
       %w[tokens forge cb_user] => "KJ_CB_USER",
@@ -2286,7 +2291,19 @@ module Kettle
         funding[:open_collective_org_source] = detected_open_collective_org.fetch(:source)
       end
       facts[:funding] = funding unless funding.empty?
-      readme_logo = readme_logo_facts(kettle_config, package_name: package_name, github_org: project_runtime[:github_org])
+      repository = repository_facts(
+        project_root,
+        source_url,
+        package_name: package_name,
+        repository_topology: REPOSITORY_TOPOLOGY_STANDALONE
+      )
+      facts[:repository] = repository unless repository.empty?
+      readme_logo = readme_logo_facts(
+        kettle_config,
+        package_name: package_name,
+        github_org: project_runtime[:github_org],
+        repository: facts[:repository]
+      )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
       template_facts = {}
       template_preferences = template_source_preferences(
@@ -2305,7 +2322,7 @@ module Kettle
     def discover_facts(project_root, env: ENV, run_options: {})
       kettle_config = kettle_jem_config(project_root)
       template_selection = template_selection_for(env, run_options)
-      configured_template_profile = kettle_config.dig("templates", "profile").to_s
+      configured_template_profile = normalize_template_profile(kettle_config.dig("templates", "profile"))
       if template_selection[:template_profile].to_s.empty? && !configured_template_profile.empty?
         template_selection[:template_profile] = configured_template_profile
       end
@@ -2377,7 +2394,13 @@ module Kettle
           engines: ruby_engines_config(kettle_config),
         ),
       }
-      repository = repository_facts(project_root, source_url, package_name: name, template_profile: template_selection[:template_profile])
+      repository_topology = repository_topology_for(kettle_config, env, template_selection)
+      repository = repository_facts(
+        project_root,
+        source_url,
+        package_name: name,
+        repository_topology: repository_topology
+      )
       facts[:repository] = repository unless repository.empty?
       generated_blocks = generated_blocks_facts(gemspec, facts, run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
@@ -2450,7 +2473,12 @@ module Kettle
       unless template_preferences.empty?
         facts[:license] = license unless license.empty?
         facts[:project_runtime] = project_runtime unless project_runtime.empty?
-        readme_logo = readme_logo_facts(kettle_config, package_name: name, github_org: project_runtime[:github_org])
+        readme_logo = readme_logo_facts(
+          kettle_config,
+          package_name: name,
+          github_org: project_runtime[:github_org],
+          repository: facts[:repository]
+        )
         facts[:readme_logo] = readme_logo unless readme_logo.empty?
         readme_style = readme_style_facts(
           project_root,
@@ -2825,7 +2853,13 @@ module Kettle
       facts = discover_facts(project_root, env: env)
       config = kettle_jem_config(project_root)
       readme_style = facts[:readme_style] ||
-        readme_style_facts(project_root, config, facts.fetch(:license, {}), template_profile: facts[:template_profile])
+        readme_style_facts(
+          project_root,
+          config,
+          facts.fetch(:license, {}),
+          template_profile: facts[:template_profile],
+          repository: facts[:repository]
+        )
       original_path = File.join(project_root, "README.md")
       original = File.exist?(original_path) ? File.read(original_path) : ""
       final_content = render_thin_readme(facts, readme_style, original, readme_preserve_config(config))
@@ -5223,6 +5257,7 @@ module Kettle
 
     def apply_kettle_config_bootstrap_profile(content, profile, gemspec_path)
       return content if profile.to_s.empty?
+      return replace_yaml_scalar_path(content, %w[templates profile], FULL_TEMPLATE_PROFILE) if profile.to_s == FULL_TEMPLATE_PROFILE
       return apply_monorepo_root_template_profile(content) if profile.to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
       return apply_monorepo_subgem_template_profile(content, gemspec_path) if profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
 
@@ -5231,13 +5266,24 @@ module Kettle
 
     def apply_monorepo_root_template_profile(content)
       entry_lines = MONOREPO_ROOT_TEMPLATE_ENTRIES.map { |entry| "    - #{entry}" }
-      entries_block = ["  profile: #{MONOREPO_ROOT_TEMPLATE_PROFILE}", "  entries:", *entry_lines].join("\n")
+      profiled_content = replace_yaml_scalar_path(content, %w[templates profile], MONOREPO_ROOT_TEMPLATE_PROFILE)
+      entries_block = ["  entries:", *entry_lines].join("\n")
       updated = insert_after_line_sequence(
-        content,
+        profiled_content,
+        ["templates:", "  root: packaged", "  apply: true", "  profile: #{MONOREPO_ROOT_TEMPLATE_PROFILE}"],
+        entries_block,
+        nil
+      )
+      updated = insert_after_line_sequence(
+        profiled_content,
         ["templates:", "  root: packaged", "  apply: true"],
         entries_block,
         "Could not apply monorepo-root template profile to .kettle-jem.yml bootstrap template"
-      )
+      ) if updated == profiled_content
+      if updated == profiled_content
+        raise Error,
+          "Could not apply monorepo-root template profile to .kettle-jem.yml bootstrap template"
+      end
       add_monorepo_root_file_overrides(updated)
     end
 
@@ -5253,13 +5299,24 @@ module Kettle
           ["    - #{entry}"]
         end
       end
-      entries_block = ["  profile: #{MONOREPO_SUBGEM_TEMPLATE_PROFILE}", "  entries:", *entry_lines].join("\n")
+      profiled_content = replace_yaml_scalar_path(content, %w[templates profile], MONOREPO_SUBGEM_TEMPLATE_PROFILE)
+      entries_block = ["  entries:", *entry_lines].join("\n")
       updated = insert_after_line_sequence(
-        content,
+        profiled_content,
+        ["templates:", "  root: packaged", "  apply: true", "  profile: #{MONOREPO_SUBGEM_TEMPLATE_PROFILE}"],
+        entries_block,
+        nil
+      )
+      updated = insert_after_line_sequence(
+        profiled_content,
         ["templates:", "  root: packaged", "  apply: true"],
         entries_block,
         "Could not apply monorepo-subgem template profile to .kettle-jem.yml bootstrap template"
-      )
+      ) if updated == profiled_content
+      if updated == profiled_content
+        raise Error,
+          "Could not apply monorepo-subgem template profile to .kettle-jem.yml bootstrap template"
+      end
 
       add_monorepo_subgem_file_overrides(updated, gemspec_path)
     end
@@ -5342,6 +5399,7 @@ module Kettle
       index = (0..(lines.length - sequence.length)).find do |candidate|
         lines[candidate, sequence.length] == sequence
       end
+      return content if !index && error_message.nil?
       raise Error, error_message unless index
 
       insertion_lines = insertion.to_s.lines(chomp: true)
@@ -5415,7 +5473,7 @@ module Kettle
         hook_templates: option_hash.fetch(:hook_templates, env_hash["hook_templates"]),
         only: normalize_list_option(option_hash.fetch(:only, env_hash["only"])),
         include: normalize_list_option(option_hash.fetch(:include, env_hash["include"])),
-        template_profile: option_hash.fetch(:template_profile, env_hash["KETTLE_JEM_TEMPLATE_PROFILE"]).to_s,
+        template_profile: normalize_template_profile(option_hash.fetch(:template_profile, env_hash["KETTLE_JEM_TEMPLATE_PROFILE"])),
         skip_commit: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_commit, env_hash["KETTLE_JEM_SKIP_COMMIT"])),
         accept_config: DecisionPolicy.value_to_boolean(option_hash.fetch(:accept_config, env_hash["KETTLE_JEM_ACCEPT_CONFIG"])),
         bootstrap_mode: DecisionPolicy.value_to_boolean(option_hash.fetch(:bootstrap_mode, env_hash["KETTLE_JEM_BOOTSTRAP_MODE"])),
@@ -5427,6 +5485,34 @@ module Kettle
     def normalize_list_option(value)
       values = Array(value).flat_map { |entry| entry.to_s.split(",") }.map(&:strip).reject(&:empty?)
       values.empty? ? nil : values
+    end
+
+    def normalize_template_profile(value)
+      profile = value.to_s.strip.downcase.tr("_", "-")
+      return "" if profile.empty?
+      return FULL_TEMPLATE_PROFILE if %w[full large default standalone].include?(profile)
+      return MONOREPO_SUBGEM_TEMPLATE_PROFILE if %w[monorepo-subgem monorepo-subproject small thin].include?(profile)
+      return MONOREPO_ROOT_TEMPLATE_PROFILE if profile == MONOREPO_ROOT_TEMPLATE_PROFILE
+
+      profile
+    end
+
+    def repository_topology_for(config, env, template_selection)
+      repository_config = config["repository"].is_a?(Hash) ? config["repository"] : {}
+      topology = preferred_template_token_value(nil, repository_config["topology"], env, "KJ_REPOSITORY_TOPOLOGY")
+      normalized = normalize_repository_topology(topology)
+      return normalized unless normalized.empty?
+
+      template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE ? REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT : REPOSITORY_TOPOLOGY_STANDALONE
+    end
+
+    def normalize_repository_topology(value)
+      topology = value.to_s.strip.downcase.tr("_", "-")
+      return "" if topology.empty?
+      return REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT if %w[monorepo-subproject monorepo-subgem monorepo-package subproject subgem].include?(topology)
+      return REPOSITORY_TOPOLOGY_STANDALONE if %w[standalone single-repo repo].include?(topology)
+
+      topology
     end
 
     def filter_recipe_pack(pack, template_selection)
@@ -6831,9 +6917,11 @@ module Kettle
       name.end_with?(".git") ? name[0...-4] : name
     end
 
-    def repository_facts(project_root, source_url, package_name:, template_profile:)
-      local_root = template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE ? git_worktree_root(project_root) : nil
-      repo_url = if template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+    def repository_facts(project_root, source_url, package_name:, repository_topology:)
+      topology = normalize_repository_topology(repository_topology)
+      monorepo_subproject = topology == REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT
+      local_root = monorepo_subproject ? git_worktree_root(project_root) : nil
+      repo_url = if monorepo_subproject
         repository_root_url(git_remote_source_url(local_root || project_root) || source_url)
       else
         repository_root_url(source_url)
@@ -6842,12 +6930,13 @@ module Kettle
       org = github_org_from_url(repo_url).to_s
       slug = [org, repo_name].reject(&:empty?).join("/")
       facts = compact_hash(
-        mode: template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE ? "monorepo_subgem" : "standalone",
+        mode: monorepo_subproject ? "monorepo_subproject" : "standalone",
+        topology: topology,
         url: repo_url,
         name: repo_name,
         slug: slug
       )
-      return facts unless template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+      return facts unless monorepo_subproject
 
       package_path = git_worktree_prefix(project_root)
       package_path = "gems/#{package_name}" if package_path.empty?
@@ -7001,8 +7090,13 @@ module Kettle
       value
     end
 
-    def readme_logo_facts(config, package_name:, github_org:)
-      entries = readme_top_logo_entries(config, org: github_org.to_s, gem_name: package_name.to_s)
+    def readme_logo_facts(config, package_name:, github_org:, repository: {})
+      entries = readme_top_logo_entries(
+        config,
+        org: github_org.to_s,
+        gem_name: package_name.to_s,
+        repository: repository || {}
+      )
       compact_hash(
         top_logos: readme_top_logo_options(config).join(","),
         top_logo_row: readme_top_logo_row(entries),
@@ -7039,16 +7133,16 @@ module Kettle
       end.uniq
     end
 
-    def readme_top_logo_entries(config, org:, gem_name:)
-      configured = configured_readme_top_logo_entries(config, org: org, gem_name: gem_name)
+    def readme_top_logo_entries(config, org:, gem_name:, repository: {})
+      configured = configured_readme_top_logo_entries(config, org: org, gem_name: gem_name, repository: repository)
       return configured if configured
 
       readme_top_logo_options(config).filter_map do |option|
-        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name)
+        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
       end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
     end
 
-    def configured_readme_top_logo_entries(config, org:, gem_name:)
+    def configured_readme_top_logo_entries(config, org:, gem_name:, repository: {})
       readme_config = config.is_a?(Hash) && config["readme"].is_a?(Hash) ? config["readme"] : {}
       logo_row = readme_config["logo_row"]
       return nil unless logo_row.is_a?(Hash)
@@ -7058,11 +7152,11 @@ module Kettle
       return [] if logos.empty?
 
       logos.filter_map do |logo|
-        readme_top_logo_entry_from_config(logo, org: org, gem_name: gem_name)
+        readme_top_logo_entry_from_config(logo, org: org, gem_name: gem_name, repository: repository)
       end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
     end
 
-    def readme_top_logo_entry_from_config(logo, org:, gem_name:)
+    def readme_top_logo_entry_from_config(logo, org:, gem_name:, repository: {})
       return nil unless logo.is_a?(Hash)
 
       type = logo["type"].to_s.strip.downcase.tr("-", "_")
@@ -7070,13 +7164,13 @@ module Kettle
       type = "ruby" if type == "language"
 
       slug = logo["slug"].to_s.strip
-      slug = default_readme_top_logo_slug(type, org: org, gem_name: gem_name) if slug.empty?
+      slug = default_readme_top_logo_slug(type, org: org, gem_name: gem_name, repository: repository) if slug.empty?
       return nil if slug.empty?
 
       alt = logo["alt"].to_s.strip
       alt = readme_top_logo_default_alt(type, slug) if alt.empty?
       href = logo["href"].to_s.strip
-      href = default_readme_top_logo_href(type, slug: slug, org: org, gem_name: gem_name) if href.empty?
+      href = default_readme_top_logo_href(type, slug: slug, org: org, gem_name: gem_name, repository: repository) if href.empty?
       credit = logo["credit"].to_s.strip
       credit = default_readme_top_logo_credit(type) if credit.empty?
       ref_slug = slug.tr("/", "-")
@@ -7091,7 +7185,7 @@ module Kettle
       }
     end
 
-    def default_readme_top_logo_slug(type, org:, gem_name:)
+    def default_readme_top_logo_slug(type, org:, gem_name:, repository: {})
       case type
       when "related_org"
         "galtzo-floss"
@@ -7100,7 +7194,7 @@ module Kettle
       when "org"
         org.to_s
       when "project"
-        [org, gem_name].reject(&:empty?).join("/")
+        repository_project_logo_slug(repository, org: org, gem_name: gem_name)
       else
         ""
       end
@@ -7122,7 +7216,7 @@ module Kettle
       end
     end
 
-    def default_readme_top_logo_href(type, slug:, org:, gem_name:)
+    def default_readme_top_logo_href(type, slug:, org:, gem_name:, repository: {})
       case type
       when "related_org"
         "https://discord.gg/3qme4XHNKN"
@@ -7131,7 +7225,7 @@ module Kettle
       when "org"
         org.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}"
       when "project"
-        org.to_s.empty? || gem_name.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}/#{gem_name}"
+        repository_project_logo_href(repository, slug: slug, org: org, gem_name: gem_name)
       else
         "#{LOGOS_GALTZO_BASE_URL}/#{slug}/"
       end
@@ -7150,11 +7244,25 @@ module Kettle
       type == "ruby" ? ", " : " by "
     end
 
-    def readme_top_logo_entry_from_option(option, org:, gem_name:)
+    def repository_project_logo_slug(repository, org:, gem_name:)
+      package_path = repository.is_a?(Hash) ? repository[:package_path].to_s : ""
+      return [org, repository[:name], File.basename(package_path)].reject(&:empty?).join("/") if repository.is_a?(Hash) && !package_path.empty?
+
+      [org, gem_name].reject(&:empty?).join("/")
+    end
+
+    def repository_project_logo_href(repository, slug:, org:, gem_name:)
+      package_source_url = repository.is_a?(Hash) ? repository[:package_source_url].to_s : ""
+      return package_source_url unless package_source_url.empty?
+
+      org.to_s.empty? || gem_name.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}/#{gem_name}"
+    end
+
+    def readme_top_logo_entry_from_option(option, org:, gem_name:, repository: {})
       return nil if option == "org" && org.to_s.empty?
       return nil if option == "project" && (org.to_s.empty? || gem_name.to_s.empty?)
 
-      readme_top_logo_entry_from_config({"type" => option}, org: org, gem_name: gem_name)
+      readme_top_logo_entry_from_config({"type" => option}, org: org, gem_name: gem_name, repository: repository)
     end
 
     def readme_top_logo_row(entries)
@@ -7479,7 +7587,7 @@ module Kettle
       end
       workflow_paths = readme_workflow_paths(integration_root)
       omitted_sections = []
-      security_enabled = template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE ||
+      security_enabled = repository_monorepo_subproject?(repository) ||
         File.exist?(File.join(project_root, "SECURITY.md"))
       floss_funding_enabled = readme_floss_funding_enabled?(license, conditional["floss_funding"])
       omitted_sections << "security" unless security_enabled
@@ -7498,9 +7606,17 @@ module Kettle
     end
 
     def readme_integration_project_root(project_root, template_profile, repository)
-      return project_root unless template_profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+      return project_root unless repository_monorepo_subproject?(repository)
 
       Array(repository && repository[:local_root]).find { |path| !path.to_s.empty? } || project_root
+    end
+
+    def repository_monorepo_subproject?(repository)
+      return false unless repository.is_a?(Hash)
+
+      repository[:topology].to_s == REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT ||
+        repository[:mode].to_s == "monorepo_subproject" ||
+        repository[:mode].to_s == "monorepo_subgem"
     end
 
     def readme_workflow_paths(project_root)

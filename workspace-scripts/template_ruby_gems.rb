@@ -9,8 +9,8 @@ require "tsort"
 
 RUBY_REPO = File.expand_path("..", __dir__)
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
-MONOREPO_TEMPLATE_PROFILE = "monorepo-subgem"
-FULL_TEMPLATE_GEMS = %w[kettle-jem].freeze
+ROOT_TEMPLATE_PROFILE = "monorepo-subgem"
+ROOT_REPOSITORY_TOPOLOGY = "monorepo-subproject"
 
 ORDER_HINT = [
   "tree_haver",
@@ -111,7 +111,7 @@ def run_kettle_jem_for_gem(gem_dir, options)
   {
     gem: File.basename(gem_dir),
     root: gem_dir,
-    template_profile: template_run_options.fetch(:template_profile, ""),
+    template_profile: result.dig(:facts, :template_profile).to_s,
     bootstrap_status: bootstrap && bootstrap[:setup_status],
     mode: result.fetch(:mode),
     changed_files: result.fetch(:changed_files, []),
@@ -128,9 +128,7 @@ def gemspec_for(gem_dir)
 end
 
 def template_profile_for_gem(gem_name)
-  return nil if FULL_TEMPLATE_GEMS.include?(gem_name)
-
-  MONOREPO_TEMPLATE_PROFILE
+  nil
 end
 
 def template_run_options_for_gem(gem_dir)
@@ -138,9 +136,9 @@ def template_run_options_for_gem(gem_dir)
   profile ? {template_profile: profile} : {}
 end
 
-def template_kind_for_gem(gem_name)
-  profile = template_profile_for_gem(gem_name)
-  profile || "full"
+def template_kind_for_result(result)
+  profile = result.fetch(:template_profile, "").to_s
+  profile.empty? ? "full" : profile
 end
 
 def local_gem_dirs
@@ -262,7 +260,8 @@ def render_options_banner(options, gem_dirs)
   lines = [
     "== StructuredMerge Ruby monorepo templating ==",
     "Action: apply kettle-jem templates and write changed files",
-    "Template kind: #{MONOREPO_TEMPLATE_PROFILE} for sub-project gems; full template for #{FULL_TEMPLATE_GEMS.join(", ")}",
+    "Template profile: ENV KETTLE_JEM_TEMPLATE_PROFILE (root default: #{ROOT_TEMPLATE_PROFILE}; per-gem override allowed)",
+    "Repository topology: ENV KJ_REPOSITORY_TOPOLOGY (root default: #{ROOT_REPOSITORY_TOPOLOGY}; independent of template profile)",
     "Missing .kettle-jem.yml: auto-bootstrap before templating",
     banner_value("Commit template result", option_state(options[:commit]), "toggle: --commit / --no-commit"),
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
@@ -321,7 +320,7 @@ results = gem_dirs.map do |gem_dir|
   end
 
   changed_files = result.fetch(:changed_files, [])
-  puts "apply (#{template_kind_for_gem(gem_name)} template): #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
+  puts "apply (#{template_kind_for_result(result)} template): #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}" unless options[:json]
   changed_files.each { |path| puts "  #{path}" } unless options[:json]
 
   result

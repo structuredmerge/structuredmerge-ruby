@@ -91,6 +91,18 @@ engines:
   - jruby
   - truffleruby
 
+# Repository URL topology.
+# This is independent from templates.profile. A gem may use the full template
+# while still living as a sub-project inside a monorepo.
+#
+# Supported values:
+#   standalone          - project URLs point at this gem's own repository
+#   monorepo-subproject - project URLs point at a subdirectory in the repository root
+#
+# ENV override: KJ_REPOSITORY_TOPOLOGY
+repository:
+  topology: standalone
+
 # Framework matrix workflows.
 # When your gem tests against multiple versions of a framework (Rails,
 # ActiveRecord, ActiveSupport, etc.), this section configures how
@@ -230,6 +242,14 @@ homepage_uri: "{KJ|HOMEPAGE_URI}"
 templates:
   root: packaged
   apply: true
+  # Template recipe profile.
+  # Supported values:
+  #   full            - full gem template
+  #   monorepo-subgem - smaller sub-project template
+  #   monorepo-root   - repository-root support template
+  #
+  # ENV override: KETTLE_JEM_TEMPLATE_PROFILE
+  profile: full
 
 # Optional kettle-jem plugins.
 # Each entry is a gem name. During bootstrap, kettle-jem ensures each plugin is
