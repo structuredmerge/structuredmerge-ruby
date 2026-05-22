@@ -76,7 +76,8 @@ RSpec.describe Psych::Merge do
     merge_fixture = read_json(fixtures_root.join("yaml", "slice-99-merge", "mapping-merge.json"))
     merge_result = ::Psych::Merge.merge_yaml(merge_fixture[:template], merge_fixture[:destination], "yaml")
     expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    expect(YAML.safe_load(merge_result[:output])).to eq(YAML.safe_load(merge_fixture.dig(:expected, :output)))
+    expect(merge_result[:output]).to include("title: Structured Merge")
   end
 
   it "preserves destination YAML comments and blank lines while adding template-only keys" do
@@ -100,6 +101,52 @@ RSpec.describe Psych::Merge do
     expect(result[:output]).to include("\n\n# local operator notes\n")
     expect(result[:output]).to include("local: true")
     expect(result[:output]).to include("generated: true")
+  end
+
+  it "preserves destination YAML formatting without requiring comments" do
+    template = <<~YAML
+      cff-version: 1.2.0
+      title: kettle-jem
+      message: "If you use this work and you want to cite it, then you can use the metadata from this file."
+      authors:
+        -
+          given-names: Peter
+          family-names: Boling
+      identifiers:
+        -
+          type: url
+          value: "https://example.test/source"
+      license: "See license file"
+    YAML
+    destination = <<~YAML
+      cff-version: 1.2.0
+      title: "kettle-jem"
+      message: >-
+        If you use this work and you want to cite it,
+        then you can use the metadata from this file.
+      authors:
+        - given-names: "Peter H."
+          family-names: "Boling"
+      identifiers:
+        - type: url
+          value: 'https://example.test/source'
+      license: See license file
+    YAML
+
+    result = ::Psych::Merge.merge_yaml(template, destination, "yaml")
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include('title: "kettle-jem"')
+    expect(result[:output]).to include(<<~YAML)
+      message: >-
+        If you use this work and you want to cite it,
+        then you can use the metadata from this file.
+    YAML
+    expect(result[:output]).to include('  - given-names: "Peter H."')
+    expect(result[:output]).to include("    family-names: \"Boling\"")
+    expect(result[:output]).to include("  - type: url")
+    expect(result[:output]).to include("    value: 'https://example.test/source'")
+    expect(result[:output]).to include("license: See license file")
   end
 
   it "keeps matched destination YAML nodes from inheriting template comments by default" do

@@ -170,12 +170,6 @@ module Psych
         return unsupported_feature_merge_result("Unsupported YAML backend #{requested}.") unless requested == BACKEND_REFERENCE.id
         return unsupported_feature_merge_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
 
-        unless template_source.match?(/^\s*#/) || destination_source.match?(/^\s*#/)
-          return Yaml::Merge.merge_yaml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
-            parse_yaml(source, parse_dialect, backend: requested)
-          end
-        end
-
         output = SmartMerger.new(
           template_source,
           destination_source,

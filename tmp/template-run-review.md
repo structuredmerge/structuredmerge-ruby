@@ -89,9 +89,9 @@ Context: generated diffs from the monorepo `workspace-scripts/template_ruby_gems
 
 ### 10. Generated documentation formatting drift
 
-- Status: pending evaluation
-- Type: mixed risk
+- Status: accepted for implementation
+- Type: merge-engine formatting bug
 - Current diff: `CITATION.cff`, `CONTRIBUTING.md`, `FUNDING.md`, and README reference definitions change formatting and URL targets.
 - Question: is formatting normalization acceptable, and are URL target changes correct separately from formatting?
-- Decision:
-- Implementation notes:
+- Decision: `CITATION.cff` formatting normalization is bad drift. This is the YAML equivalent of the JSON formatting bug: the merge path must not parse and dump a fresh canonical document when the destination has authorial formatting such as quotes, folded scalars, inline sequence mappings, or blank-line layout.
+- Implementation notes: route Psych YAML merges through the source-preserving smart merger even when neither document has comments. Do not use the canonical `Yaml::Merge` output path for git-facing templated YAML files such as `CITATION.cff`.
