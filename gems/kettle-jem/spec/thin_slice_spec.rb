@@ -341,7 +341,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "normalizes GitHub Action refs in skipped packaged workflows that already exist" do
+  it "deletes skipped packaged workflows that already exist" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-skipped-workflow-action-pin-slice", tmp_root) do |root|
@@ -375,13 +375,9 @@ RSpec.describe Kettle::Jem do
       report = plan.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
       end
-      content = report.fetch(:final_content)
 
-      expect(report.fetch(:recipe_name)).to start_with("github_actions_workflow_snippets_")
-      expect(content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2")
-      expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
-      expect(content).not_to include("actions/checkout@v6")
-      expect(content).not_to include("ruby/setup-ruby@v1")
+      expect(report.fetch(:recipe_name)).to start_with("github_actions_inactive_packaged_workflow_cleanup_")
+      expect(report.fetch(:metadata)).to include(delete_file: true)
     end
   end
 
@@ -448,10 +444,20 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/framework-ci.yml
         YAML
+        ".github/workflows/framework-ci.yml" => "name: stale framework\n",
       })
 
       unconfigured_plan = described_class.plan_project(root, env: {})
-      expect(unconfigured_plan.fetch(:changed_files)).not_to include(".github/workflows/framework-ci.yml")
+      unconfigured_report = unconfigured_plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/framework-ci.yml"
+      end
+      expect(unconfigured_plan.fetch(:changed_files)).to include(".github/workflows/framework-ci.yml")
+      expect(unconfigured_report.fetch(:recipe_name)).to start_with("github_actions_inactive_packaged_workflow_cleanup_")
+      expect(unconfigured_report.fetch(:metadata)).to include(delete_file: true)
+
+      FileUtils.rm_f(File.join(root, ".github/workflows/framework-ci.yml"))
+      missing_unconfigured_plan = described_class.plan_project(root, env: {})
+      expect(missing_unconfigured_plan.fetch(:changed_files)).not_to include(".github/workflows/framework-ci.yml")
 
       File.write(File.join(root, ".kettle-jem.yml"), <<~YAML)
         workflows:

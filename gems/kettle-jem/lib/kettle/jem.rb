@@ -56,6 +56,7 @@ module Kettle
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
+      supplied_inactive_packaged_workflow_deletion
       supplied_disabled_opencollective_file_deletion
       supplied_legacy_destination_file_deletion
       supplied_obsolete_license_file_deletion
@@ -2461,6 +2462,11 @@ module Kettle
       facts[:funding] = funding unless funding.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
       template_config = template_runtime_config(kettle_config, facts, license: license)
+      inactive_workflows = inactive_packaged_workflow_cleanup_files(
+        project_root,
+        template_config,
+        include_patterns: template_selection[:include]
+      )
       facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
       facts[:ci] = {
         provider: "github_actions",
@@ -2470,6 +2476,7 @@ module Kettle
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
       }
       facts[:ci][:opt_in_workflow_cleanups] = opt_in_workflows unless opt_in_workflows.empty?
+      facts[:ci][:inactive_packaged_workflow_cleanups] = inactive_workflows unless inactive_workflows.empty?
       coverage_config = github_actions_coverage_config(kettle_config)
       facts[:ci][:coverage] = coverage_config unless coverage_config.empty?
       framework_matrix = github_actions_framework_matrix(kettle_config)
@@ -2554,6 +2561,15 @@ module Kettle
             workflow_path,
             "file",
             "supplied_opt_in_workflow_deletion",
+            facts: %w[ci]
+          )
+        end
+        facts.dig(:ci, :inactive_packaged_workflow_cleanups).to_a.each do |workflow_path|
+          recipes << recipe_entry(
+            "github_actions_inactive_packaged_workflow_cleanup_#{workflow_recipe_slug(workflow_path)}",
+            workflow_path,
+            "file",
+            "supplied_inactive_packaged_workflow_deletion",
             facts: %w[ci]
           )
         end
@@ -5883,6 +5899,13 @@ module Kettle
           deleted_file: recipe.fetch(:target_path),
         )
       end
+      if recipe.fetch(:primitive) == "supplied_inactive_packaged_workflow_deletion"
+        metadata.merge!(
+          policy_kind: "delete_inactive_packaged_workflow",
+          operation: "delete",
+          deleted_file: recipe.fetch(:target_path),
+        )
+      end
       if recipe.fetch(:primitive) == "supplied_legacy_destination_file_deletion"
         metadata.merge!(
           policy_kind: "delete_legacy_destination_file",
@@ -6023,11 +6046,29 @@ module Kettle
       Dir.glob(File.join(workflow_root, "*.{yml,yaml}")).filter_map do |path|
         relative_path = path.delete_prefix("#{project_root}/")
         next if opencollective_disabled && opencollective_disabled_file?(relative_path)
+        next if inactive_packaged_workflow?(relative_path, config)
         next if generated_or_obsolete_github_workflow?(relative_path) &&
           !skip_packaged_workflow_template?(relative_path, config)
 
         relative_path
       end.sort
+    end
+
+    def inactive_packaged_workflow_cleanup_files(project_root, config = {}, include_patterns: nil)
+      workflow_root = File.join(project_root, ".github", "workflows")
+      return [] unless Dir.exist?(workflow_root)
+
+      Dir.glob(File.join(workflow_root, "*.{yml,yaml}")).filter_map do |path|
+        relative_path = path.delete_prefix("#{project_root}/")
+        next if OPT_IN_GITHUB_WORKFLOWS.include?(relative_path)
+
+        relative_path if inactive_packaged_workflow?(relative_path, config, include_patterns: include_patterns)
+      end.sort
+    end
+
+    def inactive_packaged_workflow?(relative_path, config = {}, include_patterns: nil)
+      preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path) &&
+        skip_packaged_workflow_template?(relative_path, config, include_patterns: include_patterns)
     end
 
     def github_actions_obsolete_workflows(project_root)
