@@ -350,6 +350,8 @@ tokens:
 patterns:
   - path: "certs/**"
     strategy: raw_copy
+  - path: ".github/workflows/**"
+    strategy: accept_template
 
 # Per-file configuration (nested directory structure)
 # Only files that need overrides belong here. Everything else defaults to merge.
