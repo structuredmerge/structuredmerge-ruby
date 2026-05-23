@@ -3829,6 +3829,7 @@ module Kettle
 
     def finalize_gemfile_template_source(recipe, content, destination_content, facts:, template_content:)
       output = merge_gemfile_template_policy(content, facts: facts, template_content: template_content)
+      return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)

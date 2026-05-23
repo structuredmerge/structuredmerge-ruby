@@ -6,12 +6,16 @@
 require "nomono/bundler" unless defined?(Nomono)
 
 local_gems = %w[
+  ast-crispr
+  ast-crispr-markdown-markly
+  ast-crispr-ruby-prism
   tree_haver
   ast-merge
   ast-template
   binary-merge
   commonmarker-merge
   citrus-toml-merge
+  dotenv-merge
   go-merge
   json-merge
   kettle-jem
@@ -22,6 +26,7 @@ local_gems = %w[
   plain-merge
   prism-merge
   psych-merge
+  rbs-merge
   ruby-merge
   rust-merge
   smorg-rb
