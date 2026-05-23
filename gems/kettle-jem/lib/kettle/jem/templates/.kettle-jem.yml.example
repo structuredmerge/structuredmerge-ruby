@@ -217,7 +217,10 @@ licenses:
 #   license - SPDX license identifier to assign
 #   version - optional dependency version for a narrower override
 license_eye:
-  dependency_licenses: []
+  dependency_licenses:
+    - name: simplecov-rcov
+      version: 0.3.7
+      license: MIT
 
 # Machine / automation accounts to exclude from generated copyright output.
 #

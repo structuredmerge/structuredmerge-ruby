@@ -1612,6 +1612,13 @@ RSpec.describe Kettle::Jem do
         licenses:
           - MIT
       YAML
+      expect(bootstrap_report.fetch(:final_content)).to include(<<~YAML)
+        license_eye:
+          dependency_licenses:
+            - name: simplecov-rcov
+              version: 0.3.7
+              license: MIT
+      YAML
     end
   end
 
