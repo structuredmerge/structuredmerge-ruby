@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Deprecated
 ### Removed
 ### Fixed
+- Removed stale `continue-on-error` handling from the generated style workflow
+  so RuboCop Gradual failures are enforced by default.
 ### Security
 
 ## [7.0.0] - 2026-05-05
