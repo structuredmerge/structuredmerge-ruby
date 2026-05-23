@@ -74,6 +74,8 @@ Gem::Specification.new do |spec|
   spec.files = [
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
+    # Executables and executable support scripts
+    *enumerate_package_files.call("exe"),
     # Public certs for gem signing
     *enumerate_package_files.call("certs"),
     # Signatures
@@ -88,7 +90,7 @@ Gem::Specification.new do |spec|
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "FUNDING.md",
-    "LICENSE.txt",
+    "LICENSE.md",
     "README.md",
     "RUBOCOP.md",
     "SECURITY.md",

@@ -193,6 +193,7 @@ module Kettle
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
+      KJ|README:FAMILY_INTRO_BACKEND_MATRIX
       KJ|README:LICENSE_BADGE
       KJ|README:LICENSE_COMPAT_BADGE
       KJ|README:LICENSE_EYE_WORKFLOW_BADGE
@@ -2906,7 +2907,7 @@ module Kettle
         "# 💎 #{title}",
         badges,
         "## 🌻 Synopsis\n\n#{section_partials.fetch("synopsis", "")}",
-        "## 💡 Info you can shake a stick at\n\nCompatible with MRI Ruby #{min_ruby}+.\n\n#{readme_family_intro_and_backend_matrix}",
+        "## 💡 Info you can shake a stick at\n\nCompatible with MRI Ruby #{min_ruby}+.\n\n#{readme_family_intro_and_backend_matrix(readme_style)}",
         "## ✨ Installation\n\n```console\ngem install #{package.fetch(:name)}\n```",
         "## ⚙️ Configuration\n\n#{section_partials.fetch("configuration", "")}",
         "## 🔧 Basic Usage\n\n#{section_partials.fetch("basic usage", "")}",
@@ -6253,7 +6254,8 @@ module Kettle
       )
       org = funding[:open_collective_org].to_s
       tokens["KJ|OPENCOLLECTIVE_ORG"] = org
-      tokens["KJ|README:FAMILY_INTRO_BACKEND_MATRIX"] = readme_family_intro_and_backend_matrix
+      tokens["KJ|README:FAMILY_INTRO_BACKEND_MATRIX"] =
+        readme_family_intro_and_backend_matrix(facts.fetch(:readme_style, {}))
       tokens.merge!(version_gem_template_tokens(facts))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
@@ -6353,7 +6355,9 @@ module Kettle
       }
     end
 
-    def readme_family_intro_and_backend_matrix
+    def readme_family_intro_and_backend_matrix(readme_style = {})
+      return "" unless readme_style.is_a?(Hash) && readme_style[:package_family].to_s == "structuredmerge"
+
       [
         "<details markdown=\"1\">",
         "<summary>StructuredMerge package family</summary>",
@@ -7654,10 +7658,12 @@ module Kettle
       omitted_sections << "security" unless security_enabled
       omitted_sections << "floss_funding" unless floss_funding_enabled
       section_partials = readme_section_partials(project_root, config, readme)
+      package_family = readme["package_family"].to_s.strip.downcase
       compact_hash(
         profile: "slice-740-kettle-readme-style-profile",
         security_enabled: security_enabled,
         floss_funding_enabled: floss_funding_enabled,
+        package_family: package_family,
         omitted_sections: omitted_sections,
         disabled_integrations: disabled_integrations,
         missing_integrations: missing_integrations,
@@ -9009,6 +9015,7 @@ module Kettle
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@70adb98ca8b3941524e9ecde48e89067c4f96736 # v3.0.0",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0",
         "kettle-rb/ts-grammar-action" => "kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1",
+        "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0",
       }
     end
 

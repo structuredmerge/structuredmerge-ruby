@@ -149,6 +149,10 @@ repository:
 #   org_and_project => related-org,ruby,org,project
 readme:
   top_logos: related-org,ruby,org
+  # Optional package-family README block.
+  # Supported values: structuredmerge
+  # Leave unset for standalone kettle-rb gems and most projects.
+  # package_family: structuredmerge
   # Sections to preserve from the destination README during template merging.
   # These section headings (case-insensitive) will keep the destination body
   # instead of being overwritten by the template. Default when absent:
@@ -335,6 +339,8 @@ patterns:
 # Per-file configuration (nested directory structure)
 # Only files that need overrides belong here. Everything else defaults to merge.
 files:
+  CHANGELOG.md:
+    strategy: keep_destination
   AGENTS.md:
     strategy: accept_template
   .github:

@@ -262,6 +262,7 @@ RSpec.describe Kettle::Jem do
                 - uses: pozil/auto-assign-issue@v2
                 - uses: apache/skywalking-eyes/dependency@v0.8.0
                 - uses: kettle-rb/ts-grammar-action@v1
+                - uses: sarisia/actions-status-discord@v1
                 - name: Project-specific check
                   run: bundle exec rake custom
         YAML
@@ -288,6 +289,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("pozil/auto-assign-issue@70adb98ca8b3941524e9ecde48e89067c4f96736 # v3.0.0")
       expect(content).to include("apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0")
       expect(content).to include("kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1")
+      expect(content).to include("sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
     end
@@ -5169,6 +5171,8 @@ RSpec.describe Kettle::Jem do
             - AGPL-3.0-only
             - PolyForm-Small-Business-1.0.0
             - LicenseRef-Big-Time-Public-License
+          readme:
+            package_family: structuredmerge
           templates:
             root: packaged
             apply: true
