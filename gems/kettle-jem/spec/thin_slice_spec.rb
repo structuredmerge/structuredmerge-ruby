@@ -5874,6 +5874,43 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "prunes legacy kettle config keys after their replacement exists" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-legacy-config-key-cleanup", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🫖"
+          readme:
+            top_logos: related-org,ruby,org
+            top_logo_mode: org_and_project
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .kettle-jem.yml
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".kettle-jem.yml" }
+      config = YAML.safe_load(report.fetch(:final_content))
+
+      expect(config.dig("readme", "top_logos")).to eq("related-org,ruby,org")
+      expect(config.fetch("readme")).not_to have_key("top_logo_mode")
+      expect(report.fetch(:final_content)).not_to include("top_logo_mode")
+      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
+    end
+  end
+
   it "derives source and forge tokens from git origin when gemspec metadata is absent" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

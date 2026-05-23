@@ -219,6 +219,14 @@ module Kettle
       "project" => %w[related_org ruby project],
       "org_and_project" => %w[related_org ruby org project],
     }.freeze
+    KETTLE_CONFIG_LEGACY_KEY_PATHS = [
+      {
+        path: %w[readme top_logo_mode],
+        replacement_path: %w[readme top_logos],
+        added_in: "7.0.0",
+        prune_after: "8.0.0",
+      },
+    ].freeze
     README_TOP_LOGO_TYPES = %w[related_org ruby language org project affiliated_project].freeze
     APPRAISAL_NAME_PREFIX = "kja"
     APPRAISAL_GEM_ABBREVIATIONS = {
@@ -5356,11 +5364,18 @@ module Kettle
     end
 
     def sync_kettle_config_env_overrides(content, env)
-      KETTLE_CONFIG_ENV_SYNC_PATHS.reduce(content.to_s) do |updated, (path, env_key)|
+      synced = KETTLE_CONFIG_ENV_SYNC_PATHS.reduce(content.to_s) do |updated, (path, env_key)|
         value = env[env_key].to_s.strip
         next updated unless present_template_token_value?(value)
 
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
+      end
+      prune_legacy_kettle_config_keys(synced)
+    end
+
+    def prune_legacy_kettle_config_keys(content)
+      KETTLE_CONFIG_LEGACY_KEY_PATHS.reduce(content.to_s) do |updated, legacy_key|
+        remove_yaml_scalar_path(updated, legacy_key.fetch(:path))
       end
     end
 
@@ -5377,6 +5392,17 @@ module Kettle
 
         lines[line_index] = "#{line[0...key_index]}#{key}: #{value}#{yaml_line_comment_suffix(line, key_index)}\n"
         return lines.join
+      end
+      content
+    end
+
+    def remove_yaml_scalar_path(content, path)
+      lines = content.to_s.lines
+      yaml_scalar_path_entries(content).each do |entry|
+        next unless entry.fetch(:path) == path
+
+        line_index = entry.fetch(:line)
+        return ensure_trailing_newline(lines.each_with_index.reject { |_line, index| index == line_index }.map(&:first).join)
       end
       content
     end
