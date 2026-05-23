@@ -620,6 +620,16 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "disables checkout credential persistence in packaged GitHub workflows" do
+    workflow_templates = Dir[File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/*.{yml,yaml}.example")]
+    checkout_templates = workflow_templates.select { |path| File.read(path).include?("uses: actions/checkout@") }
+
+    expect(checkout_templates).not_to be_empty
+    checkout_templates.each do |path|
+      expect(File.read(path)).to include("persist-credentials: false"), path
+    end
+  end
+
   it "applies README style conditionals and reports missing integrations" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
