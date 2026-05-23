@@ -6128,6 +6128,8 @@ module Kettle
     end
 
     def inactive_packaged_workflow?(relative_path, config = {}, include_patterns: nil)
+      return true if stale_versioned_engine_workflow?(relative_path)
+
       preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path) &&
         skip_packaged_workflow_template?(relative_path, config, include_patterns: include_patterns)
     end
@@ -6151,9 +6153,19 @@ module Kettle
 
     def generated_or_obsolete_github_workflow?(relative_path)
       return true if preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
+      return true if stale_versioned_engine_workflow?(relative_path)
       return true if relative_path == ".github/workflows/opencollective.yml"
 
       OBSOLETE_GITHUB_WORKFLOWS.include?(File.basename(relative_path))
+    end
+
+    def stale_versioned_engine_workflow?(relative_path)
+      return false if preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
+
+      basename = File.basename(relative_path.to_s, File.extname(relative_path.to_s))
+      basename.match?(/\Aruby-\d+\.\d+\z/) ||
+        basename.match?(/\Ajruby-\d+\.\d+\z/) ||
+        basename.match?(/\Atruffleruby-\d+\.\d+\z/)
     end
 
     def opencollective_disabled_files(project_root)

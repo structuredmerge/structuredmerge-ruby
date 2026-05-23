@@ -556,15 +556,32 @@ RSpec.describe Kettle::Jem do
               - .github/workflows/truffleruby-23.0.yml
               - .github/workflows/truffleruby-23.1.yml
         YAML
+        ".github/workflows/truffleruby-23.2.yml" => <<~YAML,
+          name: TruffleRuby 23.2
+          jobs:
+            test:
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "truffleruby-23.2"
+        YAML
       })
 
       plan = described_class.plan_project(root, env: {})
       paths = plan.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }
+      stale_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:relative_path) == ".github/workflows/truffleruby-23.2.yml"
+      end
 
       expect(paths).not_to include(".github/workflows/jruby-9.1.yml")
       expect(paths).not_to include(".github/workflows/jruby-9.4.yml")
       expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
       expect(paths).to include(".github/workflows/truffleruby-23.1.yml")
+      expect(stale_report).to include(
+        recipe_name: "github_actions_inactive_packaged_workflow_cleanup__github_workflows_truffleruby_23_2_yml",
+        changed: true
+      )
+      expect(stale_report.dig(:metadata, :delete_file)).to be(true)
     end
   end
 
