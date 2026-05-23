@@ -6218,6 +6218,11 @@ RSpec.describe Kettle::Jem do
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           project_emoji: "🫖"
+          # README top logo mode.
+          # Controls whether the generated README header includes the GitHub org logo,
+          # the project logo, or both after the shared Galtzo and ruby-lang logos.
+          # Supported values: org, project, org_and_project
+          # Default (when key is absent): org_and_project
           readme:
             top_logos: related-org,ruby,org
             top_logo_mode: org_and_project
@@ -6235,7 +6240,9 @@ RSpec.describe Kettle::Jem do
 
       expect(config.dig("readme", "top_logos")).to eq("related-org,ruby,org")
       expect(config.fetch("readme")).not_to have_key("top_logo_mode")
-      expect(report.fetch(:final_content)).not_to include("top_logo_mode")
+      expect(report.fetch(:final_content)).not_to include("top_logo_mode:")
+      expect(report.fetch(:final_content)).to include("# README top logos.")
+      expect(report.fetch(:final_content)).to include("# Supported values: related-org, ruby, org, project")
       expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
     end
   end

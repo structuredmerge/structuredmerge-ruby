@@ -5444,7 +5444,8 @@ module Kettle
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
       end
       synced = sync_kettle_config_internal_values(synced)
-      prune_legacy_kettle_config_keys(synced)
+      synced = prune_legacy_kettle_config_keys(synced)
+      sync_kettle_config_documentation_comments(synced)
     end
 
     def sync_kettle_config_internal_values(content)
@@ -5457,6 +5458,33 @@ module Kettle
       KETTLE_CONFIG_LEGACY_KEY_PATHS.reduce(content.to_s) do |updated, legacy_key|
         remove_yaml_scalar_path(updated, legacy_key.fetch(:path))
       end
+    end
+
+    def sync_kettle_config_documentation_comments(content)
+      sync_readme_top_logos_documentation_comment(content)
+    end
+
+    def sync_readme_top_logos_documentation_comment(content)
+      lines = content.to_s.lines
+      start_index = lines.index { |line| line.strip == "# README top logo mode." }
+      return content unless start_index
+      return content unless lines.any? { |line| line.strip.start_with?("top_logos:") }
+
+      readme_index = ((start_index + 1)...lines.length).find { |index| lines[index].strip == "readme:" }
+      return content unless readme_index
+
+      replacement = [
+        "# README top logos.\n",
+        "# Comma-separated list of optional logo entries for the generated README header.\n",
+        "# Supported values: related-org, ruby, org, project\n",
+        "# Default (when key is absent): related-org,ruby,org,project\n",
+        "# Legacy top_logo_mode values map as:\n",
+        "#   org => related-org,ruby,org\n",
+        "#   project => related-org,ruby,project\n",
+        "#   org_and_project => related-org,ruby,org,project\n",
+      ]
+      lines[start_index...readme_index] = replacement
+      lines.join
     end
 
     def replace_yaml_scalar_path(content, path, value)
