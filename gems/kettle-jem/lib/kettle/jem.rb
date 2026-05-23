@@ -53,10 +53,22 @@ module Kettle
       "truffleruby-24.2" => "truffleruby",
       "truffleruby-25.0" => "truffleruby",
     }.freeze
+    ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = {
+      "jruby-9.1" => "2.3",
+      "jruby-9.2" => "2.5",
+      "jruby-9.3" => "2.6",
+      "jruby-9.4" => "3.1",
+      "truffleruby-22.3" => "3.0",
+      "truffleruby-23.0" => "3.0",
+      "truffleruby-23.1" => "3.2",
+      "truffleruby-24.2" => "3.3",
+      "truffleruby-25.0" => "3.3",
+    }.freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
       supplied_inactive_packaged_workflow_deletion
+      supplied_inactive_packaged_template_deletion
       supplied_disabled_opencollective_file_deletion
       supplied_legacy_destination_file_deletion
       supplied_obsolete_license_file_deletion
@@ -2467,6 +2479,7 @@ module Kettle
         template_config,
         include_patterns: template_selection[:include]
       )
+      inactive_templates = inactive_packaged_template_cleanup_files(project_root, template_config)
       facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
       facts[:ci] = {
         provider: "github_actions",
@@ -2489,6 +2502,7 @@ module Kettle
         include_patterns: template_selection[:include]
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
+      template_facts[:inactive_packaged_template_cleanups] = inactive_templates unless inactive_templates.empty?
       legacy_cleanups = template_legacy_destination_cleanups(project_root, template_preferences)
       template_facts[:legacy_destination_cleanups] = legacy_cleanups unless legacy_cleanups.empty?
       license_cleanups = template_obsolete_license_cleanups(project_root, template_config, template_preferences)
@@ -2605,6 +2619,15 @@ module Kettle
         recipe[:template_tokens] = facts.dig(:templates, :tokens) if facts.dig(:templates, :tokens)
         recipe[:readme_style] = facts[:readme_style] if preference.fetch(:target_path) == "README.md" && facts[:readme_style]
         recipes << recipe
+      end
+      facts.dig(:templates, :inactive_packaged_template_cleanups).to_a.each do |cleanup|
+        recipes << recipe_entry(
+          "template_inactive_packaged_cleanup_#{workflow_recipe_slug(cleanup.fetch(:target_path))}",
+          cleanup.fetch(:target_path),
+          "file",
+          "supplied_inactive_packaged_template_deletion",
+          facts: %w[templates]
+        )
       end
       facts.dig(:templates, :legacy_destination_cleanups).to_a.each do |cleanup|
         recipes << recipe_entry(
@@ -4041,9 +4064,32 @@ module Kettle
       destination_gems = local_gems_assignment(destination_content)
       return content if template_gems.empty? && destination_gems.empty?
 
+      destination_gems = destination_gems.reject do |destination_gem|
+        template_gems.any? { |template_gem| versioned_gem_name_update_candidate?(destination_gem, template_gem) }
+      end
       gems = (template_gems + destination_gems).map(&:to_s).reject(&:empty?).uniq
       gems.delete(package_name) unless package_name.empty?
       replace_local_gems_assignment(content, gems)
+    end
+
+    def versioned_gem_name_update_candidate?(destination_name, template_name)
+      destination = versioned_gem_name_parts(destination_name)
+      template = versioned_gem_name_parts(template_name)
+      return false unless destination && template
+      return false unless destination.fetch(:prefix) == template.fetch(:prefix)
+      return false if destination.fetch(:versions) == template.fetch(:versions)
+
+      destination.fetch(:versions).length == template.fetch(:versions).length
+    end
+
+    def versioned_gem_name_parts(name)
+      match = name.to_s.match(/\A(.+?)(\d+(?:[_-]\d+)*)\z/)
+      return unless match
+
+      {
+        prefix: match[1],
+        versions: match[2].split(/[_-]/).map { |segment| Integer(segment, exception: false) },
+      }
     end
 
     def local_gems_assignment(content)
@@ -5902,6 +5948,13 @@ module Kettle
       if recipe.fetch(:primitive) == "supplied_inactive_packaged_workflow_deletion"
         metadata.merge!(
           policy_kind: "delete_inactive_packaged_workflow",
+          operation: "delete",
+          deleted_file: recipe.fetch(:target_path),
+        )
+      end
+      if recipe.fetch(:primitive) == "supplied_inactive_packaged_template_deletion"
+        metadata.merge!(
+          policy_kind: "delete_inactive_packaged_template",
           operation: "delete",
           deleted_file: recipe.fetch(:target_path),
         )
@@ -8251,6 +8304,22 @@ module Kettle
       COPY_ONLY_WHEN_MISSING_TEMPLATE_PATHS.include?(relative_path.to_s)
     end
 
+    def default_template_strategy_config(template_root, target_path)
+      return unless template_root.fetch(:kind) == "packaged"
+      return unless target_path.to_s.end_with?("_local.gemfile")
+
+      { strategy: :accept_template }
+    end
+
+    def inactive_packaged_template_cleanup_files(project_root, config = {})
+      Dir.glob(File.join(project_root, "gemfiles/**/*.gemfile")).filter_map do |path|
+        relative_path = path.delete_prefix("#{project_root}/")
+        next unless preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
+
+        { target_path: relative_path } if skip_packaged_gemfile_template?(relative_path, config)
+      end.sort_by { |cleanup| cleanup.fetch(:target_path) }
+    end
+
     def kettle_config_bootstrap_facts(project_root, env, template_selection: {})
       return if File.exist?(File.join(project_root, ".kettle-jem.yml"))
 
@@ -8296,12 +8365,14 @@ module Kettle
       source_path, target_path = template_entry_paths(entry)
       return nil if source_path.to_s.empty? || target_path.to_s.empty?
       return nil if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
+      return nil if skip_packaged_gemfile_template?(target_path, config)
       return nil if skip_packaged_license_template?(target_path, config)
 
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
       return nil unless selected_source
 
-      strategy_config = template_strategy_config(config, target_path)
+      strategy_config = template_strategy_config(config, target_path) ||
+        default_template_strategy_config(template_root, target_path)
       preference = {
         target_path: target_path,
         configured_source: source_path,
@@ -8494,16 +8565,35 @@ module Kettle
       basename = File.basename(path, ".yml")
       return github_actions_framework_matrix(config).empty? if basename == "framework-ci"
 
+      min_ruby = config_min_ruby(config)
+      workflow_floor = ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS[basename]
+      return true if workflow_floor && min_ruby && Gem::Version.new(workflow_floor) < min_ruby
+
       engine = ENGINE_WORKFLOW_MAP[basename]
       return true if engine && !enabled_ruby_engines(config).include?(engine)
 
       version = basename[/\Aruby-(\d+\.\d+)\z/, 1]
+      return false unless version && min_ruby
+      Gem::Version.new(version) < min_ruby
+    end
+
+    def skip_packaged_gemfile_template?(target_path, config)
+      version = packaged_gemfile_template_ruby_floor(target_path)
       return false unless version
 
       min_ruby = config_min_ruby(config)
       return false unless min_ruby
 
       Gem::Version.new(version) < min_ruby
+    end
+
+    def packaged_gemfile_template_ruby_floor(target_path)
+      path = target_path.to_s
+      if (match = path.match(%r{\Agemfiles/ruby_(\d+)_(\d+)\.gemfile\z}))
+        return "#{match[1]}.#{match[2]}"
+      end
+
+      path[%r{(?:\A|/)r(\d+\.\d+)(?:/|\z)}, 1]
     end
 
     def enabled_ruby_engines(config)

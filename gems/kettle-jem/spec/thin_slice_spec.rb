@@ -530,6 +530,79 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "prunes versioned engine workflows below minimum Ruby compatibility" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-engine-workflow-floor-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          engines:
+            - ruby
+            - jruby
+            - truffleruby
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/jruby-9.1.yml
+              - .github/workflows/jruby-9.4.yml
+              - .github/workflows/truffleruby-23.0.yml
+              - .github/workflows/truffleruby-23.1.yml
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      paths = plan.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }
+
+      expect(paths).not_to include(".github/workflows/jruby-9.1.yml")
+      expect(paths).not_to include(".github/workflows/jruby-9.4.yml")
+      expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
+      expect(paths).to include(".github/workflows/truffleruby-23.1.yml")
+    end
+  end
+
+  it "prunes packaged gemfile templates below minimum Ruby" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-floor-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/x_std_libs/r2.3/libs.gemfile
+              - gemfiles/modular/x_std_libs/r2.4/libs.gemfile
+        YAML
+        "gemfiles/modular/x_std_libs/r2.3/libs.gemfile" => "stale ruby 2.3 gemfile\n",
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      r23_report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/x_std_libs/r2.3/libs.gemfile"
+      end
+      paths = plan.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }
+
+      expect(paths).to include("gemfiles/modular/x_std_libs/r2.4/libs.gemfile")
+      expect(r23_report.fetch(:recipe_name)).to start_with("template_inactive_packaged_cleanup_")
+      expect(r23_report.fetch(:metadata)).to include(delete_file: true)
+    end
+  end
+
   it "applies README style conditionals and reports missing integrations" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -4002,6 +4075,7 @@ RSpec.describe Kettle::Jem do
 
           local_gems = %w[
             local-only
+            rubocop-ruby2_3
             kettle-jem
           ]
         RUBY
@@ -4011,6 +4085,7 @@ RSpec.describe Kettle::Jem do
           local_gems = %w[
             tree_haver
             ast-merge
+            rubocop-ruby2_4
             kettle-jem
           ]
         RUBY
@@ -4024,9 +4099,52 @@ RSpec.describe Kettle::Jem do
 
       expect(content).to include("tree_haver")
       expect(content).to include("ast-merge")
+      expect(content).to include("rubocop-ruby2_4")
       expect(content).to include("local-only")
+      expect(content).not_to include("rubocop-ruby2_3")
       expect(content).not_to include("kettle-jem")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
+    end
+  end
+
+  it "treats packaged local Gemfiles as template-owned by default" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-packaged-local-gemfile-default-strategy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/style_local.gemfile
+        YAML
+        "gemfiles/modular/style_local.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          local_gems = %w[
+            local-only
+            rubocop-ruby2_3
+          ]
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/style_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
+      expect(content).to include("rubocop-ruby")
+      expect(content).not_to include("local-only")
+      expect(content).not_to include("rubocop-ruby2_3")
     end
   end
 
