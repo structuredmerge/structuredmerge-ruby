@@ -677,12 +677,7 @@ RSpec.describe Kettle::Jem do
 
           ### Security
 
-          ## [1.0.1] - 2025-08-24
-
-          - Template-only release that must not replace project history.
-
-          [Unreleased]: https://example.com/template/compare/v1.0.1...HEAD
-          [1.0.1]: https://example.com/template/compare/v1.0.0...v1.0.1
+          [Unreleased]: https://example.com/template/compare/HEAD
         MARKDOWN
         "CHANGELOG.md" => <<~MARKDOWN,
           # Changelog
@@ -721,8 +716,7 @@ RSpec.describe Kettle::Jem do
       expect(changelog).to include("- Keep project pending fix.")
       expect(changelog).to include("## [2.0.0] - 2026-01-02")
       expect(changelog).to include("[2.0.0]: https://github.com/acme/example/compare/v1.0.0...v2.0.0")
-      expect(changelog).not_to include("Template-only release")
-      expect(changelog).not_to include("[1.0.1]: https://example.com/template/compare/v1.0.0...v1.0.1")
+      expect(changelog).not_to include("[Unreleased]: https://example.com/template/compare/HEAD")
     end
   end
 
