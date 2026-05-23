@@ -1,5 +1,31 @@
 source "https://rubygems.org"
 
+unless ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+  require "nomono/bundler"
+
+  eval_nomono_gems(
+    gems: %w[kettle-dev kettle-test],
+    prefix: "KETTLE_RB",
+    path_env: "KETTLE_RB_DEV",
+    vendored_gems_env: "VENDORED_GEMS",
+    vendor_gem_dir_env: "VENDOR_GEM_DIR",
+    debug_env: "KETTLE_DEV_DEBUG",
+  )
+end
+
+unless ENV.fetch("GALTZO_FLOSS_DEV", "false").casecmp("false").zero?
+  require "nomono/bundler"
+
+  eval_nomono_gems(
+    gems: %w[turbo_tests2],
+    prefix: "GALTZO_FLOSS",
+    path_env: "GALTZO_FLOSS_DEV",
+    vendored_gems_env: "GALTZO_FLOSS_VENDORED_GEMS",
+    vendor_gem_dir_env: "GALTZO_FLOSS_VENDOR_GEM_DIR",
+    debug_env: "GALTZO_FLOSS_DEBUG",
+  )
+end
+
 gemspec path: "gems/tree_haver"
 gemspec path: "gems/ast-merge"
 gemspec path: "gems/ast-merge-git"
