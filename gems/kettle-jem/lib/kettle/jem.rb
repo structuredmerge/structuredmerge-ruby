@@ -206,6 +206,9 @@ module Kettle
       KJ|FUNDING:POLAR
       KJ|GH:USER
       KJ|GL:USER
+      KJ|LICENSE_EYE:FLAGS
+      KJ|LICENSE_EYE:MODE
+      KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
@@ -857,6 +860,7 @@ module Kettle
     README_CODETRIAGE_LINK_LABELS = ["👽oss-help", "👽oss-helpi"].freeze
     README_LICENSE_EYE_WORKFLOW_BADGE = "[![Apache SkyWalking Eyes License Compatibility Check][🚎15-🪪-wfi]][🚎15-🪪-wf]"
     README_LICENSE_EYE_WORKFLOW_LINK_LABELS = ["🚎15-🪪-wf", "🚎15-🪪-wfi"].freeze
+    LICENSE_EYE_COMPATIBILITY_LICENSES = %w[MIT].freeze
     README_OPEN_COLLECTIVE_FUNDING_BADGES = "[![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors]"
     README_OPEN_COLLECTIVE_LINK_LABELS = [
       "🖇osc",
@@ -7685,6 +7689,9 @@ module Kettle
         readme_license_compat_badge: license_compat_badge(compat_category),
         readme_license_eye_workflow_badge: license_eye_workflow_badge(licenses),
         readme_license_refs: readme_license_refs(licenses.join(" OR "), compat_category),
+        license_eye_primary_spdx: license_eye_primary_spdx(licenses, primary),
+        license_eye_mode: license_eye_mode(licenses),
+        license_eye_flags: license_eye_flags(licenses),
         license_copyright_notice: license_copyright_notice(copyright_lines, copyright_prefix, author),
         readme_copyright_notice: readme_copyright_notice(copyright_lines, copyright_prefix, author),
         copyright_prefix: copyright_prefix
@@ -7705,6 +7712,9 @@ module Kettle
         "KJ|LICENSE_MD_CONTENT" => license[:license_md_content].to_s,
         "KJ|README:LICENSE_INTRO" => license[:readme_license_intro].to_s,
         "KJ|LICENSE:PRIMARY_SPDX" => license[:primary_spdx].to_s,
+        "KJ|LICENSE_EYE:PRIMARY_SPDX" => license[:license_eye_primary_spdx].to_s,
+        "KJ|LICENSE_EYE:MODE" => license[:license_eye_mode].to_s,
+        "KJ|LICENSE_EYE:FLAGS" => license[:license_eye_flags].to_s,
         "KJ|README:LICENSE_BADGE" => license[:readme_license_badge].to_s,
         "KJ|README:LICENSE_COMPAT_BADGE" => license[:readme_license_compat_badge].to_s,
         "KJ|README:LICENSE_EYE_WORKFLOW_BADGE" => license[:readme_license_eye_workflow_badge].to_s,
@@ -7835,6 +7845,18 @@ module Kettle
 
     def license_eye_workflow_badge(licenses)
       Array(licenses).map(&:to_s).include?("MIT") ? README_LICENSE_EYE_WORKFLOW_BADGE : ""
+    end
+
+    def license_eye_primary_spdx(licenses, fallback)
+      Array(licenses).map(&:to_s).find { |license| LICENSE_EYE_COMPATIBILITY_LICENSES.include?(license) } || fallback
+    end
+
+    def license_eye_mode(licenses)
+      Array(licenses).map(&:to_s).any? { |license| LICENSE_EYE_COMPATIBILITY_LICENSES.include?(license) } ? "check" : "resolve"
+    end
+
+    def license_eye_flags(licenses)
+      license_eye_mode(licenses) == "check" ? "--weak-compatible" : ""
     end
 
     def license_compat_ref(category)
@@ -8306,6 +8328,7 @@ module Kettle
 
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
+      return { strategy: :accept_template } if target_path.to_s == ".github/workflows/license-eye.yml"
       return unless target_path.to_s.end_with?("_local.gemfile")
 
       { strategy: :accept_template }

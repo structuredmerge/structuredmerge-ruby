@@ -5488,7 +5488,10 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("Jane Q Public")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|COPYRIGHT_PREFIX" => "Required Notice: ",
-        "KJ|LICENSE:PRIMARY_SPDX" => "AGPL-3.0-only"
+        "KJ|LICENSE:PRIMARY_SPDX" => "AGPL-3.0-only",
+        "KJ|LICENSE_EYE:PRIMARY_SPDX" => "AGPL-3.0-only",
+        "KJ|LICENSE_EYE:MODE" => "resolve",
+        "KJ|LICENSE_EYE:FLAGS" => ""
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|LICENSE_MD_CONTENT")).to include(
         "This project is made available under the following licenses."
@@ -5508,6 +5511,47 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
         "StructuredMerge Ruby package family"
       )
+    end
+  end
+
+  it "uses MIT as the License-Eye compatibility license when MIT is configured" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-license-eye-token-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.licenses = ["AGPL-3.0-only"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          licenses:
+            - AGPL-3.0-only
+            - MIT
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .licenserc.yaml
+              - .github/workflows/license-eye.yml
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      licenserc_report = plan[:recipe_reports].find do |report|
+        report.fetch(:relative_path) == ".licenserc.yaml"
+      end
+      workflow_report = plan[:recipe_reports].find do |report|
+        report.fetch(:relative_path) == ".github/workflows/license-eye.yml"
+      end
+
+      expect(licenserc_report.fetch(:final_content)).to include('spdx-id: "MIT"')
+      expect(workflow_report.fetch(:final_content)).to include('mode: "check"')
+      expect(workflow_report.fetch(:final_content)).to include('flags: "--weak-compatible"')
     end
   end
 
