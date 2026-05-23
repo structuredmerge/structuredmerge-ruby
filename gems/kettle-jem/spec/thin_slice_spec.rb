@@ -708,9 +708,12 @@ RSpec.describe Kettle::Jem do
 
       expect(changelog).to include("Template intro.")
       expect(changelog).not_to include("Project intro.")
+      expect(changelog).to include("Template intro.\n\n## [Unreleased]")
       expect(changelog).to include("### Deprecated")
       expect(changelog).to include("### Removed")
       expect(changelog).to include("### Security")
+      expect(changelog).to include("[Unreleased]\n\n### Added\n\n- Keep project pending feature.")
+      expect(changelog).to include("### Fixed\n\n- Keep project pending fix.")
       expect(changelog).to include("- Keep project pending feature.")
       expect(changelog).to include("  - Keep nested detail.")
       expect(changelog).to include("- Keep project pending fix.")
@@ -2457,6 +2460,84 @@ RSpec.describe Kettle::Jem do
       expect(command_envs).not_to be_empty
       expect(command_envs).to all(be_a(Hash))
       expect(command_envs).to all(include("BUNDLE_GEMFILE" => File.join(root, "Gemfile")))
+    end
+  end
+
+  it "honors install ENV skip-commit and normalizes lockfiles without templating env overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-env-skip-lock", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "Gemfile.lock" => <<~LOCK,
+          GEM
+            remote: https://gem.coop/
+            specs:
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+
+          BUNDLED WITH
+             4.0.10
+        LOCK
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - bin/setup
+        YAML
+      })
+
+      env = {
+        "KETTLE_JEM_SKIP_COMMIT" => "true",
+        "K_JEM_TEMPLATING" => "true",
+        "KETTLE_RB_DEV" => "/workspace/kettle-rb",
+        "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
+        "SMORG_RB_DEV" => "/workspace/smorg-rb",
+      }
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: env,
+        run_options: {only: "bin/setup"},
+        command_runner: command_runner
+      )
+
+      expect(install.fetch(:install_steps)).to include(
+        name: "bootstrap_commit",
+        status: "skipped",
+        reason: "skip_commit"
+      )
+      expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "bundle_lock_normalization",
+        command: %w[bundle lock],
+        status: "succeeded",
+        reason: "executed"
+      ))
+      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle lock] }
+      expect(lock_command).not_to be_nil
+      expect(lock_command.fetch(:env)).to include(
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "K_JEM_TEMPLATING" => "false",
+        "KETTLE_RB_DEV" => "false",
+        "GALTZO_FLOSS_DEV" => "false",
+        "SMORG_RB_DEV" => "false"
+      )
+      expect(commands.map { |entry| entry.fetch(:command) }).not_to include(%w[git add -A])
     end
   end
 

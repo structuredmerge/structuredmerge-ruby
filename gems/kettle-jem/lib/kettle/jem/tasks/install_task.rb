@@ -12,7 +12,8 @@ module Kettle
         module_function
 
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
-          report = Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
+          effective_run_options = install_run_options(env, run_options)
+          report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           install_steps = []
           install_steps << gemspec_dependency_sync_step(report)
           version_step = version_gem_bootstrap_step(project_root, report)
@@ -22,10 +23,11 @@ module Kettle
           install_steps.concat(post_template_project_fix_steps(project_root, report, env: env))
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
-          install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: run_options, command_runner: command_runner))
-          install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: run_options)
-          install_steps << bootstrap_commit_step(project_root, run_options: run_options)
-          install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: run_options, command_runner: command_runner)
+          install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
+          install_steps << normalize_lockfile_step(project_root, env: setup_env)
+          install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
+          install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
+          install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
           report.merge(
             mode: "install",
@@ -38,6 +40,10 @@ module Kettle
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps.",
             }]
           )
+        end
+
+        def install_run_options(env, run_options)
+          Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
         end
 
         def gemspec_dependency_sync_step(report)
@@ -82,6 +88,7 @@ module Kettle
               bin_setup
               bundle_binstubs
               bundle_binstub_location_validation
+              bundle_lock_normalization
             ],
             "orchestration" => %w[bundled_handoff bootstrap_commit],
           }
@@ -471,6 +478,31 @@ module Kettle
           steps
         end
 
+        def normalize_lockfile_step(project_root, env:)
+          return {
+            name: "bundle_lock_normalization",
+            status: "skipped",
+            reason: "missing Gemfile.lock",
+          } unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+
+          {
+            name: "bundle_lock_normalization",
+            command: %w[bundle lock],
+            status: "ready",
+            env: normal_lockfile_env(env),
+            reason: "reset_lockfile_without_templating_overrides",
+          }
+        end
+
+        def normal_lockfile_env(env)
+          command_env = (env || {}).to_h.dup
+          command_env["K_JEM_TEMPLATING"] = "false"
+          %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV SMORG_RB_DEV].each do |key|
+            command_env[key] = "false" if command_env.key?(key)
+          end
+          command_env
+        end
+
         def validate_bundle_binstub_location(project_root)
           destination_bin = File.join(project_root.to_s, "bin")
           destination_binstubs = binstub_files(destination_bin)
@@ -537,6 +569,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundled_handoff"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "bundle_lock_normalization"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bootstrap_commit"
               execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             else
@@ -546,7 +580,7 @@ module Kettle
         end
 
         def setup_command_env(project_root, env)
-          command_env = (env || {}).to_h
+          command_env = (env || {}).to_h.dup
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
           command_env
@@ -604,7 +638,6 @@ module Kettle
           } if dirty_entries.empty?
 
           commands = []
-          commands << %w[bundle lock] if File.exist?(File.join(project_root, "Gemfile.lock"))
           commands << %w[git add -A]
           commands << ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
           {
@@ -684,7 +717,8 @@ module Kettle
         def execute_ready_command_step(step, project_root:, env:, quiet:, command_runner:)
           return step unless step.fetch(:status) == "ready"
 
-          result = command_runner.call(step.fetch(:command), chdir: project_root, env: env, quiet: quiet)
+          command_env = step.fetch(:env, env)
+          result = command_runner.call(step.fetch(:command), chdir: project_root, env: command_env, quiet: quiet)
           return step.merge(
             status: "succeeded",
             exitstatus: result[:exitstatus],
@@ -697,8 +731,9 @@ module Kettle
         def execute_ready_commands_step(step, project_root:, env:, quiet:, command_runner:)
           return step unless step.fetch(:status) == "ready"
 
+          command_env = step.fetch(:env, env)
           results = step.fetch(:commands).map do |command|
-            result = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
+            result = command_runner.call(command, chdir: project_root, env: command_env, quiet: quiet)
             unless result.fetch(:success)
               raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{command.join(" ")}\n#{result[:stderr]}"
             end

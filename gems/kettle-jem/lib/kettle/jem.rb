@@ -3105,7 +3105,9 @@ module Kettle
         template_lines.fetch(template_unreleased),
         changelog_unreleased_items(destination_body)
       )
-      merged_lines = changelog_template_header(template_lines, template_unreleased) +
+      header = changelog_template_header(template_lines, template_unreleased)
+      merged_lines = header +
+        (header.empty? ? [] : [""]) +
         canonical +
         destination_lines[destination_end..].to_a
       ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
@@ -3179,6 +3181,7 @@ module Kettle
       CHANGELOG_STANDARD_HEADINGS.each do |standard_heading|
         lines << ""
         lines << standard_heading
+        lines << ""
         section_items = items[standard_heading].to_a.dup
         section_items.pop while section_items.any? && section_items.last.to_s.strip.empty?
         lines.concat(section_items) if section_items.any?
