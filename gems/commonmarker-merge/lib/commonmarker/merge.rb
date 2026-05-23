@@ -85,7 +85,32 @@ module Commonmarker
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
       return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
 
-      Markdown::Merge.merge_markdown(template_source, destination_source, dialect)
+      template = parse_markdown(template_source, dialect, backend: backend)
+      return template unless template[:ok]
+
+      destination = parse_markdown(destination_source, dialect, backend: backend)
+      return destination unless destination[:ok]
+
+      destination_sections = Markdown::Merge.collect_markdown_sections(
+        destination.dig(:analysis, :normalized_source),
+        destination.dig(:analysis, :owners)
+      )
+      template_sections = Markdown::Merge.collect_markdown_sections(
+        template.dig(:analysis, :normalized_source),
+        template.dig(:analysis, :owners)
+      )
+      destination_paths = destination_sections.to_h { |section| [section[:path], true] }
+      merged_sections = destination_sections.map { |section| section[:text] }.reject(&:empty?) +
+        template_sections
+          .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
+          .map { |section| section[:text] }
+
+      {
+        ok: true,
+        diagnostics: [],
+        output: "#{merged_sections.join("\n\n").strip}\n",
+        policies: []
+      }
     end
 
     def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
