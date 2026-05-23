@@ -8345,9 +8345,9 @@ module Kettle
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
       return { strategy: :accept_template } if target_path.to_s == ".github/workflows/license-eye.yml"
-      return unless target_path.to_s.end_with?("_local.gemfile")
+      return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
 
-      { strategy: :accept_template }
+      nil
     end
 
     def inactive_packaged_template_cleanup_files(project_root, config = {})
