@@ -2620,6 +2620,76 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "normalizes lockfiles from the template task without templating env overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-lock-normalization", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "Gemfile.lock" => <<~LOCK,
+          GEM
+            remote: https://gem.coop/
+            specs:
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+
+          BUNDLED WITH
+             4.0.10
+        LOCK
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries: []
+        YAML
+      })
+
+      env = {
+        "K_JEM_TEMPLATING" => "true",
+        "KETTLE_RB_DEV" => "/workspace/kettle-rb",
+        "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
+        "SMORG_RB_DEV" => "/workspace/smorg-rb",
+      }
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      report = Kettle::Jem::Tasks::TemplateTask.run(
+        project_root: root,
+        env: env,
+        run_options: {quiet: true},
+        command_runner: command_runner
+      )
+
+      expect(report.fetch(:template_steps)).to include(hash_including(
+        name: "bundle_lock_normalization",
+        command: %w[bundle lock],
+        status: "succeeded",
+        reason: "executed"
+      ))
+      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle lock] }
+      expect(lock_command).not_to be_nil
+      expect(lock_command.fetch(:env)).to include(
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "K_JEM_TEMPLATING" => "false",
+        "KETTLE_RB_DEV" => "false",
+        "GALTZO_FLOSS_DEV" => "false",
+        "SMORG_RB_DEV" => "false"
+      )
+    end
+  end
+
   it "reports gemspec dependency sync through the install task" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

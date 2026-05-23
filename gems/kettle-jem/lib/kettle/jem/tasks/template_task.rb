@@ -6,8 +6,18 @@ module Kettle
       module TemplateTask
         module_function
 
-        def run(project_root: Dir.pwd, env: ENV, run_options: env_run_options(env))
-          Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
+        def run(project_root: Dir.pwd, env: ENV, run_options: env_run_options(env), command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command))
+          report = Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
+          setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env)
+          lock_step = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+            [lock_step],
+            project_root: project_root,
+            env: setup_env,
+            run_options: run_options,
+            command_runner: command_runner
+          ).first
+          report.merge(template_steps: [lock_step])
         end
 
         def env_run_options(env)
