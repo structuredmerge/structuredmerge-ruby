@@ -244,6 +244,31 @@ RSpec.describe Kettle::Jem::CLI do
     end
   end
 
+  it "routes template through the template task orchestration" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run).and_return(
+        mode: "apply",
+        changed_files: [],
+        template_steps: [{
+          name: "bundle_lock_normalization",
+          status: "succeeded",
+          reason: "executed",
+        }]
+      )
+
+      status, out, err = run_cli(["template", root, "--skip-commit"], env: {"K_JEM_TEMPLATING" => "true"})
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      expect(out).to include("apply: 0 changed files")
+      expect(Kettle::Jem::Tasks::TemplateTask).to have_received(:run).with(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: include(skip_commit: true)
+      )
+    end
+  end
+
   it "prints old debug diagnostics without changing normal output" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       allow(Kettle::Jem).to receive(:plan_project).and_raise(Kettle::Jem::Error, "debug failure")

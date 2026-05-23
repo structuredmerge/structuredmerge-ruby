@@ -11,6 +11,7 @@ require "net/http"
 require "open3"
 require "rbconfig"
 require "set"
+require "stringio"
 require "time"
 require "uri"
 require "ruby/merge"
@@ -26,6 +27,7 @@ require "yaml"
 require "ast/merge"
 require "ast/crispr/markdown/markly"
 require "ast/crispr/ruby/prism"
+require "kettle/dev"
 require_relative "jem/version"
 
 module Kettle
@@ -2362,9 +2364,12 @@ module Kettle
       raise ArgumentError, "no gemspec found in #{project_root}" unless gemspec_path
 
       gemspec = File.read(gemspec_path)
-      name = extract_gemspec_assignment(gemspec, "spec.name") || File.basename(gemspec_path, ".gemspec")
-      homepage_url = extract_gemspec_assignment(gemspec, "spec.homepage")
-      metadata_source_url = extract_metadata_value(gemspec, "source_code_uri")
+      gemspec_metadata = project_gemspec_metadata(project_root, gemspec_path)
+      name = metadata_value(gemspec_metadata, :gem_name) ||
+        extract_gemspec_assignment(gemspec, "spec.name") ||
+        File.basename(gemspec_path, ".gemspec")
+      homepage_url = metadata_value(gemspec_metadata, :homepage) || extract_gemspec_assignment(gemspec, "spec.homepage")
+      metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri) || extract_metadata_value(gemspec, "source_code_uri")
       metadata_github_url = concrete_github_url(metadata_source_url)
       homepage_github_url = concrete_github_url(homepage_url)
       git_source_url = git_remote_source_url(project_root)
@@ -2378,25 +2383,32 @@ module Kettle
       derived_github_user = git_github_url && source_url == git_github_url ? github_org_from_url(git_github_url) : nil
       rubygems_config = kettle_config["rubygems"].is_a?(Hash) ? kettle_config["rubygems"] : {}
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
-      entrypoint_require = name.tr("-", "/") if entrypoint_require.empty?
+      entrypoint_require = metadata_value(gemspec_metadata, :entrypoint_require) if entrypoint_require.empty?
+      entrypoint_require = name.tr("-", "/") if entrypoint_require.to_s.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
       namespace = configured_namespace.empty? ? nil : configured_namespace
-      namespace ||= existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
+      namespace ||= metadata_value(gemspec_metadata, :namespace) ||
+        existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
         existing_version_namespace(project_root, version_path) ||
         classify_namespace(name)
+      project_version = metadata_value(gemspec_metadata, :version) || extract_gemspec_assignment(gemspec, "spec.version")
+      min_ruby = metadata_value(gemspec_metadata, :required_ruby_version) ||
+        metadata_value(gemspec_metadata, :min_ruby) ||
+        extract_gemspec_assignment(gemspec, "spec.required_ruby_version")
+      gemspec_licenses = Array(gemspec_metadata[:licenses]).empty? ? extract_gemspec_array(gemspec, "spec.licenses") : Array(gemspec_metadata[:licenses])
 
-      author = author_facts(gemspec, kettle_config, env)
+      author = author_facts(gemspec, kettle_config, env, gemspec_metadata: gemspec_metadata)
       copyright = copyright_facts(project_root, kettle_config)
       license = license_facts(
         kettle_config,
-        extract_gemspec_array(gemspec, "spec.licenses"),
+        gemspec_licenses,
         author: author,
         author_email: author[:email],
         copyright: copyright
       )
-      gemspec_license_spdx = extract_gemspec_array(gemspec, "spec.licenses")
+      gemspec_license_spdx = gemspec_licenses
         .map { |license_id| license_id.to_s.strip }
         .reject(&:empty?)
       project_runtime = project_runtime_facts(
@@ -2405,15 +2417,17 @@ module Kettle
         package_name: name,
         source_url: source_url,
         author_domain: author[:domain],
-        min_ruby: extract_gemspec_assignment(gemspec, "spec.required_ruby_version"),
-        version: extract_gemspec_assignment(gemspec, "spec.version")
+        min_ruby: min_ruby,
+        version: project_version
       )
       facts = {
         package: compact_hash(
           ecosystem: "rubygems",
           name: name,
           slug: name,
-          description: extract_gemspec_assignment(gemspec, "spec.description") ||
+          description: metadata_value(gemspec_metadata, :description) ||
+            metadata_value(gemspec_metadata, :summary) ||
+            extract_gemspec_assignment(gemspec, "spec.description") ||
             extract_gemspec_assignment(gemspec, "spec.summary"),
           homepage_url: homepage_url,
           source_url: source_url,
@@ -2423,7 +2437,7 @@ module Kettle
           gemspec_path: File.basename(gemspec_path),
           entrypoint_require: entrypoint_require,
           namespace: namespace,
-          min_ruby: extract_gemspec_assignment(gemspec, "spec.required_ruby_version"),
+          min_ruby: min_ruby,
           engines: ruby_engines_config(kettle_config),
         ),
       }
@@ -3083,7 +3097,7 @@ module Kettle
       }
     end
 
-    def synchronize_readme(content, facts)
+    def synchronize_readme(content, facts, project_root: nil)
       package = facts.fetch(:package)
       lines = content.to_s.split("\n", -1)
       heading = "# #{package.fetch(:name)}"
@@ -3093,7 +3107,8 @@ module Kettle
       end
       postprocess_readme_content(
         replace_markdown_managed_block(lines.join("\n"), "kettle-jem:metadata", readme_metadata_block(facts)),
-        facts
+        facts,
+        project_root: project_root
       )
     end
 
@@ -3300,7 +3315,7 @@ module Kettle
       deletion = recipe.fetch(:name) == "rakefile_scaffold_cleanup" ? delete_rakefile_scaffold(original) : nil
       final = case recipe.fetch(:name)
       when "readme_metadata"
-        synchronize_readme(original, facts)
+        synchronize_readme(original, facts, project_root: project_root)
       when "changelog_unreleased"
         normalize_changelog(original, facts)
       when "generated_block_sync"
@@ -3611,6 +3626,8 @@ module Kettle
     end
 
     def normalize_generated_rakefile(content)
+      return "" if content.to_s.empty?
+
       ensure_trailing_newline(strip_orphaned_rake_task_requires(content.to_s).rstrip)
     end
 
@@ -3650,7 +3667,8 @@ module Kettle
             destination_content: original,
             preserve_config: recipe.dig(:template_preference, :readme_preserve_config) || {}
           ),
-          facts
+          facts,
+          project_root: project_root
         )
         return append_used_markdown_link_definitions(processed, resolved)
       end
@@ -3666,11 +3684,11 @@ module Kettle
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
         accepted = finalize_github_workflow_template(accepted) if github_workflow_template_recipe?(recipe)
-        return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts) : accepted
+        return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
       end
 
       resolved = finalize_github_workflow_template(resolved) if github_workflow_template_recipe?(recipe)
-      recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(resolved, facts) : resolved
+      recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
     end
 
     def finalize_accepted_template_source(recipe, content, destination_content, facts:)
@@ -3696,7 +3714,7 @@ module Kettle
       synchronize_github_actions_framework_ci(content, facts)
     end
 
-    def postprocess_readme_content(content, facts)
+    def postprocess_readme_content(content, facts, project_root: nil)
       return content unless facts
 
       processed = ReadmePostProcessor.process(
@@ -3707,8 +3725,58 @@ module Kettle
       processed = normalize_readme_project_heading(processed, facts)
       processed = apply_readme_conditional_blocks(processed, facts)
       processed = apply_readme_badge_policy(processed, facts)
+      processed = apply_readme_kloc_badge(processed, facts, project_root)
       processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
       apply_monorepo_subgem_readme_recipe(processed, facts)
+    end
+
+    def apply_readme_kloc_badge(content, facts, project_root)
+      kloc = readme_kloc_from_changelog(project_root, facts.dig(:project_runtime, :version))
+      return content if kloc.to_s.empty?
+
+      content.to_s.gsub(
+        /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/,
+        "\\1#{kloc}\\3"
+      )
+    end
+
+    def readme_kloc_from_changelog(project_root, version)
+      return nil if project_root.to_s.empty? || version.to_s.empty?
+
+      changelog_path = File.join(project_root, "CHANGELOG.md")
+      return nil unless File.file?(changelog_path)
+
+      changelog_coverage_kloc(current_changelog_version_section(File.read(changelog_path), version))
+    end
+
+    def current_changelog_version_section(content, version)
+      version_text = version.to_s.strip
+      return nil if version_text.empty?
+
+      lines = content.to_s.lines
+      start_index = lines.index { |line| changelog_version_heading_line?(line, version_text) }
+      return nil unless start_index
+
+      end_index = lines[(start_index + 1)..].to_a.index { |line| line.start_with?("## ") }
+      lines[start_index...(end_index ? start_index + 1 + end_index : lines.length)].join
+    end
+
+    def changelog_version_heading_line?(line, version)
+      text = line.to_s.strip
+      return false unless text.start_with?("## ")
+
+      heading = text.delete_prefix("## ").strip
+      heading = heading[1...heading.index("]")] if heading.start_with?("[") && heading.include?("]")
+      heading == version || heading.start_with?("#{version} ")
+    end
+
+    def changelog_coverage_kloc(section)
+      return nil if section.to_s.empty?
+
+      match = section.to_s.match(/-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i)
+      return nil unless match
+
+      format("%.3f", match[1].to_i.to_f / 1000.0)
     end
 
     def apply_readme_conditional_blocks(content, facts)
@@ -6729,11 +6797,13 @@ module Kettle
       "0"
     end
 
-    def author_facts(gemspec_source, config, env)
+    def author_facts(gemspec_source, config, env, gemspec_metadata: {})
       token_config = token_config_values(config)
       author_config = token_config["author"].is_a?(Hash) ? token_config["author"] : {}
-      derived_name = extract_gemspec_array(gemspec_source, "spec.authors").first
-      derived_email = extract_gemspec_array(gemspec_source, "spec.email").first
+      derived_name = Array(gemspec_metadata[:authors]).map(&:to_s).find { |value| present_template_token_value?(value) } ||
+        extract_gemspec_array(gemspec_source, "spec.authors").first
+      derived_email = Array(gemspec_metadata[:email]).map(&:to_s).find { |value| present_template_token_value?(value) } ||
+        extract_gemspec_array(gemspec_source, "spec.email").first
       name = preferred_template_token_value(derived_name, author_config["name"], env, "KJ_AUTHOR_NAME").to_s
       email = preferred_template_token_value(derived_email, author_config["email"], env, "KJ_AUTHOR_EMAIL").to_s
       given_names = preferred_template_token_value(author_given_names(name), author_config["given_names"], env, "KJ_AUTHOR_GIVEN_NAMES")
@@ -6999,6 +7069,62 @@ module Kettle
         version: version.to_s,
         github_org: github_org_from_url(source_url).to_s
       )
+    end
+
+    def project_gemspec_metadata(project_root, gemspec_path)
+      metadata = quiet_gemspec_reader_load(project_root)
+      return {} unless present_template_token_value?(metadata[:gem_name])
+
+      metadata[:source_code_uri] ||= load_project_gemspec(gemspec_path)&.metadata&.fetch("source_code_uri", nil)
+      metadata
+    rescue LoadError, StandardError
+      spec = load_project_gemspec(gemspec_path)
+      return {} unless spec
+
+      {
+        gemspec_path: gemspec_path,
+        gem_name: spec.name.to_s,
+        version: spec.version.to_s,
+        min_ruby: min_ruby_version(spec.required_ruby_version),
+        homepage: spec.homepage.to_s,
+        source_code_uri: spec.metadata.fetch("source_code_uri", nil),
+        authors: Array(spec.authors).compact.uniq,
+        email: Array(spec.email).compact.uniq,
+        summary: spec.summary.to_s,
+        description: spec.description.to_s,
+        licenses: Array(spec.licenses),
+        required_ruby_version: spec.required_ruby_version,
+        require_paths: Array(spec.require_paths),
+        bindir: spec.bindir.to_s,
+        executables: Array(spec.executables),
+      }
+    end
+
+    def quiet_gemspec_reader_load(project_root)
+      original_stderr = $stderr
+      original_stdout = $stdout
+      $stderr = StringIO.new
+      $stdout = StringIO.new
+      Kettle::Dev::GemSpecReader.load(project_root)
+    ensure
+      $stderr = original_stderr
+      $stdout = original_stdout
+    end
+
+    def metadata_value(metadata, key)
+      value = metadata[key]
+      return if value.nil?
+
+      text = value.to_s.strip
+      text unless text.empty?
+    end
+
+    def load_project_gemspec(gemspec_path)
+      Dir.chdir(File.dirname(gemspec_path)) do
+        Gem::Specification.load(File.basename(gemspec_path))
+      end
+    rescue LoadError, StandardError
+      nil
     end
 
     def project_runtime_template_tokens(project_runtime)
@@ -8846,6 +8972,8 @@ module Kettle
 
     def delete_rakefile_scaffold(content)
       selectors = rakefile_scaffold_delete_selectors(content)
+      return { content: content.to_s, delete_selectors: selectors } if selectors.empty?
+
       {
         content: delete_line_ranges(content.to_s, selectors),
         delete_selectors: selectors,

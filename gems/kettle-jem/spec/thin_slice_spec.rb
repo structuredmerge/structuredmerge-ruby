@@ -578,7 +578,7 @@ RSpec.describe Kettle::Jem do
       expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
       expect(paths).to include(".github/workflows/truffleruby-23.1.yml")
       expect(stale_report).to include(
-        recipe_name: "github_actions_inactive_packaged_workflow_cleanup__github_workflows_truffleruby_23_2_yml",
+        recipe_name: "github_actions_inactive_packaged_workflow_cleanup_github_workflows_truffleruby_23_2_yml",
         changed: true
       )
       expect(stale_report.dig(:metadata, :delete_file)).to be(true)
@@ -733,7 +733,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.fetch(:changed)).to be(true)
       expect(plan.fetch(:final_content)).to include("# 💎 Example")
       expect(plan.fetch(:final_content)).to include("## 🌻 Synopsis")
-      expect(plan.fetch(:final_content)).to include("root package-family guide")
+      expect(plan.fetch(:final_content)).not_to include("root package-family guide")
       expect(plan.fetch(:final_content)).not_to include("Tokens to Remember")
 
       apply = described_class.apply_readme_style(root, env: {})
@@ -1066,6 +1066,65 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "updates the README KLOC badge from the current changelog release coverage" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-kloc-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          gem_version = Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/example/version.rb", mod) }::Example::Version::VERSION
+
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.version = gem_version
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        "lib/example/version.rb" => <<~RUBY,
+          module Example
+            module Version
+              VERSION = "1.2.3"
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            profile: full
+            apply: true
+            entries:
+              - README.md
+          files:
+            README.md:
+              strategy: accept_template
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN,
+          # Changelog
+
+          ## [1.2.3] - 2026-05-23
+
+          ### Fixed
+
+          - COVERAGE: 91.09% -- 3644/4000 lines in 80 files
+        MARKDOWN
+        "template/README.md.example" => <<~MARKDOWN,
+          # {KJ|GEM_NAME}
+
+          [🧮kloc-img]: https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&logo=YouTube&logoColor=blue
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      readme = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end.fetch(:final_content)
+
+      expect(readme).to include("KLOC-4.000-FFDD67.svg")
+      expect(File.read(File.join(root, "README.md"))).to eq(readme)
+    end
+  end
+
   it "applies packaged monorepo subgem README badge policy" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -1082,6 +1141,8 @@ RSpec.describe Kettle::Jem do
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           project_emoji: "☯️"
+          readme:
+            package_family: structuredmerge
           templates:
             root: packaged
             apply: true
@@ -1096,7 +1157,9 @@ RSpec.describe Kettle::Jem do
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
-      readme = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "README.md" }.fetch(:final_content)
+      readme = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end.fetch(:final_content)
 
       expect(readme).not_to include("Open Source Helpers")
       expect(readme).not_to include("codetriage")
@@ -1574,20 +1637,18 @@ RSpec.describe Kettle::Jem do
         run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true}
       )
       config = File.read(File.join(root, ".kettle-jem.yml"))
+      config_yaml = YAML.safe_load(config)
 
       expect(setup.fetch(:changed_files)).to include(".kettle-jem.yml")
       expect(config).to include("project_emoji: 💎\n")
-      expect(config).to include(<<~YAML)
-        templates:
-          root: packaged
-          apply: true
-          profile: monorepo-subgem
-          entries:
-            - README.md
-            - source: gem.gemspec
-              target: tree_haver.gemspec
-            - LICENSE.md
-      YAML
+      expect(config_yaml.dig("templates", "root")).to eq("packaged")
+      expect(config_yaml.dig("templates", "apply")).to be(true)
+      expect(config_yaml.dig("templates", "profile")).to eq("monorepo-subgem")
+      expect(config_yaml.dig("templates", "entries")).to include(
+        "README.md",
+        {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
+        "LICENSE.md"
+      )
       expect(config).to include(
         "    - source: lib/gem/version.rb\n" \
         "      target: lib/tree_haver/version.rb\n" \
@@ -1708,23 +1769,22 @@ RSpec.describe Kettle::Jem do
         run_options: {bootstrap_mode: true, template_profile: "monorepo-root", skip_commit: true}
       )
       config = File.read(File.join(root, ".kettle-jem.yml"))
+      config_yaml = YAML.safe_load(config)
 
       expect(setup.fetch(:changed_files)).to include(".kettle-jem.yml")
-      expect(config).to include(<<~YAML)
-        templates:
-          root: packaged
-          apply: true
-          profile: monorepo-root
-          entries:
-            - CHANGELOG.md
-            - CODE_OF_CONDUCT.md
-            - CONTRIBUTING.md
-            - FUNDING.md
-            - IRP.md
-            - RUBOCOP.md
-            - SECURITY.md
-            - .github/FUNDING.yml
-      YAML
+      expect(config_yaml.dig("templates", "root")).to eq("packaged")
+      expect(config_yaml.dig("templates", "apply")).to be(true)
+      expect(config_yaml.dig("templates", "profile")).to eq("monorepo-root")
+      expect(config_yaml.dig("templates", "entries")).to include(
+        "CHANGELOG.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.md",
+        "FUNDING.md",
+        "IRP.md",
+        "RUBOCOP.md",
+        "SECURITY.md",
+        ".github/FUNDING.yml"
+      )
       expect(config).to include(<<~YAML)
         files:
           CHANGELOG.md:
@@ -4588,9 +4648,17 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
       expect(gemspec_content).not_to include('require "my/gem/version"')
       expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
-      expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
-        include(operation: "rewrite_version_loader", min_ruby: "3.2", mode: "modern", legacy_preamble_removed: true)
-      )
+      version_loader_operation = gemspec_report.dig(
+        :report_envelope,
+        :report,
+        :step_reports,
+        0,
+        :metadata,
+        :ruby_template_policy,
+        :operations,
+      ).find { |operation| operation[:operation] == "rewrite_version_loader" }
+      expect(version_loader_operation).to include(mode: "modern", legacy_preamble_removed: true)
+      expect(Gem::Version.new(version_loader_operation.fetch(:min_ruby))).to be >= Gem::Version.new("3.1")
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
   end

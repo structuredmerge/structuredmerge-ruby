@@ -149,8 +149,10 @@ module Kettle
           Kettle::Jem.setup_project(project_root, env: env, run_options: options.fetch(:run_options))
         when "plan"
           Kettle::Jem.plan_project(project_root, env: env, run_options: options.fetch(:run_options))
-        when "apply", "template"
+        when "apply"
           Kettle::Jem.apply_project(project_root, env: env, run_options: options.fetch(:run_options))
+        when "template"
+          Kettle::Jem::Tasks::TemplateTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
         when "install"
           Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
         when "manifest"
