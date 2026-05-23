@@ -5137,11 +5137,15 @@ module Kettle
       end
       return content if records.length < 2
 
-      sorted_sources = records.sort_by { |record| [record.fetch(:name).to_s, record.fetch(:source).to_s] }.map { |record| record.fetch(:source) }
+      sorted_sources = records.sort_by { |record| [gemspec_dependency_sort_key(record.fetch(:name)), record.fetch(:source).to_s] }.map { |record| record.fetch(:source) }
       records_by_line = records.sort_by { |record| record.fetch(:start_line) }.each_with_index.to_h do |record, index|
         [record.fetch(:start_line), record.merge(replacement: sorted_sources.fetch(index))]
       end
       replace_record_ranges(content, records_by_line)
+    end
+
+    def gemspec_dependency_sort_key(name)
+      name.to_s.tr("_", "-")
     end
 
     def append_missing_gemspec_dependency_lines(content, destination_dependencies, receiver:)

@@ -4666,6 +4666,62 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "sorts runtime gemspec dependencies with RuboCop-compatible gem name ordering" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-gemspec-rubocop-order-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "example"
+            gem.summary = "Real summary"
+            gem.required_ruby_version = ">= 4.0"
+            gem.add_dependency("rspec", "~> 3.0")
+            gem.add_dependency("rspec-block_is_expected", "~> 1.0")
+            gem.add_dependency("rspec-pending_for", "~> 0.1")
+            gem.add_dependency("rspec-stubbed_env", "~> 1.0")
+            gem.add_dependency("rspec_junit_formatter", "~> 0.6")
+            gem.add_dependency("silent_stream", "~> 1.0")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "TODO: Write a short summary"
+            spec.required_ruby_version = ">= 4.0"
+            spec.add_dependency("rspec", "~> 3.0")
+            spec.add_dependency("rspec-block_is_expected", "~> 1.0")
+            spec.add_dependency("rspec-pending_for", "~> 0.1")
+            spec.add_dependency("rspec-stubbed_env", "~> 1.0")
+            spec.add_dependency("rspec_junit_formatter", "~> 0.6")
+            spec.add_dependency("silent_stream", "~> 1.0")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      gemspec_content = gemspec_report.fetch(:final_content)
+      junit_index = gemspec_content.index(%(spec.add_dependency("rspec_junit_formatter", "~> 0.6")))
+      pending_index = gemspec_content.index(%(spec.add_dependency("rspec-pending_for", "~> 0.1")))
+      stubbed_index = gemspec_content.index(%(spec.add_dependency("rspec-stubbed_env", "~> 1.0")))
+
+      expect(junit_index).to be < pending_index
+      expect(pending_index).to be < stubbed_index
+      expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "ports old gemspec emoji field replacement without duplicating the Gem::Specification block" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
