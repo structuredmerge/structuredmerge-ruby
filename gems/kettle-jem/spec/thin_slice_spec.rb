@@ -829,6 +829,26 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps the real CHANGELOG template in canonical Unreleased form" do
+    template = File.read(File.join(__dir__, "../lib/kettle/jem/templates/CHANGELOG.md.example"))
+
+    expect(template).to include(<<~MARKDOWN)
+      ## [Unreleased]
+
+      ### Added
+
+      ### Changed
+
+      ### Deprecated
+
+      ### Removed
+
+      ### Fixed
+
+      ### Security
+    MARKDOWN
+  end
+
   it "fills configured README section partials while preserving unconfigured manual sections" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
