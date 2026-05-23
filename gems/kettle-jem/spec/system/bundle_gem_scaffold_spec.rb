@@ -187,6 +187,12 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       "updates" => [
         {
           "directory" => "/",
+          "ignore" => [
+            {
+              "dependency-name" => "rubocop-lts",
+            },
+          ],
+          "open-pull-requests-limit" => 5,
           "package-ecosystem" => "bundler",
           "schedule" => { "interval" => "daily" },
         },
@@ -220,6 +226,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     rakefile = File.read(File.join(gem_root, "Rakefile"))
     expect(rakefile).to include('require "bundler/gem_tasks"')
     expect(rakefile).to include('require "kettle/dev"')
+    expect(rakefile).to include('Kettle::Dev.install_tasks unless Kettle::Dev::RUNNING_AS == "rake"')
     expect(rakefile).to include("Kettle::Jem.install_tasks")
     expect(rakefile).to include("rescue LoadError")
     previous_significant = nil
@@ -299,6 +306,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     rakefile_after_second_apply = File.read(File.join(gem_root, "Rakefile"))
     expect(rakefile_after_second_apply).to include('require "bundler/gem_tasks"')
     expect(rakefile_after_second_apply).to include('require "kettle/dev"')
+    expect(rakefile_after_second_apply).to include('Kettle::Dev.install_tasks unless Kettle::Dev::RUNNING_AS == "rake"')
     expect(rakefile_after_second_apply).to include("rescue LoadError")
     expect(rakefile_after_second_apply.scan('task("kettle:jem:selftest")').size).to eq(1)
     expect(rakefile_after_second_apply.scan('task("build:generate_checksums")').size).to eq(1)
