@@ -27,6 +27,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Removed stale `continue-on-error` handling from the generated current workflow.
 - Marked generated workflow files as template-owned by default to prevent stale
   YAML keys from surviving future template runs.
+- Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.2 or newer.
 ### Security
 
 ## [7.0.0] - 2026-05-05
