@@ -207,6 +207,18 @@ readme:
 licenses:
   - MIT
 
+# Apache SkyWalking Eyes dependency license overrides.
+# Use these when license-eye cannot identify a dependency license from the
+# package metadata or gem contents. Entries render under
+# dependency.licenses in .licenserc.yaml.
+#
+# Supported fields:
+#   name    - dependency name exactly as reported by license-eye
+#   license - SPDX license identifier to assign
+#   version - optional dependency version for a narrower override
+license_eye:
+  dependency_licenses: []
+
 # Machine / automation accounts to exclude from generated copyright output.
 #
 # When kettle-jem collects copyright information via `git blame`, it filters

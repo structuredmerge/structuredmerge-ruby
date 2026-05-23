@@ -209,6 +209,7 @@ module Kettle
       KJ|GH:USER
       KJ|GL:USER
       KJ|LICENSE_EYE:FLAGS
+      KJ|LICENSE_EYE:DEPENDENCY_LICENSES
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|MIN_DIVERGENCE_THRESHOLD
@@ -2394,9 +2395,9 @@ module Kettle
         existing_version_namespace(project_root, version_path) ||
         classify_namespace(name)
       project_version = metadata_value(gemspec_metadata, :version) || extract_gemspec_assignment(gemspec, "spec.version")
-      min_ruby = metadata_value(gemspec_metadata, :required_ruby_version) ||
-        metadata_value(gemspec_metadata, :min_ruby) ||
-        extract_gemspec_assignment(gemspec, "spec.required_ruby_version")
+      min_ruby = extract_gemspec_assignment(gemspec, "spec.required_ruby_version") ||
+        metadata_value(gemspec_metadata, :required_ruby_version) ||
+        metadata_value(gemspec_metadata, :min_ruby)
       gemspec_licenses = Array(gemspec_metadata[:licenses]).empty? ? extract_gemspec_array(gemspec, "spec.licenses") : Array(gemspec_metadata[:licenses])
 
       author = author_facts(gemspec, kettle_config, env, gemspec_metadata: gemspec_metadata)
@@ -7862,6 +7863,7 @@ module Kettle
         license_eye_primary_spdx: license_eye_primary_spdx(licenses, primary),
         license_eye_mode: license_eye_mode(licenses),
         license_eye_flags: license_eye_flags(licenses),
+        license_eye_dependency_licenses: license_eye_dependency_licenses(config),
         license_copyright_notice: license_copyright_notice(copyright_lines, copyright_prefix, author),
         readme_copyright_notice: readme_copyright_notice(copyright_lines, copyright_prefix, author),
         copyright_prefix: copyright_prefix
@@ -7885,6 +7887,7 @@ module Kettle
         "KJ|LICENSE_EYE:PRIMARY_SPDX" => license[:license_eye_primary_spdx].to_s,
         "KJ|LICENSE_EYE:MODE" => license[:license_eye_mode].to_s,
         "KJ|LICENSE_EYE:FLAGS" => license[:license_eye_flags].to_s,
+        "KJ|LICENSE_EYE:DEPENDENCY_LICENSES" => license[:license_eye_dependency_licenses].to_s,
         "KJ|README:LICENSE_BADGE" => license[:readme_license_badge].to_s,
         "KJ|README:LICENSE_COMPAT_BADGE" => license[:readme_license_compat_badge].to_s,
         "KJ|README:LICENSE_EYE_WORKFLOW_BADGE" => license[:readme_license_eye_workflow_badge].to_s,
@@ -8027,6 +8030,34 @@ module Kettle
 
     def license_eye_flags(licenses)
       license_eye_mode(licenses) == "check" ? "--weak-compatible" : ""
+    end
+
+    def license_eye_dependency_licenses(config)
+      entries = Array(config.dig("license_eye", "dependency_licenses")).filter_map do |entry|
+        license_eye_dependency_license_entry(entry)
+      end
+      return "" if entries.empty?
+
+      ["  licenses:", *entries].join("\n")
+    end
+
+    def license_eye_dependency_license_entry(entry)
+      data = if entry.is_a?(Hash)
+        entry
+      else
+        {}
+      end
+      name = data["name"] || data[:name]
+      license = data["license"] || data[:license]
+      version = data["version"] || data[:version]
+      return nil if name.to_s.strip.empty? || license.to_s.strip.empty?
+
+      lines = [
+        "    - name: #{JSON.generate(name.to_s.strip)}",
+        "      license: #{JSON.generate(license.to_s.strip)}",
+      ]
+      lines.insert(1, "      version: #{JSON.generate(version.to_s.strip)}") unless version.to_s.strip.empty?
+      lines
     end
 
     def license_compat_ref(category)

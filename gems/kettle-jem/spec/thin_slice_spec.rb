@@ -5757,6 +5757,11 @@ RSpec.describe Kettle::Jem do
           licenses:
             - AGPL-3.0-only
             - MIT
+          license_eye:
+            dependency_licenses:
+              - name: simplecov-rcov
+                version: 0.3.7
+                license: MIT
           templates:
             root: packaged
             apply: true
@@ -5775,6 +5780,7 @@ RSpec.describe Kettle::Jem do
       end
 
       expect(licenserc_report.fetch(:final_content)).to include('spdx-id: "MIT"')
+      expect(licenserc_report.fetch(:final_content)).to include("  licenses:\n    - name: \"simplecov-rcov\"\n      version: \"0.3.7\"\n      license: \"MIT\"")
       expect(workflow_report.fetch(:final_content)).to include('mode: "check"')
       expect(workflow_report.fetch(:final_content)).to include('flags: "--weak-compatible"')
     end
