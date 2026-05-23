@@ -4762,11 +4762,20 @@ module Kettle
     end
 
     def yaml_merge_options(recipe)
+      options = {
+        preference: (recipe.dig(:template_preference, :preference) || "destination").to_sym,
+        add_template_only_nodes: true,
+        freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem",
+      }
+      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+        configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
+        options[:add_template_only_nodes] = configured unless configured.nil?
+      end
       policy = recipe.dig(:template_preference, :comment_merge_policy).to_s
       policy = DEFAULT_TEMPLATE_YAML_COMMENT_MERGE_POLICY if policy.empty? && recipe.fetch(:primitive) == "supplied_template_source_application"
-      return {} if policy.empty?
+      options[:comment_merge_policy] = policy.to_sym unless policy.empty?
 
-      { comment_merge_policy: policy.to_sym }
+      options
     end
 
     def json_merge_options(recipe)
@@ -8529,6 +8538,7 @@ module Kettle
 
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
+      return { strategy: :merge, preference: :destination, add_template_only_nodes: true } if target_path.to_s == ".kettle-jem.yml"
       return { strategy: :accept_template } if target_path.to_s == ".github/workflows/license-eye.yml"
       return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
 
@@ -8595,8 +8605,12 @@ module Kettle
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
       return nil unless selected_source
 
-      strategy_config = template_strategy_config(config, target_path) ||
+      strategy_config = if template_root.fetch(:kind) == "packaged" && target_path.to_s == ".kettle-jem.yml"
         default_template_strategy_config(template_root, target_path)
+      else
+        template_strategy_config(config, target_path) ||
+          default_template_strategy_config(template_root, target_path)
+      end
       preference = {
         target_path: target_path,
         configured_source: source_path,

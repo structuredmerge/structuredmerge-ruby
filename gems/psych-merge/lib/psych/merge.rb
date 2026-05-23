@@ -165,7 +165,17 @@ module Psych
         Yaml::Merge.match_yaml_owners(template, destination)
       end
 
-      def merge_yaml(template_source, destination_source, dialect, backend: nil, comment_merge_policy: :preserve_destination)
+      def merge_yaml(
+        template_source,
+        destination_source,
+        dialect,
+        backend: nil,
+        comment_merge_policy: :preserve_destination,
+        preference: :destination,
+        add_template_only_nodes: true,
+        add_template_only_sequence_items: false,
+        **_options
+      )
         requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
         return unsupported_feature_merge_result("Unsupported YAML backend #{requested}.") unless requested == BACKEND_REFERENCE.id
         return unsupported_feature_merge_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
@@ -173,9 +183,9 @@ module Psych
         output = SmartMerger.new(
           template_source,
           destination_source,
-          preference: :destination,
-          add_template_only_nodes: true,
-          add_template_only_sequence_items: false,
+          preference: preference,
+          add_template_only_nodes: add_template_only_nodes,
+          add_template_only_sequence_items: add_template_only_sequence_items,
           recursive: true,
           comment_merge_policy: comment_merge_policy
         ).merge
