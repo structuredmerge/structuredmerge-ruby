@@ -212,11 +212,11 @@ NOTE: To build without signing the gem set `SKIP_GEM_SIGNING` to any value in th
 14. Run `bundle exec rake release` which will create a git tag for the version,
     push git commits and tags, and push the `.gem` file to the gem host configured in the gemspec.
 
-[📜src-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/
-[📜src-cb]: https://codeberg.org/structuredmerge/structuredmerge-ruby
-[📜src-gh]: https://github.com/structuredmerge/structuredmerge-ruby
+[📜src-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem
+[📜src-cb]: https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem
+[📜src-gh]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem
 [🧪build]: https://github.com/structuredmerge/structuredmerge-ruby/actions
-[🤝conduct]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/blob/main/CODE_OF_CONDUCT.md
+[🤝conduct]: https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md
 [🖐contrib-rocks]: https://contrib.rocks
 [🖐contributors]: https://github.com/structuredmerge/structuredmerge-ruby/graphs/contributors
 [🚎contributors-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main

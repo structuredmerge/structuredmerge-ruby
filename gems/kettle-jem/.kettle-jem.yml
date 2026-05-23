@@ -96,6 +96,17 @@ engines:
   - ruby
   - jruby
   - truffleruby
+# Repository URL topology.
+# This is independent from templates.profile. A gem may use the full template
+# while still living as a sub-project inside a monorepo.
+#
+# Supported values:
+#   standalone          - project URLs point at this gem's own repository
+#   monorepo-subproject - project URLs point at a subdirectory in the repository root
+#
+# ENV override: KJ_REPOSITORY_TOPOLOGY
+repository:
+  topology: "monorepo-subproject"
 # Framework matrix workflows.
 # When your gem tests against multiple versions of a framework (Rails,
 # ActiveRecord, ActiveSupport, etc.), this section configures how
@@ -216,6 +227,14 @@ machine_users:
 # change or be added during templating (100 - unchanged-file score).
 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
 min_divergence_threshold: 5
+# Hostname used for generated YARD documentation links.
+# Defaults to <gem-name>.<author-email-domain>.
+# ENV override: KJ_YARD_HOST
+yard_host: "kettle-jem.galtzo.com"
+# Full URL used for gemspec metadata["homepage_uri"].
+# Defaults to https://kettle-jem.galtzo.com.
+# ENV override: KJ_HOMEPAGE_URI
+homepage_uri: "https://structuredmerge.org"
 # Template source inventory.
 # The packaged inventory is the canonical kettle-jem project template. It
 # includes the detailed GitHub Actions workflow set, modular gemfiles,
@@ -223,6 +242,14 @@ min_divergence_threshold: 5
 templates:
   root: packaged
   apply: true
+  # Template recipe profile.
+  # Supported values:
+  #   full            - full gem template
+  #   monorepo-subgem - smaller sub-project template
+  #   monorepo-root   - repository-root support template
+  #
+  # ENV override: KETTLE_JEM_TEMPLATE_PROFILE
+  profile: "full"
 # Optional kettle-jem plugins.
 # Each entry is a gem name. During bootstrap, kettle-jem ensures each plugin is
 # added as a development dependency so it is available after bin/setup.
@@ -269,30 +296,30 @@ defaults:
 #   from the gemspec via safe derivation. After that, destination values win.
 tokens:
   forge:
-    gh_user: pboling          # GitHub username only, no @, no URL. Used for GitHub Sponsors and profile links. ENV: KJ_GH_USER
-    gl_user: pboling          # GitLab username only, no @, no URL. Used for profile links. ENV: KJ_GL_USER
-    cb_user: pboling          # Codeberg username only, no @, no URL. Used for profile links. ENV: KJ_CB_USER
-    sh_user: galtzo          # SourceHut username only, no leading ~, no URL. Used as https://sr.ht/~<value>/. ENV: KJ_SH_USER
+    gh_user: "pboling"          # GitHub username only, no @, no URL. Used for GitHub Sponsors and profile links. ENV: KJ_GH_USER
+    gl_user: "pboling"          # GitLab username only, no @, no URL. Used for profile links. ENV: KJ_GL_USER
+    cb_user: "pboling"          # Codeberg username only, no @, no URL. Used for profile links. ENV: KJ_CB_USER
+    sh_user: "galtzo"          # SourceHut username only, no leading ~, no URL. Used as https://sr.ht/~<value>/. ENV: KJ_SH_USER
   author:
     name: "Peter H. Boling"                 # Full display name. Example: Ada Lovelace. ENV: KJ_AUTHOR_NAME. Auto-seeded from gemspec authors.first
     given_names: "Peter H."   # Given/personal names only. Example: Ada. ENV: KJ_AUTHOR_GIVEN_NAMES. Auto-seeded when AUTHOR:NAME can be split
-    family_names: Boling   # Family/surname only. Example: Lovelace. ENV: KJ_AUTHOR_FAMILY_NAMES. Auto-seeded when AUTHOR:NAME can be split
+    family_names: "Boling"   # Family/surname only. Example: Lovelace. ENV: KJ_AUTHOR_FAMILY_NAMES. Auto-seeded when AUTHOR:NAME can be split
     email: "floss@galtzo.com"               # Primary public email address. Example: floss@galtzo.com. ENV: KJ_AUTHOR_EMAIL. Auto-seeded from gemspec email.first
-    domain: galtzo.com               # Bare domain only, no scheme, no email. Example: galtzo.com. ENV: KJ_AUTHOR_DOMAIN. Auto-seeded from AUTHOR:EMAIL
-    orcid: 0009-0008-8519-441X                                  # ORCID identifier only, not the full URL. Example: 0000-0001-2345-6789. ENV: KJ_AUTHOR_ORCID
+    domain: "galtzo.com"               # Bare domain only, no scheme, no email. Example: galtzo.com. ENV: KJ_AUTHOR_DOMAIN. Auto-seeded from AUTHOR:EMAIL
+    orcid: "0009-0008-8519-441X"                                  # ORCID identifier only, not the full URL. Example: 0000-0001-2345-6789. ENV: KJ_AUTHOR_ORCID
   funding:
-    patreon: galtzo          # Patreon account slug only. Used as https://patreon.com/<value>. ENV: KJ_FUNDING_PATREON
-    kofi: pboling             # Ko-fi handle/slug only. Used as https://ko-fi.com/<value>. ENV: KJ_FUNDING_KOFI
-    paypal: peterboling           # PayPal.Me slug only. Used as https://www.paypal.com/paypalme/<value>. ENV: KJ_FUNDING_PAYPAL
-    buymeacoffee: pboling     # Buy Me a Coffee slug only. Used as https://www.buymeacoffee.com/<value>. ENV: KJ_FUNDING_BUYMEACOFFEE
-    polar: pboling            # Polar handle/slug only. Used as https://polar.sh/<value>. ENV: KJ_FUNDING_POLAR
-    liberapay: pboling        # Liberapay account slug only. Used as https://liberapay.com/<value>/donate. ENV: KJ_FUNDING_LIBERAPAY
-    issuehunt: pboling        # IssueHunt identifier/handle only, not a URL. ENV: KJ_FUNDING_ISSUEHUNT
+    patreon: "galtzo"          # Patreon account slug only. Used as https://patreon.com/<value>. ENV: KJ_FUNDING_PATREON
+    kofi: "pboling"             # Ko-fi handle/slug only. Used as https://ko-fi.com/<value>. ENV: KJ_FUNDING_KOFI
+    paypal: "peterboling"           # PayPal.Me slug only. Used as https://www.paypal.com/paypalme/<value>. ENV: KJ_FUNDING_PAYPAL
+    buymeacoffee: "pboling"     # Buy Me a Coffee slug only. Used as https://www.buymeacoffee.com/<value>. ENV: KJ_FUNDING_BUYMEACOFFEE
+    polar: "pboling"            # Polar handle/slug only. Used as https://polar.sh/<value>. ENV: KJ_FUNDING_POLAR
+    liberapay: "pboling"        # Liberapay account slug only. Used as https://liberapay.com/<value>/donate. ENV: KJ_FUNDING_LIBERAPAY
+    issuehunt: "pboling"        # IssueHunt identifier/handle only, not a URL. ENV: KJ_FUNDING_ISSUEHUNT
   social:
-    mastodon: galtzo         # Local handle only for the instance assumed by the template link. Current template uses https://ruby.social/@<value>. ENV: KJ_SOCIAL_MASTODON
-    bluesky: galtzo.com          # Full Bluesky handle. Example: peterboling.dev or alice.bsky.social. Used as https://bsky.app/profile/<value>. ENV: KJ_SOCIAL_BLUESKY
-    linktree: galtzo         # Linktree username only. Used as https://linktr.ee/<value>. ENV: KJ_SOCIAL_LINKTREE
-    devto: galtzo            # DEV Community username only. Used as https://dev.to/<value>. ENV: KJ_SOCIAL_DEVTO
+    mastodon: "galtzo"         # Local handle only for the instance assumed by the template link. Current template uses https://ruby.social/@<value>. ENV: KJ_SOCIAL_MASTODON
+    bluesky: "galtzo.com"          # Full Bluesky handle. Example: peterboling.dev or alice.bsky.social. Used as https://bsky.app/profile/<value>. ENV: KJ_SOCIAL_BLUESKY
+    linktree: "galtzo"         # Linktree username only. Used as https://linktr.ee/<value>. ENV: KJ_SOCIAL_LINKTREE
+    devto: "galtzo"            # DEV Community username only. Used as https://dev.to/<value>. ENV: KJ_SOCIAL_DEVTO
 # Glob patterns evaluated in order (first match wins)
 patterns:
   -
