@@ -2,31 +2,18 @@
 
 remote = ENV.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
 
-# Cross-platform parsers
-gem "parslet"
-gem "prism", "~> 1.6"
-gem "toml"
-gem "unparser", "~> 0.8", ">= 0.8.1"
-
 platform :mri do
-  # MRI only Parsers:
-  # kettle-jem currently uses markly instead of commonmarker, but these can easily be swapped.
-  # gem "commonmarker"
-  gem "markly", "~> 0.15", ">= 0.15.3"
-  gem "rbs", ">= 3.10"   # ruby >= 3.1.0
-
-  # MRI Backend
+  # MRI tree-sitter runtime. Grammar packs are provided by tree_haver via tree_sitter_language_pack.
   gem "ruby_tree_sitter",
     "~> 2.1",
     require: false # DO NOT LOAD, because conflicts with FFI
 
   if remote
-    # AST parsing for advanced templating.
-    # Kettle-rb's Merge Recipes (released)
+    # Merge recipes and parser dependencies for released installs.
   end
 end
 
 # Set SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local development with path-based dependencies.
-# When false (default / CI), released gems are used and explicit parser pins are needed.
-# Local path overrides — merge gems bring their own parser dependencies
+# When false (default / CI), released kettle-jem brings merge gems and parser dependencies.
+# Local path overrides bring the same dependencies from sibling gemspecs.
 eval_gemfile "templating_local.gemfile" unless remote

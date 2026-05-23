@@ -592,10 +592,6 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
-    unparser (0.9.0)
-      diff-lcs (>= 1.6, < 3)
-      parser (>= 3.3.0)
-      prism (>= 1.5.1)
     version_gem (1.1.9)
     yaml-converter (0.1.0)
       kramdown (>= 2.4, < 3)
@@ -647,17 +643,13 @@ DEPENDENCIES
   kramdown-merge!
   kramdown-parser-gfm (~> 1.1)
   markdown-merge!
-  markly (~> 0.15, >= 0.15.3)
   markly-merge!
   mutex_m (~> 0.2)
-  parslet
   parslet-toml-merge!
   plain-merge!
-  prism (~> 1.6)
   prism-merge!
   psych-merge!
   rake (~> 13.0)
-  rbs (>= 3.10)
   rbs-merge!
   rdoc (~> 6.11)
   reek (~> 6.5)
@@ -675,12 +667,10 @@ DEPENDENCIES
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
-  toml
   toml-merge!
   tree_haver!
   turbo_tests2!
   typescript-merge!
-  unparser (~> 0.8, >= 0.8.1)
   yaml-converter (~> 0.1)
   yaml-merge!
   yard (~> 0.9, >= 0.9.37)
@@ -840,7 +830,6 @@ CHECKSUMS
   typescript-merge (7.0.0)
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
-  unparser (0.9.0) sha256=4331f174a73a23b69250b13d47da3794ed1449711ee0f9ed8947dc020ba76067
   version_gem (1.1.9) sha256=0c1a0962ae543c84a00889bb018d9f14d8f8af6029d26b295d98774e3d2eb9a4
   yaml-converter (0.1.0) sha256=3a8a6ce675eec8adc7ee67697ee0567e2153cad974b601c062c3a25f545ecc77
   yaml-merge (7.0.0)
