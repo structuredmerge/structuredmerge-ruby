@@ -4534,7 +4534,7 @@ RSpec.describe Ast::Merge do
         expect(final_content).to include("concurrency:")
         expect(final_content).to include("permissions:")
         expect(final_content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd")
-        expect(final_content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f")
+        expect(final_content).to include("ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92")
         expect(final_content).not_to include("actions/checkout@v3")
         expect(final_content).not_to include("ruby/setup-ruby@v1")
         expect(final_content).to include("gemfiles/current.gemfile")
