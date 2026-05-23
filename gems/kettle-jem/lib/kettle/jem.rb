@@ -2347,10 +2347,14 @@ module Kettle
         homepage_url ||
         git_source_url
       derived_github_user = git_github_url && source_url == git_github_url ? github_org_from_url(git_github_url) : nil
-      entrypoint_require = name.tr("-", "/")
+      rubygems_config = kettle_config["rubygems"].is_a?(Hash) ? kettle_config["rubygems"] : {}
+      entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
+      entrypoint_require = name.tr("-", "/") if entrypoint_require.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
+      configured_namespace = rubygems_config["namespace"].to_s.strip
+      namespace = configured_namespace.empty? ? nil : configured_namespace
+      namespace ||= existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
         existing_version_namespace(project_root, version_path) ||
         classify_namespace(name)
 
@@ -2751,7 +2755,8 @@ module Kettle
       return nil unless gemspec_declares_version_gem?(gemspec_content)
 
       facts = report.fetch(:facts)
-      entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/")
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
       signature_path = File.join("sig", entrypoint_require, "version.rbs")
@@ -3398,7 +3403,7 @@ module Kettle
     end
 
     def normalize_generated_rakefile(content)
-      strip_orphaned_rake_task_requires(content.to_s)
+      ensure_trailing_newline(strip_orphaned_rake_task_requires(content.to_s).rstrip)
     end
 
     def strip_orphaned_rake_task_requires(content)
@@ -4653,6 +4658,7 @@ module Kettle
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
+      merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
     end
 
@@ -4877,6 +4883,19 @@ module Kettle
       records_by_line = gemspec_dependency_records(content, receiver: receiver).each_with_object({}) do |record, index|
         replacement = destination_dependencies[gemspec_dependency_record_key(record)]
         index[record.fetch(:start_line)] = record.merge(replacement: replacement) if replacement
+      end
+      replace_record_ranges(content, records_by_line)
+    end
+
+    def sort_runtime_gemspec_dependency_lines(content, receiver:)
+      records = gemspec_dependency_records(content, receiver: receiver).select do |record|
+        record.fetch(:kind) != "add_development_dependency" && record.fetch(:start_line) == record.fetch(:end_line)
+      end
+      return content if records.length < 2
+
+      sorted_sources = records.sort_by { |record| [record.fetch(:name).to_s, record.fetch(:source).to_s] }.map { |record| record.fetch(:source) }
+      records_by_line = records.sort_by { |record| record.fetch(:start_line) }.each_with_index.to_h do |record, index|
+        [record.fetch(:start_line), record.merge(replacement: sorted_sources.fetch(index))]
       end
       replace_record_ranges(content, records_by_line)
     end
@@ -5375,6 +5394,21 @@ module Kettle
       end
     end
 
+    def version_gem_template_target_path_for_project(project_root, gemspec_path, source)
+      config = kettle_jem_config(project_root)
+      package_name = File.basename(gemspec_path.to_s, ".gemspec")
+      entrypoint_require = config.dig("rubygems", "entrypoint_require").to_s.strip
+      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
+      case source
+      when "lib/gem/version.rb"
+        File.join("lib", entrypoint_require, "version.rb")
+      when "sig/gem/version.rbs"
+        File.join("sig", entrypoint_require, "version.rbs")
+      else
+        source
+      end
+    end
+
     def add_monorepo_subgem_file_overrides(content, gemspec_path)
       override_lines = [
         "  README.md:",
@@ -5437,6 +5471,7 @@ module Kettle
     def decorative_grapheme?(grapheme)
       value = grapheme.to_s
       return false if value.empty?
+      return false if value.ascii_only?
 
       !value.match?(/\A[[:alnum:][:space:]]\z/u)
     end
@@ -6658,7 +6693,8 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
-      entrypoint_require = package_name.tr("-", "/")
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       signature_path = File.join("sig", entrypoint_require, "version.rbs")
@@ -7140,7 +7176,8 @@ module Kettle
 
       entries = readme_top_logo_options(config).filter_map do |option|
         readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
-      end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
+      end
+      entries = deduplicate_readme_top_logo_entries(entries)
       readme_top_logo_entries_with_asset_size(entries)
     end
 
@@ -7163,7 +7200,11 @@ module Kettle
 
       logos.filter_map do |logo|
         readme_top_logo_entry_from_config(logo, org: org, gem_name: gem_name, repository: repository)
-      end.uniq { |entry| [entry[:image_ref], entry[:link_ref], entry[:image_url], entry[:href]] }
+      end.then { |entries| deduplicate_readme_top_logo_entries(entries) }
+    end
+
+    def deduplicate_readme_top_logo_entries(entries)
+      entries.uniq { |entry| entry[:image_url].to_s }
     end
 
     def readme_top_logo_entry_from_config(logo, org:, gem_name:, repository: {})
@@ -7945,7 +7986,7 @@ module Kettle
 
       if VERSION_GEM_TEMPLATE_SOURCES.include?(logical_path)
         existing_gemspec = Dir.glob(File.join(project_root, "*.gemspec")).sort.first
-        return version_gem_template_target_path(File.basename(existing_gemspec), logical_path) if existing_gemspec
+        return version_gem_template_target_path_for_project(project_root, File.basename(existing_gemspec), logical_path) if existing_gemspec
       end
 
       if logical_path.end_with?(".gemspec")

@@ -1353,6 +1353,47 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "uses configured RubyGems entrypoint and namespace for version_gem files" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-configured-entrypoint", tmp_root) do |root|
+      write_tree(root, {
+        "turbo_tests2.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "turbo_tests2"
+            spec.version = "3.0.0"
+            spec.summary = "Turbo tests"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🚀"
+          rubygems:
+            entrypoint_require: "turbo_tests"
+            namespace: "TurboTests"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+              - source: sig/gem/version.rbs
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+
+      expect(apply.fetch(:changed_files)).to include("lib/turbo_tests/version.rb", "sig/turbo_tests/version.rbs")
+      expect(apply.fetch(:changed_files)).not_to include("lib/turbo_tests2/version.rb")
+      version_rb = File.read(File.join(root, "lib", "turbo_tests", "version.rb"))
+      expect(version_rb).to include("module TurboTests")
+      version_rbs = File.read(File.join(root, "sig", "turbo_tests", "version.rbs"))
+      expect(version_rbs).to include("module TurboTests")
+      post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
+      expect(post_step.fetch(:changed_files)).to include("lib/turbo_tests.rb")
+      expect(post_step.fetch(:changed_files)).not_to include("lib/turbo_tests2.rb")
+    end
+  end
+
   it "bootstraps a monorepo root template profile with shared documentation entries" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -5729,6 +5770,47 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("[🖼️acme-i]: https://logos.galtzo.com/assets/images/acme/avatar-128px.svg")
       expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
       expect(final_content).not_to include("unknown")
+    end
+  end
+
+  it "deduplicates README logos by asset while preserving the related-org link" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-duplicate-logo-assets-slice", tmp_root) do |root|
+      write_tree(root, {
+        "turbo_tests2.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "turbo_tests2"
+            spec.summary = "Turbo tests"
+            spec.metadata["source_code_uri"] = "https://github.com/galtzo-floss/turbo_tests2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            top_logos: related-org,ruby,org,project
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN,
+          Row:
+          {KJ|README:TOP_LOGO_ROW}
+          Refs:
+          {KJ|README:TOP_LOGO_REFS}
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = template_report.fetch(:final_content)
+      expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
+      expect(final_content).not_to include("[🖼️galtzo-floss]: https://github.com/galtzo-floss")
+      expect(final_content.scan("galtzo-floss/avatar-192px.svg").length).to eq(1)
+      expect(final_content).to include("[![turbo_tests2 Logo by Aboling0, CC BY-SA 4.0][🖼️galtzo-floss-turbo_tests2-i]][🖼️galtzo-floss-turbo_tests2]")
     end
   end
 
