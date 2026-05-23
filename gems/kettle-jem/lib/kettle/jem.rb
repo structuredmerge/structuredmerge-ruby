@@ -3062,11 +3062,161 @@ module Kettle
         "",
         "### Changed",
         "",
+        "### Deprecated",
+        "",
+        "### Removed",
+        "",
         "### Fixed",
+        "",
+        "### Security",
         "",
       ]
       lines.insert(insert_at, *section)
       ensure_trailing_newline(lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+    end
+
+    CHANGELOG_STANDARD_HEADINGS = [
+      "### Added",
+      "### Changed",
+      "### Deprecated",
+      "### Removed",
+      "### Fixed",
+      "### Security",
+    ].freeze
+
+    def merge_changelog_template_source(template_content, destination_content)
+      destination = destination_content.to_s
+      return ensure_trailing_newline(template_content.to_s) if destination.strip.empty?
+
+      template_lines = markdown_source_lines(template_content)
+      template_unreleased = changelog_unreleased_line_index(template_lines)
+      return ensure_trailing_newline(template_content.to_s) unless template_unreleased
+
+      destination_lines = markdown_source_lines(destination)
+      destination_unreleased = changelog_unreleased_line_index(destination_lines)
+      unless destination_unreleased
+        header = changelog_template_header(template_lines, template_unreleased).join("\n")
+        return ensure_trailing_newline("#{header}\n\n#{destination}")
+      end
+
+      destination_end = changelog_unreleased_end_index(destination_lines, destination_unreleased)
+      destination_body = destination_lines[(destination_unreleased + 1)...destination_end] || []
+      canonical = build_changelog_unreleased_section(
+        template_lines.fetch(template_unreleased),
+        changelog_unreleased_items(destination_body)
+      )
+      merged_lines = changelog_template_header(template_lines, template_unreleased) +
+        canonical +
+        destination_lines[destination_end..].to_a
+      ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def markdown_source_lines(content)
+      content.to_s.split("\n")
+    end
+
+    def changelog_template_header(lines, unreleased_index)
+      header = lines[0...unreleased_index].to_a
+      header.pop while header.any? && header.last.to_s.strip.empty?
+      header
+    end
+
+    def changelog_unreleased_line_index(lines)
+      lines.index { |line| changelog_unreleased_heading_line?(line) }
+    end
+
+    def changelog_unreleased_heading_line?(line)
+      text = line.to_s.strip
+      return false unless text.start_with?("## ")
+
+      changelog_unreleased_heading?(text.delete_prefix("## ").strip)
+    end
+
+    def changelog_unreleased_end_index(lines, unreleased_index)
+      index = unreleased_index + 1
+      while index < lines.length
+        line = lines.fetch(index)
+        # Markdown link-reference definitions are footer content, not Unreleased section body.
+        return index if markdown_link_reference_definition_line?(line)
+        return index if line.start_with?("# ") || (line.start_with?("## ") && !changelog_unreleased_heading_line?(line))
+
+        index += 1
+      end
+      lines.length
+    end
+
+    def markdown_link_reference_definition_line?(line)
+      line.to_s.lstrip.start_with?("[") && line.to_s.include?("]:")
+    end
+
+    def changelog_unreleased_items(body_lines)
+      items = {}
+      heading = nil
+      index = 0
+      while index < body_lines.length
+        line = body_lines.fetch(index)
+        if line.start_with?("### ")
+          heading = line.strip
+          items[heading] ||= []
+          index += 1
+          next
+        end
+
+        if changelog_bullet_line?(line)
+          lines, index = collect_changelog_list_item(body_lines, index)
+          items[heading] ||= []
+          items[heading].concat(lines)
+          next
+        end
+
+        index += 1
+      end
+      items
+    end
+
+    def build_changelog_unreleased_section(heading, items)
+      lines = [heading]
+      CHANGELOG_STANDARD_HEADINGS.each do |standard_heading|
+        lines << ""
+        lines << standard_heading
+        section_items = items[standard_heading].to_a.dup
+        section_items.pop while section_items.any? && section_items.last.to_s.strip.empty?
+        lines.concat(section_items) if section_items.any?
+      end
+      lines << ""
+      lines
+    end
+
+    def changelog_bullet_line?(line)
+      stripped = line.to_s.lstrip
+      stripped.start_with?("- ") || stripped.start_with?("* ")
+    end
+
+    def collect_changelog_list_item(lines, start_index)
+      line = lines.fetch(start_index).to_s
+      base_indent = line.length - line.lstrip.length
+      item_lines = [line.rstrip]
+      index = start_index + 1
+      in_fence = false
+      while index < lines.length
+        current = lines.fetch(index).to_s
+        current_indent = current.length - current.lstrip.length
+        break if !in_fence && current.start_with?("### ")
+        break if !in_fence && changelog_bullet_line?(current) && current_indent <= base_indent
+
+        if current.lstrip.start_with?("```")
+          in_fence = !in_fence
+          item_lines << current.rstrip
+          index += 1
+          next
+        end
+
+        break unless in_fence || current.strip.empty? || current_indent > base_indent
+
+        item_lines << current.rstrip
+        index += 1
+      end
+      [item_lines, index]
     end
 
     def changelog_unreleased_heading?(heading_text)
@@ -3809,6 +3959,10 @@ module Kettle
         merge_result = Toml::Merge.merge_toml(template_content, destination_content, "toml")
       when :json, :jsonc
         merge_result = merge_json_template_source(template_content, destination_content, recipe, file_type)
+      when :markdown
+        return merge_changelog_template_source(template_content, destination_content) if recipe.fetch(:target_path) == "CHANGELOG.md"
+
+        return template_content
       when :dotenv
         merge_result = merge_dotenv_template_source(template_content, destination_content, recipe)
       when :rbs

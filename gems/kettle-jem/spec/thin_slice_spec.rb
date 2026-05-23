@@ -637,6 +637,95 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "merges CHANGELOG templates without replacing release history" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-changelog-template-merge-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: templates
+            apply: true
+            entries:
+              - CHANGELOG.md
+        YAML
+        "templates/CHANGELOG.md.example" => <<~MARKDOWN,
+          # Changelog
+
+          Template intro.
+
+          ## [Unreleased]
+
+          ### Added
+
+          ### Changed
+
+          ### Deprecated
+
+          ### Removed
+
+          ### Fixed
+
+          ### Security
+
+          ## [1.0.1] - 2025-08-24
+
+          - Template-only release that must not replace project history.
+
+          [Unreleased]: https://example.com/template/compare/v1.0.1...HEAD
+          [1.0.1]: https://example.com/template/compare/v1.0.0...v1.0.1
+        MARKDOWN
+        "CHANGELOG.md" => <<~MARKDOWN,
+          # Changelog
+
+          Project intro.
+
+          ## [Unreleased]
+
+          ### Added
+          - Keep project pending feature.
+            - Keep nested detail.
+
+          ### Fixed
+          - Keep project pending fix.
+
+          ## [2.0.0] - 2026-01-02
+
+          - Existing release must survive.
+
+          [Unreleased]: https://github.com/acme/example/compare/v2.0.0...HEAD
+          [2.0.0]: https://github.com/acme/example/compare/v1.0.0...v2.0.0
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan[:recipe_reports].find { |candidate| candidate.fetch(:recipe_name) == "template_source_application_CHANGELOG_md" }
+      changelog = report.fetch(:final_content)
+
+      expect(changelog).to include("Template intro.")
+      expect(changelog).not_to include("Project intro.")
+      expect(changelog).to include("### Deprecated")
+      expect(changelog).to include("### Removed")
+      expect(changelog).to include("### Security")
+      expect(changelog).to include("- Keep project pending feature.")
+      expect(changelog).to include("  - Keep nested detail.")
+      expect(changelog).to include("- Keep project pending fix.")
+      expect(changelog).to include("## [2.0.0] - 2026-01-02")
+      expect(changelog).to include("[2.0.0]: https://github.com/acme/example/compare/v1.0.0...v2.0.0")
+      expect(changelog).not_to include("Template-only release")
+      expect(changelog).not_to include("[1.0.1]: https://example.com/template/compare/v1.0.0...v1.0.1")
+    end
+  end
+
   it "fills configured README section partials while preserving unconfigured manual sections" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
