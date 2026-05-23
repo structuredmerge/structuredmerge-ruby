@@ -8590,7 +8590,7 @@ module Kettle
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0
+                uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -8662,7 +8662,7 @@ module Kettle
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0
+                uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -8734,7 +8734,7 @@ module Kettle
                 uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0
+                uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -8809,7 +8809,7 @@ module Kettle
 
         - name: Upload coverage to CodeCov
           if: ${{ !env.ACT }}
-          uses: codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0
+          uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
           with:
             use_oidc: true
             fail_ci_if_error: false
@@ -8942,10 +8942,10 @@ module Kettle
     def github_actions_step_pins
       {
         "actions/checkout" => "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2",
-        "ruby/setup-ruby" => "ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@0a51d2e0b5417d06e4ecceb534aec87defc53926 # main",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0",
-        "codecov/codecov-action" => "codecov/codecov-action@57e3a136b779b570ffcdbf80b3bdc90e7fab3de2 # v6.0.0",
+        "codecov/codecov-action" => "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4",
       }

@@ -78,7 +78,7 @@ RSpec.describe Kettle::Jem do
       expect(custom_ci_report.fetch(:final_content)).to include("permissions:")
       expect(custom_ci_report.fetch(:final_content)).to include("concurrency:")
       expect(custom_ci_report.fetch(:final_content)).to include("actions/checkout@de0fac2")
-      expect(custom_ci_report.fetch(:final_content)).to include("ruby/setup-ruby@e65c17")
+      expect(custom_ci_report.fetch(:final_content)).to include("ruby/setup-ruby@afeafc")
       expect(custom_ci_report.fetch(:final_content)).to include("Upload coverage to Coveralls")
       expect(custom_ci_report.fetch(:final_content)).to include("qltysh/qlty-action/coverage@a192421")
       expect(custom_ci_report.fetch(:final_content)).to include("Code Coverage Summary Report")
@@ -267,7 +267,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("permissions:\n  contents: read")
       expect(content).to include("concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"")
       expect(content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2")
-      expect(content).to include("ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0")
+      expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
     end
