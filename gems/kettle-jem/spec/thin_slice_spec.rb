@@ -273,6 +273,96 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "normalizes GitHub Action refs when merging packaged workflow templates" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-packaged-workflow-action-pin-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/ruby-2.3.yml
+        YAML
+        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+          name: Ruby 2.3
+          jobs:
+            test:
+              runs-on: ubuntu-22.04
+              steps:
+                - name: Checkout
+                  uses: actions/checkout@v6
+                - name: Setup Ruby & RubyGems
+                  uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:recipe_name)).to start_with("template_source_application_")
+      expect(content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2")
+      expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
+      expect(content).not_to include("actions/checkout@v6")
+      expect(content).not_to include("ruby/setup-ruby@v1")
+    end
+  end
+
+  it "normalizes GitHub Action refs in skipped packaged workflows that already exist" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-skipped-workflow-action-pin-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/ruby-2.3.yml
+        YAML
+        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+          name: Ruby 2.3
+          jobs:
+            test:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v6
+                - uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:recipe_name)).to start_with("github_actions_workflow_snippets_")
+      expect(content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2")
+      expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
+      expect(content).not_to include("actions/checkout@v6")
+      expect(content).not_to include("ruby/setup-ruby@v1")
+    end
+  end
+
   it "keeps the packaged Discord notifier workflow opt-in via include" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

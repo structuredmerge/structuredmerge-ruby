@@ -2448,13 +2448,14 @@ module Kettle
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?
       facts[:funding] = funding unless funding.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
+      template_config = template_runtime_config(kettle_config, facts, license: license)
       facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
       facts[:ci] = {
         provider: "github_actions",
         default_branch: "main",
         ruby_versions: github_actions_ruby_versions(facts.fetch(:rubygems).fetch(:min_ruby, nil)),
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
-        custom_workflows: github_actions_custom_workflows(project_root, opencollective_disabled: opencollective_disabled),
+        custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
       }
       facts[:ci][:opt_in_workflow_cleanups] = opt_in_workflows unless opt_in_workflows.empty?
       coverage_config = github_actions_coverage_config(kettle_config)
@@ -2462,7 +2463,6 @@ module Kettle
       framework_matrix = github_actions_framework_matrix(kettle_config)
       facts[:ci][:framework_matrix] = framework_matrix unless framework_matrix.empty?
       template_facts = {}
-      template_config = template_runtime_config(kettle_config, facts, license: license)
       template_preferences = template_source_preferences(
         project_root,
         template_config,
@@ -3422,6 +3422,7 @@ module Kettle
       return original if strategy == "keep_destination"
 
       content = recipe_template_content(project_root, recipe)
+      return finalize_github_workflow_template(content) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
       return content if strategy == "raw_copy"
 
       resolved = resolve_template_tokens(
@@ -3449,14 +3450,18 @@ module Kettle
         merged = merge_config_template_source(recipe, resolved, original, facts: facts)
         return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
 
+        return finalize_github_workflow_template(merged) if github_workflow_template_recipe?(recipe)
+
         return merged
       end
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
+        accepted = finalize_github_workflow_template(accepted) if github_workflow_template_recipe?(recipe)
         return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts) : accepted
       end
 
+      resolved = finalize_github_workflow_template(resolved) if github_workflow_template_recipe?(recipe)
       recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(resolved, facts) : resolved
     end
 
@@ -3779,7 +3784,7 @@ module Kettle
         if file_type == :gemfile
           return finalize_gemfile_template_source(recipe, template_content, destination_content, facts: facts, template_content: template_content)
         end
-        return prune_github_workflow_matrix_by_min_ruby(template_content, facts) if github_workflow_template_recipe?(recipe)
+        return finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(template_content, facts)) if github_workflow_template_recipe?(recipe)
 
         return template_content
       end
@@ -3820,7 +3825,7 @@ module Kettle
         end
         return merge_appraisals_template_policy(output, facts: facts) if file_type == :appraisals
 
-        output = prune_github_workflow_matrix_by_min_ruby(output, facts) if github_workflow_template_recipe?(recipe)
+        output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts)) if github_workflow_template_recipe?(recipe)
         return output
       end
 
@@ -3906,6 +3911,10 @@ module Kettle
       ensure_trailing_newline(lines.each_with_index.reject { |_line, line_index| remove_indexes.include?(line_index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
     rescue StandardError
       content
+    end
+
+    def finalize_github_workflow_template(content)
+      update_github_actions_pins(content)
     end
 
     def yaml_mapping_nodes(content)
@@ -5813,14 +5822,15 @@ module Kettle
       selected.empty? ? [floor] : selected
     end
 
-    def github_actions_custom_workflows(project_root, opencollective_disabled: false)
+    def github_actions_custom_workflows(project_root, config = {}, opencollective_disabled: false)
       workflow_root = File.join(project_root, ".github", "workflows")
       return [] unless Dir.exist?(workflow_root)
 
       Dir.glob(File.join(workflow_root, "*.{yml,yaml}")).filter_map do |path|
         relative_path = path.delete_prefix("#{project_root}/")
         next if opencollective_disabled && opencollective_disabled_file?(relative_path)
-        next if generated_or_obsolete_github_workflow?(relative_path)
+        next if generated_or_obsolete_github_workflow?(relative_path) &&
+          !skip_packaged_workflow_template?(relative_path, config)
 
         relative_path
       end.sort
@@ -8990,6 +9000,8 @@ module Kettle
         "codecov/codecov-action" => "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4",
+        "actions/upload-artifact" => "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2",
+        "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
       }
     end
 
