@@ -252,6 +252,16 @@ RSpec.describe Kettle::Jem do
               steps:
                 - uses: actions/checkout@v4
                 - uses: ruby/setup-ruby@v1
+                - uses: actions/upload-artifact@v4
+                - uses: codecov/codecov-action@v6
+                - uses: coverallsapp/github-action@main
+                - uses: actions/dependency-review-action@v4
+                - uses: github/codeql-action/init@v4
+                - uses: github/codeql-action/autobuild@v4
+                - uses: github/codeql-action/analyze@v4
+                - uses: pozil/auto-assign-issue@v2
+                - uses: apache/skywalking-eyes/dependency@v0.8.0
+                - uses: kettle-rb/ts-grammar-action@v1
                 - name: Project-specific check
                   run: bundle exec rake custom
         YAML
@@ -268,6 +278,16 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"")
       expect(content).to include("actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2")
       expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
+      expect(content).to include("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1")
+      expect(content).to include("codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1")
+      expect(content).to include("coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7")
+      expect(content).to include("actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0")
+      expect(content).to include("github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
+      expect(content).to include("github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
+      expect(content).to include("github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
+      expect(content).to include("pozil/auto-assign-issue@70adb98ca8b3941524e9ecde48e89067c4f96736 # v3.0.0")
+      expect(content).to include("apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0")
+      expect(content).to include("kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
     end
