@@ -134,6 +134,9 @@ module Kettle
       %w[tokens social linktree] => "KJ_SOCIAL_LINKTREE",
       %w[tokens social devto] => "KJ_SOCIAL_DEVTO",
     }.freeze
+    KETTLE_CONFIG_INTERNAL_SYNC_PATHS = {
+      %w[kettle-jem version] => -> { VERSION },
+    }.freeze
     NON_LICENSE_MD_BASENAMES = %w[
       AGENTS
       CHANGELOG
@@ -5370,7 +5373,14 @@ module Kettle
 
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
       end
+      synced = sync_kettle_config_internal_values(synced)
       prune_legacy_kettle_config_keys(synced)
+    end
+
+    def sync_kettle_config_internal_values(content)
+      KETTLE_CONFIG_INTERNAL_SYNC_PATHS.reduce(content.to_s) do |updated, (path, value_provider)|
+        replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value_provider.call, path: path))
+      end
     end
 
     def prune_legacy_kettle_config_keys(content)
