@@ -24,24 +24,12 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 ### Security
 
-## [1.0.1] - 2025-08-24
-- TAG: [v1.0.1][1.0.1t]
-- COVERAGE: 100.00% -- 130/130 lines in 7 files
-- BRANCH COVERAGE: 96.00% -- 48/50 branches in 7 files
-- 100% documented
-### Fixed
-- bugfix: oopsie
-
-## [1.0.0] - 2025-08-24
-- TAG: [v1.0.0][1.0.0t]
-- COVERAGE: 100.00% -- 130/130 lines in 7 files
-- BRANCH COVERAGE: 96.00% -- 48/50 branches in 7 files
-- 100% documented
+## [7.0.0] - 2026-05-05
+- TAG: [v7.0.0][7.0.0t]
 ### Added
-- Initial release
+- Released the initial StructuredMerge Ruby gem set at version 7.0.0.
+- Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
-[Unreleased]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare/v1.0.0...HEAD
-[1.0.0]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare/a427c302df09cfe4253a7c8d400333f9a4c1a208...v1.0.0
-[1.0.0t]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tags/v1.0.0
-[1.0.1]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare/v1.0.0...v1.0.1
-[1.0.1t]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tags/v1.0.1
+[Unreleased]: https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD
+[7.0.0]: https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0
+[7.0.0t]: https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.0.0
