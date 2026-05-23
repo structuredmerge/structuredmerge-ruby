@@ -2,16 +2,9 @@
 
 remote = ENV.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
 
-platform :mri do
-  # MRI tree-sitter runtime. Grammar packs are provided by tree_haver via tree_sitter_language_pack.
-  gem "ruby_tree_sitter",
-    "~> 2.1",
-    require: false # DO NOT LOAD, because conflicts with FFI
-
-  if remote
-    # Merge recipes and parser dependencies for released installs.
-    gem "kettle-jem", ">= 7.0"
-  end
+if remote
+  # Merge recipes and parser dependencies for released installs.
+  gem "kettle-jem", ">= 7.0"
 end
 
 # Set SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local development with path-based dependencies.
