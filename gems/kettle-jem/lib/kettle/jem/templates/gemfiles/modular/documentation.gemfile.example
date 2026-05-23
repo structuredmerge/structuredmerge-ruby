@@ -15,7 +15,7 @@ gem "yard", "~> 0.9", ">= 0.9.37", require: false
 gem "yard-junk", "~> 0.1", ">= 0.1.0", require: false # Ruby >= 3.1
 gem "yard-relative_markdown_links", "~> 0.6", require: false
 
-if ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+if ENV.fetch("GALTZO_FLOSS_DEV", "false").casecmp("false").zero?
   gem "yard-fence", "~> 0.8", ">= 0.8.2", require: false # Ruby >= 3.2
   gem "yard-timekeeper", "~> 0.1", require: false
   gem "yard-yaml", "~> 0.1", require: false

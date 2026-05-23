@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-remote = ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+remote = ENV.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
 
 # Cross-platform parsers
 gem "parslet"
@@ -27,7 +27,7 @@ platform :mri do
   end
 end
 
-# Set KETTLE_RB_DEV=/path/to/structuredmerge/ruby/gems for local development with path-based dependencies.
+# Set SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local development with path-based dependencies.
 # When false (default / CI), released gems are used and explicit parser pins are needed.
 # Local path overrides — merge gems bring their own parser dependencies
 eval_gemfile "templating_local.gemfile" unless remote
