@@ -501,9 +501,11 @@ module Kettle
           platforms = Array(platforms)
           platforms = lockfile_platforms(lockfile) if platforms.empty?
           removable_platforms = platforms.empty? ? [] : lockfile_platforms(lockfile) - platforms
-          return %w[bundle lock] if platforms.empty?
+          gemfile = File.join(File.dirname(lockfile), "Gemfile")
+          command = ["bundle", "lock", "--gemfile=#{gemfile}", "--lockfile=#{lockfile}"]
+          return command if platforms.empty?
 
-          command = %w[bundle lock --add-platform] + platforms
+          command.concat(%w[--add-platform] + platforms)
           command.concat(%w[--remove-platform] + removable_platforms) unless removable_platforms.empty?
           command
         end

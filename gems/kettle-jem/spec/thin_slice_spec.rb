@@ -508,9 +508,12 @@ RSpec.describe Kettle::Jem do
           preset: framework
           framework_matrix:
             dimension: rails
+            gem: rails
             versions:
               - "7.0"
-              - "7.1"
+              - label: "7.1+"
+                slug: "7_1"
+                requirement: ">= 7.1"
             gemfile_pattern: rails_{version}
         templates:
           root: packaged
@@ -530,9 +533,17 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('          - "3.2"')
       expect(content).to include('          - framework_version: "7.0"')
       expect(content).to include('            gemfile: "gemfiles/rails_7_0"')
-      expect(content).to include('          - framework_version: "7.1"')
+      expect(content).to include('          - framework_version: "7.1+"')
+      expect(content).to include('            gemfile: "gemfiles/rails_7_1"')
       expect(content).not_to include("framework_version: []")
       expect(content).not_to include("gemfile: []")
+
+      gemfile_report = configured_plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/rails_7_1"
+      end
+      expect(gemfile_report.fetch(:final_content)).to include('eval_gemfile "../Gemfile"')
+      expect(gemfile_report.fetch(:final_content)).to include('ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"')
+      expect(gemfile_report.fetch(:final_content)).to include('gem "rails", ">= 7.1"')
     end
   end
 
@@ -2773,7 +2784,16 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: %w[bundle lock --add-platform arm64-darwin ruby x86_64-darwin],
+        command: [
+          "bundle",
+          "lock",
+          "--gemfile=#{File.join(root, "Gemfile")}",
+          "--lockfile=#{File.join(root, "Gemfile.lock")}",
+          "--add-platform",
+          "arm64-darwin",
+          "ruby",
+          "x86_64-darwin",
+        ],
         status: "succeeded",
         reason: "executed"
       ))
@@ -2846,7 +2866,16 @@ RSpec.describe Kettle::Jem do
 
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: %w[bundle lock --add-platform arm64-darwin ruby x86_64-darwin],
+        command: [
+          "bundle",
+          "lock",
+          "--gemfile=#{File.join(root, "Gemfile")}",
+          "--lockfile=#{File.join(root, "Gemfile.lock")}",
+          "--add-platform",
+          "arm64-darwin",
+          "ruby",
+          "x86_64-darwin",
+        ],
         status: "succeeded",
         reason: "executed"
       ))
