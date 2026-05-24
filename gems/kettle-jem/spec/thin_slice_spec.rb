@@ -4349,6 +4349,22 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "adds configured kettle plugins to the kettle-rb local Gemfile overrides" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {"plugins" => ["kettle-drift", "example-plugin"]},
+      {},
+      package_name: "example",
+      source_url: "https://github.com/example/example",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      version: "0.1.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_RB_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+  end
+
   it "treats packaged local Gemfiles as template-owned by default" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

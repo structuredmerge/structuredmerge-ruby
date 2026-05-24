@@ -7073,6 +7073,7 @@ module Kettle
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
+        kettle_rb_local_gems: kettle_rb_local_gems(config),
         yard_host: yard_host,
         homepage_uri: project_homepage_uri(config, env, yard_host: yard_host),
         project_emoji: preferred_template_token_value("💎", config["project_emoji"], env, "KJ_PROJECT_EMOJI").to_s,
@@ -7147,6 +7148,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_DATE" => project_runtime[:template_run_date].to_s,
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
+        "KJ|KETTLE_RB_LOCAL_GEMS" => project_runtime[:kettle_rb_local_gems].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
         "KJ|HOMEPAGE_URI" => project_runtime[:homepage_uri].to_s,
         "KJ|PROJECT_EMOJI" => project_runtime[:project_emoji].to_s,
@@ -7157,6 +7159,13 @@ module Kettle
     def project_yard_host(config, env, package_name:, author_domain:)
       derived = "#{package_name.to_s.tr("_", "-")}.#{author_domain.to_s.empty? ? "example.com" : author_domain}"
       preferred_template_token_value(derived, project_runtime_config_value(config, "yard_host"), env, "KJ_YARD_HOST").to_s
+    end
+
+    def kettle_rb_local_gems(config)
+      gems = %w[kettle-dev kettle-test kettle-soup-cover]
+      plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
+      gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
+      gems.uniq.join(" ")
     end
 
     def project_homepage_uri(config, env, yard_host:)
