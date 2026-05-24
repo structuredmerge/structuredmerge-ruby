@@ -9538,6 +9538,11 @@ module Kettle
 
               - name: Tests for ${{ matrix.ruby }}@current via ${{ matrix.exec_cmd }}
                 run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
+
+              - name: Verify coverage reports
+                run: |
+                  test -s coverage/lcov.info
+                  test -s coverage/coverage.xml
         #{github_actions_coverage_steps}
       YAML
     end
@@ -9582,22 +9587,27 @@ module Kettle
           uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
-          continue-on-error: ${{ matrix.experimental != 'false' }}
+            file: coverage/lcov.info
+            format: lcov
+          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
 
         - name: Upload coverage to QLTY
           if: ${{ !env.ACT }}
           uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
           with:
             token: ${{secrets.QLTY_COVERAGE_TOKEN}}
-            files: coverage/.resultset.json
-          continue-on-error: ${{ matrix.experimental != 'false' }}
+            files: coverage/lcov.info
+            format: lcov
+            skip-errors: false
+          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
 
         - name: Upload coverage to CodeCov
           if: ${{ !env.ACT }}
           uses: codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1
           with:
             use_oidc: true
-            fail_ci_if_error: false
+            disable_search: true
+            fail_ci_if_error: true
             files: coverage/lcov.info,coverage/coverage.xml
             verbose: true
 
@@ -9614,7 +9624,7 @@ module Kettle
             indicators: true
             output: both
             thresholds: '100 100'
-          continue-on-error: ${{ matrix.experimental != 'false' }}
+          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
 
         - name: Add Coverage PR Comment
           uses: marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4
@@ -9622,7 +9632,7 @@ module Kettle
           with:
             recreate: true
             path: code-coverage-results.md
-          continue-on-error: ${{ matrix.experimental != 'false' }}
+          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
       YAML
     end
 
