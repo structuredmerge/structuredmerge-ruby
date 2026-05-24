@@ -241,7 +241,7 @@ RSpec.describe Kettle::Jem do
               strategy: accept_template
         YAML
         "Gemfile" => <<~RUBY,
-          source "https://rubygems.org"
+          source "https://gem.coop"
           gem "example", path: "."
         RUBY
         "template/Gemfile.example" => <<~RUBY,
@@ -2608,7 +2608,7 @@ RSpec.describe Kettle::Jem do
         gem_root = File.join(repo_root, "gems", "example")
         write_tree(gem_root, {
           "Gemfile" => <<~RUBY,
-            source "https://rubygems.org"
+            source "https://gem.coop"
             gemspec
           RUBY
           "example.gemspec" => <<~RUBY,
@@ -3878,7 +3878,7 @@ RSpec.describe Kettle::Jem do
               - lib/example.rb
         YAML
         "Gemfile" => <<~RUBY,
-          source "https://rubygems.org"
+          source "https://gem.coop"
           gem "rspec"
           gem "example", path: "../example"
           eval_gemfile "gemfiles/modular/style.gemfile"

@@ -206,7 +206,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
 
     gemfile = File.read(File.join(gem_root, "Gemfile"))
     expect(gemfile).to include('source "https://gem.coop"')
-    expect(gemfile).not_to include('source "https://rubygems.org"')
+    expect(gemfile.scan('source "https://gem.coop"').size).to eq(1)
     expect(gemfile.scan(/^gemspec$/).size).to eq(1)
     expect(gemfile.scan('eval_gemfile "gemfiles/modular/style.gemfile"').size).to eq(1)
     expect(gemfile).to include('gem "irb"')

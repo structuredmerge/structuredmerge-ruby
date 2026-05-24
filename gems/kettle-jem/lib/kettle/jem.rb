@@ -726,8 +726,8 @@ module Kettle
     end
 
     class RubyGemsResolver
-      RUBYGEMS_V1_API_BASE = "https://rubygems.org/api/v1"
-      RUBYGEMS_V2_API_BASE = "https://rubygems.org/api/v2/rubygems"
+      RUBYGEMS_V1_API_BASE = "https://gem.coop/api/v1"
+      RUBYGEMS_V2_API_BASE = "https://gem.coop/api/v2/rubygems"
 
       attr_reader :cache
 
