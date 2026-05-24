@@ -2631,7 +2631,9 @@ RSpec.describe Kettle::Jem do
           if command == %w[bundle binstubs --all]
             FileUtils.mkdir_p(File.join(chdir, "bin"))
             File.write(File.join(chdir, "bin", "rake"), "#!/usr/bin/env ruby\nputs 'rake binstub'\n")
+            File.write(File.join(chdir, "bin", "yard"), "#!/usr/bin/env ruby\nload Gem.bin_path(\"yard\", \"yard\")\n")
             FileUtils.chmod("+x", File.join(chdir, "bin", "rake"))
+            FileUtils.chmod("+x", File.join(chdir, "bin", "yard"))
           end
           {success: true, exitstatus: 0, stdout: "", stderr: ""}
         end
@@ -2648,6 +2650,14 @@ RSpec.describe Kettle::Jem do
           destination_bin: "bin",
           destination_binstubs: include("rake")
         ))
+        expect(validated_install.fetch(:install_steps)).to include(hash_including(
+          name: "yard_binstub_rake_handoff",
+          status: "updated",
+          reason: "yard_plugins_require_rake_yard_postprocess_hooks",
+          path: "bin/yard"
+        ))
+        expect(File.read(File.join(gem_root, "bin", "yard"))).to include('exec("bundle", "exec", "rake", "yard")')
+        expect(File.executable?(File.join(gem_root, "bin", "yard"))).to be(true)
         expect(commands.find { |entry| entry.fetch(:command) == %w[bundle binstubs --all] }).to include(
           chdir: gem_root,
           env: include("BUNDLE_GEMFILE" => File.join(gem_root, "Gemfile"))
