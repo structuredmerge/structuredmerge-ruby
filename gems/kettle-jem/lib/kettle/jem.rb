@@ -127,6 +127,7 @@ module Kettle
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
       %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
+      %w[workflows exec_cmd] => "KJ_EXEC_CMD",
       %w[tokens forge gh_user] => "KJ_GH_USER",
       %w[tokens forge gl_user] => "KJ_GL_USER",
       %w[tokens forge cb_user] => "KJ_CB_USER",
@@ -1785,7 +1786,7 @@ module Kettle
       ensure_trailing_newline(lines.join("\n"))
     end
 
-    def appraisal_workflow_groups(matrix_entries, bucket_ranges:, exec_cmd: "rake spec")
+    def appraisal_workflow_groups(matrix_entries, bucket_ranges:, exec_cmd: "kettle-test")
       grouped = Hash.new { |hash, key| hash[key] = [] }
       normalized_ranges = bucket_ranges.transform_values do |range|
         {
@@ -1811,7 +1812,7 @@ module Kettle
       grouped.transform_values { |entries| entries.sort_by { |entry| entry.fetch(:appraisal).to_s } }
     end
 
-    def appraisal_workflow_yaml_snippets(matrix_entries, bucket_ranges:, exec_cmd: "rake spec")
+    def appraisal_workflow_yaml_snippets(matrix_entries, bucket_ranges:, exec_cmd: "kettle-test")
       appraisal_workflow_groups(matrix_entries, bucket_ranges: bucket_ranges, exec_cmd: exec_cmd).transform_values do |entries|
         lines = ["strategy:", "  matrix:", "    include:"]
         entries.each do |entry|
@@ -2503,13 +2504,14 @@ module Kettle
       facts[:ci] = {
         provider: "github_actions",
         default_branch: "main",
+        exec_cmd: github_actions_exec_cmd(kettle_config, env),
         ruby_versions: github_actions_ruby_versions(facts.fetch(:rubygems).fetch(:min_ruby, nil)),
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
       }
       facts[:ci][:opt_in_workflow_cleanups] = opt_in_workflows unless opt_in_workflows.empty?
       facts[:ci][:inactive_packaged_workflow_cleanups] = inactive_workflows unless inactive_workflows.empty?
-      coverage_config = github_actions_coverage_config(kettle_config)
+      coverage_config = github_actions_coverage_config(kettle_config, env)
       facts[:ci][:coverage] = coverage_config unless coverage_config.empty?
       framework_matrix = github_actions_framework_matrix(kettle_config)
       facts[:ci][:framework_matrix] = framework_matrix unless framework_matrix.empty?
@@ -6646,6 +6648,7 @@ module Kettle
         "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace).to_s),
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
         "KJ|MIN_DEV_RUBY" => minimum_dev_ruby_token(rubygems[:min_ruby]),
+        "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
       }.merge(
         rubocop_template_tokens(rubygems[:min_ruby])
       ).merge(
@@ -8916,7 +8919,7 @@ module Kettle
       }
     end
 
-    def github_actions_coverage_config(config)
+    def github_actions_coverage_config(config, env = ENV)
       workflows = config["workflows"]
       return {} unless workflows.is_a?(Hash)
 
@@ -8927,9 +8930,16 @@ module Kettle
       raw = {} unless raw.is_a?(Hash)
       {
         enabled: true,
-        command: raw.fetch("command", "rake test").to_s,
+        command: raw.fetch("command", github_actions_exec_cmd(config, env)).to_s,
         appraisal: raw.fetch("appraisal", "coverage").to_s,
       }
+    end
+
+    def github_actions_exec_cmd(config, env)
+      workflows = config["workflows"]
+      workflows = {} unless workflows.is_a?(Hash)
+
+      preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
     end
 
     def expand_framework_gemfile_pattern(pattern, version)
@@ -9220,7 +9230,7 @@ module Kettle
                   bundler-cache: true
 
               - name: Tests
-                run: bundle exec rake
+                run: bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 
@@ -9292,7 +9302,7 @@ module Kettle
                   bundler-cache: true
 
               - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
-                run: bundle exec rake test
+                run: bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 

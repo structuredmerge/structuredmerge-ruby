@@ -40,7 +40,7 @@ jobs:
           # truffleruby-33.0 (targets Ruby 3.3 compatibility)
           - ruby: "truffleruby"
             appraisal: "current"
-            exec_cmd: "rake test"
+            exec_cmd: "{KJ|CI:EXEC_CMD}"
             gemfile: "Appraisal.root"
             rubygems: default
             bundler: default

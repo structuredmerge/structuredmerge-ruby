@@ -79,6 +79,8 @@ obsolete workflow cleanup, Open Collective cleanup, selected template source
 application, and Rakefile scaffold cleanup.
 
 `workflows.preset: framework` generates a Ruby x framework-version CI matrix.
+`workflows.exec_cmd` sets the default command for generated test workflows
+(default: `kettle-test`; ENV override: `KJ_EXEC_CMD`).
 `workflows.coverage` enables coverage workflow generation. Existing custom
 workflows can receive pinned-action snippets without replacing the whole file.
 

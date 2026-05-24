@@ -128,16 +128,19 @@ repository:
 #   For deeper or more complex matrices that are better modeled as Appraisals entries,
 #   prefer kettle-jem-appraisals instead.
 #
-# workflows:
-#   preset: framework
-#   framework_matrix:
-#     dimension: activerecord
-#     versions:
-#       - "7.0"
-#       - "7.1"
-#       - "7.2"
-#       - "8.0"
-#     gemfile_pattern: "ar-{version}.x"
+workflows:
+  # Default command used by generated test workflows.
+  # ENV override: KJ_EXEC_CMD
+  exec_cmd: kettle-test
+  # preset: framework
+  # framework_matrix:
+  #   dimension: activerecord
+  #   versions:
+  #     - "7.0"
+  #     - "7.1"
+  #     - "7.2"
+  #     - "8.0"
+  #   gemfile_pattern: "ar-{version}.x"
 
 # README top logos.
 # Comma-separated list of optional logo entries for the generated README header.

@@ -66,4 +66,4 @@ jobs:
           bundler-cache: true
 
       - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
-        run: bundle exec rake test
+        run: bundle exec {KJ|CI:EXEC_CMD}

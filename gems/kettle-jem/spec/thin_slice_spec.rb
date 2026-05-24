@@ -125,6 +125,50 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "projects configured workflow exec_cmd into GitHub workflow templates" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-exec-cmd-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            exec_cmd: rake spec
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .github/workflows/current.yml
+        YAML
+        "template/.github/workflows/current.yml.example" => <<~YAML,
+          name: Current
+          jobs:
+            test:
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "3.2"
+                      exec_cmd: "{KJ|CI:EXEC_CMD}"
+              steps:
+                - run: bundle exec ${{ matrix.exec_cmd }}
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: { "KJ_EXEC_CMD" => "kettle-test" })
+      workflow_report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/current.yml"
+      end
+
+      expect(workflow_report.fetch(:final_content)).to include('exec_cmd: "kettle-test"')
+    end
+  end
+
   it "fails closed for GitHub YAML template merges when the YAML provider reports a ProcessResult adapter failure" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -5118,7 +5162,7 @@ RSpec.describe Kettle::Jem do
         {
           ruby: "3.2",
           appraisal: "kja-ar-7-1-oa-2-1-r3",
-          exec_cmd: "rake spec",
+          exec_cmd: "kettle-test",
           gemfile: "Appraisal.root",
           rubygems: "latest",
           bundler: "latest",
@@ -5128,7 +5172,7 @@ RSpec.describe Kettle::Jem do
         {
           ruby: "2.7",
           appraisal: "kja-mail-2-8-r2",
-          exec_cmd: "rake spec",
+          exec_cmd: "kettle-test",
           gemfile: "Appraisal.root",
           rubygems: "latest",
           bundler: "latest",
