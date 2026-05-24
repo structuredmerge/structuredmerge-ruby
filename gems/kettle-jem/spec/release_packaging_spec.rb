@@ -28,7 +28,7 @@ RSpec.describe "kettle-jem release packaging" do
     expect(gemspec_source).to include("spec.rdoc_options +=")
     expect(spec.summary).to eq("🔮 Gem templating engine using AST-based merging and configurable token resolution.")
     expect(spec.homepage).to eq("https://github.com/structuredmerge/structuredmerge-ruby")
-    expect(spec.metadata["homepage_uri"]).to eq("https://kettle-jem.galtzo.com/")
+    expect(spec.metadata["homepage_uri"]).to eq("https://structuredmerge.org")
     expect(spec.executables).to eq(["kettle-jem"])
     expect(File.executable?(gem_root.join("exe/kettle-jem"))).to be(true)
     expect(expected_template_files).not_to be_empty

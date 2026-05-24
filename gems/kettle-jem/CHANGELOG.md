@@ -28,6 +28,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Marked generated workflow files as template-owned by default to prevent stale
   YAML keys from surviving future template runs.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.2 or newer.
+- Updated the generated documentation bundle to require `yard-fence` 0.9.0 or newer.
 ### Security
 
 ## [7.0.0] - 2026-05-05
