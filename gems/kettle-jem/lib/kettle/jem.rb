@@ -4075,6 +4075,7 @@ module Kettle
         if file_type == :gemfile
           return finalize_gemfile_template_source(recipe, template_content, destination_content, facts: facts, template_content: template_content)
         end
+        return merge_appraisals_template_policy(template_content, facts: facts) if file_type == :appraisals
         return finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(template_content, facts)) if github_workflow_template_recipe?(recipe)
 
         return template_content
@@ -4770,9 +4771,45 @@ module Kettle
     def merge_appraisals_template_policy(content, facts:)
       package_name = facts.dig(:package, :name).to_s if facts
       min_ruby = minimum_ruby_token(facts.dig(:rubygems, :min_ruby)) if facts
-      pruned = prune_appraisals_below_min_ruby(content, min_ruby)
+      with_framework_appraisals = merge_framework_matrix_appraisals(content, facts)
+      pruned = prune_appraisals_below_min_ruby(with_framework_appraisals, min_ruby)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    def merge_framework_matrix_appraisals(content, facts)
+      entries = facts.to_h.dig(:ci, :framework_matrix, :appraisals).to_a
+      return content if entries.empty?
+
+      generated = entries.to_h do |entry|
+        [entry.fetch(:name).to_s, framework_matrix_appraisal_block(entry)]
+      end
+      parsed = appraisal_blocks(content)
+      emitted = Set.new
+      blocks = parsed.fetch(:order).map do |name|
+        emitted << name
+        generated.fetch(name) { parsed.fetch(:blocks).fetch(name).rstrip }
+      end
+      entries.each do |entry|
+        name = entry.fetch(:name).to_s
+        next if emitted.include?(name)
+
+        blocks << generated.fetch(name)
+      end
+
+      ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks).reject(&:empty?).join("\n\n"))
+    end
+
+    def framework_matrix_appraisal_block(entry)
+      lines = [
+        %(appraise "#{entry.fetch(:name)}" do),
+        %(  ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "#{entry.fetch(:gem)}"),
+      ]
+      entry.fetch(:eval_gemfiles).each do |gemfile|
+        lines << %(  eval_gemfile "#{gemfile}")
+      end
+      lines << "end"
+      lines.join("\n")
     end
 
     def yaml_merge_options(recipe)
@@ -8564,6 +8601,7 @@ module Kettle
       return unless template_root.fetch(:kind) == "packaged"
       return { strategy: :merge, preference: :destination, add_template_only_nodes: true } if target_path.to_s == ".kettle-jem.yml"
       return { strategy: :accept_template } if target_path.to_s == ".github/workflows/license-eye.yml"
+      return { strategy: :accept_template } if target_path.to_s == ".github/workflows/framework-ci.yml"
       return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
 
       nil
@@ -8932,14 +8970,17 @@ module Kettle
       version_entries = versions.filter_map { |version| framework_matrix_version_entry(version) }
       return {} if version_entries.empty?
 
+      appraisal_gemfiles = framework_matrix_appraisal_gemfiles(raw)
       {
         dimension: dimension,
         gem: framework_gem,
         versions: version_entries.map { |entry| entry.fetch(:label) },
         gemfile_pattern: pattern,
         include: version_entries.map do |entry|
-          gemfile = expand_framework_gemfile_pattern(pattern, entry.fetch(:slug))
-          { framework_version: entry.fetch(:label), gemfile: framework_gemfile_path(gemfile) }
+          {
+            framework_version: entry.fetch(:label),
+            appraisal: framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
+          }
         end,
         gemfiles: version_entries.map do |entry|
           gemfile = expand_framework_gemfile_pattern(pattern, entry.fetch(:slug))
@@ -8949,7 +8990,31 @@ module Kettle
             requirement: entry.fetch(:requirement),
           }
         end,
+        appraisals: version_entries.map do |entry|
+          gemfile = framework_gemfile_path(expand_framework_gemfile_pattern(pattern, entry.fetch(:slug)))
+          {
+            name: framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
+            framework_version: entry.fetch(:label),
+            gem: framework_gem,
+            eval_gemfiles: [framework_matrix_appraisal_gemfile_path(gemfile), *appraisal_gemfiles].uniq,
+          }
+        end,
       }
+    end
+
+    def framework_matrix_appraisal_gemfiles(raw)
+      Array(raw["appraisal_gemfiles"] || raw["appraisal_eval_gemfiles"]).filter_map do |path|
+        normalized = framework_matrix_appraisal_gemfile_path(path.to_s.strip)
+        normalized unless normalized.empty?
+      end
+    end
+
+    def framework_matrix_appraisal_gemfile_path(path)
+      path.to_s.sub(%r{\Agemfiles/}, "")
+    end
+
+    def framework_matrix_appraisal_name(dimension, slug)
+      [dimension, slug].join("-").downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-+\z/, "")
     end
 
     def framework_matrix_version_entry(raw)
@@ -9297,7 +9362,7 @@ module Kettle
       include_matrix = framework_matrix.fetch(:include).map do |entry|
         [
           "          - framework_version: \"#{entry.fetch(:framework_version)}\"",
-          "            gemfile: \"#{entry.fetch(:gemfile)}\"",
+          "            appraisal: \"#{entry.fetch(:appraisal)}\"",
         ].join("\n")
       end.join("\n")
       dimension = framework_matrix.fetch(:dimension)
@@ -9332,7 +9397,7 @@ module Kettle
             runs-on: ubuntu-latest
             continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
             env:
-              BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
+              BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
             strategy:
               fail-fast: false
               matrix:
@@ -9355,10 +9420,26 @@ module Kettle
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
                   bundler: "${{ matrix.bundler }}"
-                  bundler-cache: true
+                  bundler-cache: false
+
+              - name: Install Root Appraisal
+                run: bundle
+
+              - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework_version }}"
+                id: bundleAppraisalAttempt1
+                run: bundle exec appraisal ${{ matrix.appraisal }} install
+                continue-on-error: true
+
+              - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework_version }}"
+                id: bundleAppraisalAttempt2
+                if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
+                run: bundle exec appraisal ${{ matrix.appraisal }} install
+
+              - name: Appraisal for ${{ matrix.framework_version }}
+                run: bundle exec appraisal ${{ matrix.appraisal }} bundle
 
               - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
-                run: bundle exec #{ci.fetch(:exec_cmd)}
+                run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 
@@ -9368,14 +9449,11 @@ module Kettle
       end
       raise ArgumentError, "missing framework matrix gemfile config for #{target_path}" unless gemfile
 
-      root_gemfile = Pathname.new("Gemfile").relative_path_from(Pathname.new(File.dirname(target_path.to_s))).to_s
       <<~RUBY
         # frozen_string_literal: true
 
         # Generated by kettle-jem from workflows.framework_matrix.
         ENV["KJ_FRAMEWORK_MATRIX_GEM"] = #{gemfile.fetch(:gem).inspect}
-
-        eval_gemfile #{root_gemfile.inspect}
 
         gem #{gemfile.fetch(:gem).inspect}, #{gemfile.fetch(:requirement).inspect}
       RUBY

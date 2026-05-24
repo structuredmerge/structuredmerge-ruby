@@ -519,6 +519,7 @@ RSpec.describe Kettle::Jem do
           root: packaged
           apply: true
           entries:
+            - Appraisals
             - .github/workflows/framework-ci.yml
       YAML
 
@@ -532,18 +533,27 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("name: Rails CI")
       expect(content).to include('          - "3.2"')
       expect(content).to include('          - framework_version: "7.0"')
-      expect(content).to include('            gemfile: "gemfiles/rails_7_0"')
+      expect(content).to include('            appraisal: "rails-7-0"')
       expect(content).to include('          - framework_version: "7.1+"')
-      expect(content).to include('            gemfile: "gemfiles/rails_7_1"')
+      expect(content).to include('            appraisal: "rails-7-1"')
+      expect(content).to include("Appraisal.root.gemfile")
+      expect(content).to include("bundle exec appraisal ${{ matrix.appraisal }} install")
+      expect(content).to include("bundle exec appraisal ${{ matrix.appraisal }} bundle")
       expect(content).not_to include("framework_version: []")
       expect(content).not_to include("gemfile: []")
 
       gemfile_report = configured_plan.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == "gemfiles/rails_7_1"
       end
-      expect(gemfile_report.fetch(:final_content)).to include('eval_gemfile "../Gemfile"')
-      expect(gemfile_report.fetch(:final_content)).to include('ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"')
+      expect(gemfile_report.fetch(:final_content)).not_to include("eval_gemfile")
       expect(gemfile_report.fetch(:final_content)).to include('gem "rails", ">= 7.1"')
+
+      appraisals_report = configured_plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "Appraisals"
+      end
+      expect(appraisals_report.fetch(:final_content)).to include('appraise "rails-7-1" do')
+      expect(appraisals_report.fetch(:final_content)).to include('ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"')
+      expect(appraisals_report.fetch(:final_content)).to include('eval_gemfile "rails_7_1"')
     end
   end
 

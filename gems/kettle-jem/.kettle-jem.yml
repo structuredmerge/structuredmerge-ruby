@@ -128,6 +128,9 @@ repository:
 #                     Examples:
 #                       "ar-{version}.x"      → gemfiles/ar-7.0.x
 #                       "rails_{version}"      → gemfiles/rails_7_0.gemfile
+#   appraisal_gemfiles — optional extra modular gemfiles to eval after the
+#                        framework version gemfile in generated Appraisals
+#                        entries, e.g. modular/x_std_libs.gemfile.
 #   Use this when you need a simple 2D matrix: Ruby × one framework gem/version axis.
 #   For deeper or more complex matrices that are better modeled as Appraisals entries,
 #   prefer kettle-jem-appraisals instead.
