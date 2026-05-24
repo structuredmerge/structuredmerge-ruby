@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
   YAML keys from surviving future template runs.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.2 or newer.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.0 or newer.
+- Removed `--plugin timekeeper` from generated `.yardopts` because
+  yard-timekeeper is installed through the rake `yard` task hook.
 ### Security
 
 ## [7.0.0] - 2026-05-05
