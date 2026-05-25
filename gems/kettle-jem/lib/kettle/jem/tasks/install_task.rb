@@ -537,6 +537,19 @@ module Kettle
           %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV SMORG_RB_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
+          %w[
+            BUNDLE_BIN_PATH
+            BUNDLE_LOCKFILE
+            BUNDLER_VERSION
+            BUNDLER_SETUP
+            BUNDLE_PATH
+            BUNDLE_WITH
+            BUNDLE_WITHOUT
+            RUBYLIB
+            RUBYOPT
+          ].each do |key|
+            command_env[key] = nil
+          end
           command_env
         end
 

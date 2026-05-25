@@ -5436,16 +5436,24 @@ module Kettle
         field = gemspec_assignment_field(call)
         next unless field
         next if receiver && call.receiver&.slice != receiver.to_s
+        end_line = gemspec_assignment_end_line(call)
 
         {
           field: field,
           value: gemspec_assignment_value(call),
           receiver: call.receiver&.slice,
           start_line: call.location.start_line,
-          end_line: call.location.end_line,
-          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+          end_line: end_line,
+          source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join,
         }
       end
+    end
+
+    def gemspec_assignment_end_line(call)
+      argument = call.arguments&.arguments&.first
+      closing_line = argument.respond_to?(:closing_loc) && argument.closing_loc&.end_line
+      closing_line = nil unless closing_line.is_a?(Integer)
+      [call.location.end_line, closing_line].compact.max
     end
 
     def gemspec_assignment_field(call)
@@ -9100,7 +9108,9 @@ module Kettle
     end
 
     def default_framework_matrix_requirement(version)
-      "~> #{version}"
+      normalized = version.to_s
+      normalized = "#{normalized}.0" if normalized.match?(/\A\d+\.\d+\z/)
+      "~> #{normalized}"
     end
 
     def github_actions_coverage_config(config, env = ENV)
@@ -9435,7 +9445,7 @@ module Kettle
       ci = facts.fetch(:ci)
       framework_matrix = ci.fetch(:framework_matrix)
       ruby_matrix = ci.fetch(:ruby_versions).map { |version| "          - \"#{version}\"" }.join("\n")
-      include_matrix = framework_matrix.fetch(:include).map do |entry|
+      framework_axis = framework_matrix.fetch(:include).map do |entry|
         [
           "          - framework_version: \"#{entry.fetch(:framework_version)}\"",
           "            appraisal: \"#{entry.fetch(:appraisal)}\"",
@@ -9469,7 +9479,7 @@ module Kettle
         jobs:
           test:
             if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-            name: Specs ${{ matrix.ruby }}@${{ matrix.framework_version }}
+            name: Specs ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
             runs-on: ubuntu-latest
             continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
             env:
@@ -9483,8 +9493,8 @@ module Kettle
                   - default
                 bundler:
                   - default
-                include:
-        #{include_matrix}
+              framework:
+        #{framework_axis}
 
             steps:
               - name: Checkout
@@ -9498,18 +9508,18 @@ module Kettle
                   bundler: "${{ matrix.bundler }}"
                   bundler-cache: true
 
-              - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework_version }}"
+              - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
                 id: bundleAppraisalAttempt1
-                run: bundle exec appraisal ${{ matrix.appraisal }} install
+                run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
                 continue-on-error: true
 
-              - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework_version }}"
+              - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
                 id: bundleAppraisalAttempt2
                 if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
-                run: bundle exec appraisal ${{ matrix.appraisal }} install
+                run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
 
-              - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
-                run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
+              - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
+                run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 

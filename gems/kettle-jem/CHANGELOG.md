@@ -76,6 +76,17 @@ Please file a bug if you notice a violation of semantic versioning.
   `GALTZO_FLOSS_DEV` runs match the released documentation plugin set.
 - Updated the generated development dependency on `kettle-test` to require
   2.0.1 or newer.
+- Updated the generated development dependency on `kettle-dev` to require
+  2.0.1 or newer.
+- Generated framework CI now uses an explicit framework matrix axis instead
+  of GitHub Actions `include` expansion.
+- Scrubbed parent Bundler activation variables before the post-template
+  lockfile normalization command runs in the destination project.
+- Preserved multiline heredoc gemspec assignments as whole fields during
+  gemspec template merging.
+- Generated two-segment framework requirements as patch-bounded pessimistic
+  constraints, e.g. `~> 7.0.0`, so framework appraisals do not drift to
+  later minor versions.
 - Removed generated gemspec development dependencies when the destination
   already declares the same gem as a runtime dependency.
 - Preserved zero-byte generated template outputs such as `REEK` instead of

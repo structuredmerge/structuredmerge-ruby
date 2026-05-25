@@ -538,7 +538,8 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('          - framework_version: "7.1+"')
       expect(content).to include('            appraisal: "rails-7-1"')
       expect(content).to include("Appraisal.root.gemfile")
-      expect(content).to include("bundle exec appraisal ${{ matrix.appraisal }} install")
+      expect(content).to include("framework:")
+      expect(content).to include("bundle exec appraisal ${{ matrix.framework.appraisal }} install")
       expect(content).not_to include("framework_version: []")
       expect(content).not_to include("gemfile: []")
 
@@ -547,6 +548,11 @@ RSpec.describe Kettle::Jem do
       end
       expect(gemfile_report.fetch(:final_content)).not_to include("eval_gemfile")
       expect(gemfile_report.fetch(:final_content)).to include('gem "rails", ">= 7.1"')
+
+      default_requirement_report = configured_plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/rails_7_0"
+      end
+      expect(default_requirement_report.fetch(:final_content)).to include('gem "rails", "~> 7.0.0"')
 
       appraisals_report = configured_plan.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == "Appraisals"
@@ -2924,6 +2930,12 @@ RSpec.describe Kettle::Jem do
         "KETTLE_RB_DEV" => "/workspace/kettle-rb",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
         "SMORG_RB_DEV" => "/workspace/smorg-rb",
+        "RUBYOPT" => "-rbundler/setup",
+        "RUBYLIB" => "/workspace/kettle-jem/lib",
+        "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
+        "BUNDLE_LOCKFILE" => "/workspace/kettle-jem/Gemfile.lock",
+        "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
+        "BUNDLER_VERSION" => "4.0.11",
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|
@@ -2952,6 +2964,14 @@ RSpec.describe Kettle::Jem do
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
         "SMORG_RB_DEV" => "false"
+      )
+      expect(lock_command.fetch(:env)).to include(
+        "RUBYOPT" => nil,
+        "RUBYLIB" => nil,
+        "BUNDLE_BIN_PATH" => nil,
+        "BUNDLE_LOCKFILE" => nil,
+        "BUNDLER_SETUP" => nil,
+        "BUNDLER_VERSION" => nil
       )
     end
   end
@@ -5275,6 +5295,69 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include("# Hence.")
       expect(gemspec_content).not_to include("add_development_dependency(\"#{package_name}\"")
       expect(File.read(File.join(root, "#{package_name}.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "preserves multiline heredoc gemspec assignments as whole fields" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-gemspec-heredoc-policy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          # frozen_string_literal: true
+
+          Gem::Specification.new do |gem|
+            gem.name = "example"
+            gem.version = "1.0.0"
+            gem.summary = "Existing summary"
+            gem.description = <<-DESC
+          First line
+          Second line
+            DESC
+            gem.homepage = "https://github.com/acme/example"
+            gem.licenses = ["MIT"]
+            gem.required_ruby_version = ">= 2.3"
+            gem.add_development_dependency("test-unit", ">= 3")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🧪"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: gem.gemspec
+                target: example.gemspec
+        YAML
+        "template/gem.gemspec.example" => <<~RUBY,
+          # frozen_string_literal: true
+
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.description = "Template description"
+            spec.homepage = "https://github.com/acme/{KJ|GEM_NAME}"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 2.3"
+            spec.add_development_dependency("rake", "~> 13.0")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: { accept: true })
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "example.gemspec" }
+      gemspec_content = report.fetch(:final_content)
+
+      expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
+      expect(gemspec_content).to include("spec.description = <<-DESC")
+      expect(gemspec_content).to include("🧪 First line")
+      expect(gemspec_content).to include("Second line")
+      expect(gemspec_content).to include("  DESC")
+      expect(gemspec_content).to include('spec.homepage = "https://github.com/acme/example"')
+      expect(gemspec_content).to include('spec.add_development_dependency("test-unit", ">= 3")')
+      expect(gemspec_content).not_to match(/^spec\./)
     end
   end
 

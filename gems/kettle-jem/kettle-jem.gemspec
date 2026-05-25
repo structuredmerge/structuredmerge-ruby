@@ -113,7 +113,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("ruby-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("toml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 2.0")                            # ruby >= 2.3.0
+  spec.add_dependency("kettle-dev", "~> 2.0", ">= 2.0.1")                 # ruby >= 2.3.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
