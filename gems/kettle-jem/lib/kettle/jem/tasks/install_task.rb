@@ -31,7 +31,6 @@ module Kettle
 
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
           effective_run_options = install_run_options(env, run_options)
-          original_lockfile_platforms = existing_lockfile_platforms(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           install_steps = []
           install_steps << gemspec_dependency_sync_step(report)
@@ -44,7 +43,7 @@ module Kettle
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << normalize_lockfile_step(project_root, env: setup_env, platforms: original_lockfile_platforms)
+          install_steps << normalize_lockfile_step(project_root, env: setup_env)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
@@ -510,73 +509,24 @@ module Kettle
           %w[bundle binstubs] + CURATED_BINSTUB_GEMS
         end
 
-        def normalize_lockfile_step(project_root, env:, platforms: nil)
+        def normalize_lockfile_step(project_root, env:)
           return {
             name: "bundle_lock_normalization",
             status: "skipped",
             reason: "missing Gemfile.lock",
           } unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
 
-          lockfile = File.join(project_root.to_s, "Gemfile.lock")
           {
             name: "bundle_lock_normalization",
-            command: lockfile_normalization_command(lockfile, platforms: platforms),
+            command: lockfile_normalization_command,
             status: "ready",
             env: normal_lockfile_env(env),
-            reason: "reset_lockfile_without_templating_overrides",
+            reason: "bundle_update_without_templating_overrides",
           }
         end
 
-        def lockfile_normalization_command(lockfile, platforms: nil)
-          platforms = Array(platforms)
-          platforms = lockfile_platforms(lockfile) if platforms.empty?
-          removable_platforms = platforms.empty? ? [] : lockfile_platforms(lockfile) - platforms
-          gemfile = File.join(File.dirname(lockfile), "Gemfile")
-          command = ["bundle", "lock", "--gemfile=#{gemfile}", "--lockfile=#{lockfile}"]
-          return command if platforms.empty?
-
-          command.concat(%w[--add-platform] + platforms)
-          command.concat(%w[--remove-platform] + removable_platforms) unless removable_platforms.empty?
-          command
-        end
-
-        def existing_lockfile_platforms(project_root)
-          lockfile = File.join(project_root.to_s, "Gemfile.lock")
-          git_platforms = git_head_lockfile_platforms(project_root)
-          return git_platforms unless git_platforms.empty?
-          return [] unless File.file?(lockfile)
-
-          lockfile_platforms(lockfile)
-        end
-
-        def git_head_lockfile_platforms(project_root)
-          top_level_stdout, _top_level_stderr, top_level_status = Open3.capture3("git", "-C", project_root.to_s, "rev-parse", "--show-toplevel")
-          return [] unless top_level_status.success?
-          return [] unless File.expand_path(top_level_stdout.strip) == File.expand_path(project_root.to_s)
-
-          stdout, _stderr, status = Open3.capture3("git", "-C", project_root.to_s, "show", "HEAD:Gemfile.lock")
-          return [] unless status.success?
-
-          lockfile_platforms_from_content(stdout)
-        end
-
-        def lockfile_platforms(lockfile)
-          lockfile_platforms_from_content(File.read(lockfile))
-        end
-
-        def lockfile_platforms_from_content(content)
-          lines = content.to_s.lines
-          start = lines.index { |line| line.strip == "PLATFORMS" }
-          return [] unless start
-
-          platforms = []
-          lines[(start + 1)..].to_a.each do |line|
-            stripped = line.strip
-            break if stripped.empty?
-
-            platforms << stripped
-          end
-          platforms.uniq.sort
+        def lockfile_normalization_command
+          %w[bundle update]
         end
 
         def normal_lockfile_env(env)

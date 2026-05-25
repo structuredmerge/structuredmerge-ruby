@@ -7,11 +7,10 @@ module Kettle
         module_function
 
         def run(project_root: Dir.pwd, env: ENV, run_options: env_run_options(env), command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command))
-          original_lockfile_platforms = Kettle::Jem::Tasks::InstallTask.existing_lockfile_platforms(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           hook_step = Kettle::Jem::Tasks::InstallTask.hook_templates_step(project_root, run_options)
-          lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env, platforms: original_lockfile_platforms)
+          lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env)
           template_steps = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
             [hook_step, lock_step],
             project_root: project_root,

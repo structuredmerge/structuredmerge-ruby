@@ -2818,20 +2818,11 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: [
-          "bundle",
-          "lock",
-          "--gemfile=#{File.join(root, "Gemfile")}",
-          "--lockfile=#{File.join(root, "Gemfile.lock")}",
-          "--add-platform",
-          "arm64-darwin",
-          "ruby",
-          "x86_64-darwin",
-        ],
+        command: %w[bundle update],
         status: "succeeded",
         reason: "executed"
       ))
-      lock_command = commands.find { |entry| entry.fetch(:command).first(2) == %w[bundle lock] }
+      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
       expect(lock_command).not_to be_nil
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
@@ -2900,20 +2891,11 @@ RSpec.describe Kettle::Jem do
 
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
-        command: [
-          "bundle",
-          "lock",
-          "--gemfile=#{File.join(root, "Gemfile")}",
-          "--lockfile=#{File.join(root, "Gemfile.lock")}",
-          "--add-platform",
-          "arm64-darwin",
-          "ruby",
-          "x86_64-darwin",
-        ],
+        command: %w[bundle update],
         status: "succeeded",
         reason: "executed"
       ))
-      lock_command = commands.find { |entry| entry.fetch(:command).first(2) == %w[bundle lock] }
+      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
       expect(lock_command).not_to be_nil
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),

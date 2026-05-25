@@ -48,6 +48,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Excluded already-declared gemspec dependencies from generated local
   `eval_nomono_gems` calls so local modular gemfiles do not conflict with
   development dependencies declared by the project gemspec.
+- Changed post-template lockfile normalization to run `bundle update` with
+  templating and local sibling overrides disabled, so dependency template
+  updates are fully re-resolved against released gems.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.3 or newer.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
 - Removed `--plugin timekeeper` from generated `.yardopts` because
