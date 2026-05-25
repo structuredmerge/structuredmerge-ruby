@@ -69,6 +69,76 @@ RSpec.describe Smorg::RB do
     expect(merged).to include('"other":true')
   end
 
+  it "routes Markdown paths through the Markdown merge backend" do
+    ancestor = write_file(@dir, "ancestor.md", "# Project\n\n## Usage\n\nBase usage.\n")
+    current = write_file(
+      @dir,
+      "current.md",
+      "# Project\n\n## Usage\n\nBase usage.\n\n## Local\n\nKeep local notes.\n",
+    )
+    other = write_file(
+      @dir,
+      "other.md",
+      "# Project\n\n## Usage\n\nBase usage.\n\n## Remote\n\nInclude remote notes.\n",
+    )
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    expect(Plain::Merge).not_to receive(:merge_text)
+    exit_code = described_class.run(["merge-driver", ancestor, current, other, "README.md"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    merged = File.read(current)
+    expect(merged).to include("## Local\n\nKeep local notes.")
+    expect(merged).to include("## Remote\n\nInclude remote notes.")
+  end
+
+  it "keeps current Markdown when theirs is already present in the matching section" do
+    ancestor = write_file(
+      @dir,
+      "ancestor.md",
+      "# Project\n\n## Links\n\nRead http://example.com/posts/old-page/ for details.\n",
+    )
+    current_source = [
+      "# Project",
+      "",
+      "## Links",
+      "",
+      "Read",
+      "https://example.com/docs/new-page/",
+      "for details.",
+      "",
+      "## Local",
+      "",
+      "Keep local notes.",
+      "",
+    ].join("\n")
+    current = write_file(@dir, "current.md", current_source)
+    other = write_file(
+      @dir,
+      "other.md",
+      "# Project\n\n## Links\n\nRead https://example.com/docs/new-page/ for details.\n",
+    )
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(["merge-driver", ancestor, current, other, "README.md"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(File.read(current)).to eq(current_source)
+  end
+
+  it "advertises Markdown paths in generated gitattributes" do
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(["languages", "--gitattributes"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(stdout.string).to include("*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown")
+    expect(stdout.string).to include("*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown")
+  end
+
   it "returns conflict exit code for strict merge failures" do
     ancestor = write_file(@dir, "ancestor.json", '{"name":"structuredmerge"}')
     current = write_file(@dir, "current.json", '{"name":')
