@@ -5047,6 +5047,7 @@ module Kettle
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
+      merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
     end
@@ -5291,6 +5292,26 @@ module Kettle
 
     def gemspec_dependency_sort_key(name)
       name.to_s.tr("_", "-")
+    end
+
+    def remove_gemspec_development_dependencies_already_runtime(content, receiver:)
+      records = gemspec_dependency_records(content, receiver: receiver)
+      runtime_names = records.each_with_object(Set.new) do |record, names|
+        next if record.fetch(:kind) == "add_development_dependency"
+
+        names << record.fetch(:name)
+      end
+      return content if runtime_names.empty?
+
+      duplicate_development_records = records.select do |record|
+        record.fetch(:kind) == "add_development_dependency" && runtime_names.include?(record.fetch(:name))
+      end
+      return content if duplicate_development_records.empty?
+
+      records_by_line = duplicate_development_records.to_h do |record|
+        [record.fetch(:start_line), record.merge(replacement: "")]
+      end
+      replace_record_ranges(content, records_by_line)
     end
 
     def append_missing_gemspec_dependency_lines(content, destination_dependencies, receiver:)
@@ -9839,6 +9860,8 @@ module Kettle
     end
 
     def ensure_trailing_newline(text)
+      return "" if text.to_s.empty?
+
       text.end_with?("\n") ? text : "#{text}\n"
     end
 

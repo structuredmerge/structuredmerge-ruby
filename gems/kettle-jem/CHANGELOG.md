@@ -76,6 +76,12 @@ Please file a bug if you notice a violation of semantic versioning.
   `GALTZO_FLOSS_DEV` runs match the released documentation plugin set.
 - Updated the generated development dependency on `kettle-test` to require
   2.0.1 or newer.
+- Removed generated gemspec development dependencies when the destination
+  already declares the same gem as a runtime dependency.
+- Preserved zero-byte generated template outputs such as `REEK` instead of
+  normalizing them to a single blank line.
+- Restored generated Appraisal recording gemfiles so appraisal-isolated test
+  bundles include VCR/WebMock without loading the root development Gemfile.
 ### Security
 
 ## [7.0.0] - 2026-05-05

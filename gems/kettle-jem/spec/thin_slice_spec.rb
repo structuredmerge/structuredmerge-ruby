@@ -4962,6 +4962,90 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "does not duplicate runtime gemspec dependencies as development dependencies" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-gemspec-runtime-dev-dedup-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "example"
+            gem.summary = "Real summary"
+            gem.required_ruby_version = ">= 2.4"
+            gem.add_dependency("kettle-test", "~> 2.0", ">= 2.0.1")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "TODO: Write a short summary"
+            spec.required_ruby_version = ">= 2.4"
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")
+
+            # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+            #       visibility and discoverability.
+
+            spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.1")
+            spec.add_development_dependency("rake", "~> 13.0")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content.scan(/add_dependency\("kettle-test"/).size).to eq(1)
+      expect(gemspec_content).not_to include(%(add_development_dependency("kettle-test")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.0")))
+      expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "preserves zero-byte template outputs" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-zero-byte-template-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - REEK
+        YAML
+        "template/REEK" => "",
+        "REEK" => "",
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      reek_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:relative_path) == "REEK"
+      end
+
+      expect(reek_report.fetch(:final_content)).to eq("")
+      expect(File.binread(File.join(root, "REEK"))).to eq("")
+    end
+  end
+
   it "sorts runtime gemspec dependencies with RuboCop-compatible gem name ordering" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
