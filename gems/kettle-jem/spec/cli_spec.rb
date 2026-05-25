@@ -244,7 +244,31 @@ RSpec.describe Kettle::Jem::CLI do
     end
   end
 
-  it "routes template through the template task orchestration" do
+  it "aliases bare template to the full install task" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run).and_return(
+        mode: "install",
+        installed: true,
+        changed_files: [],
+        install_steps: []
+      )
+      allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run)
+
+      status, out, err = run_cli(["template", root, "--skip-commit"], env: {"K_JEM_TEMPLATING" => "true"})
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      expect(out).to include("install: 0 changed files")
+      expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: include(skip_commit: true)
+      )
+      expect(Kettle::Jem::Tasks::TemplateTask).not_to have_received(:run)
+    end
+  end
+
+  it "routes scoped template through the template task orchestration" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run).and_return(
         mode: "apply",
@@ -255,8 +279,9 @@ RSpec.describe Kettle::Jem::CLI do
           reason: "executed",
         }]
       )
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run)
 
-      status, out, err = run_cli(["template", root, "--skip-commit"], env: {"K_JEM_TEMPLATING" => "true"})
+      status, out, err = run_cli(["template", root, "--skip-commit", "--only", "README.md"], env: {"K_JEM_TEMPLATING" => "true"})
 
       expect(status).to eq(0)
       expect(err).to eq("")
@@ -264,8 +289,9 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::TemplateTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true)
+        run_options: include(skip_commit: true, only: ["README.md"])
       )
+      expect(Kettle::Jem::Tasks::InstallTask).not_to have_received(:run)
     end
   end
 

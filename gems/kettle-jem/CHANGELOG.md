@@ -19,8 +19,10 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [Unreleased]
 ### Added
 ### Changed
-- Documented `kettle-jem template` as the canonical templating entrypoint and
-  marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
+- Documented `kettle-jem install` as the canonical full templating entrypoint
+  and marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
+- Bare `kettle-jem template` now aliases to the full install path; use
+  `kettle-jem template --only PATH` or `--include PATH` for scoped file updates.
 - `kettle-jem` project fact discovery now uses `Kettle::Jem::GemSpecReader`
   and RubyGems specification objects instead of parsing gemspec source.
 ### Deprecated
@@ -38,7 +40,7 @@ Please file a bug if you notice a violation of semantic versioning.
   under `strategy.matrix`.
 - Removed duplicate generated `spec.homepage` assignments when destination
   gemspecs already carry the configured homepage.
-- `kettle-jem template --hook-templates l` now activates the generated
+- `kettle-jem install --hook-templates l` now activates the generated
   project-local `.git-hooks` by setting `core.hooksPath` to `.git-hooks` and
   ensuring the generated hook scripts are executable.
 - Removed stale `continue-on-error` handling from the generated style workflow

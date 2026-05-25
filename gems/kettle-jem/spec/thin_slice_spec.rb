@@ -1055,7 +1055,7 @@ RSpec.describe Kettle::Jem do
       plan = described_class.plan_readme_style(root, env: {})
       expect(plan.fetch(:final_content)).to include("Kettle template tool")
       expect(plan.fetch(:final_content)).to include("Configuration shape")
-      expect(plan.fetch(:final_content)).to include("bundle exec kettle-jem template")
+      expect(plan.fetch(:final_content)).to include("bundle exec kettle-jem install")
       expect(plan.dig(:readme_style, :section_partials, "configuration", :source_root)).to eq("packaged")
     end
   end

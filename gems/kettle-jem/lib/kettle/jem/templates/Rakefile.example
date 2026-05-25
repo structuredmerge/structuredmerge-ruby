@@ -33,7 +33,7 @@
 # rake install:local                          # Build and install {KJ|GEM_NAME}-1.0.0.gem in...
 # rake kettle:jem:install                     # Internal target used by `kettle-jem install`
 # rake kettle:jem:selftest                    # Self-test: template {KJ|GEM_NAME} against itse...
-# rake kettle:jem:template                    # Internal target used by `kettle-jem template`
+# rake kettle:jem:template                    # Internal target used by scoped `kettle-jem template --only`
 # rake reek                                   # Check for code smells
 # rake reek:update                            # Run reek and store the output into the RE...
 # rake release[remote]                        # Create tag v1.0.0 and build and push kett...
@@ -71,9 +71,10 @@ rescue LoadError
 end
 
 ### TEMPLATING TASKS
-# These tasks are installed for the `kettle-jem` executable. Run templating
-# through `kettle-jem template` or `kettle-jem install`; the executable prepares
-# the environment and then delegates here when rake orchestration is needed.
+# These tasks are installed for the `kettle-jem` executable. Run full templating
+# through `kettle-jem install`; use `kettle-jem template --only PATH` only for
+# scoped file updates. The executable prepares the environment and then
+# delegates here when rake orchestration is needed.
 begin
   require "kettle/jem"
   Kettle::Jem.install_tasks

@@ -1,14 +1,16 @@
 ```console
 kettle-jem
-K_JEM_TEMPLATING=true bundle exec kettle-jem template
+K_JEM_TEMPLATING=true bundle exec kettle-jem install
 K_JEM_TEMPLATING=true bundle exec kettle-jem selftest
 ```
 
 `kettle-jem` setup creates or updates `.kettle-jem.yml`, installs template
-support, and runs the template workflow. `kettle-jem template` reapplies
-template updates. `kettle-jem selftest` checks template drift in a temporary
-workspace. The `kettle:jem:*` rake tasks are internal targets used by the
-executable after it prepares the templating environment.
+support, and runs the template workflow. `kettle-jem install` reapplies full
+template updates and regenerates local finishing artifacts such as binstubs.
+Use `kettle-jem template --only PATH` for scoped file updates. `kettle-jem
+selftest` checks template drift in a temporary workspace. The `kettle:jem:*`
+rake tasks are internal targets used by the executable after it prepares the
+templating environment.
 
 Useful runtime controls:
 

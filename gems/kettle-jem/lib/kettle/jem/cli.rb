@@ -152,7 +152,12 @@ module Kettle
         when "apply"
           Kettle::Jem.apply_project(project_root, env: env, run_options: options.fetch(:run_options))
         when "template"
-          Kettle::Jem::Tasks::TemplateTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
+          run_options = options.fetch(:run_options)
+          if scoped_template_run?(run_options)
+            Kettle::Jem::Tasks::TemplateTask.run(project_root: project_root, env: env, run_options: run_options)
+          else
+            Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: run_options)
+          end
         when "install"
           Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
         when "manifest"
@@ -168,6 +173,11 @@ module Kettle
         else
           raise ArgumentError, "Unsupported kettle-jem command #{command.inspect}"
         end
+      end
+
+      def scoped_template_run?(run_options)
+        run_options = run_options.to_h
+        run_options.key?(:only) || run_options.key?(:include)
       end
 
       def print_result(command, result, options:, out:)

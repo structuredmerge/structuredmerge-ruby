@@ -48,7 +48,7 @@ to build `kettle-jem` extension gems against the supported plugin seam.
 - **Per-file strategies** — `merge`, `accept_template`, `keep_destination`, or `raw_copy`
 - **Multi-phase pipeline** — 11 ordered phases (service_actor-based) from config sync through duplicate checking
 - **SHA-pinned GitHub Actions** — template `uses:` always wins, propagating immutable SHAs
-- **Convergence in one pass** — a single `kettle-jem template` applies all changes; a second run produces zero diff
+- **Convergence in one pass** — a single `kettle-jem install` applies all changes; a second run produces zero diff
 - **Selftest divergence check** — CI verifies that project drift stays within a configurable threshold
 
 ## 💡 Info you can shake a stick at
@@ -325,17 +325,18 @@ kettle-jem
 The setup CLI runs a two-phase bootstrap:
 
 1. **Bootstrap** — creates `.kettle-jem.yml`, installs modular gemfiles, ensures dev dependencies
-2. **Bundled** — loads the full runtime and runs `kettle-jem template`
+2. **Bundled** — loads the full runtime and runs `kettle-jem install`
 
 ### Applying Template Updates
 
 After initial setup, re-run the template process to pull in updates:
 
 ```bash
-K_JEM_TEMPLATING=true bundle exec kettle-jem template
+K_JEM_TEMPLATING=true bundle exec kettle-jem install
 ```
 
-This applies all 11 phases:
+This applies all template phases, then runs the local finishing steps such as
+`bin/setup`, curated binstub generation, hooks, and lockfile normalization.
 
 | Phase | Description                          | Files Affected                        |
 |-------|--------------------------------------|---------------------------------------|
@@ -469,19 +470,20 @@ fill missing keys during config sync, and act as runtime overrides.
 
 ```bash
 # Standard template update (quiet, non-interactive — the default)
-K_JEM_TEMPLATING=true bundle exec kettle-jem template
+K_JEM_TEMPLATING=true bundle exec kettle-jem install
 
 # Verbose output
-K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem template
+K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem install
 
 # Interactive mode (prompts before each change)
-K_JEM_TEMPLATING=true bundle exec kettle-jem template --interactive
+K_JEM_TEMPLATING=true bundle exec kettle-jem install --interactive
 
-# Only workflow files, skip unparseable
+# Only workflow files, skip unparseable. Scoped template runs skip install
+# finishing steps and are intended for surgical file updates.
 K_JEM_TEMPLATING=true PARSE_ERROR_MODE=skip bundle exec kettle-jem template --only=".github/**"
 
 # Rescue on merge failure (don't halt)
-K_JEM_TEMPLATING=true FAILURE_MODE=rescue bundle exec kettle-jem template
+K_JEM_TEMPLATING=true FAILURE_MODE=rescue bundle exec kettle-jem install
 ```
 
 The `kettle:jem:*` rake tasks are internal targets used by the executable after
