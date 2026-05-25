@@ -5,7 +5,7 @@
 
 require "nomono/bundler" unless defined?(Nomono)
 
-local_gems = %w[yard-fence yard-timekeeper]
+local_gems = %w[yard-fence yard-timekeeper yard-yaml]
 
 # export GALTZO_FLOSS_DEV=/path/to/galtzo-floss
 eval_nomono_gems(
