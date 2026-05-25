@@ -74,6 +74,8 @@ Please file a bug if you notice a violation of semantic versioning.
   version-derived gemspec metadata such as `source_code_uri` does not stay stale.
 - Added `yard-yaml` to generated local documentation Gemfiles so local
   `GALTZO_FLOSS_DEV` runs match the released documentation plugin set.
+- Updated the generated development dependency on `kettle-test` to require
+  2.0.1 or newer.
 ### Security
 
 ## [7.0.0] - 2026-05-05
