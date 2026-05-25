@@ -2892,6 +2892,36 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "can skip install lockfile normalization from ENV" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-skip-lock-normalization", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "Gemfile.lock" => "GEM\n  remote: https://gem.coop/\n  specs:\n",
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"KETTLE_JEM_SKIP_LOCK_NORMALIZATION" => "true"},
+        run_options: {only: "example.gemspec", skip_commit: true},
+        command_runner: lambda { |_command, chdir:, env:, quiet:| {success: true, exitstatus: 0, stdout: "", stderr: ""} }
+      )
+
+      expect(install.fetch(:install_steps)).to include(
+        name: "bundle_lock_normalization",
+        status: "skipped",
+        reason: "skip_lock_normalization"
+      )
+    end
+  end
+
   it "normalizes lockfiles from the template task without templating env overrides" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

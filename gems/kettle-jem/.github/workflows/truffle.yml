@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
     env: # $BUNDLE_GEMFILE must be set at job level, so it is set for all steps
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
     strategy:
       matrix:
         include:
@@ -40,8 +40,7 @@ jobs:
           # truffleruby-33.0 (targets Ruby 3.3 compatibility)
           - ruby: "truffleruby"
             appraisal: "current"
-            exec_cmd: "rake test"
-            gemfile: "Appraisal.root"
+            exec_cmd: "kettle-test"
             rubygems: default
             bundler: default
 
@@ -49,6 +48,8 @@ jobs:
       - name: Checkout
         if: ${{ !env.ACT }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT }}

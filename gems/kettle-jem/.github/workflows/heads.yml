@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
     env: # $BUNDLE_GEMFILE must be set at job level, so it is set for all steps
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
     strategy:
       fail-fast: true
       matrix:
@@ -41,24 +41,21 @@ jobs:
           # ruby-head
           - ruby: "ruby-head"
             appraisal: "head"
-            exec_cmd: "rake test"
-            gemfile: "Appraisal.root"
+            exec_cmd: "kettle-test"
             rubygems: default
             bundler: default
 
           # truffleruby-head
           - ruby: "truffleruby-head"
             appraisal: "head"
-            exec_cmd: "rake test"
-            gemfile: "Appraisal.root"
+            exec_cmd: "kettle-test"
             rubygems: default
             bundler: default
 
           # jruby-head
           - ruby: "jruby-head"
             appraisal: "head"
-            exec_cmd: "rake test"
-            gemfile: "Appraisal.root"
+            exec_cmd: "kettle-test"
             rubygems: default
             bundler: default
 
@@ -66,6 +63,8 @@ jobs:
       - name: Checkout
         if: ${{ !env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) }}
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Ruby & RubyGems
         if: ${{ !env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) }}

@@ -10,7 +10,7 @@ module Kettle
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           hook_step = Kettle::Jem::Tasks::InstallTask.hook_templates_step(project_root, run_options)
-          lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env)
+          lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env, run_options: run_options)
           template_steps = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
             [hook_step, lock_step],
             project_root: project_root,
@@ -32,6 +32,7 @@ module Kettle
             only: env["only"],
             include: env["include"],
             skip_commit: truthy?(env["KETTLE_JEM_SKIP_COMMIT"]),
+            skip_lock_normalization: truthy?(env["KETTLE_JEM_SKIP_LOCK_NORMALIZATION"]),
             accept_config: truthy?(env["KETTLE_JEM_ACCEPT_CONFIG"]),
             bootstrap_mode: truthy?(env["KETTLE_JEM_BOOTSTRAP_MODE"]),
             quiet: truthy?(env["KETTLE_JEM_QUIET"]),

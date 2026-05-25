@@ -17,19 +17,29 @@ Please file a bug if you notice a violation of semantic versioning.
 [📗keep-changelog-img]: https://img.shields.io/badge/keep--a--changelog-1.0.0-FFDD67.svg?style=flat
 
 ## [Unreleased]
+
 ### Added
+
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA
   README badges.
+
 ### Changed
+
 - Documented `kettle-jem install` as the canonical full templating entrypoint
   and marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
 - Bare `kettle-jem template` now aliases to the full install path; use
   `kettle-jem template --only PATH` or `--include PATH` for scoped file updates.
 - `kettle-jem` project fact discovery now uses `Kettle::Jem::GemSpecReader`
   and RubyGems specification objects instead of parsing gemspec source.
+
 ### Deprecated
+
 ### Removed
+
 ### Fixed
+
+- Added `KETTLE_JEM_SKIP_LOCK_NORMALIZATION` for self-templating unreleased
+  gems whose dependencies cannot yet resolve from remote sources.
 - Added a native `Kettle::Jem::GemSpecReader` for gemspec metadata so tooling
   built on `kettle-jem` no longer needs to call into `kettle-dev` for project
   Ruby floors and gemspec facts.
@@ -109,6 +119,7 @@ Please file a bug if you notice a violation of semantic versioning.
   normalizing them to a single blank line.
 - Added `workflows.recording` to `.kettle-jem.yml` so generated Appraisals only
   include VCR/WebMock recording gemfiles for projects that opt in.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05

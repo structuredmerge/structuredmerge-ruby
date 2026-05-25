@@ -12,10 +12,10 @@
 gem "reek", "~> 6.5"
 
 platform :mri do
+  gem "rubocop-on-rbs", "~> 2.0"                    # ruby >= 3.2.0
   # gem "rubocop", "~> 1.73", ">= 1.73.2" # constrained by standard
   gem "rubocop-packaging", "~> 0.6", ">= 0.6.0"
   gem "standard", ">= 1.50"
-  gem "rubocop-on-rbs", "~> 1.8"                    # ruby >= 3.1.0
 
   if ENV.fetch("RUBOCOP_LTS_LOCAL", "false").casecmp("false").zero?
     gem "rubocop-lts", "~> 24.0"

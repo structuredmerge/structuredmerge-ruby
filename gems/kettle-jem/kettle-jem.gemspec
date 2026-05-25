@@ -58,6 +58,8 @@ Gem::Specification.new do |spec|
   spec.files = [
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
+    # Executables and executable support scripts
+    *enumerate_package_files.call("exe"),
     # Public certs for gem signing
     *enumerate_package_files.call("certs"),
     # Signatures
@@ -72,7 +74,7 @@ Gem::Specification.new do |spec|
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "FUNDING.md",
-    "LICENSE.txt",
+    "LICENSE.md",
     "README.md",
     "RUBOCOP.md",
     "SECURITY.md",
@@ -94,16 +96,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Utilities
-  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")              # ruby >= 2.2.0
-  spec.add_dependency("token-resolver", "~> 1.0", ">= 1.0.2")            # ruby >= 3.2.0
   spec.add_dependency("ast-crispr-markdown-markly", "= #{spec.version}")  # ruby >= 4.0.0
   spec.add_dependency("ast-crispr-ruby-prism", "= #{spec.version}")        # ruby >= 4.0.0
   spec.add_dependency("ast-merge", "= #{spec.version}")                  # ruby >= 4.0.0
   spec.add_dependency("bash-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("commonmarker-merge", "= #{spec.version}")         # ruby >= 4.0.0
   spec.add_dependency("dotenv-merge", "= #{spec.version}")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("kettle-dev", "~> 2.0", ">= 2.0.1")                 # ruby >= 2.3.0
   spec.add_dependency("kramdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markly-merge", "= #{spec.version}")               # ruby >= 4.0.0
@@ -111,9 +111,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency("psych-merge", "= #{spec.version}")                # ruby >= 4.0.0
   spec.add_dependency("rbs-merge", "= #{spec.version}")                  # ruby >= 4.0.0
   spec.add_dependency("ruby-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("token-resolver", "~> 1.0", ">= 1.0.2")            # ruby >= 3.2.0
   spec.add_dependency("toml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")              # ruby >= 2.2.0
   spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 2.0", ">= 2.0.1")                 # ruby >= 2.3.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
@@ -127,6 +129,8 @@ Gem::Specification.new do |spec|
   #
   #       Development dependencies that require strictly newer Ruby versions should be in a "gemfile",
   #       and preferably a modular one (see gemfiles/modular/*.gemfile).
+
+  # Dev, Test, & Release Tasks
 
   # Security
   spec.add_development_dependency("bundler-audit", "~> 0.9.3")                      # ruby >= 2.0.0

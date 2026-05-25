@@ -50,6 +50,22 @@ There are many Rake tasks available as well. You can see them by running:
 bin/rake -T
 ```
 
+## Code quality checks
+
+Run the Reek task when you want a smell check that fails on current findings:
+
+```shell
+bin/rake reek
+```
+
+Refresh the checked-in `REEK` backlog through the rake task, not by redirecting
+the raw `reek` executable output. The rake task uses the project bundle and
+avoids stale generated binstubs shadowing the Reek gem executable:
+
+```shell
+bin/rake reek:update
+```
+
 ## Environment Variables for Local Development
 
 Below are the primary environment variables recognized by stone_checksums (and its integrated tools). Unless otherwise noted, set boolean values to the string "true" to enable.

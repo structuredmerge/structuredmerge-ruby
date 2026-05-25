@@ -2,7 +2,7 @@
 
 # We run code coverage on the latest version of Ruby only.
 
-# Set KETTLE_RB_DEV=/path/to/kettle-rb for local development with path-based dependencies.
+# Set KETTLE_RB_DEV=true for local development with path-based dependencies.
 # When false (default / CI), remote released gems are used.
 if ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
   # Coverage (remote/released)

@@ -120,31 +120,32 @@ repository:
 # framework_matrix (only used when preset: framework):
 #   dimension   — framework name used in the matrix key and display
 #                 (e.g. activerecord, rails, actionmailer)
-#   versions    — ordered list of versions to test against
+#   gem         — gem name to write into generated framework gemfiles.
+#                 Defaults to dimension when absent.
+#   versions    — ordered list of versions to test against. Entries may be
+#                 strings, or mappings with:
+#                   label       - display value used in CI
+#                   slug        - path-safe value used in gemfile_pattern
+#                   requirement - Bundler requirement written to the gemfile
 #   gemfile_pattern — pattern for gemfile paths; {version} is replaced
-#                     with each version string (dots replaced by underscores
+#                     with each version slug (dots replaced by underscores
 #                     when the pattern contains an underscore placeholder).
-#                     Resolved relative to gemfiles/ directory.
+#                     Resolved relative to gemfiles/ unless it already contains
+#                     a directory.
 #                     Examples:
 #                       "ar-{version}.x"      → gemfiles/ar-7.0.x
 #                       "rails_{version}"      → gemfiles/rails_7_0.gemfile
-#   appraisal_gemfiles — optional extra modular gemfiles to eval after the
-#                        framework version gemfile in generated Appraisals
-#                        entries, e.g. modular/x_std_libs.gemfile.
 #   Use this when you need a simple 2D matrix: Ruby × one framework gem/version axis.
 #   For deeper or more complex matrices that are better modeled as Appraisals entries,
 #   prefer kettle-jem-appraisals instead.
 #
-# workflows:
-#   preset: framework
-#   framework_matrix:
-#     dimension: activerecord
-#     versions:
-#       - "7.0"
-#       - "7.1"
-#       - "7.2"
-#       - "8.0"
-#     gemfile_pattern: "ar-{version}.x"
+workflows:
+  # Default command used by generated test workflows.
+  # ENV override: KJ_EXEC_CMD
+  exec_cmd: kettle-test
+  # Include VCR/WebMock recording modular gemfiles in generated Appraisals.
+  # Enable only for projects that actually require recording support.
+  recording: false
 
 # README top logos.
 # Comma-separated list of optional logo entries for the generated README header.
@@ -156,6 +157,10 @@ repository:
 #   org_and_project => related-org,ruby,org,project
 readme:
   top_logos: related-org,ruby,org,project
+  # Optional package-family README block.
+  # Supported values: structuredmerge
+  # Leave unset for standalone kettle-rb gems and most projects.
+  package_family: structuredmerge
   # Sections to preserve from the destination README during template merging.
   # These section headings (case-insensitive) will keep the destination body
   # instead of being overwritten by the template. Default when absent:
@@ -187,6 +192,16 @@ readme:
   # section_aliases:
   #   howto: basic usage
   #   options: configuration
+  # README badges managed by the template.
+  badges:
+    # FOSSA license/security status badge.
+    # false - omit the badge (default)
+    # true  - derive project id from the GitHub repository slug
+    # string or mapping project/project_id/slug - explicit FOSSA project id
+    #
+    # Example:
+    # fossa: git+github.com/pboling/example
+    fossa: false
 
 # SPDX license identifiers for this project.
 # List one or more licenses that apply to the gem. Users may use the software
@@ -210,6 +225,20 @@ readme:
 licenses:
   - AGPL-3.0-only
   - PolyForm-Small-Business-1.0.0
+# Apache SkyWalking Eyes dependency license overrides.
+# Use these when license-eye cannot identify a dependency license from the
+# package metadata or gem contents. Entries render under
+# dependency.licenses in .licenserc.yaml.
+#
+# Supported fields:
+#   name    - dependency name exactly as reported by license-eye
+#   license - SPDX license identifier to assign
+#   version - optional dependency version for a narrower override
+license_eye:
+  dependency_licenses:
+    - name: simplecov-rcov
+      version: 0.3.7
+      license: MIT
 # Machine / automation accounts to exclude from generated copyright output.
 #
 # When kettle-jem collects copyright information via `git blame`, it filters

@@ -45,7 +45,7 @@ module Kettle
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << normalize_lockfile_step(project_root, env: setup_env)
+          install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
@@ -511,7 +511,15 @@ module Kettle
           %w[bundle binstubs] + CURATED_BINSTUB_GEMS
         end
 
-        def normalize_lockfile_step(project_root, env:)
+        def normalize_lockfile_step(project_root, env:, run_options: {})
+          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
+            return {
+              name: "bundle_lock_normalization",
+              status: "skipped",
+              reason: "skip_lock_normalization",
+            }
+          end
+
           return {
             name: "bundle_lock_normalization",
             status: "skipped",

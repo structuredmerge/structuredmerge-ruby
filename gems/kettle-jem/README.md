@@ -549,7 +549,7 @@ For most applications, prefer the [Pessimistic Version Constraint][📌pvc] with
 For example:
 
 ```ruby
-spec.add_dependency("kettle-jem", "~> 0.0")
+spec.add_dependency("kettle-jem", "~> 7.0")
 ```
 
 <details markdown="1">
@@ -736,6 +736,7 @@ Thanks for RTFM. ☺️
 [📄license-img]: https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg
 [📄license-compat]: https://www.apache.org/legal/resolved.html#category-x
 [📄license-compat-img]: https://img.shields.io/badge/Apache_Incompatible:_Category_X-✗-C0392B.svg?style=flat&logo=Apache
+
 [📄ilo-declaration]: https://www.ilo.org/declaration/lang--en/index.htm
 [📄ilo-declaration-img]: https://img.shields.io/badge/ILO_Fundamental_Principles-✓-259D6C.svg?style=flat
 [🚎yard-current]: http://rubydoc.info/gems/kettle-jem
@@ -754,7 +755,7 @@ Thanks for RTFM. ☺️
 | Package | kettle-jem |
 | Description | 🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold. |
 | Homepage | https://github.com/structuredmerge/structuredmerge-ruby |
-| Source | https://github.com/structuredmerge/structuredmerge-ruby |
+| Source | https://github.com/structuredmerge/structuredmerge-ruby/tree/v7.0.0 |
 | License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |
 | Funding | https://github.com/sponsors/pboling, https://issuehunt.io/u/pboling, https://ko-fi.com/pboling, https://liberapay.com/pboling/donate, https://patreon.com/galtzo, https://polar.sh/pboling, https://thanks.dev/u/gh/pboling, https://tidelift.com/funding/github/rubygems/kettle-jem, https://www.buymeacoffee.com/pboling |
 <!-- kettle-jem:metadata:end -->
