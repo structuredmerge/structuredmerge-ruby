@@ -1,4 +1,35 @@
 PATH
+  remote: /home/pboling/src/kettle-rb/galtzo-floss/turbo_tests2
+  specs:
+    turbo_tests2 (3.0.0)
+      parallel_tests (>= 3.3.0, < 6)
+      rspec (>= 3.10)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /home/pboling/src/kettle-rb/kettle-rb/kettle-dev
+  specs:
+    kettle-dev (2.0.1)
+      kettle-test (~> 2.0, >= 2.0.1)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /home/pboling/src/kettle-rb/kettle-rb/kettle-test
+  specs:
+    kettle-test (2.0.1)
+      appraisal2 (~> 3.0, >= 3.0.2)
+      backports (~> 3.0)
+      rspec (~> 3.0)
+      rspec-block_is_expected (~> 1.0, >= 1.0.6)
+      rspec-pending_for (~> 0.1, >= 0.1.19)
+      rspec-stubbed_env (~> 1.0, >= 1.0.4)
+      rspec_junit_formatter (~> 0.6)
+      silent_stream (~> 1.0, >= 1.0.12)
+      timecop-rspec (~> 1.0, >= 1.0.3)
+      turbo_tests2 (~> 3.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
   remote: gems/ast-crispr-markdown-markly
   specs:
     ast-crispr-markdown-markly (7.0.0)
@@ -110,6 +141,7 @@ PATH
       commonmarker-merge (= 7.0.0)
       dotenv-merge (= 7.0.0)
       json-merge (= 7.0.0)
+      kettle-dev (~> 2.0, >= 2.0.1)
       kramdown-merge (= 7.0.0)
       markdown-merge (= 7.0.0)
       markly-merge (= 7.0.0)
@@ -213,6 +245,7 @@ PATH
       ast-merge-git (= 7.0.0)
       go-merge (= 7.0.0)
       json-merge (= 7.0.0)
+      markly-merge (= 7.0.0)
       plain-merge (= 7.0.0)
       version_gem (~> 1.1, >= 1.1.9)
 
@@ -274,22 +307,13 @@ GEM
     diff-lcs (1.6.2)
     gitmoji-regex (1.0.3)
       version_gem (~> 1.1, >= 1.1.8)
-    kettle-dev (2.0.0)
-    kettle-test (1.0.10)
-      appraisal2 (~> 3.0, >= 3.0.2)
-      backports (~> 3.0)
-      rspec (~> 3.0)
-      rspec-block_is_expected (~> 1.0, >= 1.0.6)
-      rspec-pending_for (~> 0.1, >= 0.1.19)
-      rspec-stubbed_env (~> 1.0, >= 1.0.4)
-      rspec_junit_formatter (~> 0.6)
-      silent_stream (~> 1.0, >= 1.0.12)
-      timecop-rspec (~> 1.0, >= 1.0.3)
-      version_gem (~> 1.1, >= 1.1.9)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
     logger (1.7.0)
     markly (0.16.0)
+    parallel (2.1.0)
+    parallel_tests (5.7.0)
+      parallel
     parslet (2.0.0)
     prism (1.9.0)
     racc (1.8.1)
@@ -350,7 +374,7 @@ GEM
     tree_sitter_language_pack (1.8.1-x86_64-linux)
     tsort (0.2.0)
     version_gem (1.1.9)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.2)
 
 PLATFORMS
   x86_64-linux
@@ -372,9 +396,9 @@ DEPENDENCIES
   gitmoji-regex (~> 1.0, >= 1.0.3)
   go-merge!
   json-merge!
-  kettle-dev (~> 2.0)
+  kettle-dev!
   kettle-jem!
-  kettle-test (~> 1.0, >= 1.0.7)
+  kettle-test!
   kramdown-merge!
   markdown-merge!
   markly-merge!
@@ -394,6 +418,7 @@ DEPENDENCIES
   token-resolver (~> 1.0, >= 1.0.2)
   toml-merge!
   tree_haver!
+  turbo_tests2!
   typescript-merge!
   yaml-merge!
   zip-merge!
@@ -422,15 +447,17 @@ CHECKSUMS
   gitmoji-regex (1.0.3) sha256=538c6f49f5af6dc36d1630edb89a5a66f6e14ec5850d7fd071e0331f940e553f
   go-merge (7.0.0)
   json-merge (7.0.0)
-  kettle-dev (2.0.0) sha256=f3cd1a2f8cc4f1fcc573d7e9177644873cfdfe455e26365416b4290ea09490b5
+  kettle-dev (2.0.1)
   kettle-jem (7.0.0)
-  kettle-test (1.0.10) sha256=ddefc5d54b290ee6dbe5a3983128f6948fa63f624ca676c1e6cfffc9b6878179
+  kettle-test (2.0.1)
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-merge (7.0.0)
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
   markdown-merge (7.0.0)
   markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
   markly-merge (7.0.0)
+  parallel (2.1.0) sha256=b35258865c2e31134c5ecb708beaaf6772adf9d5efae28e93e99260877b09356
+  parallel_tests (5.7.0) sha256=3f1762c46ca2c223b8af8ef877217f9d76974e191bfa934f2580b58bcf1d005c
   parslet (2.0.0) sha256=d45130695d39b43d7e6a91f4d2ec66b388a8d822bae38de9b4de9a5fbde1f606
   parslet-toml-merge (7.0.0)
   plain-merge (7.0.0)
@@ -471,10 +498,11 @@ CHECKSUMS
   tree_haver (7.0.0)
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
+  turbo_tests2 (3.0.0)
   typescript-merge (7.0.0)
   version_gem (1.1.9) sha256=0c1a0962ae543c84a00889bb018d9f14d8f8af6029d26b295d98774e3d2eb9a4
   yaml-merge (7.0.0)
-  zeitwerk (2.7.5) sha256=d8da92128c09ea6ec62c949011b00ed4a20242b255293dd66bf41545398f73dd
+  zeitwerk (2.8.2) sha256=7212a61311083c604184b1ea2574b9aa05cd14f855a0841c06985cabe9181d12
   zip-merge (7.0.0)
 
 BUNDLED WITH
