@@ -11,7 +11,7 @@ module Kettle
       module InstallTask
         module_function
 
-        CURATED_BINSTUB_GEMS = %w[rake kettle-dev kettle-test kettle-soup-cover stone_checksums].freeze
+        CURATED_BINSTUB_GEMS = %w[rake rbs rspec-core kettle-dev kettle-test kettle-soup-cover stone_checksums].freeze
         CURATED_BINSTUB_EXECUTABLES = %w[
           gem_checksums
           kettle-changelog
@@ -27,6 +27,8 @@ module Kettle
           kettle-soup-cover
           kettle-test
           rake
+          rbs
+          rspec
         ].freeze
 
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))

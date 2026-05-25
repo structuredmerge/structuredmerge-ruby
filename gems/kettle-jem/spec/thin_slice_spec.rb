@@ -2707,7 +2707,7 @@ RSpec.describe Kettle::Jem do
 
   it "generates only curated documented binstubs" do
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
-      %w[bundle binstubs rake kettle-dev kettle-test kettle-soup-cover stone_checksums]
+      %w[bundle binstubs rake rbs rspec-core kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
 

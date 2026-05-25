@@ -51,6 +51,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Changed post-template lockfile normalization to run `bundle update` with
   templating and local sibling overrides disabled, so dependency template
   updates are fully re-resolved against released gems.
+- Added curated `rbs` and `rspec-core` binstubs because generated CI templates
+  call `bin/rbs` and `bin/rspec` directly through appraisals.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.3 or newer.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
 - Removed `--plugin timekeeper` from generated `.yardopts` because
