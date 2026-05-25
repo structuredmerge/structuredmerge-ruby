@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
 - Removed `--plugin timekeeper` from generated `.yardopts` because
   yard-timekeeper is installed through the rake `yard` task hook.
+- Escaped generated README metadata table cells so multiline gemspec
+  descriptions render with `<br>` instead of breaking table rows.
 ### Security
 
 ## [7.0.0] - 2026-05-05

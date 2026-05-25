@@ -9068,9 +9068,15 @@ module Kettle
         "<!-- kettle-jem:metadata:start -->",
         "| Field | Value |",
         "|---|---|",
-        *rows.map { |field, value| "| #{field} | #{value} |" },
+        *rows.map do |field, value|
+          "| #{readme_metadata_table_cell(field)} | #{readme_metadata_table_cell(value)} |"
+        end,
         "<!-- kettle-jem:metadata:end -->",
       ].join("\n")
+    end
+
+    def readme_metadata_table_cell(value)
+      value.to_s.split(/\r\n?|\n/).map(&:strip).join("<br>").gsub("|", "\\|")
     end
 
     def readme_metadata_license_expression(facts)

@@ -6000,6 +6000,27 @@ RSpec.describe Kettle::Jem do
     expect(block).to include("| License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |")
   end
 
+  it "formats README metadata values as Markdown table cells" do
+    block = described_class.readme_metadata_block(
+      package: {
+        name: "example",
+        description: "First line\n  Second | line\r\nThird line",
+        homepage_url: "https://example.test",
+        source_url: "https://example.test/source",
+        license_expression: "MIT",
+      },
+      license: {
+        spdx: ["MIT"],
+      },
+      funding: {
+        urls: [],
+      }
+    )
+
+    expect(block).to include("| Description | First line<br>Second \\| line<br>Third line |")
+    expect(block).not_to include("First line\n")
+  end
+
   it "applies configured licenses to merged gemspec output" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
