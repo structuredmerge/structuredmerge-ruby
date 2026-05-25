@@ -32,7 +32,7 @@ jobs:
     name: Specs ${{ matrix.ruby }}@${{ matrix.appraisal }}
     runs-on: ubuntu-latest
     env: # $BUNDLE_GEMFILE must be set at job level, so it is set for all steps
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
     strategy:
       matrix:
         include:
@@ -40,7 +40,6 @@ jobs:
           - ruby: "ruby"
             appraisal: "current"
             exec_cmd: "{KJ|CI:EXEC_CMD}"
-            gemfile: "Appraisal.root"
             rubygems: latest
             bundler: latest
 

@@ -1805,7 +1805,6 @@ module Kettle
           ruby: appraisal_workflow_ruby(range.fetch(:floor), lifecycle),
           appraisal: entry[:name] || entry["name"],
           exec_cmd: exec_cmd,
-          gemfile: "Appraisal.root",
           rubygems: "latest",
           bundler: "latest",
         }
@@ -1820,7 +1819,6 @@ module Kettle
           lines << %(      - ruby: "#{entry.fetch(:ruby)}")
           lines << %(        appraisal: "#{entry.fetch(:appraisal)}")
           lines << %(        exec_cmd: "#{entry.fetch(:exec_cmd)}")
-          lines << %(        gemfile: "#{entry.fetch(:gemfile)}")
           lines << %(        rubygems: "#{entry.fetch(:rubygems)}")
           lines << %(        bundler: "#{entry.fetch(:bundler)}")
         end
@@ -3691,6 +3689,7 @@ module Kettle
       end
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
+        accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
         accepted = finalize_github_workflow_template(accepted) if github_workflow_template_recipe?(recipe)
         return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
@@ -3721,6 +3720,20 @@ module Kettle
       return content if facts.to_h.dig(:ci, :framework_matrix).to_h.empty?
 
       synchronize_github_actions_framework_ci(content, facts)
+    end
+
+    def preserve_github_workflow_project_settings(recipe, content, destination_content)
+      return content unless recipe.fetch(:target_path).to_s == ".github/workflows/coverage.yml"
+
+      branch = yaml_scalar_line_value(destination_content, "K_SOUP_COV_MIN_BRANCH")
+      line = yaml_scalar_line_value(destination_content, "K_SOUP_COV_MIN_LINE")
+      preserved = content
+      preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_BRANCH", branch) if branch
+      preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_LINE", line) if line
+      if branch && line
+        preserved = replace_yaml_scalar_line(preserved, "thresholds", "'#{line} #{branch}'")
+      end
+      preserved
     end
 
     def postprocess_readme_content(content, facts, project_root: nil)
@@ -4129,7 +4142,12 @@ module Kettle
     end
 
     def finalize_gemfile_template_source(recipe, content, destination_content, facts:, template_content:)
-      output = merge_gemfile_template_policy(content, facts: facts, template_content: template_content)
+      output = merge_gemfile_template_policy(
+        content,
+        facts: facts,
+        template_content: template_content,
+        preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
+      )
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
@@ -4141,7 +4159,6 @@ module Kettle
     end
 
     def merge_local_gem_overrides(content, destination_content, facts:, template_content: nil)
-      package_name = facts.to_h.dig(:package, :name).to_s
       template_gems = local_gems_assignment(content)
       template_gems = local_gems_assignment(template_content) if template_gems.empty?
       destination_gems = local_gems_assignment(destination_content)
@@ -4151,7 +4168,6 @@ module Kettle
         template_gems.any? { |template_gem| versioned_gem_name_update_candidate?(destination_gem, template_gem) }
       end
       gems = (template_gems + destination_gems).map(&:to_s).reject(&:empty?).uniq
-      gems.delete(package_name) unless package_name.empty?
       replace_local_gems_assignment(content, gems)
     end
 
@@ -4352,19 +4368,24 @@ module Kettle
       }
     end
 
-    def merge_gemfile_template_policy(content, facts:, template_content: nil)
+    def merge_gemfile_template_policy(content, facts:, template_content: nil, preserve_self_word_entries: false)
       package_name = facts.dig(:package, :name).to_s if facts
       removable_gems = ["appraisal"]
       removable_gems << package_name unless package_name.to_s.empty?
       pruned = remove_gemfile_dependency_lines(content, removable_gems)
-      pruned = remove_gemfile_percent_w_entries(pruned, [package_name])
-      pruned = merge_template_gemfile_dependency_blocks(template_content, pruned, removable_gems)
+      pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
+      pruned = merge_template_gemfile_dependency_blocks(
+        template_content,
+        pruned,
+        removable_gems,
+        preserve_self_word_entries: preserve_self_word_entries
+      )
       apply_commented_gem_dependency_policy(template_content, pruned)
     end
 
-    def merge_template_gemfile_dependency_blocks(template_content, content, removable_gems)
+    def merge_template_gemfile_dependency_blocks(template_content, content, removable_gems, preserve_self_word_entries: false)
       template = remove_gemfile_dependency_lines(template_content, removable_gems)
-      template = remove_gemfile_percent_w_entries(template, removable_gems)
+      template = remove_gemfile_percent_w_entries(template, removable_gems) unless preserve_self_word_entries
       existing = gemfile_dependency_names(content) + gemfile_percent_w_names(content)
       additions = gemfile_paragraphs(template).filter_map do |paragraph|
         names = gemfile_dependency_names(paragraph) + gemfile_percent_w_names(paragraph)
@@ -5541,6 +5562,18 @@ module Kettle
         return lines.join
       end
       content
+    end
+
+    def yaml_scalar_line_value(content, key)
+      lines = content.to_s.lines
+      yaml_scalar_pairs(content).each do |key_node, value_node|
+        next unless key_node.value.to_s == key.to_s
+
+        line = lines[value_node.start_line].to_s
+        value_text = line.split(":", 2).last.to_s.strip
+        return value_text unless value_text.empty?
+      end
+      nil
     end
 
     def sync_kettle_config_env_overrides(content, env)
@@ -7093,6 +7126,7 @@ module Kettle
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
         kettle_rb_local_gems: kettle_rb_local_gems(config),
+        package_name: package_name.to_s,
         yard_host: yard_host,
         homepage_uri: project_homepage_uri(config, env, yard_host: yard_host),
         project_emoji: preferred_template_token_value("💎", config["project_emoji"], env, "KJ_PROJECT_EMOJI").to_s,
@@ -7171,6 +7205,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_RB_LOCAL_GEMS" => project_runtime[:kettle_rb_local_gems].to_s,
+        "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
         "KJ|HOMEPAGE_URI" => project_runtime[:homepage_uri].to_s,
         "KJ|PROJECT_EMOJI" => project_runtime[:project_emoji].to_s,
@@ -8573,8 +8608,7 @@ module Kettle
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
       return { strategy: :merge, preference: :destination, add_template_only_nodes: true } if target_path.to_s == ".kettle-jem.yml"
-      return { strategy: :accept_template } if target_path.to_s == ".github/workflows/license-eye.yml"
-      return { strategy: :accept_template } if target_path.to_s == ".github/workflows/framework-ci.yml"
+      return { strategy: :accept_template } if target_path.to_s.start_with?(".github/workflows/")
       return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
 
       nil
@@ -9399,10 +9433,7 @@ module Kettle
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
                   bundler: "${{ matrix.bundler }}"
-                  bundler-cache: false
-
-              - name: Install Root Appraisal
-                run: bundle
+                  bundler-cache: true
 
               - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework_version }}"
                 id: bundleAppraisalAttempt1
@@ -9413,9 +9444,6 @@ module Kettle
                 id: bundleAppraisalAttempt2
                 if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
                 run: bundle exec appraisal ${{ matrix.appraisal }} install
-
-              - name: Appraisal for ${{ matrix.framework_version }}
-                run: bundle exec appraisal ${{ matrix.appraisal }} bundle
 
               - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
                 run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
@@ -9481,7 +9509,7 @@ module Kettle
             runs-on: ubuntu-latest
             continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
             env:
-              BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+              BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
             strategy:
               fail-fast: false
               matrix:
@@ -9489,7 +9517,6 @@ module Kettle
                   - ruby: "ruby"
                     appraisal: "#{coverage.fetch(:appraisal)}"
                     exec_cmd: "#{coverage.fetch(:command)}"
-                    gemfile: "Appraisal.root"
                     rubygems: latest
                     bundler: latest
 

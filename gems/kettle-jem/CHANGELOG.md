@@ -34,6 +34,20 @@ Please file a bug if you notice a violation of semantic versioning.
 - Removed stale `continue-on-error` handling from the generated current workflow.
 - Marked generated workflow files as template-owned by default to prevent stale
   YAML keys from surviving future template runs.
+- Replaced generated Appraisal workflow matrix Gemfile indirection with a
+  fixed `Appraisal.root.gemfile` job environment so Appraisal never falls back
+  to the root development `Gemfile`.
+- Changed packaged GitHub workflow templates to whole-file replacement so stale
+  job steps from older matrix formats cannot accumulate beside new steps.
+- Preserved destination coverage thresholds when replacing generated coverage
+  workflows.
+- Preserved the current gem in local modular gemfile workspace arrays when the
+  generated local dependency wiring needs to include it.
+- Excluded the current gem from generated `eval_nomono_gems` calls so local
+  workspace lists do not conflict with the root `gemspec` dependency.
+- Excluded already-declared gemspec dependencies from generated local
+  `eval_nomono_gems` calls so local modular gemfiles do not conflict with
+  development dependencies declared by the project gemspec.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.3 or newer.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
 - Removed `--plugin timekeeper` from generated `.yardopts` because

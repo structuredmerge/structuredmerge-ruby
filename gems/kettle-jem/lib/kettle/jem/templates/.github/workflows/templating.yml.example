@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
     env: # $BUNDLE_GEMFILE must be set at job level, so it is set for all steps
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
     strategy:
       matrix:
         include:
@@ -41,7 +41,6 @@ jobs:
           - ruby: "ruby"
             appraisal: "templating"
             exec_cmd: "rake kettle:jem:selftest"
-            gemfile: "Appraisal.root"
             rubygems: latest
             bundler: latest
 

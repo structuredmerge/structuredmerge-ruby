@@ -539,7 +539,6 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('            appraisal: "rails-7-1"')
       expect(content).to include("Appraisal.root.gemfile")
       expect(content).to include("bundle exec appraisal ${{ matrix.appraisal }} install")
-      expect(content).to include("bundle exec appraisal ${{ matrix.appraisal }} bundle")
       expect(content).not_to include("framework_version: []")
       expect(content).not_to include("gemfile: []")
 
@@ -4412,7 +4411,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "merges modular local Gemfile dependency lists while removing the destination package" do
+  it "merges modular local Gemfile dependency lists while preserving the destination package" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-local-gemfile-policy", tmp_root) do |root|
@@ -4462,7 +4461,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("rubocop-ruby2_4")
       expect(content).to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
-      expect(content).not_to include("kettle-jem")
+      expect(content).to include("kettle-jem")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end
   end
@@ -4481,6 +4480,7 @@ RSpec.describe Kettle::Jem do
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
     expect(tokens.fetch("KJ|KETTLE_RB_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
   it "treats packaged local Gemfiles as template-owned by default" do
@@ -5307,7 +5307,6 @@ RSpec.describe Kettle::Jem do
           ruby: "3.2",
           appraisal: "kja-ar-7-1-oa-2-1-r3",
           exec_cmd: "kettle-test",
-          gemfile: "Appraisal.root",
           rubygems: "latest",
           bundler: "latest",
         },
@@ -5317,7 +5316,6 @@ RSpec.describe Kettle::Jem do
           ruby: "2.7",
           appraisal: "kja-mail-2-8-r2",
           exec_cmd: "kettle-test",
-          gemfile: "Appraisal.root",
           rubygems: "latest",
           bundler: "latest",
         },

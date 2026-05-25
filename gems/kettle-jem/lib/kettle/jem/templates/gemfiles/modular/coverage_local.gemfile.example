@@ -6,11 +6,13 @@
 require "nomono/bundler" unless defined?(Nomono)
 
 local_gems = %w[{KJ|KETTLE_RB_LOCAL_GEMS}]
+declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
+local_gems_to_eval = local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems
 
 # export KETTLE_RB_DEV=/path/to/kettle-rb
 platform :mri do
   eval_nomono_gems(
-    gems: local_gems,
+    gems: local_gems_to_eval,
     prefix: "KETTLE_RB",
     path_env: "KETTLE_RB_DEV",
     vendored_gems_env: "VENDORED_GEMS",

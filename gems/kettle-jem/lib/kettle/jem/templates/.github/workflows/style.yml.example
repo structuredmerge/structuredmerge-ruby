@@ -28,7 +28,7 @@ jobs:
     name: Style on ${{ matrix.ruby }}@current
     runs-on: ubuntu-latest
     env: # $BUNDLE_GEMFILE must be set at job level, so it is set for all steps
-      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}.gemfile
+      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +37,6 @@ jobs:
           - ruby: "ruby"
             appraisal: "style"
             exec_cmd: "rake rubocop_gradual:check"
-            gemfile: "Appraisal.root"
             rubygems: latest
             bundler: latest
 
