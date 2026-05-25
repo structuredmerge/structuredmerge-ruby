@@ -51,6 +51,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added `kettle-drift` to generated templating Gemfiles, resolved remotely in
   templating mode and via `KETTLE_RB_DEV` locally, separate from the
   `SMORG_RB_DEV` StructuredMerge local gem set.
+- Refreshed generated README metadata blocks after template README merging so
+  version-derived gemspec metadata such as `source_code_uri` does not stay stale.
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -3736,7 +3736,8 @@ module Kettle
       processed = apply_readme_badge_policy(processed, facts)
       processed = apply_readme_kloc_badge(processed, facts, project_root)
       processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
-      apply_monorepo_subgem_readme_recipe(processed, facts)
+      processed = apply_monorepo_subgem_readme_recipe(processed, facts)
+      replace_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
     end
 
     def apply_readme_kloc_badge(content, facts, project_root)

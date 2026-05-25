@@ -6067,7 +6067,7 @@ RSpec.describe Kettle::Jem do
     expect(output).to include('spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]')
   end
 
-  it "preserves README metadata during template-source README application" do
+  it "refreshes README metadata during template-source README application" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-readme-metadata-order", tmp_root) do |root|
@@ -6088,6 +6088,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "Example gem"
             spec.homepage = "https://example.test"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example/tree/v1.2.3"
             spec.license = "MIT"
           end
         RUBY
@@ -6114,6 +6115,8 @@ RSpec.describe Kettle::Jem do
 
       expect(first_readme).to include("<!-- kettle-jem:metadata:start -->")
       expect(first_readme).to include("| Package | example |")
+      expect(first_readme).to include("| Source | https://github.com/acme/example/tree/v1.2.3 |")
+      expect(first_readme).not_to include("https://github.com/structuredmerge/structuredmerge-ruby")
       expect(File.read(File.join(root, "README.md"))).to eq(first_readme)
     end
   end
