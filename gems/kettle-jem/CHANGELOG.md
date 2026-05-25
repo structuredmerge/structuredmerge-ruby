@@ -19,6 +19,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [Unreleased]
 ### Added
 ### Changed
+- Documented `kettle-jem template` as the canonical templating entrypoint and
+  marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
 ### Deprecated
 ### Removed
 ### Fixed

@@ -48,7 +48,7 @@ to build `kettle-jem` extension gems against the supported plugin seam.
 - **Per-file strategies** — `merge`, `accept_template`, `keep_destination`, or `raw_copy`
 - **Multi-phase pipeline** — 11 ordered phases (service_actor-based) from config sync through duplicate checking
 - **SHA-pinned GitHub Actions** — template `uses:` always wins, propagating immutable SHAs
-- **Convergence in one pass** — a single `rake kettle:jem:install` applies all changes; a second run produces zero diff
+- **Convergence in one pass** — a single `kettle-jem template` applies all changes; a second run produces zero diff
 - **Selftest divergence check** — CI verifies that project drift stays within a configurable threshold
 
 ## 💡 Info you can shake a stick at
@@ -325,14 +325,14 @@ kettle-jem
 The setup CLI runs a two-phase bootstrap:
 
 1. **Bootstrap** — creates `.kettle-jem.yml`, installs modular gemfiles, ensures dev dependencies
-2. **Bundled** — loads the full runtime and runs `rake kettle:jem:install`
+2. **Bundled** — loads the full runtime and runs `kettle-jem template`
 
 ### Applying Template Updates
 
 After initial setup, re-run the template process to pull in updates:
 
 ```bash
-bundle exec rake kettle:jem:install
+K_JEM_TEMPLATING=true bundle exec kettle-jem template
 ```
 
 This applies all 11 phases:
@@ -465,24 +465,28 @@ fill missing keys during config sync, and act as runtime overrides.
 | `KJ_SOCIAL_LINKTREE` | Linktree handle for social/profile links |
 | `KJ_SOCIAL_DEVTO` | DEV Community handle for social/profile links |
 
-#### Rake Task Examples
+#### Templating Examples
 
 ```bash
 # Standard template update (quiet, non-interactive — the default)
-bundle exec rake kettle:jem:install
+K_JEM_TEMPLATING=true bundle exec kettle-jem template
 
 # Verbose output
-KETTLE_JEM_VERBOSE=true bundle exec rake kettle:jem:install
+K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem template
 
 # Interactive mode (prompts before each change)
-bundle exec rake kettle:jem:install force=false
+K_JEM_TEMPLATING=true bundle exec kettle-jem template --interactive
 
 # Only workflow files, skip unparseable
-PARSE_ERROR_MODE=skip bundle exec rake kettle:jem:install only=".github/**"
+K_JEM_TEMPLATING=true PARSE_ERROR_MODE=skip bundle exec kettle-jem template --only=".github/**"
 
 # Rescue on merge failure (don't halt)
-bundle exec rake kettle:jem:install FAILURE_MODE=rescue
+K_JEM_TEMPLATING=true FAILURE_MODE=rescue bundle exec kettle-jem template
 ```
+
+The `kettle:jem:*` rake tasks are internal targets used by the executable after
+it prepares the templating environment; call `kettle-jem` directly for normal
+templating work.
 
 ## 🔐 Security
 

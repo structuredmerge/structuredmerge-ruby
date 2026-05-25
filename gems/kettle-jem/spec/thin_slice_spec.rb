@@ -998,7 +998,7 @@ RSpec.describe Kettle::Jem do
       plan = described_class.plan_readme_style(root, env: {})
       expect(plan.fetch(:final_content)).to include("Kettle template tool")
       expect(plan.fetch(:final_content)).to include("Configuration shape")
-      expect(plan.fetch(:final_content)).to include("bundle exec rake kettle:jem:install")
+      expect(plan.fetch(:final_content)).to include("bundle exec kettle-jem template")
       expect(plan.dig(:readme_style, :section_partials, "configuration", :source_root)).to eq("packaged")
     end
   end
@@ -3618,7 +3618,7 @@ RSpec.describe Kettle::Jem do
 
           ```console
           # DANGER: keep this code comment inside the Synopsis branch.
-          bundle exec rake kettle:jem:install allowed=true force=true
+          K_JEM_TEMPLATING=true bundle exec kettle-jem template
           ```
 
           ## Usage
@@ -3671,7 +3671,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("## 🌻 Synopsis\n\nDestination synopsis.")
       expect(final_content).to include("### Details\n\nDestination nested detail.")
       expect(final_content).to include("# DANGER: keep this code comment inside the Synopsis branch.")
-      expect(final_content).to include("bundle exec rake kettle:jem:install allowed=true force=true")
+      expect(final_content).to include("K_JEM_TEMPLATING=true bundle exec kettle-jem template")
       expect(final_content).to include("## 🔧 Basic Usage\n\nDestination usage.")
       expect(final_content).to include("## Custom Section\n\nDestination custom.")
       expect(final_content).to include("## Note: Local\n\nDestination note.")

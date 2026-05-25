@@ -162,18 +162,22 @@ Run the kettle-jem templater to sync project files with the latest template:
 
 ```bash
 # Standard run (quiet, non-interactive — the default)
-mise exec -C /path/to/project -- bundle exec rake kettle:jem:install
+mise exec -C /path/to/project -- env K_JEM_TEMPLATING=true bundle exec kettle-jem template
 
 # Verbose output (see per-file detail)
-mise exec -C /path/to/project -- env KETTLE_JEM_VERBOSE=true bundle exec rake kettle:jem:install
+mise exec -C /path/to/project -- env K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem template
 
 # Interactive mode (prompt before each change)
-mise exec -C /path/to/project -- bundle exec rake kettle:jem:install force=false
+mise exec -C /path/to/project -- env K_JEM_TEMPLATING=true bundle exec kettle-jem template --interactive
 ```
+
+Use the `kettle-jem` executable as the public entrypoint. The
+`kettle:jem:*` rake tasks are internal orchestration targets that the
+executable may call after it has prepared the templating environment.
 
 **Current defaults** (no flags needed):
 - **quiet=true** — only phase summary lines shown; use `--verbose` or `KETTLE_JEM_VERBOSE=true` to opt out
-- **force=true** — non-interactive; use `--interactive` or `force=false` to opt out
+- **force=true** — non-interactive; use `--interactive` to opt out
 - **allowed=true** — env file changes auto-accepted; set `allowed=false` to require review
 
 ### Building & Installing Locally
