@@ -21,6 +21,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 - Documented `kettle-jem template` as the canonical templating entrypoint and
   marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
+- `kettle-jem` project fact discovery now uses `Kettle::Dev::GemSpecReader`
+  and RubyGems specification objects instead of parsing gemspec source.
 ### Deprecated
 ### Removed
 ### Fixed

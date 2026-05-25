@@ -336,6 +336,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
+      expect(content).to end_with("\n")
     end
   end
 
@@ -1196,6 +1197,8 @@ RSpec.describe Kettle::Jem do
         "template/README.md.example" => <<~MARKDOWN,
           # {KJ|GEM_NAME}
 
+          spec.add_dependency("{KJ|GEM_NAME}", "~> {KJ|GEM_MAJOR}.0")
+
           [🧮kloc-img]: https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&logo=YouTube&logoColor=blue
         MARKDOWN
       })
@@ -1206,6 +1209,7 @@ RSpec.describe Kettle::Jem do
       end.fetch(:final_content)
 
       expect(readme).to include("KLOC-4.000-FFDD67.svg")
+      expect(readme).to include('spec.add_dependency("example", "~> 1.0")')
       expect(File.read(File.join(root, "README.md"))).to eq(readme)
     end
   end

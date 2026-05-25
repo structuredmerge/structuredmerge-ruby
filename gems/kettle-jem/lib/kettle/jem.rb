@@ -2276,7 +2276,7 @@ module Kettle
       package_name = repository_name_from_source_url(source_url)
       package_name = File.basename(project_root.to_s) if package_name.empty?
       license = license_facts(kettle_config, Array(kettle_config["licenses"]), author: {}, author_email: nil, copyright: {})
-      author = author_facts("", kettle_config, env)
+      author = author_facts(kettle_config, env)
       copyright = copyright_facts(project_root, kettle_config)
       project_runtime = project_runtime_facts(
         kettle_config,
@@ -2316,7 +2316,7 @@ module Kettle
       facts[:license] = license unless license.empty?
       facts[:project_runtime] = project_runtime unless project_runtime.empty?
       funding = compact_hash(
-        urls: funding_urls(project_root, "", package_name, opencollective_disabled: false),
+        urls: funding_urls(project_root, package_name, opencollective_disabled: false),
         platform_tokens: funding_platform_token_facts(kettle_config, env)
       )
       detected_open_collective_org = opencollective_org(project_root, env, opencollective_disabled: false)
@@ -2366,13 +2366,12 @@ module Kettle
       end
       raise ArgumentError, "no gemspec found in #{project_root}" unless gemspec_path
 
-      gemspec = File.read(gemspec_path)
-      gemspec_metadata = project_gemspec_metadata(project_root, gemspec_path)
+      gemspec_spec = load_project_gemspec(gemspec_path)
+      gemspec_metadata = project_gemspec_metadata(project_root, gemspec_path, spec: gemspec_spec)
       name = metadata_value(gemspec_metadata, :gem_name) ||
-        extract_gemspec_assignment(gemspec, "spec.name") ||
         File.basename(gemspec_path, ".gemspec")
-      homepage_url = metadata_value(gemspec_metadata, :homepage) || extract_gemspec_assignment(gemspec, "spec.homepage")
-      metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri) || extract_metadata_value(gemspec, "source_code_uri")
+      homepage_url = metadata_value(gemspec_metadata, :homepage)
+      metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri)
       metadata_github_url = concrete_github_url(metadata_source_url)
       homepage_github_url = concrete_github_url(homepage_url)
       git_source_url = git_remote_source_url(project_root)
@@ -2396,13 +2395,13 @@ module Kettle
         existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
         existing_version_namespace(project_root, version_path) ||
         classify_namespace(name)
-      project_version = metadata_value(gemspec_metadata, :version) || extract_gemspec_assignment(gemspec, "spec.version")
-      min_ruby = extract_gemspec_assignment(gemspec, "spec.required_ruby_version") ||
-        metadata_value(gemspec_metadata, :required_ruby_version) ||
+      project_version = metadata_value(gemspec_metadata, :version)
+      project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
+      min_ruby = metadata_value(gemspec_metadata, :required_ruby_version) ||
         metadata_value(gemspec_metadata, :min_ruby)
-      gemspec_licenses = Array(gemspec_metadata[:licenses]).empty? ? extract_gemspec_array(gemspec, "spec.licenses") : Array(gemspec_metadata[:licenses])
+      gemspec_licenses = Array(gemspec_metadata[:licenses])
 
-      author = author_facts(gemspec, kettle_config, env, gemspec_metadata: gemspec_metadata)
+      author = author_facts(kettle_config, env, gemspec_metadata: gemspec_metadata)
       copyright = copyright_facts(project_root, kettle_config)
       license = license_facts(
         kettle_config,
@@ -2429,9 +2428,7 @@ module Kettle
           name: name,
           slug: name,
           description: metadata_value(gemspec_metadata, :description) ||
-            metadata_value(gemspec_metadata, :summary) ||
-            extract_gemspec_assignment(gemspec, "spec.description") ||
-            extract_gemspec_assignment(gemspec, "spec.summary"),
+            metadata_value(gemspec_metadata, :summary),
           homepage_url: homepage_url,
           source_url: source_url,
           license_expression: license[:expression],
@@ -2452,7 +2449,7 @@ module Kettle
         repository_topology: repository_topology
       )
       facts[:repository] = repository unless repository.empty?
-      generated_blocks = generated_blocks_facts(gemspec, facts, run_options)
+      generated_blocks = generated_blocks_facts(gemspec_spec, facts, run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
       bootstrap[:licenses] = gemspec_license_spdx if bootstrap && !gemspec_license_spdx.empty?
@@ -2476,8 +2473,8 @@ module Kettle
       funding = compact_hash(
         urls: funding_urls(
           project_root,
-          gemspec,
           name,
+          funding_uri: metadata_value(gemspec_metadata, :funding_uri),
           opencollective_disabled: opencollective_disabled,
           open_collective_org: open_collective_org && open_collective_org.fetch(:org)
         )
@@ -2729,11 +2726,12 @@ module Kettle
     end
 
     def extract_gemspec_development_dependencies(gemspec)
-      gemspec_dependency_records(gemspec).filter_map do |record|
-        next unless record.fetch(:kind) == "add_development_dependency"
-
-        { name: record.fetch(:name), requirement: record[:requirement] }
-      end.uniq { |dependency| dependency.fetch(:name) }
+      Array(gemspec&.development_dependencies).map do |dependency|
+        {
+          name: dependency.name.to_s,
+          requirement: dependency.requirement.to_s,
+        }
+      end.reject { |dependency| dependency.fetch(:name).empty? }.uniq { |dependency| dependency.fetch(:name) }
     end
 
     def shunted_effective_floor(min_ruby)
@@ -2829,12 +2827,7 @@ module Kettle
     end
 
     def template_version_gem_bootstrap_step(project_root, report)
-      gemspec_report = report.fetch(:recipe_reports, []).find do |recipe_report|
-        recipe_report.fetch(:relative_path, "").end_with?(".gemspec")
-      end
-      gemspec_content = gemspec_report&.fetch(:final_content, "").to_s
-      gemspec_content = project_gemspec_content(project_root) if gemspec_content.empty?
-      return nil unless gemspec_declares_version_gem?(gemspec_content)
+      return nil unless project_gemspec_declares_version_gem?(project_root)
 
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
@@ -2850,19 +2843,19 @@ module Kettle
       )
     end
 
-    def project_gemspec_content(project_root)
-      candidates = Dir.glob(File.join(project_root, "*.gemspec"))
-      return "" unless candidates.length == 1
-
-      File.read(candidates.first)
-    end
-
     def project_gemspec_version(project_root)
-      extract_gemspec_assignment(project_gemspec_content(project_root), "spec.version").to_s
+      path = Dir.glob(File.join(project_root, "*.gemspec")).sort.first
+      return "" unless path
+
+      load_project_gemspec(path)&.version.to_s
     end
 
-    def gemspec_declares_version_gem?(content)
-      gemspec_dependency_records(content).any? { |record| record.fetch(:name) == "version_gem" && record.fetch(:kind) != "add_development_dependency" }
+    def project_gemspec_declares_version_gem?(project_root)
+      path = Dir.glob(File.join(project_root, "*.gemspec")).sort.first
+      return false unless path
+
+      spec = load_project_gemspec(path)
+      Array(spec&.runtime_dependencies).any? { |dependency| dependency.name == "version_gem" }
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -3367,6 +3360,7 @@ module Kettle
         original
       end
       final = normalize_generated_rakefile(final) if relative_path == "Rakefile"
+      final = ensure_trailing_newline(final) unless delete_file_recipe?(recipe)
 
       template_content = recipe_template_content(project_root, recipe)
       request = content_recipe_execution_request(
@@ -5398,28 +5392,11 @@ module Kettle
       end
     end
 
-    def gemspec_assignment_record(source, field)
-      receiver, assignment_field = gemspec_field_receiver_and_name(field)
-      gemspec_assignment_records(source, receiver: receiver).find { |record| record.fetch(:field) == assignment_field }
-    end
-
     def gemspec_field_receiver_and_name(field)
       parts = field.to_s.split(".")
       return [nil, field.to_s] if parts.length == 1
 
       [parts[0...-1].join("."), parts.last]
-    end
-
-    def gemspec_metadata_records(source)
-      ruby_call_records(source, :[]=).filter_map do |call|
-        next unless call.receiver&.slice.to_s.end_with?(".metadata")
-
-        key = ruby_string_argument_at(call, 0)
-        value = ruby_string_argument_at(call, 1)
-        next unless key
-
-        { key: key, value: value, receiver: call.receiver&.slice }
-      end
     end
 
     def replace_record_ranges(content, records_by_line)
@@ -6174,18 +6151,6 @@ module Kettle
       )
     end
 
-    def extract_gemspec_assignment(source, field)
-      value = gemspec_assignment_record(source, field)&.fetch(:value)
-      value ||= gemspec_assignment_record(source, field.to_s.split(".").last)&.fetch(:value)
-      value if value.is_a?(String)
-    end
-
-    def extract_gemspec_array(source, field)
-      value = gemspec_assignment_record(source, field)&.fetch(:value)
-      value ||= gemspec_assignment_record(source, field.to_s.split(".").last)&.fetch(:value)
-      value.is_a?(Array) ? value : []
-    end
-
     def ruby_engines_config(config)
       engines = config["engines"]
       return nil unless engines.is_a?(Array)
@@ -6193,12 +6158,8 @@ module Kettle
       engines.map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
     end
 
-    def extract_metadata_value(source, key)
-      gemspec_metadata_records(source).find { |record| record.fetch(:key) == key.to_s }&.fetch(:value)
-    end
-
-    def funding_urls(project_root, gemspec_source, package_name, opencollective_disabled: false, open_collective_org: nil)
-      urls = [extract_metadata_value(gemspec_source, "funding_uri")]
+    def funding_urls(project_root, package_name, funding_uri: nil, opencollective_disabled: false, open_collective_org: nil)
+      urls = [funding_uri]
       path = File.join(project_root, ".github", "FUNDING.yml")
       urls.concat(github_funding_urls(path, opencollective_disabled: opencollective_disabled)) if File.exist?(path)
       urls << github_funding_platform_urls("open_collective", [open_collective_org]).first unless opencollective_disabled
@@ -6859,13 +6820,21 @@ module Kettle
       "0"
     end
 
-    def author_facts(gemspec_source, config, env, gemspec_metadata: {})
+    def valid_gem_version?(version)
+      text = version.to_s
+      return false if text.empty?
+
+      Gem::Version.new(text)
+      true
+    rescue ArgumentError
+      false
+    end
+
+    def author_facts(config, env, gemspec_metadata: {})
       token_config = token_config_values(config)
       author_config = token_config["author"].is_a?(Hash) ? token_config["author"] : {}
-      derived_name = Array(gemspec_metadata[:authors]).map(&:to_s).find { |value| present_template_token_value?(value) } ||
-        extract_gemspec_array(gemspec_source, "spec.authors").first
-      derived_email = Array(gemspec_metadata[:email]).map(&:to_s).find { |value| present_template_token_value?(value) } ||
-        extract_gemspec_array(gemspec_source, "spec.email").first
+      derived_name = Array(gemspec_metadata[:authors]).map(&:to_s).find { |value| present_template_token_value?(value) }
+      derived_email = Array(gemspec_metadata[:email]).map(&:to_s).find { |value| present_template_token_value?(value) }
       name = preferred_template_token_value(derived_name, author_config["name"], env, "KJ_AUTHOR_NAME").to_s
       email = preferred_template_token_value(derived_email, author_config["email"], env, "KJ_AUTHOR_EMAIL").to_s
       given_names = preferred_template_token_value(author_given_names(name), author_config["given_names"], env, "KJ_AUTHOR_GIVEN_NAMES")
@@ -7134,33 +7103,36 @@ module Kettle
       )
     end
 
-    def project_gemspec_metadata(project_root, gemspec_path)
+    def project_gemspec_metadata(project_root, gemspec_path, spec: nil)
       metadata = quiet_gemspec_reader_load(project_root)
+      spec ||= load_project_gemspec(gemspec_path)
+      metadata = {} unless metadata.is_a?(Hash)
+      metadata = metadata.dup
+
+      if spec
+        metadata[:gemspec_path] ||= gemspec_path
+        metadata[:gem_name] = spec.name.to_s if metadata_value(metadata, :gem_name).nil?
+        metadata[:version] = spec.version.to_s if metadata_value(metadata, :version).nil?
+        metadata[:min_ruby] = min_ruby_version(spec.required_ruby_version) if metadata[:min_ruby].nil?
+        metadata[:homepage] = spec.homepage.to_s if metadata_value(metadata, :homepage).nil?
+        metadata[:source_code_uri] = spec.metadata.fetch("source_code_uri", nil) if metadata_value(metadata, :source_code_uri).nil?
+        metadata[:funding_uri] = spec.metadata.fetch("funding_uri", nil) if metadata_value(metadata, :funding_uri).nil?
+        metadata[:authors] = Array(spec.authors).compact.uniq if Array(metadata[:authors]).empty?
+        metadata[:email] = Array(spec.email).compact.uniq if Array(metadata[:email]).empty?
+        metadata[:summary] = spec.summary.to_s if metadata_value(metadata, :summary).nil?
+        metadata[:description] = spec.description.to_s if metadata_value(metadata, :description).nil?
+        metadata[:licenses] = Array(spec.licenses) if Array(metadata[:licenses]).empty?
+        metadata[:required_ruby_version] = spec.required_ruby_version if metadata[:required_ruby_version].nil?
+        metadata[:require_paths] = Array(spec.require_paths) if Array(metadata[:require_paths]).empty?
+        metadata[:bindir] = spec.bindir.to_s if metadata_value(metadata, :bindir).nil?
+        metadata[:executables] = Array(spec.executables) if Array(metadata[:executables]).empty?
+      end
+
       return {} unless present_template_token_value?(metadata[:gem_name])
 
-      metadata[:source_code_uri] ||= load_project_gemspec(gemspec_path)&.metadata&.fetch("source_code_uri", nil)
       metadata
     rescue LoadError, StandardError
-      spec = load_project_gemspec(gemspec_path)
-      return {} unless spec
-
-      {
-        gemspec_path: gemspec_path,
-        gem_name: spec.name.to_s,
-        version: spec.version.to_s,
-        min_ruby: min_ruby_version(spec.required_ruby_version),
-        homepage: spec.homepage.to_s,
-        source_code_uri: spec.metadata.fetch("source_code_uri", nil),
-        authors: Array(spec.authors).compact.uniq,
-        email: Array(spec.email).compact.uniq,
-        summary: spec.summary.to_s,
-        description: spec.description.to_s,
-        licenses: Array(spec.licenses),
-        required_ruby_version: spec.required_ruby_version,
-        require_paths: Array(spec.require_paths),
-        bindir: spec.bindir.to_s,
-        executables: Array(spec.executables),
-      }
+      {}
     end
 
     def quiet_gemspec_reader_load(project_root)
