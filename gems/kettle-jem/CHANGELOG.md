@@ -22,6 +22,9 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Deprecated
 ### Removed
 ### Fixed
+- `kettle-jem template --hook-templates l` now activates the generated
+  project-local `.git-hooks` by setting `core.hooksPath` to `.git-hooks` and
+  ensuring the generated hook scripts are executable.
 - Removed stale `continue-on-error` handling from the generated style workflow
   so RuboCop Gradual failures are enforced by default.
 - Removed stale `continue-on-error` handling from the generated current workflow.

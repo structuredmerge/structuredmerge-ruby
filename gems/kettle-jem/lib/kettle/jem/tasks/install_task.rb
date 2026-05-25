@@ -22,6 +22,7 @@ module Kettle
           mise_step = mise_trust_step(project_root, report, env: env)
           install_steps << mise_step if mise_step
           install_steps.concat(post_template_project_fix_steps(project_root, report, env: env))
+          install_steps << hook_templates_step(project_root, effective_run_options)
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
@@ -85,6 +86,7 @@ module Kettle
               readme_gemspec_grapheme_sync
               gemspec_homepage_literal
               env_local_gitignore
+              hook_templates
               bin_setup_executable
               bin_setup
               bundle_binstubs
@@ -674,6 +676,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_lock_normalization"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "hook_templates"
+              execute_hook_templates_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bootstrap_commit"
               execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             else
@@ -687,6 +691,49 @@ module Kettle
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
           command_env
+        end
+
+        def hook_templates_step(project_root, run_options)
+          mode = normalize_hook_templates_mode((run_options || {})[:hook_templates])
+          return {
+            name: "hook_templates",
+            status: "skipped",
+            reason: "not_requested",
+          } if mode.empty? || mode == "none"
+
+          return {
+            name: "hook_templates",
+            status: "unsupported",
+            reason: "global_hooks_not_implemented",
+            requested: mode,
+          } if mode == "global"
+
+          hooks_dir = File.join(project_root.to_s, ".git-hooks")
+          missing_hooks = %w[commit-msg prepare-commit-msg].reject { |hook| File.file?(File.join(hooks_dir, hook)) }
+          return {
+            name: "hook_templates",
+            status: "unavailable",
+            reason: "missing_local_hook_templates",
+            missing_hooks: missing_hooks,
+          } unless missing_hooks.empty?
+
+          {
+            name: "hook_templates",
+            status: "ready",
+            command: %w[git config core.hooksPath .git-hooks],
+            chmod_paths: %w[.git-hooks/commit-msg .git-hooks/prepare-commit-msg],
+            reason: "ready_for_local_hooks",
+          }
+        end
+
+        def normalize_hook_templates_mode(value)
+          normalized = value.to_s.strip.downcase
+          return "" if normalized.empty?
+          return "none" if %w[0 false f no n none off skip].include?(normalized)
+          return "local" if %w[1 true t yes y on l local].include?(normalized)
+          return "global" if %w[g global].include?(normalized)
+
+          normalized
         end
 
         def bundled_handoff_step(project_root:, env:, run_options:)
@@ -848,6 +895,24 @@ module Kettle
           step.merge(
             status: "succeeded",
             command_results: results,
+            reason: "executed"
+          )
+        end
+
+        def execute_hook_templates_step(step, project_root:, env:, quiet:, command_runner:)
+          return step unless step.fetch(:status) == "ready"
+
+          step.fetch(:chmod_paths, []).each do |relative_path|
+            path = File.join(project_root.to_s, relative_path)
+            FileUtils.chmod(0o755, path) if File.file?(path)
+          end
+          result = command_runner.call(step.fetch(:command), chdir: project_root, env: env, quiet: quiet)
+          unless result.fetch(:success)
+            raise Kettle::Jem::Error, "hook_templates failed: #{step.fetch(:command).join(" ")}\n#{result[:stderr]}"
+          end
+          step.merge(
+            status: "succeeded",
+            exitstatus: result[:exitstatus],
             reason: "executed"
           )
         end

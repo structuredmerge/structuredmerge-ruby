@@ -2901,6 +2901,60 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "activates local git hooks when requested by the template task" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-hook-activation", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "Gemfile.lock" => <<~LOCK,
+          GEM
+            remote: https://gem.coop/
+            specs:
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+
+          BUNDLED WITH
+             4.0.10
+        LOCK
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries: []
+        YAML
+        ".git-hooks/commit-msg" => "#!/bin/sh\n",
+        ".git-hooks/prepare-commit-msg" => "#!/bin/sh\n",
+      })
+
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      report = Kettle::Jem::Tasks::TemplateTask.run(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: {hook_templates: "l", quiet: true},
+        command_runner: command_runner
+      )
+
+      expect(report.fetch(:template_steps)).to include(hash_including(
+        name: "hook_templates",
+        command: %w[git config core.hooksPath .git-hooks],
+        status: "succeeded",
+        reason: "executed"
+      ))
+      expect(commands.map { |entry| entry.fetch(:command) }).to include(%w[git config core.hooksPath .git-hooks])
+      expect(File.stat(File.join(root, ".git-hooks", "commit-msg")).mode & 0o111).not_to eq(0)
+      expect(File.stat(File.join(root, ".git-hooks", "prepare-commit-msg")).mode & 0o111).not_to eq(0)
+    end
+  end
+
   it "reports gemspec dependency sync through the install task" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
