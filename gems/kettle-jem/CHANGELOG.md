@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
   yard-timekeeper is installed through the rake `yard` task hook.
 - Escaped generated README metadata table cells so multiline gemspec
   descriptions render with `<br>` instead of breaking table rows.
+- Updated the generated contributing guide to refresh the `REEK` backlog with
+  `bin/rake reek:update` instead of redirecting the raw `reek` executable.
 ### Security
 
 ## [7.0.0] - 2026-05-05
