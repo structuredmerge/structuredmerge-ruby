@@ -42,6 +42,9 @@ Please file a bug if you notice a violation of semantic versioning.
   descriptions render with `<br>` instead of breaking table rows.
 - Updated the generated contributing guide to refresh the `REEK` backlog with
   `bin/rake reek:update` instead of redirecting the raw `reek` executable.
+- Replaced `bundle binstubs --all` during template install with curated
+  binstubs for documented project entrypoints, and prune stale Bundler-generated
+  development-tool binstubs such as `bin/reek`.
 ### Security
 
 ## [7.0.0] - 2026-05-05
