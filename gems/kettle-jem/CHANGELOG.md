@@ -45,6 +45,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Replaced `bundle binstubs --all` during template install with curated
   binstubs for documented project entrypoints, and prune stale Bundler-generated
   development-tool binstubs such as `bin/reek`.
+- Added `kettle-test` and `kettle-drift` to the curated generated binstub set,
+  and added `kettle-drift` to generated gemspec development dependencies so the
+  documented drift plugin executable is available.
 ### Security
 
 ## [7.0.0] - 2026-05-05

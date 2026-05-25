@@ -2455,7 +2455,7 @@ RSpec.describe Kettle::Jem do
   it "runs install as active apply plus local post-template checks" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
-    curated_binstubs = %w[bundle binstubs rake kettle-dev kettle-soup-cover stone_checksums]
+    curated_binstubs = %w[bundle binstubs rake kettle-dev kettle-test kettle-soup-cover kettle-drift stone_checksums]
     Dir.mktmpdir("kettle-jem-install-post-template-slice", tmp_root) do |root|
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
@@ -2708,7 +2708,7 @@ RSpec.describe Kettle::Jem do
 
   it "generates only curated documented binstubs" do
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
-      %w[bundle binstubs rake kettle-dev kettle-soup-cover stone_checksums]
+      %w[bundle binstubs rake kettle-dev kettle-test kettle-soup-cover kettle-drift stone_checksums]
     )
   end
 
@@ -3485,7 +3485,7 @@ RSpec.describe Kettle::Jem do
       expect(signature).to include("module Version")
       expect(signature).to include("VERSION: String")
       expect(commands).to eq([
-        %w[bundle binstubs rake kettle-dev kettle-soup-cover stone_checksums],
+        %w[bundle binstubs rake kettle-dev kettle-test kettle-soup-cover kettle-drift stone_checksums],
         ["bundle", "exec", "kettle-jem", "--skip-commit", "--only", "example-gem.gemspec"],
       ])
     end

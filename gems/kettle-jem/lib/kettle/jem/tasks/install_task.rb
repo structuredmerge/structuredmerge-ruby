@@ -11,19 +11,21 @@ module Kettle
       module InstallTask
         module_function
 
-        CURATED_BINSTUB_GEMS = %w[rake kettle-dev kettle-soup-cover stone_checksums].freeze
+        CURATED_BINSTUB_GEMS = %w[rake kettle-dev kettle-test kettle-soup-cover kettle-drift stone_checksums].freeze
         CURATED_BINSTUB_EXECUTABLES = %w[
           gem_checksums
           kettle-changelog
           kettle-check-eof
           kettle-commit-msg
           kettle-dev-setup
+          kettle-drift
           kettle-dvcs
           kettle-gh-release
           kettle-pre-release
           kettle-readme-backers
           kettle-release
           kettle-soup-cover
+          kettle-test
           rake
         ].freeze
 
