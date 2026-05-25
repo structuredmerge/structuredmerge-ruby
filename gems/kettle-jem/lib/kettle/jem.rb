@@ -859,6 +859,133 @@ module Kettle
         URI.encode_www_form_component(value.to_s)
       end
     end
+
+    class GemSpecReader
+      DEFAULT_MINIMUM_RUBY = Gem::Version.new("1.8").freeze
+      CacheState = Struct.new(:entries, :mutex)
+      CACHE = CacheState.new({}, Mutex.new)
+      private_constant :CacheState, :CACHE
+
+      class << self
+        def load(root)
+          cache_key = File.expand_path(root.to_s)
+          CACHE.mutex.synchronize do
+            return CACHE.entries[cache_key] if CACHE.entries.key?(cache_key)
+          end
+
+          gemspec_path = Dir.glob(File.join(root.to_s, "*.gemspec")).first
+          spec = load_gemspec(gemspec_path)
+          result = metadata(root: root, gemspec_path: gemspec_path, spec: spec)
+
+          CACHE.mutex.synchronize do
+            CACHE.entries[cache_key] = result
+          end
+          result
+        end
+
+        def clear_cache!
+          CACHE.mutex.synchronize { CACHE.entries.clear }
+        end
+
+        private
+
+        def load_gemspec(gemspec_path)
+          return unless gemspec_path && File.file?(gemspec_path)
+
+          Gem::Specification.load(gemspec_path)
+        rescue StandardError
+          nil
+        end
+
+        def metadata(root:, gemspec_path:, spec:)
+          gem_name = spec&.name.to_s
+          gem_name = fallback_gem_name(gemspec_path) if gem_name.strip.empty?
+          homepage = spec&.homepage.to_s
+          forge = derive_forge(homepage)
+          entrypoint_require = derive_entrypoint_require(root: root, gem_name: gem_name, spec: spec)
+          namespace = entrypoint_require.to_s.split("/").reject(&:empty?).map { |segment| camelize(segment) }.join("::")
+
+          {
+            gemspec_path: gemspec_path,
+            gem_name: gem_name,
+            version: spec&.version.to_s,
+            min_ruby: min_ruby_version(spec&.required_ruby_version),
+            homepage: homepage,
+            gh_org: forge.fetch(:org, nil),
+            forge_org: forge.fetch(:org, nil),
+            gh_repo: forge.fetch(:repo, nil),
+            namespace: namespace,
+            namespace_shield: namespace.gsub("::", "%3A%3A"),
+            entrypoint_require: entrypoint_require,
+            gem_shield: gem_name.gsub("-", "--").gsub("_", "__"),
+            authors: Array(spec&.authors).compact.uniq,
+            email: Array(spec&.email).compact.uniq,
+            summary: spec&.summary.to_s,
+            description: spec&.description.to_s,
+            licenses: Array(spec&.licenses),
+            required_ruby_version: spec&.required_ruby_version,
+            require_paths: Array(spec&.require_paths),
+            bindir: (spec&.bindir || "").to_s,
+            executables: Array(spec&.executables),
+            runtime_dependencies: Array(spec&.runtime_dependencies),
+            development_dependencies: Array(spec&.development_dependencies),
+          }
+        end
+
+        def min_ruby_version(requirement)
+          return DEFAULT_MINIMUM_RUBY unless requirement
+
+          Gem::Requirement.parse(requirement)[1] || DEFAULT_MINIMUM_RUBY
+        rescue StandardError
+          DEFAULT_MINIMUM_RUBY
+        end
+
+        def fallback_gem_name(gemspec_path)
+          return "" unless gemspec_path
+
+          File.basename(gemspec_path.to_s, ".gemspec")
+        end
+
+        def derive_forge(homepage)
+          uri = URI.parse(homepage.to_s)
+          return {} unless uri.host.to_s.casecmp("github.com").zero?
+
+          parts = uri.path.to_s.split("/").reject(&:empty?)
+          {
+            org: parts[0],
+            repo: parts[1].to_s.sub(/\.git\z/, ""),
+          }
+        rescue URI::InvalidURIError
+          {}
+        end
+
+        def derive_entrypoint_require(root:, gem_name:, spec:)
+          default_entrypoint = gem_name.to_s.tr("-", "/")
+          return default_entrypoint if entrypoint_exists?(root, default_entrypoint)
+
+          Array(spec&.require_paths).each do |require_path|
+            lib_root = File.join(root.to_s, require_path.to_s)
+            next unless Dir.exist?(lib_root)
+
+            version_files = Dir.glob(File.join(lib_root, "**", "version.rb")).reject { |path| path.include?("/vendor/") }
+            return version_files.first.sub(%r{\A#{Regexp.escape(lib_root)}/?}, "").sub(%r{/version\.rb\z}, "") if version_files.size == 1
+          end
+
+          default_entrypoint
+        end
+
+        def entrypoint_exists?(root, entrypoint_require)
+          return false if entrypoint_require.to_s.strip.empty?
+
+          File.file?(File.join(root.to_s, "lib", "#{entrypoint_require}.rb")) ||
+            File.file?(File.join(root.to_s, "lib", entrypoint_require, "version.rb"))
+        end
+
+        def camelize(value)
+          value.to_s.split(/[_-]/).map { |part| "#{part[0].to_s.upcase}#{part[1..]}" }.join
+        end
+      end
+    end
     README_DEFAULT_PRESERVE_SECTIONS = ["synopsis", "configuration", "basic usage"].freeze
     README_DEFAULT_PRESERVE_PATTERNS = ["note:*"].freeze
     README_CODETRIAGE_BADGE = "[![Open Source Helpers][👽oss-helpi]][👽oss-help]"
@@ -1778,13 +1905,18 @@ module Kettle
       ]
       matrix_entries.each do |entry|
         lines << %(appraise "#{entry.fetch(:name)}" do)
-        lines << %(  eval_gemfile "#{entry.fetch(:tier1_gemfile)}") if entry[:tier1_gemfile]
-        lines << %(  eval_gemfile "#{entry.fetch(:tier2_gemfile)}") if entry[:tier2_gemfile]
-        lines << %(  eval_gemfile "#{entry.fetch(:x_std_libs_gemfile)}") if entry[:x_std_libs_gemfile]
+        lines << %(  eval_gemfile "#{appraisal_eval_gemfile_path(entry.fetch(:tier1_gemfile))}") if entry[:tier1_gemfile]
+        lines << %(  eval_gemfile "#{appraisal_eval_gemfile_path(entry.fetch(:tier2_gemfile))}") if entry[:tier2_gemfile]
+        lines << %(  eval_gemfile "#{appraisal_eval_gemfile_path(entry.fetch(:x_std_libs_gemfile))}") if entry[:x_std_libs_gemfile]
         lines << "end"
         lines << ""
       end
+      lines.pop while lines.last == ""
       ensure_trailing_newline(lines.join("\n"))
+    end
+
+    def appraisal_eval_gemfile_path(path)
+      path.to_s.delete_prefix("gemfiles/")
     end
 
     def appraisal_workflow_groups(matrix_entries, bucket_ranges:, exec_cmd: "kettle-test")
@@ -5079,6 +5211,7 @@ module Kettle
       )
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
+      merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
@@ -5187,6 +5320,30 @@ module Kettle
       return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
 
       content
+    end
+
+    def remove_duplicate_gemspec_assignments(content, receiver:, fields:)
+      wanted = fields.map(&:to_s).to_set
+      seen = Set.new
+      duplicate_ranges = []
+      gemspec_assignment_records(content, receiver: receiver).each do |record|
+        field = record.fetch(:field).to_s
+        next unless wanted.include?(field)
+
+        key = [record.fetch(:receiver).to_s, field, record.fetch(:value)]
+        if seen.include?(key)
+          duplicate_ranges << [record.fetch(:start_line), record.fetch(:end_line)]
+        else
+          seen << key
+        end
+      end
+      return content if duplicate_ranges.empty?
+
+      lines = content.to_s.lines
+      duplicate_ranges.reverse_each do |start_line, end_line|
+        lines.slice!(start_line - 1, end_line - start_line + 1)
+      end
+      ensure_trailing_newline(lines.join)
     end
 
     def gemspec_block_param(source)
@@ -7237,7 +7394,7 @@ module Kettle
       original_stdout = $stdout
       $stderr = StringIO.new
       $stdout = StringIO.new
-      Kettle::Dev::GemSpecReader.load(project_root)
+      GemSpecReader.load(project_root)
     ensure
       $stderr = original_stderr
       $stdout = original_stdout
@@ -9493,7 +9650,7 @@ module Kettle
                   - default
                 bundler:
                   - default
-              framework:
+                framework:
         #{framework_axis}
 
             steps:

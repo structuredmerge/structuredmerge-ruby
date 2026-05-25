@@ -21,11 +21,23 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 - Documented `kettle-jem template` as the canonical templating entrypoint and
   marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
-- `kettle-jem` project fact discovery now uses `Kettle::Dev::GemSpecReader`
+- `kettle-jem` project fact discovery now uses `Kettle::Jem::GemSpecReader`
   and RubyGems specification objects instead of parsing gemspec source.
 ### Deprecated
 ### Removed
 ### Fixed
+- Added a native `Kettle::Jem::GemSpecReader` for gemspec metadata so tooling
+  built on `kettle-jem` no longer needs to call into `kettle-dev` for project
+  Ruby floors and gemspec facts.
+- Kept malformed destination gemspecs from leaving template tokens unresolved
+  by falling back to filename-derived gem identity inside `GemSpecReader`.
+- Fixed generated appraisal `eval_gemfile` paths so Appraisal2 resolves
+  modular gemfiles relative to `gemfiles/` instead of `gemfiles/gemfiles/`.
+- Fixed generated Appraisals content so it does not end with an extra blank line.
+- Fixed generated framework workflow YAML indentation so `framework:` remains
+  under `strategy.matrix`.
+- Removed duplicate generated `spec.homepage` assignments when destination
+  gemspecs already carry the configured homepage.
 - `kettle-jem template --hook-templates l` now activates the generated
   project-local `.git-hooks` by setting `core.hooksPath` to `.git-hooks` and
   ensuring the generated hook scripts are executable.

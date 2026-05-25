@@ -533,10 +533,12 @@ RSpec.describe Kettle::Jem do
       expect(configured_plan.fetch(:changed_files)).to include(".github/workflows/framework-ci.yml")
       expect(content).to include("name: Rails CI")
       expect(content).to include('          - "3.2"')
+      expect(content).to include('        framework:')
       expect(content).to include('          - framework_version: "7.0"')
       expect(content).to include('            appraisal: "rails-7-0"')
       expect(content).to include('          - framework_version: "7.1+"')
       expect(content).to include('            appraisal: "rails-7-1"')
+      expect(YAML.safe_load(content)).to be_a(Hash)
       expect(content).to include("Appraisal.root.gemfile")
       expect(content).to include("framework:")
       expect(content).to include("bundle exec appraisal ${{ matrix.framework.appraisal }} install")
@@ -3158,6 +3160,7 @@ RSpec.describe Kettle::Jem do
       expect(File).not_to exist(File.join(root, ".tool-versions"))
       gemspec = File.read(File.join(root, "example.gemspec"))
       expect(gemspec).to include('spec.homepage = "https://github.com/example-org/example"')
+      expect(gemspec.scan('spec.homepage = "https://github.com/example-org/example"').size).to eq(1)
       expect(gemspec).to include('spec.summary = "🔧 Example gem"')
       expect(gemspec).to include('spec.description = "🔧 Example description"')
       expect(File.read(File.join(root, ".gitignore"))).to include(".env.local")
@@ -5545,8 +5548,10 @@ RSpec.describe Kettle::Jem do
 
     appraisals = described_class.appraisal_file_content(matrix_entries)
     expect(appraisals).to include('appraise "kja-ar-7-1-oa-2-1-r3" do')
-    expect(appraisals).to include('eval_gemfile "gemfiles/modular/activerecord/r3/v7.1.gemfile"')
+    expect(appraisals).to include('eval_gemfile "modular/activerecord/r3/v7.1.gemfile"')
+    expect(appraisals).not_to include('eval_gemfile "gemfiles/')
     expect(appraisals).to include('appraise "kja-mail-2-8-r2" do')
+    expect(appraisals).not_to end_with("\n\n")
 
     groups = described_class.appraisal_workflow_groups(matrix_entries, bucket_ranges: bucket_ranges)
     expect(groups).to eq(
@@ -5760,6 +5765,49 @@ RSpec.describe Kettle::Jem do
       "https://example.test/api/v1/versions/active+record.json" => 1,
       "https://example.test/api/v2/rubygems/active+record/versions/7.1.3.json" => 1
     )
+  end
+
+  it "loads gemspec metadata through Kettle/Jem GemSpecReader" do
+    Dir.mktmpdir do |project_root|
+      write_tree(
+        project_root,
+        {
+          "demo_tool.gemspec" => <<~RUBY,
+            Gem::Specification.new do |spec|
+              spec.name = "demo_tool"
+              spec.version = "0.1.0"
+              spec.authors = ["Demo Author"]
+              spec.email = ["demo@example.com"]
+              spec.summary = "Demo"
+              spec.homepage = "https://github.com/example/demo_tool"
+              spec.required_ruby_version = ">= 3.2"
+              spec.add_dependency "runtime_dep", ">= 1"
+              spec.add_development_dependency "dev_dep", ">= 1"
+            end
+          RUBY
+          "lib/demo_tool/version.rb" => "module DemoTool; VERSION = '0.1.0'; end\n",
+        }
+      )
+
+      described_class::GemSpecReader.clear_cache!
+
+      metadata = described_class::GemSpecReader.load(project_root)
+
+      expect(metadata).to include(
+        gem_name: "demo_tool",
+        version: "0.1.0",
+        min_ruby: Gem::Version.new("3.2"),
+        homepage: "https://github.com/example/demo_tool",
+        gh_org: "example",
+        gh_repo: "demo_tool",
+        namespace: "DemoTool",
+        entrypoint_require: "demo_tool",
+      )
+      expect(metadata.fetch(:runtime_dependencies).map(&:name)).to eq(["runtime_dep"])
+      expect(metadata.fetch(:development_dependencies).map(&:name)).to eq(["dev_dep"])
+    end
+  ensure
+    described_class::GemSpecReader.clear_cache!
   end
 
   it "ports appraisal CLI config orchestration helpers into Kettle/Jem" do
