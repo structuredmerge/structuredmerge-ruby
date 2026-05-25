@@ -139,6 +139,9 @@ workflows:
   # Default command used by generated test workflows.
   # ENV override: KJ_EXEC_CMD
   exec_cmd: kettle-test
+  # Include VCR/WebMock recording modular gemfiles in generated Appraisals.
+  # Enable only for projects that actually require recording support.
+  recording: false
   # preset: framework
   # framework_matrix:
   #   dimension: activerecord

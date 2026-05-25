@@ -2501,6 +2501,7 @@ module Kettle
         provider: "github_actions",
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
+        recording: appraisal_recording_enabled?(kettle_config),
         ruby_versions: github_actions_ruby_versions(facts.fetch(:rubygems).fetch(:min_ruby, nil)),
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
@@ -4788,9 +4789,41 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s if facts
       min_ruby = minimum_ruby_token(facts.dig(:rubygems, :min_ruby)) if facts
       with_framework_appraisals = merge_framework_matrix_appraisals(content, facts)
-      pruned = prune_appraisals_below_min_ruby(with_framework_appraisals, min_ruby)
+      pruned = prune_appraisals_recording_entries(with_framework_appraisals, facts)
+      pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    def prune_appraisals_recording_entries(content, facts)
+      return content if facts.to_h.dig(:ci, :recording)
+
+      remove_indexes = Set.new
+      lines = content.to_s.lines
+      ruby_call_records(content, :eval_gemfile).each do |call|
+        path = ruby_string_argument(call)
+        next unless path.to_s.include?("modular/recording/")
+
+        (call.location.start_line..call.location.end_line).each { |line_number| remove_indexes << (line_number - 1) }
+      end
+      head_appraisal = appraisal_call_records(content).find { |record| record.fetch(:name) == "head" }
+      if head_appraisal
+        gemfile_gem_call_records(content).each do |record|
+          next unless record.fetch(:name) == "cgi"
+          next unless record.fetch(:start_line) >= head_appraisal.fetch(:start_line)
+          next unless record.fetch(:end_line) <= head_appraisal.fetch(:end_line)
+
+          start_index = record.fetch(:start_line) - 1
+          while start_index.positive? && gemfile_comment_line?(lines[start_index - 1])
+            start_index -= 1
+          end
+          (start_index..(record.fetch(:end_line) - 1)).each { |index| remove_indexes << index }
+        end
+      end
+      return content if remove_indexes.empty?
+
+      kept = lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
+      ensure_trailing_newline(kept.join.gsub(/\n{3,}/, "\n\n"))
     end
 
     def merge_framework_matrix_appraisals(content, facts)
@@ -8906,6 +8939,8 @@ module Kettle
     end
 
     def skip_packaged_gemfile_template?(target_path, config)
+      return true if target_path.to_s.include?("gemfiles/modular/recording/") && !appraisal_recording_enabled?(config)
+
       version = packaged_gemfile_template_ruby_floor(target_path)
       return false unless version
 
@@ -9089,6 +9124,13 @@ module Kettle
       workflows = {} unless workflows.is_a?(Hash)
 
       preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
+    end
+
+    def appraisal_recording_enabled?(config)
+      workflows = config["workflows"]
+      workflows = {} unless workflows.is_a?(Hash)
+
+      DecisionPolicy.value_to_boolean(workflows["recording"]) == true
     end
 
     def expand_framework_gemfile_pattern(pattern, version)

@@ -80,8 +80,8 @@ Please file a bug if you notice a violation of semantic versioning.
   already declares the same gem as a runtime dependency.
 - Preserved zero-byte generated template outputs such as `REEK` instead of
   normalizing them to a single blank line.
-- Restored generated Appraisal recording gemfiles so appraisal-isolated test
-  bundles include VCR/WebMock without loading the root development Gemfile.
+- Added `workflows.recording` to `.kettle-jem.yml` so generated Appraisals only
+  include VCR/WebMock recording gemfiles for projects that opt in.
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -685,6 +685,55 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "prunes packaged recording gemfile templates unless recording is configured" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-recording-gemfile-slice", tmp_root) do |root|
+      recording_path = "gemfiles/modular/recording/r4/recording.gemfile"
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - #{recording_path}
+        YAML
+        recording_path => "stale recording gemfile\n",
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      cleanup_report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == recording_path
+      end
+      expect(cleanup_report.fetch(:recipe_name)).to start_with("template_inactive_packaged_cleanup_")
+      expect(cleanup_report.fetch(:metadata)).to include(delete_file: true)
+
+      write_tree(root, {
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            recording: true
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - #{recording_path}
+        YAML
+      })
+
+      opted_in = described_class.plan_project(root, env: {})
+      paths = opted_in.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }
+      expect(paths).to include(recording_path)
+      expect(opted_in.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == recording_path }.fetch(:recipe_name)).not_to start_with("template_inactive_packaged_cleanup_")
+    end
+  end
+
   it "disables checkout credential persistence in packaged GitHub workflows" do
     workflow_templates = Dir[File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/*.{yml,yaml}.example")]
     checkout_templates = workflow_templates.select { |path| File.read(path).include?("uses: actions/checkout@") }
@@ -4146,6 +4195,12 @@ RSpec.describe Kettle::Jem do
             eval_gemfile "gemfiles/modular/x_std_libs/r3/libs.gemfile"
           end
 
+          appraise "head" do
+            # Why is gem "cgi" here? See: https://github.com/vcr/vcr/issues/1057
+            gem "cgi", ">= 0.5"
+            eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"
+          end
+
           appraise "path-gems" do
             %w[
               example
@@ -4171,6 +4226,9 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_content).not_to include('gem "example"')
       expect(appraisals_content).to include('appraise "ruby-3-2"')
       expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/x_std_libs/r3/libs.gemfile"')
+      expect(appraisals_content).to include('appraise "head"')
+      expect(appraisals_content).not_to include('gem "cgi"')
+      expect(appraisals_content).not_to include("modular/recording/")
       expect(appraisals_content).to include('appraise "coverage"')
       expect(appraisals_content).to include('gem "simplecov"')
       expect(appraisals_content).to include('appraise "path-gems"')
@@ -4186,6 +4244,47 @@ RSpec.describe Kettle::Jem do
         )
       )
       expect(File.read(File.join(root, "Appraisals"))).to eq(appraisals_content)
+    end
+  end
+
+  it "keeps Appraisals recording gemfiles only when configured" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-recording-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            recording: true
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY,
+          # frozen_string_literal: true
+
+          appraise "head" do
+            gem "cgi", ">= 0.5"
+            eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      appraisals_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_Appraisals"
+      end
+      appraisals_content = appraisals_report.fetch(:final_content)
+
+      expect(appraisals_content).to include('gem "cgi", ">= 0.5"')
+      expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"')
     end
   end
 
