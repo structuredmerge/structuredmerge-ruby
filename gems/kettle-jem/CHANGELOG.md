@@ -48,6 +48,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added `kettle-test` to the curated generated binstub set, and preserve
   `kettle-drift` binstubs when they already exist from local/plugin installs
   without requiring unreleased `kettle-drift` in every generated gemspec.
+- Added `kettle-drift` to generated templating Gemfiles, resolved remotely in
+  templating mode and via `KETTLE_RB_DEV` locally, separate from the
+  `SMORG_RB_DEV` StructuredMerge local gem set.
 ### Security
 
 ## [7.0.0] - 2026-05-05
