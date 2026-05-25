@@ -18,6 +18,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 ### Added
+- Added a default-off `readme.badges.fossa` template option for managed FOSSA
+  README badges.
 ### Changed
 - Documented `kettle-jem install` as the canonical full templating entrypoint
   and marked generated `kettle:jem:*` rake tasks as internal orchestration targets.

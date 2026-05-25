@@ -200,6 +200,16 @@ readme:
   # section_aliases:
   #   howto: basic usage
   #   options: configuration
+  # README badges managed by the template.
+  badges:
+    # FOSSA license/security status badge.
+    # false - omit the badge (default)
+    # true  - derive project id from the GitHub repository slug
+    # string or mapping project/project_id/slug - explicit FOSSA project id
+    #
+    # Example:
+    # fossa: git+github.com/pboling/example
+    fossa: false
 
 # SPDX license identifiers for this project.
 # List one or more licenses that apply to the gem. Users may use the software

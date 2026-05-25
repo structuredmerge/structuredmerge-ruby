@@ -221,6 +221,8 @@ module Kettle
       KJ|README:LICENSE_BADGE
       KJ|README:LICENSE_COMPAT_BADGE
       KJ|README:LICENSE_EYE_WORKFLOW_BADGE
+      KJ|README:FOSSA_BADGE
+      KJ|README:FOSSA_REFS
       KJ|README:LICENSE_INTRO
       KJ|README:LICENSE_REFS
       KJ|README:TOP_LOGO_REFS
@@ -992,6 +994,8 @@ module Kettle
     README_CODETRIAGE_LINK_LABELS = ["👽oss-help", "👽oss-helpi"].freeze
     README_LICENSE_EYE_WORKFLOW_BADGE = "[![Apache SkyWalking Eyes License Compatibility Check][🚎15-🪪-wfi]][🚎15-🪪-wf]"
     README_LICENSE_EYE_WORKFLOW_LINK_LABELS = ["🚎15-🪪-wf", "🚎15-🪪-wfi"].freeze
+    README_FOSSA_BADGE = "[![FOSSA Status][🧪fossa-img]][🧪fossa]"
+    README_FOSSA_LINK_LABELS = ["🧪fossa", "🧪fossa-img"].freeze
     LICENSE_EYE_COMPATIBILITY_LICENSES = %w[MIT].freeze
     README_OPEN_COLLECTIVE_FUNDING_BADGES = "[![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors]"
     README_OPEN_COLLECTIVE_LINK_LABELS = [
@@ -3943,6 +3947,9 @@ module Kettle
 
     def apply_readme_badge_policy(content, facts)
       processed = remove_readme_badge_and_refs(content, README_CODETRIAGE_BADGE, README_CODETRIAGE_LINK_LABELS)
+      if facts.dig(:readme_style, :fossa_project).to_s.empty?
+        processed = remove_readme_badge_and_refs(processed, README_FOSSA_BADGE, README_FOSSA_LINK_LABELS)
+      end
       unless Array(facts.dig(:license, :spdx)).map(&:to_s).include?("MIT")
         processed = remove_readme_badge_and_refs(
           processed,
@@ -6935,9 +6942,24 @@ module Kettle
       tokens["KJ|OPENCOLLECTIVE_ORG"] = org
       tokens["KJ|README:FAMILY_INTRO_BACKEND_MATRIX"] =
         readme_family_intro_and_backend_matrix(facts.fetch(:readme_style, {}))
+      tokens.merge!(readme_fossa_template_tokens(facts.fetch(:readme_style, {})))
       tokens.merge!(version_gem_template_tokens(facts))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
+    end
+
+    def readme_fossa_template_tokens(readme_style)
+      project = readme_style.fetch(:fossa_project, "").to_s
+      return {"KJ|README:FOSSA_BADGE" => "", "KJ|README:FOSSA_REFS" => ""} if project.empty?
+
+      encoded_project = URI.encode_www_form_component(project)
+      {
+        "KJ|README:FOSSA_BADGE" => README_FOSSA_BADGE,
+        "KJ|README:FOSSA_REFS" => [
+          "[🧪fossa]: https://app.fossa.com/projects/#{encoded_project}?ref=badge_shield",
+          "[🧪fossa-img]: https://app.fossa.com/api/projects/#{encoded_project}.svg?type=shield",
+        ].join("\n"),
+      }
     end
 
     def readme_url_template_tokens(repository, package_name, github_org)
@@ -8466,17 +8488,41 @@ module Kettle
       omitted_sections << "floss_funding" unless floss_funding_enabled
       section_partials = readme_section_partials(project_root, config, readme)
       package_family = readme["package_family"].to_s.strip.downcase
+      fossa_project = readme_fossa_project(readme, repository)
       compact_hash(
         profile: "slice-740-kettle-readme-style-profile",
         security_enabled: security_enabled,
         floss_funding_enabled: floss_funding_enabled,
         package_family: package_family,
+        fossa_project: fossa_project,
         omitted_sections: omitted_sections,
         disabled_integrations: disabled_integrations,
         missing_integrations: missing_integrations,
         workflow_paths: workflow_paths,
         section_partials: section_partials,
       )
+    end
+
+    def readme_fossa_project(readme, repository)
+      badges = readme["badges"].is_a?(Hash) ? readme["badges"] : {}
+      return "" unless badges.key?("fossa")
+
+      value = badges["fossa"]
+      return "" if falsey_config?(value)
+
+      project = case value
+      when Hash
+        return "" if falsey_config?(value["enabled"])
+
+        value["project"] || value["project_id"] || value["slug"]
+      else
+        value
+      end
+      normalized = project.to_s.strip
+      return normalized unless normalized.empty? || %w[true yes 1 on enabled].include?(normalized.downcase)
+
+      slug = repository.is_a?(Hash) ? repository[:slug].to_s : ""
+      slug.empty? ? "" : "git+github.com/#{slug}"
     end
 
     def readme_integration_project_root(project_root, template_profile, repository)

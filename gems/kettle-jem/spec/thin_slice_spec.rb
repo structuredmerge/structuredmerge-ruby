@@ -6336,6 +6336,31 @@ RSpec.describe Kettle::Jem do
     expect(block).not_to include("First line\n")
   end
 
+  it "renders optional FOSSA README badge tokens from configuration" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-fossa-readme-badge", tmp_root) do |root|
+      disabled_style = described_class.readme_style_facts(
+        root,
+        {"readme" => {"badges" => {"fossa" => false}}},
+        {spdx: ["MIT"]},
+        repository: {slug: "galtzo-floss/example"}
+      )
+      enabled_style = described_class.readme_style_facts(
+        root,
+        {"readme" => {"badges" => {"fossa" => "git+github.com/pboling/flag_shih_tzu"}}},
+        {spdx: ["MIT"]},
+        repository: {slug: "galtzo-floss/flag_shih_tzu"}
+      )
+
+      expect(disabled_style[:fossa_project]).to be_nil
+      tokens = described_class.readme_fossa_template_tokens(enabled_style)
+      expect(tokens.fetch("KJ|README:FOSSA_BADGE")).to eq("[![FOSSA Status][🧪fossa-img]][🧪fossa]")
+      expect(tokens.fetch("KJ|README:FOSSA_REFS")).to include("git%2Bgithub.com%2Fpboling%2Fflag_shih_tzu.svg?type=shield")
+      expect(tokens.fetch("KJ|README:FOSSA_REFS")).to include("git%2Bgithub.com%2Fpboling%2Fflag_shih_tzu?ref=badge_shield")
+    end
+  end
+
   it "applies configured licenses to merged gemspec output" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
