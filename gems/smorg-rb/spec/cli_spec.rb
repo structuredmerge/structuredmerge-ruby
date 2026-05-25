@@ -139,6 +139,31 @@ RSpec.describe Smorg::RB do
     expect(stdout.string).to include("*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown")
   end
 
+  it "falls back from unsupported structured file types instead of failing closed" do
+    ancestor = write_file(@dir, "ancestor.yml", "name: structuredmerge\ncurrent: false\n\nother: false\n")
+    current = write_file(@dir, "current.yml", "name: structuredmerge\ncurrent: true\n\nother: false\n")
+    other = write_file(@dir, "other.yml", "name: structuredmerge\ncurrent: false\n\nother: true\n")
+    report_path = File.join(@dir, "merge-report.json")
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(["merge-driver", "--report", report_path, ancestor, current, other, "config.yml"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    merged = File.read(current)
+    expect(merged).to include("current: true")
+    expect(merged).to include("other: true")
+    report = JSON.parse(File.read(report_path))
+    expect(report.fetch("ok")).to be(true)
+    expect(report.fetch("fallbacks")).to include(
+      a_hash_including(
+        "mode" => "git_merge_file",
+        "reason" => "unsupported_language",
+        "applied" => true,
+      ),
+    )
+  end
+
   it "returns conflict exit code for strict merge failures" do
     ancestor = write_file(@dir, "ancestor.json", '{"name":"structuredmerge"}')
     current = write_file(@dir, "current.json", '{"name":')

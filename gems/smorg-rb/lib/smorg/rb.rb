@@ -70,10 +70,20 @@ module Smorg
 
       fallback_policy = options[:strict] ? "none" : options[:fallback]
       result = merge_by_path(effective_path, settings[:language], settings[:conflict_marker_size], fallback_policy, ancestor_source, current_source, other_source)
+      fallbacks = []
+      if merge_driver_fallback_eligible?(result, options)
+        result, fallbacks = apply_merge_fallbacks(
+          result,
+          options[:fallback],
+          settings[:conflict_marker_size],
+          ancestor_source,
+          current_source,
+          other_source,
+        )
+      end
       output = result[:output]
       unless result[:ok]
         print_diagnostics(stderr, result)
-        fallbacks = []
         output ||= full_file_conflict_output(settings[:conflict_marker_size], ancestor_source, current_source, other_source) unless options[:strict] || options[:fallback] == "none"
         if output && !result[:output] && !options[:strict] && options[:fallback] != "none"
           fallbacks << {
@@ -96,13 +106,13 @@ module Smorg
 
       if options[:check_only]
         exit_code = options[:exit_code] && output != current_source ? EXIT_UNRESOLVED_CONFLICT : EXIT_SUCCESS
-        report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, exit_code, [], result, stderr)
+        report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, exit_code, fallbacks, result, stderr)
         return report_exit unless report_exit == EXIT_SUCCESS
         return exit_code
       end
 
       File.write(options[:output] || options[:current], output)
-      report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, EXIT_SUCCESS, [], result, stderr)
+      report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, EXIT_SUCCESS, fallbacks, result, stderr)
       return report_exit unless report_exit == EXIT_SUCCESS
       EXIT_SUCCESS
     rescue Errno::ENOENT, Errno::EACCES => e
@@ -111,6 +121,123 @@ module Smorg
     rescue StandardError => e
       stderr.puts("internal error: #{e.message}")
       EXIT_INTERNAL_ERROR
+    end
+
+    def apply_merge_fallbacks(result, requested_mode, marker_size, ancestor_source, current_source, other_source)
+      fallback_reason_value = fallback_reason(result.fetch(:diagnostics, []))
+      git_result = merge_git_file_fallback(marker_size, ancestor_source, current_source, other_source)
+      if git_result[:output]
+        return [
+          merge_fallback_result(result, git_result),
+          [
+            {
+              mode: "git_merge_file",
+              requested_mode: requested_mode,
+              reason: fallback_reason_value,
+              applied: true
+            },
+          ],
+        ]
+      end
+
+      plain_result = merge_plain_fallback(other_source, current_source)
+      if plain_result[:ok] && plain_result[:output]
+        return [
+          merge_fallback_result(result, plain_result),
+          [
+            {
+              mode: "git_merge_file",
+              requested_mode: requested_mode,
+              reason: fallback_reason_value,
+              applied: false
+            },
+            {
+              mode: "plain_text",
+              requested_mode: requested_mode,
+              reason: fallback_reason(git_result.fetch(:diagnostics, [])),
+              applied: true
+            },
+          ],
+        ]
+      end
+
+      [result, []]
+    end
+
+    def merge_driver_fallback_eligible?(result, options)
+      return false if result[:ok] || options[:strict] || options[:fallback] == "none"
+
+      result.fetch(:diagnostics, []).any? do |diagnostic|
+        (diagnostic[:category] || diagnostic["category"]).to_s == "unsupported_language"
+      end
+    end
+
+    def merge_plain_fallback(other_source, current_source)
+      Plain::Merge.merge_text(other_source, current_source)
+    rescue StandardError => e
+      {
+        ok: false,
+        diagnostics: [{ severity: "error", category: "plain_text_fallback_error", message: e.message }],
+        policies: []
+      }
+    end
+
+    def merge_git_file_fallback(marker_size, ancestor_source, current_source, other_source)
+      require "tempfile"
+
+      files = Array.new(3) { Tempfile.new("smorg-rb-merge-file") }
+      files[0].write(current_source)
+      files[1].write(ancestor_source)
+      files[2].write(other_source)
+      files.each(&:flush)
+      output = IO.popen(
+        [
+          "git",
+          "merge-file",
+          "-p",
+          "-L",
+          "ours",
+          "-L",
+          "base",
+          "-L",
+          "theirs",
+          "--marker-size=#{marker_size}",
+          files[0].path,
+          files[1].path,
+          files[2].path,
+        ],
+        err: [:child, :out],
+        &:read
+      )
+      {
+        ok: $?.success?,
+        diagnostics: $?.success? ? [] : [{ severity: "error", category: "git_merge_file_conflict", message: "git merge-file reported unresolved conflicts" }],
+        output: output,
+        policies: []
+      }
+    rescue Errno::ENOENT => e
+      {
+        ok: false,
+        diagnostics: [{ severity: "error", category: "git_merge_file_unavailable", message: e.message }],
+        policies: []
+      }
+    ensure
+      files&.each do |file|
+        file.close
+        file.unlink
+      end
+    end
+
+    def merge_fallback_result(original_result, fallback_result)
+      original_diagnostics = original_result.fetch(:diagnostics, [])
+      fallback_diagnostics = fallback_result.fetch(:diagnostics, [])
+      {
+        **original_result,
+        ok: fallback_result[:ok],
+        diagnostics: original_diagnostics + fallback_diagnostics,
+        output: fallback_result[:output],
+        policies: fallback_result.fetch(:policies, original_result.fetch(:policies, []))
+      }
     end
 
     def full_file_conflict_output(marker_size, ancestor_source, current_source, other_source)
