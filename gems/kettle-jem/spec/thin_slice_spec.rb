@@ -1389,6 +1389,52 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "uses explicit Open Collective config as the template token source" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-opencollective-config-org-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          funding:
+            open_collective: config-org
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      expect(plan.dig(:facts, :funding, :open_collective_org)).to eq("config-org")
+      expect(plan.dig(:facts, :funding, :open_collective_org_source)).to eq("config.funding.open_collective")
+      expect(plan.dig(:facts, :funding, :urls)).to include("https://opencollective.com/config-org")
+      expect(plan.dig(:facts, :templates, :tokens)).to include("KJ|OPENCOLLECTIVE_ORG" => "config-org")
+    end
+  end
+
+  it "disables Open Collective template content when no org can be resolved" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-opencollective-missing-org-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      expect(plan.dig(:facts, :funding, :open_collective_disabled)).to be(true)
+      expect(plan.dig(:facts, :funding, :open_collective_disabled_source)).to eq("missing.open_collective_org")
+      expect(plan.dig(:facts, :funding, :open_collective_org)).to be_nil
+      expect(plan.dig(:facts, :funding, :urls)).not_to include("https://opencollective.com/")
+    end
+  end
+
   it "discovers Open Collective org from environment before .opencollective.yml" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

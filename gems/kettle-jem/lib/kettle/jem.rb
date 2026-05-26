@@ -2455,7 +2455,7 @@ module Kettle
         urls: funding_urls(project_root, package_name, opencollective_disabled: false),
         platform_tokens: funding_platform_token_facts(kettle_config, env)
       )
-      detected_open_collective_org = opencollective_org(project_root, env, opencollective_disabled: false)
+      detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: false)
       if detected_open_collective_org
         funding[:open_collective_org] = detected_open_collective_org.fetch(:org)
         funding[:open_collective_org_source] = detected_open_collective_org.fetch(:source)
@@ -2608,7 +2608,11 @@ module Kettle
       facts[:social] = social unless social.empty?
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
-      open_collective_org = opencollective_org(project_root, env, opencollective_disabled: opencollective_disabled)
+      open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
+      if !opencollective_disabled && open_collective_org.nil?
+        opencollective_disabled = true
+        opencollective_policy = { disabled: true, source: "missing.open_collective_org", value: "" }
+      end
       funding = compact_hash(
         urls: funding_urls(
           project_root,
@@ -6985,13 +6989,29 @@ module Kettle
       nil
     end
 
-    def opencollective_org(project_root, env, opencollective_disabled: false)
+    def opencollective_org(project_root, config, env, opencollective_disabled: false)
       return nil if opencollective_disabled
 
       env_org = opencollective_org_env(env)
       return env_org if env_org
 
+      config_org = opencollective_org_config(config)
+      return config_org if config_org
+
       opencollective_org_file(project_root)
+    end
+
+    def opencollective_org_config(config)
+      funding = config["funding"]
+      return nil unless funding.is_a?(Hash) && funding.key?("open_collective")
+
+      value = funding["open_collective"]
+      return nil if value == true || falsey_config?(value)
+
+      org = value.to_s.strip
+      return nil if org.empty?
+
+      { org: org, source: "config.funding.open_collective" }
     end
 
     def opencollective_org_env(env)
