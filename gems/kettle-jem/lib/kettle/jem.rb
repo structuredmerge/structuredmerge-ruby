@@ -67,6 +67,7 @@ module Kettle
       "truffleruby-24.2" => "3.3",
       "truffleruby-25.0" => "3.3",
     }.freeze
+    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift].freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
@@ -2777,6 +2778,17 @@ module Kettle
             workflow_path,
             "yaml",
             "supplied_github_actions_workflow_snippet_merge",
+            facts: %w[ci]
+          )
+        end
+      end
+      if monorepo_template_profile?(facts)
+        facts.dig(:ci, :inactive_packaged_workflow_cleanups).to_a.each do |workflow_path|
+          recipes << recipe_entry(
+            "github_actions_inactive_packaged_workflow_cleanup_#{workflow_recipe_slug(workflow_path)}",
+            workflow_path,
+            "file",
+            "supplied_inactive_packaged_workflow_deletion",
             facts: %w[ci]
           )
         end
@@ -5537,6 +5549,9 @@ module Kettle
       destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver).transform_values do |source|
         normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
       end
+      destination_dependencies = destination_dependencies.reject do |key, _source|
+        retired_gemspec_development_dependency_key?(key)
+      end
       return template_content if destination_dependencies.empty?
 
       merged = replace_matching_gemspec_dependency_lines(template_content, destination_dependencies, receiver: template_receiver)
@@ -5708,6 +5723,11 @@ module Kettle
 
     def gemspec_dependency_record_key(record)
       [record.fetch(:kind), record.fetch(:name)]
+    end
+
+    def retired_gemspec_development_dependency_key?(key)
+      key.first == "add_development_dependency" &&
+        RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES.include?(key.last)
     end
 
     def gemspec_assignment_records(source, receiver: nil)
@@ -8956,7 +8976,7 @@ module Kettle
       result["rubygems"] = {} unless result["rubygems"].is_a?(Hash)
       result["rubygems"]["min_ruby"] ||= facts.dig(:rubygems, :min_ruby)
       result["ruby"] = {} unless result["ruby"].is_a?(Hash)
-      result["ruby"]["test_minimum"] ||= facts.dig(:project_runtime, :test_min_ruby)
+      result["ruby"]["test_minimum"] = config_test_min_ruby(result, facts.dig(:rubygems, :min_ruby)).to_s
       result["resolved_licenses"] = license[:spdx]
       result
     end

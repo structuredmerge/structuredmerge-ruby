@@ -401,7 +401,50 @@ RSpec.describe Kettle::Jem do
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
+          ruby:
+            test_minimum: "2.3"
           templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/ruby-2.3.yml
+        YAML
+        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+          name: Ruby 2.3
+          jobs:
+            test:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v6
+                - uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
+      end
+
+      expect(report.fetch(:recipe_name)).to start_with("github_actions_inactive_packaged_workflow_cleanup_")
+      expect(report.fetch(:metadata)).to include(delete_file: true)
+    end
+  end
+
+  it "deletes skipped packaged workflows for monorepo subgem profiles" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-subgem-skipped-workflow-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            profile: monorepo-subgem
             root: packaged
             apply: true
             entries:
@@ -3205,6 +3248,46 @@ RSpec.describe Kettle::Jem do
         development_dependencies: ["rake"]
       )
       expect(File.read(File.join(root, "example.gemspec"))).to include('spec.add_development_dependency "rake", "~> 13.0"')
+    end
+  end
+
+  it "drops retired kettle-drift gemspec development dependencies during gemspec sync" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-retired-gemspec-dev-dependency", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.add_development_dependency "kettle-drift"
+            spec.add_development_dependency "rake", "~> 13.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: example.gemspec
+                target: example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "template"
+            spec.summary = "Template gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {}, run_options: {only: "example.gemspec"})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "example.gemspec"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).not_to include("kettle-drift")
+      expect(content).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
   end
 
