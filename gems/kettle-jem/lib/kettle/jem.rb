@@ -2592,9 +2592,12 @@ module Kettle
       generated_blocks = generated_blocks_facts(gemspec_spec, facts, run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
-      bootstrap[:licenses] = gemspec_license_spdx if bootstrap && !gemspec_license_spdx.empty?
-      bootstrap[:gemspec_path] = File.basename(gemspec_path) if bootstrap && gemspec_path
       if bootstrap
+        min_ruby_token = minimum_ruby_token(min_ruby)
+        bootstrap[:licenses] = gemspec_license_spdx unless gemspec_license_spdx.empty?
+        bootstrap[:gemspec_path] = File.basename(gemspec_path) if gemspec_path
+        bootstrap[:min_ruby] = min_ruby_token unless min_ruby_token.empty?
+        bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
         project_emoji = preferred_template_token_value(nil, nil, env, "KJ_PROJECT_EMOJI")
         project_emoji ||= readme_project_emoji(project_root)
         project_emoji ||= "💎" if template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
@@ -5887,7 +5890,7 @@ module Kettle
     def apply_kettle_config_bootstrap(project_root, recipe, env: ENV)
       content = recipe_template_content(project_root, recipe)
       tokens = stringify_template_tokens(recipe.fetch(:template_tokens, {}))
-      content = content.gsub("{KJ|MIN_DIVERGENCE_THRESHOLD}", tokens.fetch("KJ|MIN_DIVERGENCE_THRESHOLD", ""))
+      content = resolve_template_tokens(content, tokens, scan_unresolved: false)
       bootstrap_licenses = Array(recipe[:bootstrap_licenses]).map(&:to_s).reject(&:empty?)
       content = replace_kettle_config_bootstrap_licenses(content, bootstrap_licenses) unless bootstrap_licenses.empty?
       content = replace_kettle_config_bootstrap_project_emoji(content, recipe[:bootstrap_project_emoji]) unless recipe[:bootstrap_project_emoji].to_s.empty?
@@ -9103,6 +9106,8 @@ module Kettle
       recipe[:template_preference] = bootstrap.fetch(:template_preference)
       recipe[:template_tokens] = {
         "KJ|MIN_DIVERGENCE_THRESHOLD" => bootstrap.fetch(:min_divergence_threshold).to_s,
+        "KJ|MIN_RUBY" => bootstrap[:min_ruby].to_s,
+        "KJ|MIN_TEST_RUBY" => bootstrap[:test_min_ruby].to_s,
       }
       recipe[:bootstrap_licenses] = Array(bootstrap[:licenses]).map(&:to_s).reject(&:empty?)
       recipe[:bootstrap_template_profile] = bootstrap[:template_profile].to_s unless bootstrap[:template_profile].to_s.empty?

@@ -1865,6 +1865,44 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "seeds bootstrap config minimum Ruby from the gemspec" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-min-ruby", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2.0"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      content = bootstrap_report.fetch(:final_content)
+
+      expect(content).to include(<<~YAML)
+        ruby:
+          # Lowest MRI Ruby version for generated CI workflows, Appraisals, and
+          # test/development dependency assumptions. This is intentionally separate
+          # from the gemspec required_ruby_version, which describes the published
+          # runtime contract. Effective CI minimum is max(gemspec minimum, this value).
+          test_minimum: "3.2.0"
+      YAML
+      expect(content).to include(<<~YAML)
+        rubygems:
+          # Published runtime Ruby floor used for generated gemspec metadata and README
+          # compatibility text. Omit this to derive the value from the gemspec.
+          min_ruby: "3.2.0"
+      YAML
+      expect(content).not_to include('min_ruby: "2.4"')
+    end
+  end
+
   it "bootstraps a monorepo subgem template profile with package-owned entries only" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
