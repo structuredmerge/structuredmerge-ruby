@@ -349,20 +349,20 @@ RSpec.describe Kettle::Jem do
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
-            spec.required_ruby_version = ">= 2.3"
+            spec.required_ruby_version = ">= 2.4"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
           ruby:
-            test_minimum: "2.3"
+            test_minimum: "2.4"
           templates:
             root: packaged
             apply: true
             entries:
-              - .github/workflows/ruby-2.3.yml
+              - .github/workflows/ruby-2.4.yml
         YAML
-        ".github/workflows/ruby-2.3.yml" => <<~YAML,
-          name: Ruby 2.3
+        ".github/workflows/ruby-2.4.yml" => <<~YAML,
+          name: Ruby 2.4
           jobs:
             test:
               runs-on: ubuntu-22.04
@@ -376,7 +376,7 @@ RSpec.describe Kettle::Jem do
 
       plan = described_class.plan_project(root, env: {})
       report = plan.fetch(:recipe_reports).find do |candidate|
-        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
+        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.4.yml"
       end
       content = report.fetch(:final_content)
 
@@ -421,6 +421,49 @@ RSpec.describe Kettle::Jem do
       })
 
       plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
+      end
+
+      expect(report.fetch(:recipe_name)).to start_with("github_actions_inactive_packaged_workflow_cleanup_")
+      expect(report.fetch(:metadata)).to include(delete_file: true)
+    end
+  end
+
+  it "does not allow generated CI Ruby floor below 2.4" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-ci-floor-minimum-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          ruby:
+            test_minimum: "2.3"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/ruby-2.3.yml
+        YAML
+        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+          name: Ruby 2.3
+          jobs:
+            test:
+              runs-on: ubuntu-22.04
+              steps:
+                - uses: actions/checkout@v6
+                - uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      expect(plan.dig(:facts, :ci, :test_min_ruby)).to eq("2.4")
       report = plan.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == ".github/workflows/ruby-2.3.yml"
       end
@@ -1900,6 +1943,31 @@ RSpec.describe Kettle::Jem do
           min_ruby: "3.2.0"
       YAML
       expect(content).not_to include('min_ruby: "2.4"')
+    end
+  end
+
+  it "seeds bootstrap config CI minimum Ruby no lower than 2.4" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-ci-min-ruby", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      content = bootstrap_report.fetch(:final_content)
+
+      expect(content).to include('test_minimum: "2.4"')
+      expect(content).to include('min_ruby: "2.3"')
     end
   end
 

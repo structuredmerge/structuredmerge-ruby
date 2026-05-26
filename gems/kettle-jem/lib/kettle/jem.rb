@@ -9373,6 +9373,7 @@ module Kettle
       configured = config.dig("ruby", "test_minimum")
       configured_version = configured.to_s[/\d+\.\d+(?:\.\d+)?/]
       test_minimum = configured_version ? Gem::Version.new(configured_version) : DEFAULT_TEST_MINIMUM_RUBY
+      test_minimum = [test_minimum, DEFAULT_TEST_MINIMUM_RUBY].max
       gem_minimum = if gem_min_ruby
         token = minimum_ruby_token(gem_min_ruby)
         Gem::Version.new(token) unless token.empty?
