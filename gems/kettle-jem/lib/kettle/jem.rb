@@ -282,7 +282,7 @@ module Kettle
     }.freeze
     APPRAISAL_ALWAYS_EXCLUDED_GEMS = %w[version_gem].freeze
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
-    APPRAISAL_MINIMUM_RUBY_FLOOR = Gem::Version.new("2.3")
+    DEFAULT_TEST_MINIMUM_RUBY = Gem::Version.new("2.4")
     MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY = Gem::Version.new("3.1").freeze
     APPRAISAL_DEFAULT_FRESHNESS_TTL = 604_800
     DECISION_ACTIONS = %w[create merge replace keep delete skip].freeze
@@ -2097,7 +2097,7 @@ module Kettle
       previous = nil
       minors.sort_by { |minor, _entry| Gem::Version.new(minor) }.each do |minor, entry|
         min_ruby = Gem::Version.new((entry[:min_ruby] || entry["min_ruby"]).to_s)
-        min_ruby = [min_ruby, APPRAISAL_MINIMUM_RUBY_FLOOR].max
+        min_ruby = [min_ruby, DEFAULT_TEST_MINIMUM_RUBY].max
         if previous.nil? || min_ruby > previous
           seams << { version: minor, min_ruby: min_ruby }
         end
@@ -2189,7 +2189,7 @@ module Kettle
       all_versions.sort_by { |version| Gem::Version.new(version) }.each_with_object({}) do |version, map|
         while seam_index < sorted_seams.length && Gem::Version.new(sorted_seams[seam_index][:version] || sorted_seams[seam_index]["version"]) <= Gem::Version.new(version)
           current = Gem::Version.new((sorted_seams[seam_index][:min_ruby] || sorted_seams[seam_index]["min_ruby"]).to_s)
-          current = [current, APPRAISAL_MINIMUM_RUBY_FLOOR].max
+          current = [current, DEFAULT_TEST_MINIMUM_RUBY].max
           seam_index += 1
         end
         map[version] = current if current
@@ -2412,6 +2412,7 @@ module Kettle
       license = license_facts(kettle_config, Array(kettle_config["licenses"]), author: {}, author_email: nil, copyright: {})
       author = author_facts(kettle_config, env)
       copyright = copyright_facts(project_root, kettle_config)
+      test_min_ruby = config_test_min_ruby(kettle_config, nil)
       project_runtime = project_runtime_facts(
         kettle_config,
         env,
@@ -2419,6 +2420,7 @@ module Kettle
         source_url: source_url,
         author_domain: author[:domain],
         min_ruby: nil,
+        test_min_ruby: test_min_ruby,
         version: nil
       )
       facts = {
@@ -2554,6 +2556,7 @@ module Kettle
         source_url: source_url,
         author_domain: author[:domain],
         min_ruby: min_ruby,
+        test_min_ruby: config_test_min_ruby(kettle_config, min_ruby),
         version: project_version
       )
       facts = {
@@ -2638,7 +2641,8 @@ module Kettle
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
         recording: appraisal_recording_enabled?(kettle_config),
-        ruby_versions: github_actions_ruby_versions(facts.fetch(:rubygems).fetch(:min_ruby, nil)),
+        ruby_versions: github_actions_ruby_versions(project_runtime.fetch(:test_min_ruby)),
+        test_min_ruby: project_runtime.fetch(:test_min_ruby).to_s,
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
       }
@@ -3640,7 +3644,7 @@ module Kettle
 
     def appraisals_policy_operations(template_content, original, final, request)
       package_name = runtime_context_value(request, :package, :name).to_s
-      min_ruby = minimum_ruby_token(runtime_context_value(request, :rubygems, :min_ruby))
+      min_ruby = minimum_ruby_token(runtime_context_value(request, :ci, :test_min_ruby) || runtime_context_value(request, :rubygems, :min_ruby))
       source = "#{template_content}\n#{original}"
       [
         {
@@ -4364,7 +4368,7 @@ module Kettle
     end
 
     def prune_github_workflow_matrix_by_min_ruby(content, facts)
-      min_ruby = minimum_ruby_token(facts.to_h.dig(:rubygems, :min_ruby))
+      min_ruby = minimum_ruby_token(facts.to_h.dig(:ci, :test_min_ruby) || facts.to_h.dig(:rubygems, :min_ruby))
       return content if min_ruby.to_s.empty?
 
       minimum = Gem::Version.new(min_ruby)
@@ -4926,7 +4930,7 @@ module Kettle
 
     def merge_appraisals_template_policy(content, facts:)
       package_name = facts.dig(:package, :name).to_s if facts
-      min_ruby = minimum_ruby_token(facts.dig(:rubygems, :min_ruby)) if facts
+      min_ruby = minimum_ruby_token(facts.dig(:ci, :test_min_ruby) || facts.dig(:rubygems, :min_ruby)) if facts
       with_framework_appraisals = merge_framework_matrix_appraisals(content, facts)
       pruned = prune_appraisals_recording_entries(with_framework_appraisals, facts)
       pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
@@ -6917,7 +6921,8 @@ module Kettle
         "KJ|NAMESPACE" => rubygems.fetch(:namespace).to_s,
         "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace).to_s),
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
-        "KJ|MIN_DEV_RUBY" => minimum_dev_ruby_token(rubygems[:min_ruby]),
+        "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
+        "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
       }.merge(
         rubocop_template_tokens(rubygems[:min_ruby])
@@ -7078,15 +7083,6 @@ module Kettle
 
     def minimum_ruby_token(requirement)
       requirement.to_s[/\d+(?:\.\d+){1,2}/].to_s
-    end
-
-    def minimum_dev_ruby_token(requirement)
-      min_ruby = minimum_ruby_token(requirement)
-      return "" if min_ruby.empty?
-
-      [Gem::Version.new(min_ruby), Gem::Version.new("2.3")].max.to_s
-    rescue ArgumentError
-      "2.3"
     end
 
     def gem_major_token(version)
@@ -7356,7 +7352,7 @@ module Kettle
       }
     end
 
-    def project_runtime_facts(config, env, package_name:, source_url:, author_domain:, min_ruby:, version:)
+    def project_runtime_facts(config, env, package_name:, source_url:, author_domain:, min_ruby:, test_min_ruby:, version:)
       run_timestamp = Time.now
       configured_project_emoji = preferred_template_token_value(nil, config["project_emoji"], env, "KJ_PROJECT_EMOJI")
       yard_host = project_yard_host(config, env, package_name: package_name, author_domain: author_domain)
@@ -7373,7 +7369,8 @@ module Kettle
         project_emoji: preferred_template_token_value("💎", config["project_emoji"], env, "KJ_PROJECT_EMOJI").to_s,
         project_emoji_configured: !configured_project_emoji.to_s.empty?,
         min_divergence_threshold: preferred_template_token_value(nil, config["min_divergence_threshold"], env, "KJ_MIN_DIVERGENCE_THRESHOLD").to_s,
-        min_dev_ruby: minimum_dev_ruby_token(min_ruby),
+        min_dev_ruby: test_min_ruby.to_s,
+        test_min_ruby: test_min_ruby.to_s,
         version: version.to_s,
         github_org: github_org_from_url(source_url).to_s
       )
@@ -8801,6 +8798,8 @@ module Kettle
       result = deep_dup(config)
       result["rubygems"] = {} unless result["rubygems"].is_a?(Hash)
       result["rubygems"]["min_ruby"] ||= facts.dig(:rubygems, :min_ruby)
+      result["ruby"] = {} unless result["ruby"].is_a?(Hash)
+      result["ruby"]["test_minimum"] ||= facts.dig(:project_runtime, :test_min_ruby)
       result["resolved_licenses"] = license[:spdx]
       result
     end
@@ -9137,7 +9136,7 @@ module Kettle
       basename = File.basename(path, ".yml")
       return github_actions_framework_matrix(config).empty? if basename == "framework-ci"
 
-      min_ruby = config_min_ruby(config)
+      min_ruby = config_test_min_ruby(config)
       workflow_floor = ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS[basename]
       return true if workflow_floor && min_ruby && Gem::Version.new(workflow_floor) < min_ruby
 
@@ -9155,7 +9154,7 @@ module Kettle
       version = packaged_gemfile_template_ruby_floor(target_path)
       return false unless version
 
-      min_ruby = config_min_ruby(config)
+      min_ruby = config_test_min_ruby(config)
       return false unless min_ruby
 
       Gem::Version.new(version) < min_ruby
@@ -9179,6 +9178,22 @@ module Kettle
       value = config.dig("rubygems", "min_ruby") || config["min_ruby"]
       version = value.to_s[/\d+\.\d+(?:\.\d+)?/]
       version && Gem::Version.new(version)
+    end
+
+    def config_test_min_ruby(config, gem_min_ruby = nil)
+      config ||= {}
+      configured = config.dig("ruby", "test_minimum")
+      configured_version = configured.to_s[/\d+\.\d+(?:\.\d+)?/]
+      test_minimum = configured_version ? Gem::Version.new(configured_version) : DEFAULT_TEST_MINIMUM_RUBY
+      gem_minimum = if gem_min_ruby
+        token = minimum_ruby_token(gem_min_ruby)
+        Gem::Version.new(token) unless token.empty?
+      else
+        config_min_ruby(config)
+      end
+      gem_minimum ? [test_minimum, gem_minimum].max : test_minimum
+    rescue ArgumentError
+      DEFAULT_TEST_MINIMUM_RUBY
     end
 
     def template_source_display_path(template_root, selected_source)

@@ -353,6 +353,8 @@ RSpec.describe Kettle::Jem do
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
+          ruby:
+            test_minimum: "2.3"
           templates:
             root: packaged
             apply: true
@@ -4609,6 +4611,7 @@ RSpec.describe Kettle::Jem do
       source_url: "https://github.com/example/example",
       author_domain: "example.test",
       min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
       version: "0.1.0"
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
@@ -5679,7 +5682,7 @@ RSpec.describe Kettle::Jem do
     seams = described_class.appraisal_find_ruby_seams(versions)
     expect(seams).to eq(
       [
-        { version: "5.2", min_ruby: Gem::Version.new("2.3") },
+        { version: "5.2", min_ruby: Gem::Version.new("2.4") },
         { version: "6.0", min_ruby: Gem::Version.new("2.5") },
         { version: "7.0", min_ruby: Gem::Version.new("2.7") },
         { version: "7.2", min_ruby: Gem::Version.new("3.1") },

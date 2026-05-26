@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA
   README badges.
+- Added explicit `ruby.test_minimum` template configuration, defaulting to
+  Ruby 2.4, for generated CI workflow and Appraisal floors.
 
 ### Changed
 
@@ -31,6 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-jem template --only PATH` or `--include PATH` for scoped file updates.
 - `kettle-jem` project fact discovery now uses `Kettle::Jem::GemSpecReader`
   and RubyGems specification objects instead of parsing gemspec source.
+- README and CONTRIBUTING templates now document the effective
+  `ruby.test_minimum` value used when the project was templated.
 
 ### Deprecated
 

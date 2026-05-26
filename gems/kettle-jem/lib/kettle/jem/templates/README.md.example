@@ -50,6 +50,10 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 ### Compatibility
 
 Compatible with MRI Ruby {KJ|MIN_RUBY}+, and concordant releases of JRuby, and TruffleRuby.
+CI workflows and Appraisals are generated for MRI Ruby {KJ|MIN_TEST_RUBY}+.
+This test floor is configured by `ruby.test_minimum` in `.kettle-jem.yml` and
+may be higher than the gem's runtime compatibility floor when legacy Rubies are
+not practical for the current toolchain.
 
 | 🚚 _Amazing_ test matrix was brought to you by | 🔎 appraisal2 🔎 and the color 💚 green 💚             |
 |------------------------------------------------|--------------------------------------------------------|
