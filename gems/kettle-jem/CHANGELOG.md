@@ -49,6 +49,11 @@ Please file a bug if you notice a violation of semantic versioning.
   `appraisal_matrix.appraisal_gemfiles`, allowing kettle-jem-appraisals to
   model required framework dependencies without duplicating the simple
   framework matrix.
+- Standard Appraisal gemfile injection now skips blocks already enriched by a
+  collapsed framework/appraisal matrix dependency gemfile, avoiding duplicate
+  broad and version-pinned framework dependency declarations.
+- The generated `.kettle-jem.yml` keeps `Appraisal.root.gemfile`
+  template-owned so stale root-appraisal content is replaced cleanly.
 - Simple `workflows.framework_matrix` version entries can now target an
   existing appraisal with `appraisal`, `appraisal_name`, or
   `standard_appraisal`, allowing explicit collapse onto standard appraisals.

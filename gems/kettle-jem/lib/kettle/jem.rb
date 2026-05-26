@@ -4951,7 +4951,11 @@ module Kettle
       parsed = appraisal_blocks(content)
       blocks = parsed.fetch(:order).map do |name|
         block = parsed.fetch(:blocks).fetch(name)
-        standard_names.include?(name) ? inject_appraisal_gemfiles(block, gemfiles) : block
+        if standard_names.include?(name) && !appraisal_block_has_matrix_dependency_gemfile?(block)
+          inject_appraisal_gemfiles(block, gemfiles)
+        else
+          block
+        end
       end
       ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks.map(&:rstrip)).reject(&:empty?).join("\n\n"))
     end
@@ -4964,6 +4968,16 @@ module Kettle
 
         nil
       end.to_set
+    end
+
+    def appraisal_block_has_matrix_dependency_gemfile?(block)
+      ruby_call_records(block, :eval_gemfile).any? do |call|
+        path = ruby_string_argument(call).to_s
+        path.start_with?("modular/") &&
+          path.include?("/") &&
+          path != "modular/x_std_libs.gemfile" &&
+          !path.start_with?("modular/x_std_libs/")
+      end
     end
 
     def inject_appraisal_gemfiles(block, gemfiles)
