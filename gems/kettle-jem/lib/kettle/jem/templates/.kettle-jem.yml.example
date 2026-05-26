@@ -99,6 +99,12 @@ ruby:
   # runtime contract. Effective CI minimum is max(gemspec minimum, this value).
   test_minimum: "2.4"
 
+# RubyGems packaging/runtime shape.
+rubygems:
+  # Published runtime Ruby floor used for generated gemspec metadata and README
+  # compatibility text. Omit this to derive the value from the gemspec.
+  min_ruby: "2.4"
+
 # Repository URL topology.
 # This is independent from templates.profile. A gem may use the full template
 # while still living as a sub-project inside a monorepo.

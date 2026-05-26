@@ -5116,6 +5116,46 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "lets configured rubygems minimum Ruby override preserved gemspec Ruby floor" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-min-ruby-config-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "example"
+            gem.required_ruby_version = ">= 1.9.3"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "2.4"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.1"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).to include('spec.required_ruby_version = ">= 2.4"')
+      expect(gemspec_content).not_to include('gem.required_ruby_version = ">= 1.9.3"')
+      expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "inlines gemspec version loading when minimum Ruby is at least 3.1" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

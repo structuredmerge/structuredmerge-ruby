@@ -2533,7 +2533,9 @@ module Kettle
         classify_namespace(name)
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
-      min_ruby = metadata_value(gemspec_metadata, :required_ruby_version) ||
+      configured_min_ruby = rubygems_config["min_ruby"].to_s.strip
+      min_ruby = (configured_min_ruby.empty? ? nil : configured_min_ruby) ||
+        metadata_value(gemspec_metadata, :required_ruby_version) ||
         metadata_value(gemspec_metadata, :min_ruby)
       gemspec_licenses = Array(gemspec_metadata[:licenses])
 
@@ -5310,6 +5312,7 @@ module Kettle
       )
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
+      merged = apply_configured_gemspec_required_ruby_version(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
@@ -5414,6 +5417,23 @@ module Kettle
       replacement = "#{receiver}.licenses = #{licenses.inspect}"
       existing = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "licenses" }
       return replace_source_range_lines(content, existing.fetch(:start_line), existing.fetch(:end_line), "#{leading_whitespace(existing.fetch(:source))}#{replacement}\n") if existing
+
+      homepage = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "homepage" }
+      return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
+
+      content
+    end
+
+    def apply_configured_gemspec_required_ruby_version(content, facts, receiver:)
+      min_ruby = minimum_ruby_token(facts.to_h.dig(:rubygems, :min_ruby))
+      return content if min_ruby.to_s.empty?
+
+      replacement = %(#{receiver}.required_ruby_version = ">= #{min_ruby}")
+      existing = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "required_ruby_version" }
+      return replace_source_range_lines(content, existing.fetch(:start_line), existing.fetch(:end_line), "#{leading_whitespace(existing.fetch(:source))}#{replacement}\n") if existing
+
+      licenses = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "licenses" }
+      return insert_lines_after(content, licenses.fetch(:end_line), "  #{replacement}\n") if licenses
 
       homepage = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "homepage" }
       return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
