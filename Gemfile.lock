@@ -302,11 +302,16 @@ GEM
       bundler (>= 1.2.0)
       thor (~> 1.0)
     citrus (3.0.2)
+    commonmarker (2.8.2-aarch64-linux)
+    commonmarker (2.8.2-aarch64-linux-musl)
+    commonmarker (2.8.2-arm64-darwin)
+    commonmarker (2.8.2-x86_64-darwin)
     commonmarker (2.8.2-x86_64-linux)
+    commonmarker (2.8.2-x86_64-linux-musl)
     delegate (0.6.1)
     diff-lcs (1.6.2)
-    gitmoji-regex (1.0.3)
-      version_gem (~> 1.1, >= 1.1.8)
+    gitmoji-regex (2.0.0)
+      version_gem (~> 1.1, >= 1.1.9)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
     logger (1.7.0)
@@ -371,13 +376,21 @@ GEM
     toml-rb (4.2.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
+    tree_sitter_language_pack (1.8.1-aarch64-linux)
+    tree_sitter_language_pack (1.8.1-arm64-darwin)
+    tree_sitter_language_pack (1.8.1-x86_64-darwin)
     tree_sitter_language_pack (1.8.1-x86_64-linux)
     tsort (0.2.0)
     version_gem (1.1.9)
     zeitwerk (2.8.2)
 
 PLATFORMS
+  aarch64-linux
+  aarch64-linux-musl
+  arm64-darwin
+  x86_64-darwin
   x86_64-linux
+  x86_64-linux-musl
 
 DEPENDENCIES
   appraisal2 (~> 3.0, >= 3.0.6)
@@ -393,7 +406,7 @@ DEPENDENCIES
   citrus-toml-merge!
   commonmarker-merge!
   dotenv-merge!
-  gitmoji-regex (~> 1.0, >= 1.0.3)
+  gitmoji-regex (~> 2.0, >= 2.0.0)
   go-merge!
   json-merge!
   kettle-dev!
@@ -435,16 +448,21 @@ CHECKSUMS
   bash-merge (7.0.0)
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   binary-merge (7.0.0)
-  bundler (4.0.11) sha256=5bcec0fb78302e48d02ee46f10ee6e6942be647ba5b44a6d1ddfda9a240ce785
+  bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.0.0)
+  commonmarker (2.8.2-aarch64-linux) sha256=715a5df28e5c1ec7b520e6441466062e9717b82193d2a5bd11a9c94f2f1e15f0
+  commonmarker (2.8.2-aarch64-linux-musl) sha256=c7d587bd7978416978e84d0de7488906b8f29b3f67ce8424942f0ca9aa6899db
+  commonmarker (2.8.2-arm64-darwin) sha256=cd7364f1fb9735d60218e4af0a4afbbeedbc465eb81cccca56f29a4efe2b5013
+  commonmarker (2.8.2-x86_64-darwin) sha256=fb946e0bb01f0e5742aef75cc972b51ffe099e5b983ce9cd792b4a78c5d2c297
   commonmarker (2.8.2-x86_64-linux) sha256=42cfb6532b15dd5821ce99e47397923255f32dcfc81024ef4c17e01e66ac7d75
+  commonmarker (2.8.2-x86_64-linux-musl) sha256=66568dce1c6f265e85d57ea7f749a148446527c7dd599c6ded4cdc819997c43e
   commonmarker-merge (7.0.0)
   delegate (0.6.1) sha256=54cf946cacfe05b1c23114edd8fbd8d54e9cea7abf36b95130ab53cc88b8f7e4
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   dotenv-merge (7.0.0)
-  gitmoji-regex (1.0.3) sha256=538c6f49f5af6dc36d1630edb89a5a66f6e14ec5850d7fd071e0331f940e553f
+  gitmoji-regex (2.0.0) sha256=cffeeadaedc1a4fda390d5d1e93b0809feceb444087a84e227add8d1aac5166f
   go-merge (7.0.0)
   json-merge (7.0.0)
   kettle-dev (2.0.1)
@@ -496,6 +514,9 @@ CHECKSUMS
   toml-merge (7.0.0)
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
   tree_haver (7.0.0)
+  tree_sitter_language_pack (1.8.1-aarch64-linux) sha256=caf297725fca8a3171d922f20927c3f2b78ea8bf6c7f55bed97d161be14775b4
+  tree_sitter_language_pack (1.8.1-arm64-darwin) sha256=7070e2e2bee2b70a1e514bdf7af43df9d5258707a8d5640749458e85469f22f1
+  tree_sitter_language_pack (1.8.1-x86_64-darwin) sha256=0f1dc08cf951be5702bafc1c9a382ca55c9ac9297b73baed7d68b72d62e4a9d0
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.0.0)
@@ -506,4 +527,4 @@ CHECKSUMS
   zip-merge (7.0.0)
 
 BUNDLED WITH
-  4.0.11
+  4.0.12
