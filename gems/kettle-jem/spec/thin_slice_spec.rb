@@ -4452,6 +4452,71 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "adds configured support gemfiles to standard test Appraisal blocks" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-standard-appraisal-gemfiles", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          appraisal_matrix:
+            appraisal_gemfiles:
+              - gemfiles/modular/activerecord_support.gemfile
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY,
+          appraise "current" do
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+
+          appraise "style" do
+            eval_gemfile "modular/style.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: { accept: true })
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "current" do
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "ruby-3-2" do
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).not_to include(<<~RUBY.strip)
+        appraise "style" do
+          eval_gemfile "modular/style.gemfile"
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs.gemfile"
+        end
+      RUBY
+    end
+  end
+
   it "prunes GitHub workflow appraisal matrix entries below minimum Ruby" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -45,6 +45,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Same-named Appraisal blocks now merge destination-only `gem` and
   `eval_gemfile` entries into the templated block, so framework/appraisal tools
   can enrich standard `ruby-X-Y` appraisals without losing template updates.
+- Standard test Appraisal blocks now include configured
+  `appraisal_matrix.appraisal_gemfiles`, allowing kettle-jem-appraisals to
+  model required framework dependencies without duplicating the simple
+  framework matrix.
 - Simple `workflows.framework_matrix` version entries can now target an
   existing appraisal with `appraisal`, `appraisal_name`, or
   `standard_appraisal`, allowing explicit collapse onto standard appraisals.

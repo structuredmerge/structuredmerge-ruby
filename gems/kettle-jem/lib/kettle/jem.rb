@@ -2646,6 +2646,8 @@ module Kettle
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
         custom_workflows: github_actions_custom_workflows(project_root, template_config, opencollective_disabled: opencollective_disabled),
       }
+      standard_appraisal_gemfiles = github_actions_standard_appraisal_gemfiles(kettle_config)
+      facts[:ci][:standard_appraisal_gemfiles] = standard_appraisal_gemfiles unless standard_appraisal_gemfiles.empty?
       facts[:ci][:opt_in_workflow_cleanups] = opt_in_workflows unless opt_in_workflows.empty?
       facts[:ci][:inactive_packaged_workflow_cleanups] = inactive_workflows unless inactive_workflows.empty?
       coverage_config = github_actions_coverage_config(kettle_config, env)
@@ -4932,10 +4934,54 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s if facts
       min_ruby = minimum_ruby_token(facts.dig(:ci, :test_min_ruby) || facts.dig(:rubygems, :min_ruby)) if facts
       with_framework_appraisals = merge_framework_matrix_appraisals(content, facts)
-      pruned = prune_appraisals_recording_entries(with_framework_appraisals, facts)
+      with_standard_appraisal_gemfiles = inject_standard_appraisal_gemfiles(with_framework_appraisals, facts)
+      pruned = prune_appraisals_recording_entries(with_standard_appraisal_gemfiles, facts)
       pruned = prune_appraisals_below_min_ruby(pruned, min_ruby)
       pruned = remove_gemfile_dependency_lines(pruned, [package_name])
       remove_gemfile_percent_w_entries(pruned, [package_name])
+    end
+
+    def inject_standard_appraisal_gemfiles(content, facts)
+      gemfiles = facts.to_h.dig(:ci, :standard_appraisal_gemfiles).to_a
+      return content if gemfiles.empty?
+
+      standard_names = standard_test_appraisal_names(content)
+      return content if standard_names.empty?
+
+      parsed = appraisal_blocks(content)
+      blocks = parsed.fetch(:order).map do |name|
+        block = parsed.fetch(:blocks).fetch(name)
+        standard_names.include?(name) ? inject_appraisal_gemfiles(block, gemfiles) : block
+      end
+      ensure_trailing_newline(([parsed.fetch(:prelude).to_s.rstrip] + blocks.map(&:rstrip)).reject(&:empty?).join("\n\n"))
+    end
+
+    def standard_test_appraisal_names(content)
+      appraisal_call_records(content).filter_map do |record|
+        name = record.fetch(:name)
+        next name if %w[unlocked_deps head current dep-heads coverage].include?(name)
+        next name if ruby_appraisal_name_version(name)
+
+        nil
+      end.to_set
+    end
+
+    def inject_appraisal_gemfiles(block, gemfiles)
+      lines = block.to_s.lines
+      existing_lines = appraisal_dependency_lines(block).to_set
+      additions = gemfiles.filter_map do |gemfile|
+        line = %(  eval_gemfile "#{gemfile.to_s.sub(%r{\Agemfiles/}, "")}") + "\n"
+        line unless existing_lines.include?(line)
+      end
+      return block if additions.empty?
+
+      insert_index =
+        lines.index { |line| line.include?(%(eval_gemfile "modular/x_std_libs)) } ||
+        lines.rindex { |line| line.strip == "end" }
+      return block unless insert_index
+
+      lines.insert(insert_index, *additions)
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
     end
 
     def prune_appraisals_recording_entries(content, facts)
@@ -9420,6 +9466,23 @@ module Kettle
       workflows = {} unless workflows.is_a?(Hash)
 
       DecisionPolicy.value_to_boolean(workflows["recording"]) == true
+    end
+
+    def github_actions_standard_appraisal_gemfiles(config)
+      workflows = config["workflows"]
+      workflows = {} unless workflows.is_a?(Hash)
+      appraisal_matrix = config["appraisal_matrix"]
+      appraisal_matrix = {} unless appraisal_matrix.is_a?(Hash)
+
+      raw_paths =
+        workflows["standard_appraisal_gemfiles"] ||
+        appraisal_matrix["appraisal_gemfiles"] ||
+        appraisal_matrix["appraisal_eval_gemfiles"]
+
+      Array(raw_paths).filter_map do |path|
+        normalized = path.to_s.strip.sub(%r{\Agemfiles/}, "")
+        normalized unless normalized.empty?
+      end.uniq
     end
 
     def expand_framework_gemfile_pattern(pattern, version)
