@@ -42,6 +42,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated evergreen JRuby workflows now mark the current JRuby and
+  `dep-heads` JRuby jobs experimental, so JRuby 10/arjdbc incompatibilities
+  remain visible without blocking release CI.
 - Same-named Appraisal blocks now merge destination-only `gem` and
   `eval_gemfile` entries into the templated block, so framework/appraisal tools
   can enrich standard `ruby-X-Y` appraisals without losing template updates.
