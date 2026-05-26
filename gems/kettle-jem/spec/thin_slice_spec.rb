@@ -1879,6 +1879,49 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "replaces legacy version files with the packaged version_gem template" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-accept-template", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.version = "1.2.3"
+            spec.summary = "Example gem"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+          end
+        RUBY
+        "lib/example/gem/version.rb" => <<~RUBY,
+          module Example
+            module Gem
+              VERSION = "1.2.3"
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: lib/gem/version.rb
+                target: lib/example/gem/version.rb
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+
+      expect(apply.fetch(:changed_files)).to include("lib/example/gem/version.rb")
+      version_rb = File.read(File.join(root, "lib", "example", "gem", "version.rb"))
+      expect(version_rb).to include("# frozen_string_literal: true")
+      expect(version_rb).to include("module Version")
+      expect(version_rb).to include('VERSION = "1.2.3"')
+      expect(version_rb).to include("VERSION = Version::VERSION # Traditional Constant Location")
+      expect(version_rb).not_to include("module Gem\n    VERSION")
+    end
+  end
+
   it "uses configured RubyGems entrypoint and namespace for version_gem files" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

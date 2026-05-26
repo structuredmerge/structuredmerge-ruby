@@ -9009,10 +9009,16 @@ module Kettle
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
       return { strategy: :merge, preference: :destination, add_template_only_nodes: true } if target_path.to_s == ".kettle-jem.yml"
+      return { strategy: :accept_template } if version_gem_template_target_path?(target_path)
       return { strategy: :accept_template } if target_path.to_s.start_with?(".github/workflows/")
       return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
 
       nil
+    end
+
+    def version_gem_template_target_path?(target_path)
+      target = target_path.to_s
+      target.end_with?("/version.rb") || target.end_with?("/version.rbs")
     end
 
     def inactive_packaged_template_cleanup_files(project_root, config = {})
