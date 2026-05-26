@@ -517,6 +517,7 @@ RSpec.describe Kettle::Jem do
               - label: "7.1+"
                 slug: "7_1"
                 requirement: ">= 7.1"
+                appraisal: ruby-3-2
             gemfile_pattern: rails_{version}
         templates:
           root: packaged
@@ -539,10 +540,17 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('          - framework_version: "7.0"')
       expect(content).to include('            appraisal: "rails-7-0"')
       expect(content).to include('          - framework_version: "7.1+"')
-      expect(content).to include('            appraisal: "rails-7-1"')
+      expect(content).to include('            appraisal: "ruby-3-2"')
       expect(YAML.safe_load(content)).to be_a(Hash)
       expect(content).to include("Appraisal.root.gemfile")
       expect(content).to include("framework:")
+
+      appraisals_report = configured_plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "Appraisals"
+      end
+      appraisals_content = appraisals_report.fetch(:final_content)
+      expect(appraisals_content).to include('appraise "ruby-3-2" do')
+      expect(appraisals_content).to include('eval_gemfile "rails_7_1"')
       expect(content).to include("bundle exec appraisal ${{ matrix.framework.appraisal }} install")
       expect(content).not_to include("framework_version: []")
       expect(content).not_to include("gemfile: []")
@@ -561,8 +569,7 @@ RSpec.describe Kettle::Jem do
       appraisals_report = configured_plan.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == "Appraisals"
       end
-      expect(appraisals_report.fetch(:final_content)).to include('appraise "rails-7-1" do')
-      expect(appraisals_report.fetch(:final_content)).to include('ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"')
+      expect(appraisals_report.fetch(:final_content)).to include('appraise "ruby-3-2" do')
       expect(appraisals_report.fetch(:final_content)).to include('eval_gemfile "rails_7_1"')
     end
   end
@@ -4398,6 +4405,50 @@ RSpec.describe Kettle::Jem do
           preserved_destination_appraisals: include(contract_case.fetch(:destination_appraisal))
         )
       )
+    end
+  end
+
+  it "preserves destination additions inside same-named Appraisal blocks" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-same-name-merge", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/activerecord/r3/v8.0.gemfile"
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY,
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/style.gemfile"
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: { accept: true })
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include('eval_gemfile "modular/style.gemfile"')
+      expect(appraisals_content).to include('eval_gemfile "modular/activerecord/r3/v8.0.gemfile"')
+      expect(appraisals_content.scan('eval_gemfile "modular/x_std_libs/r3/libs.gemfile"').size).to eq(1)
     end
   end
 

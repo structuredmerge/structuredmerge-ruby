@@ -4980,7 +4980,9 @@ module Kettle
       emitted = Set.new
       blocks = parsed.fetch(:order).map do |name|
         emitted << name
-        generated.fetch(name) { parsed.fetch(:blocks).fetch(name).rstrip }
+        parsed_block = parsed.fetch(:blocks).fetch(name).rstrip
+        generated_block = generated[name]
+        generated_block ? merge_same_named_appraisal_block(parsed_block, generated_block) : parsed_block
       end
       entries.each do |entry|
         name = entry.fetch(:name).to_s
@@ -5133,7 +5135,11 @@ module Kettle
     def merge_appraisals_template_source(template_content, destination_content, facts:)
       template = appraisal_blocks(template_content)
       destination = appraisal_blocks(destination_content)
-      ordered_blocks = template.fetch(:order).map { |name| template.fetch(:blocks).fetch(name) }
+      ordered_blocks = template.fetch(:order).map do |name|
+        block = template.fetch(:blocks).fetch(name)
+        destination_block = destination.fetch(:blocks)[name]
+        destination_block ? merge_same_named_appraisal_block(block, destination_block) : block
+      end
       destination.fetch(:order).each do |name|
         next if template.fetch(:blocks).key?(name)
 
@@ -5142,6 +5148,28 @@ module Kettle
       prelude = template.fetch(:prelude).to_s.strip.empty? ? destination.fetch(:prelude) : template.fetch(:prelude)
       merged = ([prelude.to_s.rstrip] + ordered_blocks.map { |block| block.rstrip }).reject(&:empty?).join("\n\n")
       merge_appraisals_template_policy(ensure_trailing_newline(merged), facts: facts)
+    end
+
+    def merge_same_named_appraisal_block(template_block, destination_block)
+      addition_lines = appraisal_dependency_lines(destination_block) - appraisal_dependency_lines(template_block)
+      return template_block if addition_lines.empty?
+
+      lines = template_block.to_s.lines
+      end_index = lines.rindex { |line| line.strip == "end" }
+      return template_block if end_index.nil?
+
+      lines.insert(end_index, *addition_lines)
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def appraisal_dependency_lines(block)
+      calls = ruby_call_records(block, nil).select do |call|
+        %i[gem eval_gemfile].include?(call.name)
+      end
+      lines = block.to_s.lines
+      calls.map do |call|
+        (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
+      end
     end
 
     def appraisal_blocks(content)
@@ -9297,7 +9325,7 @@ module Kettle
         include: version_entries.map do |entry|
           {
             framework_version: entry.fetch(:label),
-            appraisal: framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
+            appraisal: entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
           }
         end,
         gemfiles: version_entries.map do |entry|
@@ -9311,7 +9339,7 @@ module Kettle
         appraisals: version_entries.map do |entry|
           gemfile = framework_gemfile_path(expand_framework_gemfile_pattern(pattern, entry.fetch(:slug)))
           {
-            name: framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
+            name: entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
             framework_version: entry.fetch(:label),
             gem: framework_gem,
             eval_gemfiles: [framework_matrix_appraisal_gemfile_path(gemfile), *appraisal_gemfiles].uniq,
@@ -9340,18 +9368,22 @@ module Kettle
         label = raw.fetch("label", raw["version"]).to_s.strip
         slug = raw.fetch("slug", label).to_s.strip
         requirement = raw.fetch("requirement", default_framework_matrix_requirement(label)).to_s.strip
+        appraisal_name = (raw["appraisal"] || raw["appraisal_name"] || raw["standard_appraisal"]).to_s.strip
       else
         label = raw.to_s.strip
         slug = label
         requirement = default_framework_matrix_requirement(label)
+        appraisal_name = ""
       end
       return if label.empty? || slug.empty? || requirement.empty?
 
-      {
+      entry = {
         label: label,
         slug: slug,
         requirement: requirement,
       }
+      entry[:appraisal_name] = appraisal_name unless appraisal_name.empty?
+      entry
     end
 
     def default_framework_matrix_requirement(version)

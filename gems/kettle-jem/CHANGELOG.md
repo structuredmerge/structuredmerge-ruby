@@ -42,6 +42,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Same-named Appraisal blocks now merge destination-only `gem` and
+  `eval_gemfile` entries into the templated block, so framework/appraisal tools
+  can enrich standard `ruby-X-Y` appraisals without losing template updates.
+- Simple `workflows.framework_matrix` version entries can now target an
+  existing appraisal with `appraisal`, `appraisal_name`, or
+  `standard_appraisal`, allowing explicit collapse onto standard appraisals.
 - README merge preservation now keeps configured destination-only sections
   instead of dropping them when the packaged README template has no matching
   heading.
