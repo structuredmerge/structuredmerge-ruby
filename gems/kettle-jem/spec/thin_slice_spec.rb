@@ -3705,6 +3705,7 @@ RSpec.describe Kettle::Jem do
               - synopsis
               - basic usage
               - custom section
+              - authors
             preserve_patterns:
               - "note:*"
             section_aliases:
@@ -3742,6 +3743,10 @@ RSpec.describe Kettle::Jem do
           ## Note: Local
 
           Destination note.
+
+          ## Authors
+
+          Destination authors.
 
           ## Installation
 
@@ -3785,7 +3790,9 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("## 🔧 Basic Usage\n\nDestination usage.")
       expect(final_content).to include("## Custom Section\n\nDestination custom.")
       expect(final_content).to include("## Note: Local\n\nDestination note.")
+      expect(final_content).to include("## Authors\n\nDestination authors.")
       expect(final_content).to include("## Installation\n\nTemplate install.")
+      expect(final_content).to match(/## Note: Local\n\nDestination note\.\n\n## Authors\n\nDestination authors\.\n\n## Installation/m)
       expect(final_content).not_to include("Template synopsis.")
       expect(final_content).not_to include("Template usage.")
       expect(final_content).not_to include("Template custom.")

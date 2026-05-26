@@ -8649,18 +8649,47 @@ module Kettle
       preserve_targets = readme_preserve_targets(template_sections, destination_lookup, preserve_config)
       return template_content if preserve_targets.empty?
 
+      template_bases = template_sections.map { |section| section.fetch(:base) }.to_set
+      extra_sections_by_anchor = readme_extra_preserved_sections_by_anchor(
+        destination_sections,
+        template_bases,
+        preserve_targets
+      )
       lines = template_content.split("\n", -1)
       template_sections.reverse_each do |section|
-        next unless preserve_targets.include?(section.fetch(:base))
+        base = section.fetch(:base)
+        extra_sections = extra_sections_by_anchor[base].to_a
+        next if !preserve_targets.include?(base) && extra_sections.empty?
 
-        destination_section = destination_lookup[section.fetch(:base)] ||
-          aliased_readme_destination_section(section.fetch(:base), destination_lookup, preserve_config)
-        next unless destination_section
+        replacement = if preserve_targets.include?(base)
+          destination_section = destination_lookup[base] ||
+            aliased_readme_destination_section(base, destination_lookup, preserve_config)
+          next unless destination_section
 
-        replacement = "#{section.fetch(:heading)}\n#{destination_section.fetch(:body)}".split("\n", -1)
+          "#{section.fetch(:heading)}\n#{destination_section.fetch(:body)}"
+        else
+          lines[section.fetch(:start)..section.fetch(:end)].join("\n")
+        end
+        replacement = ([replacement] + extra_sections.map { |extra| "#{extra.fetch(:heading)}\n#{extra.fetch(:body)}" }).join("\n")
         lines[section.fetch(:start)..section.fetch(:end)] = replacement
       end
       lines.join("\n")
+    end
+
+    def readme_extra_preserved_sections_by_anchor(destination_sections, template_bases, preserve_targets)
+      destination_sections.each_with_object({}) do |section, result|
+        base = section.fetch(:base)
+        next if template_bases.include?(base)
+        next unless preserve_targets.include?(base)
+
+        anchor = destination_sections[0...destination_sections.index(section)].reverse.find do |candidate|
+          template_bases.include?(candidate.fetch(:base))
+        end
+        next unless anchor
+
+        result[anchor.fetch(:base)] ||= []
+        result[anchor.fetch(:base)] << section
+      end
     end
 
     def preserve_readme_h1(merged_content, destination_content, preserve_config)

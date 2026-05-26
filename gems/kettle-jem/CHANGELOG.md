@@ -42,6 +42,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- README merge preservation now keeps configured destination-only sections
+  instead of dropping them when the packaged README template has no matching
+  heading.
 - Added `KETTLE_JEM_SKIP_LOCK_NORMALIZATION` for self-templating unreleased
   gems whose dependencies cannot yet resolve from remote sources.
 - Added a native `Kettle::Jem::GemSpecReader` for gemspec metadata so tooling
