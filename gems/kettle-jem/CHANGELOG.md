@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated `.yardopts` now includes `CITATION.cff` so YARD recreates
+  `file.CITATION.html` after cleaning the docs directory.
 - Generated evergreen JRuby workflows now mark the current JRuby and
   `dep-heads` JRuby jobs experimental, so JRuby 10/arjdbc incompatibilities
   remain visible without blocking release CI.

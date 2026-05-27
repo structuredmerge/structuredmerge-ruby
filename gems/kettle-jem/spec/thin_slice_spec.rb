@@ -847,6 +847,12 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "includes CITATION.cff in the packaged YARD inputs" do
+    yardopts = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".yardopts.example"))
+
+    expect(yardopts).to include("'CITATION.cff'")
+  end
+
   it "applies README style conditionals and reports missing integrations" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
