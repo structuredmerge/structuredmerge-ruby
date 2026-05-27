@@ -153,8 +153,10 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       report.fetch(:recipe_name) == "kettle_config_bootstrap"
     end
     expect(bootstrap_report.fetch(:changed)).to be(true)
-    expect(File.read(File.join(gem_root, ".kettle-jem.yml"))).to include("# kettle-jem configuration file")
-    expect(File.read(File.join(gem_root, ".kettle-jem.yml"))).to include("min_divergence_threshold: 5")
+    kettle_config = File.read(File.join(gem_root, ".kettle-jem.yml"))
+    expect(kettle_config).to include("# kettle-jem configuration file")
+    expect(kettle_config).to include("min_divergence_threshold: 5")
+    expect(kettle_config).to include("  Rakefile:\n    strategy: accept_template")
     expect(bootstrap.fetch(:changed_files)).to include(
       ".github/FUNDING.yml",
       ".kettle-jem.yml",

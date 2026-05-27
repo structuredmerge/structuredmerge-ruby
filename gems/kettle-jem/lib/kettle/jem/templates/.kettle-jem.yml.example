@@ -401,6 +401,8 @@ files:
     strategy: accept_template
   Appraisal.root.gemfile:
     strategy: accept_template
+  Rakefile:
+    strategy: accept_template
   .github:
     copilot_instructions.md:
       strategy: accept_template
@@ -430,6 +432,4 @@ files:
 #       file_type: ruby
 #
 #   Rakefile:
-#     strategy: merge
-#     preference: destination
-#     add_template_only_nodes: false
+#     strategy: accept_template
