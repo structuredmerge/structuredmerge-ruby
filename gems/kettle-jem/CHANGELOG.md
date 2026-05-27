@@ -38,7 +38,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Documented `rubygems.min_ruby` in the generated `.kettle-jem.yml` so projects
   can make the published runtime Ruby floor explicit.
 - Documentation templates now require `yard-yaml` >= 0.1.2.
-- Gem templates now require `kettle-dev` >= 2.0.3.
+- Gem templates now require `kettle-dev` >= 2.0.4.
 - Development lockfile generation now uses Bundler 4.0.12.
 - Rake task specs now run from a sandboxed temporary project root.
 
