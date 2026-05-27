@@ -88,6 +88,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Fixed generated Appraisals content so it does not end with an extra blank line.
 - Fixed generated version-gem Ruby and RBS files so whole-file template tokens
   do not add an extra blank line at EOF.
+- Generated Rakefiles now install a `kettle:jem:selftest` fallback when the
+  installed `kettle-jem` package lacks rake task support.
 - Fixed generated framework workflow YAML indentation so `framework:` remains
   under `strategy.matrix`.
 - Removed duplicate generated `spec.homepage` assignments when destination
