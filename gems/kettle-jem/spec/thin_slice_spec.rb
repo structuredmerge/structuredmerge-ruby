@@ -2065,10 +2065,12 @@ RSpec.describe Kettle::Jem do
       expect(version_rb).to include("module Example")
       expect(version_rb).to include("module Gem")
       expect(version_rb).to include('VERSION = "1.2.3"')
+      expect(version_rb).not_to end_with("\n\n")
       version_rbs = File.read(File.join(root, "sig", "example", "gem", "version.rbs"))
       expect(version_rbs).to include("module Example")
       expect(version_rbs).to include("module Gem")
       expect(version_rbs).to include("VERSION: String")
+      expect(version_rbs).not_to end_with("\n\n")
       post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
       expect(post_step.fetch(:changed_files)).to eq(["lib/example/gem.rb"])
     end
@@ -2114,6 +2116,7 @@ RSpec.describe Kettle::Jem do
       expect(version_rb).to include('VERSION = "1.2.3"')
       expect(version_rb).to include("VERSION = Version::VERSION # Traditional Constant Location")
       expect(version_rb).not_to include("module Gem\n    VERSION")
+      expect(version_rb).not_to end_with("\n\n")
     end
   end
 

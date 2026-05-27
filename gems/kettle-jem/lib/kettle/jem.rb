@@ -7239,8 +7239,8 @@ module Kettle
       return {} if namespace.empty?
 
       {
-        "KJ|VERSION_GEM:VERSION_RB" => version_gem_version_file_content(existing_version: "", namespace: namespace, version: version),
-        "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace),
+        "KJ|VERSION_GEM:VERSION_RB" => version_gem_version_file_content(existing_version: "", namespace: namespace, version: version).chomp,
+        "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace).chomp,
       }
     end
 

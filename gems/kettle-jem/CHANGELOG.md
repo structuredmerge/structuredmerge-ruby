@@ -82,6 +82,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Fixed generated appraisal `eval_gemfile` paths so Appraisal2 resolves
   modular gemfiles relative to `gemfiles/` instead of `gemfiles/gemfiles/`.
 - Fixed generated Appraisals content so it does not end with an extra blank line.
+- Fixed generated version-gem Ruby and RBS files so whole-file template tokens
+  do not add an extra blank line at EOF.
 - Fixed generated framework workflow YAML indentation so `framework:` remains
   under `strategy.matrix`.
 - Removed duplicate generated `spec.homepage` assignments when destination
