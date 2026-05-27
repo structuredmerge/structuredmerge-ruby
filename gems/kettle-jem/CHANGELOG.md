@@ -44,6 +44,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated `bin/yard` now routes through `bin/rake yard` so documentation
+  plugins installed by the templated rake task, such as yard-timekeeper, run
+  consistently.
+- GemSpec template merging now keeps the greater version requirement between
+  template-managed dependencies and destination dependencies, allowing newer
+  destination constraints to remain while still upgrading stale template-owned
+  floors.
 - Generated evergreen JRuby workflows now mark the current JRuby and
   `dep-heads` JRuby jobs experimental, so JRuby 10/arjdbc incompatibilities
   remain visible without blocking release CI.
