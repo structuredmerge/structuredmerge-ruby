@@ -4798,6 +4798,12 @@ module Kettle
       argument.unescaped if argument.is_a?(::Prism::StringNode)
     end
 
+    def ruby_string_arguments(call)
+      Array(call&.arguments&.arguments).filter_map do |argument|
+        argument.unescaped if argument.is_a?(::Prism::StringNode)
+      end
+    end
+
     def prism_parse_success(content)
       result = ::Prism.parse(content.to_s)
       result if result.success?
@@ -5549,16 +5555,23 @@ module Kettle
     end
 
     def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:)
-      destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver).transform_values do |source|
-        normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
-      end
+      template_dependencies = gemspec_dependency_line_index(template_content, receiver: template_receiver)
+      destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver)
+        .transform_values do |source|
+          normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
+        end
       destination_dependencies = destination_dependencies.reject do |key, _source|
         retired_gemspec_development_dependency_key?(key)
       end
       return template_content if destination_dependencies.empty?
 
-      merged = replace_matching_gemspec_dependency_lines(template_content, destination_dependencies, receiver: template_receiver)
-      append_missing_gemspec_dependency_lines(merged, destination_dependencies, receiver: template_receiver)
+      replacements, additions = destination_dependencies.partition do |key, source|
+        template_dependencies.key?(key) &&
+          gemspec_dependency_source_newer?(source, template_dependencies.fetch(key), receiver: template_receiver)
+      end.map(&:to_h)
+
+      merged = replace_matching_gemspec_dependency_lines(template_content, replacements, receiver: template_receiver)
+      append_missing_gemspec_dependency_lines(merged, additions, receiver: template_receiver)
     end
 
     def preserve_gemspec_freeze_blocks(content, destination_content, receiver:)
@@ -5733,6 +5746,24 @@ module Kettle
         RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES.include?(key.last)
     end
 
+    def gemspec_dependency_source_newer?(candidate_source, current_source, receiver:)
+      candidate = gemspec_dependency_records(candidate_source, receiver: receiver).first
+      current = gemspec_dependency_records(current_source, receiver: receiver).first
+      return false unless candidate && current
+
+      gemspec_dependency_record_version(candidate) > gemspec_dependency_record_version(current)
+    end
+
+    def gemspec_dependency_record_version(record)
+      versions = record.fetch(:requirements, []).filter_map do |requirement|
+        version_text = requirement.to_s[/\d+(?:[._-]?[A-Za-z0-9]+)*/]
+        Gem::Version.new(version_text.tr("_", ".")) if version_text
+      rescue ArgumentError
+        nil
+      end
+      versions.max || Gem::Version.new("0")
+    end
+
     def gemspec_assignment_records(source, receiver: nil)
       lines = source.to_s.lines
       ruby_call_records(source, nil).filter_map do |call|
@@ -5839,6 +5870,7 @@ module Kettle
           kind: kind,
           name: name,
           requirement: ruby_string_argument_at(call, 1),
+          requirements: ruby_string_arguments(call).drop(1),
           receiver: call.receiver&.slice,
           start_line: call.location.start_line,
           end_line: call.location.end_line,
