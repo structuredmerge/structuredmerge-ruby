@@ -7,27 +7,12 @@
 # dotenv-merge will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-gem_version =
-  if RUBY_VERSION >= "3.1" # rubocop:disable Gemspec/RubyVersionGlobalsUsage
-    # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
-    # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
-    # See: https://github.com/panorama-ed/memo_wise/pull/397
-    Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/dotenv/merge/version.rb", mod) }::Dotenv::Merge::Version::VERSION
-  else
-    # NOTE: Use __FILE__ or __dir__ until removal of Ruby 1.x support
-    # __dir__ introduced in Ruby 1.9.1
-    # lib = File.expand_path("../lib", __FILE__)
-    lib = File.expand_path("lib", __dir__)
-    $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-    require "dotenv/merge/version"
-    Dotenv::Merge::Version::VERSION
-  end
-
 Gem::Specification.new do |spec|
   spec.name = "dotenv-merge"
-  spec.version = gem_version
+  spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/dotenv/merge/version.rb", mod) }::Dotenv::Merge::Version::VERSION
   spec.authors = ["Peter H. Boling"]
   spec.email = ["info@structuredmerge.org"]
+
   spec.summary = "☯️ Structured Merge dotenv analysis and merge for Ruby"
   spec.description = "☯️ Dotenv assignment, comment, freeze-block, and template merge behavior for Structured Merge."
   spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
@@ -52,7 +37,7 @@ Gem::Specification.new do |spec|
     end
   end
 
-  spec.metadata["homepage_uri"] = "https://dotenv-merge.galtzo.com/"
+  spec.metadata["homepage_uri"] = "https://structuredmerge.org"
   spec.metadata["source_code_uri"] = "#{spec.homepage}/tree/v#{spec.version}"
   spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/v#{spec.version}/CHANGELOG.md"
   spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
@@ -73,6 +58,8 @@ Gem::Specification.new do |spec|
   spec.files = [
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
+    # Executables and executable support scripts
+    *enumerate_package_files.call("exe"),
     # Public certs for gem signing
     *enumerate_package_files.call("certs"),
     # Signatures
@@ -87,7 +74,7 @@ Gem::Specification.new do |spec|
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "FUNDING.md",
-    "LICENSE.txt",
+    "LICENSE.md",
     "README.md",
     "RUBOCOP.md",
     "SECURITY.md",
@@ -109,9 +96,9 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   # Utilities
-  spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
   spec.add_dependency "ast-merge", "= #{spec.version}"
   spec.add_dependency "tree_haver", "= #{spec.version}"
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")              # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
@@ -127,7 +114,7 @@ Gem::Specification.new do |spec|
   #       and preferably a modular one (see gemfiles/modular/*.gemfile).
 
   # Dev, Test, & Release Tasks
-  spec.add_development_dependency("kettle-dev", "~> 2.0")                  # ruby >= 2.3.0
+  spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.1")      # ruby >= 4.0.0
 
   # Security
   spec.add_development_dependency("bundler-audit", "~> 0.9.3")                      # ruby >= 2.0.0
@@ -140,7 +127,7 @@ Gem::Specification.new do |spec|
 
   # Testing
   spec.add_development_dependency("appraisal2", "~> 3.0", ">= 3.0.6")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
-  spec.add_development_dependency("kettle-test", "~> 2.0")                         # ruby >= 2.3
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.1")             # ruby >= 4.0.0
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0

@@ -7,7 +7,7 @@ require "optparse"
 require "rubygems"
 require "tsort"
 
-RUBY_REPO = File.expand_path("..", __dir__)
+RUBY_REPO = File.expand_path("..", __dir__).sub(%r{\A/var/home/}, "/home/")
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
 ROOT_TEMPLATE_PROFILE = "monorepo-subgem"
 ROOT_REPOSITORY_TOPOLOGY = "monorepo-subproject"
@@ -192,12 +192,18 @@ end
 def normalize_lockfile_for_gem(gem_dir)
   return unless File.exist?(File.join(gem_dir, "Gemfile"))
 
-  env = ENV.to_h
-  env["K_JEM_TEMPLATING"] = "false"
-  env["SMORG_RB_DEV"] = "false"
-  env["KETTLE_RB_DEV"] = "false"
-  command = ["mise", "exec", "-C", gem_dir, "--", "bundle", "update", "--bundler"]
-  _stdout, stderr, status = Open3.capture3(env, *command)
+  command_env = []
+  if File.basename(gem_dir) == "kettle-jem"
+    command_env << "K_JEM_TEMPLATING=true"
+    command_env << "SMORG_RB_DEV=#{GEMS_ROOT}"
+  else
+    command_env << "K_JEM_TEMPLATING=false"
+    command_env << "SMORG_RB_DEV=false"
+  end
+  command_env << "KETTLE_RB_DEV=false"
+  command_env << "GALTZO_FLOSS_DEV=false"
+  command = ["mise", "exec", "-C", gem_dir, "--", "env", *command_env, "bundle", "update", "--bundler"]
+  _stdout, stderr, status = Open3.capture3(*command)
   return if status.success?
 
   warn stderr unless stderr.empty?
