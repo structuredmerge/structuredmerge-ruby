@@ -3217,7 +3217,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
         "BUNDLE_LOCKFILE" => "/workspace/kettle-jem/Gemfile.lock",
         "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
-        "BUNDLER_VERSION" => "4.0.11",
+        "BUNDLER_VERSION" => "4.0.12",
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|

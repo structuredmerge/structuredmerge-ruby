@@ -7,8 +7,14 @@ RSpec.describe "kettle-jem Rake tasks" do
   around do |example|
     previous = Rake.application
     Rake.application = Rake::Application.new
-    Kettle::Jem.install_tasks
-    example.run
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rake-tasks", tmp_root) do |root|
+      Dir.chdir(root) do
+        Kettle::Jem.install_tasks
+        example.run
+      end
+    end
   ensure
     Rake.application = previous
   end
