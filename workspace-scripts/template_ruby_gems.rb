@@ -70,7 +70,7 @@ parser = OptionParser.new do |opts|
     options[:commit] = value
   end
 
-  opts.on("--[no-]normalize-lock", "After each templating run, run bundle install without templating/local-path env to restore release-compatible lockfiles. Default: true.") do |value|
+  opts.on("--[no-]normalize-lock", "After each templating run, run bundle update --bundler without templating/local-path env to restore release-compatible lockfiles. Default: true.") do |value|
     options[:normalize_lock] = value
   end
 end
@@ -196,7 +196,7 @@ def normalize_lockfile_for_gem(gem_dir)
   env["K_JEM_TEMPLATING"] = "false"
   env["SMORG_RB_DEV"] = "false"
   env["KETTLE_RB_DEV"] = "false"
-  command = ["mise", "exec", "-C", gem_dir, "--", "bundle", "install"]
+  command = ["mise", "exec", "-C", gem_dir, "--", "bundle", "update", "--bundler"]
   _stdout, stderr, status = Open3.capture3(env, *command)
   return if status.success?
 
@@ -211,8 +211,17 @@ def git_status_entries
   stdout.lines.map(&:chomp).reject(&:empty?)
 end
 
+def generated_docs_status_entry?(entry)
+  path = entry.sub(/\A.../, "")
+  path.split("/").include?("docs")
+end
+
+def committable_status_entries
+  git_status_entries.reject { |entry| generated_docs_status_entry?(entry) }
+end
+
 def ensure_clean_worktree_for_commit!
-  entries = git_status_entries
+  entries = committable_status_entries
   return if entries.empty?
 
   raise <<~MESSAGE
@@ -224,10 +233,20 @@ def ensure_clean_worktree_for_commit!
 end
 
 def commit_template_results
-  entries = git_status_entries
+  entries = committable_status_entries
   return {status: "clean_noop"} if entries.empty?
 
-  add_stdout, add_stderr, add_status = Open3.capture3("git", "-C", RUBY_REPO, "add", "-A")
+  add_stdout, add_stderr, add_status = Open3.capture3(
+    "git",
+    "-C",
+    RUBY_REPO,
+    "add",
+    "-A",
+    "--",
+    ".",
+    ":(exclude)docs/**",
+    ":(exclude)gems/*/docs/**"
+  )
   raise "Git add failed: #{add_stderr.empty? ? add_stdout : add_stderr}" unless add_status.success?
 
   message = "chore: apply kettle-jem templates"
