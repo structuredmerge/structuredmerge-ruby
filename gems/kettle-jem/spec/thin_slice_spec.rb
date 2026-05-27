@@ -5655,7 +5655,7 @@ RSpec.describe Kettle::Jem do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.2")
+            spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.3")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -5669,7 +5669,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include(%(spec.add_dependency("json", "~> 2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("custom-dev", ">= 1")))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.2")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.3")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.1")))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0")\n))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("rake", "~> 13.0")))
