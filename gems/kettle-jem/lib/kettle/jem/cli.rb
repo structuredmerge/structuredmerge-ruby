@@ -7,7 +7,7 @@ require "optparse"
 module Kettle
   module Jem
     module CLI
-      USAGE = <<~USAGE.freeze
+      USAGE = <<~USAGE
         Usage:
           kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
           kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
@@ -168,7 +168,7 @@ module Kettle
             destination_root: options[:destination_root] || project_root,
             template_root: options[:template_root],
             output_root: options[:selftest_output_root],
-            min_divergence_threshold: options[:min_divergence_threshold]
+            min_divergence_threshold: options[:min_divergence_threshold],
           )
         else
           raise ArgumentError, "Unsupported kettle-jem command #{command.inspect}"
@@ -198,17 +198,17 @@ module Kettle
           end
         when "manifest"
           entries = result.fetch(:entries, [])
-          out.puts("template manifest: #{entries.length} entr#{entries.length == 1 ? "y" : "ies"}")
+          out.puts("template manifest: #{entries.length} entr#{(entries.length == 1) ? "y" : "ies"}")
         when "selftest"
           comparison = result.fetch(:comparison, {})
           divergent = comparison.fetch(:changed, []).size +
             comparison.fetch(:added, []).size +
             comparison.fetch(:removed, []).size
-          out.puts("selftest: #{divergent} divergent file#{divergent == 1 ? "" : "s"}")
+          out.puts("selftest: #{divergent} divergent file#{"s" unless divergent == 1}")
           out.puts("  report: #{result.fetch(:report_path)}") if result[:report_path]
         else
           changed_files = result.fetch(:changed_files, [])
-          out.puts("#{result.fetch(:mode)}: #{changed_files.length} changed file#{changed_files.length == 1 ? "" : "s"}")
+          out.puts("#{result.fetch(:mode)}: #{changed_files.length} changed file#{"s" unless changed_files.length == 1}")
           changed_files.each { |path| out.puts("  #{path}") }
         end
       end

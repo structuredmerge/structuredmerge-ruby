@@ -59,7 +59,7 @@ module Kettle
             comparison,
             output_dir: after_dir,
             templating_environment: Kettle::Jem::TemplatingReport.snapshot,
-            diff_count: diff_count
+            diff_count: diff_count,
           )
           summary = append_drift_summary(summary, drift)
           summary_path = File.join(report_dir, "summary.md")
@@ -112,7 +112,7 @@ module Kettle
           comparison.fetch(:changed, []).each do |relative|
             diff = Kettle::Jem::SelfTest::Reporter.diff(
               File.join(before_dir, relative),
-              File.join(after_dir, relative)
+              File.join(after_dir, relative),
             )
             next if diff.empty?
 
@@ -220,7 +220,7 @@ module Kettle
             template_dir: template_root,
             lock_path: File.join("tmp", "template_test", ".kettle-drift.lock"),
             mode: :force_update,
-            printer_class: nil
+            printer_class: nil,
           )
           {
             available: true,

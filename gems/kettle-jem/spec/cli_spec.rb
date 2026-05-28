@@ -76,7 +76,7 @@ RSpec.describe Kettle::Jem::CLI do
         Kettle::Jem.apply_project(project_root, env: env, run_options: run_options).merge(
           mode: "install",
           installed: true,
-          install_steps: []
+          install_steps: [],
         )
       end
 
@@ -90,7 +90,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {},
-        run_options: include(accept_config: true)
+        run_options: include(accept_config: true),
       )
     end
   end
@@ -161,7 +161,7 @@ RSpec.describe Kettle::Jem::CLI do
       payload = JSON.parse(out, symbolize_names: true)
       expect(payload.fetch(:decision_policy)).to include(
         mode: "accept",
-        failure_mode: "warn"
+        failure_mode: "warn",
       )
       expect(payload.fetch(:template_selection)).to eq(
         allowed: "env",
@@ -173,7 +173,7 @@ RSpec.describe Kettle::Jem::CLI do
         bootstrap_mode: true,
         template_profile: "",
         quiet: true,
-        verbose: true
+        verbose: true,
       )
     end
   end
@@ -235,9 +235,9 @@ RSpec.describe Kettle::Jem::CLI do
       expect(payload.fetch(:decision_policy)).to include(
         mode: "interactive",
         prompt_answers: {
-          :"recipe:readme_metadata" => "keep",
-          :"recipe:template_source_application_README_md" => "keep",
-        }
+          "recipe:readme_metadata": "keep",
+          "recipe:template_source_application_README_md": "keep",
+        },
       )
       expect(payload.fetch(:changed_files)).not_to include("README.md")
       expect(File.read(File.join(root, "README.md"))).to eq("# Example\n\nDestination README.\n")
@@ -250,7 +250,7 @@ RSpec.describe Kettle::Jem::CLI do
         mode: "install",
         installed: true,
         changed_files: [],
-        install_steps: []
+        install_steps: [],
       )
       allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run)
 
@@ -262,7 +262,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true)
+        run_options: include(skip_commit: true),
       )
       expect(Kettle::Jem::Tasks::TemplateTask).not_to have_received(:run)
     end
@@ -277,7 +277,7 @@ RSpec.describe Kettle::Jem::CLI do
           name: "bundle_lock_normalization",
           status: "succeeded",
           reason: "executed",
-        }]
+        }],
       )
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run)
 
@@ -289,7 +289,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::TemplateTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true, only: ["README.md"])
+        run_options: include(skip_commit: true, only: ["README.md"]),
       )
       expect(Kettle::Jem::Tasks::InstallTask).not_to have_received(:run)
     end
@@ -341,7 +341,7 @@ RSpec.describe Kettle::Jem::CLI do
           installed: false,
           changed_files: [],
           diagnostics: [],
-        }
+        },
       )
 
       status, out, err = run_cli(["install", root, "--force"])
@@ -352,7 +352,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {},
-        run_options: include(force: true)
+        run_options: include(force: true),
       )
     end
   end
@@ -381,7 +381,7 @@ RSpec.describe Kettle::Jem::CLI do
             removed: [],
             skipped: [],
           },
-        }
+        },
       )
 
       template_root = File.join(root, "template")
@@ -409,7 +409,7 @@ RSpec.describe Kettle::Jem::CLI do
         destination_root: root,
         template_root: template_root,
         output_root: output_root,
-        min_divergence_threshold: 75.0
+        min_divergence_threshold: 75.0,
       )
       payload = JSON.parse(out, symbolize_names: true)
       expect(payload.fetch(:mode)).to eq("selftest")

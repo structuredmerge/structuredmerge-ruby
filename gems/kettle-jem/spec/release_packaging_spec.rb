@@ -38,7 +38,7 @@ RSpec.describe "kettle-jem release packaging" do
       "lib/kettle/jem/rakelib/prepare.rake",
       "lib/kettle/jem/rakelib/template.rake",
       "lib/kettle/jem/rakelib/install.rake",
-      "lib/kettle/jem/rakelib/selftest.rake"
+      "lib/kettle/jem/rakelib/selftest.rake",
     )
     expect(files).to include("certs/pboling.pem")
     expect(spec.extra_rdoc_files).to include("README.md")
@@ -59,7 +59,7 @@ RSpec.describe "kettle-jem release packaging" do
       "kettle-jem.gemspec",
       "--output",
       gem_path.to_s,
-      chdir: gem_root.to_s
+      chdir: gem_root.to_s,
     )
     expect(status.success?).to be(true), "gem build failed\nstdout=#{stdout}\nstderr=#{stderr}"
 
@@ -82,7 +82,7 @@ RSpec.describe "kettle-jem release packaging" do
       {"RUBYLIB" => unpack_root.join("lib").to_s},
       Gem.ruby,
       exe.to_s,
-      "version"
+      "version",
     )
     expect(version_status.success?).to be(true), "artifact executable failed\nstdout=#{version_stdout}\nstderr=#{version_stderr}"
     expect(version_stdout).to eq("#{Kettle::Jem::Version::VERSION}\n")
@@ -91,7 +91,7 @@ RSpec.describe "kettle-jem release packaging" do
       {"RUBYLIB" => unpack_root.join("lib").to_s},
       Gem.ruby,
       exe.to_s,
-      "--help"
+      "--help",
     )
     expect(help_status.success?).to be(true), "artifact help failed\nstdout=#{help_stdout}\nstderr=#{help_stderr}"
     expect(help_stdout).to include("kettle-jem install")
@@ -112,7 +112,7 @@ RSpec.describe "kettle-jem release packaging" do
       exe.to_s,
       "plan",
       project_root.to_s,
-      "--json"
+      "--json",
     )
     expect(plan_status.success?).to be(true), "artifact plan failed\nstdout=#{plan_stdout}\nstderr=#{plan_stderr}"
     expect(JSON.parse(plan_stdout).fetch("mode")).to eq("plan")

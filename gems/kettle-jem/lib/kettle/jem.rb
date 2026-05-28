@@ -210,12 +210,14 @@ module Kettle
       KJ|FUNDING:PAYPAL
       KJ|FUNDING:POLAR
       KJ|GH:USER
+      KJ|GH_ORG
       KJ|GL:USER
       KJ|LICENSE_EYE:FLAGS
       KJ|LICENSE_EYE:DEPENDENCY_LICENSES
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|MIN_DIVERGENCE_THRESHOLD
+      KJ|MIN_RUBY
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
       KJ|README:FAMILY_INTRO_BACKEND_MATRIX
@@ -275,11 +277,11 @@ module Kettle
       "rom-sql" => "rsql",
     }.freeze
     APPRAISAL_WORKFLOW_LIFECYCLE_RANGES = {
-      "current" => { min: Gem::Version.new("3.4"), max: Gem::Version.new("3.99") },
-      "supported" => { min: Gem::Version.new("3.2"), max: Gem::Version.new("3.3") },
-      "legacy" => { min: Gem::Version.new("3.0"), max: Gem::Version.new("3.1") },
-      "unsupported" => { min: Gem::Version.new("2.6"), max: Gem::Version.new("2.7") },
-      "ancient" => { min: Gem::Version.new("2.3"), max: Gem::Version.new("2.5") },
+      "current" => {min: Gem::Version.new("3.4"), max: Gem::Version.new("3.99")},
+      "supported" => {min: Gem::Version.new("3.2"), max: Gem::Version.new("3.3")},
+      "legacy" => {min: Gem::Version.new("3.0"), max: Gem::Version.new("3.1")},
+      "unsupported" => {min: Gem::Version.new("2.6"), max: Gem::Version.new("2.7")},
+      "ancient" => {min: Gem::Version.new("2.3"), max: Gem::Version.new("2.5")},
     }.freeze
     APPRAISAL_ALWAYS_EXCLUDED_GEMS = %w[version_gem].freeze
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
@@ -301,7 +303,7 @@ module Kettle
       :diagnostics,
       :prompt_required,
       :prompt,
-      keyword_init: true
+      keyword_init: true,
     ) do
       def to_h
         {
@@ -339,7 +341,7 @@ module Kettle
           failure_mode: option_hash.fetch(:failure_mode, env_hash["FAILURE_MODE"] || env_hash["failure_mode"] || "error"),
           require_clean: option_hash.fetch(:require_clean, value_to_boolean(env_hash["KETTLE_JEM_REQUIRE_CLEAN"])),
           input_source: option_hash.fetch(:input_source, "default"),
-          prompt_answers: option_hash.fetch(:prompt_answers, parse_prompt_answers(env_hash["KETTLE_JEM_PROMPT_ANSWERS"]))
+          prompt_answers: option_hash.fetch(:prompt_answers, parse_prompt_answers(env_hash["KETTLE_JEM_PROMPT_ANSWERS"])),
         )
       end
 
@@ -438,7 +440,7 @@ module Kettle
           blocking: severity_value == "fatal",
           diagnostics: decision_diagnostics,
           prompt_required: promptable,
-          prompt: prompt
+          prompt: prompt,
         )
       end
 
@@ -692,7 +694,7 @@ module Kettle
           Ast::Crispr::Delete.call(
             content: processed,
             target: Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0}),
-            source_label: "README.md"
+            source_label: "README.md",
           ).updated_content
         end
       end
@@ -914,6 +916,8 @@ module Kettle
             version: spec&.version.to_s,
             min_ruby: min_ruby_version(spec&.required_ruby_version),
             homepage: homepage,
+            source_code_uri: spec&.metadata.to_h.fetch("source_code_uri", nil),
+            funding_uri: spec&.metadata.to_h.fetch("funding_uri", nil),
             gh_org: forge.fetch(:org, nil),
             forge_org: forge.fetch(:org, nil),
             gh_repo: forge.fetch(:repo, nil),
@@ -1137,7 +1141,7 @@ module Kettle
           plugin_name: plugin_name.to_s,
           phase: normalize_phase(phase),
           timing: normalize_timing(timing),
-          callback: callback
+          callback: callback,
         )
       end
 
@@ -1150,7 +1154,7 @@ module Kettle
             actor: actor,
             phase: normalized_phase,
             phase_stats: phase_stats,
-            plugin_name: hook.plugin_name
+            plugin_name: hook.plugin_name,
           )
         end
       end
@@ -1222,7 +1226,7 @@ module Kettle
 
         handle.public_send(
           REGISTRATION_METHOD,
-          PluginRegistrar.new(plugin_name: plugin_name, registry: registry)
+          PluginRegistrar.new(plugin_name: plugin_name, registry: registry),
         )
       rescue LoadError => e
         raise Error, "Could not load plugin #{plugin_name.inspect}: #{e.message}"
@@ -1249,8 +1253,16 @@ module Kettle
     end
 
     class PluginContext
-      attr_reader :project_root, :mode, :facts, :recipe_pack, :recipe_reports, :phase_reports,
-        :changed_files, :diagnostics, :helpers, :out
+      attr_reader :project_root,
+        :mode,
+        :facts,
+        :recipe_pack,
+        :recipe_reports,
+        :phase_reports,
+        :changed_files,
+        :diagnostics,
+        :helpers,
+        :out
 
       def initialize(project_root:, mode:, facts:, recipe_pack:, recipe_reports:, changed_files:, diagnostics:, phase_reports: [])
         @project_root = project_root
@@ -1279,7 +1291,7 @@ module Kettle
         @diagnostics << {
           kind: "plugin_file_change",
           path: relative_path,
-          action: action.to_s
+          action: action.to_s,
         }
       end
 
@@ -1298,11 +1310,11 @@ module Kettle
       end
 
       def report_detail(message)
-        @diagnostics << { kind: "plugin_detail", message: message.to_s }
+        @diagnostics << {kind: "plugin_detail", message: message.to_s}
       end
 
       def warning(message)
-        @diagnostics << { kind: "plugin_warning", message: message.to_s }
+        @diagnostics << {kind: "plugin_warning", message: message.to_s}
       end
     end
 
@@ -1585,8 +1597,8 @@ module Kettle
             warnings: warnings,
             error: error,
             template_diff: template_diff,
-            template_commit_sha: template_commit_sha
-          )
+            template_commit_sha: template_commit_sha,
+          ),
         )
         report_path
       end
@@ -1852,7 +1864,7 @@ module Kettle
 
     def install_tasks
       require "rake"
-      load File.expand_path("jem/tasks.rb", __dir__)
+      load(File.expand_path("jem/tasks.rb", __dir__))
     end
 
     def appraisal_gem_abbreviation(gem_name)
@@ -1897,7 +1909,7 @@ module Kettle
 
     def appraisal_version_requirement(version)
       segments = version.to_s.split(".")
-      segments.length >= 3 ? "~> #{version}" : "~> #{version}.0"
+      (segments.length >= 3) ? "~> #{version}" : "~> #{version}.0"
     end
 
     def appraisal_file_content(matrix_entries)
@@ -1967,7 +1979,7 @@ module Kettle
       APPRAISAL_WORKFLOW_LIFECYCLE_RANGES.each do |name, range|
         return name if ruby_floor.between?(range.fetch(:min), range.fetch(:max))
       end
-      ruby_floor < APPRAISAL_WORKFLOW_LIFECYCLE_RANGES.fetch("ancient").fetch(:min) ? "ancient" : "current"
+      (ruby_floor < APPRAISAL_WORKFLOW_LIFECYCLE_RANGES.fetch("ancient").fetch(:min)) ? "ancient" : "current"
     end
 
     def appraisal_workflow_ruby(ruby_floor, lifecycle)
@@ -2006,11 +2018,11 @@ module Kettle
       when "minor-minmax"
         by_major.flat_map do |entry|
           minors = entry.fetch(:minors)
-          entry.fetch(:major) < current_major ? [minors.first, minors.last].uniq : minors
+          (entry.fetch(:major) < current_major) ? [minors.first, minors.last].uniq : minors
         end
       when "semver"
         by_major.flat_map do |entry|
-          entry.fetch(:major) < current_major ? [entry.fetch(:minors).last] : entry.fetch(:minors)
+          (entry.fetch(:major) < current_major) ? [entry.fetch(:minors).last] : entry.fetch(:minors)
         end
       end
     end
@@ -2100,7 +2112,7 @@ module Kettle
         min_ruby = Gem::Version.new((entry[:min_ruby] || entry["min_ruby"]).to_s)
         min_ruby = [min_ruby, DEFAULT_TEST_MINIMUM_RUBY].max
         if previous.nil? || min_ruby > previous
-          seams << { version: minor, min_ruby: min_ruby }
+          seams << {version: minor, min_ruby: min_ruby}
         end
         previous = min_ruby
       end
@@ -2129,7 +2141,7 @@ module Kettle
 
         next_seam = appraisal_next_seam_ruby(version, min_ruby, all_versions, version_min_rubies)
         bucket = next_seam ? appraisal_bucket_below(next_seam, buckets, normalized_ranges) : buckets.last
-        { version: version, bucket: bucket } if bucket
+        {version: version, bucket: bucket} if bucket
       end
       appraisal_fill_bucket_gaps(assignments, buckets, normalized_ranges, version_min_rubies, all_versions)
     end
@@ -2153,15 +2165,19 @@ module Kettle
       by_major.each do |major, minors|
         sorted = minors.sort_by { |minor| Gem::Version.new(minor) }
         sorted.each_with_index do |minor, index|
-          bucket = index == sorted.length - 1 ? "r#{major}" : "r#{major}.#{[sorted[index + 1].split(".").last.to_i - 1, minor.split(".").last.to_i].max}"
+          bucket = (index == sorted.length - 1) ? "r#{major}" : "r#{major}.#{[sorted[index + 1].split(".").last.to_i - 1, minor.split(".").last.to_i].max}"
           next if ranges.key?(bucket)
 
           buckets << bucket
-          ceiling = index == sorted.length - 1 ? "#{major}.99" : bucket.split(".").last ? "#{major}.#{bucket.split(".").last}" : "#{major}.99"
-          ranges[bucket] = { floor: Gem::Version.new(minor), ceiling: Gem::Version.new(ceiling) }
+          ceiling = if index == sorted.length - 1
+            "#{major}.99"
+          else
+            bucket.split(".").last ? "#{major}.#{bucket.split(".").last}" : "#{major}.99"
+          end
+          ranges[bucket] = {floor: Gem::Version.new(minor), ceiling: Gem::Version.new(ceiling)}
         end
       end
-      { buckets: buckets.sort_by { |bucket| appraisal_bucket_sort_key(bucket) }, bucket_ranges: ranges }
+      {buckets: buckets.sort_by { |bucket| appraisal_bucket_sort_key(bucket) }, bucket_ranges: ranges}
     end
 
     def appraisal_minor_key(version)
@@ -2232,7 +2248,7 @@ module Kettle
           ruby = version_min_rubies[version]
           ruby && ruby <= range.fetch(:ceiling)
         end
-        assignments << { version: filler, bucket: bucket, filler: true } if filler
+        assignments << {version: filler, bucket: bucket, filler: true} if filler
       end
       assignments.sort_by { |assignment| bucket_ranges.fetch(assignment.fetch(:bucket)).fetch(:floor) }
     end
@@ -2255,7 +2271,7 @@ module Kettle
         selected = appraisal_select_dependency_version(
           Array(dependency_versions[name] || dependency_versions[name.to_sym]),
           requirement: requirement,
-          ruby_min: ruby_floor
+          ruby_min: ruby_floor,
         )
         resolved[name] = selected if selected
       end
@@ -2308,7 +2324,7 @@ module Kettle
     def appraisal_scaffold_config(gemspec_content:, existing_config: {}, exclusions: [], default_mode: "semver", freshness_ttl: APPRAISAL_DEFAULT_FRESHNESS_TTL)
       excluded = exclusions.map(&:to_s).to_set
       runtime_dependencies = appraisal_extract_runtime_dependencies(gemspec_content)
-      tier1 = runtime_dependencies.reject { |name| excluded.include?(name) }.map { |name| { "name" => name } }
+      tier1 = runtime_dependencies.reject { |name| excluded.include?(name) }.map { |name| {"name" => name} }
       config = deep_string_key_hash(existing_config)
       matrix = config["appraisal_matrix"] || {}
       gems = matrix["gems"] || {}
@@ -2368,7 +2384,7 @@ module Kettle
       range = bucket_ranges[ruby_series] || bucket_ranges[ruby_series.to_s]
       return true unless range
 
-      ceiling = Gem::Version.new(((range[:ceiling] || range["ceiling"]).to_s))
+      ceiling = Gem::Version.new((range[:ceiling] || range["ceiling"]).to_s)
       exact_version = appraisal_latest_minor_patch(resolver: resolver, gem_name: gem_name, version: version)
       min_ruby = resolver.min_ruby_version(gem_name, exact_version)
       min_ruby.nil? || Gem::Version.new(min_ruby.to_s) <= ceiling
@@ -2422,7 +2438,7 @@ module Kettle
         author_domain: author[:domain],
         min_ruby: nil,
         test_min_ruby: test_min_ruby,
-        version: nil
+        version: nil,
       )
       facts = {
         package: compact_hash(
@@ -2454,7 +2470,7 @@ module Kettle
       facts[:project_runtime] = project_runtime unless project_runtime.empty?
       funding = compact_hash(
         urls: funding_urls(project_root, package_name, opencollective_disabled: false),
-        platform_tokens: funding_platform_token_facts(kettle_config, env)
+        platform_tokens: funding_platform_token_facts(kettle_config, env),
       )
       detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: false)
       if detected_open_collective_org
@@ -2466,14 +2482,14 @@ module Kettle
         project_root,
         source_url,
         package_name: package_name,
-        repository_topology: REPOSITORY_TOPOLOGY_STANDALONE
+        repository_topology: REPOSITORY_TOPOLOGY_STANDALONE,
       )
       facts[:repository] = repository unless repository.empty?
       readme_logo = readme_logo_facts(
         kettle_config,
         package_name: package_name,
         github_org: project_runtime[:github_org],
-        repository: facts[:repository]
+        repository: facts[:repository],
       )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
       template_facts = {}
@@ -2481,7 +2497,7 @@ module Kettle
         project_root,
         kettle_config,
         opencollective_disabled: false,
-        include_patterns: template_selection[:include]
+        include_patterns: template_selection[:include],
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
       template_tokens = template_tokens(facts, funding)
@@ -2519,7 +2535,7 @@ module Kettle
         metadata_source_url ||
         homepage_url ||
         git_source_url
-      derived_github_user = git_github_url && source_url == git_github_url ? github_org_from_url(git_github_url) : nil
+      derived_github_user = (git_github_url && source_url == git_github_url) ? github_org_from_url(git_github_url) : nil
       rubygems_config = kettle_config["rubygems"].is_a?(Hash) ? kettle_config["rubygems"] : {}
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
       entrypoint_require = metadata_value(gemspec_metadata, :entrypoint_require) if entrypoint_require.empty?
@@ -2547,7 +2563,7 @@ module Kettle
         gemspec_licenses,
         author: author,
         author_email: author[:email],
-        copyright: copyright
+        copyright: copyright,
       )
       gemspec_license_spdx = gemspec_licenses
         .map { |license_id| license_id.to_s.strip }
@@ -2560,7 +2576,7 @@ module Kettle
         author_domain: author[:domain],
         min_ruby: min_ruby,
         test_min_ruby: config_test_min_ruby(kettle_config, min_ruby),
-        version: project_version
+        version: project_version,
       )
       facts = {
         package: compact_hash(
@@ -2586,10 +2602,10 @@ module Kettle
         project_root,
         source_url,
         package_name: name,
-        repository_topology: repository_topology
+        repository_topology: repository_topology,
       )
       facts[:repository] = repository unless repository.empty?
-      generated_blocks = generated_blocks_facts(gemspec_spec, facts, run_options)
+      generated_blocks = generated_blocks_facts(gemspec_metadata, facts, run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
       if bootstrap
@@ -2615,7 +2631,7 @@ module Kettle
       open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
       if !opencollective_disabled && open_collective_org.nil?
         opencollective_disabled = true
-        opencollective_policy = { disabled: true, source: "missing.open_collective_org", value: "" }
+        opencollective_policy = {disabled: true, source: "missing.open_collective_org", value: ""}
       end
       funding = compact_hash(
         urls: funding_urls(
@@ -2623,16 +2639,18 @@ module Kettle
           name,
           funding_uri: metadata_value(gemspec_metadata, :funding_uri),
           opencollective_disabled: opencollective_disabled,
-          open_collective_org: open_collective_org && open_collective_org.fetch(:org)
-        )
+          open_collective_org: open_collective_org && open_collective_org.fetch(:org),
+        ),
       )
       funding_tokens = funding_platform_token_facts(kettle_config, env)
       funding[:platform_tokens] = funding_tokens unless funding_tokens.empty?
       funding[:open_collective_disabled] = true if opencollective_disabled
       funding[:open_collective_disabled_source] = opencollective_policy[:source] if opencollective_disabled
       if open_collective_org
-        funding[:open_collective_org] = open_collective_org.fetch(:org)
-        funding[:open_collective_org_source] = open_collective_org.fetch(:source)
+        unless open_collective_org.fetch(:source) == ".github/FUNDING.yml"
+          funding[:open_collective_org] = open_collective_org.fetch(:org)
+          funding[:open_collective_org_source] = open_collective_org.fetch(:source)
+        end
       end
       open_collective_files = opencollective_disabled ? opencollective_disabled_files(project_root) : []
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?
@@ -2642,7 +2660,7 @@ module Kettle
       inactive_workflows = inactive_packaged_workflow_cleanup_files(
         project_root,
         template_config,
-        include_patterns: template_selection[:include]
+        include_patterns: template_selection[:include],
       )
       inactive_templates = inactive_packaged_template_cleanup_files(project_root, template_config)
       facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
@@ -2669,7 +2687,7 @@ module Kettle
         project_root,
         template_config,
         opencollective_disabled: opencollective_disabled,
-        include_patterns: template_selection[:include]
+        include_patterns: template_selection[:include],
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
       template_facts[:inactive_packaged_template_cleanups] = inactive_templates unless inactive_templates.empty?
@@ -2680,11 +2698,14 @@ module Kettle
       unless template_preferences.empty?
         facts[:license] = license unless license.empty?
         facts[:project_runtime] = project_runtime unless project_runtime.empty?
+        readme_github_org = project_runtime[:github_org].to_s
+        readme_github_org = forge[:gh_user].to_s if readme_github_org.empty?
+        readme_github_org = facts.fetch(:repository, {})[:slug].to_s.split("/", 2).first.to_s if readme_github_org.empty?
         readme_logo = readme_logo_facts(
           kettle_config,
           package_name: name,
-          github_org: project_runtime[:github_org],
-          repository: facts[:repository]
+          github_org: readme_github_org,
+          repository: facts[:repository],
         )
         facts[:readme_logo] = readme_logo unless readme_logo.empty?
         readme_style = readme_style_facts(
@@ -2692,11 +2713,14 @@ module Kettle
           kettle_config,
           license,
           template_profile: template_selection[:template_profile],
-          repository: facts[:repository]
+          repository: facts[:repository],
         )
         facts[:readme_style] = readme_style unless readme_style.empty?
         template_tokens = template_tokens(facts, funding)
         template_facts[:tokens] = template_tokens unless template_tokens.empty?
+      end
+      if template_facts[:tokens].to_h.empty? && funding[:open_collective_org].to_s != ""
+        template_facts[:tokens] = {"KJ|OPENCOLLECTIVE_ORG" => funding.fetch(:open_collective_org).to_s}
       end
       facts[:templates] = template_facts unless template_facts.empty?
       facts
@@ -2715,14 +2739,14 @@ module Kettle
             "ruby",
             "supplied_managed_text_block_replacement",
             facts: %w[package generated_blocks],
-            provider_backend: "ast-crispr-ruby-prism"
+            provider_backend: "ast-crispr-ruby-prism",
           ),
           recipe_entry(
             "github_funding_yml",
             ".github/FUNDING.yml",
             "yaml",
             "supplied_github_funding_yaml_synchronization",
-            facts: %w[package funding]
+            facts: %w[package funding],
           ),
         ]
       end
@@ -2736,7 +2760,7 @@ module Kettle
             gemfile.fetch(:path),
             "ruby",
             "supplied_framework_matrix_gemfile_generation",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
         facts.dig(:ci, :obsolete_workflows).to_a.each do |workflow_path|
@@ -2745,7 +2769,7 @@ module Kettle
             workflow_path,
             "file",
             "supplied_obsolete_file_deletion",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
         facts.dig(:ci, :opt_in_workflow_cleanups).to_a.each do |workflow_path|
@@ -2754,7 +2778,7 @@ module Kettle
             workflow_path,
             "file",
             "supplied_opt_in_workflow_deletion",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
         facts.dig(:ci, :inactive_packaged_workflow_cleanups).to_a.each do |workflow_path|
@@ -2763,7 +2787,7 @@ module Kettle
             workflow_path,
             "file",
             "supplied_inactive_packaged_workflow_deletion",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
         facts.dig(:funding, :open_collective_files).to_a.each do |relative_path|
@@ -2772,7 +2796,7 @@ module Kettle
             relative_path,
             "file",
             "supplied_disabled_opencollective_file_deletion",
-            facts: %w[funding]
+            facts: %w[funding],
           )
         end
         facts.dig(:ci, :custom_workflows).to_a.each do |workflow_path|
@@ -2781,7 +2805,7 @@ module Kettle
             workflow_path,
             "yaml",
             "supplied_github_actions_workflow_snippet_merge",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
       end
@@ -2792,7 +2816,7 @@ module Kettle
             workflow_path,
             "file",
             "supplied_inactive_packaged_workflow_deletion",
-            facts: %w[ci]
+            facts: %w[ci],
           )
         end
       end
@@ -2803,7 +2827,7 @@ module Kettle
           preference.fetch(:target_path),
           "file",
           apply_template ? "supplied_template_source_application" : "supplied_template_source_preference",
-          facts: %w[templates funding]
+          facts: %w[templates funding],
         )
         recipe[:template_preference] = preference
         recipe[:template_tokens] = facts.dig(:templates, :tokens) if facts.dig(:templates, :tokens)
@@ -2816,7 +2840,7 @@ module Kettle
           cleanup.fetch(:target_path),
           "file",
           "supplied_inactive_packaged_template_deletion",
-          facts: %w[templates]
+          facts: %w[templates],
         )
       end
       facts.dig(:templates, :legacy_destination_cleanups).to_a.each do |cleanup|
@@ -2825,7 +2849,7 @@ module Kettle
           cleanup.fetch(:legacy_path),
           "file",
           "supplied_legacy_destination_file_deletion",
-          facts: %w[templates]
+          facts: %w[templates],
         )
       end
       facts.dig(:templates, :obsolete_license_cleanups).to_a.each do |cleanup|
@@ -2834,7 +2858,7 @@ module Kettle
           cleanup.fetch(:license_path),
           "file",
           "supplied_obsolete_license_file_deletion",
-          facts: %w[templates license]
+          facts: %w[templates license],
         )
       end
       recipes << recipe_entry(
@@ -2844,7 +2868,7 @@ module Kettle
         "supplied_source_selector_deletion",
         provider_backend: "generic_structural_owners",
         facts: %w[rubygems rakefile],
-        selectors: %w[rakefile_scaffold]
+        selectors: %w[rakefile_scaffold],
       )
 
       {
@@ -2857,13 +2881,13 @@ module Kettle
 
     def generated_blocks_facts(gemspec, facts, run_options)
       shunted = shunted_gemfile_block(gemspec, facts, run_options)
-      shunted ? { shunted_gemfile: shunted } : {}
+      shunted ? {shunted_gemfile: shunted} : {}
     end
 
     def shunted_gemfile_block(gemspec, facts, run_options)
       resolver = run_options[:rubygems_resolver] || run_options["rubygems_resolver"] || RubyGemsResolver.new
       dependencies = extract_gemspec_development_dependencies(gemspec)
-      return nil if dependencies.empty?
+      return if dependencies.empty?
 
       floor = shunted_effective_floor(facts.dig(:rubygems, :min_ruby))
       shunted = dependencies.filter_map do |dependency|
@@ -2880,7 +2904,7 @@ module Kettle
       rescue StandardError
         nil
       end
-      return nil if shunted.empty?
+      return if shunted.empty?
 
       shunted_gemfile_managed_block(shunted)
     rescue StandardError
@@ -2888,6 +2912,15 @@ module Kettle
     end
 
     def extract_gemspec_development_dependencies(gemspec)
+      if gemspec.is_a?(Hash)
+        return Array(gemspec[:development_dependencies] || gemspec["development_dependencies"]).map do |dependency|
+          {
+            name: dependency.name.to_s,
+            requirement: dependency.requirement.to_s,
+          }
+        end.reject { |dependency| dependency.fetch(:name).empty? }.uniq { |dependency| dependency.fetch(:name) }
+      end
+
       Array(gemspec&.development_dependencies).map do |dependency|
         {
           name: dependency.name.to_s,
@@ -2935,7 +2968,7 @@ module Kettle
         execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
       end
       plugin_registry = plugin_registry_for_project(project_root)
-      changed_files = recipe_reports.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+      changed_files = changed_files_from_recipe_reports(recipe_reports)
       diagnostics = recipe_reports.flat_map { |report| report[:diagnostics] }
       phase_reports = phase_reports_for(recipe_reports)
       decision_evaluations = recipe_reports.map { |report| report.fetch(:decision_evaluation) }
@@ -2944,7 +2977,7 @@ module Kettle
         diagnostics << plugin_lifecycle_diagnostic(
           plugin_registry,
           callbacks_run: false,
-          active_runner_phases: []
+          active_runner_phases: [],
         )
       end
       run_stats = recipe_run_stats(recipe_reports, diagnostics: diagnostics)
@@ -2967,9 +3000,23 @@ module Kettle
       }
     end
 
+    def changed_files_from_recipe_reports(recipe_reports)
+      latest_by_path = {}
+      recipe_reports.each do |report|
+        path = report[:relative_path]
+        latest_by_path[path] = report if path
+      end
+      latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+    end
+
     def apply_project(project_root, env: ENV, run_options: {})
       report = plan_project(project_root, env: env, run_options: run_options).merge(mode: "apply")
+      before_apply_files = snapshot_changed_files(
+        project_root,
+        report.fetch(:recipe_reports).filter_map { |entry| entry[:relative_path] },
+      )
       run_apply_phases(project_root, report)
+      report[:changed_files] = actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
       report[:post_apply_steps] = post_apply_steps(project_root, report)
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
         step.fetch(:changed_files, [])
@@ -2977,9 +3024,28 @@ module Kettle
       report[:duplicate_drift] = duplicate_drift_report(
         project_root: project_root,
         template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
-        run_options: run_options
+        run_options: run_options,
       )
       report
+    end
+
+    def snapshot_changed_files(project_root, changed_files)
+      changed_files.to_h do |relative_path|
+        path = File.join(project_root, relative_path)
+        [relative_path, File.exist?(path) ? File.read(path) : nil]
+      end
+    end
+
+    def actual_changed_files_after_apply(project_root, changed_files, before_apply_files)
+      changed_files.filter_map do |relative_path|
+        path = File.join(project_root, relative_path)
+        original = before_apply_files.fetch(relative_path, nil)
+        if File.exist?(path)
+          (File.read(path) == original) ? nil : relative_path
+        else
+          original.nil? ? nil : relative_path
+        end
+      end.uniq.sort
     end
 
     def post_apply_steps(project_root, report)
@@ -2989,7 +3055,7 @@ module Kettle
     end
 
     def template_version_gem_bootstrap_step(project_root, report)
-      return nil unless project_gemspec_declares_version_gem?(project_root)
+      return unless project_gemspec_declares_version_gem?(project_root)
 
       facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
@@ -3001,7 +3067,7 @@ module Kettle
         project_root,
         facts,
         manage_version_file: !templated_paths.include?(version_path),
-        manage_signature_file: !templated_paths.include?(signature_path)
+        manage_signature_file: !templated_paths.include?(signature_path),
       )
     end
 
@@ -3016,8 +3082,13 @@ module Kettle
       path = Dir.glob(File.join(project_root, "*.gemspec")).sort.first
       return false unless path
 
-      spec = load_project_gemspec(path)
-      Array(spec&.runtime_dependencies).any? { |dependency| dependency.name == "version_gem" }
+      metadata = static_project_gemspec_metadata(path)
+      dependencies = Array(metadata[:runtime_dependencies] || metadata["runtime_dependencies"])
+      if dependencies.empty?
+        spec = load_project_gemspec(path)
+        dependencies = Array(spec&.runtime_dependencies)
+      end
+      dependencies.any? { |dependency| dependency.name == "version_gem" }
     end
 
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
@@ -3042,7 +3113,7 @@ module Kettle
           template_dir: template_root,
           lock_path: File.join(project_root.to_s, ".kettle-drift.lock"),
           mode: :force_update,
-          printer_class: nil
+          printer_class: nil,
         )
       end
       {
@@ -3100,7 +3171,7 @@ module Kettle
           config,
           facts.fetch(:license, {}),
           template_profile: facts[:template_profile],
-          repository: facts[:repository]
+          repository: facts[:repository],
         )
       original_path = File.join(project_root, "README.md")
       original = File.exist?(original_path) ? File.read(original_path) : ""
@@ -3161,7 +3232,7 @@ module Kettle
       merge_readme_template(
         template_content: template_content,
         destination_content: original,
-        preserve_config: readme_preserve_config_without_partial_sections(preserve_config, section_partials.keys)
+        preserve_config: readme_preserve_config_without_partial_sections(preserve_config, section_partials.keys),
       )
     end
 
@@ -3276,7 +3347,7 @@ module Kettle
       postprocess_readme_content(
         replace_markdown_managed_block(lines.join("\n"), "kettle-jem:metadata", readme_metadata_block(facts)),
         facts,
-        project_root: project_root
+        project_root: project_root,
       )
     end
 
@@ -3340,7 +3411,7 @@ module Kettle
       destination_body = destination_lines[(destination_unreleased + 1)...destination_end] || []
       canonical = build_changelog_unreleased_section(
         template_lines.fetch(template_unreleased),
-        changelog_unreleased_items(destination_body)
+        changelog_unreleased_items(destination_body),
       )
       header = changelog_template_header(template_lines, template_unreleased)
       merged_lines = header +
@@ -3429,7 +3500,7 @@ module Kettle
 
     def changelog_bullet_line?(line)
       stripped = line.to_s.lstrip
-      stripped.start_with?("- ") || stripped.start_with?("* ")
+      stripped.start_with?("- ", "* ")
     end
 
     def collect_changelog_list_item(lines, start_index)
@@ -3480,7 +3551,7 @@ module Kettle
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
-      deletion = recipe.fetch(:name) == "rakefile_scaffold_cleanup" ? delete_rakefile_scaffold(original) : nil
+      deletion = (recipe.fetch(:name) == "rakefile_scaffold_cleanup") ? delete_rakefile_scaffold(original) : nil
       final = case recipe.fetch(:name)
       when "readme_metadata"
         synchronize_readme(original, facts, project_root: project_root)
@@ -3535,7 +3606,7 @@ module Kettle
         destination_content: original,
         steps: [content_recipe_step(recipe)],
         runtime_context: recipe_runtime_context(recipe, facts, deletion),
-        metadata: { packaging_recipe: recipe.fetch(:name), project_root: project_root.to_s },
+        metadata: {packaging_recipe: recipe.fetch(:name), project_root: project_root.to_s},
       )
       changed = delete_file_recipe?(recipe) || final != original
       metadata = recipe_report_metadata(recipe).merge(destination_existed: destination_existed)
@@ -3543,7 +3614,7 @@ module Kettle
         decision_policy: decision_policy,
         recipe: recipe,
         changed: changed,
-        destination_existed: destination_existed
+        destination_existed: destination_existed,
       )
       if %w[keep skip].include?(decision_evaluation.fetch(:selected_action))
         final = original
@@ -3580,7 +3651,7 @@ module Kettle
         step_kind: recipe.fetch(:primitive),
         name: recipe.fetch(:name),
         provider_family: recipe.fetch(:provider_family),
-        metadata: { target_path: recipe.fetch(:target_path) },
+        metadata: {target_path: recipe.fetch(:target_path)},
       }
       step[:provider_backend] = recipe[:provider_backend] if recipe[:provider_backend]
       if recipe.fetch(:primitive) == "supplied_source_selector_deletion"
@@ -3624,7 +3695,7 @@ module Kettle
         application: application,
         diagnostics: [],
         metadata: step_report_metadata(recipe, deletion).merge(
-          ruby_template_policy_report(recipe: recipe, request: request, original: original, final: final)
+          ruby_template_policy_report(recipe: recipe, request: request, original: original, final: final),
         ),
       }
     end
@@ -3649,7 +3720,7 @@ module Kettle
         appraisals_policy_operations(template_content, original, final, request)
       end
       report[:operations] = operations
-      { ruby_template_policy: report }
+      {ruby_template_policy: report}
     end
 
     def gemfile_policy_operations(template_content, original, final, request)
@@ -3791,7 +3862,7 @@ module Kettle
       preference = recipe.fetch(:template_preference)
       path = File.join(
         preference.fetch(:source_root_path, project_root),
-        preference.fetch(:source_relative_path, preference.fetch(:selected_source))
+        preference.fetch(:source_relative_path, preference.fetch(:selected_source)),
       )
       File.read(path)
     end
@@ -3835,7 +3906,7 @@ module Kettle
       resolved = resolve_template_tokens(
         content,
         recipe.fetch(:template_tokens, {}),
-        scan_unresolved: unresolved_template_scan?(recipe)
+        scan_unresolved: unresolved_template_scan?(recipe),
       )
     rescue ArgumentError => e
       raise ArgumentError, "#{recipe.fetch(:target_path)}: #{e.message}"
@@ -3847,10 +3918,10 @@ module Kettle
           merge_readme_template(
             template_content: resolved,
             destination_content: original,
-            preserve_config: recipe.dig(:template_preference, :readme_preserve_config) || {}
+            preserve_config: recipe.dig(:template_preference, :readme_preserve_config) || {},
           ),
           facts,
-          project_root: project_root
+          project_root: project_root,
         )
         return append_used_markdown_link_definitions(processed, resolved)
       end
@@ -3867,11 +3938,11 @@ module Kettle
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
         accepted = finalize_github_workflow_template(accepted) if github_workflow_template_recipe?(recipe)
-        return recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
+        return (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
       end
 
       resolved = finalize_github_workflow_template(resolved) if github_workflow_template_recipe?(recipe)
-      recipe.fetch(:target_path) == "README.md" ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
+      (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
     end
 
     def finalize_accepted_template_source(recipe, content, destination_content, facts:)
@@ -3917,7 +3988,7 @@ module Kettle
       processed = ReadmePostProcessor.process(
         content: content,
         min_ruby: minimum_ruby_token(facts.dig(:rubygems, :min_ruby)),
-        engines: facts.dig(:rubygems, :engines)
+        engines: facts.dig(:rubygems, :engines),
       )
       processed = normalize_readme_project_heading(processed, facts)
       processed = apply_readme_conditional_blocks(processed, facts)
@@ -3925,7 +3996,7 @@ module Kettle
       processed = apply_readme_kloc_badge(processed, facts, project_root)
       processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
       processed = apply_monorepo_subgem_readme_recipe(processed, facts)
-      replace_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
+      replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
     end
 
     def apply_readme_kloc_badge(content, facts, project_root)
@@ -3934,26 +4005,26 @@ module Kettle
 
       content.to_s.gsub(
         /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/,
-        "\\1#{kloc}\\3"
+        "\\1#{kloc}\\3",
       )
     end
 
     def readme_kloc_from_changelog(project_root, version)
-      return nil if project_root.to_s.empty? || version.to_s.empty?
+      return if project_root.to_s.empty? || version.to_s.empty?
 
       changelog_path = File.join(project_root, "CHANGELOG.md")
-      return nil unless File.file?(changelog_path)
+      return unless File.file?(changelog_path)
 
       changelog_coverage_kloc(current_changelog_version_section(File.read(changelog_path), version))
     end
 
     def current_changelog_version_section(content, version)
       version_text = version.to_s.strip
-      return nil if version_text.empty?
+      return if version_text.empty?
 
       lines = content.to_s.lines
       start_index = lines.index { |line| changelog_version_heading_line?(line, version_text) }
-      return nil unless start_index
+      return unless start_index
 
       end_index = lines[(start_index + 1)..].to_a.index { |line| line.start_with?("## ") }
       lines[start_index...(end_index ? start_index + 1 + end_index : lines.length)].join
@@ -3969,10 +4040,10 @@ module Kettle
     end
 
     def changelog_coverage_kloc(section)
-      return nil if section.to_s.empty?
+      return if section.to_s.empty?
 
       match = section.to_s.match(/-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i)
-      return nil unless match
+      return unless match
 
       format("%.3f", match[1].to_i.to_f / 1000.0)
     end
@@ -3992,14 +4063,14 @@ module Kettle
         processed = remove_readme_badge_and_refs(
           processed,
           README_LICENSE_EYE_WORKFLOW_BADGE,
-          README_LICENSE_EYE_WORKFLOW_LINK_LABELS
+          README_LICENSE_EYE_WORKFLOW_LINK_LABELS,
         )
       end
       if facts.dig(:funding, :open_collective_disabled)
         processed = remove_readme_badge_and_refs(
           processed,
           README_OPEN_COLLECTIVE_FUNDING_BADGES,
-          README_OPEN_COLLECTIVE_LINK_LABELS
+          README_OPEN_COLLECTIVE_LINK_LABELS,
         )
       end
       processed
@@ -4011,7 +4082,7 @@ module Kettle
       Array(link_labels).reduce(processed) do |memo, label|
         delete_markdown_with_ast_crispr(
           memo,
-          Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0})
+          Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0}),
         )
       end
     end
@@ -4022,11 +4093,11 @@ module Kettle
       if keep
         processed = delete_markdown_with_ast_crispr(
           content,
-          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: start_text, limit: {at_least: 0})
+          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: start_text, limit: {at_least: 0}),
         )
         delete_markdown_with_ast_crispr(
           processed,
-          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: end_text, limit: {at_least: 0})
+          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: end_text, limit: {at_least: 0}),
         )
       else
         delete_markdown_with_ast_crispr(
@@ -4034,8 +4105,8 @@ module Kettle
           Ast::Crispr::Markdown::Markly::Selectors.html_comment_block(
             start_text: start_text,
             end_text: end_text,
-            limit: {at_least: 0}
-          )
+            limit: {at_least: 0},
+          ),
         )
       end
     end
@@ -4069,8 +4140,8 @@ module Kettle
           Ast::Crispr::Markdown::Markly::Selectors.heading_section(
             heading_text: owner.heading_text,
             level: owner.level,
-            limit: {at_least: 0}
-          )
+            limit: {at_least: 0},
+          ),
         )
       end
       append_missing_markdown_link_definitions(projected, link_definitions)
@@ -4098,7 +4169,7 @@ module Kettle
         replace_markdown_with_ast_crispr(
           processed,
           Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: owner.label, limit: {exactly: 1}),
-          markdown_link_definition_source(owner, replacement)
+          markdown_link_definition_source(owner, replacement),
         )
       end
     end
@@ -4106,7 +4177,7 @@ module Kettle
     def append_missing_markdown_link_definitions(content, definitions)
       existing = Ast::Crispr::Markdown::Markly.document_context(
         content: content,
-        source_label: "README.md"
+        source_label: "README.md",
       ).structural_owners(owner_scope: :link_definitions).map { |owner| owner.label.to_s }
       missing_sources = definitions.reject { |owner| existing.include?(owner.label.to_s) }.map do |owner|
         owner.source.to_s.end_with?("\n") ? owner.source.to_s : "#{owner.source}\n"
@@ -4139,7 +4210,7 @@ module Kettle
         content: content.to_s,
         target: target,
         replacement: replacement,
-        source_label: "README.md"
+        source_label: "README.md",
       ).updated_content
     end
 
@@ -4189,7 +4260,7 @@ module Kettle
       prepared = ReadmePostProcessor.process(
         content: prepared,
         min_ruby: "0",
-        workflow_paths: style[:workflow_paths]
+        workflow_paths: style[:workflow_paths],
       ) if style[:workflow_paths]
       prepared = prune_missing_workflow_link_definitions(prepared, style[:workflow_paths]) if style[:workflow_paths]
       prepared = ReadmePostProcessor.prune_orphaned_workflow_inline_references(prepared) if style[:workflow_paths]
@@ -4208,7 +4279,7 @@ module Kettle
         README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, []).reduce(pruned_badges) do |memo, label|
           delete_markdown_with_ast_crispr(
             memo,
-            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0})
+            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0}),
           )
         end
       end.gsub(/[ \t]{2,}/, " ")
@@ -4224,7 +4295,7 @@ module Kettle
 
           delete_markdown_with_ast_crispr(
             processed,
-            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: owner.label, limit: {at_least: 0})
+            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: owner.label, limit: {at_least: 0}),
           )
         end
     end
@@ -4280,7 +4351,7 @@ module Kettle
           template_content,
           destination_content,
           "yaml",
-          **yaml_merge_options(recipe)
+          **yaml_merge_options(recipe),
         )
       when :toml
         merge_result = Toml::Merge.merge_toml(template_content, destination_content, "toml")
@@ -4324,7 +4395,7 @@ module Kettle
         content,
         facts: facts,
         template_content: template_content,
-        preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
+        preserve_self_word_entries: local_gemfile_template_recipe?(recipe),
       )
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
@@ -4459,11 +4530,11 @@ module Kettle
 
     def appraisal_ruby_version(value)
       parts = value.to_s.split("-")
-      return nil unless parts.length == 3 && parts.first == "ruby"
+      return unless parts.length == 3 && parts.first == "ruby"
 
       major = Integer(parts[1], exception: false)
       minor = Integer(parts[2], exception: false)
-      return nil unless major && minor
+      return unless major && minor
 
       "#{major}.#{minor}"
     end
@@ -4503,7 +4574,7 @@ module Kettle
     end
 
     def ruby_merge_options(recipe, merge_template_requires:)
-      options = { merge_template_requires: merge_template_requires }
+      options = {merge_template_requires: merge_template_requires}
       parameters = Ruby::Merge.method(:merge_ruby).parameters
       if parameters.include?([:key, :method_move_policy]) || parameters.any? { |kind, _name| kind == :keyrest }
         options[:method_move_policy] = ruby_method_move_policy(recipe)
@@ -4521,7 +4592,7 @@ module Kettle
         preference: :destination,
         add_template_only_nodes: true,
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
-        **prism_ruby_merge_options(recipe)
+        **prism_ruby_merge_options(recipe),
       )
       if file_type == :ruby && result[:ok]
         result = result.merge(output: remove_template_only_require_calls(template_content, destination_content, result.fetch(:output)))
@@ -4536,7 +4607,7 @@ module Kettle
         "ruby",
         preference: :template,
         add_template_only_nodes: true,
-        signature_generator: Prism::Merge.ruby_dsl_signature_generator
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator,
       )
     end
 
@@ -4556,7 +4627,7 @@ module Kettle
         template_content,
         pruned,
         removable_gems,
-        preserve_self_word_entries: preserve_self_word_entries
+        preserve_self_word_entries: preserve_self_word_entries,
       )
       apply_commented_gem_dependency_policy(template_content, pruned)
     end
@@ -4677,7 +4748,7 @@ module Kettle
         record.merge(
           block_start_line: start_index + 1,
           block_end_line: record.fetch(:end_line),
-          source_lines: lines[start_index..(record.fetch(:end_line) - 1)] || []
+          source_lines: lines[start_index..(record.fetch(:end_line) - 1)] || [],
         )
       end
     end
@@ -4722,7 +4793,7 @@ module Kettle
         (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
       end
       ensure_trailing_newline(
-        merged_content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n")
+        merged_content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"),
       )
     end
 
@@ -4837,7 +4908,7 @@ module Kettle
         else
           ruby_multiline_word_array_source(kept, indent: record.fetch(:start_column))
         end
-        { start_offset: record.fetch(:start_offset), end_offset: record.fetch(:end_offset), replacement: replacement }
+        {start_offset: record.fetch(:start_offset), end_offset: record.fetch(:end_offset), replacement: replacement}
       end
       return content if replacements.empty?
 
@@ -4881,7 +4952,7 @@ module Kettle
     def ruby_multiline_word_array_source(names, indent:)
       prefix = " " * indent.to_i
       element_prefix = "#{prefix}  "
-      ([ "#{prefix}%w[" ] + names.map { |name| "#{element_prefix}#{name}" } + [ "#{prefix}]" ]).join("\n")
+      (["#{prefix}%w["] + names.map { |name| "#{element_prefix}#{name}" } + ["#{prefix}]"]).join("\n")
     end
 
     def replace_source_offsets(content, replacements)
@@ -5138,11 +5209,11 @@ module Kettle
       output = Json::Merge::SmartMerger.new(
         template_content,
         destination_content,
-        **json_merge_options(recipe)
+        **json_merge_options(recipe),
       ).merge
-      { ok: true, output: output, diagnostics: [] }
+      {ok: true, output: output, diagnostics: []}
     rescue Json::Merge::Error => e
-      { ok: false, output: destination_content, diagnostics: [{ kind: "#{file_type}_merge_failed", message: e.message }] }
+      {ok: false, output: destination_content, diagnostics: [{kind: "#{file_type}_merge_failed", message: e.message}]}
     end
 
     def dotenv_merge_options(recipe)
@@ -5162,11 +5233,11 @@ module Kettle
       output = Dotenv::Merge::SmartMerger.new(
         template_content,
         destination_content,
-        **dotenv_merge_options(recipe)
+        **dotenv_merge_options(recipe),
       ).merge
-      { ok: true, output: output, diagnostics: [] }
+      {ok: true, output: output, diagnostics: []}
     rescue Dotenv::Merge::Error => e
-      { ok: false, output: destination_content, diagnostics: [{ kind: "dotenv_merge_failed", message: e.message }] }
+      {ok: false, output: destination_content, diagnostics: [{kind: "dotenv_merge_failed", message: e.message}]}
     end
 
     def rbs_merge_options(recipe)
@@ -5186,11 +5257,11 @@ module Kettle
       output = Rbs::Merge::SmartMerger.new(
         template_content,
         destination_content,
-        **rbs_merge_options(recipe)
+        **rbs_merge_options(recipe),
       ).merge
-      { ok: true, output: output, diagnostics: [] }
+      {ok: true, output: output, diagnostics: []}
     rescue Rbs::Merge::Error => e
-      { ok: false, output: destination_content, diagnostics: [{ kind: "rbs_merge_failed", message: e.message }] }
+      {ok: false, output: destination_content, diagnostics: [{kind: "rbs_merge_failed", message: e.message}]}
     end
 
     def bash_merge_options(recipe)
@@ -5223,11 +5294,11 @@ module Kettle
       output = Bash::Merge::SmartMerger.new(
         template_content,
         destination_content,
-        **bash_merge_options(recipe)
+        **bash_merge_options(recipe),
       ).merge
-      { ok: true, output: output, diagnostics: [] }
+      {ok: true, output: output, diagnostics: []}
     rescue Bash::Merge::Error => e
-      { ok: false, output: destination_content, diagnostics: [{ kind: "bash_merge_failed", message: e.message }] }
+      {ok: false, output: destination_content, diagnostics: [{kind: "bash_merge_failed", message: e.message}]}
     end
 
     def merge_appraisals_template_source(template_content, destination_content, facts:)
@@ -5284,7 +5355,7 @@ module Kettle
       end
       prelude_end = records.empty? ? lines.length : records.first.fetch(:start_line) - 1
       prelude = lines[0...prelude_end].join
-      { prelude: prelude, blocks: blocks, order: order }
+      {prelude: prelude, blocks: blocks, order: order}
     end
 
     def prune_appraisals_below_min_ruby(content, min_ruby)
@@ -5344,7 +5415,7 @@ module Kettle
         merged,
         destination_content,
         template_receiver: template_receiver,
-        destination_receiver: destination_receiver
+        destination_receiver: destination_receiver,
       )
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
@@ -5411,9 +5482,34 @@ module Kettle
 
     def remove_gemspec_legacy_version_loader_preamble(content)
       node = gemspec_top_level_gem_version_node(content)
-      return content unless node
+      unless node
+        fallback_range = gemspec_legacy_version_loader_preamble_line_range(content)
+        return content unless fallback_range
+
+        return replace_source_range_lines(content, fallback_range.fetch(:start_line), fallback_range.fetch(:end_line), "")
+      end
 
       replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), "")
+    end
+
+    def gemspec_legacy_version_loader_preamble_line_range(content)
+      lines = content.to_s.lines
+      start_index = lines.index do |line|
+        # Prism has represented this legacy multiline assignment inconsistently across
+        # parser versions; this fallback is limited to the exact top-level preamble
+        # shape immediately preceding Gem::Specification.new.
+        line.match?(/\Agem_version\s*=/)
+      end
+      return nil unless start_index
+
+      gemspec_index = lines.each_with_index.find do |line, index|
+        index > start_index && line.include?("Gem::Specification.new")
+      end&.last
+      return nil unless gemspec_index
+
+      end_line = gemspec_index
+      end_line -= 1 while end_line > start_index && lines[end_line - 1].strip.empty?
+      {start_line: start_index + 1, end_line: end_line}
     end
 
     def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:)
@@ -5837,17 +5933,17 @@ module Kettle
         next [] if line_number < skip_until
 
         record = records_by_line[line_number]
-        unless record
-          line
-        else
+        if record
           skip_until = record.fetch(:end_line) + 1
           record.fetch(:replacement)
+        else
+          line
         end
       end.join
     end
 
     def replace_source_range_lines(content, start_line, end_line, replacement)
-      replace_record_ranges(content, { start_line => { end_line: end_line, replacement: replacement } })
+      replace_record_ranges(content, {start_line => {end_line: end_line, replacement: replacement}})
     end
 
     def insert_lines_before(content, line_number, insertion)
@@ -6141,13 +6237,13 @@ module Kettle
         profiled_content,
         ["templates:", "  root: packaged", "  apply: true", "  profile: #{MONOREPO_ROOT_TEMPLATE_PROFILE}"],
         entries_block,
-        nil
+        nil,
       )
       updated = insert_after_line_sequence(
         profiled_content,
         ["templates:", "  root: packaged", "  apply: true"],
         entries_block,
-        "Could not apply monorepo-root template profile to .kettle-jem.yml bootstrap template"
+        "Could not apply monorepo-root template profile to .kettle-jem.yml bootstrap template",
       ) if updated == profiled_content
       if updated == profiled_content
         raise Error,
@@ -6174,13 +6270,13 @@ module Kettle
         profiled_content,
         ["templates:", "  root: packaged", "  apply: true", "  profile: #{MONOREPO_SUBGEM_TEMPLATE_PROFILE}"],
         entries_block,
-        nil
+        nil,
       )
       updated = insert_after_line_sequence(
         profiled_content,
         ["templates:", "  root: packaged", "  apply: true"],
         entries_block,
-        "Could not apply monorepo-subgem template profile to .kettle-jem.yml bootstrap template"
+        "Could not apply monorepo-subgem template profile to .kettle-jem.yml bootstrap template",
       ) if updated == profiled_content
       if updated == profiled_content
         raise Error,
@@ -6198,7 +6294,7 @@ module Kettle
         content,
         ["files:"],
         override_lines.join("\n"),
-        "Could not apply monorepo-root file overrides to .kettle-jem.yml bootstrap template"
+        "Could not apply monorepo-root file overrides to .kettle-jem.yml bootstrap template",
       )
     end
 
@@ -6219,14 +6315,14 @@ module Kettle
       gemspec = gemspec_path.to_s.strip
       return entries if gemspec.empty?
 
-      entries.insert(1, { "source" => "gem.gemspec", "target" => gemspec })
+      entries.insert(1, {"source" => "gem.gemspec", "target" => gemspec})
       entries.concat(version_gem_template_entries(gemspec))
       entries
     end
 
     def version_gem_template_entries(gemspec_path)
       VERSION_GEM_TEMPLATE_SOURCES.map do |source|
-        { "source" => source, "target" => version_gem_template_target_path(gemspec_path, source) }
+        {"source" => source, "target" => version_gem_template_target_path(gemspec_path, source)}
       end
     end
 
@@ -6274,7 +6370,7 @@ module Kettle
         content,
         ["files:"],
         override_lines.join("\n"),
-        "Could not apply monorepo-subgem file overrides to .kettle-jem.yml bootstrap template"
+        "Could not apply monorepo-subgem file overrides to .kettle-jem.yml bootstrap template",
       )
     end
 
@@ -6306,7 +6402,7 @@ module Kettle
 
     def readme_project_emoji(project_root)
       readme_path = File.join(project_root, "README.md")
-      return nil unless File.exist?(readme_path)
+      return unless File.exist?(readme_path)
 
       h1 = markdown_heading_owners(File.read(readme_path), source_label: "README.md").find { |owner| owner.level == 1 }
       candidate = first_grapheme(h1&.heading_text)
@@ -6337,7 +6433,7 @@ module Kettle
     end
 
     def recipe_report_metadata(recipe)
-      metadata = { packaging_recipe: recipe.fetch(:name) }
+      metadata = {packaging_recipe: recipe.fetch(:name)}
       metadata[:delete_file] = true if delete_file_recipe?(recipe)
       metadata[:template_source_preference] = deep_dup(recipe[:template_preference]) if recipe[:template_preference]
       metadata[:template_tokens] = deep_dup(recipe[:template_tokens]) if recipe[:template_tokens]
@@ -6388,7 +6484,7 @@ module Kettle
       normalized = normalize_repository_topology(topology)
       return normalized unless normalized.empty?
 
-      template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE ? REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT : REPOSITORY_TOPOLOGY_STANDALONE
+      (template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE) ? REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT : REPOSITORY_TOPOLOGY_STANDALONE
     end
 
     def normalize_repository_topology(value)
@@ -6405,7 +6501,7 @@ module Kettle
       return pack if patterns.empty?
 
       pack.merge(
-        recipes: pack.fetch(:recipes).select { |recipe| selected_template_path?(recipe.fetch(:target_path), patterns) }
+        recipes: pack.fetch(:recipes).select { |recipe| selected_template_path?(recipe.fetch(:target_path), patterns) },
       )
     end
 
@@ -6432,7 +6528,7 @@ module Kettle
         file: recipe.fetch(:target_path),
         default_action: recipe_default_action(recipe, changed: changed, destination_existed: destination_existed),
         severity: :advisory,
-        diagnostics: recipe_decision_diagnostics(recipe)
+        diagnostics: recipe_decision_diagnostics(recipe),
       ).to_h
     end
 
@@ -6469,10 +6565,10 @@ module Kettle
       {
         severity: "advisory",
         message: if config_existed
-          "Kettle/Jem setup bootstrap mode found existing .kettle-jem.yml; run kettle-jem apply to template the project."
-        else
-          "Created .kettle-jem.yml. Review it, then run kettle-jem --accept-config to continue setup."
-        end,
+                   "Kettle/Jem setup bootstrap mode found existing .kettle-jem.yml; run kettle-jem apply to template the project."
+                 else
+                   "Created .kettle-jem.yml. Review it, then run kettle-jem --accept-config to continue setup."
+                 end,
       }
     end
 
@@ -6595,7 +6691,7 @@ module Kettle
 
     def ruby_engines_config(config)
       engines = config["engines"]
-      return nil unless engines.is_a?(Array)
+      return unless engines.is_a?(Array)
 
       engines.map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).uniq
     end
@@ -6611,7 +6707,7 @@ module Kettle
     end
 
     def github_funding_urls(path, opencollective_disabled: false)
-      funding = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false) || {}
+      funding = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
       return [] unless funding.is_a?(Hash)
 
       funding.flat_map do |platform, value|
@@ -6798,7 +6894,7 @@ module Kettle
       path = File.join(project_root, ".kettle-jem.yml")
       return {} unless File.exist?(path)
 
-      config = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false) || {}
+      config = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
       validate_kettle_jem_config!(config)
       config
     rescue Psych::SyntaxError => error
@@ -6827,7 +6923,7 @@ module Kettle
       rescue Error => e
         registry.load_errors << {
           plugin_name: plugin_name,
-          message: e.message
+          message: e.message,
         }
       end
       registry
@@ -6855,11 +6951,11 @@ module Kettle
           {
             plugin_name: hook.plugin_name,
             phase: hook.phase.to_s,
-            timing: hook.timing.to_s
+            timing: hook.timing.to_s,
           }
         end,
         callbacks_run: callbacks_run,
-        active_runner_phases: active_runner_phases.map(&:to_s)
+        active_runner_phases: active_runner_phases.map(&:to_s),
       }
     end
 
@@ -6875,7 +6971,7 @@ module Kettle
         recipe_reports: report.fetch(:recipe_reports),
         phase_reports: report.fetch(:phase_reports),
         changed_files: changed_files,
-        diagnostics: diagnostics
+        diagnostics: diagnostics,
       )
       reports_by_phase = report.fetch(:recipe_reports).group_by { |recipe_report| recipe_report_phase(recipe_report) }
       active_runner_phases = report.fetch(:phase_reports).map { |phase_report| phase_report.fetch(:phase).to_sym }
@@ -6888,7 +6984,7 @@ module Kettle
             phase: phase,
             context: context,
             actor: self,
-            phase_stats: phase_stats
+            phase_stats: phase_stats,
           )
         end
         reports_by_phase.fetch(phase, []).each do |recipe_report|
@@ -6900,7 +6996,7 @@ module Kettle
             phase: phase,
             context: context,
             actor: self,
-            phase_stats: phase_stats
+            phase_stats: phase_stats,
           )
         end
       end
@@ -6908,7 +7004,7 @@ module Kettle
         diagnostics << plugin_lifecycle_diagnostic(
           plugin_registry,
           callbacks_run: true,
-          active_runner_phases: active_runner_phases
+          active_runner_phases: active_runner_phases,
         )
       end
       changed_files.sort!
@@ -6957,8 +7053,8 @@ module Kettle
       return :modular_gemfiles if path.start_with?("gemfiles/modular/")
       return :spec_helper if path == "spec/spec_helper.rb" || path.start_with?("spec/support/")
       return :environment_templates if path.start_with?(".env") || path.end_with?(".env")
-      return :git_hooks if path.start_with?(".git/hooks/") || path.start_with?("git-hooks/")
-      return :license_files if path.start_with?("LICENSE") || path.start_with?("NOTICE") || managed_license_template_basename(path)
+      return :git_hooks if path.start_with?(".git/hooks/", "git-hooks/")
+      return :license_files if path.start_with?("LICENSE", "NOTICE") || managed_license_template_basename(path)
       return :duplicate_check if name.include?("duplicate")
       return :quality_config if quality_config_path?(path)
 
@@ -7038,25 +7134,25 @@ module Kettle
       end
 
       env_falsey = opencollective_falsey_env(env)
-      return { disabled: true, source: "env.#{env_falsey.fetch(:key)}", value: env_falsey.fetch(:value).to_s } if env_falsey
+      return {disabled: true, source: "env.#{env_falsey.fetch(:key)}", value: env_falsey.fetch(:value).to_s} if env_falsey
 
       if config.dig("templates", "profile").to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
-        return { disabled: true, source: "config.templates.profile", value: MONOREPO_SUBGEM_TEMPLATE_PROFILE }
+        return {disabled: true, source: "config.templates.profile", value: MONOREPO_SUBGEM_TEMPLATE_PROFILE}
       end
 
-      { disabled: false }
+      {disabled: false}
     end
 
     def opencollective_falsey_env(env)
       %w[OPENCOLLECTIVE_HANDLE FUNDING_ORG].each do |key|
         value = env[key]
-        return { key: key, value: value } if falsey_config?(value)
+        return {key: key, value: value} if falsey_config?(value)
       end
       nil
     end
 
     def opencollective_org(project_root, config, env, opencollective_disabled: false)
-      return nil if opencollective_disabled
+      return if opencollective_disabled
 
       env_org = opencollective_org_env(env)
       return env_org if env_org
@@ -7064,20 +7160,23 @@ module Kettle
       config_org = opencollective_org_config(config)
       return config_org if config_org
 
+      funding_org = opencollective_org_github_funding_file(project_root)
+      return funding_org if funding_org
+
       opencollective_org_file(project_root)
     end
 
     def opencollective_org_config(config)
       funding = config["funding"]
-      return nil unless funding.is_a?(Hash) && funding.key?("open_collective")
+      return unless funding.is_a?(Hash) && funding.key?("open_collective")
 
       value = funding["open_collective"]
-      return nil if value == true || falsey_config?(value)
+      return if value == true || falsey_config?(value)
 
       org = value.to_s.strip
-      return nil if org.empty?
+      return if org.empty?
 
-      { org: org, source: "config.funding.open_collective" }
+      {org: org, source: "config.funding.open_collective"}
     end
 
     def opencollective_org_env(env)
@@ -7085,33 +7184,49 @@ module Kettle
         value = env[key].to_s.strip
         next if value.empty? || falsey_config?(value)
 
-        return { org: value, source: "env.#{key}" }
+        return {org: value, source: "env.#{key}"}
       end
       nil
     end
 
     def opencollective_org_file(project_root)
       path = File.join(project_root, ".opencollective.yml")
-      return nil unless File.exist?(path)
+      return unless File.exist?(path)
 
-      config = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false) || {}
-      return nil unless config.is_a?(Hash)
+      config = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
+      return unless config.is_a?(Hash)
 
       org = config.fetch("collective", config["org"]).to_s.strip
-      return nil if org.empty?
+      return if org.empty?
 
-      { org: org, source: ".opencollective.yml" }
+      {org: org, source: ".opencollective.yml"}
+    end
+
+    def opencollective_org_github_funding_file(project_root)
+      path = File.join(project_root, ".github", "FUNDING.yml")
+      return unless File.exist?(path)
+
+      funding = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
+      return unless funding.is_a?(Hash)
+
+      org = Array(funding["open_collective"]).map(&:to_s).map(&:strip).reject(&:empty?).first
+      return unless org
+
+      {org: org.delete_prefix("@"), source: ".github/FUNDING.yml"}
     end
 
     def template_tokens(facts, funding)
       package = facts.fetch(:package)
       rubygems = facts.fetch(:rubygems)
+      github_org = facts.fetch(:project_runtime, {})[:github_org].to_s
+      github_org = facts.fetch(:forge, {})[:gh_user].to_s if github_org.empty?
+      github_org = facts.fetch(:repository, {})[:slug].to_s.split("/", 2).first.to_s if github_org.empty?
       tokens = {
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
         "KJ|GEM_MAJOR" => gem_major_token(facts.fetch(:project_runtime, {})[:version]),
-        "KJ|GH_ORG" => facts.fetch(:project_runtime, {})[:github_org].to_s,
+        "KJ|GH_ORG" => github_org,
         "KJ|NAMESPACE" => rubygems.fetch(:namespace).to_s,
         "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace).to_s),
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
@@ -7119,23 +7234,23 @@ module Kettle
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
       }.merge(
-        rubocop_template_tokens(rubygems[:min_ruby])
+        rubocop_template_tokens(rubygems[:min_ruby]),
       ).merge(
-        author_template_tokens(facts.fetch(:author, {}))
+        author_template_tokens(facts.fetch(:author, {})),
       ).merge(
-        forge_template_tokens(facts.fetch(:forge, {}))
+        forge_template_tokens(facts.fetch(:forge, {})),
       ).merge(
-        funding_template_tokens(funding)
+        funding_template_tokens(funding),
       ).merge(
-        social_template_tokens(facts.fetch(:social, {}))
+        social_template_tokens(facts.fetch(:social, {})),
       ).merge(
-        license_template_tokens(facts.fetch(:license, {}))
+        license_template_tokens(facts.fetch(:license, {})),
       ).merge(
-        project_runtime_template_tokens(facts.fetch(:project_runtime, {}))
+        project_runtime_template_tokens(facts.fetch(:project_runtime, {})),
       ).merge(
-        readme_url_template_tokens(facts.fetch(:repository, {}), package.fetch(:name).to_s, facts.fetch(:project_runtime, {})[:github_org].to_s)
+        readme_url_template_tokens(facts.fetch(:repository, {}), package.fetch(:name).to_s, github_org),
       ).merge(
-        readme_logo_template_tokens(facts.fetch(:readme_logo, {}))
+        readme_logo_template_tokens(facts.fetch(:readme_logo, {})),
       )
       org = funding[:open_collective_org].to_s
       tokens["KJ|OPENCOLLECTIVE_ORG"] = org
@@ -7177,7 +7292,7 @@ module Kettle
         name: repo_name,
         slug: repo_slug,
         package_path: package_path,
-        package_source_url: package_source_url
+        package_source_url: package_source_url,
       )
       resources = repository[:resource_urls].is_a?(Hash) ? repository[:resource_urls] : repository_resource_urls(repository)
       resource_url = lambda do |key, fallback|
@@ -7312,7 +7427,7 @@ module Kettle
         family_names: family_names.to_s,
         email: email,
         domain: domain.to_s,
-        orcid: orcid.to_s
+        orcid: orcid.to_s,
       )
     end
 
@@ -7366,7 +7481,7 @@ module Kettle
       files = git_capture(project_root, "ls-files", "-z")
       return [] if files.to_s.empty?
 
-      author_map = Hash.new { |hash, email| hash[email] = { name: nil, years: [], email: email } }
+      author_map = Hash.new { |hash, email| hash[email] = {name: nil, years: [], email: email} }
       files.split("\0").reject(&:empty?).each do |relative_path|
         next unless File.exist?(File.join(project_root, relative_path))
 
@@ -7415,8 +7530,8 @@ module Kettle
         elsif line.start_with?("filename ")
           next unless current_sha && current_email
 
-          commit_meta[current_sha] ||= { name: current_name, email: current_email, time: current_time }
-          year = current_time && current_time.positive? ? Time.at(current_time).utc.year.to_s : Time.now.utc.year.to_s
+          commit_meta[current_sha] ||= {name: current_name, email: current_email, time: current_time}
+          year = (current_time && current_time.positive?) ? Time.at(current_time).utc.year.to_s : Time.now.utc.year.to_s
           author_map[current_email][:name] ||= current_name
           author_map[current_email][:years] << year
         end
@@ -7474,7 +7589,7 @@ module Kettle
         gh_user: forge_user_value(forge_config, env, :gh_user, derived_value: derived_github_user).to_s,
         gl_user: forge_user_value(forge_config, env, :gl_user).to_s,
         cb_user: forge_user_value(forge_config, env, :cb_user).to_s,
-        sh_user: forge_user_value(forge_config, env, :sh_user).to_s
+        sh_user: forge_user_value(forge_config, env, :sh_user).to_s,
       )
     end
 
@@ -7501,7 +7616,7 @@ module Kettle
         buymeacoffee: funding_platform_token_value(funding_config, env, :buymeacoffee).to_s,
         polar: funding_platform_token_value(funding_config, env, :polar).to_s,
         liberapay: funding_platform_token_value(funding_config, env, :liberapay).to_s,
-        issuehunt: funding_platform_token_value(funding_config, env, :issuehunt).to_s
+        issuehunt: funding_platform_token_value(funding_config, env, :issuehunt).to_s,
       )
     end
 
@@ -7529,7 +7644,7 @@ module Kettle
         mastodon: social_token_value(social_config, env, :mastodon).to_s,
         bluesky: social_token_value(social_config, env, :bluesky).to_s,
         linktree: social_token_value(social_config, env, :linktree).to_s,
-        devto: social_token_value(social_config, env, :devto).to_s
+        devto: social_token_value(social_config, env, :devto).to_s,
       )
     end
 
@@ -7566,7 +7681,7 @@ module Kettle
         min_dev_ruby: test_min_ruby.to_s,
         test_min_ruby: test_min_ruby.to_s,
         version: version.to_s,
-        github_org: github_org_from_url(source_url).to_s
+        github_org: github_org_from_url(source_url).to_s,
       )
     end
 
@@ -7599,7 +7714,50 @@ module Kettle
 
       metadata
     rescue LoadError, StandardError
-      {}
+      static_project_gemspec_metadata(gemspec_path)
+    end
+
+    def static_project_gemspec_metadata(gemspec_path)
+      return {} unless gemspec_path && File.file?(gemspec_path)
+
+      content = File.read(gemspec_path)
+      assignments = gemspec_assignment_records(content)
+      values = assignments.to_h { |record| [record.fetch(:field).to_sym, record.fetch(:value)] }
+      name = values[:name].to_s
+      return {} if name.empty?
+
+      metadata = {
+        gemspec_path: gemspec_path,
+        gem_name: name,
+        homepage: values[:homepage].to_s,
+        summary: values[:summary].to_s,
+        description: values[:description].to_s,
+        required_ruby_version: values[:required_ruby_version],
+        min_ruby: min_ruby_version(values[:required_ruby_version]),
+        licenses: Array(values[:licenses]),
+        runtime_dependencies: gemspec_dependency_records(content).select { |dependency| dependency.fetch(:kind) == "add_dependency" }.map { |dependency| gemspec_dependency_from_record(dependency) },
+        development_dependencies: gemspec_dependency_records(content).select { |dependency| dependency.fetch(:kind) == "add_development_dependency" }.map { |dependency| gemspec_dependency_from_record(dependency) },
+      }
+      static_source_code_uri = static_gemspec_metadata_assignment(content, "source_code_uri")
+      metadata[:source_code_uri] = static_source_code_uri if static_source_code_uri
+      metadata
+    end
+
+    def gemspec_dependency_from_record(record)
+      Gem::Dependency.new(record.fetch(:name), *record.fetch(:requirements), record.fetch(:kind) == "add_development_dependency" ? :development : :runtime)
+    end
+
+    def static_gemspec_metadata_assignment(content, key)
+      ruby_call_records(content, :[]=).each do |call|
+        next unless call.receiver&.slice.to_s.end_with?(".metadata")
+
+        args = call.arguments&.arguments.to_a
+        next unless args.first.respond_to?(:unescaped) && args.first.unescaped == key
+        return args[1].unescaped if args[1].respond_to?(:unescaped)
+      end
+      nil
+    rescue Ast::Crispr::Error
+      nil
     end
 
     def quiet_gemspec_reader_load(project_root)
@@ -7698,7 +7856,7 @@ module Kettle
         changes << write_if_changed(
           project_root,
           version_path,
-          version_gem_version_file_content(existing_version: existing_version_file_value(project_root, version_path), namespace: namespace, version: version)
+          version_gem_version_file_content(existing_version: existing_version_file_value(project_root, version_path), namespace: namespace, version: version),
         )
       end
       current_entrypoint = read_project_file(project_root, entrypoint_path)
@@ -7913,7 +8071,7 @@ module Kettle
     def write_if_changed(project_root, relative_path, content)
       path = File.join(project_root, relative_path)
       current = File.file?(path) ? File.read(path) : ""
-      return nil if current == content
+      return if current == content
 
       FileUtils.mkdir_p(File.dirname(path))
       File.write(path, content)
@@ -7957,7 +8115,7 @@ module Kettle
         topology: topology,
         url: repo_url,
         name: repo_name,
-        slug: slug
+        slug: slug,
       )
       return facts unless monorepo_subproject
 
@@ -7970,7 +8128,7 @@ module Kettle
         package_source_url: source_tree_url(repo_url, package_path),
         gitlab_package_source_url: source_tree_url("https://gitlab.com/#{slug}", package_path),
         codeberg_package_source_url: source_tree_url("https://codeberg.org/#{slug}", package_path),
-        checksums_url: source_tree_url("https://gitlab.com/#{slug}", "checksums")
+        checksums_url: source_tree_url("https://gitlab.com/#{slug}", "checksums"),
       )
     end
 
@@ -8065,10 +8223,14 @@ module Kettle
     def git_worktree_root(project_root)
       root = git_capture(project_root, "rev-parse", "--show-toplevel").strip
       root.empty? ? project_root.to_s : root
+    rescue ArgumentError
+      project_root.to_s
     end
 
     def git_worktree_prefix(project_root)
       git_capture(project_root, "rev-parse", "--show-prefix").strip
+    rescue ArgumentError
+      ""
     end
 
     def gitlab_repo_url(repository, repo_slug, suffix)
@@ -8101,7 +8263,7 @@ module Kettle
 
     def normalize_git_source_url(url)
       value = url.to_s.strip
-      return nil if value.empty?
+      return if value.empty?
 
       if (match = value.match(/\Agit@github\.com:([^\/]+)\/(.+?)(?:\.git)?\z/))
         return "https://github.com/#{match[1]}/#{match[2]}"
@@ -8118,12 +8280,12 @@ module Kettle
         config,
         org: github_org.to_s,
         gem_name: package_name.to_s,
-        repository: repository || {}
+        repository: repository || {},
       )
       compact_hash(
         top_logos: readme_top_logo_options(config).join(","),
         top_logo_row: readme_top_logo_row(entries),
-        top_logo_refs: readme_top_logo_refs(entries)
+        top_logo_refs: readme_top_logo_refs(entries),
       )
     end
 
@@ -8168,7 +8330,7 @@ module Kettle
     end
 
     def readme_top_logo_entries_with_asset_size(entries)
-      size = entries.length == 4 ? 128 : 192
+      size = (entries.length == 4) ? 128 : 192
       entries.map do |entry|
         image_url = entry.fetch(:image_url).to_s.sub(%r{/avatar-\d+px\.svg\z}, "/avatar-#{size}px.svg")
         entry.merge(image_url: image_url)
@@ -8176,9 +8338,9 @@ module Kettle
     end
 
     def configured_readme_top_logo_entries(config, org:, gem_name:, repository: {})
-      readme_config = config.is_a?(Hash) && config["readme"].is_a?(Hash) ? config["readme"] : {}
+      readme_config = (config.is_a?(Hash) && config["readme"].is_a?(Hash)) ? config["readme"] : {}
       logo_row = readme_config["logo_row"]
-      return nil unless logo_row.is_a?(Hash)
+      return unless logo_row.is_a?(Hash)
       return [] if falsey_config?(logo_row["enabled"])
 
       logos = Array(logo_row["logos"]).first(4)
@@ -8194,15 +8356,15 @@ module Kettle
     end
 
     def readme_top_logo_entry_from_config(logo, org:, gem_name:, repository: {})
-      return nil unless logo.is_a?(Hash)
+      return unless logo.is_a?(Hash)
 
       type = logo["type"].to_s.strip.downcase.tr("-", "_")
-      return nil unless README_TOP_LOGO_TYPES.include?(type)
+      return unless README_TOP_LOGO_TYPES.include?(type)
       type = "ruby" if type == "language"
 
       slug = logo["slug"].to_s.strip
       slug = default_readme_top_logo_slug(type, org: org, gem_name: gem_name, repository: repository) if slug.empty?
-      return nil if slug.empty?
+      return if slug.empty?
 
       alt = logo["alt"].to_s.strip
       alt = readme_top_logo_default_alt(type, slug) if alt.empty?
@@ -8278,26 +8440,26 @@ module Kettle
     end
 
     def readme_top_logo_credit_separator(type)
-      type == "ruby" ? ", " : " by "
+      (type == "ruby") ? ", " : " by "
     end
 
     def repository_project_logo_slug(repository, org:, gem_name:)
       package_path = repository.is_a?(Hash) ? repository[:package_path].to_s : ""
-      return [org, repository[:name], File.basename(package_path)].reject(&:empty?).join("/") if repository.is_a?(Hash) && !package_path.empty?
+      return [org, repository[:name].to_s, File.basename(package_path)].reject(&:empty?).join("/") if repository.is_a?(Hash) && !package_path.empty?
 
-      [org, gem_name].reject(&:empty?).join("/")
+      [org.to_s, gem_name.to_s].reject(&:empty?).join("/")
     end
 
     def repository_project_logo_href(repository, slug:, org:, gem_name:)
       package_source_url = repository.is_a?(Hash) ? repository[:package_source_url].to_s : ""
       return package_source_url unless package_source_url.empty?
 
-      org.to_s.empty? || gem_name.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}/#{gem_name}"
+      (org.to_s.empty? || gem_name.to_s.empty?) ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}/#{gem_name}"
     end
 
     def readme_top_logo_entry_from_option(option, org:, gem_name:, repository: {})
-      return nil if option == "org" && org.to_s.empty?
-      return nil if option == "project" && (org.to_s.empty? || gem_name.to_s.empty?)
+      return if option == "org" && org.to_s.empty?
+      return if option == "project" && (org.to_s.empty? || gem_name.to_s.empty?)
 
       readme_top_logo_entry_from_config({"type" => option}, org: org, gem_name: gem_name, repository: repository)
     end
@@ -8347,7 +8509,7 @@ module Kettle
 
     def min_ruby_version(requirement)
       token = minimum_ruby_token(requirement)
-      return nil if token.empty?
+      return if token.empty?
 
       Gem::Version.new(token)
     rescue ArgumentError
@@ -8376,7 +8538,7 @@ module Kettle
         license_eye_dependency_licenses: license_eye_dependency_licenses(config),
         license_copyright_notice: license_copyright_notice(copyright_lines, copyright_prefix, author),
         readme_copyright_notice: readme_copyright_notice(copyright_lines, copyright_prefix, author),
-        copyright_prefix: copyright_prefix
+        copyright_prefix: copyright_prefix,
       )
     end
 
@@ -8535,11 +8697,11 @@ module Kettle
     end
 
     def license_eye_mode(licenses)
-      Array(licenses).map(&:to_s).any? { |license| LICENSE_EYE_COMPATIBILITY_LICENSES.include?(license) } ? "check" : "resolve"
+      (Array(licenses).map(&:to_s).any? { |license| LICENSE_EYE_COMPATIBILITY_LICENSES.include?(license) }) ? "check" : "resolve"
     end
 
     def license_eye_flags(licenses)
-      license_eye_mode(licenses) == "check" ? "--weak-compatible" : ""
+      (license_eye_mode(licenses) == "check") ? "--weak-compatible" : ""
     end
 
     def license_eye_dependency_licenses(config)
@@ -8560,7 +8722,7 @@ module Kettle
       name = data["name"] || data[:name]
       license = data["license"] || data[:license]
       version = data["version"] || data[:version]
-      return nil if name.to_s.strip.empty? || license.to_s.strip.empty?
+      return if name.to_s.strip.empty? || license.to_s.strip.empty?
 
       lines = [
         "    - name: #{JSON.generate(name.to_s.strip)}",
@@ -8780,7 +8942,7 @@ module Kettle
         disabled << name.to_s if falsey_config?(value)
       end
       disabled.concat(Array(badges["disabled"]).map(&:to_s))
-      disabled.map { |name| name.tr("_", "-").downcase }.map { |name| name == "code-ql" ? "codeql" : name }.uniq & README_INTEGRATIONS
+      disabled.map { |name| name.tr("_", "-").downcase }.map { |name| (name == "code-ql") ? "codeql" : name }.uniq & README_INTEGRATIONS
     end
 
     def readme_integration_configured?(project_root, integration)
@@ -8847,7 +9009,7 @@ module Kettle
       extra_sections_by_anchor = readme_extra_preserved_sections_by_anchor(
         destination_sections,
         template_bases,
-        preserve_targets
+        preserve_targets,
       )
       lines = template_content.split("\n", -1)
       template_sections.reverse_each do |section|
@@ -8977,7 +9139,7 @@ module Kettle
       if readme["section_aliases"].is_a?(Hash)
         result[:aliases] = README_SECTION_ALIASES.merge(
           readme["section_aliases"].transform_keys { |key| normalize_readme_heading(key) }
-                                   .transform_values { |value| normalize_readme_heading(value) }
+                                   .transform_values { |value| normalize_readme_heading(value) },
         )
       end
       result
@@ -9012,7 +9174,7 @@ module Kettle
           config,
           opencollective_disabled: opencollective_disabled,
           include_patterns: include_patterns,
-          apply_templates: apply_templates
+          apply_templates: apply_templates,
         )
       end
     end
@@ -9067,7 +9229,7 @@ module Kettle
         if target_path == logical_path
           logical_path
         else
-          { "source" => logical_path, "target" => target_path }
+          {"source" => logical_path, "target" => target_path}
         end
       end
     end
@@ -9094,18 +9256,18 @@ module Kettle
 
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
-      return { strategy: :merge, preference: :destination, add_template_only_nodes: true } if target_path.to_s == ".kettle-jem.yml"
-      return { strategy: :accept_template } if target_path.to_s == "Rakefile"
-      return { strategy: :accept_template } if version_gem_template_target_path?(target_path)
-      return { strategy: :accept_template } if target_path.to_s.start_with?(".github/workflows/")
-      return { strategy: :accept_template } if target_path.to_s.start_with?("gemfiles/modular/")
+      return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == ".kettle-jem.yml"
+      return {strategy: :accept_template} if target_path.to_s == "Rakefile"
+      return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
+      return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")
+      return {strategy: :accept_template} if target_path.to_s.start_with?("gemfiles/modular/")
 
       nil
     end
 
     def version_gem_template_target_path?(target_path)
       target = target_path.to_s
-      target.end_with?("/version.rb") || target.end_with?("/version.rbs")
+      target.end_with?("/version.rb", "/version.rbs")
     end
 
     def inactive_packaged_template_cleanup_files(project_root, config = {})
@@ -9113,7 +9275,7 @@ module Kettle
         relative_path = path.delete_prefix("#{project_root}/")
         next unless preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
 
-        { target_path: relative_path } if skip_packaged_gemfile_template?(relative_path, config)
+        {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config)
       end.sort_by { |cleanup| cleanup.fetch(:target_path) }
     end
 
@@ -9145,7 +9307,7 @@ module Kettle
         ".kettle-jem.yml",
         "yaml",
         "supplied_kettle_config_bootstrap",
-        facts: %w[kettle_config_bootstrap]
+        facts: %w[kettle_config_bootstrap],
       )
       recipe[:template_preference] = bootstrap.fetch(:template_preference)
       recipe[:template_tokens] = {
@@ -9162,13 +9324,17 @@ module Kettle
 
     def template_source_preference(project_root, template_root, entry, config, opencollective_disabled: false, include_patterns: nil, apply_templates: false)
       source_path, target_path = template_entry_paths(entry)
-      return nil if source_path.to_s.empty? || target_path.to_s.empty?
-      return nil if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
-      return nil if skip_packaged_gemfile_template?(target_path, config)
-      return nil if skip_packaged_license_template?(target_path, config)
+      if template_root.fetch(:kind) == "packaged" && VERSION_GEM_TEMPLATE_SOURCES.include?(source_path) && target_path == source_path
+        existing_gemspec = Dir.glob(File.join(project_root, "*.gemspec")).sort.first
+        target_path = version_gem_template_target_path_for_project(project_root, File.basename(existing_gemspec), source_path) if existing_gemspec
+      end
+      return if source_path.to_s.empty? || target_path.to_s.empty?
+      return if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
+      return if skip_packaged_gemfile_template?(target_path, config)
+      return if skip_packaged_license_template?(target_path, config)
 
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
-      return nil unless selected_source
+      return unless selected_source
 
       strategy_config = if template_root.fetch(:kind) == "packaged" && target_path.to_s == ".kettle-jem.yml"
         default_template_strategy_config(template_root, target_path)
@@ -9231,7 +9397,7 @@ module Kettle
         next if retained_paths.include?(license_path)
         next unless File.exist?(File.join(project_root, license_path))
 
-        { license_path: license_path, license_basename: basename }
+        {license_path: license_path, license_basename: basename}
       end
     end
 
@@ -9271,7 +9437,7 @@ module Kettle
       strategy = entry["strategy"].to_s.strip.downcase.to_sym
       raise ArgumentError, "unknown kettle-jem template strategy: #{entry["strategy"]}" unless SUPPORTED_TEMPLATE_STRATEGIES.include?(strategy)
 
-      result = { strategy: strategy }
+      result = {strategy: strategy}
       result[:path] = path if path
       result[:skip_unresolved_scan] = true if entry["skip_unresolved_scan"]
       if entry.key?("file_type")
@@ -9308,15 +9474,15 @@ module Kettle
       configured_root = templates["root"].to_s
       if configured_root.empty?
         local_root = File.join(project_root, "template")
-        return { kind: "project", path: local_root, display_prefix: "template" } if Dir.exist?(local_root)
+        return {kind: "project", path: local_root, display_prefix: "template"} if Dir.exist?(local_root)
 
-        return { kind: "packaged", path: PACKAGED_TEMPLATE_ROOT }
+        return {kind: "packaged", path: PACKAGED_TEMPLATE_ROOT}
       end
 
-      return { kind: "packaged", path: PACKAGED_TEMPLATE_ROOT } if configured_root == "packaged"
+      return {kind: "packaged", path: PACKAGED_TEMPLATE_ROOT} if configured_root == "packaged"
 
       path = configured_root.start_with?("/") ? configured_root : File.join(project_root, configured_root)
-      { kind: "project", path: path, display_prefix: configured_root }
+      {kind: "project", path: path, display_prefix: configured_root}
     end
 
     def default_template_config
@@ -9403,7 +9569,7 @@ module Kettle
 
     def enabled_ruby_engines(config)
       engines = ruby_engines_config(config)
-      engines.nil? || engines.empty? ? DEFAULT_ENGINES : engines
+      (engines.nil? || engines.empty?) ? DEFAULT_ENGINES : engines
     end
 
     def config_min_ruby(config)
@@ -9706,7 +9872,7 @@ module Kettle
 
     def delete_rakefile_scaffold(content)
       selectors = rakefile_scaffold_delete_selectors(content)
-      return { content: content.to_s, delete_selectors: selectors } if selectors.empty?
+      return {content: content.to_s, delete_selectors: selectors} if selectors.empty?
 
       {
         content: delete_line_ranges(content.to_s, selectors),
@@ -9781,7 +9947,7 @@ module Kettle
           "rakefile_scaffold_task_default",
           record.fetch(:start_line),
           record.fetch(:end_line),
-          "wrapper_selected_scaffold_task"
+          "wrapper_selected_scaffold_task",
         )
       end
     end
@@ -9829,7 +9995,7 @@ module Kettle
       lines = content.to_s.lines
       cursor = line_number - 2
       cursor -= 1 while cursor >= 0 && lines[cursor].strip.empty?
-      cursor >= 0 ? cursor + 1 : nil
+      (cursor >= 0) ? cursor + 1 : nil
     end
 
     def rakefile_selector(selector_id, start_line, end_line, reason)
@@ -10103,13 +10269,13 @@ module Kettle
         content.to_s,
         "permissions",
         "permissions:\n  contents: read\n\n",
-        before: "on"
+        before: "on",
       )
       updated = ensure_workflow_top_level_section(
         updated,
         "concurrency",
         "concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"\n  cancel-in-progress: true\n\n",
-        before: "jobs"
+        before: "jobs",
       )
       updated = append_github_actions_coverage_steps(updated) if github_actions_coverage_enabled?(updated)
       update_github_actions_pins(updated)
@@ -10194,7 +10360,7 @@ module Kettle
       lines = content.lines
       index = top_level_keys[before.to_s]
       if index
-        prepared_section = index.zero? || lines[index - 1].strip.empty? ? section : "\n#{section}"
+        prepared_section = (index.zero? || lines[index - 1].strip.empty?) ? section : "\n#{section}"
         lines.insert(index, prepared_section)
       else
         lines << "\n" unless lines.empty? || lines.last == "\n"
@@ -10312,6 +10478,14 @@ module Kettle
       close = "<!-- #{marker}:end -->"
       replace_markdown_managed_block_with_crispr(content, open, close, replacement) do
         ensure_trailing_newline([content.rstrip, "", replacement.to_s.rstrip].join("\n"))
+      end
+    end
+
+    def replace_existing_markdown_managed_block(content, marker, replacement)
+      open = "<!-- #{marker}:start -->"
+      close = "<!-- #{marker}:end -->"
+      replace_markdown_managed_block_with_crispr(content, open, close, replacement) do
+        content
       end
     end
 

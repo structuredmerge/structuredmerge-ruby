@@ -69,7 +69,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       "--no-changelog",
       "--no-linter",
       "--no-github-username",
-      chdir: sandbox_root
+      chdir: sandbox_root,
     )
     expect(status.success?).to be(true), "bundle gem failed\nstdout=#{stdout}\nstderr=#{stderr}"
   end
@@ -81,27 +81,27 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     content = content.sub('spec.email = ["TODO: Write your email address"]', 'spec.email = ["test@example.com"]')
     content = content.sub(
       'spec.summary = "TODO: Write a short summary, because RubyGems requires one."',
-      'spec.summary = "Dummy gem"'
+      'spec.summary = "Dummy gem"',
     )
     content = content.sub(
       'spec.description = "TODO: Write a longer description or delete this line."',
-      'spec.description = "Dummy gem for kettle-jem system testing."'
+      'spec.description = "Dummy gem for kettle-jem system testing."',
     )
     content = content.sub(
       'spec.homepage = "TODO: Put your gem\'s website or public repo URL here."',
-      'spec.homepage = "https://github.com/acme/dummy-gem"'
+      'spec.homepage = "https://github.com/acme/dummy-gem"',
     )
     content = content.sub(
       'spec.metadata["source_code_uri"] = "TODO: Put your gem\'s public repo URL here."',
-      'spec.metadata["source_code_uri"] = "https://github.com/acme/dummy-gem"'
+      'spec.metadata["source_code_uri"] = "https://github.com/acme/dummy-gem"',
     )
     content = content.sub(
       /^end$/,
-      <<~RUBY.chomp
-          # Destination runtime dependency
-          spec.add_dependency("json", "~> 2.7") # preserve custom runtime dependency
-          spec.add_development_dependency("rake", "~> 13.1") # preserve destination rake policy
-      end
+      <<~RUBY.chomp,
+            # Destination runtime dependency
+            spec.add_dependency("json", "~> 2.7") # preserve custom runtime dependency
+            spec.add_development_dependency("rake", "~> 13.1") # preserve destination rake policy
+        end
       RUBY
     )
     File.write(path, content)
@@ -160,7 +160,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(bootstrap.fetch(:changed_files)).to include(
       ".github/FUNDING.yml",
       ".kettle-jem.yml",
-      "Rakefile"
+      "Rakefile",
     )
     expect(bootstrap.fetch(:changed_files)).not_to include(".github/workflows/ci.yml")
 
@@ -184,7 +184,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(readme).to include("Compatible with MRI Ruby 3.2.0+")
     expect(readme).to include("https://github.com/acme/dummy-gem")
 
-    dependabot = YAML.safe_load(File.read(File.join(gem_root, ".github/dependabot.yml")))
+    dependabot = YAML.safe_load_file(File.join(gem_root, ".github/dependabot.yml"))
     expect(dependabot).to eq(
       "updates" => [
         {
@@ -196,10 +196,10 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
           ],
           "open-pull-requests-limit" => 5,
           "package-ecosystem" => "bundler",
-          "schedule" => { "interval" => "daily" },
+          "schedule" => {"interval" => "daily"},
         },
       ],
-      "version" => 2
+      "version" => 2,
     )
 
     style_gemfile = File.read(File.join(gem_root, "gemfiles/modular/style.gemfile"))
@@ -223,7 +223,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(gemspec).to include('spec.metadata["source_code_uri"] = "#{spec.homepage}/tree/v#{spec.version}"')
     expect(gemspec).to include('spec.add_dependency("json", "~> 2.7") # preserve custom runtime dependency')
     expect(gemspec).to include('spec.add_development_dependency("rake", "~> 13.1") # preserve destination rake policy')
-    expect(gemspec.scan(/spec\.add_development_dependency\("rake"/).size).to eq(1)
+    expect(gemspec.scan('spec.add_development_dependency("rake"').size).to eq(1)
 
     rakefile = File.read(File.join(gem_root, "Rakefile"))
     expect(rakefile).to include('require "bundler/gem_tasks"')

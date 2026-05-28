@@ -79,7 +79,7 @@ RSpec.describe "kettle-jem Rake tasks" do
       accept_config: true,
       bootstrap_mode: true,
       quiet: true,
-      verbose: true
+      verbose: true,
     )
   end
 end
