@@ -3062,6 +3062,64 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "runs setup commands without inherited Bundler activation" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-env-bundler-strip", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - bin/setup
+        YAML
+      })
+
+      inherited_env = {
+        "BUNDLE_GEMFILE" => "/workspace/kettle-jem/Gemfile",
+        "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
+        "BUNDLE_LOCKFILE" => "/workspace/kettle-jem/Gemfile.lock",
+        "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
+        "BUNDLER_VERSION" => "4.0.12",
+        "RUBYLIB" => "/workspace/kettle-jem/lib",
+        "RUBYOPT" => "-rbundler/setup",
+      }
+      command_envs = []
+      command_runner = lambda do |_command, chdir:, env:, quiet:|
+        expect(chdir).to eq(root)
+        expect(quiet).to be(true)
+        command_envs << env
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: inherited_env,
+        run_options: {only: "bin/setup", quiet: true, skip_commit: true},
+        command_runner: command_runner,
+      )
+
+      expect(command_envs).not_to be_empty
+      expect(command_envs).to all(include("BUNDLE_GEMFILE" => File.join(root, "Gemfile")))
+      expect(command_envs).to all(include(
+        "BUNDLE_BIN_PATH" => nil,
+        "BUNDLE_LOCKFILE" => nil,
+        "BUNDLER_SETUP" => nil,
+        "BUNDLER_VERSION" => nil,
+        "RUBYLIB" => nil,
+        "RUBYOPT" => nil,
+      ))
+    end
+  end
+
   it "honors install ENV skip-commit and normalizes lockfiles without templating env overrides" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

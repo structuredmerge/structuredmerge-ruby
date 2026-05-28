@@ -48,6 +48,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem install` now strips inherited Bundler activation variables before
+  running destination setup commands, so generated `bin/setup` can run
+  `bundle install` even when the destination lockfile references gems that are
+  not installed yet.
 - Generated `bin/yard` now routes through `bin/rake yard` so documentation
   plugins installed by the templated rake task, such as yard-timekeeper, run
   consistently.

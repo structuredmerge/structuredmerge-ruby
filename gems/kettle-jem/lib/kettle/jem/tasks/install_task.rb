@@ -717,7 +717,21 @@ module Kettle
           command_env = (env || {}).to_h.dup
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
+          strip_inherited_bundler_activation!(command_env)
           command_env
+        end
+
+        def strip_inherited_bundler_activation!(command_env)
+          %w[
+            BUNDLE_BIN_PATH
+            BUNDLE_LOCKFILE
+            BUNDLER_SETUP
+            BUNDLER_VERSION
+            RUBYLIB
+            RUBYOPT
+          ].each do |key|
+            command_env[key] = nil if command_env.key?(key)
+          end
         end
 
         def hook_templates_step(project_root, run_options)
