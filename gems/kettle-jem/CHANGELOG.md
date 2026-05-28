@@ -178,6 +178,11 @@ Please file a bug if you notice a violation of semantic versioning.
   include VCR/WebMock recording gemfiles for projects that opt in.
 - Applied configured `rubygems.min_ruby` to generated gemspec
   `required_ruby_version` instead of preserving a stale destination value.
+- Preserved heredoc gemspec descriptions when applying project emoji
+  normalization so templating does not corrupt valid `<<~` assignments.
+- Generated local templating Gemfiles now wire `tree_sitter_language_pack` from
+  the sibling StructuredMerge checkout when iterating on unreleased
+  `kettle-jem`, avoiding broken released native gem materialization.
 - VersionGem-managed `version.rb` and `version.rbs` packaged template targets
   now default to whole-file replacement, preventing legacy version constants
   from being merged into the generated shape.

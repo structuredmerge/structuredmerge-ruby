@@ -5188,6 +5188,11 @@ RSpec.describe Kettle::Jem do
             rubocop-ruby2_4
             kettle-jem
           ]
+
+          tree_sitter_language_pack_dev = ENV.fetch("TREE_SITTER_LANGUAGE_PACK_DEV", nil)
+          unless tree_sitter_language_pack_dev.to_s.empty?
+            gem "tree_sitter_language_pack", path: tree_sitter_language_pack_dev
+          end
         RUBY
       })
 
@@ -5203,6 +5208,8 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
       expect(content).to include("kettle-jem")
+      expect(content).to include("TREE_SITTER_LANGUAGE_PACK_DEV")
+      expect(content).to include('gem "tree_sitter_language_pack", path: tree_sitter_language_pack_dev')
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end
   end
@@ -6089,6 +6096,7 @@ RSpec.describe Kettle::Jem do
 
       expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
       expect(gemspec_content).to include("spec.description = <<-DESC")
+      expect(gemspec_content).not_to include("spec.description = 🧪")
       expect(gemspec_content).to include("🧪 First line")
       expect(gemspec_content).to include("Second line")
       expect(gemspec_content).to include("  DESC")
@@ -6276,6 +6284,57 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include('spec.summary = "🔮 OAuth 2.1 resource-server helpers for MCP servers."')
       expect(gemspec_content).to include('spec.description = "🔮 oauth2-mcp provides Ruby helpers')
       expect(gemspec_content).not_to include("spec.description = 🔮")
+    end
+  end
+
+  it "keeps squiggly heredoc gemspec descriptions valid when adding the project emoji" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    package_name = "sanitize_email"
+
+    Dir.mktmpdir("kettle-jem-gemspec-emoji-squiggly-heredoc", tmp_root) do |root|
+      write_tree(root, {
+        "#{package_name}.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "#{package_name}"
+            spec.summary = "Email Condom for your Ruby Server"
+            spec.description = <<~DESCRIPTION
+                Email Condom for your Ruby Server.
+              In Rails, Sinatra, et al.
+            DESCRIPTION
+            spec.homepage = "https://github.com/pboling/sanitize_email"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "📧"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: gem.gemspec
+                target: #{package_name}.gemspec
+        YAML
+        "template/gem.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.summary = "{KJ|PROJECT_EMOJI} "
+            spec.description = "{KJ|PROJECT_EMOJI} "
+            spec.homepage = "https://template.example"
+            spec.required_ruby_version = ">= 2.3"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "#{package_name}.gemspec"
+      end
+      gemspec_content = report.fetch(:final_content)
+
+      expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
+      expect(gemspec_content).to include("spec.description = <<~DESCRIPTION")
+      expect(gemspec_content).not_to include("spec.description = 📧")
     end
   end
 

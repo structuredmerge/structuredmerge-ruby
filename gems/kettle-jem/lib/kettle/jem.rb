@@ -5635,6 +5635,7 @@ module Kettle
       record = gemspec_assignment_records(line).find { |candidate| candidate.fetch(:field) == field.to_s }
       value = record&.fetch(:value)
       return line unless value.is_a?(String)
+      return line if value.lstrip.start_with?("<<")
 
       if value.start_with?('"', "'")
         quote = value[0]
