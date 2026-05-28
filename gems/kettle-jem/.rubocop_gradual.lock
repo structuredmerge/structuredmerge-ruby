@@ -18,7 +18,7 @@
     [116, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
     [118, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:3886980672": [
+  "lib/kettle/jem.rb:1714123837": [
     [331, 7, 1114, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 675371207],
     [348, 7, 121, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 155654330],
     [352, 7, 89, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 173395318],
@@ -41,13 +41,13 @@
     [5411, 79, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
     [5515, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
     [5520, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [6376, 24, 90, "Style/ConcatArrayLiterals: Use `push(\"  #{gemspec}:\", \"    strategy: keep_destination\")` instead of `concat([\n          \"  #{gemspec}:\",\n          \"    strategy: keep_destination\",\n        ])`.", 96516132],
-    [7546, 19, 38, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 3603984863],
-    [7759, 78, 77, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3918037406],
-    [7795, 7, 37, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 822446440],
-    [9426, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
-    [9528, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835],
-    [10389, 35, 16, "Style/RedundantEach: Use `with_object` to remove redundant `each`.", 4071736605]
+    [6382, 24, 90, "Style/ConcatArrayLiterals: Use `push(\"  #{gemspec}:\", \"    strategy: keep_destination\")` instead of `concat([\n          \"  #{gemspec}:\",\n          \"    strategy: keep_destination\",\n        ])`.", 96516132],
+    [7552, 19, 38, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 3603984863],
+    [7765, 78, 77, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3918037406],
+    [7801, 7, 37, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 822446440],
+    [9432, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
+    [9534, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835],
+    [10395, 35, 16, "Style/RedundantEach: Use `with_object` to remove redundant `each`.", 4071736605]
   ],
   "lib/kettle/jem/tasks/install_task.rb:2637530998": [
     [63, 13, 2, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 5861509],
@@ -97,10 +97,10 @@
   "spec/template_version_gem_bootstrap_spec.rb:3767460001": [
     [5, 16, 43, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 874562695]
   ],
-  "spec/thin_slice_spec.rb:279615603": [
+  "spec/thin_slice_spec.rb:2134259494": [
     [5, 1, 26, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*_spec.rb`.", 2213719156],
-    [6109, 41, 51, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2249056217],
-    [8472, 51, 68, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2025778683]
+    [6157, 41, 51, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2249056217],
+    [8570, 51, 68, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2025778683]
   ],
   "spec/version_gem_pattern_spec.rb:4198176520": [
     [3, 16, 37, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 1528688504],

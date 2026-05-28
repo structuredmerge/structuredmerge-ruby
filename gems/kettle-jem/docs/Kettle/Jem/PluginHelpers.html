@@ -197,14 +197,14 @@
       <pre class="lines">
 
 
-1270
-1271
-1272
-1273
-1274</pre>
+1282
+1283
+1284
+1285
+1286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1270</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>changed_files:</span><span class='comma'>,</span> <span class='label'>diagnostics:</span><span class='rparen'>)</span>
   <span class='ivar'>@project_root</span> <span class='op'>=</span> <span class='id identifier rubyid_project_root'>project_root</span>
@@ -238,26 +238,28 @@
       <pre class="lines">
 
 
-1276
-1277
-1278
-1279
-1280
-1281
-1282
-1283
-1284</pre>
+1288
+1289
+1290
+1291
+1292
+1293
+1294
+1295
+1296
+1297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1276</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1288</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_record_template_result'>record_template_result</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_action'>action</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>=</span> <span class='id identifier rubyid_relative_project_path'>relative_project_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalize_recorded_template_file'>normalize_recorded_template_file</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_relative_path'>relative_path</span><span class='rparen'>)</span>
   <span class='ivar'>@changed_files</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='kw'>unless</span> <span class='ivar'>@changed_files</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_relative_path'>relative_path</span><span class='rparen'>)</span>
   <span class='ivar'>@diagnostics</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span>
     <span class='label'>kind:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>plugin_file_change</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>path:</span> <span class='id identifier rubyid_relative_path'>relative_path</span><span class='comma'>,</span>
-    <span class='label'>action:</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='label'>action:</span> <span class='id identifier rubyid_action'>action</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -270,7 +272,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed May 27 11:33:10 2026 by
+  Generated on Thu May 28 02:15:04 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

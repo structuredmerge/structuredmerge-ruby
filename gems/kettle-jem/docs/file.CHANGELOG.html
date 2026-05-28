@@ -96,6 +96,9 @@ and RubyGems specification objects instead of parsing gemspec source.</li>
   <li>Documented <code>rubygems.min_ruby</code> in the generated <code>.kettle-jem.yml</code> so projects<br>
 can make the published runtime Ruby floor explicit.</li>
   <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.1.2.</li>
+  <li>Gem templates now require <code>kettle-dev</code> &gt;= 2.0.5.</li>
+  <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.1.</li>
+  <li>Runtime dependency <code>token-resolver</code> now requires the released 2.x line.</li>
   <li>Development lockfile generation now uses Bundler 4.0.12.</li>
   <li>Rake task specs now run from a sandboxed temporary project root.</li>
 </ul>
@@ -107,6 +110,14 @@ can make the published runtime Ruby floor explicit.</li>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>Generated <code>gemfiles/modular/x_std_libs.gemfile</code> now selects the extracted<br>
+stdlib dependency set from the active Ruby version, so dependency solvers<br>
+running on Ruby 3.1 do not receive Ruby 4-only stdlib requirements.</li>
+  <li>
+<code>kettle-jem install</code> now strips inherited Bundler activation variables before<br>
+running destination setup commands, so generated <code>bin/setup</code> can run<br>
+<code>bundle install</code> even when the destination lockfile references gems that are<br>
+not installed yet.</li>
   <li>Generated <code>bin/yard</code> now routes through <code>bin/rake yard</code> so documentation<br>
 plugins installed by the templated rake task, such as yard-timekeeper, run<br>
 consistently.</li>
@@ -147,6 +158,10 @@ modular gemfiles relative to <code>gemfiles/</code> instead of <code>gemfiles/ge
   <li>Fixed generated Appraisals content so it does not end with an extra blank line.</li>
   <li>Fixed generated version-gem Ruby and RBS files so whole-file template tokens<br>
 do not add an extra blank line at EOF.</li>
+  <li>Generated Rakefiles now install a <code>kettle:jem:selftest</code> fallback when the<br>
+installed <code>kettle-jem</code> package lacks rake task support.</li>
+  <li>Generated Rakefile merging now normalizes section spacing so template-added<br>
+task blocks do not introduce RuboCop <code>Layout/EmptyLines</code> offenses.</li>
   <li>Fixed generated framework workflow YAML indentation so <code>framework:</code> remains<br>
 under <code>strategy.matrix</code>.</li>
   <li>Removed duplicate generated <code>spec.homepage</code> assignments when destination<br>
@@ -185,6 +200,10 @@ call <code>bin/rbs</code> and <code>bin/rspec</code> directly through appraisals
 yard-timekeeper is installed through the rake <code>yard</code> task hook.</li>
   <li>Escaped generated README metadata table cells so multiline gemspec<br>
 descriptions render with <code>&lt;br&gt;</code> instead of breaking table rows.</li>
+  <li>Fixed gemspec emoji normalization so multiline quoted summaries and<br>
+descriptions remain valid Ruby after templating.</li>
+  <li>Fixed version-gem bootstrap so an explicit <code>rubygems.namespace</code> in<br>
+<code>.kettle-jem.yml</code> wins over stale inferred entrypoint namespaces.</li>
   <li>Updated the generated contributing guide to refresh the <code>REEK</code> backlog with<br>
 <code>bin/rake reek:update</code> instead of redirecting the raw <code>reek</code> executable.</li>
   <li>Replaced <code>bundle binstubs --all</code> during template install with curated<br>
@@ -241,7 +260,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Wed May 27 11:33:09 2026 by
+  Generated on Thu May 28 02:15:02 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

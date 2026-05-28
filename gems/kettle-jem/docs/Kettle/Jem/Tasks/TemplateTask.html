@@ -218,15 +218,6 @@
       <pre class="lines">
 
 
-24
-25
-26
-27
-28
-29
-30
-31
-32
 33
 34
 35
@@ -235,10 +226,19 @@
 38
 39
 40
-41</pre>
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_env_run_options'>env_run_options</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='lbrace'>{</span>
@@ -301,12 +301,12 @@
       <pre class="lines">
 
 
-47
-48
-49</pre>
+56
+57
+58</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 47</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 56</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_falsey?'>falsey?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_falsey?'><span class='object_link'><a href="../DecisionPolicy.html#falsey%3F-class_method" title="Kettle::Jem::DecisionPolicy.falsey? (method)">falsey?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -344,13 +344,31 @@
 19
 20
 21
-22</pre>
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 9</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='label'>project_root:</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='const'>ENV</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_env_run_options'>env_run_options</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>command_runner:</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="InstallTask.html" title="Kettle::Jem::Tasks::InstallTask (module)">InstallTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:run_system_command</span><span class='rparen'>)</span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_report'>report</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_apply_project'><span class='object_link'><a href="../../Jem.html#apply_project-class_method" title="Kettle::Jem.apply_project (method)">apply_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_report'>report</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_glob'>glob</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*.gemspec</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='lbrace'>{</span>
+      <span class='label'>mode:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>apply</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+      <span class='label'>changed_files:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>recipe_reports:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>else</span>
+    <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_apply_project'><span class='object_link'><a href="../../Jem.html#apply_project-class_method" title="Kettle::Jem.apply_project (method)">apply_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
   <span class='id identifier rubyid_setup_env'>setup_env</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="InstallTask.html" title="Kettle::Jem::Tasks::InstallTask (module)">InstallTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_setup_command_env'><span class='object_link'><a href="InstallTask.html#setup_command_env-class_method" title="Kettle::Jem::Tasks::InstallTask.setup_command_env (method)">setup_command_env</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_hook_step'>hook_step</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="InstallTask.html" title="Kettle::Jem::Tasks::InstallTask (module)">InstallTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_hook_templates_step'><span class='object_link'><a href="InstallTask.html#hook_templates_step-class_method" title="Kettle::Jem::Tasks::InstallTask.hook_templates_step (method)">hook_templates_step</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_step'>lock_step</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="InstallTask.html" title="Kettle::Jem::Tasks::InstallTask (module)">InstallTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_normalize_lockfile_step'><span class='object_link'><a href="InstallTask.html#normalize_lockfile_step-class_method" title="Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step (method)">normalize_lockfile_step</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_setup_env'>setup_env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
@@ -359,7 +377,7 @@
     <span class='label'>project_root:</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span>
     <span class='label'>env:</span> <span class='id identifier rubyid_setup_env'>setup_env</span><span class='comma'>,</span>
     <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='comma'>,</span>
-    <span class='label'>command_runner:</span> <span class='id identifier rubyid_command_runner'>command_runner</span>
+    <span class='label'>command_runner:</span> <span class='id identifier rubyid_command_runner'>command_runner</span><span class='comma'>,</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>template_steps:</span> <span class='id identifier rubyid_template_steps'>template_steps</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -406,12 +424,12 @@
       <pre class="lines">
 
 
-43
-44
-45</pre>
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 43</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/template_task.rb', line 52</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_truthy?'><span class='object_link'><a href="../DecisionPolicy.html#truthy%3F-class_method" title="Kettle::Jem::DecisionPolicy.truthy? (method)">truthy?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
@@ -426,7 +444,7 @@
 </div>
 
       <div id="footer">
-  Generated on Wed May 27 11:33:10 2026 by
+  Generated on Thu May 28 02:15:04 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

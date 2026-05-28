@@ -5636,7 +5636,13 @@ module Kettle
       value = record&.fetch(:value)
       return line unless value.is_a?(String)
 
-      line.sub(value, "#{project_emoji} #{strip_leading_decorative_graphemes(value)}")
+      if value.start_with?('"', "'")
+        quote = value[0]
+        value_body = value[1..].to_s
+        line.sub(value, "#{quote}#{project_emoji} #{strip_leading_decorative_graphemes(value_body)}")
+      else
+        line.sub(value, "#{project_emoji} #{strip_leading_decorative_graphemes(value)}")
+      end
     end
 
     def gemspec_preserved_assignments(source, receiver:)
@@ -7854,9 +7860,9 @@ module Kettle
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       signature_path = File.join("sig", entrypoint_require, "version.rbs")
-      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
-        existing_version_namespace(project_root, version_path) ||
-        facts.dig(:rubygems, :namespace).to_s
+      namespace = facts.dig(:rubygems, :namespace).to_s
+      namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
+      namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
       return {name: "version_gem_bootstrap", status: "unavailable", reason: "missing_package_facts"} if namespace.empty?
 
       version = facts.dig(:project_runtime, :version).to_s

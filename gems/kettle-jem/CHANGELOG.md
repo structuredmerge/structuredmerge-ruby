@@ -138,6 +138,10 @@ Please file a bug if you notice a violation of semantic versioning.
   yard-timekeeper is installed through the rake `yard` task hook.
 - Escaped generated README metadata table cells so multiline gemspec
   descriptions render with `<br>` instead of breaking table rows.
+- Fixed gemspec emoji normalization so multiline quoted summaries and
+  descriptions remain valid Ruby after templating.
+- Fixed version-gem bootstrap so an explicit `rubygems.namespace` in
+  `.kettle-jem.yml` wins over stale inferred entrypoint namespaces.
 - Updated the generated contributing guide to refresh the `REEK` backlog with
   `bin/rake reek:update` instead of redirecting the raw `reek` executable.
 - Replaced `bundle binstubs --all` during template install with curated

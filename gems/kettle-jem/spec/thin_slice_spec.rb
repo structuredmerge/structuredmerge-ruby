@@ -3942,6 +3942,54 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "uses configured version_gem namespace before stale entrypoint inference" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-version-gem-configured-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "lib/oauth2/mcp.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module OAuth2
+            module MCP
+            end
+          end
+
+          Oauth2::Mcp::Version.class_eval do
+            extend VersionGem::Basic
+          end
+        RUBY
+        "lib/oauth2/mcp/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module OAuth2
+            module MCP
+              VERSION = "0.1.0"
+            end
+          end
+        RUBY
+      })
+      facts = {
+        package: {name: "oauth2-mcp"},
+        rubygems: {entrypoint_require: "oauth2/mcp", namespace: "OAuth2::MCP"},
+        project_runtime: {version: "0.1.0"},
+      }
+
+      step = described_class.send(:version_gem_bootstrap_step, root, facts)
+      version_file = File.read(File.join(root, "lib", "oauth2", "mcp", "version.rb"))
+      signature = File.read(File.join(root, "sig", "oauth2", "mcp", "version.rbs"))
+
+      expect(step.fetch(:status)).to eq("applied")
+      expect(version_file).to include("module OAuth2")
+      expect(version_file).to include("module MCP")
+      expect(version_file).not_to include("module Oauth2")
+      expect(signature).to include("module OAuth2")
+      expect(signature).to include("module MCP")
+      expect(signature).not_to include("module Oauth2")
+    end
+  end
+
   it "places version_gem entrypoint requires from top-level Ruby structure" do
     content = <<~RUBY
       # frozen_string_literal: true
@@ -6178,6 +6226,56 @@ RSpec.describe Kettle::Jem do
       expect(report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
         include(operation: "delete_self_dependency_declarations", deleted_dependency_count: 4),
       )
+    end
+  end
+
+  it "keeps multiline gemspec descriptions valid when adding the project emoji" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    package_name = "oauth2-mcp"
+
+    Dir.mktmpdir("kettle-jem-gemspec-emoji", tmp_root) do |root|
+      write_tree(root, {
+        "#{package_name}.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "#{package_name}"
+            spec.summary = "OAuth 2.1 resource-server helpers for MCP servers."
+            spec.description = "oauth2-mcp provides Ruby helpers for securing HTTP Model Context Protocol servers " \\
+                               "with OAuth protected-resource metadata, bearer challenges, and scoped authorization."
+            spec.homepage = "https://github.com/ruby-oauth/oauth2-mcp"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🔮"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: gem.gemspec
+                target: #{package_name}.gemspec
+        YAML
+        "template/gem.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.summary = "{KJ|PROJECT_EMOJI} "
+            spec.description = "{KJ|PROJECT_EMOJI} "
+            spec.homepage = "https://template.example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "#{package_name}.gemspec"
+      end
+      gemspec_content = report.fetch(:final_content)
+
+      expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
+      expect(gemspec_content).to include('spec.summary = "🔮 OAuth 2.1 resource-server helpers for MCP servers."')
+      expect(gemspec_content).to include('spec.description = "🔮 oauth2-mcp provides Ruby helpers')
+      expect(gemspec_content).not_to include("spec.description = 🔮")
     end
   end
 
