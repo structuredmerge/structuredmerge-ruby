@@ -4948,6 +4948,7 @@ RSpec.describe Kettle::Jem do
               - Appraisals
               - gemfiles/rails_7_2.gemfile
               - .github/workflows/framework-ci.yml
+              - .github/workflows/ruby-3.2.yml
         YAML
         "Appraisals" => <<~RUBY,
           appraise "ruby-3-2" do
@@ -4972,17 +4973,36 @@ RSpec.describe Kettle::Jem do
           end
         RUBY
         "template/.github/workflows/framework-ci.yml.example" => "name: Framework CI\n",
+        "template/.github/workflows/ruby-3.2.yml.example" => <<~YAML,
+          name: Ruby 3.2
+
+          jobs:
+            test:
+              env:
+                BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "ruby-3.2"
+                      appraisal: "ruby-3-2"
+                      exec_cmd: "kettle-test"
+        YAML
         "template/gemfiles/rails_7_2.gemfile.example" => "gem \"rails\", \"~> 7.2.2\"\n",
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
       appraisals_report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
       appraisals_content = appraisals_report.fetch(:final_content)
+      workflow_report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".github/workflows/ruby-3.2.yml" }
+      workflow_content = workflow_report.fetch(:final_content)
 
-      expect(appraisals_content).to include('ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"')
-      expect(appraisals_content).to include('ENV["RAILS_MAJOR_MINOR"] = "7.2"')
+      expect(appraisals_content).not_to include("ENV[")
       expect(appraisals_content).to include('eval_gemfile "rails_7_2.gemfile"')
       expect(appraisals_content).not_to include('appraise "rails-7-2"')
+      expect(workflow_content).to include("KJ_FRAMEWORK_MATRIX_GEM: ${{ matrix.KJ_FRAMEWORK_MATRIX_GEM || '' }}")
+      expect(workflow_content).to include("RAILS_MAJOR_MINOR: ${{ matrix.RAILS_MAJOR_MINOR || '' }}")
+      expect(workflow_content).to include('KJ_FRAMEWORK_MATRIX_GEM: "rails"')
+      expect(workflow_content).to include('RAILS_MAJOR_MINOR: "7.2"')
       expect(File.read(File.join(root, "gemfiles/rails_7_2.gemfile"))).to include('gem "combustion", "~> 1.5"')
       expect(File).not_to exist(File.join(root, ".github/workflows/framework-ci.yml"))
     end
@@ -5176,7 +5196,6 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_content).to include(<<~RUBY.strip)
         appraise "ruby-3-2" do
           eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
-          ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "rails"
           eval_gemfile "rails_8_0.gemfile"
         end
       RUBY

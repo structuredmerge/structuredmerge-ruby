@@ -3933,7 +3933,7 @@ module Kettle
       return original if strategy == "keep_destination"
 
       content = recipe_template_content(project_root, recipe)
-      return finalize_github_workflow_template(content) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
+      return finalize_github_workflow_template(content, facts) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
       return content if strategy == "raw_copy"
 
       resolved = resolve_template_tokens(
@@ -3962,7 +3962,7 @@ module Kettle
         merged = merge_config_template_source(recipe, resolved, original, facts: facts)
         return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
 
-        return finalize_github_workflow_template(merged) if github_workflow_template_recipe?(recipe)
+        return finalize_github_workflow_template(merged, facts) if github_workflow_template_recipe?(recipe)
 
         return merged
       end
@@ -3970,11 +3970,11 @@ module Kettle
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
-        accepted = finalize_github_workflow_template(accepted) if github_workflow_template_recipe?(recipe)
+        accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
         return (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
       end
 
-      resolved = finalize_github_workflow_template(resolved) if github_workflow_template_recipe?(recipe)
+      resolved = finalize_github_workflow_template(resolved, facts) if github_workflow_template_recipe?(recipe)
       (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
     end
 
@@ -4366,7 +4366,7 @@ module Kettle
           return finalize_gemfile_template_source(recipe, template_content, destination_content, facts: facts, template_content: template_content)
         end
         return merge_appraisals_template_policy(template_content, facts: facts) if file_type == :appraisals
-        return finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(template_content, facts)) if github_workflow_template_recipe?(recipe)
+        return finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(template_content, facts), facts) if github_workflow_template_recipe?(recipe)
 
         return template_content
       end
@@ -4415,7 +4415,7 @@ module Kettle
         end
         return merge_appraisals_template_policy(output, facts: facts) if file_type == :appraisals
 
-        output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts)) if github_workflow_template_recipe?(recipe)
+        output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts), facts) if github_workflow_template_recipe?(recipe)
         return output
       end
 
@@ -4529,8 +4529,97 @@ module Kettle
       content
     end
 
-    def finalize_github_workflow_template(content)
-      update_github_actions_pins(content)
+    def finalize_github_workflow_template(content, facts = nil)
+      inject_framework_matrix_workflow_env(update_github_actions_pins(content), facts)
+    end
+
+    def inject_framework_matrix_workflow_env(content, facts)
+      env_by_appraisal = framework_matrix_appraisal_env_by_name(facts)
+      return content if env_by_appraisal.empty?
+
+      lines = content.to_s.lines
+      inserted_keys = Set.new
+      yaml_mapping_nodes(content).sort_by { |mapping| -mapping.start_line }.each do |mapping|
+        appraisal = yaml_mapping_scalar_value(mapping, "appraisal")
+        matrix_env = env_by_appraisal[appraisal]
+        next unless matrix_env
+
+        insert_index = workflow_matrix_env_insert_index(lines, mapping)
+        next unless insert_index
+
+        indent = workflow_matrix_env_indent(lines, mapping)
+        additions = matrix_env.reject { |key, _value| yaml_mapping_scalar_value(mapping, key) }
+        next if additions.empty?
+
+        additions.each_key { |key| inserted_keys << key }
+        lines.insert(insert_index, *additions.map { |key, value| %(#{indent}#{key}: #{yaml_double_quoted_scalar(value)}\n) })
+      end
+      return content if inserted_keys.empty?
+
+      add_framework_matrix_job_env(lines.join, inserted_keys)
+    rescue StandardError
+      content
+    end
+
+    def framework_matrix_appraisal_env_by_name(facts)
+      entries = facts.to_h.dig(:ci, :framework_matrix, :appraisals).to_a
+      entries.to_h do |entry|
+        env = {"KJ_FRAMEWORK_MATRIX_GEM" => entry.fetch(:gem).to_s}.merge(entry.fetch(:env, {}).transform_keys(&:to_s))
+        [entry.fetch(:name).to_s, env.reject { |_key, value| value.to_s.empty? }]
+      end.reject { |_name, env| env.empty? }
+    end
+
+    def workflow_matrix_env_insert_index(lines, mapping)
+      ((mapping.start_line - 1)...mapping.end_line).each do |index|
+        return index + 1 if lines[index].to_s.match?(/\A\s+appraisal:/)
+      end
+      mapping.start_line
+    end
+
+    def workflow_matrix_env_indent(lines, mapping)
+      ((mapping.start_line - 1)...mapping.end_line).each do |index|
+        line = lines[index].to_s
+        match = line.match(/\A(\s+)appraisal:/)
+        return match[1] if match
+      end
+      lines.fetch(mapping.start_line - 1, "").match(/\A(\s*)/)[1] + "  "
+    end
+
+    def yaml_double_quoted_scalar(value)
+      %("#{value.to_s.gsub("\\", "\\\\\\").gsub('"', '\"')}")
+    end
+
+    def add_framework_matrix_job_env(content, keys)
+      lines = content.lines
+      bundle_index = lines.index { |line| line.match?(/\A\s+BUNDLE_GEMFILE:/) }
+      return content unless bundle_index
+
+      indent = lines.fetch(bundle_index).match(/\A(\s*)/)[1]
+      existing = workflow_job_env_existing_keys(lines, bundle_index, indent.length)
+      additions = keys.map(&:to_s).sort.reject { |key| existing.include?(key) }
+      return content if additions.empty?
+
+      lines.insert(
+        bundle_index + 1,
+        *additions.map { |key| %(#{indent}#{key}: ${{ matrix.#{key} || '' }}\n) },
+      )
+      lines.join
+    end
+
+    def workflow_job_env_existing_keys(lines, bundle_index, indent_length)
+      existing = Set.new
+      ((bundle_index + 1)...lines.length).each do |index|
+        line = lines.fetch(index)
+        next if line.strip.empty?
+
+        current_indent = line.match(/\A(\s*)/)[1].length
+        break if current_indent < indent_length
+        next unless current_indent == indent_length
+
+        key = line.strip.split(":", 2).first.to_s
+        existing << key unless key.empty?
+      end
+      existing
     end
 
     def yaml_mapping_nodes(content)
@@ -5216,11 +5305,7 @@ module Kettle
     def framework_matrix_appraisal_block(entry)
       lines = [
         %(appraise "#{entry.fetch(:name)}" do),
-        %(  ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "#{entry.fetch(:gem)}"),
       ]
-      entry.fetch(:env, {}).each do |key, value|
-        lines << %(  ENV[#{key.inspect}] = #{value.inspect})
-      end
       entry.fetch(:eval_gemfiles).each do |gemfile|
         lines << %(  eval_gemfile "#{gemfile}")
       end
@@ -5386,16 +5471,12 @@ module Kettle
 
     def appraisal_dependency_lines(block)
       calls = ruby_call_records(block, nil).select do |call|
-        %i[gem eval_gemfile].include?(call.name) || ruby_env_assignment_call?(call)
+        %i[gem eval_gemfile].include?(call.name)
       end
       lines = block.to_s.lines
       calls.map do |call|
         (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
       end
-    end
-
-    def ruby_env_assignment_call?(call)
-      call.name == :[]= && call.receiver&.slice == "ENV"
     end
 
     def appraisal_blocks(content)

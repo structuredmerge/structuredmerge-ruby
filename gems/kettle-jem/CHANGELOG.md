@@ -92,6 +92,10 @@ Please file a bug if you notice a violation of semantic versioning.
   per-version environment variables, can skip framework workflow generation,
   respect `keep_destination` framework gemfiles, and remove replaced standalone
   framework appraisal blocks.
+- Collapsed framework matrix environment variables now render into generated
+  GitHub workflow matrices instead of mutating `ENV` from `Appraisals`, so each
+  appraisal run receives its own framework version without definition-order
+  leakage.
 - README merge preservation now keeps configured destination-only sections
   instead of dropping them when the packaged README template has no matching
   heading.
