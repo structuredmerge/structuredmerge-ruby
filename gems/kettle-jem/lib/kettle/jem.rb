@@ -51,6 +51,47 @@ module Kettle
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
+    RRRRBMatrixEntry = Struct.new(
+      :ruby,
+      :engine,
+      :mri,
+      :workflow_ruby,
+      :rubygems,
+      :bundler,
+      :rubocop,
+      :rubocop_lts,
+      :rails,
+      :rails_appraisals,
+      :notes,
+      keyword_init: true,
+    )
+    RRRRB_MATRIX = {
+      "ruby-1.8" => RRRRBMatrixEntry.new(ruby: "1.8.7-p374", engine: "ruby", rails: "4.0.x", rubocop_lts: "0.1"),
+      "ruby-1.9" => RRRRBMatrixEntry.new(ruby: "1.9.3-p551", engine: "ruby", rubygems: "2.7.11", bundler: "1.17.3", rubocop: "0.41.2", rubocop_lts: "2.0", rails: "4.2.11.3"),
+      "jruby-1.7" => RRRRBMatrixEntry.new(ruby: "jruby-1.7.27", engine: "jruby", mri: "1.9", workflow_ruby: "1.9"),
+      "ruby-2.0" => RRRRBMatrixEntry.new(ruby: "2.0.0-p648", engine: "ruby", rubocop: "0.50.0", rubocop_lts: "4.0"),
+      "ruby-2.1" => RRRRBMatrixEntry.new(ruby: "2.1.10", engine: "ruby", rubocop: "0.57.2", rubocop_lts: "6.0"),
+      "ruby-2.2" => RRRRBMatrixEntry.new(ruby: "2.2.10", engine: "ruby", rubocop: "0.68.1", rubocop_lts: "8.0", rails: "5.2.8.1"),
+      "ruby-2.3" => RRRRBMatrixEntry.new(ruby: "2.3.8", engine: "ruby", rubygems: "3.3.27", bundler: "2.3.27", rubocop: "0.81.0", rubocop_lts: "10.0"),
+      "jruby-9.1" => RRRRBMatrixEntry.new(ruby: "jruby-9.1.17.0", engine: "jruby", mri: "2.3", workflow_ruby: "2.3"),
+      "ruby-2.4" => RRRRBMatrixEntry.new(ruby: "2.4.10", engine: "ruby", rubocop: "1.12.1", rubocop_lts: "12.0", rails_appraisals: ["4.2.11.3", "5.2.8.1"]),
+      "ruby-2.5" => RRRRBMatrixEntry.new(ruby: "2.5.9", engine: "ruby", rubocop: "1.28.2", rubocop_lts: "14.0", rails: "6.0.6.1"),
+      "jruby-9.2" => RRRRBMatrixEntry.new(ruby: "jruby-9.2.21.0", engine: "jruby", mri: "2.5", workflow_ruby: "2.5"),
+      "ruby-2.6" => RRRRBMatrixEntry.new(ruby: "2.6.10", engine: "ruby", rubygems: "3.4.22", bundler: "2.4.22", rubocop: "1.50.2", rubocop_lts: "16.0", rails: "6.1.7.10"),
+      "jruby-9.3" => RRRRBMatrixEntry.new(ruby: "jruby-9.3.15.0", engine: "jruby", mri: "2.6", workflow_ruby: "2.6", notes: ["JRuby 9.3 can require jar-dependencies ~> 0.4.1 when psych activates a newer default gem stack."]),
+      "ruby-2.7" => RRRRBMatrixEntry.new(ruby: "2.7.8", engine: "ruby", rubocop: "1.80.x", rubocop_lts: "18.0", rails: "7.2.2.2"),
+      "ruby-3.0" => RRRRBMatrixEntry.new(ruby: "3.0.7", engine: "ruby", rubygems: "3.5.23", bundler: "2.5.23", rubocop_lts: "20.0"),
+      "truffleruby-22.3" => RRRRBMatrixEntry.new(ruby: "truffleruby-22.3.1", engine: "truffleruby", mri: "3.0", workflow_ruby: "3.0", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
+      "ruby-3.1" => RRRRBMatrixEntry.new(ruby: "3.1.7", engine: "ruby", rubygems: "3.6.9", bundler: "2.6.9", rubocop_lts: "22.0"),
+      "truffleruby-23.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-23.0.0", engine: "truffleruby", mri: "3.1", workflow_ruby: "3.0", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby.", "psych < 5.3 is needed while Gem.ruby_version is below 3.3."]),
+      "jruby-9.4" => RRRRBMatrixEntry.new(ruby: "jruby-9.4.12.x", engine: "jruby", mri: "3.1", workflow_ruby: "3.1"),
+      "ruby-3.2" => RRRRBMatrixEntry.new(ruby: "3.2.9", engine: "ruby", rubygems: "3.7.x", bundler: "2.7.x", rubocop_lts: "24.0", rails: "8.0.x"),
+      "truffleruby-23.1" => RRRRBMatrixEntry.new(ruby: "truffleruby-23.1.2", engine: "truffleruby", mri: "3.2", workflow_ruby: "3.1", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby.", "Use the Ruby 3.1/Rails 7.2 appraisal in CI; Rails 8 failed on this engine.", "psych < 5.3 is needed while Gem.ruby_version is below 3.3."]),
+      "ruby-3.3" => RRRRBMatrixEntry.new(ruby: "3.3.9", engine: "ruby"),
+      "truffleruby-24.2" => RRRRBMatrixEntry.new(ruby: "truffleruby-24.2.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
+      "truffleruby-25.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-25.0.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
+      "ruby-3.4" => RRRRBMatrixEntry.new(ruby: "3.4.7", engine: "ruby"),
+    }.transform_values(&:freeze).freeze
     ENGINE_WORKFLOW_MAP = {
       "jruby" => "jruby",
       "jruby-9.1" => "jruby",
@@ -64,17 +105,9 @@ module Kettle
       "truffleruby-24.2" => "truffleruby",
       "truffleruby-25.0" => "truffleruby",
     }.freeze
-    ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = {
-      "jruby-9.1" => "2.3",
-      "jruby-9.2" => "2.5",
-      "jruby-9.3" => "2.6",
-      "jruby-9.4" => "3.1",
-      "truffleruby-22.3" => "3.0",
-      "truffleruby-23.0" => "3.0",
-      "truffleruby-23.1" => "3.1",
-      "truffleruby-24.2" => "3.3",
-      "truffleruby-25.0" => "3.3",
-    }.freeze
+    ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = RRRRB_MATRIX.each_with_object({}) do |(name, entry), result|
+      result[name] = entry.workflow_ruby if entry.workflow_ruby
+    end.freeze
     RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift].freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
@@ -7955,9 +7988,7 @@ module Kettle
     end
 
     def load_project_gemspec(gemspec_path)
-      Dir.chdir(File.dirname(gemspec_path)) do
-        Gem::Specification.load(File.basename(gemspec_path))
-      end
+      Gem::Specification.load(gemspec_path)
     rescue LoadError, StandardError
       nil
     end
@@ -9168,9 +9199,49 @@ module Kettle
     def merge_readme_template(template_content:, destination_content:, preserve_config: {})
       return template_content if destination_content.to_s.strip.empty?
 
-      preserved = preserve_readme_sections(template_content, destination_content, preserve_config)
+      with_front_sections = preserve_readme_front_sections(template_content, destination_content)
+      preserved = preserve_readme_sections(with_front_sections, destination_content, preserve_config)
       with_h1 = preserve_readme_h1(preserved, destination_content, preserve_config)
       preserve_readme_managed_block(with_h1, destination_content, "kettle-jem:metadata")
+    end
+
+    def preserve_readme_front_sections(template_content, destination_content)
+      front_sections = readme_destination_front_sections(destination_content)
+      return template_content if front_sections.empty?
+
+      template_sections = markdown_sections(template_content)
+      template_h1 = template_sections.find { |section| section.fetch(:level) == 1 }
+      insert_before = template_sections.find do |section|
+        section.fetch(:level) == 2 && section.fetch(:start) > template_h1.to_h.fetch(:start, -1)
+      end
+      return template_content unless insert_before
+
+      lines = template_content.split("\n", -1)
+      inserted = front_sections.map { |section| "#{section.fetch(:heading)}\n#{section.fetch(:body).rstrip}" }.join("\n\n")
+      lines[(template_h1.fetch(:start) + 1)...insert_before.fetch(:start)] = ["", *inserted.split("\n"), ""]
+      lines.join("\n")
+    end
+
+    def readme_destination_front_sections(destination_content)
+      sections = markdown_sections(destination_content)
+      h1 = sections.find { |section| section.fetch(:level) == 1 }
+      synopsis = sections.find { |section| section.fetch(:level) == 2 && section.fetch(:base) == "synopsis" }
+      return [] unless h1 && synopsis
+
+      sections.select do |section|
+        section.fetch(:level) == 2 &&
+          section.fetch(:start) > h1.fetch(:start) &&
+          section.fetch(:end) < synopsis.fetch(:start) &&
+          readme_front_section_preserved?(section)
+      end
+    end
+
+    def readme_front_section_preserved?(section)
+      section.fetch(:base) == "important" || readme_section_contains_badge_cloud?(section)
+    end
+
+    def readme_section_contains_badge_cloud?(section)
+      section.fetch(:body).to_s.lines.any? { |line| line.include?("[![") }
     end
 
     def preserve_readme_sections(template_content, destination_content, preserve_config)

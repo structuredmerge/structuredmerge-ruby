@@ -4251,6 +4251,114 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves a front Important section that encloses the README badge cloud" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-front-important-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "README.md" => <<~MARKDOWN,
+          # 💎 Example
+
+          ## Important
+
+          Keep this local warning.
+
+          [![Version][version-img]][version] [![CI][ci-img]][ci]
+
+          ## Synopsis
+
+          Destination synopsis.
+        MARKDOWN
+        "template/README.md.example" => <<~MARKDOWN,
+          # 💎 Example
+
+          [![Version][version-img]][version] [![CI][ci-img]][ci]
+
+          ## 🌻 Synopsis
+
+          Template synopsis.
+
+          ## ✨ Installation
+
+          Template install.
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      readme = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end.fetch(:final_content)
+
+      expect(readme).to include("## Important\n\nKeep this local warning.")
+      expect(readme).to match(/\A# 💎 Example\n\n## Important/m)
+      expect(readme).to match(/## Important.*\[!\[Version\]\[version-img\]\]\[version\].*## 🌻 Synopsis/m)
+      expect(readme).to include("## 🌻 Synopsis\n\nDestination synopsis.")
+      expect(readme).to include("## ✨ Installation\n\nTemplate install.")
+      expect(File.read(File.join(root, "README.md"))).to eq(readme)
+    end
+  end
+
+  it "only preserves recognized README front sections before the first canonical section" do
+    template = <<~MARKDOWN
+      # Example
+
+      Template prelude.
+
+      ## Synopsis
+
+      Template synopsis.
+    MARKDOWN
+    important_destination = <<~MARKDOWN
+      # Example
+
+      ## Important
+
+      Keep this warning even without badges.
+
+      ## Synopsis
+
+      Destination synopsis.
+    MARKDOWN
+    unknown_destination = <<~MARKDOWN
+      # Example
+
+      ## Old Notes
+
+      Drop this stale front section.
+
+      ## Synopsis
+
+      Destination synopsis.
+    MARKDOWN
+    no_synopsis_destination = <<~MARKDOWN
+      # Example
+
+      ## Important
+
+      No canonical anchor exists.
+    MARKDOWN
+
+    important = described_class.send(:preserve_readme_front_sections, template, important_destination)
+
+    expect(important).to include("## Important\n\nKeep this warning even without badges.")
+    expect(described_class.send(:preserve_readme_front_sections, template, unknown_destination)).to eq(template)
+    expect(described_class.send(:preserve_readme_front_sections, template, no_synopsis_destination)).to eq(template)
+    expect(described_class.send(:preserve_readme_front_sections, "# Example\n", important_destination)).to eq("# Example\n")
+  end
+
   it "merges YAML and TOML template applications with destination values" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -5253,6 +5361,13 @@ RSpec.describe Kettle::Jem do
       expect(workflow_content).to include('ruby: "3.2"')
       expect(workflow_content).to include('appraisal: "ruby-3-2"')
     end
+  end
+
+  it "derives engine workflow Ruby floors from the compatibility matrix" do
+    expect(described_class::RRRRB_MATRIX.fetch("truffleruby-23.1").mri).to eq("3.2")
+    expect(described_class::RRRRB_MATRIX.fetch("truffleruby-23.1").workflow_ruby).to eq("3.1")
+    expect(described_class::ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS.fetch("truffleruby-23.1")).to eq("3.1")
+    expect(described_class::RRRRB_MATRIX.fetch("ruby-2.4").rails_appraisals).to include("4.2.11.3", "5.2.8.1")
   end
 
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do

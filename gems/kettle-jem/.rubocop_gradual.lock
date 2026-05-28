@@ -18,36 +18,35 @@
     [117, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
     [119, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:855206418": [
-    [339, 7, 1114, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 675371207],
-    [356, 7, 121, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 155654330],
-    [360, 7, 89, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 173395318],
-    [364, 7, 90, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 984413807],
-    [368, 7, 208, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 3164846020],
-    [377, 7, 401, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 2459866297],
-    [966, 11, 58, "Style/InvertibleUnlessCondition: Prefer `if uri.host.to_s.casecmp(\"github.com\").nonzero?` over `unless uri.host.to_s.casecmp(\"github.com\").zero?`.", 2031525918],
-    [1692, 11, 36, "Style/InvertibleUnlessCondition: Prefer `if diff.fetch(key, []).none?` over `unless diff.fetch(key, []).any?`.", 486549428],
-    [2265, 11, 65, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 2246286248],
-    [3247, 16, 581, "Style/ConcatArrayLiterals: Use `push(\"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\", \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\", \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\", \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\")` instead of `concat([\n        \"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\",\n        \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\",\n        \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\",\n        \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\",\n      ])`.", 745011514],
-    [4187, 9, 49, "Style/InvertibleUnlessCondition: Prefer `if candidate.level.to_i >= ancestor_level` over `unless candidate.level.to_i < ancestor_level`.", 201534072],
-    [5165, 89, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
-    [5261, 11, 74, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:start_line) < head_appraisal.fetch(:start_line)` over `unless record.fetch(:start_line) >= head_appraisal.fetch(:start_line)`.", 929913612],
-    [5262, 11, 70, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:end_line) > head_appraisal.fetch(:end_line)` over `unless record.fetch(:end_line) <= head_appraisal.fetch(:end_line)`.", 1222596142],
-    [5322, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5339, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5363, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5387, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5411, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5537, 79, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
-    [5641, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [5646, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [6517, 24, 90, "Style/ConcatArrayLiterals: Use `push(\"  #{gemspec}:\", \"    strategy: keep_destination\")` instead of `concat([\n          \"  #{gemspec}:\",\n          \"    strategy: keep_destination\",\n        ])`.", 96516132],
-    [7688, 19, 38, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 3603984863],
-    [7901, 78, 77, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3918037406],
-    [7958, 7, 37, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 822446440],
-    [9590, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
-    [9692, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835],
-    [10602, 35, 16, "Style/RedundantEach: Use `with_object` to remove redundant `each`.", 4071736605]
+  "lib/kettle/jem.rb:855935017": [
+    [372, 7, 1114, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 675371207],
+    [389, 7, 121, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 155654330],
+    [393, 7, 89, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 173395318],
+    [397, 7, 90, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 984413807],
+    [401, 7, 208, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 3164846020],
+    [410, 7, 401, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 2459866297],
+    [999, 11, 58, "Style/InvertibleUnlessCondition: Prefer `if uri.host.to_s.casecmp(\"github.com\").nonzero?` over `unless uri.host.to_s.casecmp(\"github.com\").zero?`.", 2031525918],
+    [1725, 11, 36, "Style/InvertibleUnlessCondition: Prefer `if diff.fetch(key, []).none?` over `unless diff.fetch(key, []).any?`.", 486549428],
+    [2298, 11, 65, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 2246286248],
+    [3280, 16, 581, "Style/ConcatArrayLiterals: Use `push(\"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\", \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\", \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\", \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\")` instead of `concat([\n        \"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\",\n        \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\",\n        \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\",\n        \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\",\n      ])`.", 745011514],
+    [4220, 9, 49, "Style/InvertibleUnlessCondition: Prefer `if candidate.level.to_i >= ancestor_level` over `unless candidate.level.to_i < ancestor_level`.", 201534072],
+    [5198, 89, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
+    [5294, 11, 74, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:start_line) < head_appraisal.fetch(:start_line)` over `unless record.fetch(:start_line) >= head_appraisal.fetch(:start_line)`.", 929913612],
+    [5295, 11, 70, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:end_line) > head_appraisal.fetch(:end_line)` over `unless record.fetch(:end_line) <= head_appraisal.fetch(:end_line)`.", 1222596142],
+    [5355, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5372, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5396, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5420, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5444, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5570, 79, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
+    [5674, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
+    [5679, 7, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
+    [6550, 24, 90, "Style/ConcatArrayLiterals: Use `push(\"  #{gemspec}:\", \"    strategy: keep_destination\")` instead of `concat([\n          \"  #{gemspec}:\",\n          \"    strategy: keep_destination\",\n        ])`.", 96516132],
+    [7721, 19, 38, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 3603984863],
+    [7934, 78, 77, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3918037406],
+    [9661, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
+    [9763, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835],
+    [10673, 35, 16, "Style/RedundantEach: Use `with_object` to remove redundant `each`.", 4071736605]
   ],
   "lib/kettle/jem/tasks/install_task.rb:2637530998": [
     [63, 13, 2, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 5861509],
@@ -73,8 +72,8 @@
     [939, 13, 18, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1095916192],
     [957, 13, 18, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1095916192]
   ],
-  "spec/cli_spec.rb:2368335363": [
-    [6, 1, 31, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem/cli*_spec.rb`.", 242933042]
+  "spec/cli_spec.rb:3620238791": [
+    [7, 1, 31, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem/cli*_spec.rb`.", 242933042]
   ],
   "spec/old_public_spec_audit_spec.rb:964761921": [
     [5, 16, 34, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 3165191681]
@@ -88,19 +87,19 @@
     [11, 5, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639],
     [20, 31, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
   ],
-  "spec/self_test_task_spec.rb:2504890627": [
+  "spec/self_test_task_spec.rb:1473657129": [
     [5, 1, 47, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem/tasks/self_test_task*_spec.rb`.", 363358509]
   ],
-  "spec/system/bundle_gem_scaffold_spec.rb:924815390": [
-    [264, 7, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
+  "spec/system/bundle_gem_scaffold_spec.rb:1969518699": [
+    [268, 7, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
   ],
   "spec/template_version_gem_bootstrap_spec.rb:3767460001": [
     [5, 16, 43, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 874562695]
   ],
-  "spec/thin_slice_spec.rb:37355731": [
+  "spec/thin_slice_spec.rb:1394359910": [
     [5, 1, 26, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*_spec.rb`.", 2213719156],
-    [6418, 41, 51, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2249056217],
-    [8882, 51, 68, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2025778683]
+    [6533, 41, 51, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2249056217],
+    [8997, 51, 68, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2025778683]
   ],
   "spec/version_gem_pattern_spec.rb:4198176520": [
     [3, 16, 37, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 1528688504],

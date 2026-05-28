@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "spec_helper"
+require "kettle/jem/cli"
 require "stringio"
 
 RSpec.describe Kettle::Jem::CLI do

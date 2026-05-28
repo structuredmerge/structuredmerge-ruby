@@ -43,6 +43,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Runtime dependency `token-resolver` now requires the released 2.x line.
 - Development lockfile generation now uses Bundler 4.0.12.
 - Rake task specs now run from a sandboxed temporary project root.
+- Ruby, engine, Bundler, RubyGems, RuboCop, and Rails compatibility choices now
+  come from an `RRRRB_MATRIX` source of truth so generated workflows and
+  appraisals can select the newest stable compatible toolchain per Ruby.
 
 ### Deprecated
 
@@ -53,6 +56,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated `gemfiles/modular/x_std_libs.gemfile` now selects the extracted
   stdlib dependency set from the active Ruby version, so dependency solvers
   running on Ruby 3.1 do not receive Ruby 4-only stdlib requirements.
+- README merging now preserves a destination front `## Important`/warning
+  section before Synopsis when that section encloses the badge cloud.
+- Same-named destination gemspecs loaded from different project directories no
+  longer bleed metadata into one another during templating.
 - `kettle-jem install` now strips inherited Bundler activation variables before
   running destination setup commands, so generated `bin/setup` can run
   `bundle install` even when the destination lockfile references gems that are

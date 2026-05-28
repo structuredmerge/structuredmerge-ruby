@@ -169,12 +169,16 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     seed_destination_dependabot!
 
     apply = Kettle::Jem.apply_project(gem_root, env: env)
-    expect(apply.fetch(:changed_files)).to include(".github/dependabot.yml", "Gemfile", "Rakefile", "README.md")
+    expect(apply.fetch(:changed_files)).to include(".github/dependabot.yml", "Gemfile", "README.md")
     expect(File).to exist(File.join(gem_root, ".github/FUNDING.yml"))
     expect(File).not_to exist(File.join(gem_root, ".github/workflows/ci.yml"))
     expect(File).to exist(File.join(gem_root, ".github/workflows/current.yml"))
     expect(File).to exist(File.join(gem_root, ".github/workflows/ruby-3.2.yml"))
     expect(File).to exist(File.join(gem_root, ".github/workflows/style.yml"))
+
+    rakefile = File.read(File.join(gem_root, "Rakefile"))
+    expect(rakefile).to include("Kettle::Dev.install_tasks")
+    expect(rakefile).to include("Kettle::Jem.install_tasks")
 
     readme = File.read(File.join(gem_root, "README.md"))
     expect(readme).to include("# 💎 Dummy::Gem")
