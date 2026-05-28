@@ -323,13 +323,27 @@ RSpec.describe Kettle::Jem::CLI do
           end
         RUBY
       })
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run) do |project_root:, env:, run_options:|
+        File.write(File.join(project_root, ".kettle-jem.yml"), "templates:\n  root: packaged\n")
+        {
+          mode: "install",
+          changed_files: [".kettle-jem.yml"],
+          install_steps: [],
+          install_phase_reports: [],
+        }
+      end
 
-      status, out, err = run_cli(["template", root, "--force"])
+      status, out, err = run_cli(["template", root, "--force", "--skip-commit"])
 
       expect(status).to eq(0)
       expect(err).to eq("")
-      expect(out).to include("apply:")
+      expect(out).to include("install:")
       expect(File.exist?(File.join(root, ".kettle-jem.yml"))).to be(true)
+      expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
+        project_root: root,
+        env: {},
+        run_options: include(force: true, skip_commit: true),
+      )
     end
   end
 

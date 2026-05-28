@@ -1287,6 +1287,7 @@ module Kettle
 
       def record_template_result(path, action)
         relative_path = relative_project_path(path)
+        normalize_recorded_template_file(path, relative_path)
         @changed_files << relative_path unless @changed_files.include?(relative_path)
         @diagnostics << {
           kind: "plugin_file_change",
@@ -1296,6 +1297,17 @@ module Kettle
       end
 
       private
+
+      def normalize_recorded_template_file(path, relative_path)
+        return unless relative_path == "Rakefile"
+
+        expanded = File.expand_path(path.to_s, @project_root)
+        return unless File.file?(expanded)
+
+        content = File.read(expanded)
+        normalized = Kettle::Jem.send(:normalize_generated_rakefile, content)
+        File.write(expanded, normalized) unless normalized == content
+      end
 
       def relative_project_path(path)
         expanded = File.expand_path(path.to_s, @project_root)
