@@ -39,6 +39,7 @@ Please file a bug if you notice a violation of semantic versioning.
   can make the published runtime Ruby floor explicit.
 - Documentation templates now require `yard-yaml` >= 0.1.2.
 - Gem templates now require `kettle-dev` >= 2.0.4.
+- Runtime dependency `token-resolver` now requires the released 2.x line.
 - Development lockfile generation now uses Bundler 4.0.12.
 - Rake task specs now run from a sandboxed temporary project root.
 
