@@ -71,6 +71,7 @@
             "7.1"
           ],
           "gemfile_pattern": "rails_{version}",
+          "workflow": true,
           "include": [
             {
               "framework_version": "7.0",
@@ -85,12 +86,14 @@
             {
               "path": "gemfiles/rails_7_0",
               "gem": "rails",
-              "requirement": "~> 7.0.0"
+              "requirement": "~> 7.0.0",
+              "env": {}
             },
             {
               "path": "gemfiles/rails_7_1",
               "gem": "rails",
-              "requirement": "~> 7.1.0"
+              "requirement": "~> 7.1.0",
+              "env": {}
             }
           ],
           "appraisals": [
@@ -100,7 +103,9 @@
               "gem": "rails",
               "eval_gemfiles": [
                 "rails_7_0"
-              ]
+              ],
+              "replaces": [],
+              "env": {}
             },
             {
               "name": "rails-7-1",
@@ -108,7 +113,9 @@
               "gem": "rails",
               "eval_gemfiles": [
                 "rails_7_1"
-              ]
+              ],
+              "replaces": [],
+              "env": {}
             }
           ]
         }

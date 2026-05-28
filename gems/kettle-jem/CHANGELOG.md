@@ -77,6 +77,12 @@ Please file a bug if you notice a violation of semantic versioning.
 - Standard Appraisal gemfile injection now skips blocks already enriched by a
   collapsed framework/appraisal matrix dependency gemfile, avoiding duplicate
   broad and version-pinned framework dependency declarations.
+- Standard Appraisal gemfile injection now distinguishes ordinary modular
+  support gemfiles from framework matrix fragments, so coverage and dependency
+  test appraisals still receive required framework dependencies.
+- TOML recipe merging now loads the concrete TOML backend provider with
+  kettle-jem, so `.toml` template merges have a registered parser in ordinary
+  bundle contexts.
 - The generated `.kettle-jem.yml` keeps `Appraisal.root.gemfile`
   template-owned so stale root-appraisal content is replaced cleanly.
 - Simple `workflows.framework_matrix` version entries can now target an

@@ -22,7 +22,7 @@ require "json/merge"
 require "dotenv/merge"
 require "rbs/merge"
 require "token/resolver"
-require "toml-merge"
+require "citrus-toml-merge"
 require "psych-merge"
 require "yaml"
 require "ast/merge"
@@ -5081,10 +5081,11 @@ module Kettle
       standard_names = standard_test_appraisal_names(content)
       return content if standard_names.empty?
 
+      matrix_dependency_gemfiles = framework_matrix_appraisal_dependency_gemfiles(facts)
       parsed = appraisal_blocks(content)
       blocks = parsed.fetch(:order).map do |name|
         block = parsed.fetch(:blocks).fetch(name)
-        if standard_names.include?(name) && !appraisal_block_has_matrix_dependency_gemfile?(block)
+        if standard_names.include?(name) && !appraisal_block_has_matrix_dependency_gemfile?(block, matrix_dependency_gemfiles)
           inject_appraisal_gemfiles(block, gemfiles)
         else
           block
@@ -5103,12 +5104,21 @@ module Kettle
       end.to_set
     end
 
-    def appraisal_block_has_matrix_dependency_gemfile?(block)
+    def framework_matrix_appraisal_dependency_gemfiles(facts)
+      framework_matrix = facts.to_h.dig(:ci, :framework_matrix).to_h
+      [
+        *framework_matrix.fetch(:appraisals, []).flat_map { |entry| entry.fetch(:eval_gemfiles, []) },
+        *framework_matrix.fetch(:gemfiles, []).map { |entry| entry.fetch(:path).to_s.sub(%r{\Agemfiles/}, "") },
+      ].map(&:to_s).to_set
+    end
+
+    def appraisal_block_has_matrix_dependency_gemfile?(block, matrix_dependency_gemfiles)
       ruby_call_records(block, :eval_gemfile).any? do |call|
         path = ruby_string_argument(call).to_s
+        next true if matrix_dependency_gemfiles.include?(path)
+
         path.start_with?("modular/") &&
-          path.include?("/") &&
-          path != "modular/x_std_libs.gemfile" &&
+          path.delete_prefix("modular/").include?("/") &&
           !path.start_with?("modular/x_std_libs/")
       end
     end

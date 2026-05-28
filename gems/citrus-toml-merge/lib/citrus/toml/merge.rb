@@ -3,8 +3,8 @@
 require "version_gem"
 require_relative "merge/version"
 
-require "toml-merge"
 require "toml-rb"
+require "toml-merge"
 
 module Citrus
   module Toml
