@@ -154,6 +154,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated workflow pruning now treats TruffleRuby 23.1 as Ruby 3.1
   compatible, matching README compatibility pruning and removing that stale
   workflow from Ruby 3.2+ projects.
+- Generated JRuby 9.3 workflows now use RubyGems 3.4.22 and Bundler 2.4.22,
+  matching Ruby 2.6 compatibility workflows and avoiding default-gem activation
+  conflicts during Appraisal setup.
 - Monorepo-root template bootstrap now falls back to package-derived namespace
   and entrypoint tokens when no gemspec-backed RubyGems config is present.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
