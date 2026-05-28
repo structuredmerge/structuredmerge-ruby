@@ -4492,6 +4492,21 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "normalizes generated Rakefile section spacing after merge" do
+    rakefile = described_class.send(:normalize_generated_rakefile, <<~RAKE)
+      task :custom do
+        puts "custom"
+      end
+
+
+      ### TEMPLATING TASKS
+      task "kettle:jem:selftest"
+    RAKE
+
+    expect(rakefile).to include("\n\n### TEMPLATING TASKS\n")
+    expect(rakefile).not_to include("\n\n\n### TEMPLATING TASKS")
+  end
+
   it "passes Ruby method move policy through per-file template strategy config" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -97,6 +97,8 @@ Please file a bug if you notice a violation of semantic versioning.
   do not add an extra blank line at EOF.
 - Generated Rakefiles now install a `kettle:jem:selftest` fallback when the
   installed `kettle-jem` package lacks rake task support.
+- Generated Rakefile merging now normalizes section spacing so template-added
+  task blocks do not introduce RuboCop `Layout/EmptyLines` offenses.
 - Fixed generated framework workflow YAML indentation so `framework:` remains
   under `strategy.matrix`.
 - Removed duplicate generated `spec.homepage` assignments when destination

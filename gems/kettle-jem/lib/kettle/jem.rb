@@ -3799,7 +3799,18 @@ module Kettle
     def normalize_generated_rakefile(content)
       return "" if content.to_s.empty?
 
-      ensure_trailing_newline(strip_orphaned_rake_task_requires(content.to_s).rstrip)
+      stripped = strip_orphaned_rake_task_requires(content.to_s)
+      spaced = normalize_rakefile_section_spacing(stripped)
+      ensure_trailing_newline(spaced.rstrip)
+    end
+
+    def normalize_rakefile_section_spacing(content)
+      content.to_s.lines.each_with_object([]) do |line, normalized|
+        if line.start_with?("### ")
+          normalized.pop while normalized.length > 1 && normalized[-1].strip.empty? && normalized[-2].strip.empty?
+        end
+        normalized << line
+      end.join
     end
 
     def strip_orphaned_rake_task_requires(content)
