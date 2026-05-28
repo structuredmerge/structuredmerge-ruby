@@ -4357,7 +4357,11 @@ module Kettle
 
         return template_content
       end
-      return destination_content if destination_content == template_content
+      if destination_content == template_content
+        return merge_appraisals_template_policy(destination_content, facts: facts) if file_type == :appraisals
+
+        return destination_content
+      end
 
       case file_type
       when :gemspec
@@ -5165,14 +5169,17 @@ module Kettle
       generated = entries.to_h do |entry|
         [entry.fetch(:name).to_s, framework_matrix_appraisal_block(entry)]
       end
+      replaced = entries.flat_map { |entry| entry.fetch(:replaces, []) }.map(&:to_s).to_set
       parsed = appraisal_blocks(content)
       emitted = Set.new
       blocks = parsed.fetch(:order).map do |name|
+        next if replaced.include?(name) && !generated.key?(name)
+
         emitted << name
         parsed_block = parsed.fetch(:blocks).fetch(name).rstrip
         generated_block = generated[name]
         generated_block ? merge_same_named_appraisal_block(parsed_block, generated_block) : parsed_block
-      end
+      end.compact
       entries.each do |entry|
         name = entry.fetch(:name).to_s
         next if emitted.include?(name)
@@ -5188,6 +5195,9 @@ module Kettle
         %(appraise "#{entry.fetch(:name)}" do),
         %(  ENV["KJ_FRAMEWORK_MATRIX_GEM"] = "#{entry.fetch(:gem)}"),
       ]
+      entry.fetch(:env, {}).each do |key, value|
+        lines << %(  ENV[#{key.inspect}] = #{value.inspect})
+      end
       entry.fetch(:eval_gemfiles).each do |gemfile|
         lines << %(  eval_gemfile "#{gemfile}")
       end
@@ -5353,12 +5363,16 @@ module Kettle
 
     def appraisal_dependency_lines(block)
       calls = ruby_call_records(block, nil).select do |call|
-        %i[gem eval_gemfile].include?(call.name)
+        %i[gem eval_gemfile].include?(call.name) || ruby_env_assignment_call?(call)
       end
       lines = block.to_s.lines
       calls.map do |call|
         (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
       end
+    end
+
+    def ruby_env_assignment_call?(call)
+      call.name == :[]= && call.receiver&.slice == "ENV"
     end
 
     def appraisal_blocks(content)
@@ -9561,7 +9575,10 @@ module Kettle
       return true if OPT_IN_GITHUB_WORKFLOWS.include?(path) && !selected_template_path?(path, Array(include_patterns))
 
       basename = File.basename(path, ".yml")
-      return github_actions_framework_matrix(config).empty? if basename == "framework-ci"
+      if basename == "framework-ci"
+        matrix = github_actions_framework_matrix(config)
+        return matrix.empty? || !matrix.fetch(:workflow, true)
+      end
 
       min_ruby = config_test_min_ruby(config)
       workflow_floor = ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS[basename]
@@ -9688,9 +9705,20 @@ module Kettle
       return {} if version_entries.empty?
 
       appraisal_gemfiles = framework_matrix_appraisal_gemfiles(raw)
+      gemfiles = version_entries.map do |entry|
+        gemfile = expand_framework_gemfile_pattern(pattern, entry.fetch(:slug))
+        {
+          path: framework_gemfile_path(gemfile),
+          gem: framework_gem,
+          requirement: entry.fetch(:requirement),
+          env: entry.fetch(:env, {}),
+        }
+      end.uniq { |entry| entry.fetch(:path) }
+      gemfiles.reject! { |entry| template_keep_destination_path?(config, entry.fetch(:path)) }
       {
         dimension: dimension,
         gem: framework_gem,
+        workflow: framework_matrix_workflow_enabled?(raw),
         versions: version_entries.map { |entry| entry.fetch(:label) },
         gemfile_pattern: pattern,
         include: version_entries.map do |entry|
@@ -9699,24 +9727,36 @@ module Kettle
             appraisal: entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
           }
         end,
-        gemfiles: version_entries.map do |entry|
-          gemfile = expand_framework_gemfile_pattern(pattern, entry.fetch(:slug))
-          {
-            path: framework_gemfile_path(gemfile),
-            gem: framework_gem,
-            requirement: entry.fetch(:requirement),
-          }
-        end,
+        gemfiles: gemfiles,
         appraisals: version_entries.map do |entry|
           gemfile = framework_gemfile_path(expand_framework_gemfile_pattern(pattern, entry.fetch(:slug)))
+          name = entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug))
           {
-            name: entry[:appraisal_name] || framework_matrix_appraisal_name(dimension, entry.fetch(:slug)),
+            name: name,
             framework_version: entry.fetch(:label),
             gem: framework_gem,
+            env: entry.fetch(:env, {}),
             eval_gemfiles: [framework_matrix_appraisal_gemfile_path(gemfile), *appraisal_gemfiles].uniq,
+            replaces: framework_matrix_replaced_appraisal_names(dimension, entry, name),
           }
         end,
       }
+    end
+
+    def framework_matrix_replaced_appraisal_names(dimension, entry, name)
+      default_name = framework_matrix_appraisal_name(dimension, entry.fetch(:slug))
+      return [] if default_name == name
+
+      [default_name]
+    end
+
+    def framework_matrix_workflow_enabled?(raw)
+      configured = raw["workflow"]
+      configured = raw["generate_workflow"] if configured.nil?
+      configured = raw["ci"] if configured.nil?
+      return true if configured.nil?
+
+      DecisionPolicy.value_to_boolean(configured) != false
     end
 
     def framework_matrix_appraisal_gemfiles(raw)
@@ -9740,11 +9780,13 @@ module Kettle
         slug = raw.fetch("slug", label).to_s.strip
         requirement = raw.fetch("requirement", default_framework_matrix_requirement(label)).to_s.strip
         appraisal_name = (raw["appraisal"] || raw["appraisal_name"] || raw["standard_appraisal"]).to_s.strip
+        env = framework_matrix_env(raw["env"])
       else
         label = raw.to_s.strip
         slug = label
         requirement = default_framework_matrix_requirement(label)
         appraisal_name = ""
+        env = {}
       end
       return if label.empty? || slug.empty? || requirement.empty?
 
@@ -9754,7 +9796,24 @@ module Kettle
         requirement: requirement,
       }
       entry[:appraisal_name] = appraisal_name unless appraisal_name.empty?
+      entry[:env] = env unless env.empty?
       entry
+    end
+
+    def framework_matrix_env(raw)
+      return {} unless raw.is_a?(Hash)
+
+      raw.each_with_object({}) do |(key, value), result|
+        name = key.to_s.strip
+        next if name.empty?
+
+        result[name] = value.to_s
+      end
+    end
+
+    def template_keep_destination_path?(config, target_path)
+      strategy = template_file_strategy_config(config, target_path) || template_pattern_strategy_config(config, target_path)
+      strategy.to_h.fetch(:strategy, nil) == :keep_destination
     end
 
     def default_framework_matrix_requirement(version)
@@ -10196,14 +10255,18 @@ module Kettle
       end
       raise ArgumentError, "missing framework matrix gemfile config for #{target_path}" unless gemfile
 
-      <<~RUBY
-        # frozen_string_literal: true
-
-        # Generated by kettle-jem from workflows.framework_matrix.
-        ENV["KJ_FRAMEWORK_MATRIX_GEM"] = #{gemfile.fetch(:gem).inspect}
-
-        gem #{gemfile.fetch(:gem).inspect}, #{gemfile.fetch(:requirement).inspect}
-      RUBY
+      lines = [
+        "# frozen_string_literal: true",
+        "",
+        "# Generated by kettle-jem from workflows.framework_matrix.",
+        %(ENV["KJ_FRAMEWORK_MATRIX_GEM"] = #{gemfile.fetch(:gem).inspect}),
+      ]
+      gemfile.fetch(:env, {}).each do |key, value|
+        lines << %(ENV[#{key.inspect}] = #{value.inspect})
+      end
+      lines << ""
+      lines << %(gem #{gemfile.fetch(:gem).inspect}, #{gemfile.fetch(:requirement).inspect})
+      "#{lines.join("\n")}\n"
     end
 
     def synchronize_github_actions_coverage_ci(_content, facts)

@@ -82,6 +82,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Simple `workflows.framework_matrix` version entries can now target an
   existing appraisal with `appraisal`, `appraisal_name`, or
   `standard_appraisal`, allowing explicit collapse onto standard appraisals.
+- Collapsed `workflows.framework_matrix` appraisals now preserve configured
+  per-version environment variables, can skip framework workflow generation,
+  respect `keep_destination` framework gemfiles, and remove replaced standalone
+  framework appraisal blocks.
 - README merge preservation now keeps configured destination-only sections
   instead of dropping them when the packaged README template has no matching
   heading.
