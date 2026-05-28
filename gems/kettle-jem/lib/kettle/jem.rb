@@ -7243,6 +7243,7 @@ module Kettle
       tokens = {
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
+        "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
         "KJ|GEM_MAJOR" => gem_major_token(facts.fetch(:project_runtime, {})[:version]),
         "KJ|GH_ORG" => github_org,
@@ -9280,6 +9281,7 @@ module Kettle
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
       return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")
       return {strategy: :accept_template} if target_path.to_s.start_with?("gemfiles/modular/")
+      return {strategy: :accept_template} if target_path.to_s == "spec/spec_helper.rb"
 
       nil
     end

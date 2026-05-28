@@ -5232,6 +5232,54 @@ RSpec.describe Kettle::Jem do
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
+  it "templates spec helper coverage bootstrap before loading the library" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-spec-helper-coverage", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          rubygems:
+            entrypoint_require: "example/custom"
+            namespace: "Example::Custom"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - spec/spec_helper.rb
+        YAML
+        "spec/spec_helper.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require "example/custom"
+
+          RSpec.configure do |config|
+            config.example_status_persistence_file_path = ".rspec_status"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "spec/spec_helper.rb"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
+      expect(content).to include('require "simplecov" if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include('require "kettle/test/rspec"')
+      expect(content.scan('require "example/custom"').size).to eq(1)
+    end
+  end
+
   it "treats packaged local Gemfiles as template-owned by default" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -183,6 +183,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated local templating Gemfiles now wire `tree_sitter_language_pack` from
   the sibling StructuredMerge checkout when iterating on unreleased
   `kettle-jem`, avoiding broken released native gem materialization.
+- Generated `spec/spec_helper.rb` now starts `kettle-soup-cover`/SimpleCov
+  before loading the library so `kettle-test` produces the canonical
+  `coverage/coverage.json` consumed by `kettle-changelog`.
 - VersionGem-managed `version.rb` and `version.rbs` packaged template targets
   now default to whole-file replacement, preventing legacy version constants
   from being merged into the generated shape.
