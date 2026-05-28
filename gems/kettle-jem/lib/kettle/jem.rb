@@ -2545,6 +2545,9 @@ module Kettle
         File.basename(gemspec_path, ".gemspec")
       homepage_url = metadata_value(gemspec_metadata, :homepage)
       metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri)
+      unless static_gemspec_metadata_key_assigned?(File.read(gemspec_path), "source_code_uri")
+        metadata_source_url = nil if generated_version_tree_source_url?(metadata_source_url, metadata_value(gemspec_metadata, :version))
+      end
       metadata_github_url = concrete_github_url(metadata_source_url)
       homepage_github_url = concrete_github_url(homepage_url)
       git_source_url = git_remote_source_url(project_root)
@@ -3571,7 +3574,7 @@ module Kettle
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
-      deletion = (recipe.fetch(:name) == "rakefile_scaffold_cleanup") ? delete_rakefile_scaffold(original) : nil
+      deletion = rakefile_scaffold_cleanup_recipe?(recipe) ? rakefile_scaffold_cleanup(original, facts) : nil
       final = case recipe.fetch(:name)
       when "readme_metadata"
         synchronize_readme(original, facts, project_root: project_root)
@@ -3663,6 +3666,16 @@ module Kettle
         decision_evaluation: decision_evaluation,
         diagnostics: [],
       }
+    end
+
+    def rakefile_scaffold_cleanup_recipe?(recipe)
+      recipe.fetch(:name) == "rakefile_scaffold_cleanup"
+    end
+
+    def rakefile_scaffold_cleanup(content, facts)
+      return {content: content.to_s, delete_selectors: []} if facts[:template_profile].to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
+
+      delete_rakefile_scaffold(content)
     end
 
     def content_recipe_step(recipe)
@@ -6339,7 +6352,7 @@ module Kettle
 
     def add_monorepo_root_file_overrides(content)
       override_lines = MONOREPO_ROOT_TEMPLATE_ENTRIES.reject { |entry| entry.to_s.include?("/") }.flat_map do |entry|
-        kettle_config_file_override_lines(entry, "accept_template")
+        kettle_config_file_override_lines(entry, monorepo_root_file_strategy(entry))
       end
       insert_after_line_sequence(
         content,
@@ -6347,6 +6360,14 @@ module Kettle
         override_lines.join("\n"),
         "Could not apply monorepo-root file overrides to .kettle-jem.yml bootstrap template",
       )
+    end
+
+    def monorepo_root_file_strategy(entry)
+      if entry.to_s == "CHANGELOG.md"
+        "keep_destination"
+      else
+        "accept_template"
+      end
     end
 
     def kettle_config_file_override_lines(path, strategy)
@@ -7810,6 +7831,27 @@ module Kettle
       nil
     rescue Ast::Crispr::Error
       nil
+    end
+
+    def static_gemspec_metadata_key_assigned?(content, key)
+      ruby_call_records(content, :[]=).any? do |call|
+        next false unless call.receiver&.slice.to_s.end_with?(".metadata")
+
+        args = call.arguments&.arguments.to_a
+        args.first.respond_to?(:unescaped) && args.first.unescaped == key
+      end
+    rescue Ast::Crispr::Error
+      false
+    end
+
+    def generated_version_tree_source_url?(source_url, version)
+      return false unless present_template_token_value?(source_url) && present_template_token_value?(version)
+
+      uri = URI.parse(source_url.to_s)
+      segments = uri.path.to_s.split("/").reject(&:empty?)
+      uri.host == "github.com" && segments[2] == "tree" && segments[3] == "v#{version}"
+    rescue URI::InvalidURIError
+      false
     end
 
     def quiet_gemspec_reader_load(project_root)

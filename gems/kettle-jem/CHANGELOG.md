@@ -179,7 +179,16 @@ Please file a bug if you notice a violation of semantic versioning.
 - Updated the generated development dependency on `kettle-test` to require
   2.0.1 or newer.
 - Updated the generated development dependency on `kettle-dev` to require
-  2.0.1 or newer.
+  2.0.5 or newer.
+- Monorepo-root bootstrap now keeps existing changelogs instead of replacing
+  release history with a blank generated template.
+- Monorepo-root Rakefiles no longer lose existing RSpec/default tasks during
+  scaffold cleanup before plugin task injection runs.
+- StructuredMerge family templating now runs child gem updates under the
+  kettle-jem bundle so child directories without a Gemfile do not inherit the
+  workspace root bundle.
+- StructuredMerge family templating now uses a gitmoji-prefixed default commit
+  message so scripted commits satisfy the local commit hook.
 - Generated framework CI now uses an explicit framework matrix axis instead
   of GitHub Actions `include` expansion.
 - Scrubbed parent Bundler activation variables before the post-template

@@ -9,6 +9,7 @@ require "tsort"
 
 RUBY_REPO = File.expand_path("..", __dir__).sub(%r{\A/var/home/}, "/home/")
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
+KETTLE_JEM_GEMFILE = File.join(GEMS_ROOT, "kettle-jem", "Gemfile")
 ROOT_TEMPLATE_PROFILE = "monorepo-subgem"
 ROOT_REPOSITORY_TOPOLOGY = "monorepo-subproject"
 
@@ -255,7 +256,7 @@ def commit_template_results
   )
   raise "Git add failed: #{add_stderr.empty? ? add_stdout : add_stderr}" unless add_status.success?
 
-  message = "chore: apply kettle-jem templates"
+  message = "🔧 Apply kettle-jem templates"
   commit_stdout, commit_stderr, commit_status = Open3.capture3("git", "-C", RUBY_REPO, "commit", "-m", message)
   raise "Git commit failed: #{commit_stderr.empty? ? commit_stdout : commit_stderr}" unless commit_status.success?
 
@@ -287,6 +288,7 @@ def render_options_banner(options, gem_dirs)
     "Action: apply kettle-jem templates and write changed files",
     "Template profile: ENV KETTLE_JEM_TEMPLATE_PROFILE (root default: #{ROOT_TEMPLATE_PROFILE}; per-gem override allowed)",
     "Repository topology: ENV KJ_REPOSITORY_TOPOLOGY (root default: #{ROOT_REPOSITORY_TOPOLOGY}; independent of template profile)",
+    "Template runtime bundle: #{KETTLE_JEM_GEMFILE}",
     "Missing .kettle-jem.yml: auto-bootstrap before templating",
     banner_value("Commit template result", option_state(options[:commit]), "toggle: --commit / --no-commit"),
     banner_value("Normalize lockfiles", option_state(options[:normalize_lock]), "toggle: --normalize-lock / --no-normalize-lock"),
@@ -331,7 +333,11 @@ results = gem_dirs.map do |gem_dir|
     "--gem-dir", gem_dir,
   ]
   child_env = ENV.to_h
-  child_env["SMORG_RB_DEV"] = GEMS_ROOT unless child_env.key?("SMORG_RB_DEV")
+  child_env["BUNDLE_GEMFILE"] = KETTLE_JEM_GEMFILE
+  child_env["SMORG_RB_DEV"] = GEMS_ROOT
+  child_env["KETTLE_RB_DEV"] = "false"
+  child_env["GALTZO_FLOSS_DEV"] = "false"
+  child_env["UR_BRAIN_DEV"] = "false"
   child_env["K_JEM_TEMPLATING"] = "true"
   stdout, stderr, status = Open3.capture3(child_env, *command)
   unless status.success?

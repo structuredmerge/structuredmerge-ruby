@@ -320,7 +320,7 @@ patterns:
 # Only files that need overrides belong here. Everything else defaults to merge.
 files:
   CHANGELOG.md:
-    strategy: accept_template
+    strategy: keep_destination
   CODE_OF_CONDUCT.md:
     strategy: accept_template
   CONTRIBUTING.md:

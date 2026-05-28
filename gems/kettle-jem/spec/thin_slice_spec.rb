@@ -2210,9 +2210,45 @@ RSpec.describe Kettle::Jem do
       expect(config).to include(<<~YAML)
         files:
           CHANGELOG.md:
-            strategy: accept_template
+            strategy: keep_destination
       YAML
       expect(config.lines.count { |line| line == "  .github:\n" }).to eq(1)
+    end
+  end
+
+  it "preserves monorepo root Rakefile tasks during scaffold cleanup" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-monorepo-root-rakefile", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🍲"
+          templates:
+            root: packaged
+            apply: true
+            profile: monorepo-root
+            entries: []
+        YAML
+        "Rakefile" => <<~RUBY,
+          require "rake/testtask"
+          require "rspec/core/rake_task"
+
+          RSpec::Core::RakeTask.new(:spec)
+
+          task default: :spec
+        RUBY
+      })
+
+      report = described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+      )
+      rakefile_report = report.fetch(:recipe_reports).find { |recipe| recipe.fetch(:recipe_name) == "rakefile_scaffold_cleanup" }
+
+      expect(rakefile_report.dig(:request_envelope, :request, :runtime_context, :delete_selectors)).to eq([])
+      expect(File.read(File.join(root, "Rakefile"))).to include("RSpec::Core::RakeTask.new(:spec)")
+      expect(File.read(File.join(root, "Rakefile"))).to include("task default: :spec")
     end
   end
 

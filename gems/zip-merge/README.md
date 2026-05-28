@@ -288,14 +288,3 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [💎appraisal2]: https://github.com/appraisal-rb/appraisal2
 [💎appraisal2-img]: https://img.shields.io/badge/appraised_by-appraisal2-34495e.svg?plastic&logo=ruby&logoColor=white
 [💎d-in-dvcs]: https://railsbling.com/posts/dvcs/put_the_d_in_dvcs/
-
-<!-- kettle-jem:metadata:start -->
-| Field | Value |
-|---|---|
-| Package | zip-merge |
-| Description | Portable ZIP inventory, planning, nested dispatch, and raw-preservation rendering helpers for Structured Merge. |
-| Homepage | https://github.com/structuredmerge/structuredmerge-ruby |
-| Source | https://github.com/structuredmerge/structuredmerge-ruby/tree/v7.0.0 |
-| License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |
-| Funding | https://github.com/sponsors/pboling, https://tidelift.com/funding/github/rubygems/zip-merge |
-<!-- kettle-jem:metadata:end -->
