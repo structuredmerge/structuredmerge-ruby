@@ -133,6 +133,13 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added curated `rbs` and `rspec-core` binstubs because generated CI templates
   call `bin/rbs` and `bin/rspec` directly through appraisals.
 - Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.3 or newer.
+- Removed the generated CodeQL workflow so templated repositories can rely on
+  GitHub CodeQL default setup instead of failing from duplicate advanced setup.
+- Generated workflow pruning now treats TruffleRuby 23.1 as Ruby 3.1
+  compatible, matching README compatibility pruning and removing that stale
+  workflow from Ruby 3.2+ projects.
+- Monorepo-root template bootstrap now falls back to package-derived namespace
+  and entrypoint tokens when no gemspec-backed RubyGems config is present.
 - Updated the generated documentation bundle to require `yard-fence` 0.9.1 or newer.
 - Removed `--plugin timekeeper` from generated `.yardopts` because
   yard-timekeeper is installed through the rake `yard` task hook.

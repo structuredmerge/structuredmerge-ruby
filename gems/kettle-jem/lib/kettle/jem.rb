@@ -39,7 +39,15 @@ module Kettle
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
-    OBSOLETE_GITHUB_WORKFLOWS = %w[ancient.yml legacy.yml supported.yml unsupported.yml main.yml hoary.yml].freeze
+    OBSOLETE_GITHUB_WORKFLOWS = %w[
+      ancient.yml
+      legacy.yml
+      supported.yml
+      unsupported.yml
+      main.yml
+      hoary.yml
+      codeql-analysis.yml
+    ].freeze
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
@@ -63,7 +71,7 @@ module Kettle
       "jruby-9.4" => "3.1",
       "truffleruby-22.3" => "3.0",
       "truffleruby-23.0" => "3.0",
-      "truffleruby-23.1" => "3.2",
+      "truffleruby-23.1" => "3.1",
       "truffleruby-24.2" => "3.3",
       "truffleruby-25.0" => "3.3",
     }.freeze
@@ -7243,12 +7251,12 @@ module Kettle
       tokens = {
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
-        "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require).to_s,
+        "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require, package.fetch(:name).to_s.tr("-", "/")).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
         "KJ|GEM_MAJOR" => gem_major_token(facts.fetch(:project_runtime, {})[:version]),
         "KJ|GH_ORG" => github_org,
-        "KJ|NAMESPACE" => rubygems.fetch(:namespace).to_s,
-        "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace).to_s),
+        "KJ|NAMESPACE" => rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s,
+        "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s),
         "KJ|MIN_RUBY" => minimum_ruby_token(rubygems[:min_ruby]),
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,

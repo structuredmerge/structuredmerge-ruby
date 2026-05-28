@@ -764,7 +764,7 @@ RSpec.describe Kettle::Jem do
       expect(paths).not_to include(".github/workflows/jruby-9.1.yml")
       expect(paths).not_to include(".github/workflows/jruby-9.4.yml")
       expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
-      expect(paths).to include(".github/workflows/truffleruby-23.1.yml")
+      expect(paths).not_to include(".github/workflows/truffleruby-23.1.yml")
       expect(stale_report).to include(
         recipe_name: "github_actions_inactive_packaged_workflow_cleanup_github_workflows_truffleruby_23_2_yml",
         changed: true,
