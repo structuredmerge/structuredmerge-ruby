@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Kettle::Jem::TemplateChecksums
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Kettle::Jem::TemplateChecksums";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Kettle.html" title="Kettle (module)">Kettle</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span>
+     &raquo; 
+    <span class="title">TemplateChecksums</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Kettle::Jem::TemplateChecksums
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/kettle/jem.rb
+</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="YAML_KEY-constant" class="">YAML_KEY =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>kettle-jem</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="CHECKSUMS_SUBKEY-constant" class="">CHECKSUMS_SUBKEY =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>checksums</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="VERSION_SUBKEY-constant" class="">VERSION_SUBKEY =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>version</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#build_yaml_block-class_method" title="build_yaml_block (class method)">.<strong>build_yaml_block</strong>(checksums:, version: nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compute-class_method" title="compute (class method)">.<strong>compute</strong>(template_root:)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#detail_lines-class_method" title="detail_lines (class method)">.<strong>detail_lines</strong>(diff)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#diff-class_method" title="diff (class method)">.<strong>diff</strong>(current:, stored:)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#diff_count-class_method" title="diff_count (class method)">.<strong>diff_count</strong>(diff)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#load_stored-class_method" title="load_stored (class method)">.<strong>load_stored</strong>(config_path:)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#replace_top_level_yaml_block-class_method" title="replace_top_level_yaml_block (class method)">.<strong>replace_top_level_yaml_block</strong>(content, key, replacement)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#summary-class_method" title="summary (class method)">.<strong>summary</strong>(diff)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#write_to_config-class_method" title="write_to_config (class method)">.<strong>write_to_config</strong>(config_path:, checksums:, version: nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="build_yaml_block-class_method">
+  
+    .<strong>build_yaml_block</strong>(checksums:, version: nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1373
+1374
+1375
+1376
+1377
+1378
+1379
+1380
+1381
+1382</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1373</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_build_yaml_block'>build_yaml_block</span><span class='lparen'>(</span><span class='label'>checksums:</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#YAML_KEY-constant" title="Kettle::Jem::TemplateChecksums::YAML_KEY (constant)">YAML_KEY</a></span></span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#VERSION_SUBKEY-constant" title="Kettle::Jem::TemplateChecksums::VERSION_SUBKEY (constant)">VERSION_SUBKEY</a></span></span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_version'>version</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_version'>version</span>
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#CHECKSUMS_SUBKEY-constant" title="Kettle::Jem::TemplateChecksums::CHECKSUMS_SUBKEY (constant)">CHECKSUMS_SUBKEY</a></span></span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span>
+  <span class='id identifier rubyid_checksums'>checksums</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_sha'>sha</span><span class='op'>|</span>
+    <span class='id identifier rubyid_lines'>lines</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>    </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_sha'>sha</span><span class='period'>.</span><span class='id identifier rubyid_dump'>dump</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="compute-class_method">
+  
+    .<strong>compute</strong>(template_root:)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1316
+1317
+1318
+1319
+1320
+1321
+1322
+1323
+1324
+1325
+1326</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1316</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_compute'>compute</span><span class='lparen'>(</span><span class='label'>template_root:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_template_root'>template_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_checksums'>checksums</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='const'>Find</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_relative_path'>relative_path</span> <span class='op'>=</span> <span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_delete_prefix'>delete_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='embexpr_end'>}</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_checksums'>checksums</span><span class='lbracket'>[</span><span class='id identifier rubyid_relative_path'>relative_path</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA256</span><span class='period'>.</span><span class='id identifier rubyid_file'>file</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_hexdigest'>hexdigest</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_checksums'>checksums</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="detail_lines-class_method">
+  
+    .<strong>detail_lines</strong>(diff)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1365
+1366
+1367
+1368
+1369
+1370
+1371</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1365</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_detail_lines'>detail_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
+  <span class='lbracket'>[</span>
+    <span class='op'>*</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:added</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  + </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='op'>*</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  ~ </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='op'>*</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:removed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>  - </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_path'>path</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="diff-class_method">
+  
+    .<strong>diff</strong>(current:, stored:)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1339
+1340
+1341
+1342
+1343
+1344
+1345
+1346
+1347
+1348</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1339</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_diff'>diff</span><span class='lparen'>(</span><span class='label'>current:</span><span class='comma'>,</span> <span class='label'>stored:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_current_keys'>current_keys</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+  <span class='id identifier rubyid_stored_keys'>stored_keys</span> <span class='op'>=</span> <span class='id identifier rubyid_stored'>stored</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>added:</span> <span class='lparen'>(</span><span class='id identifier rubyid_current_keys'>current_keys</span> <span class='op'>-</span> <span class='id identifier rubyid_stored_keys'>stored_keys</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
+    <span class='label'>changed:</span> <span class='lparen'>(</span><span class='id identifier rubyid_current_keys'>current_keys</span> <span class='op'>&amp;</span> <span class='id identifier rubyid_stored_keys'>stored_keys</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_current'>current</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='id identifier rubyid_stored'>stored</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
+    <span class='label'>removed:</span> <span class='lparen'>(</span><span class='id identifier rubyid_stored_keys'>stored_keys</span> <span class='op'>-</span> <span class='id identifier rubyid_current_keys'>current_keys</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="diff_count-class_method">
+  
+    .<strong>diff_count</strong>(diff)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1350
+1351
+1352</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1350</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_diff_count'>diff_count</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:added</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>+</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>+</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:removed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="load_stored-class_method">
+  
+    .<strong>load_stored</strong>(config_path:)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1328
+1329
+1330
+1331
+1332
+1333
+1334
+1335
+1336
+1337</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1328</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_load_stored'>load_stored</span><span class='lparen'>(</span><span class='label'>config_path:</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='const'>YAML</span><span class='period'>.</span><span class='id identifier rubyid_safe_load_file'>safe_load_file</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='label'>permitted_classes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>aliases:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#YAML_KEY-constant" title="Kettle::Jem::TemplateChecksums::YAML_KEY (constant)">YAML_KEY</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_stored'>stored</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#CHECKSUMS_SUBKEY-constant" title="Kettle::Jem::TemplateChecksums::CHECKSUMS_SUBKEY (constant)">CHECKSUMS_SUBKEY</a></span></span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_stored'>stored</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_stored'>stored</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span>
+  <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="replace_top_level_yaml_block-class_method">
+  
+    .<strong>replace_top_level_yaml_block</strong>(content, key, replacement)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1394
+1395
+1396
+1397
+1398
+1399
+1400
+1401
+1402
+1403
+1404
+1405
+1406
+1407
+1408
+1409
+1410
+1411
+1412
+1413</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1394</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_replace_top_level_yaml_block'>replace_top_level_yaml_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_replacement'>replacement</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
+  <span class='id identifier rubyid_document'>document</span> <span class='op'>=</span> <span class='const'>Psych</span><span class='period'>.</span><span class='id identifier rubyid_parse_stream'>parse_stream</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+  <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_document'>document</span><span class='op'>&amp;.</span><span class='id identifier rubyid_root'>root</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_content'>content</span> <span class='kw'>unless</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Psych</span><span class='op'>::</span><span class='const'>Nodes</span><span class='op'>::</span><span class='const'>Mapping</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_pairs'>pairs</span> <span class='op'>=</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_each_slice'>each_slice</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+  <span class='id identifier rubyid_pairs'>pairs</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='lparen'>(</span><span class='id identifier rubyid_key_node'>key_node</span><span class='comma'>,</span> <span class='id identifier rubyid_value_node'>value_node</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_key_node'>key_node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Psych</span><span class='op'>::</span><span class='const'>Nodes</span><span class='op'>::</span><span class='const'>Scalar</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_key_node'>key_node</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>==</span> <span class='id identifier rubyid_key'>key</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+
+    <span class='id identifier rubyid_next_key'>next_key</span> <span class='op'>=</span> <span class='id identifier rubyid_pairs'>pairs</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span>
+    <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_next_key'>next_key</span><span class='op'>&amp;.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>||</span> <span class='id identifier rubyid_value_node'>value_node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
+    <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>+=</span> <span class='int'>1</span> <span class='kw'>if</span> <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_key_node'>key_node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
+    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='op'>*</span><span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_key_node'>key_node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_replacement'>replacement</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_end_line'>end_line</span><span class='op'>..</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_content'>content</span>
+<span class='kw'>rescue</span> <span class='const'>Psych</span><span class='op'>::</span><span class='const'>Exception</span>
+  <span class='id identifier rubyid_content'>content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="summary-class_method">
+  
+    .<strong>summary</strong>(diff)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1354
+1355
+1356
+1357
+1358
+1359
+1360
+1361
+1362
+1363</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1354</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_summary'>summary</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_count'>count</span> <span class='op'>=</span> <span class='id identifier rubyid_diff_count'>diff_count</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no template files changed since last run</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_zero?'>zero?</span>
+
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:added</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> added</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:added</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> changed</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+  <span class='id identifier rubyid_parts'>parts</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:removed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> removed</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:removed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_count'>count</span><span class='embexpr_end'>}</span><span class='tstring_content'> template file(s) since last run: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_parts'>parts</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="write_to_config-class_method">
+  
+    .<strong>write_to_config</strong>(config_path:, checksums:, version: nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1384
+1385
+1386
+1387
+1388
+1389
+1390
+1391
+1392</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1384</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_write_to_config'>write_to_config</span><span class='lparen'>(</span><span class='label'>config_path:</span><span class='comma'>,</span> <span class='label'>checksums:</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_new_block'>new_block</span> <span class='op'>=</span> <span class='id identifier rubyid_build_yaml_block'>build_yaml_block</span><span class='lparen'>(</span><span class='label'>checksums:</span> <span class='id identifier rubyid_checksums'>checksums</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='id identifier rubyid_version'>version</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_updated'>updated</span> <span class='op'>=</span> <span class='id identifier rubyid_replace_top_level_yaml_block'>replace_top_level_yaml_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#YAML_KEY-constant" title="Kettle::Jem::TemplateChecksums::YAML_KEY (constant)">YAML_KEY</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_new_block'>new_block</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_updated'>updated</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_new_block'>new_block</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_updated'>updated</span> <span class='op'>==</span> <span class='id identifier rubyid_content'>content</span>
+  <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='id identifier rubyid_updated'>updated</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Wed May 27 11:33:10 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

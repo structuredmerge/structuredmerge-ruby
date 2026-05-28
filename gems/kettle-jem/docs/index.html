@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg" alt="kettle-jem Logo by Aboling0, CC BY-SA 4.0"></a></p>
+
+<h1 id="-kettlejem">🔮 Kettle::Jem</h1>
+
+<p><a href="https://bestgems.org/gems/kettle-jem"><img src="https://img.shields.io/gem/v/kettle-jem.svg" alt="Version"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases"><img src="https://img.shields.io/github/tag/structuredmerge/structuredmerge-ruby.svg" alt="GitHub tag (latest SemVer)"></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://bestgems.org/gems/kettle-jem"><img src="https://img.shields.io/gem/rd/kettle-jem.svg" alt="Downloads Rank"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml/badge.svg" alt="CI Current"></a></p>
+
+<p><code>if ci_badges.map(&amp;:color).detect { it != "green"}</code> ☝️ <a href="https://discord.gg/3qme4XHNKN">let me know</a>, as I may have missed the <a href="https://discord.gg/3qme4XHNKN">discord notification</a>.</p>
+
+<hr>
+
+<p><code>if ci_badges.map(&amp;:color).all? { it == "green"}</code> 👇️ send money so I can do more of this. FLOSS maintenance is now my full-time job.</p>
+
+<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://polar.sh/pboling"><img src="https://img.shields.io/badge/polar-donate-a51611.svg?style=flat" alt="Donate on Polar"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
+
+<details>
+ <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
+
+I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo).
+
+</details>
+
+<h2 id="-synopsis">🌻 Synopsis</h2>
+
+<p>Kettle::Jem is an AST-aware gem templating system that keeps hundreds of Ruby gems<br>
+in sync with a shared template while preserving each project’s customizations.<br>
+Unlike line-based copy/merge tools, Kettle::Jem understands the <em>structure</em> of<br>
+every file it touches — Ruby via Prism, YAML via Psych, Markdown via Markly,<br>
+TOML via tree-sitter, and more — so template updates land precisely where they<br>
+belong, and project-specific additions are never clobbered.</p>
+
+<p>Plugin authors can now use the dedicated <a href="KETTLE_JEM_PLUGINS.md">plugin authoring guide</a><br>
+to build <code>kettle-jem</code> extension gems against the supported plugin seam.</p>
+
+<h3 id="key-features">Key Features</h3>
+
+<ul>
+  <li>
+<strong>AST-aware merging</strong> — 10 format-specific merge engines (prism, psych, markly, toml, json, jsonc, bash, dotenv, rbs, text)</li>
+  <li>
+<strong>Token substitution</strong> — <code>{KJ|TOKEN}</code> patterns resolved from config, ENV, or auto-derived from gemspec</li>
+  <li>
+<strong>Freeze blocks</strong> — protect any section from template overwrites with <code># kettle-jem:freeze</code> / <code># kettle-jem:unfreeze</code>
+</li>
+  <li>
+<strong>Per-file strategies</strong> — <code>merge</code>, <code>accept_template</code>, <code>keep_destination</code>, or <code>raw_copy</code>
+</li>
+  <li>
+<strong>Multi-phase pipeline</strong> — 11 ordered phases (service_actor-based) from config sync through duplicate checking</li>
+  <li>
+<strong>SHA-pinned GitHub Actions</strong> — template <code>uses:</code> always wins, propagating immutable SHAs</li>
+  <li>
+<strong>Convergence in one pass</strong> — a single <code>kettle-jem install</code> applies all changes; a second run produces zero diff</li>
+  <li>
+<strong>Selftest divergence check</strong> — CI verifies that project drift stays within a configurable threshold</li>
+</ul>
+
+<h2 id="-info-you-can-shake-a-stick-at">💡 Info you can shake a stick at</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tokens to Remember</th>
+      <th>
+<a href="https://bestgems.org/gems/kettle-jem"><img src="https://img.shields.io/badge/name-kettle--jem-3C2D2D.svg?style=square&amp;logo=rubygems&amp;logoColor=red" alt="Gem name"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/namespace-Kettle::Jem-3C2D2D.svg?style=square&amp;logo=ruby&amp;logoColor=white" alt="Gem namespace"></a>
+</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Works with MRI Ruby 4</td>
+      <td>
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Ruby 4.0 Compat"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Support &amp; Community</td>
+      <td>
+<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Source</td>
+      <td>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=Github&amp;logoColor=green" alt="Source on Github.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Documentation</td>
+      <td>
+<a href="http://rubydoc.info/gems/kettle-jem"><img src="https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="Current release on RubyDoc.info"></a> <a href="https://kettle-jem.galtzo.com"><img src="https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="YARD on Galtzo.com"></a> <a href="http://www.railsbling.com/tags/kettle-jem"><img src="https://img.shields.io/badge/blog-railsbling-0093D0.svg?style=for-the-badge&amp;logo=rubyonrails&amp;logoColor=orange" alt="Maintainer Blog"></a> <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/wikis/home"><img src="https://img.shields.io/badge/wiki-gitlab-943CD2.svg?style=for-the-badge&amp;logo=gitlab&amp;logoColor=white" alt="GitLab Wiki"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/wiki"><img src="https://img.shields.io/badge/wiki-github-943CD2.svg?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="GitHub Wiki"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Compliance</td>
+      <td>
+<a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://www.apache.org/legal/resolved.html#category-x"><img src="https://img.shields.io/badge/Apache_Incompatible:_Category_X-%E2%9C%97-C0392B.svg?style=flat&amp;logo=Apache" alt="Apache license compatibility: Category X"></a> <a href="https://www.ilo.org/declaration/lang--en/index.htm"><img src="https://img.shields.io/badge/ILO_Fundamental_Principles-%E2%9C%93-259D6C.svg?style=flat" alt="📄ilo-declaration-img"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/security-policy-259D6C.svg?style=flat" alt="Security Policy"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg" alt="Contributor Covenant 2.1"></a> <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="SemVer 2.0.0"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>
+<a href="https://github.com/rubocop-lts/rubocop-lts"><img src="https://img.shields.io/badge/code_style_&amp;_linting-rubocop--lts-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Enforced Code Style Linter"></a> <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep-A-Changelog 1.0.0"></a> <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji_commits-%20%F0%9F%98%9C%20%F0%9F%98%8D-34495e.svg?style=flat-square" alt="Gitmoji Commits"></a> <a href="https://github.com/appraisal-rb/appraisal2"><img src="https://img.shields.io/badge/appraised_by-appraisal2-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Compatibility appraised by: appraisal2"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Maintainer 🎖️</td>
+      <td>
+<a href="http://www.linkedin.com/in/peterboling"><img src="https://img.shields.io/badge/LinkedIn-Profile-0B66C2?style=flat&amp;logo=newjapanprowrestling" alt="Follow Me on LinkedIn"></a> <a href="https://ruby.social/@galtzo"><img src="https://img.shields.io/mastodon/follow/109447111526622197?domain=https://ruby.social&amp;style=flat&amp;logo=mastodon&amp;label=Ruby%20@galtzo" alt="Follow Me on Ruby.Social"></a> <a href="https://bsky.app/profile/galtzo.com"><img src="https://img.shields.io/badge/@galtzo.com-0285FF?style=flat&amp;logo=bluesky&amp;logoColor=white" alt="Follow Me on Bluesky"></a> <a href="http://www.railsbling.com/contact"><img src="https://img.shields.io/badge/Contact-Maintainer-0093D0.svg?style=flat&amp;logo=rubyonrails&amp;logoColor=red" alt="Contact Maintainer"></a> <a href="https://dev.to/galtzo"><img src="https://img.shields.io/badge/dev.to-0A0A0A?style=flat&amp;logo=devdotto&amp;logoColor=white" alt="My technical writing"></a>
+</td>
+    </tr>
+    <tr>
+      <td>
+<code>...</code> 💖</td>
+      <td>
+<a href="https://wellfound.com/u/peter-boling"><img src="https://img.shields.io/badge/peter--boling-orange?style=flat&amp;logo=wellfound" alt="Find Me on WellFound:"></a> <a href="https://www.crunchbase.com/person/peter-boling"><img src="https://img.shields.io/badge/peter--boling-purple?style=flat&amp;logo=crunchbase" alt="Find Me on CrunchBase"></a> <a href="https://linktr.ee/galtzo"><img src="https://img.shields.io/badge/galtzo-purple?style=flat&amp;logo=linktree" alt="My LinkTree"></a> <a href="https://about.me/peter.boling"><img src="https://img.shields.io/badge/about.me-0A0A0A?style=flat&amp;logo=aboutme&amp;logoColor=white" alt="More About Me"></a> <a href="https://codeberg.org/pboling">🧊</a> <a href="https://github.org/pboling">🐙</a> <a href="https://sr.ht/~galtzo/">🛖</a> <a href="https://gitlab.com/pboling">🧪</a>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="compatibility">Compatibility</h3>
+
+<p>Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.<br>
+CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.<br>
+This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle-jem.yml</code> and<br>
+may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
+not practical for the current toolchain.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>🚚 <em>Amazing</em> test matrix was brought to you by</th>
+      <th>🔎 appraisal2 🔎 and the color 💚 green 💚</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>👟 Check it out!</td>
+      <td>✨ <a href="https://github.com/appraisal-rb/appraisal2">github.com/appraisal-rb/appraisal2</a> ✨</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+  <summary>StructuredMerge package family</summary>
+
+  <p>This gem is part of the StructuredMerge Ruby package family. The implementation inventory, layering model, and backend notes live in the <a href="https://github.com/structuredmerge/structuredmerge-ruby#package-family">root package-family guide</a>. Shared behavior is defined by the <a href="https://github.com/structuredmerge/structuredmerge-fixtures">StructuredMerge fixtures</a> and implemented by the <a href="https://github.com/structuredmerge/structuredmerge-go">Go</a>, <a href="https://github.com/structuredmerge/structuredmerge-ruby">Ruby</a>, <a href="https://github.com/structuredmerge/structuredmerge-rust">Rust</a>, and <a href="https://github.com/structuredmerge/structuredmerge-typescript">TypeScript</a> repositories.</p>
+
+</details>
+
+<h3 id="federated-dvcs">Federated DVCS</h3>
+
+<details>
+  <summary>Find this repo on federated forges (Coming soon!)</summary>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Federated <a href="https://railsbling.com/posts/dvcs/put_the_d_in_dvcs/">DVCS</a> Repository</th>
+        <th>Status</th>
+        <th>Issues</th>
+        <th>PRs</th>
+        <th>Wiki</th>
+        <th>CI</th>
+        <th>Discussions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🧪 <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/kettle-jem">structuredmerge/structuredmerge-ruby on GitLab</a>
+</td>
+        <td>The Truth</td>
+        <td><a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/issues">💚</a></td>
+        <td><a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/merge_requests">💚</a></td>
+        <td><a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/wikis/home">💚</a></td>
+        <td>🐭 Tiny Matrix</td>
+        <td>➖</td>
+      </tr>
+      <tr>
+        <td>🧊 <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/kettle-jem">structuredmerge/structuredmerge-ruby on CodeBerg</a>
+</td>
+        <td>An Ethical Mirror (<a href="https://donate.codeberg.org/">Donate</a>)</td>
+        <td><a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/issues">💚</a></td>
+        <td><a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/pulls">💚</a></td>
+        <td>➖</td>
+        <td>⭕️ No Matrix</td>
+        <td>➖</td>
+      </tr>
+      <tr>
+        <td>🐙 <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem">structuredmerge/structuredmerge-ruby on GitHub</a>
+</td>
+        <td>Another Mirror</td>
+        <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">💚</a></td>
+        <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">💚</a></td>
+        <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/wiki">💚</a></td>
+        <td>💯 Full Matrix</td>
+        <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/discussions">💚</a></td>
+      </tr>
+      <tr>
+        <td>🎮️ <a href="https://discord.gg/3qme4XHNKN">Discord Server</a>
+</td>
+        <td><a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a></td>
+        <td><a href="https://discord.gg/3qme4XHNKN">Let’s</a></td>
+        <td><a href="https://discord.gg/3qme4XHNKN">talk</a></td>
+        <td><a href="https://discord.gg/3qme4XHNKN">about</a></td>
+        <td><a href="https://discord.gg/3qme4XHNKN">this</a></td>
+        <td><a href="https://discord.gg/3qme4XHNKN">library!</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+</details>
+
+<h3 id="enterprise-support-">Enterprise Support <a href="https://tidelift.com/subscription/pkg/rubygems-kettle-jem?utm_source=rubygems-kettle-jem&amp;utm_medium=referral&amp;utm_campaign=readme"><img src="https://tidelift.com/badges/package/rubygems/kettle-jem" alt="Tidelift"></a>
+</h3>
+
+<p>Available as part of the Tidelift Subscription.</p>
+
+<details>
+  <summary>Need enterprise-level guarantees?</summary>
+
+  <p>The maintainers of this and thousands of other packages are working with Tidelift to deliver commercial support and maintenance for the open source packages you use to build your applications. Save time, reduce risk, and improve code health, while paying the maintainers of the exact packages you use.</p>
+
+  <p><a href="https://tidelift.com/subscription/pkg/rubygems-kettle-jem?utm_source=rubygems-kettle-jem&amp;utm_medium=referral&amp;utm_campaign=readme"><img src="https://img.shields.io/badge/Tidelift_and_Sonar-Enterprise_Support-FD3456?style=for-the-badge&amp;logo=sonar&amp;logoColor=white" alt="Get help from me on Tidelift"></a></p>
+
+  <ul>
+    <li>💡Subscribe for support guarantees covering <em>all</em> your FLOSS dependencies</li>
+    <li>💡Tidelift is part of <a href="https://blog.tidelift.com/tidelift-joins-sonar">Sonar</a>
+</li>
+    <li>💡Tidelift pays maintainers to maintain the software you depend on!<br>📊<code>@</code>Pointy Haired Boss: An <a href="https://tidelift.com/subscription/pkg/rubygems-kettle-jem?utm_source=rubygems-kettle-jem&amp;utm_medium=referral&amp;utm_campaign=readme">enterprise support</a> subscription is “<a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ">never gonna let you down</a>”, and <em>supports</em> open source maintainers</li>
+  </ul>
+
+  <p>Alternatively:</p>
+
+  <ul>
+    <li><a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a></li>
+    <li><a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a></li>
+    <li><a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a></li>
+  </ul>
+
+</details>
+
+<h2 id="-installation">✨ Installation</h2>
+
+<p>Install the gem and add to the application’s Gemfile by executing:</p>
+
+<pre class="code language-console"><code class="language-console">bundle add kettle-jem
+</code></pre>
+
+<p>If bundler is not being used to manage dependencies, install the gem by executing:</p>
+
+<pre class="code language-console"><code class="language-console">gem install kettle-jem
+</code></pre>
+
+<h2 id="️-configuration">⚙️ Configuration</h2>
+
+<p>Each gem that uses Kettle::Jem has a <code>.kettle-jem.yml</code> file at its root. This file controls<br>
+every aspect of how the template is applied.</p>
+
+<h3 id="minimal-configuration">Minimal Configuration</h3>
+
+<pre class="code language-yaml"><code class="language-yaml">project_emoji: &quot;🔮&quot;
+engines:
+  - ruby
+licenses:
+  - MIT
+tokens:
+  forge:
+    gh_user: &quot;your-username&quot;
+  author:
+    name: &quot;Your Name&quot;
+    email: &quot;you@example.com&quot;
+</code></pre>
+
+<h3 id="full-configuration-reference">Full Configuration Reference</h3>
+
+<pre class="code language-yaml"><code class="language-yaml"># REQUIRED — unique emoji used in badges and gemspec summary
+project_emoji: &quot;🔮&quot;               # ENV override: KJ_PROJECT_EMOJI
+
+# Ruby engines to include in CI matrix (remove to skip)
+engines:
+  - ruby
+  - jruby
+  - truffleruby
+
+# SPDX license identifiers
+licenses:
+  - MIT
+
+# Logo layout in README header: org | project | org_and_project
+readme:
+  top_logo_mode: org
+
+# Bot accounts to exclude from contributor lists
+machine_users:
+  - dependabot
+
+# Maximum allowed divergence (%) for selftest CI check
+min_divergence_threshold: 5       # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
+
+# Default merge behavior applied to all files
+defaults:
+  preference: &quot;template&quot;           # template | destination
+  add_template_only_nodes: true    # add nodes that only exist in template
+  freeze_token: &quot;kettle-jem&quot;       # marker for frozen sections
+
+# Token values for {KJ|TOKEN} substitution
+tokens:
+  forge:
+    gh_user: &quot;github-username&quot;    # ENV override: KJ_GH_USER
+    gl_user: &quot;gitlab-username&quot;    # ENV override: KJ_GL_USER
+    cb_user: &quot;codeberg-username&quot;  # ENV override: KJ_CB_USER
+    sh_user: &quot;sourcehut-user&quot;     # ENV override: KJ_SH_USER
+  author:
+    name: &quot;Full Name&quot;             # ENV override: KJ_AUTHOR_NAME
+    given_names: &quot;Full&quot;           # ENV override: KJ_AUTHOR_GIVEN_NAMES
+    family_names: &quot;Name&quot;          # ENV override: KJ_AUTHOR_FAMILY_NAMES
+    email: &quot;you@example.com&quot;      # ENV override: KJ_AUTHOR_EMAIL
+    domain: &quot;example.com&quot;         # ENV override: KJ_AUTHOR_DOMAIN
+    orcid: &quot;0000-0000-0000-0000&quot;  # ENV override: KJ_AUTHOR_ORCID
+  funding:
+    patreon: &quot;username&quot;           # ENV override: KJ_FUNDING_PATREON
+    kofi: &quot;username&quot;              # ENV override: KJ_FUNDING_KOFI
+    paypal: &quot;username&quot;            # ENV override: KJ_FUNDING_PAYPAL
+    buymeacoffee: &quot;username&quot;      # ENV override: KJ_FUNDING_BUYMEACOFFEE
+    polar: &quot;username&quot;             # ENV override: KJ_FUNDING_POLAR
+    liberapay: &quot;username&quot;         # ENV override: KJ_FUNDING_LIBERAPAY
+    issuehunt: &quot;username&quot;         # ENV override: KJ_FUNDING_ISSUEHUNT
+  social:
+    mastodon: &quot;username&quot;          # ENV override: KJ_SOCIAL_MASTODON
+    bluesky: &quot;user.bsky.social&quot;   # ENV override: KJ_SOCIAL_BLUESKY
+    linktree: &quot;username&quot;          # ENV override: KJ_SOCIAL_LINKTREE
+    devto: &quot;username&quot;             # ENV override: KJ_SOCIAL_DEVTO
+
+# Glob-based overrides (first match wins)
+patterns:
+  - path: &quot;certs/**&quot;
+    strategy: raw_copy
+
+# Per-file overrides
+files:
+  Rakefile:
+    strategy: merge
+    preference: destination        # preserve local tasks
+  AGENTS.md:
+    strategy: accept_template      # always use template version
+</code></pre>
+
+<h3 id="framework-matrix-vs-appraisals">Framework Matrix vs. Appraisals</h3>
+
+<p><code>workflows.preset: framework</code> and <code>workflows.framework_matrix</code> are meant for a<br>
+simple 2D matrix: <strong>Ruby versions × one framework gem/version axis</strong>. This is a<br>
+good fit when you want kettle-jem to generate framework-version modular gemfiles,<br>
+<code>Appraisals</code> entries, and CI matrix entries for a single framework dependency.</p>
+
+<p>If you need a deeper or more complex matrix, prefer<br>
+<strong><code>kettle-jem-appraisals</code></strong>, which generates <code>Appraisals</code> entries and is the<br>
+better fit for Appraisals-style combinations.</p>
+
+<h3 id="strategies">Strategies</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Strategy</th>
+      <th>Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>merge</code></td>
+      <td>Resolve tokens, then AST-merge template + destination (default)</td>
+    </tr>
+    <tr>
+      <td><code>accept_template</code></td>
+      <td>Resolve tokens, overwrite destination with template result</td>
+    </tr>
+    <tr>
+      <td><code>keep_destination</code></td>
+      <td>Skip entirely — no merge, no creation</td>
+    </tr>
+    <tr>
+      <td><code>raw_copy</code></td>
+      <td>Copy bytes as-is — no token resolution, no merge (for binary assets)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="token-substitution">Token Substitution</h3>
+
+<p>Tokens use <code>{KJ|TOKEN}</code> syntax and are resolved in priority order:</p>
+
+<ol>
+  <li>
+<strong>ENV variables</strong> (highest) — e.g., <code>KJ_AUTHOR_NAME</code>
+</li>
+  <li>
+<strong><code>.kettle-jem.yml</code> <code>tokens:</code> section</strong> — explicit values</li>
+  <li>
+<strong>Auto-derived from gemspec</strong> (lowest) — author name, email, domain</li>
+</ol>
+
+<p>Common tokens:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Source</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>{KJ\|GEM_NAME}</code></td>
+      <td>Gem name from gemspec</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|NAMESPACE}</code></td>
+      <td>Ruby module namespace</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|AUTHOR:NAME}</code></td>
+      <td>Author full name</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|AUTHOR:EMAIL}</code></td>
+      <td>Author email</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|GH:USER}</code></td>
+      <td>GitHub username</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|PROJECT_EMOJI}</code></td>
+      <td>Project emoji from config</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|MIN_RUBY}</code></td>
+      <td>Minimum Ruby version</td>
+    </tr>
+    <tr>
+      <td><code>{KJ\|FREEZE_TOKEN}</code></td>
+      <td>Freeze marker name</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="freeze-blocks">Freeze Blocks</h3>
+
+<p>Protect sections in any file from template overwrites:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># kettle-jem:freeze
+gem &quot;my-local-fork&quot;, path: &quot;../custom&quot;
+# kettle-jem:unfreeze
+</code></pre>
+
+<p>Content between freeze/unfreeze markers is always preserved from the destination,<br>
+regardless of what the template contains. Works in all supported formats (Ruby, YAML,<br>
+Markdown, TOML, JSON, Bash, etc.).</p>
+
+<h3 id="merge-engine-selection">Merge Engine Selection</h3>
+
+<p>Kettle::Jem selects the merge engine by file type:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>File Pattern</th>
+      <th>Merge Engine</th>
+      <th>Key Behaviors</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+<code>*.rb</code>, <code>Gemfile</code>, <code>*.gemspec</code>, <code>Rakefile</code>, <code>Appraisals</code>
+</td>
+      <td>Prism::Merge</td>
+      <td>Three-phase matching, gemspec var renaming</td>
+    </tr>
+    <tr>
+      <td>
+<code>*.yml</code>, <code>*.yaml</code>
+</td>
+      <td>Psych::Merge</td>
+      <td>SHA-pinned <code>uses:</code>, per-key preferences</td>
+    </tr>
+    <tr>
+      <td>
+<code>*.md</code>, <code>*.markdown</code>
+</td>
+      <td>Markly::Merge</td>
+      <td>Heading/list matching, inner list merge</td>
+    </tr>
+    <tr>
+      <td><code>*.toml</code></td>
+      <td>Toml::Merge</td>
+      <td>Sort keys, table matching</td>
+    </tr>
+    <tr>
+      <td><code>*.json</code></td>
+      <td>Json::Merge</td>
+      <td>Key-based matching</td>
+    </tr>
+    <tr>
+      <td><code>*.jsonc</code></td>
+      <td>Json::Merge</td>
+      <td>With comment preservation</td>
+    </tr>
+    <tr>
+      <td>
+<code>*.sh</code>, <code>*.bash</code>, <code>.envrc</code>
+</td>
+      <td>Bash::Merge</td>
+      <td>Block matching</td>
+    </tr>
+    <tr>
+      <td><code>.env*</code></td>
+      <td>Dotenv::Merge</td>
+      <td>KEY=value matching</td>
+    </tr>
+    <tr>
+      <td><code>*.rbs</code></td>
+      <td>RBS::Merge</td>
+      <td>Type signature matching</td>
+    </tr>
+    <tr>
+      <td><code>.gitignore</code></td>
+      <td>Text::Merge</td>
+      <td>Intentional line-based merge</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p><strong>No silent fallback:</strong> If a tree-sitter grammar is unavailable for a file<br>
+type that requires AST merging, kettle-jem will <strong>fail</strong> (default) or<br>
+<strong>skip</strong> the file — never silently degrade to text-based merging.<br>
+See <code>PARSE_ERROR_MODE</code> below.</p>
+</blockquote>
+
+<h2 id="-basic-usage">🔧 Basic Usage</h2>
+
+<h3 id="initial-setup">Initial Setup</h3>
+
+<pre class="code language-bash"><code class="language-bash">gem install kettle-jem
+cd my-gem
+kettle-jem
+</code></pre>
+
+<p>The setup CLI runs a two-phase bootstrap:</p>
+
+<ol>
+  <li>
+<strong>Bootstrap</strong> — creates <code>.kettle-jem.yml</code>, installs modular gemfiles, ensures dev dependencies</li>
+  <li>
+<strong>Bundled</strong> — loads the full runtime and runs <code>kettle-jem install</code>
+</li>
+</ol>
+
+<h3 id="applying-template-updates">Applying Template Updates</h3>
+
+<p>After initial setup, re-run the template process to pull in updates:</p>
+
+<pre class="code language-bash"><code class="language-bash">K_JEM_TEMPLATING=true bundle exec kettle-jem install
+</code></pre>
+
+<p>This applies all template phases, then runs the local finishing steps such as<br>
+<code>bin/setup</code>, curated binstub generation, hooks, and lockfile normalization.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Phase</th>
+      <th>Description</th>
+      <th>Files Affected</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Config sync</td>
+      <td><code>.kettle-jem.yml</code></td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>Dev container</td>
+      <td><code>.devcontainer/</code></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>GitHub workflows</td>
+      <td>
+<code>.github/workflows/</code>, <code>FUNDING.yml</code>
+</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>Quality config</td>
+      <td><code>.qlty/qlty.toml</code></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>Modular gemfiles</td>
+      <td><code>gemfiles/modular/</code></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>Spec helper</td>
+      <td><code>spec/spec_helper.rb</code></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>Environment templates</td>
+      <td><code>.env.local.example</code></td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>Remaining files</td>
+      <td>gemspec, README, LICENSE, Rakefile, …</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>Git hooks</td>
+      <td><code>.git-hooks/</code></td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>License files</td>
+      <td><code>LICENSE*</code></td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>Duplicate check</td>
+      <td><em>(validation only)</em></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Each phase is implemented as a composable <a href="https://github.com/sunny/actor">service_actor</a><br>
+actor, enabling per-phase statistics (📄 templates, 🆕 created, 📋 pre-existing,<br>
+🟰 identical, ✏️ changed) and future slice-based workflows.</p>
+
+<h3 id="checking-divergence">Checking Divergence</h3>
+
+<p>CI can verify that a project hasn’t drifted too far from the template:</p>
+
+<pre class="code language-bash"><code class="language-bash">bundle exec rake kettle:jem:selftest
+</code></pre>
+
+<p>This re-applies the template in a temporary checkout and measures the diff.<br>
+Output is condensed to two summary lines after the template run:</p>
+
+<pre class="code ruby"><code class="ruby">[selftest] 📄  Report - tmp/template_test/report/summary.md
+[selftest] ✅  Score: 100.0% · Divergence: 0.0% · Threshold: fail when divergence reaches 5.0%
+</code></pre>
+
+<p>If divergence exceeds <code>min_divergence_threshold</code> (default 5%), the check fails.</p>
+
+<h3 id="workflow-specific-options">Workflow-Specific Options</h3>
+
+<p>For GitHub Actions workflows, the template always wins for <code>uses:</code> lines<br>
+(SHA-pinned action references) while destination wins for job configuration:</p>
+
+<pre class="code language-yaml"><code class="language-yaml"># Template updates this SHA automatically:
+uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+# Your matrix customizations are preserved:
+matrix:
+  ruby: [&quot;3.2&quot;, &quot;3.3&quot;, &quot;3.4&quot;]
+</code></pre>
+
+<h3 id="per-file-overrides">Per-File Overrides</h3>
+
+<p>Override merge behavior for specific files in <code>.kettle-jem.yml</code>:</p>
+
+<pre class="code language-yaml"><code class="language-yaml">files:
+  Rakefile:
+    strategy: merge
+    preference: destination     # keep your custom tasks
+  certs/my.pem:
+    strategy: raw_copy          # binary file, no merging
+  generated/report.md:
+    strategy: keep_destination  # never touch this file
+</code></pre>
+
+<h3 id="environment-variables--cli-options">Environment Variables &amp; CLI Options</h3>
+
+<p>Kettle::Jem behavior is controlled via environment variables (which double as<br>
+Rake task arguments) and CLI flags passed to <code>kettle-jem setup</code>.</p>
+
+<h4 id="merge--error-handling">Merge &amp; Error Handling</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>CLI Flag</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>FAILURE_MODE</code></td>
+      <td><code>--failure-mode=VAL</code></td>
+      <td><code>error</code></td>
+      <td>How general merge failures are handled. <code>error</code> raises and halts; <code>rescue</code> logs a warning and uses unmerged content.</td>
+    </tr>
+    <tr>
+      <td><code>PARSE_ERROR_MODE</code></td>
+      <td>—</td>
+      <td><code>fail</code></td>
+      <td>How AST parser unavailability is handled. <code>fail</code> raises immediately (recommended); <code>skip</code> warns and preserves the destination file unchanged. <strong>There is no text-merge fallback</strong> — AST merge or nothing.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="task-control">Task Control</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>CLI Flag</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>allowed</code></td>
+      <td><code>--allowed=VAL</code></td>
+      <td><code>true</code></td>
+      <td>Set to <code>false</code>/<code>0</code>/<code>no</code> to require manual review of env file changes before continuing.</td>
+    </tr>
+    <tr>
+      <td>—</td>
+      <td><code>--interactive</code></td>
+      <td><em>(off)</em></td>
+      <td>Enable interactive prompts (opt-in). Overrides the default non-interactive behavior.</td>
+    </tr>
+    <tr>
+      <td><code>KETTLE_JEM_VERBOSE</code></td>
+      <td><code>--verbose</code></td>
+      <td><code>false</code></td>
+      <td>Show detailed output including per-file messages and setup progress. Overrides the default quiet behavior.</td>
+    </tr>
+    <tr>
+      <td><code>only</code></td>
+      <td><code>--only=VAL</code></td>
+      <td><em>(all)</em></td>
+      <td>Comma-separated glob patterns — only template files matching at least one pattern are processed.</td>
+    </tr>
+    <tr>
+      <td><code>include</code></td>
+      <td><code>--include=VAL</code></td>
+      <td><em>(all)</em></td>
+      <td>Comma-separated glob patterns — additional files to include beyond the default set.</td>
+    </tr>
+    <tr>
+      <td><code>hook_templates</code></td>
+      <td><code>--hook_templates=VAL</code></td>
+      <td><em>(prompt)</em></td>
+      <td>Git hook install location: <code>l</code>/<code>local</code>, <code>g</code>/<code>global</code>, or <code>n</code>/<code>none</code>. Also via <code>KETTLE_DEV_HOOK_TEMPLATES</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="config--identity-kj_-prefix">Config &amp; Identity (KJ_ prefix)</h4>
+
+<p>These map directly to <code>.kettle-jem.yml</code> keys, seed freshly created configs,<br>
+fill missing keys during config sync, and act as runtime overrides.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>KJ_PROJECT_EMOJI</code></td>
+      <td>Project identifying emoji (e.g. <code>🪙</code>). Required in config.</td>
+    </tr>
+    <tr>
+      <td><code>KJ_MIN_DIVERGENCE_THRESHOLD</code></td>
+      <td>Selftest divergence threshold for <code>min_divergence_threshold</code>.</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_NAME</code></td>
+      <td>Gem author full name</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_EMAIL</code></td>
+      <td>Gem author email</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_DOMAIN</code></td>
+      <td>Author website domain (derived from email if unset)</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_GIVEN_NAMES</code></td>
+      <td>First/given names</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_FAMILY_NAMES</code></td>
+      <td>Last/family names</td>
+    </tr>
+    <tr>
+      <td><code>KJ_AUTHOR_ORCID</code></td>
+      <td>ORCID identifier</td>
+    </tr>
+    <tr>
+      <td><code>KJ_GH_USER</code></td>
+      <td>GitHub username</td>
+    </tr>
+    <tr>
+      <td><code>KJ_GL_USER</code></td>
+      <td>GitLab username</td>
+    </tr>
+    <tr>
+      <td><code>KJ_CB_USER</code></td>
+      <td>Codeberg username</td>
+    </tr>
+    <tr>
+      <td><code>KJ_SH_USER</code></td>
+      <td>SourceHut username</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="workspace--funding">Workspace &amp; Funding</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Variable</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>KETTLE_RB_DEV</code></td>
+      <td>Workspace root for local sibling gems. <code>true</code> = <code>~/src/kettle-rb</code>; a path = that path; unset/<code>false</code> = released gems.</td>
+    </tr>
+    <tr>
+      <td><code>KETTLE_DEV_DEBUG</code></td>
+      <td>Set to <code>true</code> for verbose debug output.</td>
+    </tr>
+    <tr>
+      <td><code>FUNDING_ORG</code></td>
+      <td>OpenCollective organization handle for FUNDING.yml. Auto-derived from git remote if unset.</td>
+    </tr>
+    <tr>
+      <td><code>OPENCOLLECTIVE_HANDLE</code></td>
+      <td>Alternative to <code>FUNDING_ORG</code> for personal OpenCollective pages.</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_PATREON</code></td>
+      <td>Patreon handle for FUNDING.yml</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_KOFI</code></td>
+      <td>Ko-fi handle for FUNDING.yml</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_PAYPAL</code></td>
+      <td>PayPal handle for FUNDING.yml</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_BUYMEACOFFEE</code></td>
+      <td>Buy Me a Coffee handle for funding links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_POLAR</code></td>
+      <td>Polar handle for funding links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_LIBERAPAY</code></td>
+      <td>Liberapay handle for funding links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_FUNDING_ISSUEHUNT</code></td>
+      <td>IssueHunt handle for funding links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_SOCIAL_MASTODON</code></td>
+      <td>Mastodon handle for social/profile links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_SOCIAL_BLUESKY</code></td>
+      <td>Bluesky handle for social/profile links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_SOCIAL_LINKTREE</code></td>
+      <td>Linktree handle for social/profile links</td>
+    </tr>
+    <tr>
+      <td><code>KJ_SOCIAL_DEVTO</code></td>
+      <td>DEV Community handle for social/profile links</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="templating-examples">Templating Examples</h4>
+
+<pre class="code language-bash"><code class="language-bash"># Standard template update (quiet, non-interactive — the default)
+K_JEM_TEMPLATING=true bundle exec kettle-jem install
+
+# Verbose output
+K_JEM_TEMPLATING=true KETTLE_JEM_VERBOSE=true bundle exec kettle-jem install
+
+# Interactive mode (prompts before each change)
+K_JEM_TEMPLATING=true bundle exec kettle-jem install --interactive
+
+# Only workflow files, skip unparseable. Scoped template runs skip install
+# finishing steps and are intended for surgical file updates.
+K_JEM_TEMPLATING=true PARSE_ERROR_MODE=skip bundle exec kettle-jem template --only=&quot;.github/**&quot;
+
+# Rescue on merge failure (don&#39;t halt)
+K_JEM_TEMPLATING=true FAILURE_MODE=rescue bundle exec kettle-jem install
+</code></pre>
+
+<p>The <code>kettle:jem:*</code> rake tasks are internal targets used by the executable after<br>
+it prepares the templating environment; call <code>kettle-jem</code> directly for normal<br>
+templating work.</p>
+
+<h2 id="-security">🔐 Security</h2>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+
+<h2 id="-contributing">🤝 Contributing</h2>
+
+<p>If you need some ideas of where to help, you could work on adding more code coverage,<br>
+or if it is already 💯 (see <a href="#code-coverage">below</a>) check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>,<br>
+or use the gem and think about how it could be better.</p>
+
+<p>We <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep A Changelog"></a> so if you make changes, remember to update it.</p>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more detailed instructions.</p>
+
+<h3 id="-release-instructions">🚀 Release Instructions</h3>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+
+<h3 id="code-coverage">Code Coverage</h3>
+
+<details>
+  <summary>Coverage service badges</summary>
+
+</details>
+
+<h3 id="-code-of-conduct">🪇 Code of Conduct</h3>
+
+<p>Everyone interacting with this project’s codebases, issue trackers,<br>
+chat rooms and mailing lists agrees to follow the <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg" alt="Contributor Covenant 2.1"></a>.</p>
+
+<h2 id="-contributors">🌈 Contributors</h2>
+
+<p><a href="https://github.com/structuredmerge/structuredmerge-ruby/graphs/contributors"><img src="https://contrib.rocks/image?repo=structuredmerge/structuredmerge-ruby" alt="Contributors"></a></p>
+
+<p>Made with <a href="https://contrib.rocks">contributors-img</a>.</p>
+
+<p>Also see GitLab Contributors: <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main">https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main</a></p>
+
+<details>
+ <summary>⭐️ Star History</summary>
+
+<a href="https://star-history.com/structuredmerge/structuredmerge-ruby&amp;Date">
+ <picture>
+ <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date&amp;theme=dark"></source>
+ <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date"></source>
+ <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date">
+ </picture>
+</a>
+
+</details>
+
+<h2 id="-versioning">📌 Versioning</h2>
+
+<p>This library follows <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="Semantic Versioning 2.0.0"></a> for its public API where practical.<br>
+For most applications, prefer the <a href="http://guides.rubygems.org/patterns/#pessimistic-version-constraint">Pessimistic Version Constraint</a> with two digits of precision.</p>
+
+<p>For example:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">spec.add_dependency(&quot;kettle-jem&quot;, &quot;~&gt; 7.0&quot;)
+</code></pre>
+
+<details>
+  <summary>📌 Is "Platform Support" part of the public API? More details inside.</summary>
+
+  <p>Dropping support for a platform can be a breaking change for affected users.
+If a release changes supported platforms, it should be called out clearly in the changelog and versioned with that impact in mind.</p>
+
+  <p>To get a better understanding of how SemVer is intended to work over a project’s lifetime,
+read this article from the creator of SemVer:</p>
+
+  <ul>
+    <li><a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">“Major Version Numbers are Not Sacred”</a></li>
+  </ul>
+
+</details>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CHANGELOG.md">CHANGELOG.md</a> for a list of releases.</p>
+
+<h2 id="-license">📄 License</h2>
+
+<p>The gem is available under the following licenses: <a href="AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
+See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
+
+<p>If none of the available licenses suit your use case, please <a href="mailto:floss@galtzo.com">contact us</a> to discuss a custom commercial license.</p>
+
+<h3 id="-copyright">© Copyright</h3>
+
+<p>See <a href="LICENSE.md">LICENSE.md</a> for the official copyright notice.</p>
+
+<details>
+  <summary>Copyright holders</summary>
+
+  <ul>
+    <li>Required Notice: Copyright (c) 2026 Peter H. Boling</li>
+  </ul>
+
+</details>
+
+<h2 id="-a-request-for-help">🤑 A request for help</h2>
+
+<p>Maintainers have teeth and need to pay their dentists.<br>
+After getting laid off in an RIF in March, and encountering difficulty finding a new one,<br>
+I began spending most of my time building open source tools.<br>
+I’m hoping to be able to pay for my kids’ health insurance this month,<br>
+so if you value the work I am doing, I need your support.<br>
+Please consider sponsoring me or the project.</p>
+
+<p>To join the community or get help 👇️ Join the Discord.</p>
+
+<p><a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a></p>
+
+<p>To say “thanks!” ☝️ Join the Discord or 👇️ send money.</p>
+
+<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling-blue?style=for-the-badge&amp;logo=github" alt="Sponsor me on GitHub Sponsors"></a> 💌 <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?style=for-the-badge&amp;logo=liberapay&amp;color=a51611" alt="Sponsor me on Liberapay"></a> 💌 <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=for-the-badge&amp;logo=paypal&amp;color=0A0A0A" alt="Donate on PayPal"></a></p>
+
+<h3 id="please-give-the-project-a-star--">Please give the project a star ⭐ ♥.</h3>
+
+<p>Thanks for RTFM. ☺️</p>
+
+<!-- kettle-jem:metadata:start -->
+<p>| Field | Value |<br>
+|—|—|<br>
+| Package | kettle-jem |<br>
+| Description | 🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold. |<br>
+| Homepage | https://github.com/structuredmerge/structuredmerge-ruby |<br>
+| Source | https://github.com/structuredmerge/structuredmerge-ruby/tree/v7.0.0 |<br>
+| License | <code>AGPL-3.0-only</code> OR <code>PolyForm-Small-Business-1.0.0</code> |<br>
+| Funding | https://github.com/sponsors/pboling, https://issuehunt.io/u/pboling, https://ko-fi.com/pboling, https://liberapay.com/pboling/donate, https://patreon.com/galtzo, https://polar.sh/pboling, https://thanks.dev/u/gh/pboling, https://tidelift.com/funding/github/rubygems/kettle-jem, https://www.buymeacoffee.com/pboling |<br>
+<!-- kettle-jem:metadata:end --></p>
+</div></div>
+
+      <div id="footer">
+  Generated on Wed May 27 11:33:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

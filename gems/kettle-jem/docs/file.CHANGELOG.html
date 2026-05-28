@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: CHANGELOG
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "CHANGELOG";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: CHANGELOG</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="changelog">Changelog</h1>
+
+<p><a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-FFDD67.svg?style=flat" alt="SemVer 2.0.0"></a> <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-FFDD67.svg?style=flat" alt="Keep-A-Changelog 1.0.0"></a></p>
+
+<p>All notable changes to this project will be documented in this file.</p>
+
+<p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,<br>
+and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>,<br>
+and <a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">yes</a>, platform and engine support are part of the <a href="https://github.com/semver/semver/issues/716#issuecomment-869336139">public API</a>.<br>
+Please file a bug if you notice a violation of semantic versioning.</p>
+
+<h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD">Unreleased</a></h2>
+
+<h3 id="added">Added</h3>
+
+<ul>
+  <li>Added a default-off <code>readme.badges.fossa</code> template option for managed FOSSA<br>
+README badges.</li>
+  <li>Added explicit <code>ruby.test_minimum</code> template configuration, defaulting to<br>
+Ruby 2.4, for generated CI workflow and Appraisal floors.</li>
+</ul>
+
+<h3 id="changed">Changed</h3>
+
+<ul>
+  <li>Documented <code>kettle-jem install</code> as the canonical full templating entrypoint<br>
+and marked generated <code>kettle:jem:*</code> rake tasks as internal orchestration targets.</li>
+  <li>Bare <code>kettle-jem template</code> now aliases to the full install path; use<br>
+<code>kettle-jem template --only PATH</code> or <code>--include PATH</code> for scoped file updates.</li>
+  <li>
+<code>kettle-jem</code> project fact discovery now uses <code>Kettle::Jem::GemSpecReader</code><br>
+and RubyGems specification objects instead of parsing gemspec source.</li>
+  <li>README and CONTRIBUTING templates now document the effective<br>
+<code>ruby.test_minimum</code> value used when the project was templated.</li>
+  <li>Documented <code>rubygems.min_ruby</code> in the generated <code>.kettle-jem.yml</code> so projects<br>
+can make the published runtime Ruby floor explicit.</li>
+  <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.1.2.</li>
+  <li>Development lockfile generation now uses Bundler 4.0.12.</li>
+  <li>Rake task specs now run from a sandboxed temporary project root.</li>
+</ul>
+
+<h3 id="deprecated">Deprecated</h3>
+
+<h3 id="removed">Removed</h3>
+
+<h3 id="fixed">Fixed</h3>
+
+<ul>
+  <li>Generated <code>bin/yard</code> now routes through <code>bin/rake yard</code> so documentation<br>
+plugins installed by the templated rake task, such as yard-timekeeper, run<br>
+consistently.</li>
+  <li>GemSpec template merging now keeps the greater version requirement between<br>
+template-managed dependencies and destination dependencies, allowing newer<br>
+destination constraints to remain while still upgrading stale template-owned<br>
+floors.</li>
+  <li>Generated evergreen JRuby workflows now mark the current JRuby and<br>
+<code>dep-heads</code> JRuby jobs experimental, so JRuby 10/arjdbc incompatibilities<br>
+remain visible without blocking release CI.</li>
+  <li>Same-named Appraisal blocks now merge destination-only <code>gem</code> and<br>
+<code>eval_gemfile</code> entries into the templated block, so framework/appraisal tools<br>
+can enrich standard <code>ruby-X-Y</code> appraisals without losing template updates.</li>
+  <li>Standard test Appraisal blocks now include configured<br>
+<code>appraisal_matrix.appraisal_gemfiles</code>, allowing kettle-jem-appraisals to<br>
+model required framework dependencies without duplicating the simple<br>
+framework matrix.</li>
+  <li>Standard Appraisal gemfile injection now skips blocks already enriched by a<br>
+collapsed framework/appraisal matrix dependency gemfile, avoiding duplicate<br>
+broad and version-pinned framework dependency declarations.</li>
+  <li>The generated <code>.kettle-jem.yml</code> keeps <code>Appraisal.root.gemfile</code><br>
+template-owned so stale root-appraisal content is replaced cleanly.</li>
+  <li>Simple <code>workflows.framework_matrix</code> version entries can now target an<br>
+existing appraisal with <code>appraisal</code>, <code>appraisal_name</code>, or<br>
+<code>standard_appraisal</code>, allowing explicit collapse onto standard appraisals.</li>
+  <li>README merge preservation now keeps configured destination-only sections<br>
+instead of dropping them when the packaged README template has no matching<br>
+heading.</li>
+  <li>Added <code>KETTLE_JEM_SKIP_LOCK_NORMALIZATION</code> for self-templating unreleased<br>
+gems whose dependencies cannot yet resolve from remote sources.</li>
+  <li>Added a native <code>Kettle::Jem::GemSpecReader</code> for gemspec metadata so tooling<br>
+built on <code>kettle-jem</code> no longer needs to call into <code>kettle-dev</code> for project<br>
+Ruby floors and gemspec facts.</li>
+  <li>Kept malformed destination gemspecs from leaving template tokens unresolved<br>
+by falling back to filename-derived gem identity inside <code>GemSpecReader</code>.</li>
+  <li>Fixed generated appraisal <code>eval_gemfile</code> paths so Appraisal2 resolves<br>
+modular gemfiles relative to <code>gemfiles/</code> instead of <code>gemfiles/gemfiles/</code>.</li>
+  <li>Fixed generated Appraisals content so it does not end with an extra blank line.</li>
+  <li>Fixed generated version-gem Ruby and RBS files so whole-file template tokens<br>
+do not add an extra blank line at EOF.</li>
+  <li>Fixed generated framework workflow YAML indentation so <code>framework:</code> remains<br>
+under <code>strategy.matrix</code>.</li>
+  <li>Removed duplicate generated <code>spec.homepage</code> assignments when destination<br>
+gemspecs already carry the configured homepage.</li>
+  <li>
+<code>kettle-jem install --hook-templates l</code> now activates the generated<br>
+project-local <code>.git-hooks</code> by setting <code>core.hooksPath</code> to <code>.git-hooks</code> and<br>
+ensuring the generated hook scripts are executable.</li>
+  <li>Removed stale <code>continue-on-error</code> handling from the generated style workflow<br>
+so RuboCop Gradual failures are enforced by default.</li>
+  <li>Removed stale <code>continue-on-error</code> handling from the generated current workflow.</li>
+  <li>Marked generated workflow files as template-owned by default to prevent stale<br>
+YAML keys from surviving future template runs.</li>
+  <li>Replaced generated Appraisal workflow matrix Gemfile indirection with a<br>
+fixed <code>Appraisal.root.gemfile</code> job environment so Appraisal never falls back<br>
+to the root development <code>Gemfile</code>.</li>
+  <li>Changed packaged GitHub workflow templates to whole-file replacement so stale<br>
+job steps from older matrix formats cannot accumulate beside new steps.</li>
+  <li>Preserved destination coverage thresholds when replacing generated coverage<br>
+workflows.</li>
+  <li>Preserved the current gem in local modular gemfile workspace arrays when the<br>
+generated local dependency wiring needs to include it.</li>
+  <li>Excluded the current gem from generated <code>eval_nomono_gems</code> calls so local<br>
+workspace lists do not conflict with the root <code>gemspec</code> dependency.</li>
+  <li>Excluded already-declared gemspec dependencies from generated local<br>
+<code>eval_nomono_gems</code> calls so local modular gemfiles do not conflict with<br>
+development dependencies declared by the project gemspec.</li>
+  <li>Changed post-template lockfile normalization to run <code>bundle update</code> with<br>
+templating and local sibling overrides disabled, so dependency template<br>
+updates are fully re-resolved against released gems.</li>
+  <li>Added curated <code>rbs</code> and <code>rspec-core</code> binstubs because generated CI templates<br>
+call <code>bin/rbs</code> and <code>bin/rspec</code> directly through appraisals.</li>
+  <li>Updated the generated coverage bundle to require <code>kettle-soup-cover</code> 1.1.3 or newer.</li>
+  <li>Updated the generated documentation bundle to require <code>yard-fence</code> 0.9.1 or newer.</li>
+  <li>Removed <code>--plugin timekeeper</code> from generated <code>.yardopts</code> because<br>
+yard-timekeeper is installed through the rake <code>yard</code> task hook.</li>
+  <li>Escaped generated README metadata table cells so multiline gemspec<br>
+descriptions render with <code>&lt;br&gt;</code> instead of breaking table rows.</li>
+  <li>Updated the generated contributing guide to refresh the <code>REEK</code> backlog with<br>
+<code>bin/rake reek:update</code> instead of redirecting the raw <code>reek</code> executable.</li>
+  <li>Replaced <code>bundle binstubs --all</code> during template install with curated<br>
+binstubs for documented project entrypoints, and prune stale Bundler-generated<br>
+development-tool binstubs such as <code>bin/reek</code>.</li>
+  <li>Added <code>kettle-test</code> to the curated generated binstub set, and preserve<br>
+<code>kettle-drift</code> binstubs when they already exist from local/plugin installs<br>
+without requiring unreleased <code>kettle-drift</code> in every generated gemspec.</li>
+  <li>Added <code>kettle-drift</code> to generated templating Gemfiles, resolved remotely in<br>
+templating mode and via <code>KETTLE_RB_DEV</code> locally, separate from the<br>
+<code>SMORG_RB_DEV</code> StructuredMerge local gem set.</li>
+  <li>Refreshed generated README metadata blocks after template README merging so<br>
+version-derived gemspec metadata such as <code>source_code_uri</code> does not stay stale.</li>
+  <li>Added <code>yard-yaml</code> to generated local documentation Gemfiles so local<br>
+<code>GALTZO_FLOSS_DEV</code> runs match the released documentation plugin set.</li>
+  <li>Updated the generated development dependency on <code>kettle-test</code> to require<br>
+2.0.1 or newer.</li>
+  <li>Updated the generated development dependency on <code>kettle-dev</code> to require<br>
+2.0.1 or newer.</li>
+  <li>Generated framework CI now uses an explicit framework matrix axis instead<br>
+of GitHub Actions <code>include</code> expansion.</li>
+  <li>Scrubbed parent Bundler activation variables before the post-template<br>
+lockfile normalization command runs in the destination project.</li>
+  <li>Preserved multiline heredoc gemspec assignments as whole fields during<br>
+gemspec template merging.</li>
+  <li>Generated two-segment framework requirements as patch-bounded pessimistic<br>
+constraints, e.g. <code>~&gt; 7.0.0</code>, so framework appraisals do not drift to<br>
+later minor versions.</li>
+  <li>Removed generated gemspec development dependencies when the destination<br>
+already declares the same gem as a runtime dependency.</li>
+  <li>Preserved zero-byte generated template outputs such as <code>REEK</code> instead of<br>
+normalizing them to a single blank line.</li>
+  <li>Added <code>workflows.recording</code> to <code>.kettle-jem.yml</code> so generated Appraisals only<br>
+include VCR/WebMock recording gemfiles for projects that opt in.</li>
+  <li>Applied configured <code>rubygems.min_ruby</code> to generated gemspec<br>
+<code>required_ruby_version</code> instead of preserving a stale destination value.</li>
+  <li>VersionGem-managed <code>version.rb</code> and <code>version.rbs</code> packaged template targets<br>
+now default to whole-file replacement, preventing legacy version constants<br>
+from being merged into the generated shape.</li>
+</ul>
+
+<h3 id="security">Security</h3>
+
+<h2 id="700---2026-05-05">
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/0aae485e7ca20583b73f8c146f467a64e526ca41...v7.0.0">7.0.0</a> - 2026-05-05</h2>
+<ul>
+  <li>TAG: <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases/tag/v7.0.0">v7.0.0</a>
+    <h3 id="added-1">Added</h3>
+  </li>
+  <li>Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.</li>
+  <li>Included packaged templates and parser-backed merge support for Ruby gem templating.</li>
+</ul>
+
+</div></div>
+
+      <div id="footer">
+  Generated on Wed May 27 11:33:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>
