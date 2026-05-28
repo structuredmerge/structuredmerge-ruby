@@ -72,7 +72,7 @@ options = {
   gem_names: DEFAULT_GEMS.dup,
   roots: DEFAULT_ROOTS.select { |path| Dir.exist?(path) },
   install: true,
-  template: true,
+  template: false,
   template_args: %w[install --skip-commit],
   template_env: {},
 }
@@ -82,6 +82,7 @@ OptionParser.new do |opts|
 
   opts.on("--destination PATH", "Destination gem to template after installing the local stack.") do |path|
     options[:destination] = File.expand_path(path)
+    options[:template] = true
   end
 
   opts.on("--root PATH", "Add a root whose immediate children may be local gem repos. May be repeated.") do |path|
@@ -102,6 +103,7 @@ OptionParser.new do |opts|
 
   opts.on("--template-only", "Run kettle-jem without rebuilding local gems first.") do
     options[:install] = false
+    options[:template] = true
   end
 
   opts.on("--template-args ARGS", "Arguments passed to kettle-jem. Default: install --skip-commit") do |args|
@@ -206,9 +208,8 @@ if options.fetch(:install)
 end
 
 if options.fetch(:template)
-  destination = options.fetch(:destination) do
-    raise OptionParser::MissingArgument, "--destination is required unless --install-only is used"
-  end
+  destination = options.fetch(:destination)
+  raise OptionParser::MissingArgument, "--destination is required when templating is enabled" if destination.nil?
   raise "Destination does not exist: #{destination}" unless Dir.exist?(destination)
 
   puts "== template #{destination}"
