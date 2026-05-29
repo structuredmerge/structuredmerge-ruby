@@ -7,7 +7,7 @@ require "optparse"
 require "rubygems"
 require "tsort"
 
-RUBY_REPO = File.expand_path("..", __dir__).sub(%r{\A/var/home/}, "/home/")
+RUBY_REPO = File.expand_path("../..", __dir__).sub(%r{\A/var/home/}, "/home/")
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
 KETTLE_JEM_GEMFILE = File.join(GEMS_ROOT, "kettle-jem", "Gemfile")
 ROOT_TEMPLATE_PROFILE = "monorepo-subgem"
@@ -53,7 +53,7 @@ options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: template_ruby_gems.rb [options]"
+  opts.banner = "Usage: 2_template_ruby_gems.rb [options]"
 
   opts.on("--only GEM", "Template only one gem directory.") do |gem_name|
     options[:only] = gem_name

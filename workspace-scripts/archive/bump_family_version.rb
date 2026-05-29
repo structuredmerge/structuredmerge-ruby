@@ -23,7 +23,7 @@ module StructuredMergeRuby
     end
 
     def initialize(argv)
-      @root = Pathname(__dir__).parent.expand_path
+      @root = Pathname(__dir__).parent.parent.expand_path
       @options = {
         dry_run: false,
         check: false,
@@ -67,7 +67,7 @@ module StructuredMergeRuby
 
     def parse_options(argv)
       parser = OptionParser.new do |opts|
-        opts.banner = "Usage: ruby workspace-scripts/bump_family_version.rb VERSION [options]"
+        opts.banner = "Usage: 9_bump_family_version.rb VERSION [options]"
 
         opts.on("--from VERSION", "Require the current family version before bumping") do |version|
           @from_version = version

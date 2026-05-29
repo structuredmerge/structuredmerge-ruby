@@ -12,7 +12,7 @@ require "rubygems"
 require "shellwords"
 require "uri"
 
-RUBY_REPO = File.expand_path("..", __dir__)
+RUBY_REPO = File.expand_path("../..", __dir__)
 
 GEMS = [
   ["tree_haver", "tree_haver", "tree_haver/version", "TreeHaver::Version::VERSION"],
@@ -56,7 +56,7 @@ options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: release_ruby_gems.rb [options]"
+  opts.banner = "Usage: 10_release_ruby_gems.rb [options]"
 
   opts.on("--push", "Push each built gem to RubyGems after local verification (default)") do
     options[:push] = true

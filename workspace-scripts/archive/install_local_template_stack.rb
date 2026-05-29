@@ -9,7 +9,7 @@ require "rubygems"
 require "tsort"
 
 SCRIPT_DIR = File.expand_path(__dir__)
-RUBY_WORKSPACE = File.expand_path("..", SCRIPT_DIR)
+RUBY_WORKSPACE = File.expand_path("../..", SCRIPT_DIR)
 KETTLE_ROOT = File.expand_path("../..", RUBY_WORKSPACE)
 DEFAULT_ROOTS = [
   File.join(RUBY_WORKSPACE, "gems"),
@@ -72,7 +72,7 @@ options = {
 }
 
 OptionParser.new do |opts|
-  opts.banner = "Usage: install_local_template_stack.rb [options]"
+  opts.banner = "Usage: 1_install_local_template_stack.rb [options]"
 
   opts.on("--root PATH", "Add a root whose immediate children may be local gem repos. May be repeated.") do |path|
     options[:roots] << File.expand_path(path)
