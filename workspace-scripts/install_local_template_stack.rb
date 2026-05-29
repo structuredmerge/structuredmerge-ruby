@@ -6,7 +6,6 @@ require "open3"
 require "optparse"
 require "set"
 require "rubygems"
-require "shellwords"
 require "tsort"
 
 SCRIPT_DIR = File.expand_path(__dir__)
@@ -68,22 +67,12 @@ DEFAULT_GEMS = %w[
 ORDER_HINT = DEFAULT_GEMS.each_with_index.to_h.freeze
 
 options = {
-  destination: nil,
   gem_names: DEFAULT_GEMS.dup,
   roots: DEFAULT_ROOTS.select { |path| Dir.exist?(path) },
-  install: true,
-  template: false,
-  template_args: %w[install --skip-commit],
-  template_env: {},
 }
 
 OptionParser.new do |opts|
   opts.banner = "Usage: install_local_template_stack.rb [options]"
-
-  opts.on("--destination PATH", "Destination gem to template after installing the local stack.") do |path|
-    options[:destination] = File.expand_path(path)
-    options[:template] = true
-  end
 
   opts.on("--root PATH", "Add a root whose immediate children may be local gem repos. May be repeated.") do |path|
     options[:roots] << File.expand_path(path)
@@ -97,25 +86,7 @@ OptionParser.new do |opts|
     options[:gem_names] = names
   end
 
-  opts.on("--install-only", "Build and install local gems, but do not run kettle-jem.") do
-    options[:template] = false
-  end
-
-  opts.on("--template-only", "Run kettle-jem without rebuilding local gems first.") do
-    options[:install] = false
-    options[:template] = true
-  end
-
-  opts.on("--template-args ARGS", "Arguments passed to kettle-jem. Default: install --skip-commit") do |args|
-    options[:template_args] = Shellwords.split(args)
-  end
-
-  opts.on("--env KEY=VALUE", "Environment variable for the kettle-jem templating command. May be repeated.") do |pair|
-    key, value = pair.split("=", 2)
-    raise OptionParser::InvalidArgument, "--env requires KEY=VALUE" if key.to_s.empty? || value.nil?
-
-    options[:template_env][key] = value
-  end
+  opts.on("--install-only", "Accepted for compatibility; this script only installs.") {}
 end.parse!
 
 def run!(argv, env: {}, chdir: nil)
@@ -203,16 +174,4 @@ warn "Skipping missing local gems: #{missing.join(", ")}" unless missing.empty?
 selected = options.fetch(:gem_names).uniq & specs_by_name.keys
 ordered = dependency_order(selected, specs_by_name)
 
-if options.fetch(:install)
-  ordered.each { |name| build_and_install(specs_by_name.fetch(name)) }
-end
-
-if options.fetch(:template)
-  destination = options.fetch(:destination)
-  raise OptionParser::MissingArgument, "--destination is required when templating is enabled" if destination.nil?
-  raise "Destination does not exist: #{destination}" unless Dir.exist?(destination)
-
-  puts "== template #{destination}"
-  command = ["kettle-jem", *options.fetch(:template_args)]
-  puts run!(command, env: {"SKIP_GEM_SIGNING" => "true"}.merge(options.fetch(:template_env)), chdir: destination)
-end
+ordered.each { |name| build_and_install(specs_by_name.fetch(name)) }
