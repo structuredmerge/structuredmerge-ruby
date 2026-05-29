@@ -15,7 +15,7 @@ check_drift() {
 
   echo "=== $gem ==="
   mise trust -C "$dir" --quiet 2>/dev/null || true
-  template_dir="$(mise exec -C "$dir" -- bundle exec ruby -e 'require "kettle/jem"; puts Kettle::Jem::DuplicateLineValidator.kettle_template_dir')"
+  template_dir="$(mise exec -C "$dir" -- bundle exec ruby -e 'require "kettle/jem"; puts Kettle::Jem.template_root_path(Dir.pwd)')"
   mise exec -C "$dir" -- bundle exec kettle-drift . --template-dir="$template_dir"
   echo ""
 }
