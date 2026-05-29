@@ -19,9 +19,10 @@ while [[ "$index" -lt "${#args[@]}" ]]; do
   esac
 done
 
-"$SCRIPT_DIR/0_install_local_template_stack.rb"
-"$SCRIPT_DIR/1_template_ruby_gems.rb" "$@"
-"$SCRIPT_DIR/2_check_template_drift.sh" "${family_args[@]}"
-"$SCRIPT_DIR/3_lint_ruby_gems.sh" "${family_args[@]}"
-"$SCRIPT_DIR/4_test_ruby_gems.sh" "${family_args[@]}"
-"$SCRIPT_DIR/5_docs_ruby_gems.sh" "${family_args[@]}"
+"$SCRIPT_DIR/0_bundle_update_ruby_gems.sh" "${family_args[@]}"
+"$SCRIPT_DIR/1_install_local_template_stack.rb"
+"$SCRIPT_DIR/2_template_ruby_gems.rb" "$@"
+"$SCRIPT_DIR/3_check_template_drift.sh" "${family_args[@]}"
+"$SCRIPT_DIR/4_lint_ruby_gems.sh" "${family_args[@]}"
+"$SCRIPT_DIR/5_test_ruby_gems.sh" "${family_args[@]}"
+"$SCRIPT_DIR/6_docs_ruby_gems.sh" "${family_args[@]}"

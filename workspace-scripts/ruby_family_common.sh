@@ -96,6 +96,11 @@ gem_dir_for() {
   printf '%s/%s\n' "$GEMS_ROOT" "$1"
 }
 
+git_relative_path() {
+  local path="$1"
+  realpath --relative-to="$RUBY_WORKSPACE" "$path"
+}
+
 run_for_selected_gems() {
   local callback="$1"
   local seen=false
@@ -109,4 +114,29 @@ run_for_selected_gems() {
     echo "No gems matched selection." >&2
     exit 1
   fi
+}
+
+commit_selected_lockfiles() {
+  local message="$1"
+  shift
+
+  local changed=()
+  local lockfile
+  local relative_lockfile
+  for lockfile in "$@"; do
+    [[ -f "$lockfile" ]] || continue
+    relative_lockfile="$(git_relative_path "$lockfile")"
+    if ! git -C "$RUBY_WORKSPACE" diff --quiet -- "$relative_lockfile" ||
+      ! git -C "$RUBY_WORKSPACE" diff --cached --quiet -- "$relative_lockfile"; then
+      changed+=("$relative_lockfile")
+    fi
+  done
+
+  if [[ "${#changed[@]}" -eq 0 ]]; then
+    echo "NOOP: Gemfile.lock unchanged"
+    return 0
+  fi
+
+  git -C "$RUBY_WORKSPACE" add -- "${changed[@]}"
+  git -C "$RUBY_WORKSPACE" commit -m "$message" --only -- "${changed[@]}"
 }
