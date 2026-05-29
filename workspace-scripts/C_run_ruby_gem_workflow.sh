@@ -26,3 +26,13 @@ done
 "$SCRIPT_DIR/4_lint_ruby_gems.sh" "${family_args[@]}"
 "$SCRIPT_DIR/5_test_ruby_gems.sh" "${family_args[@]}"
 "$SCRIPT_DIR/6_docs_ruby_gems.sh" "${family_args[@]}"
+
+cat <<'NOTE'
+
+Workflow checks completed.
+Run release sequence steps explicitly when ready:
+  7_version_license_ruby_gems.rb
+  8_git_push_ruby_gems.sh
+  9_bump_family_version.rb
+  10_release_ruby_gems.rb
+NOTE
