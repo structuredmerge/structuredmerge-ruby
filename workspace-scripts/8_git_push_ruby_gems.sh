@@ -20,4 +20,11 @@ push_gem() {
 }
 
 run_for_selected_gems push_gem
+
+if [[ -x "$RUBY_WORKSPACE/bin/rake" ]]; then
+  echo "=== monitor ruby monorepo CI ==="
+  (cd "$RUBY_WORKSPACE" && bin/rake ci:act)
+  echo ""
+fi
+
 echo "=== ALL DONE ==="

@@ -53,6 +53,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Monorepo-root templating now applies without a root gemspec, detects root
+  license files ahead of stale config values, installs the generated Rakefile
+  task plumbing, and syncs root Gemfile tooling dependencies without duplicating
+  local nomono declarations.
 - Generated `gemfiles/modular/x_std_libs.gemfile` now selects the extracted
   stdlib dependency set from the active Ruby version, so dependency solvers
   running on Ruby 3.1 do not receive Ruby 4-only stdlib requirements.

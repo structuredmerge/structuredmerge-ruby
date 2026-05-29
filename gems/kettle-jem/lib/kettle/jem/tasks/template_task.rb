@@ -7,7 +7,7 @@ module Kettle
         module_function
 
         def run(project_root: Dir.pwd, env: ENV, run_options: env_run_options(env), command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command))
-          report = if Dir.glob(File.join(project_root.to_s, "*.gemspec")).empty?
+          report = if Dir.glob(File.join(project_root.to_s, "*.gemspec")).empty? && !monorepo_root_profile?(project_root, env, run_options)
             {
               mode: "apply",
               changed_files: [],
@@ -55,6 +55,12 @@ module Kettle
 
         def falsey?(value)
           Kettle::Jem::DecisionPolicy.falsey?(value)
+        end
+
+        def monorepo_root_profile?(project_root, env, run_options)
+          profile = (run_options || {})[:template_profile] || (run_options || {})["template_profile"] || (env || {})["KETTLE_JEM_TEMPLATE_PROFILE"]
+          profile = Kettle::Jem.kettle_jem_config(project_root).dig("templates", "profile") if profile.to_s.empty?
+          Kettle::Jem.normalize_template_profile(profile) == Kettle::Jem::MONOREPO_ROOT_TEMPLATE_PROFILE
         end
       end
     end

@@ -143,8 +143,13 @@ module Kettle
       "CODE_OF_CONDUCT.md",
       "CONTRIBUTING.md",
       "FUNDING.md",
+      "Gemfile",
       "IRP.md",
+      "LICENSE.md",
+      "AGPL-3.0-only.md",
+      "PolyForm-Small-Business-1.0.0.md",
       "RUBOCOP.md",
+      "Rakefile",
       "SECURITY.md",
       ".github/FUNDING.yml",
     ].freeze
@@ -202,6 +207,7 @@ module Kettle
       CODE_OF_CONDUCT
       CONTRIBUTING
       FUNDING
+      IRP
       LICENSE
       README
       RUBOCOP
@@ -243,6 +249,8 @@ module Kettle
     EMPTY_TEMPLATE_TOKENS = %w[
       KJ|CB:USER
       KJ|COPYRIGHT_PREFIX
+      KJ|AUTHOR:DOMAIN
+      KJ|AUTHOR:NAME
       KJ|FUNDING:BUYMEACOFFEE
       KJ|FUNDING:ISSUEHUNT
       KJ|FUNDING:KOFI
@@ -2479,9 +2487,11 @@ module Kettle
       source_url = git_remote_source_url(project_root)
       package_name = repository_name_from_source_url(source_url)
       package_name = File.basename(project_root.to_s) if package_name.empty?
-      license = license_facts(kettle_config, Array(kettle_config["licenses"]), author: {}, author_email: nil, copyright: {})
+      configured_or_detected_licenses = detected_license_ids(project_root)
+      configured_or_detected_licenses = Array(kettle_config["licenses"]) if configured_or_detected_licenses.empty?
       author = author_facts(kettle_config, env)
       copyright = copyright_facts(project_root, kettle_config)
+      license = license_facts(kettle_config.merge("licenses" => configured_or_detected_licenses), configured_or_detected_licenses, author: author, author_email: author[:email], copyright: copyright)
       test_min_ruby = config_test_min_ruby(kettle_config, nil)
       project_runtime = project_runtime_facts(
         kettle_config,
@@ -2511,7 +2521,7 @@ module Kettle
         template_profile: MONOREPO_ROOT_TEMPLATE_PROFILE,
       }
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
-      bootstrap[:licenses] = Array(kettle_config["licenses"]) if bootstrap && kettle_config["licenses"]
+      bootstrap[:licenses] = configured_or_detected_licenses if bootstrap && !configured_or_detected_licenses.empty?
       facts[:kettle_config_bootstrap] = bootstrap if bootstrap
       facts[:author] = author unless author.empty?
       facts[:copyright] = copyright unless copyright.empty?
@@ -2546,9 +2556,10 @@ module Kettle
       )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
       template_facts = {}
+      template_config = template_runtime_config(kettle_config, facts, license: license)
       template_preferences = template_source_preferences(
         project_root,
-        kettle_config,
+        template_config,
         opencollective_disabled: false,
         include_patterns: template_selection[:include],
       )
@@ -3107,7 +3118,77 @@ module Kettle
     def post_apply_steps(project_root, report)
       [
         template_version_gem_bootstrap_step(project_root, report),
+        monorepo_root_gemfile_dependency_sync_step(project_root, report),
       ].compact
+    end
+
+    def monorepo_root_gemfile_dependency_sync_step(project_root, report)
+      facts = report.fetch(:facts)
+      return unless monorepo_root_template_profile?(facts)
+
+      path = File.join(project_root.to_s, "Gemfile")
+      before = File.exist?(path) ? File.read(path) : %(source "https://gem.coop"\n)
+      after = ensure_monorepo_root_gemfile_dependencies(before)
+      File.write(path, after) if after != before
+      {
+        name: "monorepo_root_gemfile_dependency_sync",
+        path: "Gemfile",
+        status: after == before ? "already_current" : "applied",
+        changed_files: after == before ? [] : ["Gemfile"],
+      }
+    end
+
+    def ensure_monorepo_root_gemfile_dependencies(content)
+      updated = ensure_trailing_newline(content.to_s.empty? ? %(source "https://gem.coop"\n) : content.to_s).dup
+      monorepo_root_gemfile_dependency_lines.each do |line|
+        next if gemfile_declares_gem?(updated, line.fetch(:name))
+
+        updated << "\n" unless updated.end_with?("\n\n")
+        updated << line.fetch(:source)
+      end
+      ensure_trailing_newline(updated)
+    end
+
+    def monorepo_root_gemfile_dependency_lines
+      [
+        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.0", ">= 3.0.6"\n)},
+        {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.0", ">= 2.0.5"\n)},
+        {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.1"\n)},
+        {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
+        {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.1"\n)},
+        {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
+        {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
+        {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.3"\n)},
+      ].freeze
+    end
+
+    def gemfile_declares_gem?(content, gem_name)
+      return true if content.to_s.include?(%Q(gemspec path: "gems/#{gem_name}"))
+      return true if content.to_s.include?(%Q(gemspec path: 'gems/#{gem_name}'))
+      # Prism tells us a Gemfile has eval_nomono_gems(...), but this bounded
+      # fallback checks the %w[...] payload so monorepo roots do not duplicate
+      # local workspace declarations already managed by nomono.
+      return true if content.to_s.match?(/\bgems:\s*%w\[[^\]]*\b#{Regexp.escape(gem_name)}\b/m)
+
+      ruby_call_records(content, :gem).any? do |call|
+        call.receiver.nil? && ruby_string_argument(call) == gem_name.to_s
+      end
+    rescue StandardError
+      content.to_s.lines.any? { |line| line.include?(%("#{gem_name}")) || line.include?(%('#{gem_name}')) }
+    end
+
+    def detected_license_ids(project_root)
+      known_license_template_basenames.filter_map do |basename|
+        path = File.join(project_root.to_s, "#{basename}.md")
+        File.exist?(path) ? spdx_from_basename(basename) : nil
+      end.sort
+    end
+
+    def spdx_from_basename(basename)
+      return "LicenseRef-Big-Time-Public-License" if basename.to_s == "Big-Time-Public-License"
+
+      basename.to_s
     end
 
     def template_version_gem_bootstrap_step(project_root, report)
@@ -6477,7 +6558,7 @@ module Kettle
     end
 
     def monorepo_root_file_strategy(entry)
-      if entry.to_s == "CHANGELOG.md"
+      if %w[CHANGELOG.md Gemfile].include?(entry.to_s)
         "keep_destination"
       else
         "accept_template"
@@ -7661,7 +7742,7 @@ module Kettle
 
     def copyright_machine_users(config)
       copyright = config["copyright"].is_a?(Hash) ? config["copyright"] : {}
-      Array(copyright["machine_users"]).map { |user| user.to_s.downcase.strip }.reject(&:empty?)
+      (Array(config["machine_users"]) + Array(copyright["machine_users"])).map { |user| user.to_s.downcase.strip }.reject(&:empty?)
     end
 
     def git_copyright_lines(project_root, machine_users)

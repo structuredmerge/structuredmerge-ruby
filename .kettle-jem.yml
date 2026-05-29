@@ -193,7 +193,8 @@ readme:
 #   - When MIT (or AGPL), a PolyForm variant, AND LicenseRef-Big-Time-Public-License
 #     are all present, a use-case guide table is added to README and LICENSE.md.
 licenses:
-  - MIT
+  - AGPL-3.0-only
+  - PolyForm-Small-Business-1.0.0
 
 # Machine / automation accounts to exclude from generated copyright output.
 #
@@ -230,8 +231,13 @@ templates:
     - CODE_OF_CONDUCT.md
     - CONTRIBUTING.md
     - FUNDING.md
+    - Gemfile
     - IRP.md
+    - LICENSE.md
+    - AGPL-3.0-only.md
+    - PolyForm-Small-Business-1.0.0.md
     - RUBOCOP.md
+    - Rakefile
     - SECURITY.md
     - .github/FUNDING.yml
 
@@ -327,9 +333,19 @@ files:
     strategy: accept_template
   FUNDING.md:
     strategy: accept_template
+  Gemfile:
+    strategy: keep_destination
   IRP.md:
     strategy: accept_template
+  LICENSE.md:
+    strategy: accept_template
+  AGPL-3.0-only.md:
+    strategy: accept_template
+  PolyForm-Small-Business-1.0.0.md:
+    strategy: accept_template
   RUBOCOP.md:
+    strategy: accept_template
+  Rakefile:
     strategy: accept_template
   SECURITY.md:
     strategy: accept_template

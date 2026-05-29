@@ -2202,17 +2202,73 @@ RSpec.describe Kettle::Jem do
         "CODE_OF_CONDUCT.md",
         "CONTRIBUTING.md",
         "FUNDING.md",
+        "Gemfile",
         "IRP.md",
+        "LICENSE.md",
+        "AGPL-3.0-only.md",
+        "PolyForm-Small-Business-1.0.0.md",
         "RUBOCOP.md",
+        "Rakefile",
         "SECURITY.md",
         ".github/FUNDING.yml",
       )
-      expect(config).to include(<<~YAML)
-        files:
-          CHANGELOG.md:
-            strategy: keep_destination
-      YAML
+      expect(config_yaml.dig("files", "CHANGELOG.md", "strategy")).to eq("keep_destination")
+      expect(config_yaml.dig("files", "Gemfile", "strategy")).to eq("keep_destination")
       expect(config.lines.count { |line| line == "  .github:\n" }).to eq(1)
+    end
+  end
+
+  it "templates a monorepo root without a gemspec and syncs root Gemfile tooling dependencies" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-monorepo-root-apply", tmp_root) do |root|
+      write_tree(root, {
+        "AGPL-3.0-only.md" => "AGPL\n",
+        "PolyForm-Small-Business-1.0.0.md" => "PolyForm\n",
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🍲"
+          licenses:
+            - MIT
+          templates:
+            root: packaged
+            apply: true
+            profile: monorepo-root
+            entries:
+              - Gemfile
+              - Rakefile
+              - LICENSE.md
+              - AGPL-3.0-only.md
+              - PolyForm-Small-Business-1.0.0.md
+          files:
+            Gemfile:
+              strategy: keep_destination
+            Rakefile:
+              strategy: accept_template
+        YAML
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec path: "gems/kettle-jem"
+          gem "rake"
+        RUBY
+      })
+
+      report = described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+      rakefile = File.read(File.join(root, "Rakefile"))
+
+      expect(report.fetch(:changed_files)).to include("Gemfile", "LICENSE.md")
+      expect(report.fetch(:facts).dig(:license, :spdx)).to eq(["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"])
+      expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
+      expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.5"')
+      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.1"')
+      expect(rakefile).to include('require "kettle/dev"')
+      expect(rakefile).to include("Kettle::Dev.install_tasks")
     end
   end
 
