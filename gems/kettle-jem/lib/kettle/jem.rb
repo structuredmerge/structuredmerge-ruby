@@ -3133,8 +3133,8 @@ module Kettle
       {
         name: "monorepo_root_gemfile_dependency_sync",
         path: "Gemfile",
-        status: after == before ? "already_current" : "applied",
-        changed_files: after == before ? [] : ["Gemfile"],
+        status: (after == before) ? "already_current" : "applied",
+        changed_files: (after == before) ? [] : ["Gemfile"],
       }
     end
 
@@ -3164,8 +3164,8 @@ module Kettle
     end
 
     def gemfile_declares_gem?(content, gem_name)
-      return true if content.to_s.include?(%Q(gemspec path: "gems/#{gem_name}"))
-      return true if content.to_s.include?(%Q(gemspec path: 'gems/#{gem_name}'))
+      return true if content.to_s.include?(%(gemspec path: "gems/#{gem_name}"))
+      return true if content.to_s.include?(%(gemspec path: 'gems/#{gem_name}'))
       # Prism tells us a Gemfile has eval_nomono_gems(...), but this bounded
       # fallback checks the %w[...] payload so monorepo roots do not duplicate
       # local workspace declarations already managed by nomono.
@@ -5752,12 +5752,12 @@ module Kettle
         # shape immediately preceding Gem::Specification.new.
         line.match?(/\Agem_version\s*=/)
       end
-      return nil unless start_index
+      return unless start_index
 
       gemspec_index = lines.each_with_index.find do |line, index|
         index > start_index && line.include?("Gem::Specification.new")
       end&.last
-      return nil unless gemspec_index
+      return unless gemspec_index
 
       end_line = gemspec_index
       end_line -= 1 while end_line > start_index && lines[end_line - 1].strip.empty?
@@ -8012,7 +8012,7 @@ module Kettle
     end
 
     def gemspec_dependency_from_record(record)
-      Gem::Dependency.new(record.fetch(:name), *record.fetch(:requirements), record.fetch(:kind) == "add_development_dependency" ? :development : :runtime)
+      Gem::Dependency.new(record.fetch(:name), *record.fetch(:requirements), (record.fetch(:kind) == "add_development_dependency") ? :development : :runtime)
     end
 
     def static_gemspec_metadata_assignment(content, key)
