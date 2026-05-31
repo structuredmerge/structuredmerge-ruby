@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated style Gemfiles now include released `rubocop-lts-rspec` in the
+  non-local RuboCop-LTS bundle instead of requiring `rubocop-rspec` directly.
 - Fixed generated documentation URLs for standalone gems so template-owned
   citation and documentation links do not retain monorepo `gems/` paths.
 - Monorepo-root templating now applies without a root gemspec, detects root

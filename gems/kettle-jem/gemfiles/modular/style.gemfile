@@ -19,8 +19,7 @@ platform :mri do
 
   if ENV.fetch("RUBOCOP_LTS_LOCAL", "false").casecmp("false").zero?
     gem "rubocop-lts", "~> 24.1.0"
-    # "rubocop-lts-rspec" can't add here until other gems are updated.
-    gem "rubocop-rspec", "~> 3.6"
+    gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.1"
     gem "rubocop-ruby3_2", "~> 3.0.0"
   else
     eval_gemfile("style_local.gemfile")
