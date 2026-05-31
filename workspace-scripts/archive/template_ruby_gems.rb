@@ -10,7 +10,7 @@ require "tsort"
 RUBY_REPO = File.expand_path("../..", __dir__).sub(%r{\A/var/home/}, "/home/")
 GEMS_ROOT = File.join(RUBY_REPO, "gems")
 KETTLE_JEM_GEMFILE = File.join(GEMS_ROOT, "kettle-jem", "Gemfile")
-ROOT_TEMPLATE_PROFILE = "monorepo-subgem"
+ROOT_TEMPLATE_PROFILE = "monorepo-subgem-release"
 ROOT_REPOSITORY_TOPOLOGY = "monorepo-subproject"
 
 ORDER_HINT = [
@@ -129,7 +129,9 @@ def gemspec_for(gem_dir)
 end
 
 def template_profile_for_gem(gem_name)
-  nil
+  return nil if gem_name == "kettle-jem"
+
+  ROOT_TEMPLATE_PROFILE
 end
 
 def template_run_options_for_gem(gem_dir)
