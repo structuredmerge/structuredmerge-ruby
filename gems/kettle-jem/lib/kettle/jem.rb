@@ -6719,6 +6719,7 @@ module Kettle
       {
         allowed: option_hash.fetch(:allowed, env_hash["allowed"]),
         hook_templates: option_hash.fetch(:hook_templates, env_hash["hook_templates"]),
+        git_drivers: option_hash.fetch(:git_drivers, env_hash["git_drivers"] || env_hash["KETTLE_JEM_GIT_DRIVERS"]),
         only: normalize_list_option(option_hash.fetch(:only, env_hash["only"])),
         include: normalize_list_option(option_hash.fetch(:include, env_hash["include"])),
         template_profile: normalize_template_profile(option_hash.fetch(:template_profile, env_hash["KETTLE_JEM_TEMPLATE_PROFILE"])),

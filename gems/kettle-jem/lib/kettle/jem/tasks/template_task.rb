@@ -19,9 +19,10 @@ module Kettle
           end
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           hook_step = Kettle::Jem::Tasks::InstallTask.hook_templates_step(project_root, run_options)
+          git_drivers_step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(project_root, run_options)
           lock_step = Kettle::Jem::Tasks::InstallTask.normalize_lockfile_step(project_root, env: setup_env, run_options: run_options)
           template_steps = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
-            [hook_step, lock_step],
+            [hook_step, git_drivers_step, lock_step],
             project_root: project_root,
             env: setup_env,
             run_options: run_options,
@@ -38,6 +39,7 @@ module Kettle
             failure_mode: env["FAILURE_MODE"] || env["failure_mode"],
             allowed: env["allowed"],
             hook_templates: env["hook_templates"],
+            git_drivers: env["git_drivers"] || env["KETTLE_JEM_GIT_DRIVERS"],
             only: env["only"],
             include: env["include"],
             skip_commit: truthy?(env["KETTLE_JEM_SKIP_COMMIT"]),

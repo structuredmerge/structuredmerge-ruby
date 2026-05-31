@@ -43,6 +43,7 @@ module Kettle
           install_steps << mise_step if mise_step
           install_steps.concat(post_template_project_fix_steps(project_root, report, env: env))
           install_steps << hook_templates_step(project_root, effective_run_options)
+          install_steps << git_drivers_step(project_root, effective_run_options)
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
@@ -110,6 +111,7 @@ module Kettle
               gemspec_homepage_literal
               env_local_gitignore
               hook_templates
+              git_drivers
               bin_setup_executable
               bin_setup
               bundle_binstubs
@@ -705,6 +707,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "hook_templates"
               execute_hook_templates_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "git_drivers"
+              execute_git_drivers_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bootstrap_commit"
               execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             else
@@ -775,6 +779,117 @@ module Kettle
           return "global" if %w[g global].include?(normalized)
 
           normalized
+        end
+
+        DEFAULT_GIT_DRIVER_DEFINITIONS = [
+          {
+            language: "ruby",
+            pattern: "*.rb",
+            diff: "smorg-ruby",
+            merge: "smorg-ruby",
+            diff_command: "smorg-ruby diff-driver",
+            merge_command: "smorg-ruby merge-driver %O %A %B %P",
+          },
+          {
+            language: "go",
+            pattern: "*.go",
+            diff: "smorg-go",
+            merge: "smorg-go",
+            diff_command: "smorg-go diff-driver",
+            merge_command: "smorg-go merge-driver %O %A %B %P",
+          },
+          {
+            language: "rust",
+            pattern: "*.rs",
+            diff: "smorg-rs",
+            merge: "smorg-rs",
+            diff_command: "smorg-rs diff-driver",
+            merge_command: "smorg-rs merge-driver %O %A %B %P",
+          },
+        ].freeze
+
+        BUILTIN_GIT_DIFF_ATTRIBUTES = [
+          {pattern: "*.rb", attributes: {"diff" => "ruby"}},
+          {pattern: "*.go", attributes: {"diff" => "golang"}},
+          {pattern: "*.rs", attributes: {"diff" => "rust"}},
+        ].freeze
+
+        def git_drivers_step(_project_root, run_options)
+          mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
+          return {
+            name: "git_drivers",
+            status: "skipped",
+            reason: "not_requested",
+            mode: mode,
+          } if mode == "none"
+
+          case mode
+          when "check"
+            {
+              name: "git_drivers",
+              status: "planned",
+              mode: mode,
+              profile: "semantic-diff",
+              scope: "check",
+              reason: "ready_for_git_driver_check",
+            }
+          when "global"
+            {
+              name: "git_drivers",
+              status: "ready",
+              mode: mode,
+              profile: "semantic-diff",
+              scope: "global",
+              commands: git_driver_global_commands,
+              reason: "ready_for_global_git_drivers",
+            }
+          when "builtin-diff"
+            {
+              name: "git_drivers",
+              status: "planned",
+              mode: mode,
+              profile: "builtin-diff",
+              scope: "local",
+              attribute_updates: BUILTIN_GIT_DIFF_ATTRIBUTES,
+              commands: [],
+              reason: "ready_for_builtin_git_attributes",
+            }
+          else
+            {
+              name: "git_drivers",
+              status: "planned",
+              mode: "local",
+              profile: "semantic-diff",
+              scope: "local",
+              attribute_updates: DEFAULT_GIT_DRIVER_DEFINITIONS.map do |definition|
+                {pattern: definition.fetch(:pattern), attributes: {"diff" => definition.fetch(:diff)}}
+              end,
+              commands: [],
+              reason: "ready_for_local_git_driver_attributes",
+            }
+          end
+        end
+
+        def normalize_git_drivers_mode(value)
+          normalized = value.to_s.strip.downcase.tr("_", "-")
+          return "local" if normalized.empty?
+          return "none" if %w[0 false f no n none off skip].include?(normalized)
+          return "local" if %w[1 true t yes y on l local semantic semantic-diff].include?(normalized)
+          return "global" if %w[g global].include?(normalized)
+          return "builtin-diff" if %w[b builtin builtin-diff].include?(normalized)
+          return "check" if normalized == "check"
+
+          normalized
+        end
+
+        def git_driver_global_commands
+          DEFAULT_GIT_DRIVER_DEFINITIONS.flat_map do |definition|
+            [
+              ["git", "config", "--global", "diff.#{definition.fetch(:diff)}.command", definition.fetch(:diff_command)],
+              ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.driver", definition.fetch(:merge_command)],
+              ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.name", "StructuredMerge #{definition.fetch(:language)} merge driver"],
+            ]
+          end
         end
 
         def bundled_handoff_step(project_root:, env:, run_options:)
@@ -863,6 +978,7 @@ module Kettle
           argv.concat(value_arg("--failure-mode", options[:failure_mode]))
           argv.concat(value_arg("--allowed", options[:allowed]))
           argv.concat(value_arg("--hook-templates", options[:hook_templates]))
+          argv.concat(value_arg("--git-drivers", options[:git_drivers]))
           argv.concat(list_arg("--only", options[:only]))
           argv.concat(list_arg("--include", options[:include]))
           argv
@@ -956,6 +1072,10 @@ module Kettle
             exitstatus: result[:exitstatus],
             reason: "executed"
           )
+        end
+
+        def execute_git_drivers_step(step, project_root:, env:, quiet:, command_runner:)
+          execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
         end
 
         def run_system_command(command, chdir:, env:, quiet:)

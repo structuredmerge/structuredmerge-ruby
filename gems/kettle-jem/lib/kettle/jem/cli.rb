@@ -105,6 +105,12 @@ module Kettle
           opts.on("--hook_templates VALUE", "Alias for --hook-templates.") do |value|
             options[:run_options][:hook_templates] = value
           end
+          opts.on("--git-drivers VALUE", "Set Git diff/merge driver setup handling.") do |value|
+            options[:run_options][:git_drivers] = value
+          end
+          opts.on("--git_drivers VALUE", "Alias for --git-drivers.") do |value|
+            options[:run_options][:git_drivers] = value
+          end
           opts.on("--only PATHS", "Restrict templating to comma-separated paths or patterns.") do |value|
             (options[:run_options][:only] ||= []) << value
           end

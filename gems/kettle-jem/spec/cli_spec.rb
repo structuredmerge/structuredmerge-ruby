@@ -146,6 +146,8 @@ RSpec.describe Kettle::Jem::CLI do
         "env",
         "--hook-templates",
         "false",
+        "--git-drivers",
+        "builtin-diff",
         "--quiet",
         "--verbose",
         "--accept-config",
@@ -167,6 +169,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(payload.fetch(:template_selection)).to eq(
         allowed: "env",
         hook_templates: "false",
+        git_drivers: "builtin-diff",
         only: ["Gemfile", "Rakefile"],
         include: ["gemfiles/modular/**"],
         skip_commit: true,

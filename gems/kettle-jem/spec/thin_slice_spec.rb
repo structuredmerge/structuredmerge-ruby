@@ -3482,6 +3482,68 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "plans local semantic Git driver setup by default" do
+    step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {})
+
+    expect(step).to include(
+      name: "git_drivers",
+      status: "planned",
+      mode: "local",
+      profile: "semantic-diff",
+      scope: "local",
+      reason: "ready_for_local_git_driver_attributes",
+    )
+    expect(step.fetch(:attribute_updates)).to include(
+      pattern: "*.rb",
+      attributes: {"diff" => "smorg-ruby"},
+    )
+    expect(step.fetch(:commands)).to eq([])
+  end
+
+  it "plans builtin Git diff attributes when requested" do
+    step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "builtin-diff"})
+
+    expect(step).to include(
+      name: "git_drivers",
+      status: "planned",
+      mode: "builtin-diff",
+      profile: "builtin-diff",
+      scope: "local",
+    )
+    expect(step.fetch(:attribute_updates)).to include(
+      pattern: "*.rb",
+      attributes: {"diff" => "ruby"},
+    )
+  end
+
+  it "plans global Git driver command registration when requested" do
+    step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "global"})
+
+    expect(step).to include(
+      name: "git_drivers",
+      status: "ready",
+      mode: "global",
+      profile: "semantic-diff",
+      scope: "global",
+      reason: "ready_for_global_git_drivers",
+    )
+    expect(step.fetch(:commands)).to include(
+      ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+      ["git", "config", "--global", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+    )
+  end
+
+  it "skips Git driver setup when explicitly disabled" do
+    step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "none"})
+
+    expect(step).to include(
+      name: "git_drivers",
+      status: "skipped",
+      reason: "not_requested",
+      mode: "none",
+    )
+  end
+
   it "reports gemspec dependency sync through the install task" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
