@@ -3168,10 +3168,6 @@ module Kettle
     def gemfile_declares_gem?(content, gem_name)
       return true if content.to_s.include?(%(gemspec path: "gems/#{gem_name}"))
       return true if content.to_s.include?(%(gemspec path: 'gems/#{gem_name}'))
-      # Prism tells us a Gemfile has eval_nomono_gems(...), but this bounded
-      # fallback checks the %w[...] payload so monorepo roots do not duplicate
-      # local workspace declarations already managed by nomono.
-      return true if content.to_s.match?(/\bgems:\s*%w\[[^\]]*\b#{Regexp.escape(gem_name)}\b/m)
 
       ruby_call_records(content, :gem).any? do |call|
         call.receiver.nil? && ruby_string_argument(call) == gem_name.to_s

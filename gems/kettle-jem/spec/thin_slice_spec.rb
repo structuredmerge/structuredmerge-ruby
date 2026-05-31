@@ -2272,6 +2272,56 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "adds released root Gemfile tooling even when local nomono overrides are present" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-monorepo-root-gemfile-released-tooling", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🍲"
+          licenses:
+            - MIT
+          templates:
+            root: packaged
+            apply: true
+            profile: monorepo-root
+            entries:
+              - Gemfile
+          files:
+            Gemfile:
+              strategy: keep_destination
+        YAML
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          unless ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+            require "nomono/bundler"
+
+            eval_nomono_gems(
+              gems: %w[kettle-dev kettle-test],
+              prefix: "KETTLE_RB",
+              path_env: "KETTLE_RB_DEV",
+              vendored_gems_env: "VENDORED_GEMS",
+              vendor_gem_dir_env: "VENDOR_GEM_DIR",
+              debug_env: "KETTLE_DEV_DEBUG",
+            )
+          end
+        RUBY
+      })
+
+      report = described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(report.fetch(:changed_files)).to include("Gemfile")
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.5"')
+      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.1"')
+    end
+  end
+
   it "preserves monorepo root Rakefile tasks during scaffold cleanup" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
