@@ -2019,7 +2019,7 @@ RSpec.describe Kettle::Jem do
       expect(config).to include("project_emoji: 💎\n")
       expect(config_yaml.dig("templates", "root")).to eq("packaged")
       expect(config_yaml.dig("templates", "apply")).to be(true)
-      expect(config_yaml.dig("templates", "profile")).to eq("monorepo-subgem")
+      expect(config_yaml.dig("templates", "profile")).to eq("monorepo-subgem-package")
       expect(config_yaml.dig("templates", "entries")).to include(
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
@@ -2049,6 +2049,51 @@ RSpec.describe Kettle::Jem do
       expect(File).not_to exist(File.join(root, ".github"))
       expect(File).not_to exist(File.join(root, "Gemfile"))
       expect(File).not_to exist(File.join(root, "Rakefile"))
+    end
+  end
+
+  it "bootstraps a monorepo subgem release profile with per-gem harness entries" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-monorepo-subgem-release", tmp_root) do |root|
+      write_tree(root, {
+        "tree_haver.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "tree_haver"
+            spec.summary = "Example gem"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+      })
+
+      setup = described_class.setup_project(
+        root,
+        env: {},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem-release", skip_commit: true},
+      )
+      config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
+      config_yaml = YAML.safe_load(config)
+
+      expect(setup.fetch(:changed_files)).to include(".structuredmerge/kettle-jem.yml")
+      expect(config_yaml.dig("templates", "profile")).to eq("monorepo-subgem-release")
+      expect(config_yaml.dig("templates", "entries")).to include(
+        "Gemfile",
+        "Rakefile",
+        ".rspec",
+        ".simplecov",
+        ".yardopts",
+        ".yardignore",
+        "bin/setup",
+        "spec/spec_helper.rb",
+        "gemfiles/modular/documentation.gemfile",
+      )
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+      expect(apply.fetch(:changed_files)).to include("Gemfile", ".yardopts", ".yardignore", "bin/setup")
+      expect(File).to exist(File.join(root, "Rakefile"))
+      expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File).to exist(File.join(root, ".yardopts"))
     end
   end
 

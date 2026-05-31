@@ -136,7 +136,10 @@ module Kettle
     PACKAGED_TEMPLATE_ROOT = File.expand_path("jem/templates", __dir__)
     COPY_ONLY_WHEN_MISSING_TEMPLATE_PATHS = %w[REEK bin/setup].freeze
     MONOREPO_ROOT_TEMPLATE_PROFILE = "monorepo-root"
-    MONOREPO_SUBGEM_TEMPLATE_PROFILE = "monorepo-subgem"
+    MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE = "monorepo-subgem-package"
+    MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE = "monorepo-subgem-release"
+    MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE = "monorepo-subgem-full"
+    MONOREPO_SUBGEM_TEMPLATE_PROFILE = MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE
     FULL_TEMPLATE_PROFILE = "full"
     REPOSITORY_TOPOLOGY_STANDALONE = "standalone"
     REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT = "monorepo-subproject"
@@ -167,6 +170,30 @@ module Kettle
       "certs/pboling.pem",
       "tmp/.gitignore",
     ].freeze
+    MONOREPO_SUBGEM_RELEASE_TEMPLATE_ENTRIES = (
+      MONOREPO_SUBGEM_TEMPLATE_ENTRIES + [
+        "Gemfile",
+        "Rakefile",
+        ".rspec",
+        ".simplecov",
+        ".yardignore",
+        ".yardopts",
+        "bin/setup",
+        "spec/spec_helper.rb",
+        "gemfiles/modular/coverage.gemfile",
+        "gemfiles/modular/coverage_local.gemfile",
+        "gemfiles/modular/debug.gemfile",
+        "gemfiles/modular/documentation.gemfile",
+        "gemfiles/modular/documentation_local.gemfile",
+        "gemfiles/modular/optional.gemfile",
+        "gemfiles/modular/rspec.gemfile",
+        "gemfiles/modular/style.gemfile",
+        "gemfiles/modular/style_local.gemfile",
+        "gemfiles/modular/templating.gemfile",
+        "gemfiles/modular/templating_local.gemfile",
+        "gemfiles/modular/x_std_libs.gemfile",
+      ]
+    ).freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
       "sig/gem/version.rbs",
@@ -2686,7 +2713,7 @@ module Kettle
         bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
         project_emoji = preferred_template_token_value(nil, nil, env, "KJ_PROJECT_EMOJI")
         project_emoji ||= readme_project_emoji(project_root)
-        project_emoji ||= "💎" if template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+        project_emoji ||= "💎" if monorepo_subgem_template_profile_value?(template_selection[:template_profile])
         bootstrap[:project_emoji] = project_emoji
       end
       facts[:kettle_config_bootstrap] = bootstrap if bootstrap
@@ -6482,7 +6509,7 @@ module Kettle
       return content if profile.to_s.empty?
       return replace_yaml_scalar_path(content, %w[templates profile], FULL_TEMPLATE_PROFILE) if profile.to_s == FULL_TEMPLATE_PROFILE
       return apply_monorepo_root_template_profile(content) if profile.to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
-      return apply_monorepo_subgem_template_profile(content, gemspec_path) if profile.to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+      return apply_monorepo_subgem_template_profile(content, gemspec_path, profile) if monorepo_subgem_template_profile_value?(profile)
 
       raise Error, "Unknown kettle-jem template profile: #{profile}"
     end
@@ -6510,8 +6537,8 @@ module Kettle
       add_monorepo_root_file_overrides(updated)
     end
 
-    def apply_monorepo_subgem_template_profile(content, gemspec_path)
-      entries = monorepo_subgem_template_entries(gemspec_path)
+    def apply_monorepo_subgem_template_profile(content, gemspec_path, profile = MONOREPO_SUBGEM_TEMPLATE_PROFILE)
+      entries = monorepo_subgem_template_entries(gemspec_path, profile)
       entry_lines = entries.flat_map do |entry|
         if entry.is_a?(Hash)
           [
@@ -6522,11 +6549,12 @@ module Kettle
           ["    - #{entry}"]
         end
       end
-      profiled_content = replace_yaml_scalar_path(content, %w[templates profile], MONOREPO_SUBGEM_TEMPLATE_PROFILE)
+      normalized_profile = normalize_template_profile(profile)
+      profiled_content = replace_yaml_scalar_path(content, %w[templates profile], normalized_profile)
       entries_block = ["  entries:", *entry_lines].join("\n")
       updated = insert_after_line_sequence(
         profiled_content,
-        ["templates:", "  root: packaged", "  apply: true", "  profile: #{MONOREPO_SUBGEM_TEMPLATE_PROFILE}"],
+        ["templates:", "  root: packaged", "  apply: true", "  profile: #{normalized_profile}"],
         entries_block,
         nil,
       )
@@ -6538,7 +6566,7 @@ module Kettle
       ) if updated == profiled_content
       if updated == profiled_content
         raise Error,
-          "Could not apply monorepo-subgem template profile to .kettle-jem.yml bootstrap template"
+          "Could not apply #{normalized_profile} template profile to .kettle-jem.yml bootstrap template"
       end
 
       add_monorepo_subgem_file_overrides(updated, gemspec_path)
@@ -6576,14 +6604,26 @@ module Kettle
       end
     end
 
-    def monorepo_subgem_template_entries(gemspec_path)
-      entries = MONOREPO_SUBGEM_TEMPLATE_ENTRIES.dup
+    def monorepo_subgem_template_entries(gemspec_path, profile = MONOREPO_SUBGEM_TEMPLATE_PROFILE)
+      entries = monorepo_subgem_template_entries_for_profile(gemspec_path, profile)
       gemspec = gemspec_path.to_s.strip
       return entries if gemspec.empty?
 
       entries.insert(1, {"source" => "gem.gemspec", "target" => gemspec})
       entries.concat(version_gem_template_entries(gemspec))
       entries
+    end
+
+    def monorepo_subgem_template_entries_for_profile(gemspec_path, profile)
+      case normalize_template_profile(profile)
+      when MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE
+        MONOREPO_SUBGEM_RELEASE_TEMPLATE_ENTRIES.dup
+      when MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE
+        project_root = File.dirname(File.expand_path(gemspec_path.to_s))
+        template_inventory_entries(project_root, PACKAGED_TEMPLATE_ROOT).dup
+      else
+        MONOREPO_SUBGEM_TEMPLATE_ENTRIES.dup
+      end
     end
 
     def version_gem_template_entries(gemspec_path)
@@ -6655,7 +6695,7 @@ module Kettle
     end
 
     def monorepo_subgem_template_profile?(facts)
-      facts[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
+      monorepo_subgem_template_profile_value?(facts[:template_profile])
     end
 
     def monorepo_root_template_profile?(facts)
@@ -6664,6 +6704,14 @@ module Kettle
 
     def monorepo_template_profile?(facts)
       monorepo_root_template_profile?(facts) || monorepo_subgem_template_profile?(facts)
+    end
+
+    def monorepo_subgem_template_profile_value?(profile)
+      [
+        MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE,
+        MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE,
+        MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE,
+      ].include?(normalize_template_profile(profile))
     end
 
     def readme_project_emoji(project_root)
@@ -6740,7 +6788,9 @@ module Kettle
       profile = value.to_s.strip.downcase.tr("_", "-")
       return "" if profile.empty?
       return FULL_TEMPLATE_PROFILE if %w[full large default standalone].include?(profile)
-      return MONOREPO_SUBGEM_TEMPLATE_PROFILE if %w[monorepo-subgem monorepo-subproject small thin].include?(profile)
+      return MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE if %w[monorepo-subgem monorepo-subproject monorepo-package monorepo-subgem-package small thin package].include?(profile)
+      return MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE if %w[monorepo-subgem-release monorepo-release release].include?(profile)
+      return MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE if %w[monorepo-subgem-full monorepo-full subgem-full].include?(profile)
       return MONOREPO_ROOT_TEMPLATE_PROFILE if profile == MONOREPO_ROOT_TEMPLATE_PROFILE
 
       profile
@@ -6752,7 +6802,7 @@ module Kettle
       normalized = normalize_repository_topology(topology)
       return normalized unless normalized.empty?
 
-      (template_selection[:template_profile].to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE) ? REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT : REPOSITORY_TOPOLOGY_STANDALONE
+      monorepo_subgem_template_profile_value?(template_selection[:template_profile]) ? REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT : REPOSITORY_TOPOLOGY_STANDALONE
     end
 
     def normalize_repository_topology(value)
