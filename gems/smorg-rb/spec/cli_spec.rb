@@ -69,6 +69,30 @@ RSpec.describe Smorg::RB do
     expect(merged).to include('"other":true')
   end
 
+  it "installs local Git diff driver attributes" do
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(["git", "install", "--json"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    report = JSON.parse(stdout.string)
+    expect(report.fetch("profile")).to eq("semantic-diff")
+    expect(report.fetch("scope")).to eq("local")
+    expect(File.read(".gitattributes")).to include("*.rb diff=smorg-ruby")
+  end
+
+  it "supports builtin Git diff driver install profile" do
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(["git", "install", "--profile", "builtin-diff"], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(stdout.string).to include("git install: succeeded builtin-diff local")
+    expect(File.read(".gitattributes")).to include("*.rb diff=ruby")
+  end
+
   it "routes Markdown paths through the Markdown merge backend" do
     ancestor = write_file(@dir, "ancestor.md", "# Project\n\n## Usage\n\nBase usage.\n")
     current = write_file(

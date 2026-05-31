@@ -7,6 +7,7 @@ require "ast/merge"
 require "ast-merge-git"
 require "json"
 require "json-merge"
+require "kettle/jem/tasks/install_task"
 require "markly/merge"
 require "pathname"
 require "plain-merge"
@@ -34,6 +35,8 @@ module Smorg
         run_conflicts(rest, stdout, stderr)
       when "languages"
         run_languages(rest, stdout, stderr)
+      when "git"
+        run_git(rest, stdout, stderr)
       when "help", "-h", "--help"
         print_usage(stdout)
         EXIT_SUCCESS
@@ -51,6 +54,89 @@ module Smorg
       out.puts("       smorg-rb diff-driver PATH OLD-FILE OLD-HEX OLD-MODE NEW-FILE NEW-HEX NEW-MODE [OLD-PREFIX NEW-PREFIX]")
       out.puts("       smorg-rb conflicts diff [--path-name PATH] [--exit-code] FILE")
       out.puts("       smorg-rb languages --gitattributes")
+      out.puts("       smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]")
+    end
+
+    def run_git(args, stdout, stderr)
+      subcommand, *rest = args
+      return git_usage(stderr) unless subcommand == "install"
+
+      options = parse_git_install_options(rest, stderr)
+      return EXIT_USER_ERROR unless options
+
+      run_options = git_install_run_options(options)
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(Dir.pwd, run_options)
+      step = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: Dir.pwd,
+        env: ENV.to_h,
+        run_options: run_options,
+        command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command),
+      ).first
+      report = {
+        ok: step.fetch(:status) != "failed",
+        profile: step.fetch(:profile, "semantic-diff"),
+        scope: step.fetch(:scope, run_options.fetch(:git_drivers, "local")),
+        install_steps: [step],
+        missing: step.fetch(:missing, []),
+      }
+      if options[:json]
+        stdout.puts(JSON.pretty_generate(report))
+      else
+        stdout.puts("git install: #{step.fetch(:status)} #{report.fetch(:profile)} #{report.fetch(:scope)}")
+        step.fetch(:diagnostics, []).each { |diagnostic| stdout.puts("  #{diagnostic.fetch(:message)}") if diagnostic[:message] }
+      end
+      report.fetch(:ok) ? EXIT_SUCCESS : EXIT_USER_ERROR
+    rescue Kettle::Jem::Error => error
+      stderr.puts(error.message)
+      EXIT_USER_ERROR
+    end
+
+    def git_usage(stderr)
+      stderr.puts("usage: smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]")
+      EXIT_USER_ERROR
+    end
+
+    def parse_git_install_options(args, stderr)
+      options = {scope: "local", profile: "semantic-diff", json: false, dry_run: false}
+      until args.empty?
+        value = args.shift
+        case value
+        when "--scope"
+          options[:scope] = args.shift.to_s
+        when "--profile"
+          options[:profile] = args.shift.to_s
+        when "--check"
+          options[:check] = true
+        when "--undo"
+          options[:undo] = true
+        when "--dry-run"
+          options[:dry_run] = true
+        when "--json"
+          options[:json] = true
+        else
+          stderr.puts("unknown git install option #{value.inspect}")
+          return nil
+        end
+      end
+      options
+    end
+
+    def git_install_run_options(options)
+      git_drivers = if options[:check]
+        "check"
+      elsif options[:undo]
+        "undo"
+      elsif options.fetch(:scope) == "global"
+        "global"
+      elsif options.fetch(:scope) == "include-file"
+        "include-file"
+      elsif options.fetch(:profile) == "builtin-diff"
+        "builtin-diff"
+      else
+        "semantic-diff"
+      end
+      {git_drivers: git_drivers, dry_run: options[:dry_run]}.compact
     end
 
     def run_merge_driver(args, stdout, stderr)

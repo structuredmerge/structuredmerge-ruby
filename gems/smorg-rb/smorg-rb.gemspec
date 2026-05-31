@@ -30,6 +30,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "ast-merge-git", "= #{spec.version}"
   spec.add_dependency "go-merge", "= #{spec.version}"
   spec.add_dependency "json-merge", "= #{spec.version}"
+  spec.add_dependency "kettle-jem", "= #{spec.version}"
   spec.add_dependency "markly-merge", "= #{spec.version}"
   spec.add_dependency "plain-merge", "= #{spec.version}"
   spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
