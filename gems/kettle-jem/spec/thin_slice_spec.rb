@@ -2088,6 +2088,7 @@ RSpec.describe Kettle::Jem do
         "spec/spec_helper.rb",
         "gemfiles/modular/documentation.gemfile",
       )
+      expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
       expect(apply.fetch(:changed_files)).to include("Gemfile", ".yardopts", ".yardignore", "bin/setup")

@@ -170,6 +170,11 @@ module Kettle
       "certs/pboling.pem",
       "tmp/.gitignore",
     ].freeze
+    PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES = Dir.glob(File.join(PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "**", "*.example"))
+      .map { |path| path.delete_prefix("#{PACKAGED_TEMPLATE_ROOT}/").sub(/\.example\z/, "") }
+      .reject { |path| path == "gemfiles/modular/shunted.gemfile" }
+      .sort
+      .freeze
     MONOREPO_SUBGEM_RELEASE_TEMPLATE_ENTRIES = (
       MONOREPO_SUBGEM_TEMPLATE_ENTRIES + [
         "Gemfile",
@@ -180,19 +185,7 @@ module Kettle
         ".yardopts",
         "bin/setup",
         "spec/spec_helper.rb",
-        "gemfiles/modular/coverage.gemfile",
-        "gemfiles/modular/coverage_local.gemfile",
-        "gemfiles/modular/debug.gemfile",
-        "gemfiles/modular/documentation.gemfile",
-        "gemfiles/modular/documentation_local.gemfile",
-        "gemfiles/modular/optional.gemfile",
-        "gemfiles/modular/rspec.gemfile",
-        "gemfiles/modular/style.gemfile",
-        "gemfiles/modular/style_local.gemfile",
-        "gemfiles/modular/templating.gemfile",
-        "gemfiles/modular/templating_local.gemfile",
-        "gemfiles/modular/x_std_libs.gemfile",
-      ]
+      ] + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES
     ).freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
@@ -3204,7 +3197,27 @@ module Kettle
       else
         updated.insert(profile_index + 1, *entries_lines)
       end
+      sync_kettle_config_gemspec_strategy_lines!(updated, gemspec_path, normalized_profile)
       ensure_trailing_newline(updated.join("\n"))
+    end
+
+    def sync_kettle_config_gemspec_strategy_lines!(lines, gemspec_path, profile)
+      gemspec = gemspec_path.to_s
+      return if gemspec.empty?
+
+      gemspec_index = lines.index("  #{gemspec}:")
+      return unless gemspec_index
+
+      strategy_index = ((gemspec_index + 1)...lines.length).find do |index|
+        line = lines.fetch(index)
+        break nil unless line.start_with?("    ")
+
+        line.start_with?("    strategy:")
+      end
+      return unless strategy_index
+
+      strategy = normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE ? "merge" : "keep_destination"
+      lines[strategy_index] = "    strategy: #{strategy}"
     end
 
     def top_level_yaml_key_line?(line)
@@ -6643,7 +6656,7 @@ module Kettle
           "Could not apply #{normalized_profile} template profile to .kettle-jem.yml bootstrap template"
       end
 
-      add_monorepo_subgem_file_overrides(updated, gemspec_path)
+      add_monorepo_subgem_file_overrides(updated, gemspec_path, normalized_profile)
     end
 
     def add_monorepo_root_file_overrides(content)
@@ -6734,16 +6747,17 @@ module Kettle
       end
     end
 
-    def add_monorepo_subgem_file_overrides(content, gemspec_path)
+    def add_monorepo_subgem_file_overrides(content, gemspec_path, profile = MONOREPO_SUBGEM_TEMPLATE_PROFILE)
       override_lines = [
         "  README.md:",
         "    strategy: merge",
       ]
       gemspec = gemspec_path.to_s.strip
       unless gemspec.empty?
+        gemspec_strategy = normalize_template_profile(profile) == MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE ? "merge" : "keep_destination"
         override_lines.concat([
           "  #{gemspec}:",
-          "    strategy: keep_destination",
+          "    strategy: #{gemspec_strategy}",
         ])
       end
       insert_after_line_sequence(
