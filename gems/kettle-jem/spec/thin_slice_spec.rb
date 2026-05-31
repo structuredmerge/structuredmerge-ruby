@@ -6183,6 +6183,7 @@ RSpec.describe Kettle::Jem do
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
       expect(content.scan('require "example-gem"').size).to eq(1)
       expect(content).not_to include('require "example/gem"')
+      expect(content).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")
       expect(content).to include('require_relative "config/debug"')
       expect(content).to include('require_relative "config/vcr"')
       expect(content).to include('require_relative "support/shared_contexts/with_rake"')

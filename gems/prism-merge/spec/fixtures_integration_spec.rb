@@ -122,6 +122,7 @@ RSpec.describe "Prism::Merge" do
 
         require "kettle/test/rspec"
 
+
         # This library
         require "example/gem"
 
@@ -164,6 +165,7 @@ RSpec.describe "Prism::Merge" do
     expect(result[:output]).not_to include('require "example/gem"')
     expect(result[:output].scan('require "example-gem"').size).to eq(1)
     expect(result[:output].index('require "kettle-soup-cover"')).to be < result[:output].index('require "example-gem"')
+    expect(result[:output]).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")
   end
 
   it "projects the structured-edit provider profile through Prism" do

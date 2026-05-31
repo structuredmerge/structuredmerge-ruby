@@ -27,6 +27,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Ruby merges now defer template-only top-level groups behind later destination
   matches and skip crossed duplicate require aliases, preventing library
   requires from moving ahead of coverage bootstrap code.
+- Shared layout handling now prunes blank-line gaps owned by removed or skipped
+  nodes, so semantic Ruby merges do not leave duplicate interstitial blank lines
+  after de-duplicating requires.
+- `ast-merge` now declares its runtime `token-resolver` dependency explicitly.
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -153,6 +153,66 @@ module Ast
         @lines.length
       end
 
+      # Remove blank lines from the end of the current result.
+      #
+      # Layout-aware merge adapters use this when they later discover that a
+      # removed owner controlled a leading blank-line gap already emitted as
+      # part of the preceding output.
+      #
+      # @param max [Integer, nil] Maximum number of blank lines to remove
+      # @return [Integer] Number of lines removed
+      def remove_trailing_blank_lines(max: nil)
+        removed = 0
+
+        while @lines.any? && @lines.last.to_s.strip.empty?
+          break if max && removed >= max
+
+          @lines.pop
+          @line_metadata.pop if instance_variable_defined?(:@line_metadata) && @line_metadata.respond_to?(:pop)
+          removed += 1
+        end
+
+        removed
+      end
+
+      # Normalize repeated blank-line runs in the current result.
+      #
+      # This is a safety repair for line-oriented semantic merges after
+      # ownership-aware layout handling has run. It prevents removed/skipped
+      # owners from leaving impossible interstitial blank runs in generated
+      # output.
+      #
+      # @param max [Integer] Maximum number of consecutive blank lines to retain
+      # @return [Integer] Number of blank lines removed
+      def normalize_blank_line_runs!(max: 1)
+        max = Integer(max)
+        raise ArgumentError, "max must be >= 0" if max.negative?
+
+        normalized_lines = []
+        normalized_metadata = [] if instance_variable_defined?(:@line_metadata) && @line_metadata.respond_to?(:each)
+        blank_count = 0
+        removed = 0
+
+        @lines.each_with_index do |line, index|
+          if line.to_s.strip.empty?
+            blank_count += 1
+            if blank_count > max
+              removed += 1
+              next
+            end
+          else
+            blank_count = 0
+          end
+
+          normalized_lines << line
+          normalized_metadata << @line_metadata[index] if normalized_metadata
+        end
+
+        @lines = normalized_lines
+        @line_metadata = normalized_metadata if normalized_metadata
+        removed
+      end
+
       def unresolved?
         @unresolved_cases.any?
       end

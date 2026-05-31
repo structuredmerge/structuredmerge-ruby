@@ -39,7 +39,7 @@ module Ast
     # @see TreeHaver::Base::Node The base class defining the canonical Node API
     # @see Comment::Line Example synthetic node for comments
     # @see Text::LineNode Example synthetic node for text lines
-    class AstNode < TreeHaver::Base::Node
+    class AstNode < ::TreeHaver::Base::Node
       # Point class compatible with TreeHaver::Point
       # Provides both method and hash-style access to row/column
       Point = Struct.new(:row, :column, keyword_init: true) do

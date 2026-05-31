@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require "support/fictive_language_harness"
+require "ast/merge/rspec/shared_examples/comment_behavior_matrix"
+
 # rubocop:disable RSpec/DescribeClass
 RSpec.describe "fictive language harness" do
   describe SpecSupport::FictiveLanguageHarness::FlatAnalysis do
@@ -68,6 +71,33 @@ RSpec.describe "fictive language harness" do
       let(:comment_matrix_comment_line_builder) { ->(text, indent: "") { "#{indent}# #{text}" } }
       let(:comment_matrix_default_indent) { "" }
       let(:comment_matrix_line_builder) { line_builder }
+    end
+
+    it "does not leave duplicate interstitial blank gaps when removing an owner" do
+      template = <<~SRC
+        alpha = 1
+
+        beta = 2
+      SRC
+      destination = <<~SRC
+        alpha = 1
+
+        removed = 0
+
+        beta = 2
+      SRC
+
+      result = described_class.new(
+        template,
+        destination,
+        remove_template_missing_nodes: true,
+      ).merge
+
+      expect(result.to_s).to eq(<<~SRC)
+        alpha = 1
+
+        beta = 2
+      SRC
     end
   end
 

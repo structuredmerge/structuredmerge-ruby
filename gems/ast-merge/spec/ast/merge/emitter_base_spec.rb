@@ -308,4 +308,38 @@ RSpec.describe Ast::Merge::EmitterBase do
       expect(emitter.lines).to eq(["", "", "", ""])
     end
   end
+
+  describe "layout-owned removed owners" do
+    it "prunes an already emitted leading gap controlled by a removed owner" do
+      result = Ast::Merge::MergeResultBase.new
+      result.content = "before\n"
+      gap = Ast::Merge::Layout::Gap.new(
+        kind: :interstitial,
+        start_line: 2,
+        end_line: 2,
+        lines: [""],
+        before_owner: before_owner,
+        after_owner: owner,
+      )
+      attachment = Ast::Merge::Layout::Attachment.new(owner: owner, leading_gap: gap)
+
+      removed = Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
+        result: result,
+        attachment: attachment,
+      )
+
+      expect(removed).to eq(1)
+      expect(result.lines).to eq(["before"])
+    end
+
+    it "normalizes impossible repeated blank runs after ownership-aware emission" do
+      result = Ast::Merge::MergeResultBase.new
+      result.content = "before\n\n\nafter\n"
+
+      removed = result.normalize_blank_line_runs!(max: 1)
+
+      expect(removed).to eq(1)
+      expect(result.to_s).to eq("before\n\nafter\n")
+    end
+  end
 end

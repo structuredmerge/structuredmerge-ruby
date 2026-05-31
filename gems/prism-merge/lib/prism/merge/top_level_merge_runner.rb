@@ -139,6 +139,7 @@ module Prism
           emit_tail_template_only_nodes(consumed_template_indices) if destination_tail_template_only_placement?
 
           emit_dest_postlude_lines(last_output_dest_line)
+          normalize_layout_blank_runs(merger.result)
 
           merger.result
         end
@@ -1045,6 +1046,7 @@ module Prism
             destination_template_indices: destination_template_indices,
             consumed_template_indices: consumed_template_indices,
           )
+            prune_removed_owner_leading_gap(dest_node)
             output_dest_line_ranges << node_range
             return dest_node.location.end_line
           end
@@ -1169,6 +1171,19 @@ module Prism
         template_index = template_info.fetch(:index)
         future_indices = destination_template_indices[(dest_position + 1)..] || []
         future_indices.compact.any? { |future_index| future_index < template_index && !consumed_template_indices.include?(future_index) }
+      end
+
+      def prune_removed_owner_leading_gap(dest_node)
+        return unless merger.dest_analysis.respond_to?(:layout_attachment_for)
+
+        Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
+          result: merger.result,
+          attachment: merger.dest_analysis.layout_attachment_for(dest_node),
+        )
+      end
+
+      def normalize_layout_blank_runs(result)
+        result.normalize_blank_line_runs!(max: 1) if result.respond_to?(:normalize_blank_line_runs!)
       end
 
       def process_matched_node(dest_node:, dest_signature:, template_info:, cursor:, consumed_template_indices:, sig_cursor:, output_dest_line_ranges:, node_range:, last_output_dest_line:)

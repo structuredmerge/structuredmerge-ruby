@@ -364,7 +364,10 @@ module SpecSupport
         attachment = @dest_analysis.comment_attachment_for(dest_node)
 
         emit_region_lines(result, attachment.leading_region || removable_preamble_region_for(dest_node))
-        emit_layout_gap(result, attachment.leading_gap)
+        Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
+          result: result,
+          attachment: attachment,
+        )
 
         if attachment.inline_region
           result.add_line(
@@ -376,7 +379,6 @@ module SpecSupport
         end
 
         emit_region_lines(result, attachment.trailing_region)
-        emit_layout_gap(result, attachment.trailing_gap)
       end
 
       def emit_region_lines(result, region)
