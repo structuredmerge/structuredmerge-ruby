@@ -3704,6 +3704,49 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps semantic diff commands separate from textconv projections" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-textconv-separation", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+
+          [profiles.semantic-diff]
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.command"
+          value = "smorg-ruby diff-driver"
+
+          [profiles.textconv-normalized]
+
+          [[profiles.textconv-normalized.git_config]]
+          scope = "global"
+          key = "diff.smorg-json-textconv.textconv"
+          value = "smorg-rb textconv --format json"
+
+          [[profiles.textconv-normalized.git_config]]
+          scope = "global"
+          key = "diff.smorg-json-textconv.cachetextconv"
+          value = "true"
+        TOML
+      })
+
+      manifest = Kettle::Jem::Tasks::InstallTask.git_driver_manifest(root)
+      semantic_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "semantic-diff")
+      textconv_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
+
+      expect(semantic_commands).to eq([
+        ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+      ])
+      expect(textconv_commands).to contain_exactly(
+        ["git", "config", "--global", "diff.smorg-json-textconv.textconv", "smorg-rb textconv --format json"],
+        ["git", "config", "--global", "diff.smorg-json-textconv.cachetextconv", "true"],
+      )
+    end
+  end
+
   it "skips Git driver setup when explicitly disabled" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "none"})
 
