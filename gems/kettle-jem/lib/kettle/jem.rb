@@ -3149,7 +3149,81 @@ module Kettle
       [
         template_version_gem_bootstrap_step(project_root, report),
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
+        monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
       ].compact
+    end
+
+    def monorepo_subgem_kettle_config_profile_sync_step(project_root, report)
+      facts = report.fetch(:facts)
+      return unless monorepo_subgem_template_profile?(facts)
+
+      profile = normalize_template_profile(facts[:template_profile])
+      path = File.join(project_root.to_s, KETTLE_CONFIG_PATH)
+      return unless File.file?(path)
+
+      gemspec = facts.dig(:rubygems, :gemspec_path).to_s
+      before = File.read(path)
+      after = sync_kettle_config_monorepo_subgem_profile(before, gemspec, profile)
+      File.write(path, after) if after != before
+      {
+        name: "monorepo_subgem_kettle_config_profile_sync",
+        path: KETTLE_CONFIG_PATH,
+        status: (after == before) ? "already_current" : "applied",
+        changed_files: (after == before) ? [] : [KETTLE_CONFIG_PATH],
+      }
+    end
+
+    def sync_kettle_config_monorepo_subgem_profile(content, gemspec_path, profile)
+      normalized_profile = normalize_template_profile(profile)
+      entries = monorepo_subgem_template_entries(gemspec_path, normalized_profile)
+      lines = content.to_s.lines(chomp: true)
+      templates_index = lines.index("templates:")
+      return content unless templates_index
+
+      profile_index = ((templates_index + 1)...lines.length).find do |index|
+        line = lines.fetch(index)
+        break nil if top_level_yaml_key_line?(line)
+
+        line.start_with?("  profile:")
+      end
+      return content unless profile_index
+
+      updated = lines.dup
+      updated[profile_index] = "  profile: #{normalized_profile}"
+      entries_lines = kettle_config_template_entries_lines(entries)
+      entries_index = ((templates_index + 1)...updated.length).find do |index|
+        line = updated.fetch(index)
+        break nil if top_level_yaml_key_line?(line)
+
+        line == "  entries:"
+      end
+      if entries_index
+        entries_end = entries_index + 1
+        entries_end += 1 while entries_end < updated.length && updated.fetch(entries_end).start_with?("    ")
+        updated[entries_index...entries_end] = entries_lines
+      else
+        updated.insert(profile_index + 1, *entries_lines)
+      end
+      ensure_trailing_newline(updated.join("\n"))
+    end
+
+    def top_level_yaml_key_line?(line)
+      return false if line.to_s.empty? || line.start_with?("#") || line.start_with?(" ")
+
+      line.include?(":")
+    end
+
+    def kettle_config_template_entries_lines(entries)
+      ["  entries:", *entries.flat_map do |entry|
+        if entry.is_a?(Hash)
+          [
+            "    - source: #{entry.fetch("source")}",
+            "      target: #{entry.fetch("target")}",
+          ]
+        else
+          ["    - #{entry}"]
+        end
+      end]
     end
 
     def monorepo_root_gemfile_dependency_sync_step(project_root, report)

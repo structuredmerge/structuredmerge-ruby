@@ -2094,6 +2094,9 @@ RSpec.describe Kettle::Jem do
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
       expect(File).to exist(File.join(root, ".yardopts"))
+      updated_config = YAML.safe_load(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml")))
+      expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
+      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yardopts")
     end
   end
 
