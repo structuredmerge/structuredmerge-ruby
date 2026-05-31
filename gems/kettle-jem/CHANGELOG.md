@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Fixed generated documentation URLs for standalone gems so template-owned
+  citation and documentation links do not retain monorepo `gems/` paths.
 - Monorepo-root templating now applies without a root gemspec, detects root
   license files ahead of stale config values, installs the generated Rakefile
   task plumbing, and syncs root Gemfile tooling dependencies without duplicating
