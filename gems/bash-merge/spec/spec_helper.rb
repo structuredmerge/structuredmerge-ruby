@@ -1,64 +1,33 @@
 # frozen_string_literal: true
 
-require "json"
-require "pathname"
-require "version_gem/rspec"
-require "ast/merge/rspec/setup"
-require "ast/merge"
-require "tree_haver"
-require "bash/merge"
-
-%w[mri ffi rust java].each do |legacy_backend_id|
-  next if TreeHaver::BackendRegistry.fetch(legacy_backend_id)
-
-  TreeHaver::BackendRegistry.register(
-    TreeHaver::BackendReference.new(id: legacy_backend_id, family: "tree-sitter")
-  )
+# Config for development dependencies of this library
+# i.e., not configured by this library
+#
+# SimpleCov & related config (must run BEFORE any other requires)
+# NOTE: Gemfiles for non-coverage appraisals may not have kettle-soup-cover.
+#       The rescue LoadError handles that scenario.
+begin
+  require "kettle-soup-cover"
+  require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+rescue LoadError => error
+  # check the error message and re-raise when unexpected
+  raise error unless error.message.include?("kettle")
 end
 
-Dir[File.join(__dir__, "support", "**", "*.rb")].each { |path| require path }
+# External RSpec & related config
+require "kettle/test/rspec"
+
+# This library
+require "bash/merge"
 
 RSpec.configure do |config|
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
+
+  # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 
-  config.before(:each, :bash_grammar) do
-    skip "tree-sitter bash grammar is not available" unless TreeHaver::GrammarFinder.new(:bash).available?
-  end
-
-  config.before(:each, :mri_backend) do
-    skip "TreeHaver MRI backend is not available" unless TreeHaver.const_defined?(:Backends) &&
-      TreeHaver::Backends.const_defined?(:MRI) &&
-      TreeHaver::Backends::MRI.available?
-  end
-
-  config.before(:each, :ffi_backend) do
-    skip "TreeHaver FFI backend is not available" unless TreeHaver.const_defined?(:Backends) &&
-      TreeHaver::Backends.const_defined?(:FFI) &&
-      TreeHaver::Backends::FFI.available?
-  end
-
-  config.before(:each, :rust_backend) do
-    skip "TreeHaver Rust backend is not available" unless TreeHaver.const_defined?(:Backends) &&
-      TreeHaver::Backends.const_defined?(:Rust) &&
-      TreeHaver::Backends::Rust.available?
-  end
-
-  config.before(:each, :java_backend) do
-    skip "TreeHaver Java backend is not available" unless TreeHaver.const_defined?(:Backends) &&
-      TreeHaver::Backends.const_defined?(:Java) &&
-      TreeHaver::Backends::Java.available?
-  end
-
-  config.before do
-    TreeHaver::LanguageRegistry.clear_cache!
-  end
-
-  config.after do
-    TreeHaver::LanguageRegistry.clear_cache!
-    TreeHaver.reset_backend!(to: :auto) if TreeHaver.respond_to?(:reset_backend!)
-  end
-
-  config.expect_with(:rspec) do |expectations|
-    expectations.syntax = :expect
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
   end
 end

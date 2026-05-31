@@ -1,0 +1,2071 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::StructuralEdit::RemovePlan
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::StructuralEdit::RemovePlan";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../StructuralEdit.html" title="Ast::Merge::StructuralEdit (module)">StructuralEdit</a></span></span>
+     &raquo; 
+    <span class="title">RemovePlan</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::StructuralEdit::RemovePlan
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::StructuralEdit::RemovePlan</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/structural_edit/remove_plan.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Passive plan for removing a contiguous structural range while preserving<br />
+exact untouched source and recording which removed comment/layout<br />
+attachments should be promoted to surviving adjacent owners.<br />
+:reek:TooManyMethods<br />
+:reek:MissingSafeMethod</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#after_content-instance_method" title="#after_content (instance method)">#<strong>after_content</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the untouched content after the removed range.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#apply_to-instance_method" title="#apply_to (instance method)">#<strong>apply_to</strong>(alternate_source = source)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Apply the removal to the original source or a compatible alternate source.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#before_content-instance_method" title="#before_content (instance method)">#<strong>before_content</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the untouched content before the removed range.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#changed%3F-instance_method" title="#changed? (instance method)">#<strong>changed?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source:, remove_start_line:, remove_end_line:, leading_boundary: nil, trailing_boundary: nil, removed_attachments: [], removed_owners: nil, retained_owners: nil, metadata: {}, preserve_removed_trailing_blank_lines: true, **options)  &#x21d2; RemovePlan </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>:reek:LongParameterList :reek:ControlParameter Build a plan that removes a contiguous line range and preserves promotable attachments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return a concise debug representation of the remove plan.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#leading_boundary-instance_method" title="#leading_boundary (instance method)">#<strong>leading_boundary</strong>  &#x21d2; Boundary<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the surviving boundary before the removed range.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#line_range-instance_method" title="#line_range (instance method)">#<strong>line_range</strong>  &#x21d2; Range </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the removed line range.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merged_content-instance_method" title="#merged_content (instance method)">#<strong>merged_content</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return merged content after applying the removal.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#metadata-instance_method" title="#metadata (instance method)">#<strong>metadata</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return metadata describing how the remove plan was constructed.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#promoted_comment_regions-instance_method" title="#promoted_comment_regions (instance method)">#<strong>promoted_comment_regions</strong>  &#x21d2; Array&lt;Comment::Region&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all promoted comment regions implied by the rehome plans.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#promoted_layout_gaps-instance_method" title="#promoted_layout_gaps (instance method)">#<strong>promoted_layout_gaps</strong>  &#x21d2; Array&lt;Layout::Gap&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all promoted layout gaps implied by the rehome plans.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#rehome_plans-instance_method" title="#rehome_plans (instance method)">#<strong>rehome_plans</strong>  &#x21d2; Array&lt;RehomePlan&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all fragment rehome plans produced from removed attachments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_end_line-instance_method" title="#remove_end_line (instance method)">#<strong>remove_end_line</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the last removed line number.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_start_line-instance_method" title="#remove_start_line (instance method)">#<strong>remove_start_line</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the first removed line number.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#removed_attachments-instance_method" title="#removed_attachments (instance method)">#<strong>removed_attachments</strong>  &#x21d2; Array&lt;Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all attachments collected from removed owners.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#removed_content-instance_method" title="#removed_content (instance method)">#<strong>removed_content</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the content removed by the plan.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#removed_owners-instance_method" title="#removed_owners (instance method)">#<strong>removed_owners</strong>  &#x21d2; Array&lt;Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return removed owners associated with the removal.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#retained_owners-instance_method" title="#retained_owners (instance method)">#<strong>retained_owners</strong>  &#x21d2; Array&lt;Object&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return surviving owners allowed to receive promoted fragments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source-instance_method" title="#source (instance method)">#<strong>source</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the original source text.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_splice_plan-instance_method" title="#to_splice_plan (instance method)">#<strong>to_splice_plan</strong>  &#x21d2; SplicePlan </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the equivalent splice plan for exact application.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#trailing_boundary-instance_method" title="#trailing_boundary (instance method)">#<strong>trailing_boundary</strong>  &#x21d2; Boundary<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the surviving boundary after the removed range.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(source:, remove_start_line:, remove_end_line:, leading_boundary: nil, trailing_boundary: nil, removed_attachments: [], removed_owners: nil, retained_owners: nil, metadata: {}, preserve_removed_trailing_blank_lines: true, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::StructuralEdit::RemovePlan (class)">RemovePlan</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>:reek:LongParameterList<br />
+:reek:ControlParameter<br />
+Build a plan that removes a contiguous line range and preserves promotable attachments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>source</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>original source text</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_start_line</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>first removed line, 1-based</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_end_line</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>last removed line, 1-based</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>leading_boundary</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>surviving boundary before the removed range</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>trailing_boundary</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>surviving boundary after the removed range</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>removed_attachments</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>attachments from removed owners</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>removed_owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>explicit removed owners</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>retained_owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>explicit surviving owners</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>metadata</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>base metadata</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preserve_removed_trailing_blank_lines</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>whether trailing blank lines should survive in the splice</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>extra metadata merged into +metadata+</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>remove_start_line:</span><span class='comma'>,</span> <span class='label'>remove_end_line:</span><span class='comma'>,</span> <span class='label'>leading_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>trailing_boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>removed_attachments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>removed_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>retained_owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_removed_attachments'>removed_attachments</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+  <span class='ivar'>@state</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>boundaries:</span> <span class='lbrace'>{</span>
+      <span class='label'>leading:</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='comma'>,</span>
+      <span class='label'>trailing:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='label'>removed_attachments:</span> <span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span><span class='comma'>,</span>
+    <span class='label'>removed_owners:</span> <span class='id identifier rubyid_normalize_owners'>normalize_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_removed_owners'>removed_owners</span> <span class='op'>||</span> <span class='id identifier rubyid_removed_attachment_owners'>removed_attachment_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized_removed_attachments'>normalized_removed_attachments</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>retained_owners:</span> <span class='id identifier rubyid_normalize_owners'>normalize_owners</span><span class='lparen'>(</span><span class='id identifier rubyid_retained_owners'>retained_owners</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+
+  <span class='id identifier rubyid_validate_boundaries!'>validate_boundaries!</span>
+  <span class='ivar'>@splice_plan</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="SplicePlan.html" title="Ast::Merge::StructuralEdit::SplicePlan (class)">SplicePlan</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SplicePlan.html#initialize-instance_method" title="Ast::Merge::StructuralEdit::SplicePlan#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
+    <span class='label'>replacement:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>replace_start_line:</span> <span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='comma'>,</span>
+    <span class='label'>replace_end_line:</span> <span class='id identifier rubyid_remove_end_line'>remove_end_line</span><span class='comma'>,</span>
+    <span class='label'>leading_boundary:</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span><span class='comma'>,</span>
+    <span class='label'>trailing_boundary:</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span><span class='comma'>,</span>
+    <span class='label'>preserve_removed_trailing_blank_lines:</span> <span class='id identifier rubyid_preserve_removed_trailing_blank_lines'>preserve_removed_trailing_blank_lines</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:structural_edit_remove_plan</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="after_content-instance_method">
+  
+    #<strong>after_content</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the untouched content after the removed range.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+140
+141
+142</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 140</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_after_content'>after_content</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_after_content'>after_content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="apply_to-instance_method">
+  
+    #<strong>apply_to</strong>(alternate_source = source)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Apply the removal to the original source or a compatible alternate source.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>alternate_source</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>source</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>alternate source text</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_apply_to'>apply_to</span><span class='lparen'>(</span><span class='id identifier rubyid_alternate_source'>alternate_source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_apply_to'>apply_to</span><span class='lparen'>(</span><span class='id identifier rubyid_alternate_source'>alternate_source</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="before_content-instance_method">
+  
+    #<strong>before_content</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the untouched content before the removed range.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 126</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_before_content'>before_content</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_before_content'>before_content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="changed?-instance_method">
+  
+    #<strong>changed?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+151
+152
+153</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 151</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_changed?'>changed?</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_changed?'>changed?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a concise debug representation of the remove plan.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+194
+195
+196</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 194</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_remove_end_line'>remove_end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'> removed_owners=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_removed_owners'>removed_owners</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'> rehome_plans=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="leading_boundary-instance_method">
+  
+    #<strong>leading_boundary</strong>  &#x21d2; <tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the surviving boundary before the removed range.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_leading_boundary'>leading_boundary</span>
+  <span class='id identifier rubyid_boundaries'>boundaries</span><span class='lbracket'>[</span><span class='symbol'>:leading</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="line_range-instance_method">
+  
+    #<strong>line_range</strong>  &#x21d2; <tt>Range</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the removed line range.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Range</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 77</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_line_range'>line_range</span>
+  <span class='id identifier rubyid_remove_start_line'>remove_start_line</span><span class='op'>..</span><span class='id identifier rubyid_remove_end_line'>remove_end_line</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merged_content-instance_method">
+  
+    #<strong>merged_content</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return merged content after applying the removal.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 147</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merged_content'>merged_content</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_merged_content'>merged_content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="metadata-instance_method">
+  
+    #<strong>metadata</strong>  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return metadata describing how the remove plan was constructed.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 119</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
+  <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:metadata</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="promoted_comment_regions-instance_method">
+  
+    #<strong>promoted_comment_regions</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="../Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Comment::Region</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all promoted comment regions implied by the rehome plans.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="../Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Comment::Region</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+180
+181
+182</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 180</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_promoted_comment_regions'>promoted_comment_regions</span>
+  <span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:comment_regions</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="promoted_layout_gaps-instance_method">
+  
+    #<strong>promoted_layout_gaps</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="../Layout/Gap.html" title="Ast::Merge::Layout::Gap (class)">Layout::Gap</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all promoted layout gaps implied by the rehome plans.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="../Layout/Gap.html" title="Ast::Merge::Layout::Gap (class)">Layout::Gap</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_promoted_layout_gaps'>promoted_layout_gaps</span>
+  <span class='id identifier rubyid_rehome_plans'>rehome_plans</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:layout_gaps</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="rehome_plans-instance_method">
+  
+    #<strong>rehome_plans</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="RehomePlan.html" title="Ast::Merge::StructuralEdit::RehomePlan (class)">RehomePlan</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all fragment rehome plans produced from removed attachments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="RehomePlan.html" title="Ast::Merge::StructuralEdit::RehomePlan (class)">RehomePlan</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+173
+174
+175</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 173</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_rehome_plans'>rehome_plans</span>
+  <span class='id identifier rubyid_removed_attachments'>removed_attachments</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_attachment'>attachment</span><span class='op'>|</span> <span class='id identifier rubyid_build_rehome_plans_for'>build_rehome_plans_for</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_end_line-instance_method">
+  
+    #<strong>remove_end_line</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the last removed line number.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_end_line'>remove_end_line</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_replace_end_line'>replace_end_line</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="remove_start_line-instance_method">
+  
+    #<strong>remove_start_line</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the first removed line number.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_start_line'>remove_start_line</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_replace_start_line'>replace_start_line</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="removed_attachments-instance_method">
+  
+    #<strong>removed_attachments</strong>  &#x21d2; <tt>Array&lt;Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all attachments collected from removed owners.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_removed_attachments'>removed_attachments</span>
+  <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:removed_attachments</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="removed_content-instance_method">
+  
+    #<strong>removed_content</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the content removed by the plan.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+133
+134
+135</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 133</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_removed_content'>removed_content</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_removed_content'>removed_content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="removed_owners-instance_method">
+  
+    #<strong>removed_owners</strong>  &#x21d2; <tt>Array&lt;Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return removed owners associated with the removal.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 105</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_removed_owners'>removed_owners</span>
+  <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:removed_owners</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="retained_owners-instance_method">
+  
+    #<strong>retained_owners</strong>  &#x21d2; <tt>Array&lt;Object&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return surviving owners allowed to receive promoted fragments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112
+113
+114</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_retained_owners'>retained_owners</span>
+  <span class='ivar'>@state</span><span class='lbracket'>[</span><span class='symbol'>:retained_owners</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="source-instance_method">
+  
+    #<strong>source</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the original source text.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span><span class='period'>.</span><span class='id identifier rubyid_source'>source</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_splice_plan-instance_method">
+  
+    #<strong>to_splice_plan</strong>  &#x21d2; <tt><span class='object_link'><a href="SplicePlan.html" title="Ast::Merge::StructuralEdit::SplicePlan (class)">SplicePlan</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the equivalent splice plan for exact application.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="SplicePlan.html" title="Ast::Merge::StructuralEdit::SplicePlan (class)">SplicePlan</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+158
+159
+160</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 158</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_splice_plan'>to_splice_plan</span>
+  <span class='id identifier rubyid_splice_plan'>splice_plan</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="trailing_boundary-instance_method">
+  
+    #<strong>trailing_boundary</strong>  &#x21d2; <tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the surviving boundary after the removed range.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Boundary.html" title="Ast::Merge::StructuralEdit::Boundary (class)">Boundary</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/structural_edit/remove_plan.rb', line 91</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_trailing_boundary'>trailing_boundary</span>
+  <span class='id identifier rubyid_boundaries'>boundaries</span><span class='lbracket'>[</span><span class='symbol'>:trailing</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:52 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

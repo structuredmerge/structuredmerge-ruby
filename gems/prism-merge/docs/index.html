@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-192px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-192px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0"></a></p>
+
+<h1 id="️-prismmerge">☯️ Prism::Merge</h1>
+
+<p><a href="https://bestgems.org/gems/prism-merge"><img src="https://img.shields.io/gem/v/prism-merge.svg" alt="Version"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases"><img src="https://img.shields.io/github/tag/structuredmerge/structuredmerge-ruby.svg" alt="GitHub tag (latest SemVer)"></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://bestgems.org/gems/prism-merge"><img src="https://img.shields.io/gem/rd/prism-merge.svg" alt="Downloads Rank"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml/badge.svg" alt="CI Current"></a></p>
+
+<p><code>if ci_badges.map(&amp;:color).detect { it != "green"}</code> ☝️ <a href="https://discord.gg/3qme4XHNKN">let me know</a>, as I may have missed the <a href="https://discord.gg/3qme4XHNKN">discord notification</a>.</p>
+
+<hr>
+
+<p><code>if ci_badges.map(&amp;:color).all? { it == "green"}</code> 👇️ send money so I can do more of this. FLOSS maintenance is now my full-time job.</p>
+
+<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://polar.sh/pboling"><img src="https://img.shields.io/badge/polar-donate-a51611.svg?style=flat" alt="Donate on Polar"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
+
+<details>
+ <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
+
+I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo).
+
+</details>
+
+<h2 id="-synopsis">🌻 Synopsis</h2>
+
+<p>Prism::Merge intelligently merges two versions of a Ruby file using Prism AST analysis. It is built on <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge">ast-merge</a> and <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver">tree_haver</a>, and provides the Ruby-source provider for the StructuredMerge Ruby stack.</p>
+
+<h3 id="key-features">Key Features</h3>
+
+<ul>
+  <li>
+<strong>AST-Aware</strong>: Uses Prism parser to understand Ruby structure</li>
+  <li>
+<strong>Intelligent</strong>: Matches nodes by structural signatures</li>
+  <li>
+<strong>Three-Phase Node Matching</strong>: Ordered matching pipeline ensures optimal pairing:
+    <ol>
+      <li>
+<strong>Exact</strong> — structural signature match (method name, parameters)</li>
+      <li>
+<strong>Similar</strong> — Jaccard body-text similarity for renamed methods/refactors</li>
+      <li>
+<strong>Cross-depth</strong> — finds nodes wrapped in conditionals (<code>if</code>/<code>unless</code>) at deeper AST levels</li>
+    </ol>
+  </li>
+  <li>
+<strong>Moved-Node Detection</strong>: Recognizes when a template node exists inside a destination<br>
+control-flow block (e.g., <code>eval_gemfile</code> wrapped in <code>if ENV["CI"]</code>) and avoids duplicating it</li>
+  <li>
+<strong>Gemspec Variable Renaming</strong>: When a legacy gemspec uses <code>do |gem|</code> but the template<br>
+uses <code>do |spec|</code>, all receivers are AST-rewritten (not regex!) so the merged output is consistent</li>
+  <li>
+<strong>Fuzzy Method Matching</strong>: <code>MethodMatchRefiner</code> matches similar method names and signatures<br>
+(e.g., <code>process_user</code> ↔ <code>process_users</code>) using Levenshtein distance</li>
+  <li>
+<strong>Recursive Merge</strong>: Automatically merges class and module bodies recursively, intelligently combining nested methods and constants</li>
+  <li>
+<strong>Partial Template Merge Support</strong>: Can surgically replace or merge an anchored top-level Ruby section through the shared <code>ast-merge</code> recipe substrate</li>
+  <li>
+<strong>Comment-Preserving</strong>: Comments are properly attached to relevant nodes and/or placement</li>
+  <li>
+<strong>Freeze Block Support</strong>: Respects freeze markers (default: <code>prism-merge:freeze</code> / <code>prism-merge:unfreeze</code>) for template merge control - customizable to match your project’s conventions</li>
+  <li>
+<strong>Full Provenance</strong>: Tracks origin of every line</li>
+  <li>
+<strong>Standalone</strong>: No dependencies other than <code>prism</code> and <code>version_gem</code> (which is a tiny tool all my gems depend on)</li>
+  <li>
+<strong>Customizable</strong>:
+    <ul>
+      <li>
+<code>signature_generator</code> - callable custom signature generators</li>
+      <li>
+<code>preference</code> - setting of <code>:template</code>, <code>:destination</code>, or a Hash for per-node-type preferences</li>
+      <li>
+<code>node_typing</code> - Hash mapping node types to callables for per-node-type merge customization (see <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge">ast-merge</a> docs)</li>
+      <li>
+<code>add_template_only_nodes</code> - setting to retain nodes that do not exist in destination</li>
+      <li>
+<code>freeze_token</code> - customize freeze block markers (default: <code>"prism-merge"</code>)</li>
+      <li>
+<code>match_refiners</code> - array of refiners for fuzzy matching (e.g., <code>MethodMatchRefiner</code>)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="example">Example</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;prism/merge&quot;
+
+template = File.read(&quot;template.rb&quot;)
+destination = File.read(&quot;destination.rb&quot;)
+
+merger = Prism::Merge::SmartMerger.new(template, destination)
+result = merger.merge
+
+File.write(&quot;merged.rb&quot;, result)
+</code></pre>
+
+<h2 id="-info-you-can-shake-a-stick-at">💡 Info you can shake a stick at</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tokens to Remember</th>
+      <th>
+<a href="https://bestgems.org/gems/prism-merge"><img src="https://img.shields.io/badge/name-prism--merge-3C2D2D.svg?style=square&amp;logo=rubygems&amp;logoColor=red" alt="Gem name"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/prism-merge"><img src="https://img.shields.io/badge/namespace-Prism::Merge-3C2D2D.svg?style=square&amp;logo=ruby&amp;logoColor=white" alt="Gem namespace"></a>
+</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Works with MRI Ruby 4</td>
+      <td>
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Ruby 4.0 Compat"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Support &amp; Community</td>
+      <td>
+<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Source</td>
+      <td>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/prism-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/prism-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/prism-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=Github&amp;logoColor=green" alt="Source on Github.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Documentation</td>
+      <td>
+<a href="http://rubydoc.info/gems/prism-merge"><img src="https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="Current release on RubyDoc.info"></a> <a href="https://prism-merge.galtzo.com"><img src="https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="YARD on Galtzo.com"></a> <a href="http://www.railsbling.com/tags/prism-merge"><img src="https://img.shields.io/badge/blog-railsbling-0093D0.svg?style=for-the-badge&amp;logo=rubyonrails&amp;logoColor=orange" alt="Maintainer Blog"></a> <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/wikis/home"><img src="https://img.shields.io/badge/wiki-gitlab-943CD2.svg?style=for-the-badge&amp;logo=gitlab&amp;logoColor=white" alt="GitLab Wiki"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/wiki"><img src="https://img.shields.io/badge/wiki-github-943CD2.svg?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="GitHub Wiki"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Compliance</td>
+      <td>
+<a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://www.apache.org/legal/resolved.html#category-x"><img src="https://img.shields.io/badge/Apache_Incompatible:_Category_X-%E2%9C%97-C0392B.svg?style=flat&amp;logo=Apache" alt="Apache license compatibility: Category X"></a> <a href="https://www.ilo.org/declaration/lang--en/index.htm"><img src="https://img.shields.io/badge/ILO_Fundamental_Principles-%E2%9C%93-259D6C.svg?style=flat" alt="📄ilo-declaration-img"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/security-policy-259D6C.svg?style=flat" alt="Security Policy"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg" alt="Contributor Covenant 2.1"></a> <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="SemVer 2.0.0"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>
+<a href="https://github.com/rubocop-lts/rubocop-lts"><img src="https://img.shields.io/badge/code_style_&amp;_linting-rubocop--lts-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Enforced Code Style Linter"></a> <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep-A-Changelog 1.0.0"></a> <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji_commits-%20%F0%9F%98%9C%20%F0%9F%98%8D-34495e.svg?style=flat-square" alt="Gitmoji Commits"></a> <a href="https://github.com/appraisal-rb/appraisal2"><img src="https://img.shields.io/badge/appraised_by-appraisal2-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Compatibility appraised by: appraisal2"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Maintainer 🎖️</td>
+      <td>
+<a href="http://www.linkedin.com/in/peterboling"><img src="https://img.shields.io/badge/LinkedIn-Profile-0B66C2?style=flat&amp;logo=newjapanprowrestling" alt="Follow Me on LinkedIn"></a> <a href="https://ruby.social/@galtzo"><img src="https://img.shields.io/mastodon/follow/109447111526622197?domain=https://ruby.social&amp;style=flat&amp;logo=mastodon&amp;label=Ruby%20@galtzo" alt="Follow Me on Ruby.Social"></a> <a href="https://bsky.app/profile/galtzo.com"><img src="https://img.shields.io/badge/@galtzo.com-0285FF?style=flat&amp;logo=bluesky&amp;logoColor=white" alt="Follow Me on Bluesky"></a> <a href="http://www.railsbling.com/contact"><img src="https://img.shields.io/badge/Contact-Maintainer-0093D0.svg?style=flat&amp;logo=rubyonrails&amp;logoColor=red" alt="Contact Maintainer"></a> <a href="https://dev.to/galtzo"><img src="https://img.shields.io/badge/dev.to-0A0A0A?style=flat&amp;logo=devdotto&amp;logoColor=white" alt="My technical writing"></a>
+</td>
+    </tr>
+    <tr>
+      <td>
+<code>...</code> 💖</td>
+      <td>
+<a href="https://wellfound.com/u/peter-boling"><img src="https://img.shields.io/badge/peter--boling-orange?style=flat&amp;logo=wellfound" alt="Find Me on WellFound:"></a> <a href="https://www.crunchbase.com/person/peter-boling"><img src="https://img.shields.io/badge/peter--boling-purple?style=flat&amp;logo=crunchbase" alt="Find Me on CrunchBase"></a> <a href="https://linktr.ee/galtzo"><img src="https://img.shields.io/badge/galtzo-purple?style=flat&amp;logo=linktree" alt="My LinkTree"></a> <a href="https://about.me/peter.boling"><img src="https://img.shields.io/badge/about.me-0A0A0A?style=flat&amp;logo=aboutme&amp;logoColor=white" alt="More About Me"></a> <a href="https://codeberg.org/pboling">🧊</a> <a href="https://github.org/pboling">🐙</a> <a href="https://sr.ht/~galtzo/">🛖</a> <a href="https://gitlab.com/pboling">🧪</a>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="compatibility">Compatibility</h3>
+
+<p>Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.<br>
+CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.<br>
+This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle-jem.yml</code> and<br>
+may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
+not practical for the current toolchain.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>🚚 <em>Amazing</em> test matrix was brought to you by</th>
+      <th>🔎 appraisal2 🔎 and the color 💚 green 💚</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>👟 Check it out!</td>
+      <td>✨ <a href="https://github.com/appraisal-rb/appraisal2">github.com/appraisal-rb/appraisal2</a> ✨</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-installation">✨ Installation</h2>
+
+<p>Install the gem and add to the application’s Gemfile by executing:</p>
+
+<pre class="code language-console"><code class="language-console">bundle add prism-merge
+</code></pre>
+
+<p>If bundler is not being used to manage dependencies, install the gem by executing:</p>
+
+<pre class="code language-console"><code class="language-console">gem install prism-merge
+</code></pre>
+
+<h2 id="️-configuration">⚙️ Configuration</h2>
+
+<p>Prism::Merge works out of the box with zero configuration, but offers customization options for advanced use cases.</p>
+
+<h3 id="signature-match-preference">Signature Match Preference</h3>
+
+<p>Control which version to use when nodes have matching signatures but different content:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Use template version (for version files, configs where template has updates)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  preference: :template,
+)
+
+# Use destination version (for Appraisals, configs with customizations)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  preference: :destination,  # This is the default
+)
+</code></pre>
+
+<p><strong>When to use each:</strong></p>
+
+<ul>
+  <li>
+<strong><code>:template</code></strong> - Template contains canonical/updated values
+    <ul>
+      <li>Version files (<code>VERSION = "2.0.0"</code> should replace <code>VERSION = "1.0.0"</code>)</li>
+      <li>Configuration updates (<code>API_ENDPOINT</code> should be updated)</li>
+      <li>Conditional bodies (<code>if ENV["DEBUG"]</code> should use template’s implementation)</li>
+    </ul>
+  </li>
+  <li>
+<strong><code>:destination</code></strong> (default) - Destination contains customizations
+    <ul>
+      <li>Appraisals files (destination has project-specific gem versions)</li>
+      <li>Project-specific configurations</li>
+      <li>Custom implementations</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="template-only-nodes">Template-Only Nodes</h3>
+
+<p>Control whether to add nodes that only exist in the template:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Add template-only nodes (for merging new features/constants)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  add_template_only_nodes: true,
+)
+
+# Skip template-only nodes (for templates with placeholder content)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  add_template_only_nodes: false,  # This is the default
+)
+</code></pre>
+
+<p><strong>When to use each:</strong></p>
+
+<ul>
+  <li>
+<strong><code>true</code></strong> - Template has new content to add
+    <ul>
+      <li>New constants (<code>NAME = "myapp"</code> should be added to destination)</li>
+      <li>New methods/classes from template</li>
+      <li>Required configuration options</li>
+    </ul>
+  </li>
+  <li>
+<strong><code>false</code></strong> (default) - Template has placeholder/example content
+    <ul>
+      <li>Appraisals templates with ruby version blocks not in destination</li>
+      <li>Example configurations that shouldn’t be added</li>
+      <li>Template-only nodes would create unwanted additions</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="combined-configuration">Combined Configuration</h3>
+
+<p>For different merge scenarios:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Scenario 1: Version file merge (template wins, add new constants)
+merger = Prism::Merge::SmartMerger.new(
+  template_content,
+  dest_content,
+  preference: :template,
+  add_template_only_nodes: true,
+)
+# Result: VERSION updated to template value, NAME constant added
+
+# Scenario 2: Appraisals merge (destination wins, skip template-only blocks)
+merger = Prism::Merge::SmartMerger.new(
+  template_content,
+  dest_content,
+  preference: :destination,       # default
+  add_template_only_nodes: false, # default
+)
+# Result: Destination gem versions preserved, template-only ruby blocks skipped
+
+# Scenario 3: Config merge (mix and match)
+merger = Prism::Merge::SmartMerger.new(
+  template_content,
+  dest_content,
+  preference: :destination,       # Keep custom values
+  add_template_only_nodes: true,  # But add new required configs
+)
+# Result: Existing configs keep destination values, new configs added from template
+</code></pre>
+
+<h3 id="recursion-depth-limit">Recursion Depth Limit</h3>
+
+<p>Prism::Merge automatically detects when block bodies contain only literals or simple expressions (no mergeable statements) and treats them atomically. However, as a safety valve for edge cases, you can limit recursion depth:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Limit recursive merging to 3 levels deep
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  max_recursion_depth: 3,
+)
+
+# Disable recursive merging entirely (treat all nodes atomically)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  max_recursion_depth: 0,
+)
+</code></pre>
+
+<p><strong>When to use:</strong></p>
+
+<ul>
+  <li>
+<strong><code>Float::INFINITY</code></strong> (default) - Normal operation, recursion terminates naturally based on content analysis.
+    <ul>
+      <li>NOTE: If you get <code>stack level too deep (SystemStackError)</code>, please file a <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">bug</a>!</li>
+    </ul>
+  </li>
+  <li>
+<strong>Finite value</strong> - Safety valve if you encounter edge cases with unexpected deep recursion</li>
+  <li>
+<strong><code>0</code></strong> - Disable recursive merging entirely; all matching nodes are treated atomically</li>
+</ul>
+
+<h3 id="per-node-type-preferences">Per-Node-Type Preferences</h3>
+
+<p>For advanced use cases, you can specify different preferences for different node types using a Hash:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  preference: {
+    default: :destination,    # Default for unspecified types
+    lint_gem: :template,      # Use template versions for lint gems
+    test_gem: :destination,   # Keep destination versions for test gems
+  },
+)
+</code></pre>
+
+<p>This is especially powerful when combined with the <code>node_typing</code> option (see below) to create custom node categories.</p>
+
+<h3 id="node-typing">Node Typing</h3>
+
+<p>The <code>node_typing</code> option allows you to transform nodes and add custom <code>merge_type</code> attributes that can be used for per-node-type preferences:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Define a node typing config that categorizes gem calls
+node_typing = {
+  CallNode: -&gt;(node) {
+    # Only process gem() calls
+    return node unless node.name == :gem
+    first_arg = node.arguments&amp;.arguments&amp;.first
+    return node unless first_arg.is_a?(Prism::StringNode)
+
+    gem_name = first_arg.unescaped
+
+    # Categorize gems by type
+    if gem_name.start_with?(&quot;rubocop&quot;, &quot;standard&quot;)
+      Ast::Merge::NodeTyping.with_merge_type(node, :lint_gem)
+    elsif gem_name.start_with?(&quot;rspec&quot;, &quot;minitest&quot;, &quot;test-&quot;)
+      Ast::Merge::NodeTyping.with_merge_type(node, :test_gem)
+    else
+      node  # Return unchanged for other gems
+    end
+  },
+}
+
+# Use the node typing with per-type preferences
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  node_typing: node_typing,
+  preference: {
+    default: :destination,    # Default: keep destination versions
+    lint_gem: :template,      # But use template versions for linters
+  },
+)
+</code></pre>
+
+<h4 id="how-node-typing-works">How Node Typing Works</h4>
+
+<ol>
+  <li>
+<strong>Node Processing</strong>: During analysis, each node is passed through the typing config for its type</li>
+  <li>
+<strong>Type Wrapping</strong>: The config can wrap nodes with <code>Ast::Merge::NodeTyping.with_merge_type(node, :type)</code>
+</li>
+  <li>
+<strong>Preference Lookup</strong>: During conflict resolution, wrapped nodes have their <code>merge_type</code> checked against the preference Hash</li>
+  <li>
+<strong>Transparent Delegation</strong>: Wrapped nodes delegate all methods to the original node, so existing logic works unchanged</li>
+</ol>
+
+<h4 id="node-typing-return-values">Node Typing Return Values</h4>
+
+<p>Your typing callable can return:</p>
+
+<ul>
+  <li>
+<strong>The original node</strong> - Node is processed normally with default preference</li>
+  <li>
+<strong>A wrapped node</strong> (using <code>NodeTyping.with_merge_type</code>) - Node uses the type-specific preference</li>
+  <li>
+<strong><code>nil</code></strong> - Node is skipped (use with caution)</li>
+</ul>
+
+<h4 id="integration-with-signature-generator">Integration with Signature Generator</h4>
+
+<p>Node typing works alongside <code>signature_generator</code>. Nodes are first processed through the typing config, then the (potentially wrapped) node is passed to the signature generator:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">node_typing = {
+  CallNode: -&gt;(node) {
+    # Categorize gem calls
+    return node unless node.name == :gem
+    gem_name = node.arguments&amp;.arguments&amp;.first&amp;.unescaped
+    return node unless gem_name
+
+    if gem_name.match?(/^(rubocop|standard)/)
+      Ast::Merge::NodeTyping.with_merge_type(node, :lint_gem)
+    else
+      node
+    end
+  },
+}
+
+signature_generator = -&gt;(node) {
+  # Custom signature for gem calls
+  if node.is_a?(Prism::CallNode) &amp;&amp; node.name == :gem
+    first_arg = node.arguments&amp;.arguments&amp;.first
+    return [:gem, first_arg.unescaped] if first_arg.is_a?(Prism::StringNode)
+  end
+  node  # Fall through to default
+}
+
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  node_typing: node_typing,
+  signature_generator: signature_generator,
+  preference: {default: :destination, lint_gem: :template},
+)
+</code></pre>
+
+<h3 id="method-match-refiner">Method Match Refiner</h3>
+
+<p>When Ruby method definitions don’t match by exact signature (name + parameters), the<br>
+<code>MethodMatchRefiner</code> uses fuzzy matching to pair methods with:</p>
+
+<ul>
+  <li>Similar names (e.g., <code>process_user</code> vs <code>process_users</code>)</li>
+  <li>Same name but different parameter signatures</li>
+  <li>Renamed methods that perform similar functions</li>
+</ul>
+
+<pre class="code language-ruby"><code class="language-ruby"># Enable method fuzzy matching
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [
+    Prism::Merge::MethodMatchRefiner.new(threshold: 0.6),
+  ],
+)
+</code></pre>
+
+<h4 id="methodmatchrefiner-options">MethodMatchRefiner Options</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>threshold</code></td>
+      <td>0.5</td>
+      <td>Minimum similarity score (0.0-1.0) to accept a match</td>
+    </tr>
+    <tr>
+      <td><code>name_weight</code></td>
+      <td>0.7</td>
+      <td>Weight for method name similarity</td>
+    </tr>
+    <tr>
+      <td><code>params_weight</code></td>
+      <td>0.3</td>
+      <td>Weight for parameter similarity</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre class="code language-ruby"><code class="language-ruby"># Custom weights for name-centric matching
+refiner = Prism::Merge::MethodMatchRefiner.new(
+  threshold: 0.6,
+  name_weight: 0.8,   # Focus more on method names
+  params_weight: 0.2,  # Less focus on parameters
+)
+
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [refiner],
+)
+</code></pre>
+
+<h4 id="fuzzy-method-matching-example">Fuzzy Method Matching Example</h4>
+
+<pre class="code language-ruby"><code class="language-ruby">template = &lt;&lt;~RUBY
+  class UserService
+    def process_user(user)
+      validate(user)
+      save(user)
+    end
+
+    def find_user_by_email(email)
+      User.find_by(email: email)
+    end
+  end
+RUBY
+
+destination = &lt;&lt;~RUBY
+  class UserService
+    def process_users(users)
+      users.each { |u| validate(u); save(u) }
+    end
+
+    def find_by_email(email)
+      User.where(email: email).first
+    end
+  end
+RUBY
+
+# Default merge won&#39;t match methods (names/params differ)
+# Use MethodMatchRefiner for fuzzy matching
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [
+    Prism::Merge::MethodMatchRefiner.new(threshold: 0.5),
+  ],
+)
+
+# Methods are matched despite name differences:
+# - process_user ↔ process_users (similar: &quot;process_user&quot;)
+# - find_user_by_email ↔ find_by_email (similar: &quot;find&quot;, &quot;email&quot;)
+</code></pre>
+
+<h3 id="custom-signature-generator">Custom Signature Generator</h3>
+
+<p>By default, Prism::Merge uses intelligent structural signatures to match nodes. The signature determines how nodes are matched between template and destination files.</p>
+
+<h4 id="default-signature-matching">Default Signature Matching</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Node Type</th>
+      <th>Signature Format</th>
+      <th>Matching Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>DefNode</code></td>
+      <td><code>[:def, name, params]</code></td>
+      <td>Methods match by name and parameter names</td>
+    </tr>
+    <tr>
+      <td><code>ClassNode</code></td>
+      <td><code>[:class, name]</code></td>
+      <td>Classes match by name</td>
+    </tr>
+    <tr>
+      <td><code>ModuleNode</code></td>
+      <td><code>[:module, name]</code></td>
+      <td>Modules match by name</td>
+    </tr>
+    <tr>
+      <td><code>SingletonClassNode</code></td>
+      <td><code>[:singleton_class, expr]</code></td>
+      <td>Singleton classes match by expression (<code>class &lt;&lt; self</code>)</td>
+    </tr>
+    <tr>
+      <td><code>ConstantWriteNode</code></td>
+      <td><code>[:const, name]</code></td>
+      <td>Constants match by name only (not value)</td>
+    </tr>
+    <tr>
+      <td><code>ConstantPathWriteNode</code></td>
+      <td><code>[:const, target]</code></td>
+      <td>Namespaced constants match by full path</td>
+    </tr>
+    <tr>
+      <td><code>LocalVariableWriteNode</code></td>
+      <td><code>[:local_var, name]</code></td>
+      <td>Local variables match by name</td>
+    </tr>
+    <tr>
+      <td><code>InstanceVariableWriteNode</code></td>
+      <td><code>[:ivar, name]</code></td>
+      <td>Instance variables match by name</td>
+    </tr>
+    <tr>
+      <td><code>ClassVariableWriteNode</code></td>
+      <td><code>[:cvar, name]</code></td>
+      <td>Class variables match by name</td>
+    </tr>
+    <tr>
+      <td><code>GlobalVariableWriteNode</code></td>
+      <td><code>[:gvar, name]</code></td>
+      <td>Global variables match by name</td>
+    </tr>
+    <tr>
+      <td><code>MultiWriteNode</code></td>
+      <td><code>[:multi_write, targets]</code></td>
+      <td>Multiple assignment matches by target names</td>
+    </tr>
+    <tr>
+      <td>
+<code>IfNode</code> / <code>UnlessNode</code>
+</td>
+      <td><code>[:if, condition]</code></td>
+      <td>Conditionals match by condition expression</td>
+    </tr>
+    <tr>
+      <td><code>CaseNode</code></td>
+      <td><code>[:case, predicate]</code></td>
+      <td>Case statements match by the expression being switched</td>
+    </tr>
+    <tr>
+      <td><code>CaseMatchNode</code></td>
+      <td><code>[:case_match, predicate]</code></td>
+      <td>Pattern matching cases match by expression</td>
+    </tr>
+    <tr>
+      <td>
+<code>WhileNode</code> / <code>UntilNode</code>
+</td>
+      <td><code>[:while, condition]</code></td>
+      <td>Loops match by condition</td>
+    </tr>
+    <tr>
+      <td><code>ForNode</code></td>
+      <td><code>[:for, index, collection]</code></td>
+      <td>For loops match by index variable and collection</td>
+    </tr>
+    <tr>
+      <td><code>BeginNode</code></td>
+      <td><code>[:begin, first_stmt]</code></td>
+      <td>Begin blocks match by first statement (partial)</td>
+    </tr>
+    <tr>
+      <td>
+<code>CallNode</code> (regular)</td>
+      <td><code>[:call, name, first_arg]</code></td>
+      <td>Method calls match by name and first argument</td>
+    </tr>
+    <tr>
+      <td>
+<code>CallNode</code> (assignment)</td>
+      <td><code>[:call, :method=, receiver]</code></td>
+      <td>Assignment calls (<code>x.y = z</code>) match by receiver, not value</td>
+    </tr>
+    <tr>
+      <td>
+<code>CallNode</code> (with block)</td>
+      <td><code>[:call_with_block, name, first_arg]</code></td>
+      <td>Block calls match by name and first argument</td>
+    </tr>
+    <tr>
+      <td><code>SuperNode</code></td>
+      <td><code>[:super, :with_block]</code></td>
+      <td>Super calls match by presence of block</td>
+    </tr>
+    <tr>
+      <td><code>LambdaNode</code></td>
+      <td><code>[:lambda, params]</code></td>
+      <td>Lambdas match by parameter signature</td>
+    </tr>
+    <tr>
+      <td><code>PreExecutionNode</code></td>
+      <td><code>[:pre_execution, line]</code></td>
+      <td>BEGIN blocks match by line number</td>
+    </tr>
+    <tr>
+      <td><code>PostExecutionNode</code></td>
+      <td><code>[:post_execution, line]</code></td>
+      <td>END blocks match by line number</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="recursive-merge-support">Recursive Merge Support</h4>
+
+<p>The following node types support <strong>recursive body merging</strong>, where nested content is intelligently combined:</p>
+
+<ul>
+  <li>
+<code>ClassNode</code> - class bodies are recursively merged</li>
+  <li>
+<code>ModuleNode</code> - module bodies are recursively merged</li>
+  <li>
+<code>SingletonClassNode</code> - singleton class bodies are recursively merged</li>
+  <li>
+<code>CallNode</code> with block - block bodies are recursively merged <strong>only when the body contains mergeable statements</strong> (e.g., <code>describe do ... end</code> with nested <code>it</code> blocks). Blocks containing only literals or simple expressions (like <code>git_source(:github) { |repo| "https://..." }</code>) are treated atomically.</li>
+  <li>
+<code>BeginNode</code> - begin/rescue/ensure blocks are recursively merged</li>
+</ul>
+
+<h4 id="custom-signature-generator-1">Custom Signature Generator</h4>
+
+<p>You can provide a custom signature generator to control how nodes are matched between template and destination files. The signature generator is a callable (lambda/proc) that receives a <code>Prism::Node</code> (or <code>FreezeNodeBase</code> subclass) and returns one of three types of values:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Return Value</th>
+      <th>Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+<strong>Array</strong> (e.g., <code>[:gem, "foo"]</code>)</td>
+      <td>Used as the node’s signature for matching. Nodes with identical signatures are considered matches.</td>
+    </tr>
+    <tr>
+      <td><strong><code>nil</code></strong></td>
+      <td>The node gets no signature and won’t be matched by signature. Useful for nodes you want to skip or handle specially.</td>
+    </tr>
+    <tr>
+      <td><strong><code>Prism::Node</code> or <code>FreezeNodeBase</code> subclass</strong></td>
+      <td>Falls through to the default signature computation using the returned node. Return the original node unchanged for simple fallthrough, or return a modified node to influence default matching.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h5 id="basic-example">Basic Example</h5>
+
+<pre class="code language-ruby"><code class="language-ruby">signature_generator = lambda do |node|
+  case node
+  when Prism::CallNode
+    # Match method calls by name only, ignoring arguments
+    [:call, node.name]
+  when Prism::DefNode
+    # Match method definitions by name and parameters
+    [:def, node.name, node.parameters&amp;.slice]
+  when Prism::ClassNode
+    # Match classes by name
+    [:class, node.constant_path.slice]
+  else
+    # Default matching - return node to fall through
+    node
+  end
+end
+</code></pre>
+
+<h5 id="fallthrough-example-recommended-pattern">Fallthrough Example (Recommended Pattern)</h5>
+
+<p>The fallthrough pattern allows you to customize only specific node types while delegating everything else to the built-in signature logic:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">signature_generator = -&gt;(node) {
+  # Only customize CallNode signatures for specific methods
+  if node.is_a?(Prism::CallNode)
+    # source() calls - match by method name only (there&#39;s usually just one)
+    return [:source] if node.name == :source
+
+    # gem() calls - match by gem name (first argument)
+    if node.name == :gem
+      first_arg = node.arguments&amp;.arguments&amp;.first
+      if first_arg.is_a?(Prism::StringNode)
+        return [:gem, first_arg.unescaped]
+      end
+    end
+  end
+
+  # Return the node to fall through to default signature computation
+  # This preserves correct handling for FreezeNodeBase subclasses, classes, modules, etc.
+  node
+}
+
+merger = Prism::Merge::SmartMerger.new(
+  template_content,
+  destination_content,
+  signature_generator: signature_generator,
+  preference: :template,
+  add_template_only_nodes: true,
+)
+</code></pre>
+
+<h5 id="why-fallthrough-matters">Why Fallthrough Matters</h5>
+
+<p>When you provide a custom signature generator, it’s called for <strong>all</strong> node types, including internal types like <code>FreezeNodeBase</code> subclasses. If your generator returns <code>nil</code> for node types it doesn’t recognize, those nodes won’t be matched properly:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># ❌ Bad: Returns nil for unrecognized nodes
+signature_generator = -&gt;(node) {
+  return unless node.is_a?(Prism::CallNode)  # FreezeNodeBase subclasses get nil!
+  [:call, node.name]
+}
+
+# ✅ Good: Falls through for unrecognized nodes
+signature_generator = -&gt;(node) {
+  if node.is_a?(Prism::CallNode)
+    return [:call, node.name]
+  end
+  node  # FreezeNodeBase subclasses and others use default signatures
+}
+</code></pre>
+
+<h3 id="three-phase-node-matching">Three-Phase Node Matching</h3>
+
+<p>Prism::Merge uses an ordered three-phase matching pipeline to handle renames, refactors, and moved nodes without duplication:</p>
+
+<p><strong>Phase 1 — Exact Signature Match</strong> (always runs first)</p>
+
+<p>Nodes are paired by structural signature (e.g., <code>[:def, :my_method, [:arg1, :arg2]]</code>). This is the fastest and most precise phase. All exact matches are locked in before any fuzzy matching begins.</p>
+
+<p><strong>Phase 2 — Body-Text Similarity</strong> (for renamed methods)</p>
+
+<p>After Phase 1, unmatched nodes at the same AST depth are compared using Jaccard body-text similarity. This catches renames — e.g., <code>def process_users</code> renamed to <code>def handle_users</code> with the same body. Only compound nodes with bodies (DefNode, ClassNode, ModuleNode) are eligible. Threshold: Jaccard &gt; 0.6, minimum 3 body tokens.</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Template                          # Destination
+def handle_users(data)              def process_users(data)
+  data.each { |u| validate(u) }      data.each { |u| validate(u) }
+end                                 end
+# Phase 2 recognizes these as the same method (renamed), not two separate nodes
+</code></pre>
+
+<p><strong>Phase 3 — Cross-Depth Search</strong> (for moved nodes)</p>
+
+<p>Remaining orphan template nodes are searched for inside destination control-flow blocks (<code>if</code>, <code>unless</code>, <code>begin</code>). This handles the common pattern where a template top-level statement exists inside a conditional in the destination:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Template has this at the top level:
+eval_gemfile &quot;gemfiles/modular/templating.gemfile&quot;
+
+# Destination has it wrapped in a conditional:
+if ENV.fetch(&quot;CI&quot;, &quot;false&quot;).casecmp(&quot;false&quot;).zero?
+  eval_gemfile &quot;gemfiles/modular/templating.gemfile&quot;
+end
+# Phase 3 finds the match inside the if-block, preventing duplication
+</code></pre>
+
+<p>Phase ordering is critical: exact matches must be locked in first so that fuzzy scoring cannot consume nodes that would have exact matches at different positions.</p>
+
+<h3 id="gemspec-variable-renaming">Gemspec Variable Renaming</h3>
+
+<p>When merging gemspec files where the block variable differs between template and destination (e.g., <code>do |spec|</code> vs <code>do |gem|</code>), Prism::Merge automatically rewrites receivers using AST-directed byte-offset replacement:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Template gemspec uses |spec|:
+Gem::Specification.new do |spec|
+  spec.name = &quot;mylib&quot;
+  spec.add_development_dependency(&quot;rake&quot;, &quot;~&gt; 13.0&quot;)
+end
+
+# Destination gemspec uses |gem|:
+Gem::Specification.new do |gem|
+  gem.name = &quot;mylib&quot;
+  gem.summary = &quot;A great library&quot;
+  gem.metadata[&quot;funding_uri&quot;] = &quot;https://fund.me&quot;
+end
+
+# After merge — all receivers use template&#39;s variable name:
+Gem::Specification.new do |spec|
+  spec.name = &quot;mylib&quot;
+  spec.add_development_dependency(&quot;rake&quot;, &quot;~&gt; 13.0&quot;)
+  spec.summary = &quot;A great library&quot;          # dest-only, auto-renamed
+  spec.metadata[&quot;funding_uri&quot;] = &quot;https://fund.me&quot;  # dest-only, auto-renamed
+end
+</code></pre>
+
+<p>The renaming is performed by <code>Prism::Merge::GemspecVarRenamer</code>, which:</p>
+
+<ol>
+  <li>Parses the source with Prism</li>
+  <li>Walks the AST via <code>Prism::Visitor</code> to find all <code>CallNode</code> root receivers matching the old variable</li>
+  <li>Collects unique byte offsets (handles chained calls like <code>gem.metadata[]</code> and operator writes like <code>gem.files +=</code>)</li>
+  <li>Applies positional replacements — <strong>no regular expressions</strong>
+</li>
+</ol>
+
+<h3 id="freeze-blocks">Freeze Blocks</h3>
+
+<p>Protect sections in the destination file from being overwritten by the template using freeze markers.</p>
+
+<p>By default, Prism::Merge uses <code>prism-merge</code> as the freeze token:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># In your destination.rb file
+# prism-merge:freeze
+gem &quot;custom-gem&quot;, path: &quot;../custom&quot;
+# Add any custom configuration you want to preserve
+# prism-merge:unfreeze
+</code></pre>
+
+<p>You can customize the freeze token to match your project’s conventions:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Use a custom freeze token (e.g., for kettle-dev projects)
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  freeze_token: &quot;kettle-dev&quot;,  # Now uses # kettle-dev:freeze / # kettle-dev:unfreeze
+)
+</code></pre>
+
+<p>Freeze blocks are <strong>always preserved</strong> from the destination file during merge, regardless of template content. They can be placed inside:</p>
+
+<ul>
+  <li>Class and module bodies (<code>class Foo ... end</code>, <code>module Bar ... end</code>)</li>
+  <li>Singleton class bodies (<code>class &lt;&lt; self ... end</code>)</li>
+  <li>Method definitions (<code>def method_name ... end</code>)</li>
+  <li>Lambda/proc bodies (<code>-&gt; { ... }</code>)</li>
+  <li>Block-based DSLs (e.g., RSpec <code>describe</code>/<code>context</code> blocks)</li>
+</ul>
+
+<p>This allows you to protect entire methods, portions of method implementations, or sections within DSL blocks.</p>
+
+<h4 id="inline-freeze-comments">Inline Freeze Comments</h4>
+
+<p>In addition to freeze blocks (with matching <code>freeze</code>/<code>unfreeze</code> markers), you can freeze a <strong>single Ruby statement</strong> by placing a freeze comment immediately before it:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># prism-merge:freeze
+gem &quot;my-custom-gem&quot;, path: &quot;../local-fork&quot;
+</code></pre>
+
+<p>When a freeze comment appears in the leading comments of a Ruby statement, that <strong>entire statement is frozen</strong>. This has important implications:</p>
+
+<h5 id="simple-statements">Simple Statements</h5>
+
+<p>For simple statements like method calls, assignments, or single expressions, the entire line is frozen:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># prism-merge:freeze
+gem &quot;example&quot;, &quot;~&gt; 1.0&quot;  # This entire gem declaration is frozen
+
+# prism-merge:freeze
+VERSION = &quot;1.2.3&quot;  # This constant assignment is frozen
+</code></pre>
+
+<h5 id="block-statements">Block Statements</h5>
+
+<p><strong>⚠️ Important:</strong> When a freeze comment precedes a block-based statement (like a class, module, method definition, or DSL block), the <strong>entire block is frozen</strong>, preventing any template updates to that section:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># prism-merge:freeze
+class MyCustomClass
+  # EVERYTHING inside this class is frozen!
+  # Template changes to this class will be ignored.
+  def custom_method
+    # ...
+  end
+end
+
+# prism-merge:freeze
+module MyModule
+  # The entire module body is frozen
+end
+
+# prism-merge:freeze
+def my_method(arg)
+  # The entire method body is frozen
+end
+
+# prism-merge:freeze
+describe &quot;My Feature&quot; do
+  # All specs inside this describe block are frozen
+  it &quot;does something&quot; do
+    # ...
+  end
+end
+</code></pre>
+
+<h5 id="matching-behavior">Matching Behavior</h5>
+
+<p>Frozen statements are matched by their <strong>structural identity</strong>, not their content. This means:</p>
+
+<ul>
+  <li>A frozen <code>gem "example"</code> in the destination will match <code>gem "example"</code> in the template (by gem name)</li>
+  <li>A frozen <code>def my_method</code> will match <code>def my_method</code> in the template (by method name)</li>
+  <li>A frozen <code>class Foo</code> will match <code>class Foo</code> in the template (by class name)</li>
+</ul>
+
+<p>The destination’s frozen version is always preserved, regardless of changes in the template.</p>
+
+<h3 id="integration-with-existing-systems">Integration with Existing Systems</h3>
+
+<p>If you’re integrating with an existing system that has its own signature logic:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Use your existing signature function
+my_signature_func = -&gt;(node) { MySystem.calculate_signature(node) }
+
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  signature_generator: my_signature_func,
+)
+</code></pre>
+
+<h2 id="-basic-usage">🔧 Basic Usage</h2>
+
+<h3 id="simple-merge">Simple Merge</h3>
+
+<p>The most basic usage merges two Ruby files:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;prism/merge&quot;
+
+template = File.read(&quot;template.rb&quot;)
+destination = File.read(&quot;destination.rb&quot;)
+
+merger = Prism::Merge::SmartMerger.new(template, destination)
+result = merger.merge
+
+File.write(&quot;merged.rb&quot;, result)
+</code></pre>
+
+<h3 id="understanding-the-merge">Understanding the Merge</h3>
+
+<p>Prism::Merge intelligently combines files by:</p>
+
+<ol>
+  <li>
+<strong>Finding Anchors</strong>: Identifies matching sections between files</li>
+  <li>
+<strong>Detecting Boundaries</strong>: Locates areas where files differ</li>
+  <li>
+<strong>Resolving Conflicts</strong>: Uses structural signatures to merge differences</li>
+  <li>
+<strong>Preserving Context</strong>: Maintains comments and freeze blocks</li>
+</ol>
+
+<p>Example:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># template.rb
+VERSION = &quot;2.0.0&quot;
+
+def greet(name)
+  puts &quot;Hello, #{name}!&quot;
+end
+
+# destination.rb
+VERSION = &quot;1.0.0&quot;
+
+def greet(name)
+  puts &quot;Hello, #{name}!&quot;
+end
+
+def custom_method
+  # This is destination-only
+end
+
+# After merge:
+# - VERSION from template (2.0.0) replaces destination (1.0.0)
+# - greet method matches, template version kept
+# - custom_method is preserved (destination-only)
+</code></pre>
+
+<h3 id="how-prismmerge-compares-to-other-merge-strategies">How Prism::Merge Compares to Other Merge Strategies</h3>
+
+<p>Prism::Merge uses a <strong>single-pass, AST-aware</strong> algorithm that differs fundamentally from line-based merge tools like <code>git merge</code> and IDE smart merges:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>Git Merge (3-way)</th>
+      <th>IDE Smart Merge</th>
+      <th>Prism::Merge</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Input</strong></td>
+      <td>3 files (base, ours, theirs)</td>
+      <td>2-3 files</td>
+      <td>2 files (template, destination)</td>
+    </tr>
+    <tr>
+      <td><strong>Unit of comparison</strong></td>
+      <td>Lines of text</td>
+      <td>Lines + some syntax awareness</td>
+      <td>AST nodes (Ruby structures)</td>
+    </tr>
+    <tr>
+      <td><strong>Passes</strong></td>
+      <td>Multi-pass (LCS algorithm)</td>
+      <td>Multi-pass</td>
+      <td>Single-pass with anchors</td>
+    </tr>
+    <tr>
+      <td><strong>Conflict handling</strong></td>
+      <td>Manual resolution with markers (<code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code>)</td>
+      <td>Interactive resolution</td>
+      <td>Automatic via signature matching</td>
+    </tr>
+    <tr>
+      <td><strong>Language awareness</strong></td>
+      <td>None (text-only)</td>
+      <td>Basic (indentation, brackets)</td>
+      <td>Full Ruby AST understanding</td>
+    </tr>
+    <tr>
+      <td><strong>Comment handling</strong></td>
+      <td>Treated as text</td>
+      <td>Treated as text</td>
+      <td>Attached to relevant nodes</td>
+    </tr>
+    <tr>
+      <td><strong>Structural matching</strong></td>
+      <td>Line equality only</td>
+      <td>Line + heuristics</td>
+      <td>Node signatures (type + identifier)</td>
+    </tr>
+    <tr>
+      <td><strong>Recursive merge</strong></td>
+      <td>No</td>
+      <td>Sometimes</td>
+      <td>Yes (class/module bodies)</td>
+    </tr>
+    <tr>
+      <td><strong>Freeze blocks</strong></td>
+      <td>No</td>
+      <td>No</td>
+      <td>Yes (preserve destination sections)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="key-differences-explained">Key Differences Explained</h4>
+
+<p><strong>Git Merge (3-way merge):</strong></p>
+
+<ul>
+  <li>Requires a common ancestor (base) to detect changes from each side</li>
+  <li>Uses Longest Common Subsequence (LCS) algorithm in multiple passes</li>
+  <li>Produces conflict markers when both sides modify the same lines</li>
+  <li>Language-agnostic: treats Ruby, Python, and prose identically</li>
+</ul>
+
+<p><strong>IDE Smart Merge:</strong></p>
+
+<ul>
+  <li>Often uses 3-way merge as foundation</li>
+  <li>Adds heuristics for common patterns (moved blocks, reformatting)</li>
+  <li>May understand basic syntax for better conflict detection</li>
+  <li>Still fundamentally line-based with enhancements</li>
+</ul>
+
+<p><strong>Prism::Merge:</strong></p>
+
+<ul>
+  <li>Uses 2 files: template (source of truth) and destination (customized version)</li>
+  <li>Single-pass algorithm that builds a timeline of anchors (matches) and boundaries (differences)</li>
+  <li>Matches by <strong>structural signature</strong> (e.g., <code>[:def, :method_name]</code>), not line content</li>
+  <li>Automatically resolves conflicts based on configurable preference</li>
+  <li>Never produces conflict markers - always produces valid, runnable Ruby</li>
+</ul>
+
+<h4 id="when-to-use-each">When to Use Each</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Scenario</th>
+      <th>Best Tool</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Merging git branches with divergent changes</td>
+      <td>Git Merge</td>
+    </tr>
+    <tr>
+      <td>Resolving complex conflicts interactively</td>
+      <td>IDE Smart Merge</td>
+    </tr>
+    <tr>
+      <td>Updating project files from a template</td>
+      <td><strong>Prism::Merge</strong></td>
+    </tr>
+    <tr>
+      <td>Maintaining customizations across template updates</td>
+      <td><strong>Prism::Merge</strong></td>
+    </tr>
+    <tr>
+      <td>Merging non-Ruby files</td>
+      <td>Git Merge / IDE</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="with-debug-information">With Debug Information</h3>
+
+<p>Get detailed information about merge decisions:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">merger = Prism::Merge::SmartMerger.new(template, destination)
+debug_result = merger.merge_with_debug
+
+puts debug_result[:content]      # Final merged content
+puts debug_result[:statistics]   # Decision counts
+puts debug_result[:debug]        # Line-by-line provenance
+</code></pre>
+
+<p>The debug output shows:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">debug_result[:statistics]
+# =&gt; {
+#   kept_template: 42,        # Lines from template (no conflict)
+#   kept_destination: 8,      # Lines from destination (no conflict)
+#   replaced: 5,              # Template replaced matching destination
+#   appended: 3,              # Destination-only content added
+#   freeze_block: 2           # Lines from freeze blocks
+# }
+</code></pre>
+
+<h3 id="error-handling">Error Handling</h3>
+
+<p>Prism::Merge raises exceptions when files have syntax errors:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">begin
+  merger = Prism::Merge::SmartMerger.new(template, destination)
+  result = merger.merge
+rescue Prism::Merge::TemplateParseError =&gt; e
+  puts &quot;Template has syntax errors&quot;
+  puts &quot;Content: #{e.content}&quot;
+  puts &quot;Parse errors: #{e.parse_result.errors}&quot;
+rescue Prism::Merge::DestinationParseError =&gt; e
+  puts &quot;Destination has syntax errors&quot;
+  puts &quot;Content: #{e.content}&quot;
+  puts &quot;Parse errors: #{e.parse_result.errors}&quot;
+end
+</code></pre>
+
+<h3 id="validating-before-merge">Validating Before Merge</h3>
+
+<p>Check if files are valid before attempting a merge:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">template_analysis = Prism::Merge::FileAnalysis.new(template_content)
+dest_analysis = Prism::Merge::FileAnalysis.new(dest_content)
+
+if template_analysis.valid? &amp;&amp; dest_analysis.valid?
+  merger = Prism::Merge::SmartMerger.new(template_content, dest_content)
+  result = merger.merge
+else
+  puts &quot;Files have syntax errors&quot; unless template_analysis.valid?
+  puts &quot;Cannot merge&quot;
+end
+</code></pre>
+
+<h3 id="working-with-freeze-blocks">Working with Freeze Blocks</h3>
+
+<p>Protect custom sections from template updates:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># destination.rb
+class MyApp
+  # prism-merge:freeze
+  CUSTOM_CONFIG = {
+    api_key: ENV.fetch(&quot;API_KEY&quot;),
+    endpoint: &quot;https://custom.example.com&quot;,
+  }
+  # prism-merge:unfreeze
+
+  VERSION = &quot;1.0.0&quot;
+end
+
+# template.rb
+class MyApp
+  CUSTOM_CONFIG = {}  # Template wants to reset this
+
+  VERSION = &quot;2.0.0&quot;
+end
+
+# Merge with default freeze token
+merger = Prism::Merge::SmartMerger.new(template, destination)
+result = merger.merge
+
+# Or use a custom freeze token if your project uses a different convention
+merger = Prism::Merge::SmartMerger.new(
+  template,
+  destination,
+  freeze_token: &quot;kettle-dev&quot;,  # for kettle-dev projects
+)
+result = merger.merge
+
+# After merge, CUSTOM_CONFIG keeps destination values
+# but VERSION is updated to 2.0.0
+</code></pre>
+
+<h3 id="advanced-inspect-merge-components">Advanced: Inspect Merge Components</h3>
+
+<p>For debugging or understanding the merge process:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Analyze files separately
+template_analysis = Prism::Merge::FileAnalysis.new(template)
+dest_analysis = Prism::Merge::FileAnalysis.new(destination)
+
+puts &quot;Template statements: #{template_analysis.statements.length}&quot;
+puts &quot;Template freeze blocks: #{template_analysis.freeze_blocks.length}&quot;
+
+# See what anchors and boundaries are found
+aligner = Prism::Merge::FileAligner.new(template_analysis, dest_analysis)
+boundaries = aligner.align
+
+puts &quot;Anchors (matching sections): #{aligner.anchors.length}&quot;
+aligner.anchors.each do |anchor|
+  puts &quot;  Lines #{anchor.template_start}-#{anchor.template_end} match&quot;
+end
+
+puts &quot;Boundaries (differences): #{boundaries.length}&quot;
+boundaries.each do |boundary|
+  puts &quot;  Template #{boundary.template_range} vs Dest #{boundary.dest_range}&quot;
+end
+</code></pre>
+
+<h3 id="integration-example">Integration Example</h3>
+
+<p>Use Prism::Merge in your own templating system:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">class MyTemplateEngine
+  def merge_ruby_file(template_path, destination_path)
+    template = File.read(template_path)
+    destination = File.exist?(destination_path) ? File.read(destination_path) : &quot;&quot;
+
+    merger = Prism::Merge::SmartMerger.new(template, destination)
+    merged_content = merger.merge
+
+    File.write(destination_path, merged_content)
+
+    # Return statistics for reporting
+    debug_result = merger.merge_with_debug
+    debug_result[:statistics]
+  rescue Prism::Merge::Error =&gt; e
+    puts &quot;Merge failed: #{e.message}&quot;
+    # Fall back to template only
+    File.write(destination_path, template)
+    nil
+  end
+end
+</code></pre>
+
+<h3 id="testing-your-merges">Testing Your Merges</h3>
+
+<p>Example RSpec test:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;prism/merge&quot;
+
+RSpec.describe(&quot;Ruby file merging&quot;) do
+  it &quot;updates VERSION from template&quot; do
+    template = &lt;&lt;~RUBY
+      VERSION = &quot;2.0.0&quot;
+      def hello; end
+    RUBY
+
+    destination = &lt;&lt;~RUBY
+      VERSION = &quot;1.0.0&quot;
+      def hello; end
+      def custom; end
+    RUBY
+
+    merger = Prism::Merge::SmartMerger.new(template, destination)
+    result = merger.merge
+
+    # Template version wins
+    expect(result).to(include(&#39;VERSION = &quot;2.0.0&quot;&#39;))
+    # Destination-only method preserved
+    expect(result).to(include(&quot;def custom&quot;))
+  end
+
+  it &quot;preserves freeze blocks&quot; do
+    template = &lt;&lt;~RUBY
+      CONFIG = {}
+    RUBY
+
+    destination = &lt;&lt;~RUBY
+      # prism-merge:freeze
+      CONFIG = { key: &quot;secret&quot; }
+      # prism-merge:unfreeze
+    RUBY
+
+    merger = Prism::Merge::SmartMerger.new(template, destination)
+    result = merger.merge
+
+    # Freeze block content preserved
+    expect(result).to(include(&#39;CONFIG = { key: &quot;secret&quot; }&#39;))
+  end
+
+  it &quot;works with custom freeze tokens&quot; do
+    template = &lt;&lt;~RUBY
+      CONFIG = {}
+    RUBY
+
+    destination = &lt;&lt;~RUBY
+      # my-app:freeze
+      CONFIG = { key: &quot;secret&quot; }
+      # my-app:unfreeze
+    RUBY
+
+    merger = Prism::Merge::SmartMerger.new(
+      template,
+      destination,
+      freeze_token: &quot;my-app&quot;,  # Match your project&#39;s freeze token
+    )
+    result = merger.merge
+
+    # Freeze block content preserved
+    expect(result).to(include(&#39;CONFIG = { key: &quot;secret&quot; }&#39;))
+  end
+end
+</code></pre>
+
+<h2 id="-security">🔐 Security</h2>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+
+<h2 id="-contributing">🤝 Contributing</h2>
+
+<p>If you need some ideas of where to help, you could work on adding more code coverage,<br>
+or if it is already 💯 (see <a href="#code-coverage">below</a>) check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>,<br>
+or use the gem and think about how it could be better.</p>
+
+<p>We <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep A Changelog"></a> so if you make changes, remember to update it.</p>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more detailed instructions.</p>
+
+<h2 id="-versioning">📌 Versioning</h2>
+
+<p>This library follows <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="Semantic Versioning 2.0.0"></a> for its public API where practical.<br>
+For most applications, prefer the <a href="http://guides.rubygems.org/patterns/#pessimistic-version-constraint">Pessimistic Version Constraint</a> with two digits of precision.</p>
+
+<p>For example:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">spec.add_dependency(&quot;prism-merge&quot;, &quot;~&gt; 7.0&quot;)
+</code></pre>
+
+<details>
+  <summary>📌 Is "Platform Support" part of the public API? More details inside.</summary>
+
+  <p>Dropping support for a platform can be a breaking change for affected users.
+If a release changes supported platforms, it should be called out clearly in the changelog and versioned with that impact in mind.</p>
+
+  <p>To get a better understanding of how SemVer is intended to work over a project’s lifetime,
+read this article from the creator of SemVer:</p>
+
+  <ul>
+    <li><a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">“Major Version Numbers are Not Sacred”</a></li>
+  </ul>
+
+</details>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CHANGELOG.md">CHANGELOG.md</a> for a list of releases.</p>
+
+<h2 id="-license">📄 License</h2>
+
+<p>The gem is available under the following licenses: <a href="AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
+See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
+
+<p>If none of the available licenses suit your use case, please <a href="mailto:floss@galtzo.com">contact us</a> to discuss a custom commercial license.</p>
+
+</div></div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

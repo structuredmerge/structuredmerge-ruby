@@ -1,32 +1,33 @@
 # frozen_string_literal: true
 
-require "json"
-require "pathname"
-require "version_gem/rspec"
-require "rspec/stubbed_env"
-require_relative "../../../spec/bootstrap/tree_haver_backends"
-require_relative "../../../spec/bootstrap/merge_gems"
+# Config for development dependencies of this library
+# i.e., not configured by this library
+#
+# SimpleCov & related config (must run BEFORE any other requires)
+# NOTE: Gemfiles for non-coverage appraisals may not have kettle-soup-cover.
+#       The rescue LoadError handles that scenario.
+begin
+  require "kettle-soup-cover"
+  require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+rescue LoadError => error
+  # check the error message and re-raise when unexpected
+  raise error unless error.message.include?("kettle")
+end
 
+# External RSpec & related config
+require "kettle/test/rspec"
+
+# This library
 require "ast/merge"
-require "ast/merge/rspec/dependency_tags_config"
-require "ast/merge/rspec/shared_examples"
-require "markdown-merge"
-require "toml-merge"
-require "ruby-merge"
-
-require_relative "support/testable_node"
-require_relative "support/fictive_language_harness"
 
 RSpec.configure do |config|
+  # Enable flags like --only-failures and --next-failure
+  config.example_status_persistence_file_path = ".rspec_status"
+
+  # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
-  config.include RSpec::StubbedEnv::StubHelpers
-  config.include RSpec::StubbedEnv::HideHelpers
 
-  config.before do
-    allow(described_class).to receive(:sleep) if described_class&.respond_to?(:sleep)
-  end
-
-  config.expect_with(:rspec) do |expectations|
-    expectations.syntax = :expect
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
   end
 end

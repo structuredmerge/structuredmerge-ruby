@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::TrailingGroups::Core
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::TrailingGroups::Core";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../TrailingGroups.html" title="Ast::Merge::TrailingGroups (module)">TrailingGroups</a></span></span>
+     &raquo; 
+    <span class="title">Core</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::TrailingGroups::Core
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="DestIterate.html" title="Ast::Merge::TrailingGroups::DestIterate (module)">DestIterate</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/trailing_groups/core.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Core primitives for position-aware template-only node interleaving.</p>
+
+<p>This module provides three stateless methods that form the backbone of<br />
+the trailing-groups algorithm.  They operate on plain data structures<br />
+(hashes, sets, arrays) and yield to caller-supplied blocks for<br />
+format-specific emission — no emitter API coupling.</p>
+
+<h2 id="algorithm-overview">Algorithm overview</h2>
+
+<ol>
+  <li>
+    <p><strong>Build</strong> — Walk template nodes in template order.  Each node is<br />
+classified as <em>matched</em> (present in destination) or <em>template-only</em><br />
+via a caller-supplied predicate.  Consecutive template-only nodes are<br />
+grouped under the index of the preceding matched node (<code>:prefix</code> for<br />
+nodes before the first match).</p>
+  </li>
+  <li>
+    <p><strong>Flush</strong> — After each destination node is consumed during the dest<br />
+iteration loop, check whether any interior trailing groups are now<br />
+<em>ready</em>.  A group anchored at template index K is ready when <strong>all</strong><br />
+matched template indices ≤ K have been consumed.  This deferred-flush<br />
+approach handles destination reordering correctly.</p>
+  </li>
+  <li>
+    <p><strong>Emit remaining</strong> — After the dest loop, emit any trailing groups<br />
+that were never flushed (tail groups, safety net for edge cases).</p>
+  </li>
+</ol>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Direct usage (rare — prefer DestIterate wrapper)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../TrailingGroups.html" title="Ast::Merge::TrailingGroups (module)">TrailingGroups</a></span></span><span class='op'>::</span><span class='const'>Core</span>
+
+<span class='id identifier rubyid_groups'>groups</span><span class='comma'>,</span> <span class='id identifier rubyid_matched'>matched</span> <span class='op'>=</span> <span class='id identifier rubyid_build_trailing_groups'>build_trailing_groups</span><span class='lparen'>(</span>
+  <span class='label'>template_nodes:</span> <span class='id identifier rubyid_nodes'>nodes</span><span class='comma'>,</span>
+  <span class='label'>matched_predicate:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_sig'>sig</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="DestIterate.html" title="Ast::Merge::TrailingGroups::DestIterate (module)">Higher-level wrapper for Pattern A gems</a></span></li>
+    
+      <li><span class='object_link'><a href="AlignmentSort.html" title="Ast::Merge::TrailingGroups::AlignmentSort (module)">Higher-level wrapper for Pattern B gems</a></span></li>
+    
+  </ul>
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#build_trailing_groups-instance_method" title="#build_trailing_groups (instance method)">#<strong>build_trailing_groups</strong>(template_nodes:, matched_predicate:, entry_builder: nil)  &#x21d2; Array(Hash{Symbol,Integer =&gt; Array&lt;Hash&gt;}, Set&lt;Integer&gt;) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a map of trailing groups for position-aware insertion.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#emit_remaining_trailing_groups-instance_method" title="#emit_remaining_trailing_groups (instance method)">#<strong>emit_remaining_trailing_groups</strong>(trailing_groups:, consumed_indices:) {|info| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Emit any trailing groups not yet flushed (tail + safety net).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#flush_ready_trailing_groups-instance_method" title="#flush_ready_trailing_groups (instance method)">#<strong>flush_ready_trailing_groups</strong>(trailing_groups:, matched_indices:, consumed_indices:) {|info| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Flush interior trailing groups whose prerequisites are met.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="build_trailing_groups-instance_method">
+  
+    #<strong>build_trailing_groups</strong>(template_nodes:, matched_predicate:, entry_builder: nil)  &#x21d2; <tt>Array(Hash{Symbol,Integer =&gt; Array&lt;Hash&gt;}, Set&lt;Integer&gt;)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a map of trailing groups for position-aware insertion.</p>
+
+<p>Walks +template_nodes+ in order.  For each node the +matched_predicate+<br />
+is called with +(node, index)+.  Matched nodes become group anchors;<br />
+consecutive unmatched nodes accumulate in the current group.</p>
+
+<p>Each group entry is a Hash with at least +:node+ and +:index+ keys.<br />
+Callers may supply +entry_builder+ to add extra keys (e.g. +:item+<br />
+for sequence items in psych-merge).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Ordered template nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>matched_predicate</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lambda receiving +(node, index)+,<br />
+returns truthy when the node is matched in the destination</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>entry_builder</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional lambda receiving<br />
++(node, index)+ that returns the Hash to store in the buffer.<br />
+Defaults to +{ node: node, index: index }+.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(Hash{Symbol,Integer =&gt; Array&lt;Hash&gt;}, Set&lt;Integer&gt;)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Tuple of +[trailing_groups, matched_indices]+.<br />
++trailing_groups+ is keyed by +:prefix+ or the Integer index of the<br />
+preceding matched template node.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/core.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_build_trailing_groups'>build_trailing_groups</span><span class='lparen'>(</span><span class='label'>template_nodes:</span><span class='comma'>,</span> <span class='label'>matched_predicate:</span><span class='comma'>,</span> <span class='label'>entry_builder:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_groups'>groups</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_matched_indices'>matched_indices</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+  <span class='id identifier rubyid_current_anchor'>current_anchor</span> <span class='op'>=</span> <span class='symbol'>:prefix</span>
+  <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_matched_predicate'>matched_predicate</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_matched_indices'>matched_indices</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_idx'>idx</span>
+      <span class='id identifier rubyid_groups'>groups</span><span class='lbracket'>[</span><span class='id identifier rubyid_current_anchor'>current_anchor</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='kw'>unless</span> <span class='id identifier rubyid_current_buffer'>current_buffer</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_current_anchor'>current_anchor</span> <span class='op'>=</span> <span class='id identifier rubyid_idx'>idx</span>
+      <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span> <span class='op'>?</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='label'>node:</span> <span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='id identifier rubyid_idx'>idx</span><span class='rbrace'>}</span>
+      <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_entry'>entry</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_groups'>groups</span><span class='lbracket'>[</span><span class='id identifier rubyid_current_anchor'>current_anchor</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_current_buffer'>current_buffer</span> <span class='kw'>unless</span> <span class='id identifier rubyid_current_buffer'>current_buffer</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='lbracket'>[</span><span class='id identifier rubyid_groups'>groups</span><span class='comma'>,</span> <span class='id identifier rubyid_matched_indices'>matched_indices</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="emit_remaining_trailing_groups-instance_method">
+  
+    #<strong>emit_remaining_trailing_groups</strong>(trailing_groups:, consumed_indices:) {|info| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Emit any trailing groups not yet flushed (tail + safety net).</p>
+
+<p>This is called after the destination iteration loop completes.<br />
+Groups are emitted in ascending anchor order, skipping +:prefix+<br />
+(which is always handled before the loop).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>trailing_groups</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,Integer =&gt; Array&lt;Hash&gt;}</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>consumed_indices</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template indices consumed so far</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>info</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Called for each entry that should be emitted</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>info</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The entry hash</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/core.rb', line 139</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_remaining_trailing_groups'>emit_remaining_trailing_groups</span><span class='lparen'>(</span><span class='label'>trailing_groups:</span><span class='comma'>,</span> <span class='label'>consumed_indices:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_emit_block'>emit_block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sorted_anchors'>sorted_anchors</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_anchor'>anchor</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='op'>==</span> <span class='symbol'>:prefix</span> <span class='comment'># already emitted before the loop
+</span>
+    <span class='id identifier rubyid_group'>group</span> <span class='op'>=</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='lbracket'>[</span><span class='id identifier rubyid_anchor'>anchor</span><span class='rbracket'>]</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_group'>group</span>
+
+    <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+      <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+      <span class='id identifier rubyid_emit_block'>emit_block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_consumed_indices'>consumed_indices</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="flush_ready_trailing_groups-instance_method">
+  
+    #<strong>flush_ready_trailing_groups</strong>(trailing_groups:, matched_indices:, consumed_indices:) {|info| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Flush interior trailing groups whose prerequisites are met.</p>
+
+<p>An <em>interior</em> group is one whose anchor is strictly less than the<br />
+largest matched template index (tail groups are deferred to<br />
+<span class='object_link'><a href="#emit_remaining_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#emit_remaining_trailing_groups (method)">#emit_remaining_trailing_groups</a></span>).</p>
+
+<p>A group anchored at template index K is <em>ready</em> when every matched<br />
+template index in the range 0..K has been consumed.  This prevents<br />
+premature emission when the destination reorders matched items<br />
+relative to the template.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>trailing_groups</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,Integer =&gt; Array&lt;Hash&gt;}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The groups built by <span class='object_link'><a href="#build_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#build_trailing_groups (method)">#build_trailing_groups</a></span></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>matched_indices</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>All matched template indices</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>consumed_indices</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template indices consumed so far</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>info</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Called for each entry that should be emitted</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>info</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The entry hash (contains at least +:node+, +:index+)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/core.rb', line 101</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_flush_ready_trailing_groups'>flush_ready_trailing_groups</span><span class='lparen'>(</span><span class='label'>trailing_groups:</span><span class='comma'>,</span> <span class='label'>matched_indices:</span><span class='comma'>,</span> <span class='label'>consumed_indices:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_emit_block'>emit_block</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_matched_indices'>matched_indices</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_last_matched'>last_matched</span> <span class='op'>=</span> <span class='id identifier rubyid_matched_indices'>matched_indices</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
+
+  <span class='id identifier rubyid_sorted_anchors'>sorted_anchors</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_anchor'>anchor</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='op'>==</span> <span class='symbol'>:prefix</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_last_matched'>last_matched</span> <span class='comment'># tail group — defer to remaining pass
+</span>
+    <span class='id identifier rubyid_group'>group</span> <span class='op'>=</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='lbracket'>[</span><span class='id identifier rubyid_anchor'>anchor</span><span class='rbracket'>]</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+    <span class='comment'># Check if all matched template indices 0..anchor have been consumed
+</span>    <span class='id identifier rubyid_ready'>ready</span> <span class='op'>=</span> <span class='id identifier rubyid_matched_indices'>matched_indices</span>
+      <span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_idx'>idx</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_anchor'>anchor</span> <span class='rbrace'>}</span>
+      <span class='period'>.</span><span class='id identifier rubyid_all?'>all?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_ready'>ready</span>
+
+    <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+      <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+      <span class='id identifier rubyid_emit_block'>emit_block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_consumed_indices'>consumed_indices</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

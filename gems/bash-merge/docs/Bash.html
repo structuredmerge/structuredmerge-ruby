@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Bash
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Bash";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index (B)</a> &raquo;
+    
+    
+    <span class="title">Bash</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Bash
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/bash/merge.rb<span class="defines">,<br>
+  lib/bash/merge/emitter.rb,<br> lib/bash/merge/version.rb,<br> lib/bash/merge/freeze_node.rb,<br> lib/bash/merge/debug_logger.rb,<br> lib/bash/merge/merge_result.rb,<br> lib/bash/merge/node_wrapper.rb,<br> lib/bash/merge/smart_merger.rb,<br> lib/bash/merge/file_analysis.rb,<br> lib/bash/merge/comment_tracker.rb</span>
+
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Bash::Merge provides a generic Bash script smart merge system using tree-sitter AST analysis.<br />
+It intelligently merges template and destination Bash scripts by identifying matching<br />
+statements and resolving differences using structural signatures.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_template'>template</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>template.sh</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_destination'>destination</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>destination.sh</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>Bash</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Bash/Merge.html" title="Bash::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Bash/Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Bash/Merge/SmartMerger.html#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With debug information</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>Bash</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Bash/Merge.html" title="Bash::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Bash/Merge/SmartMerger.html" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Bash/Merge/SmartMerger.html#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_debug_result'>debug_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_debug_result'>debug_result</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_debug_result'>debug_result</span><span class='lbracket'>[</span><span class='symbol'>:statistics</span><span class='rbracket'>]</span></code></pre>
+    
+  </div>
+
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+      <strong class="modules">Modules:</strong> <span class='object_link'><a href="Bash/Merge.html" title="Bash::Merge (module)">Merge</a></span>
+    
+  
+    
+  
+</p>
+
+
+
+
+
+
+
+
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:54 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

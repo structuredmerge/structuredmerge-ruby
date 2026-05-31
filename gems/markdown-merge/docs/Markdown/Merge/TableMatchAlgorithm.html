@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markdown::Merge::TableMatchAlgorithm
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markdown::Merge::TableMatchAlgorithm";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">TableMatchAlgorithm</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markdown::Merge::TableMatchAlgorithm
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Markdown::Merge::TableMatchAlgorithm</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markdown/merge/table_match_algorithm.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Algorithm for computing match scores between two Markdown tables.</p>
+
+<p>This algorithm uses multiple factors to determine how well two tables match:</p>
+<ul>
+  <li>(A) Percentage of matching header cells (using Levenshtein similarity)</li>
+  <li>(B) Percentage of matching cells in the first column (using Levenshtein similarity)</li>
+  <li>(C) Average percentage of matching cells in rows with matching first column</li>
+  <li>(D) Percentage of matching total cells</li>
+  <li>(E) Position distance weight (closer tables score higher)</li>
+</ul>
+
+<p>Cell comparisons use Levenshtein distance to compute similarity, allowing<br />
+partial matches (e.g., “Value” vs “Values” would get a high similarity score).</p>
+
+<p>The final score is the weighted average of these factors.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_algorithm'>algorithm</span> <span class='op'>=</span> <span class='const'>TableMatchAlgorithm</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::TableMatchAlgorithm#initialize (method)">new</a></span></span>
+<span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='id identifier rubyid_algorithm'>algorithm</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='comma'>,</span> <span class='id identifier rubyid_table_b'>table_b</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With position information</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_algorithm'>algorithm</span> <span class='op'>=</span> <span class='const'>TableMatchAlgorithm</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::TableMatchAlgorithm#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>position_a:</span> <span class='int'>0</span><span class='comma'>,</span>  <span class='comment'># First table in template
+</span>  <span class='label'>position_b:</span> <span class='int'>2</span><span class='comma'>,</span>  <span class='comment'># Third table in destination
+</span>  <span class='label'>total_tables_a:</span> <span class='int'>3</span><span class='comma'>,</span>
+  <span class='label'>total_tables_b:</span> <span class='int'>3</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_score'>score</span> <span class='op'>=</span> <span class='id identifier rubyid_algorithm'>algorithm</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='comma'>,</span> <span class='id identifier rubyid_table_b'>table_b</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_WEIGHTS-constant" class="">DEFAULT_WEIGHTS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default weights for each factor in the algorithm</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>header_match:</span> <span class='float'>0.25</span><span class='comma'>,</span>      <span class='comment'># (A) Header row matching
+</span>  <span class='label'>first_column:</span> <span class='float'>0.20</span><span class='comma'>,</span>      <span class='comment'># (B) First column matching
+</span>  <span class='label'>row_content:</span> <span class='float'>0.25</span><span class='comma'>,</span>       <span class='comment'># (C) Content in matching rows
+</span>  <span class='label'>total_cells:</span> <span class='float'>0.15</span><span class='comma'>,</span>       <span class='comment'># (D) Overall cell matching
+</span>  <span class='label'>position:</span> <span class='float'>0.15</span><span class='comma'>,</span>          <span class='comment'># (E) Position distance
+</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="FIRST_COLUMN_SIMILARITY_THRESHOLD-constant" class="">FIRST_COLUMN_SIMILARITY_THRESHOLD =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Minimum similarity threshold to consider cells as potentially matching<br />
+for first column lookup (used in row content matching)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='float'>0.7</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#backend-instance_method" title="#backend (instance method)">#<strong>backend</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The markdown backend being used.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#position_a-instance_method" title="#position_a (instance method)">#<strong>position_a</strong>  &#x21d2; Integer<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Position of table A in its document (0-indexed).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#position_b-instance_method" title="#position_b (instance method)">#<strong>position_b</strong>  &#x21d2; Integer<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Position of table B in its document (0-indexed).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#total_tables_a-instance_method" title="#total_tables_a (instance method)">#<strong>total_tables_a</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Total number of tables in document A.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#total_tables_b-instance_method" title="#total_tables_b (instance method)">#<strong>total_tables_b</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Total number of tables in document B.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#weights-instance_method" title="#weights (instance method)">#<strong>weights</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Weights for each scoring factor.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(table_a, table_b)  &#x21d2; Float </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Compute the match score between two tables.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(position_a: nil, position_b: nil, total_tables_a: 1, total_tables_b: 1, weights: {}, backend: :commonmarker)  &#x21d2; TableMatchAlgorithm </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize the table match algorithm.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(position_a: nil, position_b: nil, total_tables_a: 1, total_tables_b: 1, weights: {}, backend: :commonmarker)  &#x21d2; <tt><span class='object_link'><a href="" title="Markdown::Merge::TableMatchAlgorithm (class)">TableMatchAlgorithm</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize the table match algorithm.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>position_a</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Position of first table in its document</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>position_b</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Position of second table in its document</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>total_tables_a</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Total tables in first document (default: 1)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>total_tables_b</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Total tables in second document (default: 1)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>weights</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom weights for scoring factors</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:commonmarker</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Markdown backend for type normalization (default: :commonmarker)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+71
+72
+73
+74
+75
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 71</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>position_a:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>position_b:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>total_tables_a:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>total_tables_b:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='label'>weights:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>backend:</span> <span class='symbol'>:commonmarker</span><span class='rparen'>)</span>
+  <span class='ivar'>@position_a</span> <span class='op'>=</span> <span class='id identifier rubyid_position_a'>position_a</span>
+  <span class='ivar'>@position_b</span> <span class='op'>=</span> <span class='id identifier rubyid_position_b'>position_b</span>
+  <span class='ivar'>@total_tables_a</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_total_tables_a'>total_tables_a</span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
+  <span class='ivar'>@total_tables_b</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_total_tables_b'>total_tables_b</span><span class='comma'>,</span> <span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span>
+  <span class='ivar'>@weights</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_WEIGHTS-constant" title="Markdown::Merge::TableMatchAlgorithm::DEFAULT_WEIGHTS (constant)">DEFAULT_WEIGHTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_weights'>weights</span><span class='rparen'>)</span>
+  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="backend-instance_method">
+  
+    #<strong>backend</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The markdown backend being used.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The markdown backend being used</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61
+62
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_backend'>backend</span>
+  <span class='ivar'>@backend</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="position_a-instance_method">
+  
+    #<strong>position_a</strong>  &#x21d2; <tt>Integer</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Position of table A in its document (0-indexed).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Position of table A in its document (0-indexed)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_position_a'>position_a</span>
+  <span class='ivar'>@position_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="position_b-instance_method">
+  
+    #<strong>position_b</strong>  &#x21d2; <tt>Integer</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Position of table B in its document (0-indexed).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Position of table B in its document (0-indexed)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+49
+50
+51</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 49</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_position_b'>position_b</span>
+  <span class='ivar'>@position_b</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="total_tables_a-instance_method">
+  
+    #<strong>total_tables_a</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Total number of tables in document A.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Total number of tables in document A</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_total_tables_a'>total_tables_a</span>
+  <span class='ivar'>@total_tables_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="total_tables_b-instance_method">
+  
+    #<strong>total_tables_b</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Total number of tables in document B.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Total number of tables in document B</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_total_tables_b'>total_tables_b</span>
+  <span class='ivar'>@total_tables_b</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="weights-instance_method">
+  
+    #<strong>weights</strong>  &#x21d2; <tt>Hash</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Weights for each scoring factor.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Weights for each scoring factor</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_weights'>weights</span>
+  <span class='ivar'>@weights</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="call-instance_method">
+  
+    #<strong>call</strong>(table_a, table_b)  &#x21d2; <tt>Float</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Compute the match score between two tables.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>table_a</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>First table node</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>table_b</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Second table node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Score between 0.0 and 1.0</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/table_match_algorithm.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='comma'>,</span> <span class='id identifier rubyid_table_b'>table_b</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_rows_a'>rows_a</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_rows'>extract_rows</span><span class='lparen'>(</span><span class='id identifier rubyid_table_a'>table_a</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_rows_b'>rows_b</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_rows'>extract_rows</span><span class='lparen'>(</span><span class='id identifier rubyid_table_b'>table_b</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='float'>0.0</span> <span class='kw'>if</span> <span class='id identifier rubyid_rows_a'>rows_a</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_scores'>scores</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>header_match:</span> <span class='id identifier rubyid_compute_header_match'>compute_header_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>first_column:</span> <span class='id identifier rubyid_compute_first_column_match'>compute_first_column_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>row_content:</span> <span class='id identifier rubyid_compute_row_content_match'>compute_row_content_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>total_cells:</span> <span class='id identifier rubyid_compute_total_cells_match'>compute_total_cells_match</span><span class='lparen'>(</span><span class='id identifier rubyid_rows_a'>rows_a</span><span class='comma'>,</span> <span class='id identifier rubyid_rows_b'>rows_b</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>position:</span> <span class='id identifier rubyid_compute_position_score'>compute_position_score</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_weighted_average'>weighted_average</span><span class='lparen'>(</span><span class='id identifier rubyid_scores'>scores</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:06 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

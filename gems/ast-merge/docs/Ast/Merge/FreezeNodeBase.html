@@ -1,0 +1,3386 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::FreezeNodeBase
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::FreezeNodeBase";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">FreezeNodeBase</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::FreezeNodeBase
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::FreezeNodeBase</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="BlockDirective.html" title="Ast::Merge::BlockDirective (module)">BlockDirective</a></span>, <span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/freeze_node_base.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Base class for freeze block nodes in AST merge libraries.</p>
+
+<p>A freeze block is a section marked with freeze/unfreeze comment markers that<br />
+should be preserved from the destination during merges. The entire content<br />
+between the markers is treated as opaque and matched by content identity.</p>
+
+<h2 id="key-distinction-from-frozenwrapper">Key Distinction from FrozenWrapper</h2>
+
+<p>FreezeNodeBase represents <strong>explicit freeze blocks</strong> with clear boundaries:</p>
+<ul>
+  <li>Starts with <code># token:freeze</code> (or equivalent in other comment styles)</li>
+  <li>Ends with <code># token:unfreeze</code></li>
+  <li>The content between markers is opaque and preserved verbatim</li>
+  <li>Matched by CONTENT identity via <code>freeze_signature</code></li>
+</ul>
+
+<p>In contrast, NodeTyping::FrozenWrapper represents <strong>AST nodes with freeze markers<br />
+in their leading comments</strong>:</p>
+<ul>
+  <li>The marker appears in the node’s leading comments, not as a block boundary</li>
+  <li>The node is still a structural AST element (e.g., a <code>gem</code> call)</li>
+  <li>Matched by the underlying node’s STRUCTURAL identity</li>
+</ul>
+
+<h2 id="signature-generation-behavior">Signature Generation Behavior</h2>
+
+<p>When FileAnalyzable#generate_signature encounters a FreezeNodeBase, it uses<br />
+the <code>freeze_signature</code> method directly, which returns <code>[:FreezeNode, content]</code>.<br />
+This ensures that explicit freeze blocks are matched by their exact content.</p>
+
+<p>This class provides shared functionality for file-type-specific implementations<br />
+(e.g., Prism::Merge::FreezeNode, Psych::Merge::FreezeNode).</p>
+
+<p>Supports multiple comment syntax styles via configurable marker patterns:</p>
+<ul>
+  <li><code>:hash_comment</code> - Ruby/Python/YAML style (<code># freeze-begin</code> / <code># freeze-end</code>)</li>
+  <li><code>:html_comment</code> - HTML/Markdown style (<code>&lt;!-- freeze-begin --&gt;</code> / <code>&lt;!-- freeze-end --&gt;</code>)</li>
+  <li><code>:c_style_line</code> - C/JavaScript line comments (<code>// freeze-begin</code> / <code>// freeze-end</code>)</li>
+  <li><code>:c_style_block</code> - C/JavaScript block comments (<code>/* freeze-begin */</code> / <code>/* freeze-end */</code>)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Freeze block with hash comments (Ruby/YAML)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='comment'># &lt;token&gt;:freeze
+</span><span class='id identifier rubyid_content'>content</span> <span class='id identifier rubyid_to'>to</span> <span class='id identifier rubyid_preserve'>preserve</span><span class='op'>...</span>
+<span class='comment'># &lt;token&gt;:unfreeze</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Freeze block with HTML comments (Markdown)</p>
+</div></h5>
+      
+      <pre class="example code"><code>&lt;!-- &lt;token&gt;:freeze --&gt;
+content to preserve...
+&lt;!-- &lt;token&gt;:unfreeze --&gt;</code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Creating a custom pattern</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'>FreezeNodeBase</span><span class='period'>.</span><span class='id identifier rubyid_register_pattern'><span class='object_link'><a href="#register_pattern-class_method" title="Ast::Merge::FreezeNodeBase.register_pattern (method)">register_pattern</a></span></span><span class='lparen'>(</span><span class='symbol'>:custom</span><span class='comma'>,</span>
+  <span class='label'>start:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^--\s*freeze-begin</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='label'>end_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^--\s*freeze-end</span><span class='regexp_end'>/i</span></span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Freezable.html#freeze_signature-instance_method" title="Ast::Merge::Freezable#freeze_signature (method)">- Content-based signature for matching</a></span></li>
+    
+      <li><span class='object_link'><a href="NodeTyping/FrozenWrapper.html" title="Ast::Merge::NodeTyping::FrozenWrapper (class)">- Structural matching alternative</a></span></li>
+    
+      <li><span class='object_link'><a href="FileAnalyzable.html#generate_signature-instance_method" title="Ast::Merge::FileAnalyzable#generate_signature (method)">- Routing logic for signature generation</a></span></li>
+    
+  </ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="FreezeNodeBase/InvalidStructureError.html" title="Ast::Merge::FreezeNodeBase::InvalidStructureError (class)">InvalidStructureError</a></span>, <span class='object_link'><a href="FreezeNodeBase/Location.html" title="Ast::Merge::FreezeNodeBase::Location (class)">Location</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="MARKER_PATTERNS-constant" class="">MARKER_PATTERNS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Pattern configuration for freeze block markers.<br />
+Mutable to allow runtime registration of custom patterns.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Hash{Symbol =&gt; Regexp}}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Registered marker patterns</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>hash_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>start:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*#\s*[\w-]+:freeze\b</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+    <span class='label'>end:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*#\s*[\w-]+:unfreeze\b</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>html_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>start:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--\s*[\w-]+:freeze\b.*--&gt;</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+    <span class='label'>end:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--\s*[\w-]+:unfreeze\b.*--&gt;</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>c_style_line:</span> <span class='lbrace'>{</span>
+    <span class='label'>start:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*//\s*[\w-]+:freeze\b</span><span class='regexp_end'>}i</span></span><span class='comma'>,</span>
+    <span class='label'>end:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*//\s*[\w-]+:unfreeze\b</span><span class='regexp_end'>}i</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>c_style_block:</span> <span class='lbrace'>{</span>
+    <span class='label'>start:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*/\*\s*[\w-]+:freeze\b.*\*/</span><span class='regexp_end'>}i</span></span><span class='comma'>,</span>
+    <span class='label'>end:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*/\*\s*[\w-]+:unfreeze\b.*\*/</span><span class='regexp_end'>}i</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="DEFAULT_PATTERN-constant" class="">DEFAULT_PATTERN =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default pattern when none specified</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:hash_comment</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#analysis-instance_method" title="#analysis (instance method)">#<strong>analysis</strong>  &#x21d2; Object<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Reference to FileAnalysis (for subclasses that need it).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#content-instance_method" title="#content (instance method)">#<strong>content</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Content of the freeze block.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#end_line-instance_method" title="#end_line (instance method)">#<strong>end_line</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Line number of unfreeze marker (1-based).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#end_marker-instance_method" title="#end_marker (instance method)">#<strong>end_marker</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The freeze end marker text.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#lines-instance_method" title="#lines (instance method)">#<strong>lines</strong>  &#x21d2; Array&lt;String&gt;<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Lines within the freeze block.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#nodes-instance_method" title="#nodes (instance method)">#<strong>nodes</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>AST nodes contained within the freeze block.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#overlapping_nodes-instance_method" title="#overlapping_nodes (instance method)">#<strong>overlapping_nodes</strong>  &#x21d2; Array<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Nodes that overlap with the freeze block boundaries.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern_type-instance_method" title="#pattern_type (instance method)">#<strong>pattern_type</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The pattern type used for this freeze node.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start_line-instance_method" title="#start_line (instance method)">#<strong>start_line</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Line number of freeze marker (1-based).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start_marker-instance_method" title="#start_marker (instance method)">#<strong>start_marker</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The freeze start marker text.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#end_pattern-class_method" title="end_pattern (class method)">.<strong>end_pattern</strong>(pattern_type = DEFAULT_PATTERN)  &#x21d2; Regexp </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get end marker pattern for a given pattern type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_end%3F-class_method" title="freeze_end? (class method)">.<strong>freeze_end?</strong>(line, pattern_type = DEFAULT_PATTERN)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line matches a freeze end marker.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_start%3F-class_method" title="freeze_start? (class method)">.<strong>freeze_start?</strong>(line, pattern_type = DEFAULT_PATTERN)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line matches a freeze start marker.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern_for-class_method" title="pattern_for (class method)">.<strong>pattern_for</strong>(pattern_type = DEFAULT_PATTERN, token = nil)  &#x21d2; Hash{Symbol =&gt; Regexp}, Regexp </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get both start and end patterns for a given pattern type When token is provided, returns a combined pattern with capture groups for marker type (freeze/unfreeze) and optional reason.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern_types-class_method" title="pattern_types (class method)">.<strong>pattern_types</strong>  &#x21d2; Array&lt;Symbol&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Available pattern types.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_pattern-class_method" title="register_pattern (class method)">.<strong>register_pattern</strong>(name, start:, end_pattern:)  &#x21d2; Hash{Symbol =&gt; Regexp} </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Register a custom marker pattern.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#start_pattern-class_method" title="start_pattern (class method)">.<strong>start_pattern</strong>(pattern_type = DEFAULT_PATTERN)  &#x21d2; Regexp </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get start marker pattern for a given pattern type.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#children-instance_method" title="#children (instance method)">#<strong>children</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>AST nodes contained within the freeze block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_node%3F-instance_method" title="#freeze_node? (instance method)">#<strong>freeze_node?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if this is a freeze node (always true for FreezeNode).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(start_line:, end_line:, lines: nil, analysis: nil, content: nil, nodes: [], overlapping_nodes: nil, start_marker: nil, end_marker: nil, pattern_type: DEFAULT_PATTERN, reason: nil)  &#x21d2; FreezeNodeBase </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a freeze node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>String representation for debugging.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#kind-instance_method" title="#kind (instance method)">#<strong>kind</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Always :freeze for FreezeNodeBase.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#location-instance_method" title="#location (instance method)">#<strong>location</strong>  &#x21d2; Location </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns a location-like object for compatibility with AST nodes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_policy-instance_method" title="#merge_policy (instance method)">#<strong>merge_policy</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Freeze blocks are user customizations; dest always wins.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_type-instance_method" title="#merge_type (instance method)">#<strong>merge_type</strong>  &#x21d2; Symbol </a>
+    
+
+    
+      (also: #type)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Node type for merge classification.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reason-instance_method" title="#reason (instance method)">#<strong>reason</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Extract the reason/comment from the freeze start marker.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#signature-instance_method" title="#signature (instance method)">#<strong>signature</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns a stable signature for this freeze block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#slice-instance_method" title="#slice (instance method)">#<strong>slice</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the freeze block content.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="BlockDirective.html" title="Ast::Merge::BlockDirective (module)">BlockDirective</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="BlockDirective.html#block_directive%3F-instance_method" title="Ast::Merge::BlockDirective#block_directive? (method)">#block_directive?</a></span>, <span class='object_link'><a href="BlockDirective.html#covers_line%3F-instance_method" title="Ast::Merge::BlockDirective#covers_line? (method)">#covers_line?</a></span>, <span class='object_link'><a href="BlockDirective.html#freeze_directive%3F-instance_method" title="Ast::Merge::BlockDirective#freeze_directive? (method)">#freeze_directive?</a></span>, <span class='object_link'><a href="BlockDirective.html#line_range-instance_method" title="Ast::Merge::BlockDirective#line_range (method)">#line_range</a></span>, <span class='object_link'><a href="BlockDirective.html#nocov_directive%3F-instance_method" title="Ast::Merge::BlockDirective#nocov_directive? (method)">#nocov_directive?</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Freezable.html#freeze_signature-instance_method" title="Ast::Merge::Freezable#freeze_signature (method)">#freeze_signature</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(start_line:, end_line:, lines: nil, analysis: nil, content: nil, nodes: [], overlapping_nodes: nil, start_marker: nil, end_marker: nil, pattern_type: DEFAULT_PATTERN, reason: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a freeze node.</p>
+
+<p>This unified constructor accepts all parameters that any *-merge gem might need.<br />
+Subclasses should call super with the parameters they use.</p>
+
+<p>Content can be provided via:</p>
+<ul>
+  <li><code>lines:</code> - Direct array of line strings</li>
+  <li><code>analysis:</code> - FileAnalysis reference (lines extracted via analysis.lines)</li>
+  <li><code>content:</code> - Direct content string (will be split into lines)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>start_line</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number of freeze marker (1-based)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>end_line</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number of unfreeze marker (1-based)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>lines</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Direct array of source lines</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>analysis</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>FileAnalysis reference for content access</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Direct content string</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>AST nodes contained within the freeze block</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>overlapping_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Nodes that overlap block boundaries</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>start_marker</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The freeze start marker text</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>end_marker</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The freeze end marker text</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type for marker matching</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>reason</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional reason extracted from freeze marker</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 288</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='label'>start_line:</span><span class='comma'>,</span>
+  <span class='label'>end_line:</span><span class='comma'>,</span>
+  <span class='label'>lines:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>content:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>nodes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='label'>overlapping_nodes:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>start_marker:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>end_marker:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>pattern_type:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='comma'>,</span>
+  <span class='label'>reason:</span> <span class='kw'>nil</span>
+<span class='rparen'>)</span>
+  <span class='ivar'>@start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_start_line'>start_line</span>
+  <span class='ivar'>@end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_end_line'>end_line</span>
+  <span class='ivar'>@start_marker</span> <span class='op'>=</span> <span class='id identifier rubyid_start_marker'>start_marker</span>
+  <span class='ivar'>@end_marker</span> <span class='op'>=</span> <span class='id identifier rubyid_end_marker'>end_marker</span>
+  <span class='ivar'>@pattern_type</span> <span class='op'>=</span> <span class='id identifier rubyid_pattern_type'>pattern_type</span>
+  <span class='ivar'>@explicit_reason</span> <span class='op'>=</span> <span class='id identifier rubyid_reason'>reason</span>
+  <span class='ivar'>@nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_nodes'>nodes</span>
+  <span class='ivar'>@overlapping_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_overlapping_nodes'>overlapping_nodes</span>
+  <span class='ivar'>@analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_analysis'>analysis</span>
+
+  <span class='comment'># Handle content from various sources
+</span>  <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_lines'>resolve_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+  <span class='ivar'>@content</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve_content'>resolve_content</span><span class='lparen'>(</span><span class='ivar'>@lines</span><span class='comma'>,</span> <span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="analysis-instance_method">
+  
+    #<strong>analysis</strong>  &#x21d2; <tt>Object</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Reference to FileAnalysis (for subclasses that need it).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Reference to FileAnalysis (for subclasses that need it)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+259
+260
+261</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 259</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_analysis'>analysis</span>
+  <span class='ivar'>@analysis</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="content-instance_method">
+  
+    #<strong>content</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Content of the freeze block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Content of the freeze block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 244</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_content'>content</span>
+  <span class='ivar'>@content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="end_line-instance_method">
+  
+    #<strong>end_line</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Line number of unfreeze marker (1-based).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number of unfreeze marker (1-based)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 241</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_end_line'>end_line</span>
+  <span class='ivar'>@end_line</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="end_marker-instance_method">
+  
+    #<strong>end_marker</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The freeze end marker text.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The freeze end marker text</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+250
+251
+252</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 250</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_end_marker'>end_marker</span>
+  <span class='ivar'>@end_marker</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="lines-instance_method">
+  
+    #<strong>lines</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Lines within the freeze block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lines within the freeze block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+256
+257
+258</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 256</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_lines'>lines</span>
+  <span class='ivar'>@lines</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="nodes-instance_method">
+  
+    #<strong>nodes</strong>  &#x21d2; <tt>Array</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns AST nodes contained within the freeze block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>AST nodes contained within the freeze block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+262
+263
+264</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 262</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_nodes'>nodes</span>
+  <span class='ivar'>@nodes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="overlapping_nodes-instance_method">
+  
+    #<strong>overlapping_nodes</strong>  &#x21d2; <tt>Array</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Nodes that overlap with the freeze block boundaries.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Nodes that overlap with the freeze block boundaries</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+265
+266
+267</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 265</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_overlapping_nodes'>overlapping_nodes</span>
+  <span class='ivar'>@overlapping_nodes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="pattern_type-instance_method">
+  
+    #<strong>pattern_type</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The pattern type used for this freeze node.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The pattern type used for this freeze node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+253
+254
+255</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 253</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pattern_type'>pattern_type</span>
+  <span class='ivar'>@pattern_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="start_line-instance_method">
+  
+    #<strong>start_line</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Line number of freeze marker (1-based).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number of freeze marker (1-based)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+238
+239
+240</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 238</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_start_line'>start_line</span>
+  <span class='ivar'>@start_line</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="start_marker-instance_method">
+  
+    #<strong>start_marker</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The freeze start marker text.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The freeze start marker text</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+247
+248
+249</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 247</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_start_marker'>start_marker</span>
+  <span class='ivar'>@start_marker</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="end_pattern-class_method">
+  
+    .<strong>end_pattern</strong>(pattern_type = DEFAULT_PATTERN)  &#x21d2; <tt>Regexp</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get end marker pattern for a given pattern type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type name (defaults to DEFAULT_PATTERN)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>End marker regex</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if pattern type not found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+161
+162
+163
+164
+165
+166</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 161</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_end_pattern'>end_pattern</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_patterns'>patterns</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown pattern type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_patterns'>patterns</span>
+
+  <span class='id identifier rubyid_patterns'>patterns</span><span class='lbracket'>[</span><span class='symbol'>:end</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_end?-class_method">
+  
+    .<strong>freeze_end?</strong>(line, pattern_type = DEFAULT_PATTERN)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line matches a freeze end marker</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line content to check</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type to use (defaults to DEFAULT_PATTERN)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+224
+225
+226
+227
+228</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 224</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_end?'>freeze_end?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_pattern_type'>pattern_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_end_pattern'>end_pattern</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_start?-class_method">
+  
+    .<strong>freeze_start?</strong>(line, pattern_type = DEFAULT_PATTERN)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line matches a freeze start marker</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line content to check</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type to use (defaults to DEFAULT_PATTERN)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216
+217
+218</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_start?'>freeze_start?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_pattern_type'>pattern_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_start_pattern'>start_pattern</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pattern_for-class_method">
+  
+    .<strong>pattern_for</strong>(pattern_type = DEFAULT_PATTERN, token = nil)  &#x21d2; <tt>Hash{Symbol =&gt; Regexp}</tt>, <tt>Regexp</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get both start and end patterns for a given pattern type<br />
+When token is provided, returns a combined pattern with capture groups<br />
+for marker type (freeze/unfreeze) and optional reason.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Without token (returns hash of patterns)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'>FreezeNode</span><span class='period'>.</span><span class='id identifier rubyid_pattern_for'>pattern_for</span><span class='lparen'>(</span><span class='symbol'>:hash_comment</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; { start: /.../, end: /.../ }</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With token (returns combined pattern with capture groups)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'>FreezeNode</span><span class='period'>.</span><span class='id identifier rubyid_pattern_for'>pattern_for</span><span class='lparen'>(</span><span class='symbol'>:hash_comment</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>my-merge</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='comment'># =&gt; /^\s*#\s*my-merge:(freeze|unfreeze)\b\s*(.*)?$/i
+</span><span class='comment'># Capture group 1: &quot;freeze&quot; or &quot;unfreeze&quot;
+</span><span class='comment'># Capture group 2: optional reason text</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type name (defaults to DEFAULT_PATTERN)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional freeze token to build specific pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Regexp}</tt>, <tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Hash with :start/:end keys, or combined Regexp if token provided</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if pattern type not found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 186</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pattern_for'>pattern_for</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown pattern type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rparen'>)</span>
+
+  <span class='comment'># If no token provided, return the static patterns hash
+</span>  <span class='kw'>return</span> <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_token'>token</span>
+
+  <span class='comment'># Build a combined pattern with capture groups for the specific token
+</span>  <span class='id identifier rubyid_escaped_token'>escaped_token</span> <span class='op'>=</span> <span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+
+  <span class='kw'>case</span> <span class='id identifier rubyid_pattern_type'>pattern_type</span>
+  <span class='kw'>when</span> <span class='symbol'>:hash_comment</span>
+    <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*#\s*</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_escaped_token'>escaped_token</span><span class='embexpr_end'>}</span><span class='tstring_content'>:(freeze|unfreeze)\b\s*(.*)?$</span><span class='regexp_end'>/i</span></span>
+  <span class='kw'>when</span> <span class='symbol'>:html_comment</span>
+    <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--\s*</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_escaped_token'>escaped_token</span><span class='embexpr_end'>}</span><span class='tstring_content'>:(freeze|unfreeze)(?:\s+(.+?))?\s*--&gt;</span><span class='regexp_end'>/i</span></span>
+  <span class='kw'>when</span> <span class='symbol'>:c_style_line</span>
+    <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*//\s*</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_escaped_token'>escaped_token</span><span class='embexpr_end'>}</span><span class='tstring_content'>:(freeze|unfreeze)\b\s*(.*)?$</span><span class='regexp_end'>}i</span></span>
+  <span class='kw'>when</span> <span class='symbol'>:c_style_block</span>
+    <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*/\*\s*</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_escaped_token'>escaped_token</span><span class='embexpr_end'>}</span><span class='tstring_content'>:(freeze|unfreeze)\b\s*(.*)? *\*/</span><span class='regexp_end'>}i</span></span>
+  <span class='kw'>else</span>
+    <span class='comment'># Fallback for custom registered patterns - can&#39;t build token-specific
+</span>    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cannot build token-specific pattern for custom type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pattern_types-class_method">
+  
+    .<strong>pattern_types</strong>  &#x21d2; <tt>Array&lt;Symbol&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Available pattern types</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+232
+233
+234</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 232</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pattern_types'>pattern_types</span>
+  <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_pattern-class_method">
+  
+    .<strong>register_pattern</strong>(name, start:, end_pattern:)  &#x21d2; <tt>Hash{Symbol =&gt; Regexp}</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Register a custom marker pattern</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern name</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>start</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Regex to match freeze start marker</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>end_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Regex to match freeze end marker</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Regexp}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The registered pattern</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if name already exists or patterns invalid</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+138
+139
+140
+141
+142
+143
+144</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 138</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_pattern'>register_pattern</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>start:</span><span class='comma'>,</span> <span class='label'>end_pattern:</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Pattern :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> already registered</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Start pattern must be a Regexp</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_start'>start</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Regexp</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>End pattern must be a Regexp</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_end_pattern'>end_pattern</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Regexp</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='label'>start:</span> <span class='id identifier rubyid_start'>start</span><span class='comma'>,</span> <span class='label'>end:</span> <span class='id identifier rubyid_end_pattern'>end_pattern</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="start_pattern-class_method">
+  
+    .<strong>start_pattern</strong>(pattern_type = DEFAULT_PATTERN)  &#x21d2; <tt>Regexp</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get start marker pattern for a given pattern type</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_PATTERN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern type name (defaults to DEFAULT_PATTERN)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Start marker regex</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if pattern type not found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+150
+151
+152
+153
+154
+155</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 150</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_start_pattern'>start_pattern</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern_type'>pattern_type</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PATTERN-constant" title="Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN (constant)">DEFAULT_PATTERN</a></span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_patterns'>patterns</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#MARKER_PATTERNS-constant" title="Ast::Merge::FreezeNodeBase::MARKER_PATTERNS (constant)">MARKER_PATTERNS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown pattern type: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_patterns'>patterns</span>
+
+  <span class='id identifier rubyid_patterns'>patterns</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="children-instance_method">
+  
+    #<strong>children</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns AST nodes contained within the freeze block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>AST nodes contained within the freeze block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_children'>children</span> <span class='op'>=</span> <span class='ivar'>@nodes</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_node?-instance_method">
+  
+    #<strong>freeze_node?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if this is a freeze node (always true for FreezeNode)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+363
+364
+365</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 363</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span>
+  <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>String representation for debugging</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+385
+386
+387</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 385</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> lines=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_start_line'>start_line</span><span class='embexpr_end'>}</span><span class='tstring_content'>..</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_end_line'>end_line</span><span class='embexpr_end'>}</span><span class='tstring_content'> pattern=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pattern_type'>pattern_type</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="kind-instance_method">
+  
+    #<strong>kind</strong>  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Always :freeze for FreezeNodeBase.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Always :freeze for FreezeNodeBase</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_kind'>kind</span> <span class='op'>=</span> <span class='symbol'>:freeze</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="location-instance_method">
+  
+    #<strong>location</strong>  &#x21d2; <tt><span class='object_link'><a href="FreezeNodeBase/Location.html" title="Ast::Merge::FreezeNodeBase::Location (class)">Location</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a location-like object for compatibility with AST nodes</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FreezeNodeBase/Location.html" title="Ast::Merge::FreezeNodeBase::Location (class)">Location</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+318
+319
+320</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 318</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_location'>location</span>
+  <span class='ivar'>@location</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="FreezeNodeBase/Location.html" title="Ast::Merge::FreezeNodeBase::Location (class)">Location</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::FreezeNodeBase#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='ivar'>@start_line</span><span class='comma'>,</span> <span class='ivar'>@end_line</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_policy-instance_method">
+  
+    #<strong>merge_policy</strong>  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Freeze blocks are user customizations; dest always wins.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Freeze blocks are user customizations; dest always wins</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_policy'>merge_policy</span> <span class='op'>=</span> <span class='symbol'>:destination</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_type-instance_method">
+  
+    #<strong>merge_type</strong>  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='type-instance_method'>type</span></span>
+    </span>
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Node type for merge classification</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:freeze_block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+369
+370
+371</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 369</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_type'>merge_type</span>
+  <span class='symbol'>:freeze_block</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reason-instance_method">
+  
+    #<strong>reason</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Extract the reason/comment from the freeze start marker.<br />
+The reason is any text after the freeze directive.<br />
+If an explicit reason was provided at initialization, that takes precedence.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With reason</p>
+</div></h5>
+      
+      <pre class="example code"><code># rbs-merge:freeze Custom reason here
+=&gt; &quot;Custom reason here&quot;</code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Without reason</p>
+</div></h5>
+      
+      <pre class="example code"><code># rbs-merge:freeze
+=&gt; nil</code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The reason text, or nil if not present</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 335</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reason'>reason</span>
+  <span class='comment'># Return explicit reason if provided at initialization
+</span>  <span class='kw'>return</span> <span class='ivar'>@explicit_reason</span> <span class='kw'>if</span> <span class='ivar'>@explicit_reason</span>
+
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='ivar'>@start_marker</span>
+
+  <span class='comment'># Use the canonical pattern which has capture group 2 for reason
+</span>  <span class='comment'># We need to extract the token from the marker first
+</span>  <span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_token_from_marker'>extract_token_from_marker</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_token'>token</span>
+
+  <span class='id identifier rubyid_pattern'>pattern</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_pattern_for'>pattern_for</span><span class='lparen'>(</span><span class='ivar'>@pattern_type</span><span class='comma'>,</span> <span class='id identifier rubyid_token'>token</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_match'>match</span> <span class='op'>=</span> <span class='ivar'>@start_marker</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_match'>match</span>
+
+  <span class='comment'># Capture group 2 is the reason text
+</span>  <span class='id identifier rubyid_reason_text'>reason_text</span> <span class='op'>=</span> <span class='id identifier rubyid_match'>match</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='id identifier rubyid_reason_text'>reason_text</span><span class='op'>&amp;.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id identifier rubyid_reason_text'>reason_text</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="signature-instance_method">
+  
+    #<strong>signature</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a stable signature for this freeze block.<br />
+Override in subclasses for file-type-specific normalization.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature array</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+379
+380
+381</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 379</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
+  <span class='lbracket'>[</span><span class='symbol'>:FreezeNode</span><span class='comma'>,</span> <span class='ivar'>@content</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="slice-instance_method">
+  
+    #<strong>slice</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the freeze block content</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+357
+358
+359</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 357</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_slice'>slice</span>
+  <span class='ivar'>@content</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+390
+391
+392</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/freeze_node_base.rb', line 390</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='id identifier rubyid_inspect'>inspect</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:50 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

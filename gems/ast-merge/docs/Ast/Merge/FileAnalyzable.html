@@ -1,0 +1,4633 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::FileAnalyzable
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::FileAnalyzable";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">FileAnalyzable</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::FileAnalyzable
+  <span class="abstract note title">Abstract</span>
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="Text/FileAnalysis.html" title="Ast::Merge::Text::FileAnalysis (class)">Text::FileAnalysis</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/file_analyzable.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <div class="note abstract">
+  <strong>This module is abstract.</strong>
+  <div class='inline'><p>Include this module and implement <span class='object_link'><a href="#compute_node_signature-instance_method" title="Ast::Merge::FileAnalyzable#compute_node_signature (method)">#compute_node_signature</a></span> and optionally <span class='object_link'><a href="#fallthrough_node%3F-instance_method" title="Ast::Merge::FileAnalyzable#fallthrough_node? (method)">#fallthrough_node?</a></span></p>
+</div>
+</div>
+<p>Mixin module for file analysis classes across all *-merge gems.</p>
+
+<p>This module provides common functionality for analyzing source files,<br />
+including freeze block detection, line access, and signature generation.<br />
+Include this module in your FileAnalysis class and implement the required<br />
+abstract methods.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Including in a FileAnalysis class</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>class</span> <span class='const'>FileAnalysis</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'>FileAnalyzable</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'>DEFAULT_FREEZE_TOKEN</span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
+    <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+    <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
+    <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+    <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_parse_and_extract_statements'>parse_and_extract_statements</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Required: implement this method for parser-specific signature logic
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+    <span class='comment'># Return signature array or nil
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># Required: implement if using generate_signature with custom node type detection
+</span>  <span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>MyParser</span><span class='op'>::</span><span class='const'>Node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#included-class_method" title="included (class method)">.<strong>included</strong>(base)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Install the shared attr_reader interface on including analyses.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_attachment_for-instance_method" title="#comment_attachment_for (instance method)">#<strong>comment_attachment_for</strong>(owner, **options)  &#x21d2; Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return a passive shared attachment for a structural owner.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_attachment_strategy-instance_method" title="#comment_attachment_strategy (instance method)">#<strong>comment_attachment_strategy</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Describe the shared attachment strategy used by this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_augmenter-instance_method" title="#comment_augmenter (instance method)">#<strong>comment_augmenter</strong>(owners: nil, **options)  &#x21d2; Comment::Augmenter </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a passive shared comment augmenter for the current analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_capability-instance_method" title="#comment_capability (instance method)">#<strong>comment_capability</strong>  &#x21d2; Comment::Capability </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Describe the level of comment support available from this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_node_at-instance_method" title="#comment_node_at (instance method)">#<strong>comment_node_at</strong>(_line_num)  &#x21d2; Ast::Merge::Comment::Line<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the shared comment node at a specific line.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_nodes-instance_method" title="#comment_nodes (instance method)">#<strong>comment_nodes</strong>  &#x21d2; Array&lt;Ast::Merge::Comment::Line&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return all shared comment nodes known to this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_region_for_range-instance_method" title="#comment_region_for_range (instance method)">#<strong>comment_region_for_range</strong>(range, kind:, **options)  &#x21d2; Comment::Region </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return a shared comment region spanning a requested line range.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_support_style-instance_method" title="#comment_support_style (instance method)">#<strong>comment_support_style</strong>  &#x21d2; Comment::SupportStyle </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Describe how the merge pipeline will own and emit comments for this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#compute_node_signature-instance_method" title="#compute_node_signature (instance method)">#<strong>compute_node_signature</strong>(node)  &#x21d2; Array<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  <span class="abstract note title">abstract</span>
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Compute default signature for a node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fallthrough_node%3F-instance_method" title="#fallthrough_node? (instance method)">#<strong>fallthrough_node?</strong>(value)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a value represents a fallthrough node that should be used for default signature computation.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#feature_profile-instance_method" title="#feature_profile (instance method)">#<strong>feature_profile</strong>  &#x21d2; Ruleset::FeatureProfile </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Describe the current analysis using spec-aligned merge feature terms.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_block_at-instance_method" title="#freeze_block_at (instance method)">#<strong>freeze_block_at</strong>(line_num)  &#x21d2; FreezeNodeBase<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the freeze block containing the given line, if any.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_blocks-instance_method" title="#freeze_blocks (instance method)">#<strong>freeze_blocks</strong>  &#x21d2; Array&lt;Freezable&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get all freeze blocks/nodes from statements.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#generate_signature-instance_method" title="#generate_signature (instance method)">#<strong>generate_signature</strong>(node)  &#x21d2; Array<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Generate signature for a node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#in_freeze_block%3F-instance_method" title="#in_freeze_block? (instance method)">#<strong>in_freeze_block?</strong>(line_num)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line is within a freeze block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#layout_attachment_for-instance_method" title="#layout_attachment_for (instance method)">#<strong>layout_attachment_for</strong>(owner, **options)  &#x21d2; Layout::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return a passive shared layout attachment for a structural owner.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#layout_augmenter-instance_method" title="#layout_augmenter (instance method)">#<strong>layout_augmenter</strong>(owners: nil, **options)  &#x21d2; Layout::Augmenter </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a passive shared layout augmenter for the current analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#layout_owner_supported%3F-instance_method" title="#layout_owner_supported? (instance method)">#<strong>layout_owner_supported?</strong>(owner)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#line_at-instance_method" title="#line_at (instance method)">#<strong>line_at</strong>(line_num)  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get a specific line (1-indexed).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_augmented_comment_attachment_with_layout-instance_method" title="#merge_augmented_comment_attachment_with_layout (instance method)">#<strong>merge_augmented_comment_attachment_with_layout</strong>(owner, tracker_attachment:, **options)  &#x21d2; Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Prefer an augmenter-built attachment when available, then merge the result with shared layout ownership data.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_comment_attachment_with_layout-instance_method" title="#merge_comment_attachment_with_layout (instance method)">#<strong>merge_comment_attachment_with_layout</strong>(owner, comment_attachment, **options)  &#x21d2; Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge a format-specific comment attachment with shared inferred layout gaps.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_layout_owned_comment_attachment-instance_method" title="#normalize_layout_owned_comment_attachment (instance method)">#<strong>normalize_layout_owned_comment_attachment</strong>(attachment)  &#x21d2; Comment::Attachment<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Mark a leading region as floating when shared layout already proves it is gap-owned, without changing the underlying region content.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_tracked_comment_attachment_with_layout-instance_method" title="#normalize_tracked_comment_attachment_with_layout (instance method)">#<strong>normalize_tracked_comment_attachment_with_layout</strong>(owner, tracker_attachment:, **options)  &#x21d2; Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge a tracker-built attachment with shared layout ownership and then normalize any layout-owned leading region metadata.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalized_line-instance_method" title="#normalized_line (instance method)">#<strong>normalized_line</strong>(line_num)  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get a normalized line (whitespace-trimmed, for comparison).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_leading_comment_freeze%3F-instance_method" title="#owner_leading_comment_freeze? (instance method)">#<strong>owner_leading_comment_freeze?</strong>(owner, freeze_token: self.freeze_token, **options)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether an owner’s leading normalized comment attachment contains a freeze directive.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_leading_comment_unfreeze%3F-instance_method" title="#owner_leading_comment_unfreeze? (instance method)">#<strong>owner_leading_comment_unfreeze?</strong>(owner, freeze_token: self.freeze_token, **options)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check whether an owner’s leading normalized comment attachment contains an unfreeze directive.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_attachment_strategy-instance_method" title="#ruleset_attachment_strategy (instance method)">#<strong>ruleset_attachment_strategy</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_capabilities-instance_method" title="#ruleset_capabilities (instance method)">#<strong>ruleset_capabilities</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_comment_style-instance_method" title="#ruleset_comment_style (instance method)">#<strong>ruleset_comment_style</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_delegation_policies-instance_method" title="#ruleset_delegation_policies (instance method)">#<strong>ruleset_delegation_policies</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_logical_owners-instance_method" title="#ruleset_logical_owners (instance method)">#<strong>ruleset_logical_owners</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_match_key-instance_method" title="#ruleset_match_key (instance method)">#<strong>ruleset_match_key</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_owner_selector-instance_method" title="#ruleset_owner_selector (instance method)">#<strong>ruleset_owner_selector</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_read_strategy-instance_method" title="#ruleset_read_strategy (instance method)">#<strong>ruleset_read_strategy</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_render_family-instance_method" title="#ruleset_render_family (instance method)">#<strong>ruleset_render_family</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_repair_policies-instance_method" title="#ruleset_repair_policies (instance method)">#<strong>ruleset_repair_policies</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_surfaces-instance_method" title="#ruleset_surfaces (instance method)">#<strong>ruleset_surfaces</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#shared_comment_attachment_for-instance_method" title="#shared_comment_attachment_for (instance method)">#<strong>shared_comment_attachment_for</strong>(owner, tracker_attachment: nil, strategy: comment_attachment_strategy, **options)  &#x21d2; Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a comment attachment through one of the shared runtime strategies.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#shared_comment_support_style-instance_method" title="#shared_comment_support_style (instance method)">#<strong>shared_comment_support_style</strong>(source:, style:, read_strategy:, capability: comment_capability.level)  &#x21d2; Comment::SupportStyle </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a shared support-style declaration for analyses that already know their read/write model.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#signature_at-instance_method" title="#signature_at (instance method)">#<strong>signature_at</strong>(index)  &#x21d2; Array<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get structural signature for a statement at given index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#statements-instance_method" title="#statements (instance method)">#<strong>statements</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get all top-level statements (nodes and freeze blocks).</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="included-class_method">
+  
+    .<strong>included</strong>(base)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Install the shared attr_reader interface on including analyses.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>base</span>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>analysis class receiving the shared readers</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+54
+55
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 54</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_included'>included</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_class_eval'>class_eval</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_attr_reader'>attr_reader</span><span class='lparen'>(</span><span class='symbol'>:source</span><span class='comma'>,</span> <span class='symbol'>:lines</span><span class='comma'>,</span> <span class='symbol'>:freeze_token</span><span class='comma'>,</span> <span class='symbol'>:signature_generator</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="comment_attachment_for-instance_method">
+  
+    #<strong>comment_attachment_for</strong>(owner, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a passive shared attachment for a structural owner.</p>
+
+<p>Analyses with comment ownership data should override this to return<br />
+meaningful leading/inline/trailing regions. The default implementation<br />
+returns an empty attachment so callers can migrate incrementally.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 309</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_layout_attachment'>layout_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>nil</span>
+
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Attachment</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Attachment.html#initialize-instance_method" title="Ast::Merge::Comment::Attachment#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>leading_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
+    <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_attachment_strategy-instance_method">
+  
+    #<strong>comment_attachment_strategy</strong>  &#x21d2; <tt>Symbol</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Describe the shared attachment strategy used by this analysis.</p>
+
+<p>Analyses that rely on one of the common tracked/augmented attachment<br />
+shapes can override this and delegate <code>comment_attachment_for</code> through<br />
+<span class='object_link'><a href="#shared_comment_attachment_for-instance_method" title="Ast::Merge::FileAnalyzable#shared_comment_attachment_for (method)">#shared_comment_attachment_for</a></span> instead of open-coding the merge path.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+329
+330
+331</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 329</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span>
+  <span class='symbol'>:layout_only</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_augmenter-instance_method">
+  
+    #<strong>comment_augmenter</strong>(owners: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Augmenter.html" title="Ast::Merge::Comment::Augmenter (class)">Comment::Augmenter</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a passive shared comment augmenter for the current analysis.</p>
+
+<p>Format-specific analyses should override this when they can provide<br />
+native or tracked comment data. The default implementation preserves the<br />
+shared augmenter interface while reporting the analysis capability.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;#start_line,#end_line&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>owners for attachment inference</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>augmenter metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Augmenter.html" title="Ast::Merge::Comment::Augmenter (class)">Comment::Augmenter</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+460
+461
+462
+463
+464
+465
+466
+467
+468</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 460</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Augmenter.html" title="Ast::Merge::Comment::Augmenter (class)">Augmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Augmenter.html#initialize-instance_method" title="Ast::Merge::Comment::Augmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span>
+    <span class='label'>comments:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span>
+    <span class='label'>capability:</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_capability-instance_method">
+  
+    #<strong>comment_capability</strong>  &#x21d2; <tt><span class='object_link'><a href="Comment/Capability.html" title="Ast::Merge::Comment::Capability (class)">Comment::Capability</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Describe the level of comment support available from this analysis.</p>
+
+<p>Analyses with native or augmented comment support should override this.<br />
+The default implementation advertises no comment support while still<br />
+providing the shared hook surface used by merge gems.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Capability.html" title="Ast::Merge::Comment::Capability (class)">Comment::Capability</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+130
+131
+132</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 130</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Capability.html" title="Ast::Merge::Comment::Capability (class)">Capability</a></span></span><span class='period'>.</span><span class='id identifier rubyid_none'><span class='object_link'><a href="Comment/Capability.html#none-class_method" title="Ast::Merge::Comment::Capability.none (method)">none</a></span></span><span class='lparen'>(</span><span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_node_at-instance_method">
+  
+    #<strong>comment_node_at</strong>(_line_num)  &#x21d2; <tt><span class='object_link'><a href="Comment/Line.html" title="Ast::Merge::Comment::Line (class)">Ast::Merge::Comment::Line</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the shared comment node at a specific line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>_line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Line.html" title="Ast::Merge::Comment::Line (class)">Ast::Merge::Comment::Line</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+275
+276
+277</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 275</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid__line_num'>_line_num</span><span class='rparen'>)</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_nodes-instance_method">
+  
+    #<strong>comment_nodes</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Comment/Line.html" title="Ast::Merge::Comment::Line (class)">Ast::Merge::Comment::Line</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return all shared comment nodes known to this analysis.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Comment/Line.html" title="Ast::Merge::Comment::Line (class)">Ast::Merge::Comment::Line</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 137</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
+  <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_region_for_range-instance_method">
+  
+    #<strong>comment_region_for_range</strong>(range, kind:, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Comment::Region</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a shared comment region spanning a requested line range.</p>
+
+<p>Analyses with comment support should override this to return attached or<br />
+tracked comment content. The default implementation returns an empty<br />
+region of the requested kind so callers can rely on the hook surface.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>range</span>
+      
+      
+        <span class='type'>(<tt>Range</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line range</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>kind</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>region ownership kind</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>region metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Comment::Region</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 289</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Region</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Region.html#initialize-instance_method" title="Ast::Merge::Comment::Region#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>kind:</span> <span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
+    <span class='label'>nodes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
+      <span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_support_style-instance_method">
+  
+    #<strong>comment_support_style</strong>  &#x21d2; <tt><span class='object_link'><a href="Comment/SupportStyle.html" title="Ast::Merge::Comment::SupportStyle (class)">Comment::SupportStyle</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Describe how the merge pipeline will own and emit comments for this<br />
+analysis.</p>
+
+<p>Analyses with comment support should override this to advertise their<br />
+intended read/write model independently from raw parser capability.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/SupportStyle.html" title="Ast::Merge::Comment::SupportStyle (class)">Comment::SupportStyle</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 148</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
+  <span class='id identifier rubyid_capability'>capability</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
+  <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
+    <span class='label'>capability:</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_none?'>none?</span>
+    <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/SupportStyle.html" title="Ast::Merge::Comment::SupportStyle (class)">SupportStyle</a></span></span><span class='period'>.</span><span class='id identifier rubyid_unavailable'><span class='object_link'><a href="Comment/SupportStyle.html#unavailable-class_method" title="Ast::Merge::Comment::SupportStyle.unavailable (method)">unavailable</a></span></span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_details'>details</span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_capability'>capability</span><span class='period'>.</span><span class='id identifier rubyid_source_augmented?'>source_augmented?</span>
+    <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html" title="Ast::Merge::Ruleset::SupportStyleResolver (class)">SupportStyleResolver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html#call-class_method" title="Ast::Merge::Ruleset::SupportStyleResolver.call (method)">call</a></span></span><span class='lparen'>(</span>
+      <span class='label'>read:</span> <span class='symbol'>:source_augmented_portable_write</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>capability:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:capability</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html" title="Ast::Merge::Ruleset::SupportStyleResolver (class)">SupportStyleResolver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html#call-class_method" title="Ast::Merge::Ruleset::SupportStyleResolver.call (method)">call</a></span></span><span class='lparen'>(</span>
+      <span class='label'>read:</span> <span class='symbol'>:native_read_portable_write</span><span class='comma'>,</span>
+      <span class='label'>source:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>capability:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:capability</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>style:</span> <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="compute_node_signature-instance_method">
+  
+    #<strong>compute_node_signature</strong>(node)  &#x21d2; <tt>Array</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <div class="note abstract">
+  <strong>This method is abstract.</strong>
+  <div class='inline'>
+</div>
+</div>
+<p>Compute default signature for a node.<br />
+This method must be implemented by including classes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The node to compute signature for</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature array or nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>NotImplementedError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+743
+744
+745</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 743</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>NotImplementedError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> must implement #compute_node_signature</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fallthrough_node?-instance_method">
+  
+    #<strong>fallthrough_node?</strong>(value)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a value represents a fallthrough node that should be used for<br />
+default signature computation.</p>
+
+<p>When a signature_generator returns a non-Array/nil value, we check if it’s<br />
+a “fallthrough” node that should be passed to compute_node_signature.<br />
+This includes:</p>
+<ul>
+  <li>AstNode instances (custom AST nodes like Comment::Line)</li>
+  <li>Freezable nodes (frozen wrappers)</li>
+  <li>FreezeNodeBase instances</li>
+  <li>NodeTyping::Wrapper instances (unwrapped to get the underlying node)</li>
+</ul>
+
+<p>Override this method to add custom node type detection for your parser.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The value to check</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if this is a fallthrough node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+729
+730
+731
+732
+733
+734
+735</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 729</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="AstNode.html" title="Ast::Merge::AstNode (class)">AstNode</a></span></span><span class='rparen'>)</span> <span class='op'>||</span>
+    <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span> <span class='op'>||</span>
+    <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></span><span class='rparen'>)</span> <span class='op'>||</span>
+    <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="NodeTyping/Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></span><span class='rparen'>)</span> <span class='op'>||</span>
+    <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="BlockDirective.html" title="Ast::Merge::BlockDirective (module)">BlockDirective</a></span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="feature_profile-instance_method">
+  
+    #<strong>feature_profile</strong>  &#x21d2; <tt><span class='object_link'><a href="Ruleset/FeatureProfile.html" title="Ast::Merge::Ruleset::FeatureProfile (class)">Ruleset::FeatureProfile</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Describe the current analysis using spec-aligned merge feature terms.</p>
+
+<p>Analyses can override the individual <code>ruleset_*</code> hooks below to make this<br />
+surface more specific without replacing the whole profile object.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Ruleset/FeatureProfile.html" title="Ast::Merge::Ruleset::FeatureProfile (class)">Ruleset::FeatureProfile</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_feature_profile'>feature_profile</span>
+  <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/FeatureProfile.html" title="Ast::Merge::Ruleset::FeatureProfile (class)">FeatureProfile</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Ruleset/FeatureProfile.html#initialize-instance_method" title="Ast::Merge::Ruleset::FeatureProfile#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner_selector:</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span><span class='comma'>,</span>
+    <span class='label'>match_key:</span> <span class='id identifier rubyid_ruleset_match_key'>ruleset_match_key</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='id identifier rubyid_ruleset_read_strategy'>ruleset_read_strategy</span><span class='comma'>,</span>
+    <span class='label'>attachment_strategy:</span> <span class='id identifier rubyid_ruleset_attachment_strategy'>ruleset_attachment_strategy</span><span class='comma'>,</span>
+    <span class='label'>comment_style:</span> <span class='id identifier rubyid_ruleset_comment_style'>ruleset_comment_style</span><span class='comma'>,</span>
+    <span class='label'>render_family:</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span><span class='comma'>,</span>
+    <span class='label'>comment_capability:</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span><span class='comma'>,</span>
+    <span class='label'>support_style:</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span><span class='comma'>,</span>
+    <span class='label'>capabilities:</span> <span class='id identifier rubyid_ruleset_capabilities'>ruleset_capabilities</span><span class='comma'>,</span>
+    <span class='label'>logical_owners:</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span><span class='comma'>,</span>
+    <span class='label'>repair_policies:</span> <span class='id identifier rubyid_ruleset_repair_policies'>ruleset_repair_policies</span><span class='comma'>,</span>
+    <span class='label'>surfaces:</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span><span class='comma'>,</span>
+    <span class='label'>delegation_policies:</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_block_at-instance_method">
+  
+    #<strong>freeze_block_at</strong>(line_num)  &#x21d2; <tt><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the freeze block containing the given line, if any.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Freeze block node or nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+90
+91
+92</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 90</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fb'>fb</span><span class='op'>|</span> <span class='id identifier rubyid_fb'>fb</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_blocks-instance_method">
+  
+    #<strong>freeze_blocks</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get all freeze blocks/nodes from statements.<br />
+Includes both traditional FreezeNodeBase blocks and Freezable-wrapped nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>All freeze nodes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+74
+75
+76</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 74</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span>
+  <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="generate_signature-instance_method">
+  
+    #<strong>generate_signature</strong>(node)  &#x21d2; <tt>Array</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Generate signature for a node.</p>
+
+<p>Signatures are used to match nodes between template and destination files.<br />
+Two nodes with the same signature are considered “the same” for merge purposes,<br />
+allowing the merger to decide which version to keep based on preference settings.</p>
+
+<h2 id="signature-generation-flow">Signature Generation Flow</h2>
+
+<ol>
+  <li>
+    <p><strong>FreezeNodeBase</strong> (explicit freeze blocks like <code># token:freeze ... # token:unfreeze</code>):<br />
+Uses content-based signature via <code>freeze_signature</code>. This ensures explicit freeze<br />
+blocks match between files based on their actual content.</p>
+  </li>
+  <li>
+    <p><strong>FrozenWrapper</strong> (AST nodes with freeze markers in leading comments):<br />
+The wrapper is <strong>unwrapped first</strong> to get the underlying AST node. The signature<br />
+is then generated from the underlying node, NOT the wrapper. This is critical<br />
+because the freeze marker only affects merge <em>preference</em> (destination wins),<br />
+not <em>matching</em>. Two nodes should match by their structural identity even if<br />
+their content differs slightly.</p>
+  </li>
+  <li><strong>Custom signature_generator</strong>: If provided, receives the unwrapped node and can:
+    <ul>
+      <li>Return an Array signature (e.g., <code>[:gem, "foo"]</code>) - used directly</li>
+      <li>Return <code>nil</code> - node gets no signature, won’t be matched</li>
+      <li>Return the node (fallthrough) - default signature computation is used</li>
+    </ul>
+  </li>
+  <li><strong>Default computation</strong>: Falls through to <code>compute_node_signature</code> for<br />
+parser-specific default signature generation.</li>
+</ol>
+
+<h2 id="why-frozenwrapper-must-be-unwrapped">Why FrozenWrapper Must Be Unwrapped</h2>
+
+<p>Consider a gemspec with a frozen <code>gem_version</code> variable:</p>
+
+<p>Template:                         Destination:<br />
+  # kettle-dev:freeze               # kettle-dev:freeze<br />
+  # Comment                         # Comment<br />
+  # kettle-dev:unfreeze             # More comments<br />
+  gem_version = “1.0”               # kettle-dev:unfreeze<br />
+                                    gem_version = “1.0”</p>
+
+<p>Both have a <code>gem_version</code> assignment with a freeze marker in leading comments.<br />
+The assignments are wrapped in FrozenWrapper, but their CONTENT differs<br />
+(template has fewer comments in the freeze block).</p>
+
+<p>If we generated signatures from the wrapper (which delegates <code>slice</code> to the<br />
+full node content), they would NOT match and both would be output - duplicating<br />
+the freeze block!</p>
+
+<p>By unwrapping first, we generate signatures from the underlying<br />
+<code>LocalVariableWriteNode</code>, which matches by variable name (<code>gem_version</code>),<br />
+ensuring only ONE version is output (the destination version, since it’s frozen).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Custom generator with fallthrough</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_node'>node</span>
+  <span class='kw'>when</span> <span class='const'>MyParser</span><span class='op'>::</span><span class='const'>SpecialNode</span>
+    <span class='lbracket'>[</span><span class='symbol'>:special</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_node'>node</span>  <span class='comment'># Return original node for default signature computation
+</span>  <span class='kw'>end</span>
+<span class='rbrace'>}</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Node to generate signature for (may be wrapped)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature array or nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Freezable.html#freeze_signature-instance_method" title="Ast::Merge::Freezable#freeze_signature (method)">Ast::Merge::Freezable#freeze_signature</a></span></li>
+    
+      <li><span class='object_link'><a href="NodeTyping/FrozenWrapper.html" title="Ast::Merge::NodeTyping::FrozenWrapper (class)">NodeTyping::FrozenWrapper</a></span></li>
+    
+      <li><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Ast::Merge::Freezable</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
+708
+709
+710
+711
+712</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 613</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+  <span class='comment'># ==========================================================================
+</span>  <span class='comment'># CASE 1: FreezeNodeBase (explicit freeze blocks)
+</span>  <span class='comment'># ==========================================================================
+</span>  <span class='comment'># FreezeNodeBase represents an explicit freeze block delimited by markers:
+</span>  <span class='comment'>#   # token:freeze
+</span>  <span class='comment'>#   ... content ...
+</span>  <span class='comment'>#   # token:unfreeze
+</span>  <span class='comment'>#
+</span>  <span class='comment'># These are standalone structural elements (not attached to AST nodes).
+</span>  <span class='comment'># They use content-based signatures so identical freeze blocks match.
+</span>  <span class='comment'># This is different from FrozenWrapper which wraps AST nodes.
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># ==========================================================================
+</span>  <span class='comment'># CASE 2: Unwrap FrozenWrapper (and other wrappers)
+</span>  <span class='comment'># ==========================================================================
+</span>  <span class='comment'># FrozenWrapper wraps AST nodes that have freeze markers in their leading
+</span>  <span class='comment'># comments. The wrapper marks the node as &quot;frozen&quot; (prefer destination),
+</span>  <span class='comment'># but for MATCHING purposes, we need the underlying node&#39;s identity.
+</span>  <span class='comment'>#
+</span>  <span class='comment'># Example: A `gem_version = ...` assignment wrapped in FrozenWrapper should
+</span>  <span class='comment'># match another `gem_version = ...` assignment by variable name, not by
+</span>  <span class='comment'># the full content of the assignment (which may differ).
+</span>  <span class='comment'>#
+</span>  <span class='comment'># CRITICAL: We must unwrap BEFORE calling the signature_generator so it
+</span>  <span class='comment'># receives the actual AST node type (e.g., Prism::LocalVariableWriteNode)
+</span>  <span class='comment'># rather than the wrapper (FrozenWrapper). Otherwise, type-based signature
+</span>  <span class='comment'># generators (like kettle-jem&#39;s gemspec generator) won&#39;t recognize the node
+</span>  <span class='comment'># and will fall through to default handling incorrectly.
+</span>  <span class='id identifier rubyid_actual_node'>actual_node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span>
+
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+    <span class='comment'># ==========================================================================
+</span>    <span class='comment'># CASE 3: Custom signature generator
+</span>    <span class='comment'># ==========================================================================
+</span>    <span class='comment'># Pass the UNWRAPPED node to the custom generator. This ensures:
+</span>    <span class='comment'># - Type checks work (e.g., `node.is_a?(Prism::CallNode)`)
+</span>    <span class='comment'># - The generator sees the real AST structure
+</span>    <span class='comment'># - Frozen nodes match by their underlying identity
+</span>    <span class='comment'>#
+</span>    <span class='comment'># NOTE: For TreeHaver-based backends, the node already has a unified API
+</span>    <span class='comment'># with #text, #type, #source_position methods. For other backends, they
+</span>    <span class='comment'># must conform to the same API (either via TreeHaver or equivalent adapter).
+</span>    <span class='id identifier rubyid_custom_result'>custom_result</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
+    <span class='kw'>when</span> <span class='const'>Array</span><span class='comma'>,</span> <span class='kw'>nil</span>
+      <span class='comment'># Generator returned a final signature or nil - use as-is
+</span>      <span class='id identifier rubyid_custom_result'>custom_result</span>
+    <span class='kw'>else</span>
+      <span class='comment'># Generator returned a node (fallthrough) - compute default signature.
+</span>      <span class='comment'>#
+</span>      <span class='comment'># Two conditions indicate the generator is deferring to default handling:
+</span>      <span class='comment'># 1. Identity equality: the generator returned the exact same object it
+</span>      <span class='comment'>#    received (classic &quot;I don&#39;t handle this type&quot; passthrough pattern).
+</span>      <span class='comment'># 2. Known node type: the result is a recognised wrapper/node class.
+</span>      <span class='comment'>#
+</span>      <span class='comment'># If neither applies, treat the return value as a final custom signature
+</span>      <span class='comment'># (e.g. a String, Symbol, or other non-node key).
+</span>      <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_custom_result'>custom_result</span><span class='rparen'>)</span>
+        <span class='comment'># Special case: if fallthrough result is Freezable, use freeze_signature
+</span>        <span class='comment'># This handles cases where the generator wraps a node in Freezable
+</span>        <span class='kw'>if</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span>
+          <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
+        <span class='kw'>else</span>
+          <span class='comment'># Unwrap any wrapper and compute default signature
+</span>          <span class='id identifier rubyid_unwrapped'>unwrapped</span> <span class='op'>=</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_custom_result'>custom_result</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_custom_result'>custom_result</span>
+          <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_unwrapped'>unwrapped</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+      <span class='kw'>else</span>
+        <span class='comment'># Non-node return value - pass through (allows arbitrary signature types)
+</span>        <span class='id identifier rubyid_custom_result'>custom_result</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>else</span>
+    <span class='comment'># ==========================================================================
+</span>    <span class='comment'># CASE 4: No custom generator - use default computation
+</span>    <span class='comment'># ==========================================================================
+</span>    <span class='comment'># Pass the UNWRAPPED node to compute_node_signature. This is critical
+</span>    <span class='comment'># because compute_node_signature uses type checking (e.g., case statements
+</span>    <span class='comment'># matching Prism::DefNode, Prism::CallNode, etc.). If we pass a
+</span>    <span class='comment'># FrozenWrapper, it won&#39;t match any of those types and will fall through
+</span>    <span class='comment'># to a generic handler, producing incorrect signatures.
+</span>    <span class='comment'>#
+</span>    <span class='comment'># For FrozenWrapper nodes, the underlying AST node determines the signature
+</span>    <span class='comment'># (e.g., method name for DefNode, gem name for CallNode). The wrapper only
+</span>    <span class='comment'># affects merge preference (destination wins), not matching.
+</span>    <span class='id identifier rubyid_compute_node_signature'>compute_node_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_actual_node'>actual_node</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Ast::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'><span class='object_link'><a href="DebugLogger.html#debug-instance_method" title="Ast::Merge::DebugLogger#debug (method)">debug</a></span></span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Generated signature</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+    <span class='label'>node_type:</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='comma'>,</span>
+    <span class='label'>signature:</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span>
+    <span class='label'>generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span>
+
+  <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="in_freeze_block?-instance_method">
+  
+    #<strong>in_freeze_block?</strong>(line_num)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line is within a freeze block.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if line is inside a freeze block</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+82
+83
+84</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 82</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_in_freeze_block?'>in_freeze_block?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fb'>fb</span><span class='op'>|</span> <span class='id identifier rubyid_fb'>fb</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="layout_attachment_for-instance_method">
+  
+    #<strong>layout_attachment_for</strong>(owner, **options)  &#x21d2; <tt><span class='object_link'><a href="Layout/Attachment.html" title="Ast::Merge::Layout::Attachment (class)">Layout::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return a passive shared layout attachment for a structural owner.</p>
+
+<p>Analyses with explicit blank-line ownership data should override this to<br />
+return meaningful leading/trailing gap attachments. The default<br />
+implementation returns an empty attachment so callers can migrate<br />
+incrementally.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Layout/Attachment.html" title="Ast::Merge::Layout::Attachment (class)">Layout::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 480</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span>
+  <span class='id identifier rubyid_augmenter'>augmenter</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_augmenter'>augmenter</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="Layout.html" title="Ast::Merge::Layout (module)">Layout</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Layout/Attachment.html" title="Ast::Merge::Layout::Attachment (class)">Attachment</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Layout/Attachment.html#initialize-instance_method" title="Ast::Merge::Layout::Attachment#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>leading_gap:</span> <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
+    <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_inferred_attachment'>inferred_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:file_analyzable_default</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="layout_augmenter-instance_method">
+  
+    #<strong>layout_augmenter</strong>(owners: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="Layout/Augmenter.html" title="Ast::Merge::Layout::Augmenter (class)">Layout::Augmenter</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a passive shared layout augmenter for the current analysis.</p>
+
+<p>Format-specific analyses should override this when they can provide a<br />
+stronger ownership model for blank-line gaps. The default implementation<br />
+preserves the shared hook surface while inferring only directly adjacent<br />
+blank-line runs from source lines and owner ranges.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;#start_line,#end_line&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>owners for gap inference</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>augmenter metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Layout/Augmenter.html" title="Ast::Merge::Layout::Augmenter (class)">Layout::Augmenter</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+510
+511
+512
+513
+514
+515
+516</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 510</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="Layout.html" title="Ast::Merge::Layout (module)">Layout</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Layout/Augmenter.html" title="Ast::Merge::Layout::Augmenter (class)">Augmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Layout/Augmenter.html#initialize-instance_method" title="Ast::Merge::Layout::Augmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span>
+    <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="layout_owner_supported?-instance_method">
+  
+    #<strong>layout_owner_supported?</strong>(owner)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+518
+519
+520
+521
+522
+523</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 518</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_owner'>owner</span><span class='op'>&amp;.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:start_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:end_line</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span>
+    <span class='op'>!</span><span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="line_at-instance_method">
+  
+    #<strong>line_at</strong>(line_num)  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get a specific line (1-indexed).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number (1-indexed)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The line content or nil if out of bounds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_line_at'>line_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>&lt;</span> <span class='int'>1</span>
+
+  <span class='id identifier rubyid_lines'>lines</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>-</span> <span class='int'>1</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_augmented_comment_attachment_with_layout-instance_method">
+  
+    #<strong>merge_augmented_comment_attachment_with_layout</strong>(owner, tracker_attachment:, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Prefer an augmenter-built attachment when available, then merge the<br />
+result with shared layout ownership data.</p>
+
+<p>This lets analyses use richer augmenter ownership (for example floating<br />
+leading regions) while preserving tracker-based fallback behavior.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tracker_attachment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>tracker-built fallback</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+393
+394
+395
+396
+397
+398
+399
+400
+401</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 393</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_augmented_comment_attachment_with_layout'>merge_augmented_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_augmenter_attachment'>augmenter_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_augmenter_attachment'>augmenter_attachment</span> <span class='op'>||</span> <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_comment_attachment_with_layout-instance_method">
+  
+    #<strong>merge_comment_attachment_with_layout</strong>(owner, comment_attachment, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge a format-specific comment attachment with shared inferred layout gaps.</p>
+
+<p>This lets analyses keep custom comment-region logic while still exposing<br />
+the shared gap ownership model through the returned comment attachment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>comment_attachment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>existing comment attachment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 368</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_layout_attachment'>layout_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_owner_supported?'>layout_owner_supported?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>nil</span>
+
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Attachment</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Attachment.html#initialize-instance_method" title="Ast::Merge::Comment::Attachment#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_owner'>owner</span> <span class='op'>||</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>leading_region:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='comma'>,</span>
+    <span class='label'>inline_region:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_inline_region'>inline_region</span><span class='comma'>,</span>
+    <span class='label'>trailing_region:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='comma'>,</span>
+    <span class='label'>orphan_regions:</span> <span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>leading_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
+    <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lparen'>(</span><span class='id identifier rubyid_comment_attachment'>comment_attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_metadata'>metadata</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_layout_owned_comment_attachment-instance_method">
+  
+    #<strong>normalize_layout_owned_comment_attachment</strong>(attachment)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Mark a leading region as floating when shared layout already proves it is<br />
+gap-owned, without changing the underlying region content.</p>
+
+<p>Some format analyzers still build attachments from tracker-level comment<br />
+regions that do not set <code>floating: true</code> even though the shared layout<br />
+augmenter has already established a leading gap. This helper preserves the<br />
+attachment shape while normalizing that metadata in one place.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>attachment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 430</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_layout_owned_comment_attachment'>normalize_layout_owned_comment_attachment</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_attachment'>attachment</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='op'>&amp;.</span><span class='id identifier rubyid_leading_region'>leading_region</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_attachment'>attachment</span> <span class='kw'>if</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_floating?'>floating?</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_attachment'>attachment</span> <span class='kw'>unless</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span>
+
+  <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Attachment</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Attachment.html#initialize-instance_method" title="Ast::Merge::Comment::Attachment#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>leading_region:</span> <span class='const'><span class='object_link'><a href="Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Comment/Region.html" title="Ast::Merge::Comment::Region (class)">Region</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Comment/Region.html#initialize-instance_method" title="Ast::Merge::Comment::Region#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>kind:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span>
+      <span class='label'>nodes:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='comma'>,</span>
+      <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_region'>leading_region</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>floating:</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>inline_region:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_inline_region'>inline_region</span><span class='comma'>,</span>
+    <span class='label'>trailing_region:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='comma'>,</span>
+    <span class='label'>orphan_regions:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_orphan_regions'>orphan_regions</span><span class='comma'>,</span>
+    <span class='label'>leading_gap:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
+    <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_tracked_comment_attachment_with_layout-instance_method">
+  
+    #<strong>normalize_tracked_comment_attachment_with_layout</strong>(owner, tracker_attachment:, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge a tracker-built attachment with shared layout ownership and then<br />
+normalize any layout-owned leading region metadata.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tracker_attachment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>tracker-built attachment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+410
+411
+412
+413
+414
+415
+416
+417
+418</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 410</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_tracked_comment_attachment_with_layout'>normalize_tracked_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalize_layout_owned_comment_attachment'>normalize_layout_owned_comment_attachment</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span>
+      <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+      <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='comma'>,</span>
+    <span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalized_line-instance_method">
+  
+    #<strong>normalized_line</strong>(line_num)  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get a normalized line (whitespace-trimmed, for comparison).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line number (1-indexed)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Normalized line content or nil if out of bounds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalized_line'>normalized_line</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='id identifier rubyid_line_at'>line_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_line'>line</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_leading_comment_freeze?-instance_method">
+  
+    #<strong>owner_leading_comment_freeze?</strong>(owner, freeze_token: self.freeze_token, **options)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether an owner’s leading normalized comment attachment contains a freeze directive.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>self.freeze_token</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>token to detect (defaults to this analysis token)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+531
+532
+533
+534</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 531</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_leading_comment_freeze?'>owner_leading_comment_freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_freeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_freeze?'>leading_freeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_leading_comment_unfreeze?-instance_method">
+  
+    #<strong>owner_leading_comment_unfreeze?</strong>(owner, freeze_token: self.freeze_token, **options)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check whether an owner’s leading normalized comment attachment contains an unfreeze directive.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>self.freeze_token</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>token to detect (defaults to this analysis token)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+542
+543
+544
+545</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 542</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_leading_comment_unfreeze?'>owner_leading_comment_unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attachment'>attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_unfreeze?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_unfreeze?'>leading_unfreeze?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_attachment_strategy-instance_method">
+  
+    #<strong>ruleset_attachment_strategy</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+236
+237
+238</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 236</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_attachment_strategy'>ruleset_attachment_strategy</span>
+  <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_capabilities-instance_method">
+  
+    #<strong>ruleset_capabilities</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+248
+249
+250
+251
+252
+253</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 248</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_capabilities'>ruleset_capabilities</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>layout_aware:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>logical_owner:</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_comment_style-instance_method">
+  
+    #<strong>ruleset_comment_style</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+240
+241
+242</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 240</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_comment_style'>ruleset_comment_style</span>
+  <span class='id identifier rubyid_comment_support_style'>comment_support_style</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:style</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_delegation_policies-instance_method">
+  
+    #<strong>ruleset_delegation_policies</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+267
+268
+269</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 267</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span>
+  <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_logical_owners-instance_method">
+  
+    #<strong>ruleset_logical_owners</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+255
+256
+257</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 255</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_logical_owners'>ruleset_logical_owners</span>
+  <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_match_key-instance_method">
+  
+    #<strong>ruleset_match_key</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+225
+226
+227</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 225</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_match_key'>ruleset_match_key</span>
+  <span class='symbol'>:signature</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_owner_selector-instance_method">
+  
+    #<strong>ruleset_owner_selector</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+221
+222
+223</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 221</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span>
+  <span class='symbol'>:shared_default</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_read_strategy-instance_method">
+  
+    #<strong>ruleset_read_strategy</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+229
+230
+231
+232
+233
+234</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 229</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_read_strategy'>ruleset_read_strategy</span>
+  <span class='id identifier rubyid_support_style'>support_style</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_support_style'>support_style</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:available?</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_support_style'>support_style</span><span class='period'>.</span><span class='id identifier rubyid_available?'>available?</span>
+
+  <span class='id identifier rubyid_support_style'>support_style</span><span class='period'>.</span><span class='id identifier rubyid_style'>style</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_render_family-instance_method">
+  
+    #<strong>ruleset_render_family</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 244</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_repair_policies-instance_method">
+  
+    #<strong>ruleset_repair_policies</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+259
+260
+261</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 259</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_repair_policies'>ruleset_repair_policies</span>
+  <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_surfaces-instance_method">
+  
+    #<strong>ruleset_surfaces</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+263
+264
+265</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 263</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span>
+  <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="shared_comment_attachment_for-instance_method">
+  
+    #<strong>shared_comment_attachment_for</strong>(owner, tracker_attachment: nil, strategy: comment_attachment_strategy, **options)  &#x21d2; <tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a comment attachment through one of the shared runtime strategies.</p>
+
+<p>This surfaces the current repeated runtime seam explicitly so<br />
+format-specific analyses can declare which ownership path they use while<br />
+still preserving any custom tracker attachment selection they need.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>structural owner</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>tracker_attachment</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>tracker-built or custom base attachment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>strategy</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>comment_attachment_strategy</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment strategy override</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>attachment metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Attachment.html" title="Ast::Merge::Comment::Attachment (class)">Comment::Attachment</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 344</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_shared_comment_attachment_for'>shared_comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='id identifier rubyid_comment_attachment_strategy'>comment_attachment_strategy</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>case</span> <span class='id identifier rubyid_strategy'>strategy</span>
+  <span class='kw'>when</span> <span class='symbol'>:layout_only</span>
+    <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='symbol'>:tracker_layout_merge</span>
+    <span class='id identifier rubyid_merge_comment_attachment_with_layout'>merge_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='symbol'>:augmenter_preferred_tracker_layout</span>
+    <span class='id identifier rubyid_merge_augmented_comment_attachment_with_layout'>merge_augmented_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span> <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='symbol'>:normalize_tracked_layout_merge</span>
+    <span class='id identifier rubyid_normalize_tracked_comment_attachment_with_layout'>normalize_tracked_comment_attachment_with_layout</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='label'>tracker_attachment:</span> <span class='id identifier rubyid_tracker_attachment'>tracker_attachment</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown comment attachment strategy: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_strategy'>strategy</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="shared_comment_support_style-instance_method">
+  
+    #<strong>shared_comment_support_style</strong>(source:, style:, read_strategy:, capability: comment_capability.level)  &#x21d2; <tt><span class='object_link'><a href="Comment/SupportStyle.html" title="Ast::Merge::Comment::SupportStyle (class)">Comment::SupportStyle</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a shared support-style declaration for analyses that already know<br />
+their read/write model.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>source</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>support-style source identifier</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>style</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>comment syntax family</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>read_strategy</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>support-style read/write strategy</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>capability</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>comment_capability.level</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>advertised capability level</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/SupportStyle.html" title="Ast::Merge::Comment::SupportStyle (class)">Comment::SupportStyle</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 182</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span><span class='label'>source:</span><span class='comma'>,</span> <span class='label'>style:</span><span class='comma'>,</span> <span class='label'>read_strategy:</span><span class='comma'>,</span> <span class='label'>capability:</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
+    <span class='label'>capability:</span> <span class='id identifier rubyid_capability'>capability</span><span class='comma'>,</span>
+    <span class='label'>style:</span> <span class='id identifier rubyid_style'>style</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+
+  <span class='const'><span class='object_link'><a href="Ruleset.html" title="Ast::Merge::Ruleset (module)">Ruleset</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html" title="Ast::Merge::Ruleset::SupportStyleResolver (class)">SupportStyleResolver</a></span></span><span class='period'>.</span><span class='id identifier rubyid_call'><span class='object_link'><a href="Ruleset/SupportStyleResolver.html#call-class_method" title="Ast::Merge::Ruleset::SupportStyleResolver.call (method)">call</a></span></span><span class='lparen'>(</span><span class='label'>read:</span> <span class='id identifier rubyid_read_strategy'>read_strategy</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_details'>details</span><span class='rparen'>)</span>
+<span class='kw'>rescue</span> <span class='const'>ArgumentError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown ruleset read strategy:</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown comment support read strategy: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_read_strategy'>read_strategy</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="signature_at-instance_method">
+  
+    #<strong>signature_at</strong>(index)  &#x21d2; <tt>Array</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get structural signature for a statement at given index.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Statement index (0-based)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature array or nil if index out of bounds</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_signature_at'>signature_at</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&lt;</span> <span class='int'>0</span> <span class='op'>||</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+
+  <span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="statements-instance_method">
+  
+    #<strong>statements</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get all top-level statements (nodes and freeze blocks).<br />
+Override this method in including classes to return the appropriate collection.<br />
+The default implementation returns @statements if set, otherwise an empty array.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>All top-level statements</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/file_analyzable.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_statements'>statements</span>
+  <span class='ivar'>@statements</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

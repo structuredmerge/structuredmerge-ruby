@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Prism::Merge::TopLevelMergeRunner
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Prism::Merge::TopLevelMergeRunner";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">TopLevelMergeRunner</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Prism::Merge::TopLevelMergeRunner
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Prism::Merge::TopLevelMergeRunner</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Ast::Merge::JaccardSimilarity, Ast::Merge::TrailingGroups::DestIterate</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/prism/merge/top_level_merge_runner.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Orchestrates the top-level merge of two Ruby files parsed by Prism.</p>
+
+<p>Uses a <strong>three-phase matching</strong> strategy to pair template nodes with<br />
+destination nodes before emitting the merged result:</p>
+
+<ol>
+  <li>
+    <p><strong>Phase 1 — Exact signature match.</strong><br />
+Pairs nodes whose structural signatures (method name + params,<br />
+call name + args, etc.) are identical. This is the fastest phase<br />
+and handles the vast majority of nodes.</p>
+  </li>
+  <li>
+    <p><strong>Phase 2 — Similarity match at the same depth.</strong><br />
+For nodes left unmatched after Phase 1, computes body-text Jaccard<br />
+similarity ({Ast::Merge::JaccardSimilarity}) to pair probable<br />
+renames or minor refactors. Only operates on the residual<br />
+unmatched sets, keeping cost proportional to orphan count.</p>
+  </li>
+  <li>
+    <p><strong>Phase 3 — Cross-depth match.</strong><br />
+For nodes still unmatched after Phase 2, searches recursively into<br />
+destination subtrees (conditionals, begin/rescue, call blocks) to<br />
+detect “moved” nodes — e.g. a template top-level +eval_gemfile+<br />
+that the destination wrapped inside an +if+ block. Only runs on<br />
+the tiny residual set surviving both previous phases.</p>
+  </li>
+</ol>
+
+<p>The phase ordering is critical: exact matches are locked in first so<br />
+that fuzzy Phase 2 scoring cannot accidentally consume a node that<br />
+belongs to a later exact match at a different position.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage (internal — called by SmartMerger)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_runner'>runner</span> <span class='op'>=</span> <span class='const'>TopLevelMergeRunner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::TopLevelMergeRunner#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>merger:</span> <span class='id identifier rubyid_smart_merger'>smart_merger</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_runner'>runner</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>   <span class='comment'># =&gt; MergeResult</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>Jaccard token-set similarity</li>
+    
+      <li>Template-only node positioning</li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="SIMILARITY_THRESHOLD-constant" class="">SIMILARITY_THRESHOLD =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Minimum Jaccard score for Phase 2 body-text matching.<br />
+Below this threshold, two nodes are too dissimilar to pair.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='float'>0.6</span></pre></dd>
+      
+        <dt id="MIN_BODY_TOKENS-constant" class="">MIN_BODY_TOKENS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Minimum token count for meaningful Jaccard comparison.<br />
+Nodes with fewer body tokens than this are skipped in Phase 2<br />
+to avoid spurious matches on trivially short bodies.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='int'>3</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merger-instance_method" title="#merger (instance method)">#<strong>merger</strong>  &#x21d2; SmartMerger </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The merger instance driving this run.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(merger:)  &#x21d2; TopLevelMergeRunner </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of TopLevelMergeRunner.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge-instance_method" title="#merge (instance method)">#<strong>merge</strong>  &#x21d2; MergeResult </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Execute the three-phase merge and return the result.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(merger:)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::TopLevelMergeRunner (class)">TopLevelMergeRunner</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of TopLevelMergeRunner.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>merger</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="SmartMerger.html" title="Prism::Merge::SmartMerger (class)">SmartMerger</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merger to run</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/top_level_merge_runner.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>merger:</span><span class='rparen'>)</span>
+  <span class='ivar'>@merger</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="merger-instance_method">
+  
+    #<strong>merger</strong>  &#x21d2; <tt><span class='object_link'><a href="SmartMerger.html" title="Prism::Merge::SmartMerger (class)">SmartMerger</a></span></tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The merger instance driving this run.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="SmartMerger.html" title="Prism::Merge::SmartMerger (class)">SmartMerger</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merger instance driving this run</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/top_level_merge_runner.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merger'>merger</span>
+  <span class='ivar'>@merger</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge-instance_method">
+  
+    #<strong>merge</strong>  &#x21d2; <tt><span class='object_link'><a href="MergeResult.html" title="Prism::Merge::MergeResult (class)">MergeResult</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Execute the three-phase merge and return the result.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="MergeResult.html" title="Prism::Merge::MergeResult (class)">MergeResult</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merged output</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/top_level_merge_runner.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
+  <span class='id identifier rubyid_root_operation'>root_operation</span> <span class='op'>=</span> <span class='id identifier rubyid_start_runtime_session!'>start_runtime_session!</span>
+
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_comment_only_merge?'>comment_only_merge?</span>
+    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:comment_only_file_merger</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_template_by_signature'>template_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:build_signature_map</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_prepare_comment_augmenters!'>prepare_comment_augmenters!</span><span class='lparen'>(</span><span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='label'>dest_by_signature:</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_sig_cursor'>sig_cursor</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='symbol'>:emit_dest_prefix_lines</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+
+    <span class='comment'># Phase 1: exact signature match (existing behavior).
+</span>    <span class='id identifier rubyid_dest_sigs'>dest_sigs</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='rparen'>)</span>
+
+    <span class='comment'># Phase 2: compute similarity-matched pairs from residual orphans.
+</span>    <span class='ivar'>@similarity_pairs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_similarity_pairs'>compute_similarity_pairs</span><span class='lparen'>(</span><span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_by_signature'>dest_by_signature</span><span class='rparen'>)</span>
+
+    <span class='comment'># Phase 3: cross-depth search, but only for orphans surviving Phases 1+2.
+</span>    <span class='ivar'>@deep_dest_sigs</span> <span class='op'>=</span> <span class='id identifier rubyid_compute_deep_sigs_for_orphans'>compute_deep_sigs_for_orphans</span><span class='lparen'>(</span>
+      <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span>
+    <span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid__matched_indices'>_matched_indices</span> <span class='op'>=</span> <span class='id identifier rubyid_build_dest_iterate_trailing_groups'>build_dest_iterate_trailing_groups</span><span class='lparen'>(</span>
+      <span class='label'>template_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span>
+      <span class='label'>dest_sigs:</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span><span class='comma'>,</span>
+      <span class='label'>signature_for:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_generate_signature'>generate_signature</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+      <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+
+    <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+      <span class='id identifier rubyid_emit_prefix_trailing_group'>emit_prefix_trailing_group</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+        <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='op'>|</span>
+      <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span> <span class='op'>=</span> <span class='id identifier rubyid_process_dest_node'>process_dest_node</span><span class='lparen'>(</span>
+        <span class='label'>dest_node:</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+        <span class='label'>template_by_signature:</span> <span class='id identifier rubyid_template_by_signature'>template_by_signature</span><span class='comma'>,</span>
+        <span class='label'>consumed_template_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
+        <span class='label'>sig_cursor:</span> <span class='id identifier rubyid_sig_cursor'>sig_cursor</span><span class='comma'>,</span>
+        <span class='label'>output_dest_line_ranges:</span> <span class='id identifier rubyid_output_dest_line_ranges'>output_dest_line_ranges</span><span class='comma'>,</span>
+        <span class='label'>last_output_dest_line:</span> <span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='comma'>,</span>
+        <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
+      <span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Safety net: emit any trailing groups whose anchor was never consumed
+</span>    <span class='kw'>unless</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+      <span class='id identifier rubyid_emit_remaining_trailing_groups'>emit_remaining_trailing_groups</span><span class='lparen'>(</span>
+        <span class='label'>trailing_groups:</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span>
+        <span class='label'>consumed_indices:</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='comma'>,</span>
+      <span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+        <span class='id identifier rubyid_emit_template_only_node'>emit_template_only_node</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_emit_tail_template_only_nodes'>emit_tail_template_only_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_consumed_template_indices'>consumed_template_indices</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_destination_tail_template_only_placement?'>destination_tail_template_only_placement?</span>
+
+    <span class='id identifier rubyid_emit_dest_postlude_lines'>emit_dest_postlude_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_last_output_dest_line'>last_output_dest_line</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_complete_runtime_session!'>complete_runtime_session!</span><span class='lparen'>(</span><span class='id identifier rubyid_root_operation'>root_operation</span><span class='comma'>,</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_fail_runtime_session!'>fail_runtime_session!</span><span class='lparen'>(</span><span class='id identifier rubyid_root_operation'>root_operation</span><span class='comma'>,</span> <span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:10 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

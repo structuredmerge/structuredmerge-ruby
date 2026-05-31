@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: TreeHaver::Tree
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "TreeHaver::Tree";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span>
+     &raquo; 
+    <span class="title">Tree</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: TreeHaver::Tree
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Base::Tree</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Base::Tree</li>
+          
+            <li class="next">TreeHaver::Tree</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/tree_haver/tree.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Unified Tree wrapper providing a consistent API across all backends</p>
+
+<p>This class wraps backend-specific tree objects and provides a unified interface.<br />
+It stores the source text to enable text extraction from nodes.</p>
+
+<p>== Wrapping/Unwrapping Contract</p>
+
+<p>TreeHaver follows a consistent pattern for object wrapping:</p>
+
+<ol>
+  <li><strong>TreeHaver::Parser</strong> (top level) handles ALL wrapping/unwrapping</li>
+  <li><strong>Backends</strong> work exclusively with raw backend objects</li>
+  <li><strong>User-facing API</strong> uses only TreeHaver wrapper classes</li>
+</ol>
+
+<p>Specifically for trees:</p>
+<ul>
+  <li>Backend Parser#parse returns raw backend tree (TreeSitter::Tree, TreeStump::Tree, etc.)</li>
+  <li>TreeHaver::Parser#parse wraps it in TreeHaver::Tree</li>
+  <li>TreeHaver::Parser#parse_string unwraps old_tree before passing to backend</li>
+  <li>Backend Parser#parse_string receives raw backend tree, returns raw backend tree</li>
+  <li>TreeHaver::Parser#parse_string wraps the returned tree</li>
+</ul>
+
+<p>This ensures:</p>
+<ul>
+  <li>Backends are simple and consistent</li>
+  <li>All complexity is in one place (TreeHaver top level)</li>
+  <li>Users always work with TreeHaver wrapper classes</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_parser'>parser</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Parser.html" title="TreeHaver::Parser (class)">Parser</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Parser.html#initialize-instance_method" title="TreeHaver::Parser#initialize (method)">new</a></span></span>
+<span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_language'>language</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Language.html" title="TreeHaver::Language (module)">Language</a></span></span><span class='period'>.</span><span class='id identifier rubyid_toml'>toml</span>
+<span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Incremental parsing (if backend supports it)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>x = 1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='comment'># Edit the source: &quot;x = 1&quot; → &quot;x = 42&quot;
+</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span>
+  <span class='label'>start_byte:</span> <span class='int'>4</span><span class='comma'>,</span>
+  <span class='label'>old_end_byte:</span> <span class='int'>5</span><span class='comma'>,</span>
+  <span class='label'>new_end_byte:</span> <span class='int'>6</span><span class='comma'>,</span>
+  <span class='label'>start_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>4</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>old_end_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>5</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>new_end_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>6</span> <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_new_tree'>new_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse_string'>parse_string</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>x = 42</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Accessing backend-specific features</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='comment'># Via passthrough (method_missing delegates to inner_tree)
+</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_some_backend_specific_method'>some_backend_specific_method</span>  <span class='comment'># Automatically delegated
+</span>
+<span class='comment'># Or explicitly via inner_tree
+</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_inner_tree'>inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_some_backend_specific_method'>some_backend_specific_method</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#edit-instance_method" title="#edit (instance method)">#<strong>edit</strong>(start_byte:, old_end_byte:, new_end_byte:, start_point:, old_end_point:, new_end_point:)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Mark the tree as edited for incremental re-parsing.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(tree, source: nil)  &#x21d2; Tree </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of Tree.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>String representation.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#method_missing-instance_method" title="#method_missing (instance method)">#<strong>method_missing</strong>(method_name, *args, **kwargs, &amp;block)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Delegate unknown methods to the underlying backend-specific tree.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#respond_to_missing%3F-instance_method" title="#respond_to_missing? (instance method)">#<strong>respond_to_missing?</strong>(method_name, include_private = false)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if tree responds to a method (includes delegation to inner_tree).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#root_node-instance_method" title="#root_node (instance method)">#<strong>root_node</strong>  &#x21d2; Node </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the root node of the tree.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_editing%3F-instance_method" title="#supports_editing? (instance method)">#<strong>supports_editing?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if the current backend supports incremental parsing.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(tree, source: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="TreeHaver::Tree (class)">Tree</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of Tree.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>tree</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend-specific tree object</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>source</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Source text for node text extraction</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice this">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+  </p>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="method_missing-instance_method">
+  
+    #<strong>method_missing</strong>(method_name, *args, **kwargs, &amp;block)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>This maintains backward compatibility with code written for<br />
+specific backends while providing the benefits of the unified API</p>
+</div>
+  </div>
+
+<p>Delegate unknown methods to the underlying backend-specific tree</p>
+
+<p>This provides passthrough access for advanced usage when you need<br />
+backend-specific features not exposed by TreeHaver’s unified API.</p>
+
+<p>The delegation is automatic and transparent - you can call backend-specific<br />
+methods directly on the TreeHaver::Tree and they’ll be forwarded to the<br />
+underlying tree implementation.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Using TreeStump-specific methods</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='comment'># print_dot_graph is TreeStump-specific
+</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree.dot</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>w</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span>
+  <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_print_dot_graph'>print_dot_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='rparen'>)</span>  <span class='comment'># Delegated to inner_tree
+</span><span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Safe usage with respond_to? check</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>if</span> <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:print_dot_graph</span><span class='rparen'>)</span>
+  <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_open'>open</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree.dot</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>w</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_f'>f</span><span class='op'>|</span> <span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_print_dot_graph'>print_dot_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_f'>f</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Equivalent explicit access</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_print_dot_graph'>print_dot_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='rparen'>)</span>              <span class='comment'># Via passthrough (method_missing)
+</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_inner_tree'>inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_print_dot_graph'>print_dot_graph</span><span class='lparen'>(</span><span class='id identifier rubyid_file'>file</span><span class='rparen'>)</span>   <span class='comment'># Explicit access (same result)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>method_name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>method to call</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>args</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>arguments to pass</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>block to pass</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>result from the underlying tree</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+250
+251
+252
+253
+254
+255
+256</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 250</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='rparen'>)</span>
+    <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_public_send'>public_send</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_kwargs'>kwargs</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='kw'>super</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="edit-instance_method">
+  
+    #<strong>edit</strong>(start_byte:, old_end_byte:, new_end_byte:, start_point:, old_end_point:, new_end_point:)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Mark the tree as edited for incremental re-parsing</p>
+
+<p>Call this method after the source code has been modified but before<br />
+re-parsing. This tells tree-sitter which parts of the tree are<br />
+invalidated so it can efficiently re-parse only the affected regions.</p>
+
+<p>Not all backends support incremental parsing. Use <span class='object_link'><a href="#supports_editing%3F-instance_method" title="TreeHaver::Tree#supports_editing? (method)">#supports_editing?</a></span><br />
+to check before calling this method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Incremental parsing workflow</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='comment'># Original source: &quot;x = 1&quot;
+</span><span class='id identifier rubyid_tree'>tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>x = 1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+<span class='comment'># Edit the source: replace &quot;1&quot; with &quot;42&quot; at byte offset 4
+</span><span class='id identifier rubyid_tree'>tree</span><span class='period'>.</span><span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span>
+  <span class='label'>start_byte:</span> <span class='int'>4</span><span class='comma'>,</span>
+  <span class='label'>old_end_byte:</span> <span class='int'>5</span><span class='comma'>,</span>     <span class='comment'># &quot;1&quot; ends at byte 5
+</span>  <span class='label'>new_end_byte:</span> <span class='int'>6</span><span class='comma'>,</span>     <span class='comment'># &quot;42&quot; ends at byte 6
+</span>  <span class='label'>start_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>4</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>old_end_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>5</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>new_end_point:</span> <span class='lbrace'>{</span> <span class='label'>row:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>column:</span> <span class='int'>6</span> <span class='rbrace'>}</span>
+<span class='rparen'>)</span>
+
+<span class='comment'># Re-parse with the edited tree for incremental parsing
+</span><span class='id identifier rubyid_new_tree'>new_tree</span> <span class='op'>=</span> <span class='id identifier rubyid_parser'>parser</span><span class='period'>.</span><span class='id identifier rubyid_parse_string'>parse_string</span><span class='lparen'>(</span><span class='id identifier rubyid_tree'>tree</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>x = 42</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>start_byte</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>byte offset where the edit starts</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>old_end_byte</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>byte offset where the old text ended</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>new_end_byte</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>byte offset where the new text ends</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>start_point</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>starting position as <code>{ row:, column: }</code></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>old_end_point</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>old ending position as <code>{ row:, column: }</code></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>new_end_point</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>new ending position as <code>{ row:, column: }</code></p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">TreeHaver::NotAvailable</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if the backend doesn’t support incremental parsing</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><a href="https://tree-sitter.github.io/tree-sitter/using-parsers#editing" target="_parent" title="https://tree-sitter.github.io/tree-sitter/using-parsers#editing">https://tree-sitter.github.io/tree-sitter/using-parsers#editing</a></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span><span class='label'>start_byte:</span><span class='comma'>,</span> <span class='label'>old_end_byte:</span><span class='comma'>,</span> <span class='label'>new_end_byte:</span><span class='comma'>,</span> <span class='label'>start_point:</span><span class='comma'>,</span> <span class='label'>old_end_point:</span><span class='comma'>,</span> <span class='label'>new_end_point:</span><span class='rparen'>)</span>
+  <span class='comment'># MRI backend (ruby_tree_sitter) requires an InputEdit object
+</span>  <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>InputEdit</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>Tree</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>InputEdit</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_start_byte'>start_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_start_byte'>start_byte</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_old_end_byte'>old_end_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_old_end_byte'>old_end_byte</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_new_end_byte'>new_end_byte</span> <span class='op'>=</span> <span class='id identifier rubyid_new_end_byte'>new_end_byte</span>
+
+    <span class='comment'># Convert hash points to Point objects if needed
+</span>    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_start_point'>start_point</span> <span class='op'>=</span> <span class='id identifier rubyid_make_point'>make_point</span><span class='lparen'>(</span><span class='id identifier rubyid_start_point'>start_point</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_old_end_point'>old_end_point</span> <span class='op'>=</span> <span class='id identifier rubyid_make_point'>make_point</span><span class='lparen'>(</span><span class='id identifier rubyid_old_end_point'>old_end_point</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input_edit'>input_edit</span><span class='period'>.</span><span class='id identifier rubyid_new_end_point'>new_end_point</span> <span class='op'>=</span> <span class='id identifier rubyid_make_point'>make_point</span><span class='lparen'>(</span><span class='id identifier rubyid_new_end_point'>new_end_point</span><span class='rparen'>)</span>
+
+    <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span><span class='id identifier rubyid_input_edit'>input_edit</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='comment'># Other backends may accept keyword arguments directly
+</span>    <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_edit'>edit</span><span class='lparen'>(</span>
+      <span class='label'>start_byte:</span> <span class='id identifier rubyid_start_byte'>start_byte</span><span class='comma'>,</span>
+      <span class='label'>old_end_byte:</span> <span class='id identifier rubyid_old_end_byte'>old_end_byte</span><span class='comma'>,</span>
+      <span class='label'>new_end_byte:</span> <span class='id identifier rubyid_new_end_byte'>new_end_byte</span><span class='comma'>,</span>
+      <span class='label'>start_point:</span> <span class='id identifier rubyid_start_point'>start_point</span><span class='comma'>,</span>
+      <span class='label'>old_end_point:</span> <span class='id identifier rubyid_old_end_point'>old_end_point</span><span class='comma'>,</span>
+      <span class='label'>new_end_point:</span> <span class='id identifier rubyid_new_end_point'>new_end_point</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>rescue</span> <span class='const'>NoMethodError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='comment'># Re-raise as NotAvailable if it&#39;s about the edit method
+</span>  <span class='id identifier rubyid_raise'>raise</span> <span class='kw'>unless</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>==</span> <span class='symbol'>:edit</span> <span class='op'>||</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>edit</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Incremental parsing not supported by current backend. </span><span class='tstring_end'>&quot;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Use MRI (ruby_tree_sitter), Rust (tree_stump), or Java (java-tree-sitter / jtreesitter) backend.</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>String representation</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+205
+206
+207
+208</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 205</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='id identifier rubyid_inner_class'>inner_class</span> <span class='op'>=</span> <span class='ivar'>@inner_tree</span> <span class='op'>?</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>nil</span><span class='tstring_end'>&quot;</span></span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;</span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'> source_length=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@source</span><span class='op'>&amp;.</span><span class='id identifier rubyid_bytesize'>bytesize</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unknown</span><span class='tstring_end'>&quot;</span></span><span class='embexpr_end'>}</span><span class='tstring_content'> inner_tree=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inner_class'>inner_class</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="respond_to_missing?-instance_method">
+  
+    #<strong>respond_to_missing?</strong>(method_name, include_private = false)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if tree responds to a method (includes delegation to inner_tree)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>method_name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>method to check</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>include_private</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>include private methods</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+215
+216
+217</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 215</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_respond_to_missing?'>respond_to_missing?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='id identifier rubyid_method_name'>method_name</span><span class='comma'>,</span> <span class='id identifier rubyid_include_private'>include_private</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="root_node-instance_method">
+  
+    #<strong>root_node</strong>  &#x21d2; <tt><span class='object_link'><a href="Node.html" title="TreeHaver::Node (class)">Node</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the root node of the tree</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Node.html" title="TreeHaver::Node (class)">Node</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Wrapped root node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_root_node'>root_node</span>
+  <span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_root_node'>root_node</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='const'><span class='object_link'><a href="Node.html" title="TreeHaver::Node (class)">Node</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Node.html#initialize-instance_method" title="TreeHaver::Node#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='comma'>,</span> <span class='label'>source:</span> <span class='ivar'>@source</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_editing?-instance_method">
+  
+    #<strong>supports_editing?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if the current backend supports incremental parsing</p>
+
+<p>Incremental parsing allows tree-sitter to reuse unchanged nodes when<br />
+re-parsing edited source code, improving performance for large files<br />
+with small edits.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code>if tree.supports_editing?
+  tree.edit(...)
+  new_tree = parser.parse_string(tree, edited_source)
+else
+  # Fall back to full re-parse
+  new_tree = parser.parse(edited_source)
+end</code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if <span class='object_link'><a href="#edit-instance_method" title="TreeHaver::Tree#edit (method)">#edit</a></span> can be called on this tree</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+193
+194
+195
+196
+197
+198
+199
+200
+201</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/tree.rb', line 193</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_editing?'>supports_editing?</span>
+  <span class='comment'># Try to get the edit method to verify it exists
+</span>  <span class='comment'># This is more reliable than respond_to? with Delegator wrappers
+</span>  <span class='ivar'>@inner_tree</span><span class='period'>.</span><span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:edit</span><span class='rparen'>)</span>
+  <span class='kw'>true</span>
+<span class='kw'>rescue</span> <span class='const'>NameError</span>
+  <span class='comment'># NameError is the parent class of NoMethodError, so this catches both
+</span>  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:39 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

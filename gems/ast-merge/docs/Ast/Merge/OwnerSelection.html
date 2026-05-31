@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::OwnerSelection
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::OwnerSelection";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (O)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">OwnerSelection</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::OwnerSelection
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/owner_selection.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Shared helpers for recurring owner-selection and owner-matching shapes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match_by_path-class_method" title="match_by_path (class method)">.<strong>match_by_path</strong>(template, destination, owners_key: :owners)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_path-class_method" title="owner_path (class method)">.<strong>owner_path</strong>(owner)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_paths-class_method" title="owner_paths (class method)">.<strong>owner_paths</strong>(owners)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owners_from-class_method" title="owners_from (class method)">.<strong>owners_from</strong>(analysis, owners_key)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#selector_kind-class_method" title="selector_kind (class method)">.<strong>selector_kind</strong>(owner_selector, logical_owners: {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="match_by_path-class_method">
+  
+    .<strong>match_by_path</strong>(template, destination, owners_key: :owners)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/owner_selection.rb', line 9</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match_by_path'>match_by_path</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_destination'>destination</span><span class='comma'>,</span> <span class='label'>owners_key:</span> <span class='symbol'>:owners</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_template_owners'>template_owners</span> <span class='op'>=</span> <span class='id identifier rubyid_owners_from'>owners_from</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_owners_key'>owners_key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_destination_owners'>destination_owners</span> <span class='op'>=</span> <span class='id identifier rubyid_owners_from'>owners_from</span><span class='lparen'>(</span><span class='id identifier rubyid_destination'>destination</span><span class='comma'>,</span> <span class='id identifier rubyid_owners_key'>owners_key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_destination_paths'>destination_paths</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_paths'>owner_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_destination_owners'>destination_owners</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_template_paths'>template_paths</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_paths'>owner_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_template_owners'>template_owners</span><span class='rparen'>)</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>matched:</span> <span class='id identifier rubyid_template_owners'>template_owners</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span>
+      <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_path'>owner_path</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+      <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+
+      <span class='lbrace'>{</span><span class='label'>template_path:</span> <span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='label'>destination_path:</span> <span class='id identifier rubyid_path'>path</span><span class='rbrace'>}</span>
+    <span class='kw'>end</span><span class='comma'>,</span>
+    <span class='label'>unmatched_template:</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>unmatched_destination:</span> <span class='id identifier rubyid_destination_paths'>destination_paths</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_template_paths'>template_paths</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_path-class_method">
+  
+    .<strong>owner_path</strong>(owner)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/owner_selection.rb', line 38</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_path'>owner_path</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value_for'>value_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='symbol'>:path</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_paths-class_method">
+  
+    .<strong>owner_paths</strong>(owners)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/owner_selection.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_paths'>owner_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_owners'>owners</span><span class='rparen'>)</span>
+  <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_owners'>owners</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner_path'>owner_path</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owners_from-class_method">
+  
+    .<strong>owners_from</strong>(analysis, owners_key)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/owner_selection.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owners_from'>owners_from</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_owners_key'>owners_key</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value_for'>value_for</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_owners_key'>owners_key</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="selector_kind-class_method">
+  
+    .<strong>selector_kind</strong>(owner_selector, logical_owners: {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/owner_selection.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='lparen'>(</span><span class='id identifier rubyid_owner_selector'>owner_selector</span><span class='comma'>,</span> <span class='label'>logical_owners:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_selector'>owner_selector</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_logical_owners'>logical_owners</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_logical_owners'>logical_owners</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='symbol'>:logical_owner</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>==</span> <span class='symbol'>:shared_default</span>
+    <span class='symbol'>:shared_default</span>
+  <span class='kw'>else</span>
+    <span class='symbol'>:explicit</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

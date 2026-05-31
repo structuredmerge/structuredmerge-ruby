@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markdown::Merge::CodeBlockMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markdown::Merge::CodeBlockMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">CodeBlockMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markdown::Merge::CodeBlockMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Markdown::Merge::CodeBlockMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markdown/merge/code_block_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Merges fenced code blocks using language-specific *-merge gems.</p>
+
+<p>When two code blocks with the same signature are matched, this class<br />
+delegates the merge to the appropriate language-specific merger:</p>
+<ul>
+  <li>Ruby code → prism-merge</li>
+  <li>YAML code → psych-merge</li>
+  <li>JSON code → json-merge</li>
+  <li>TOML code → toml-merge</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::CodeBlockMerger#initialize (method)">new</a></span></span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_code_blocks'>merge_code_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='rparen'>)</span>
+<span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:merged</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span>
+<span class='kw'>else</span>
+  <span class='comment'># Fall back to standard resolution
+</span><span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With custom mergers</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::CodeBlockMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>mergers:</span> <span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_pref'>pref</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='const'>MyCustomRubyMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_pref'>pref</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="SmartMergerBase.html" title="Markdown::Merge::SmartMergerBase (class)">SmartMergerBase</a></span></li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_MERGERS-constant" class="">DEFAULT_MERGERS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default language-to-merger mapping<br />
+Each merger is a lambda that takes (template_content, dest_content, preference)<br />
+and returns { merged: true/false, content: String, stats: Hash }<br />
+:nocov: integration - DEFAULT_MERGERS lambdas require external gems</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='comment'># Ruby code blocks
+</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_prism'><span class='object_link'><a href="#merge_with_prism-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_prism (method)">merge_with_prism</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rb</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_prism'><span class='object_link'><a href="#merge_with_prism-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_prism (method)">merge_with_prism</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+
+  <span class='comment'># YAML code blocks
+</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yaml</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>psych/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_psych'><span class='object_link'><a href="#merge_with_psych-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_psych (method)">merge_with_psych</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yml</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>psych/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_psych'><span class='object_link'><a href="#merge_with_psych-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_psych (method)">merge_with_psych</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+
+  <span class='comment'># JSON code blocks
+</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>json</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>json/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_json'><span class='object_link'><a href="#merge_with_json-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_json (method)">merge_with_json</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+
+  <span class='comment'># Markdown code blocks
+</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_markdown'><span class='object_link'><a href="#merge_with_markdown-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_markdown (method)">merge_with_markdown</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>md</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>markdown/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_markdown'><span class='object_link'><a href="#merge_with_markdown-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_markdown (method)">merge_with_markdown</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+
+  <span class='comment'># TOML code blocks
+</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>toml</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>toml/merge</span><span class='tstring_end'>&quot;</span></span>
+    <span class='const'>CodeBlockMerger</span><span class='period'>.</span><span class='id identifier rubyid_merge_with_toml'><span class='object_link'><a href="#merge_with_toml-class_method" title="Markdown::Merge::CodeBlockMerger.merge_with_toml (method)">merge_with_toml</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enabled-instance_method" title="#enabled (instance method)">#<strong>enabled</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether inner-merge is enabled.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mergers-instance_method" title="#mergers (instance method)">#<strong>mergers</strong>  &#x21d2; Hash&lt;String, Proc&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Language to merger mapping.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runtime_delegates-instance_method" title="#runtime_delegates (instance method)">#<strong>runtime_delegates</strong>  &#x21d2; Array&lt;Ast::Merge::Runtime::Delegate&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Runtime delegates exposed by this merger.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_json-class_method" title="merge_with_json (class method)">.<strong>merge_with_json</strong>(template, dest, preference, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge JSON code using json-merge.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_markdown-class_method" title="merge_with_markdown (class method)">.<strong>merge_with_markdown</strong>(template, dest, preference, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge Markdown code using markdown-merge.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_prism-class_method" title="merge_with_prism (class method)">.<strong>merge_with_prism</strong>(template, dest, preference, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge Ruby code using prism-merge.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_psych-class_method" title="merge_with_psych (class method)">.<strong>merge_with_psych</strong>(template, dest, preference, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge YAML code using psych-merge.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_toml-class_method" title="merge_with_toml (class method)">.<strong>merge_with_toml</strong>(template, dest, preference, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge TOML code using toml-merge.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(mergers: {}, enabled: true)  &#x21d2; CodeBlockMerger </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new CodeBlockMerger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_code_blocks-instance_method" title="#merge_code_blocks (instance method)">#<strong>merge_code_blocks</strong>(template_node, dest_node, preference:, runtime_session: nil, parent_operation: nil, **opts)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge two code blocks using the appropriate language-specific merger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_code_blocks_without_runtime-instance_method" title="#merge_code_blocks_without_runtime (instance method)">#<strong>merge_code_blocks_without_runtime</strong>(template_node, dest_node, preference:, **opts)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_language%3F-instance_method" title="#supports_language? (instance method)">#<strong>supports_language?</strong>(language)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if inner-merge is available for a language.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(mergers: {}, enabled: true)  &#x21d2; <tt><span class='object_link'><a href="" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new CodeBlockMerger.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>mergers</span>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Proc&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom language-to-merger mapping.<br />
+Mergers are merged with defaults, allowing selective overrides.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>enabled</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to enable inner-merge (default: true)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>mergers:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>enabled:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+  <span class='ivar'>@mergers</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_MERGERS-constant" title="Markdown::Merge::CodeBlockMerger::DEFAULT_MERGERS (constant)">DEFAULT_MERGERS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_mergers'>mergers</span><span class='rparen'>)</span>
+  <span class='ivar'>@enabled</span> <span class='op'>=</span> <span class='id identifier rubyid_enabled'>enabled</span>
+  <span class='ivar'>@runtime_delegates</span> <span class='op'>=</span> <span class='id identifier rubyid_build_runtime_delegates'>build_runtime_delegates</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="enabled-instance_method">
+  
+    #<strong>enabled</strong>  &#x21d2; <tt>Boolean</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Whether inner-merge is enabled.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether inner-merge is enabled</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enabled'>enabled</span>
+  <span class='ivar'>@enabled</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="mergers-instance_method">
+  
+    #<strong>mergers</strong>  &#x21d2; <tt>Hash&lt;String, Proc&gt;</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Language to merger mapping.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash&lt;String, Proc&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Language to merger mapping</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+83
+84
+85</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 83</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mergers'>mergers</span>
+  <span class='ivar'>@mergers</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="runtime_delegates-instance_method">
+  
+    #<strong>runtime_delegates</strong>  &#x21d2; <tt>Array&lt;Ast::Merge::Runtime::Delegate&gt;</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Runtime delegates exposed by this merger.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Ast::Merge::Runtime::Delegate&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Runtime delegates exposed by this merger</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 89</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_runtime_delegates'>runtime_delegates</span>
+  <span class='ivar'>@runtime_delegates</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge_with_json-class_method">
+  
+    .<strong>merge_with_json</strong>(template, dest, preference, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Errors are handled by merge_code_blocks when called via DEFAULT_MERGERS</p>
+</div>
+  </div>
+
+<p>Merge JSON code using json-merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template JSON code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination JSON code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Json::Merge::ParseError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template or dest has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
+656
+657
+658
+659
+660
+661
+662</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 644</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_json'>merge_with_json</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Json</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:add_template_only_nodes</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:resolution_mode</span><span class='comma'>,</span> <span class='symbol'>:eager</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:unresolved_policy</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_json'>to_json</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_markdown-class_method">
+  
+    .<strong>merge_with_markdown</strong>(template, dest, preference, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge Markdown code using markdown-merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template Markdown code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination Markdown code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 670</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_markdown'>merge_with_markdown</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_nested_code_block_merger'>nested_code_block_merger</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="" title="Markdown::Merge::CodeBlockMerger (class)">CodeBlockMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::CodeBlockMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='label'>mergers:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:nested_mergers</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>enabled:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:inner_merge_code_blocks</span><span class='comma'>,</span> <span class='kw'>true</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="SmartMerger.html" title="Markdown::Merge::SmartMerger (class)">SmartMerger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="SmartMerger.html#initialize-instance_method" title="Markdown::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:add_template_only_nodes</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>inner_merge_code_blocks:</span> <span class='id identifier rubyid_nested_code_block_merger'>nested_code_block_merger</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:resolution_mode</span><span class='comma'>,</span> <span class='symbol'>:eager</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:unresolved_policy</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>nested_runtime_session:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_prism-class_method">
+  
+    .<strong>merge_with_prism</strong>(template, dest, preference, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Errors are handled by merge_code_blocks when called via DEFAULT_MERGERS</p>
+</div>
+  </div>
+
+<p>Merge Ruby code using prism-merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template Ruby code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination Ruby code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Prism::Merge::ParseError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template or dest has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599
+600
+601
+602
+603
+604
+605
+606</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 588</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_prism'>merge_with_prism</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Prism</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:add_template_only_nodes</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:resolution_mode</span><span class='comma'>,</span> <span class='symbol'>:eager</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:unresolved_policy</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_psych-class_method">
+  
+    .<strong>merge_with_psych</strong>(template, dest, preference, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Errors are handled by merge_code_blocks when called via DEFAULT_MERGERS</p>
+</div>
+  </div>
+
+<p>Merge YAML code using psych-merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template YAML code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination YAML code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Psych::Merge::ParseError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template or dest has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 616</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_psych'>merge_with_psych</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Psych</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:add_template_only_nodes</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:resolution_mode</span><span class='comma'>,</span> <span class='symbol'>:eager</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:unresolved_policy</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_yaml'>to_yaml</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_toml-class_method">
+  
+    .<strong>merge_with_toml</strong>(template, dest, preference, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>Errors are handled by merge_code_blocks when called via DEFAULT_MERGERS</p>
+</div>
+  </div>
+
+<p>Merge TOML code using toml-merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template TOML code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination TOML code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Toml::Merge::ParseError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template or dest has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+706
+707
+708
+709
+710
+711
+712
+713
+714
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 706</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_toml'>merge_with_toml</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Toml</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:add_template_only_nodes</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_opts'>opts</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:resolution_mode</span><span class='comma'>,</span> <span class='symbol'>:eager</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:unresolved_policy</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_apply_unresolved_resolutions!'>apply_unresolved_resolutions!</span><span class='lparen'>(</span><span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:apply_unresolved_resolutions</span><span class='rbracket'>]</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_toml'>to_toml</span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge_code_blocks-instance_method">
+  
+    #<strong>merge_code_blocks</strong>(template_node, dest_node, preference:, runtime_session: nil, parent_operation: nil, **opts)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge two code blocks using the appropriate language-specific merger.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template code block node</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination code block node</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination or :template</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>opts</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options passed to the merger</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>{ merged: Boolean, content: String, stats: Hash }</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 120</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_code_blocks'>merge_code_blocks</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span> <span class='label'>preference:</span><span class='comma'>,</span> <span class='label'>runtime_session:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>parent_operation:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_parent_operation'>parent_operation</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_merge_code_blocks_with_runtime'>merge_code_blocks_with_runtime</span><span class='lparen'>(</span>
+      <span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span>
+      <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+      <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+      <span class='label'>runtime_session:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='comma'>,</span>
+      <span class='label'>parent_operation:</span> <span class='id identifier rubyid_parent_operation'>parent_operation</span><span class='comma'>,</span>
+      <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_merge_code_blocks_without_runtime'>merge_code_blocks_without_runtime</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span> <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_code_blocks_without_runtime-instance_method">
+  
+    #<strong>merge_code_blocks_without_runtime</strong>(template_node, dest_node, preference:, **opts)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 135</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_code_blocks_without_runtime'>merge_code_blocks_without_runtime</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span> <span class='label'>preference:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>inner-merge disabled</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@enabled</span>
+
+  <span class='id identifier rubyid_language'>language</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_language'>extract_language</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_extract_language'>extract_language</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no language specified</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_language'>language</span>
+
+  <span class='id identifier rubyid_template_content'>template_content</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_content'>extract_content</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_content'>extract_content</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_perform_code_block_merge'>perform_code_block_merge</span><span class='lparen'>(</span>
+    <span class='label'>language:</span> <span class='id identifier rubyid_language'>language</span><span class='comma'>,</span>
+    <span class='label'>template_content:</span> <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+    <span class='label'>dest_content:</span> <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>reference_node:</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_opts'>opts</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_language?-instance_method">
+  
+    #<strong>supports_language?</strong>(language)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if inner-merge is available for a language.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>language</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The language identifier from fence_info</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if a merger exists for this language</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/code_block_merger.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_language?'>supports_language?</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='ivar'>@enabled</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='ivar'>@mergers</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_language'>language</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:05 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

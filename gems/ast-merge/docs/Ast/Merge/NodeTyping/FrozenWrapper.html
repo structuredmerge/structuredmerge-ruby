@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::NodeTyping::FrozenWrapper
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::NodeTyping::FrozenWrapper";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span>
+     &raquo; 
+    <span class="title">FrozenWrapper</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::NodeTyping::FrozenWrapper
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></li>
+          
+            <li class="next">Ast::Merge::NodeTyping::FrozenWrapper</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="../Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/node_typing/frozen_wrapper.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Wrapper for frozen AST nodes that includes Freezable behavior.</p>
+
+<p>FrozenWrapper extends Wrapper to add freeze node semantics, making the<br />
+wrapped node satisfy both the NodeTyping API and the Freezable API.<br />
+This enables composition where frozen nodes are:</p>
+<ul>
+  <li>Wrapped AST nodes (can unwrap to get original)</li>
+  <li>Typed nodes (have merge_type)</li>
+  <li>Freeze nodes (satisfy is_a?(Freezable) and freeze_node?)</li>
+</ul>
+
+<h2 id="key-distinction-from-freezenodebase">Key Distinction from FreezeNodeBase</h2>
+
+<p>FrozenWrapper and FreezeNodeBase both include Freezable, but they represent<br />
+fundamentally different concepts:</p>
+
+<h3 id="frozenwrapper-this-class">FrozenWrapper (this class)</h3>
+<ul>
+  <li>Wraps an AST node that has a freeze marker in its leading comments</li>
+  <li>The node is still a structural AST node (e.g., a <code>gem</code> call in a gemspec)</li>
+  <li>During matching, we want to match by the underlying node’s IDENTITY<br />
+(e.g., the gem name), NOT by the full content</li>
+  <li>Signature generation should unwrap and use the underlying node’s structure</li>
+  <li>Example: <code># token:freeze\ngem "example_gem", "~&gt; 1.0"</code> wraps a CallNode</li>
+</ul>
+
+<h3 id="freezenodebase">FreezeNodeBase</h3>
+<ul>
+  <li>Represents an explicit freeze block with <code># token:freeze ... # token:unfreeze</code></li>
+  <li>The entire block is opaque content that should be preserved verbatim</li>
+  <li>During matching, we match by the full CONTENT of the block</li>
+  <li>Signature generation uses freeze_signature (content-based)</li>
+  <li>Example: A multi-line comment block with custom formatting</li>
+</ul>
+
+<h2 id="signature-generation-behavior">Signature Generation Behavior</h2>
+
+<p>When FileAnalyzable#generate_signature encounters a FrozenWrapper:</p>
+<ol>
+  <li>It unwraps to get the underlying AST node</li>
+  <li>Passes the unwrapped node to the signature_generator</li>
+  <li>This allows the signature generator to recognize the node type<br />
+(e.g., Prism::CallNode) and generate appropriate signatures</li>
+</ol>
+
+<p>This is critical because signature generators check for specific AST types.<br />
+If we passed the wrapper, the generator wouldn’t recognize it as a CallNode<br />
+and would fall back to a generic signature, breaking matching.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Creating a frozen wrapper</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_frozen'>frozen</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span><span class='op'>::</span><span class='const'>FrozenWrapper</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::NodeTyping::FrozenWrapper#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_prism_node'>prism_node</span><span class='comma'>,</span> <span class='symbol'>:frozen</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_frozen'>frozen</span><span class='period'>.</span><span class='id identifier rubyid_freeze_node?'>freeze_node?</span>  <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_frozen'>frozen</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></span><span class='rparen'>)</span>  <span class='comment'># =&gt; true
+</span><span class='id identifier rubyid_frozen'>frozen</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span>  <span class='comment'># =&gt; prism_node</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></li>
+    
+      <li><span class='object_link'><a href="../Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></li>
+    
+      <li><span class='object_link'><a href="../FreezeNodeBase.html" title="Ast::Merge::FreezeNodeBase (class)">FreezeNodeBase</a></span></li>
+    
+      <li><span class='object_link'><a href="../FileAnalyzable.html#generate_signature-instance_method" title="Ast::Merge::FileAnalyzable#generate_signature (method)">FileAnalyzable#generate_signature</a></span></li>
+    
+  </ul>
+
+</div>
+
+
+
+
+
+  <h2>Instance Attribute Summary</h2>
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Wrapper.html#merge_type-instance_method" title="Ast::Merge::NodeTyping::Wrapper#merge_type (method)">#merge_type</a></span>, <span class='object_link'><a href="Wrapper.html#node-instance_method" title="Ast::Merge::NodeTyping::Wrapper#node (method)">#node</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#frozen_node%3F-instance_method" title="#frozen_node? (instance method)">#<strong>frozen_node?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns true to indicate this is a frozen node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(node, merge_type = :frozen)  &#x21d2; FrozenWrapper </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Create a frozen wrapper for an AST node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Forward inspect to show frozen status.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#signature-instance_method" title="#signature (instance method)">#<strong>signature</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the signature for this frozen node.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#slice-instance_method" title="#slice (instance method)">#<strong>slice</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the content of this frozen node.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Freezable.html" title="Ast::Merge::Freezable (module)">Freezable</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Freezable.html#freeze_node%3F-instance_method" title="Ast::Merge::Freezable#freeze_node? (method)">#freeze_node?</a></span>, <span class='object_link'><a href="../Freezable.html#freeze_signature-instance_method" title="Ast::Merge::Freezable#freeze_signature (method)">#freeze_signature</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Wrapper</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Wrapper.html#==-instance_method" title="Ast::Merge::NodeTyping::Wrapper#== (method)">#==</a></span>, <span class='object_link'><a href="Wrapper.html#eql%3F-instance_method" title="Ast::Merge::NodeTyping::Wrapper#eql? (method)">#eql?</a></span>, <span class='object_link'><a href="Wrapper.html#hash-instance_method" title="Ast::Merge::NodeTyping::Wrapper#hash (method)">#hash</a></span>, <span class='object_link'><a href="Wrapper.html#method_missing-instance_method" title="Ast::Merge::NodeTyping::Wrapper#method_missing (method)">#method_missing</a></span>, <span class='object_link'><a href="Wrapper.html#respond_to_missing%3F-instance_method" title="Ast::Merge::NodeTyping::Wrapper#respond_to_missing? (method)">#respond_to_missing?</a></span>, <span class='object_link'><a href="Wrapper.html#typed_node%3F-instance_method" title="Ast::Merge::NodeTyping::Wrapper#typed_node? (method)">#typed_node?</a></span>, <span class='object_link'><a href="Wrapper.html#unwrap-instance_method" title="Ast::Merge::NodeTyping::Wrapper#unwrap (method)">#unwrap</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(node, merge_type = :frozen)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::NodeTyping::FrozenWrapper (class)">FrozenWrapper</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Create a frozen wrapper for an AST node.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The AST node to wrap</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>merge_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:frozen</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The merge type (defaults to :frozen)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64
+65
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/frozen_wrapper.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_merge_type'>merge_type</span> <span class='op'>=</span> <span class='symbol'>:frozen</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_merge_type'>merge_type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+<div id="method_missing_details" class="method_details_list">
+  <h2>Dynamic Method Handling</h2>
+  <p class="notice super">
+    This class handles dynamic methods through the <tt>method_missing</tt> method
+    
+      in the class <span class='object_link'><a href="Wrapper.html#method_missing-instance_method" title="Ast::Merge::NodeTyping::Wrapper#method_missing (method)">Ast::Merge::NodeTyping::Wrapper</a></span>
+    
+  </p>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="frozen_node?-instance_method">
+  
+    #<strong>frozen_node?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns true to indicate this is a frozen node.<br />
+Overrides both Wrapper#typed_node? context and provides freeze_node? from Freezable.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+72
+73
+74</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/frozen_wrapper.rb', line 72</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_frozen_node?'>frozen_node?</span>
+  <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Forward inspect to show frozen status.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/frozen_wrapper.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;NodeTyping::FrozenWrapper merge_type=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@merge_type</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> node=</span><span class='embexpr_beg'>#{</span><span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="signature-instance_method">
+  
+    #<strong>signature</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the signature for this frozen node.<br />
+Uses the freeze_signature from Freezable module.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature in the form [:FreezeNode, content]</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/frozen_wrapper.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
+  <span class='id identifier rubyid_freeze_signature'>freeze_signature</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="slice-instance_method">
+  
+    #<strong>slice</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the content of this frozen node.<br />
+Delegates to the wrapped node’s slice method.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The node content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/frozen_wrapper.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_slice'>slice</span>
+  <span class='ivar'>@node</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:52 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

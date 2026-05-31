@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Prism::Merge::Comment::Line
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Prism::Merge::Comment::Line";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (L)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Prism.html" title="Prism (module)">Prism</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Prism::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Comment.html" title="Prism::Merge::Comment (module)">Comment</a></span></span>
+     &raquo; 
+    <span class="title">Line</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Prism::Merge::Comment::Line
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::Comment::Line</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::Comment::Line</li>
+          
+            <li class="next">Prism::Merge::Comment::Line</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/prism/merge/comment/line.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Ruby-specific comment line with magic comment detection.</p>
+
+<p>Extends the generic <code>Ast::Merge::Comment::Line</code> with Ruby-specific<br />
+features like detection of magic comments (frozen_string_literal,<br />
+encoding, etc.).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_line'>line</span> <span class='op'>=</span> <span class='const'>Line</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::Comment::Line#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>text:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># frozen_string_literal: true</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>line_number:</span> <span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_magic_comment?'>magic_comment?</span> <span class='comment'>#=&gt; true
+</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span> <span class='comment'>#=&gt; :frozen_string_literal</span></code></pre>
+    
+  </div>
+
+
+</div><div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="RuntimeLine.html" title="Prism::Merge::Comment::RuntimeLine (class)">RuntimeLine</a></span></p>
+</div>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="MAGIC_COMMENT_PATTERNS-constant" class="">MAGIC_COMMENT_PATTERNS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Ruby magic comment patterns</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>frozen_string_literal:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^frozen_string_literal:\s*(true|false)$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='label'>encoding:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^(encoding|coding):\s*\S+$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='label'>warn_indent:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^warn_indent:\s*(true|false)$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+  <span class='label'>shareable_constant_value:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^shareable_constant_value:\s*\S+$</span><span class='regexp_end'>/i</span></span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#magic_comment_type-instance_method" title="#magic_comment_type (instance method)">#<strong>magic_comment_type</strong>  &#x21d2; Symbol<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the type of magic comment.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#from_tree_haver-class_method" title="from_tree_haver (class method)">.<strong>from_tree_haver</strong>(th_comment, magic_comment_types = {})  &#x21d2; Prism::Merge::Comment::Line </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a Line from a +TreeHaver::Backends::Prism::Comment+ instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#magic_comment_type_for-class_method" title="magic_comment_type_for (class method)">.<strong>magic_comment_type_for</strong>(text)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(text:, line_number:, magic_comment_type: nil)  &#x21d2; Line </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a new Ruby comment Line.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Human-readable representation.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#magic_comment%3F-instance_method" title="#magic_comment? (instance method)">#<strong>magic_comment?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if this is a Ruby magic comment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#magic_comment_value-instance_method" title="#magic_comment_value (instance method)">#<strong>magic_comment_value</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the value of a magic comment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#signature-instance_method" title="#signature (instance method)">#<strong>signature</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Generate signature for matching.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(text:, line_number:, magic_comment_type: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::Comment::Line (class)">Line</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a new Ruby comment Line.</p>
+
+<p>Always uses hash_comment style for Ruby.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>text</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The full comment text including <code>#</code></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_number</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The 1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+53
+54
+55
+56</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 53</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>text:</span><span class='comma'>,</span> <span class='label'>line_number:</span><span class='comma'>,</span> <span class='label'>magic_comment_type:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@magic_comment_type</span> <span class='op'>=</span> <span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>text:</span> <span class='id identifier rubyid_text'>text</span><span class='comma'>,</span> <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span> <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="magic_comment_type-instance_method">
+  
+    #<strong>magic_comment_type</strong>  &#x21d2; <tt>Symbol</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the type of magic comment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The magic comment type, or nil if not a magic comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 75</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span>
+  <span class='ivar'>@magic_comment_type</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="from_tree_haver-class_method">
+  
+    .<strong>from_tree_haver</strong>(th_comment, magic_comment_types = {})  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a Line from a +TreeHaver::Backends::Prism::Comment+ instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>th_comment</span>
+      
+      
+        <span class='type'>(<tt>TreeHaver::Backends::Prism::Comment</tt>)</span>
+      
+      
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>magic_comment_types</span>
+      
+      
+        <span class='type'>(<tt>Hash{Integer =&gt; Symbol}</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>optional pre-computed<br />
+map of line_number =&gt; magic_comment_type (avoids duplicate lookups)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+37
+38
+39
+40
+41
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 37</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_from_tree_haver'>from_tree_haver</span><span class='lparen'>(</span><span class='id identifier rubyid_th_comment'>th_comment</span><span class='comma'>,</span> <span class='id identifier rubyid_magic_comment_types'>magic_comment_types</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_line_number'>line_number</span> <span class='op'>=</span> <span class='id identifier rubyid_th_comment'>th_comment</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span>
+  <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>text:</span> <span class='id identifier rubyid_th_comment'>th_comment</span><span class='period'>.</span><span class='id identifier rubyid_text'>text</span><span class='comma'>,</span>
+    <span class='label'>line_number:</span> <span class='id identifier rubyid_line_number'>line_number</span><span class='comma'>,</span>
+    <span class='label'>magic_comment_type:</span> <span class='id identifier rubyid_magic_comment_types'>magic_comment_types</span><span class='lbracket'>[</span><span class='id identifier rubyid_line_number'>line_number</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="magic_comment_type_for-class_method">
+  
+    .<strong>magic_comment_type_for</strong>(text)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_type_for'>magic_comment_type_for</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Prism::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../MagicCommentSupport.html" title="Prism::Merge::MagicCommentSupport (module)">MagicCommentSupport</a></span></span><span class='period'>.</span><span class='id identifier rubyid_magic_comment_type_for_text'><span class='object_link'><a href="../MagicCommentSupport.html#magic_comment_type_for_text-class_method" title="Prism::Merge::MagicCommentSupport.magic_comment_type_for_text (method)">magic_comment_type_for_text</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Human-readable representation.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Human-readable representation</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='id identifier rubyid_magic'>magic</span> <span class='op'>=</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> magic=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;Prism::Merge::Comment::Line line=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_line_number'>line_number</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_magic'>magic</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="magic_comment?-instance_method">
+  
+    #<strong>magic_comment?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if this is a Ruby magic comment.</p>
+
+<p>Magic comments are special comments that affect Ruby’s behavior:</p>
+<ul>
+  <li><code># frozen_string_literal: true/false</code></li>
+  <li><code># encoding: UTF-8</code></li>
+  <li><code># coding: UTF-8</code></li>
+  <li><code># warn_indent: true/false</code></li>
+  <li><code># shareable_constant_value: literal/...</code></li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if this is a magic comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 68</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
+  <span class='op'>!</span><span class='ivar'>@magic_comment_type</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="magic_comment_value-instance_method">
+  
+    #<strong>magic_comment_value</strong>  &#x21d2; <tt>String</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the value of a magic comment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The magic comment value, or nil if not a magic comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82
+83
+84
+85</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_magic_comment_value'>magic_comment_value</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
+
+  <span class='id identifier rubyid_stripped'>stripped</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>:</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='op'>&amp;.</span><span class='id identifier rubyid_strip'>strip</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="signature-instance_method">
+  
+    #<strong>signature</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Generate signature for matching.</p>
+
+<p>For magic comments, uses the magic comment TYPE as the signature<br />
+so that <code># frozen_string_literal: true</code> matches <code># frozen_string_literal: false</code>.<br />
+This allows preference to be applied when both template and dest have<br />
+the same type of magic comment with different values.</p>
+
+<p>For non-magic comments, uses the parent implementation (normalized content).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Signature for matching</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99
+100
+101
+102
+103</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/comment/line.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_signature'>signature</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_magic_comment?'>magic_comment?</span>
+    <span class='lbracket'>[</span><span class='symbol'>:magic_comment</span><span class='comma'>,</span> <span class='id identifier rubyid_magic_comment_type'>magic_comment_type</span><span class='rbracket'>]</span>
+  <span class='kw'>else</span>
+    <span class='kw'>super</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

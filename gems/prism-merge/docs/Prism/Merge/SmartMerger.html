@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Prism::Merge::SmartMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Prism::Merge::SmartMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">SmartMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Prism::Merge::SmartMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::SmartMergerBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::SmartMergerBase</li>
+          
+            <li class="next">Prism::Merge::SmartMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/prism/merge/smart_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>A merger that uses section-based semantics with recursive body merging for cleaner merging.</p>
+
+<p>SmartMerger:</p>
+<ol>
+  <li>Converts each top-level node into a “section” identified by its signature</li>
+  <li>Uses SectionTyping-style merge logic to decide which sections to include</li>
+  <li>Recursively merges matching class/module/block bodies</li>
+  <li>Outputs each selected node exactly once (with its comments)</li>
+</ol>
+
+<p>This approach avoids the complexity of tracking line ranges for anchors<br />
+and boundaries, which can lead to duplicate content when comments are<br />
+attached to multiple overlapping ranges.</p>
+
+<h2 id="merge-algorithm">Merge Algorithm</h2>
+
+<ol>
+  <li>Parse both template and destination files</li>
+  <li>Generate signatures for all top-level nodes in both files</li>
+  <li>Build a signature -&gt; node map for destination</li>
+  <li>Walk template nodes in order:
+    <ul>
+      <li>If signature matches a dest node:
+        <ul>
+          <li>If class/module/block with mergeable body: recursively merge bodies</li>
+          <li>Otherwise: output based on preference</li>
+        </ul>
+      </li>
+      <li>If template-only: output if add_template_only_nodes is true</li>
+    </ul>
+  </li>
+  <li>Output any remaining dest-only nodes</li>
+</ol>
+
+<h2 id="recursive-body-merging">Recursive Body Merging</h2>
+
+<p>When matching class/module definitions or CallNodes with blocks are found,<br />
+the merger recursively merges their body contents. This allows template<br />
+updates to nested methods/constants to be merged with destination customizations.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic merge</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_content'>dest_content</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Template wins with additions</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Prism::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+  </div>
+
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="CORRUPTION_HANDLINGS-constant" class="">CORRUPTION_HANDLINGS =
+          
+        </dt>
+        <dd><pre class="code"><span class='op'>::</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Healer</span><span class='op'>::</span><span class='const'>HANDLINGS</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#corruption_handling-instance_method" title="#corruption_handling (instance method)">#<strong>corruption_handling</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>How suspected corruption should be handled (:heal, :warn, :error, :skip).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#max_recursion_depth-instance_method" title="#max_recursion_depth (instance method)">#<strong>max_recursion_depth</strong>  &#x21d2; Integer, Float </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Maximum recursion depth for body merging.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_template_requires-instance_method" title="#merge_template_requires (instance method)">#<strong>merge_template_requires</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether template-only require calls may be emitted.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_template_missing_nodes-instance_method" title="#remove_template_missing_nodes (instance method)">#<strong>remove_template_missing_nodes</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether to remove destination-only nodes that are missing from the template.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runtime_session-instance_method" title="#runtime_session (instance method)">#<strong>runtime_session</strong>  &#x21d2; Ast::Merge::Runtime::Session<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Runtime-charter state recorded during merge.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#template_only_placement-instance_method" title="#template_only_placement (instance method)">#<strong>template_only_placement</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Where template-only nodes are emitted.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#text_merger_options-instance_method" title="#text_merger_options (instance method)">#<strong>text_merger_options</strong>  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Options to pass to Text::SmartMerger for comment-only files.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_only_file%3F-instance_method" title="#comment_only_file? (instance method)">#<strong>comment_only_file?</strong>(analysis)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Determine whether the given analysis represents a comment-only file.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, freeze_token: nil, node_typing: nil, max_recursion_depth: Float::INFINITY, current_depth: 0, match_refiner: nil, regions: nil, region_placeholder: nil, text_merger_options: nil, corruption_handling: :heal, merge_template_requires: false, template_only_placement: :after_anchor, **options)  &#x21d2; SmartMerger </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new SmartMerger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_debug-instance_method" title="#merge_with_debug (instance method)">#<strong>merge_with_debug</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the merge and return a hash with content, debug info, and statistics.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_template_only_placement-instance_method" title="#normalize_template_only_placement (instance method)">#<strong>normalize_template_only_placement</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, freeze_token: nil, node_typing: nil, max_recursion_depth: Float::INFINITY, current_depth: 0, match_refiner: nil, regions: nil, region_placeholder: nil, text_merger_options: nil, corruption_handling: :heal, merge_template_requires: false, template_only_placement: :after_anchor, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::SmartMerger (class)">SmartMerger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new SmartMerger.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template Ruby source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination Ruby source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:destination</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>:template, :destination, or per-type Hash</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_template_only_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to add template-only nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_template_missing_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to remove destination-only nodes<br />
+while preserving or promoting their attached comments</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Token for freeze block markers</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,String =&gt; #call}</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration<br />
+for per-node-type merge preferences</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>max_recursion_depth</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>Float</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>Float::INFINITY</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum depth for recursive body merging.<br />
+Default: Float::INFINITY (no limit). This is a safety valve that users can set<br />
+if they encounter edge cases.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>current_depth</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>0</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Current recursion depth (internal use)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>match_refiner</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional match refiner (unused but accepted for API compatibility)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>regions</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Region configurations (unused but accepted for API compatibility)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>region_placeholder</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom placeholder prefix (unused but accepted for API compatibility)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>text_merger_options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Options to pass to Text::SmartMerger when<br />
+merging comment-only files (files with no Ruby code statements). Supported options:</p>
+<ul>
+  <li>:freeze_token - Token for freeze block markers (defaults to @freeze_token or “text-merge”)</li>
+  <li>Any other options supported by Ast::Merge::Text::SmartMerger</li>
+</ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>freeze_token:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>max_recursion_depth:</span> <span class='const'>Float</span><span class='op'>::</span><span class='const'>INFINITY</span><span class='comma'>,</span>
+  <span class='label'>current_depth:</span> <span class='int'>0</span><span class='comma'>,</span>
+  <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>regions:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>region_placeholder:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>text_merger_options:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span>
+  <span class='label'>merge_template_requires:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>template_only_placement:</span> <span class='symbol'>:after_anchor</span><span class='comma'>,</span>
+  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+<span class='rparen'>)</span>
+  <span class='ivar'>@max_recursion_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_max_recursion_depth'>max_recursion_depth</span>
+  <span class='ivar'>@current_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_current_depth'>current_depth</span>
+  <span class='ivar'>@text_merger_options</span> <span class='op'>=</span> <span class='id identifier rubyid_text_merger_options'>text_merger_options</span>
+  <span class='ivar'>@remove_template_missing_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
+  <span class='ivar'>@corruption_handling</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_corruption_handling'>normalize_corruption_handling</span><span class='lparen'>(</span><span class='id identifier rubyid_corruption_handling'>corruption_handling</span><span class='rparen'>)</span>
+  <span class='ivar'>@merge_template_requires</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_template_requires'>merge_template_requires</span>
+  <span class='ivar'>@template_only_placement</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_template_only_placement'>normalize_template_only_placement</span><span class='lparen'>(</span><span class='id identifier rubyid_template_only_placement'>template_only_placement</span><span class='rparen'>)</span>
+  <span class='ivar'>@dest_prefix_comment_lines</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+  <span class='comment'># Store the raw (unwrapped) signature_generator so that
+</span>  <span class='comment'># merge_node_body_recursively can pass it to inner SmartMergers
+</span>  <span class='comment'># without double-wrapping.
+</span>  <span class='ivar'>@raw_signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+
+  <span class='comment'># Wrap signature_generator to include node_typing processing
+</span>  <span class='id identifier rubyid_effective_signature_generator'>effective_signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_build_effective_signature_generator'>build_effective_signature_generator</span><span class='lparen'>(</span><span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span> <span class='id identifier rubyid_node_typing'>node_typing</span><span class='rparen'>)</span>
+
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_effective_signature_generator'>effective_signature_generator</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
+    <span class='label'>remove_template_missing_nodes:</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span><span class='comma'>,</span>
+    <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span>
+    <span class='label'>match_refiner:</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span><span class='comma'>,</span>
+    <span class='label'>regions:</span> <span class='id identifier rubyid_regions'>regions</span><span class='comma'>,</span>
+    <span class='label'>region_placeholder:</span> <span class='id identifier rubyid_region_placeholder'>region_placeholder</span><span class='comma'>,</span>
+    <span class='label'>node_typing:</span> <span class='id identifier rubyid_node_typing'>node_typing</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="corruption_handling-instance_method">
+  
+    #<strong>corruption_handling</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns How suspected corruption should be handled (:heal, :warn, :error, :skip).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>How suspected corruption should be handled (:heal, :warn, :error, :skip)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 59</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
+  <span class='ivar'>@corruption_handling</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="max_recursion_depth-instance_method">
+  
+    #<strong>max_recursion_depth</strong>  &#x21d2; <tt>Integer</tt>, <tt>Float</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Maximum recursion depth for body merging.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>Float</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum recursion depth for body merging</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_max_recursion_depth'>max_recursion_depth</span>
+  <span class='ivar'>@max_recursion_depth</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="merge_template_requires-instance_method">
+  
+    #<strong>merge_template_requires</strong>  &#x21d2; <tt>Boolean</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Whether template-only require calls may be emitted.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether template-only require calls may be emitted</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 62</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_template_requires'>merge_template_requires</span>
+  <span class='ivar'>@merge_template_requires</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="remove_template_missing_nodes-instance_method">
+  
+    #<strong>remove_template_missing_nodes</strong>  &#x21d2; <tt>Boolean</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Whether to remove destination-only nodes that are missing from the template.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to remove destination-only nodes that are missing from the template</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 56</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
+  <span class='ivar'>@remove_template_missing_nodes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="runtime_session-instance_method">
+  
+    #<strong>runtime_session</strong>  &#x21d2; <tt>Ast::Merge::Runtime::Session</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Runtime-charter state recorded during merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Runtime::Session</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Runtime-charter state recorded during merge</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 68</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span>
+  <span class='ivar'>@runtime_session</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="template_only_placement-instance_method">
+  
+    #<strong>template_only_placement</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Where template-only nodes are emitted.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Where template-only nodes are emitted</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_template_only_placement'>template_only_placement</span>
+  <span class='ivar'>@template_only_placement</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="text_merger_options-instance_method">
+  
+    #<strong>text_merger_options</strong>  &#x21d2; <tt>Hash</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Options to pass to Text::SmartMerger for comment-only files.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Options to pass to Text::SmartMerger for comment-only files</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+53
+54
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 53</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_text_merger_options'>text_merger_options</span>
+  <span class='ivar'>@text_merger_options</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="comment_only_file?-instance_method">
+  
+    #<strong>comment_only_file?</strong>(analysis)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Determine whether the given analysis represents a comment-only file.</p>
+
+<p>Returns true when every top-level statement is a comment/block/empty<br />
+node produced by the comment parsers. This is used to decide whether to<br />
+delegate to the comment-only merger logic.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Prism::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+164
+165
+166</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 164</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_only_file?'>comment_only_file?</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_comment_only_file_merger'>comment_only_file_merger</span><span class='period'>.</span><span class='id identifier rubyid_comment_only_file?'>comment_only_file?</span><span class='lparen'>(</span><span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_debug-instance_method">
+  
+    #<strong>merge_with_debug</strong>  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the merge and return a hash with content, debug info, and statistics.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Hash with :content, :debug, and :statistics keys</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 171</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
+  <span class='id identifier rubyid_result_obj'>result_obj</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@template_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
+    <span class='label'>statements:</span> <span class='ivar'>@dest_analysis</span><span class='op'>&amp;.</span><span class='id identifier rubyid_statements'>statements</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+    <span class='label'>debug:</span> <span class='lbrace'>{</span>
+      <span class='label'>template_statements:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='lbracket'>[</span><span class='symbol'>:statements</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>dest_statements:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='lbracket'>[</span><span class='symbol'>:statements</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>preference:</span> <span class='ivar'>@preference</span><span class='comma'>,</span>
+      <span class='label'>add_template_only_nodes:</span> <span class='ivar'>@add_template_only_nodes</span><span class='comma'>,</span>
+      <span class='label'>freeze_token:</span> <span class='ivar'>@freeze_token</span><span class='comma'>,</span>
+      <span class='label'>corruption_handling:</span> <span class='ivar'>@corruption_handling</span><span class='comma'>,</span>
+      <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
+    <span class='label'>statistics:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:statistics</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span> <span class='op'>:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
+    <span class='label'>decisions:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:decision_summary</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span> <span class='op'>:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span><span class='comma'>,</span>
+    <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_template_only_placement-instance_method">
+  
+    #<strong>normalize_template_only_placement</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+149
+150
+151
+152
+153
+154</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/smart_merger.rb', line 149</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_template_only_placement'>normalize_template_only_placement</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>after_anchor</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_normalized'>normalized</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>if</span> <span class='qwords_beg'>%w[</span><span class='tstring_content'>after_anchor</span><span class='words_sep'> </span><span class='tstring_content'>destination_tail</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_normalized'>normalized</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unsupported template-only placement </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

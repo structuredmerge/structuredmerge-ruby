@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::Text::LineSectionSplitter
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::Text::LineSectionSplitter";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (L)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Text.html" title="Ast::Merge::Text (module)">Text</a></span></span>
+     &raquo; 
+    <span class="title">LineSectionSplitter</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::Text::LineSectionSplitter
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="SectionSplitter.html" title="Ast::Merge::Text::SectionSplitter (class)">SectionSplitter</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="SectionSplitter.html" title="Ast::Merge::Text::SectionSplitter (class)">SectionSplitter</a></span></li>
+          
+            <li class="next">Ast::Merge::Text::LineSectionSplitter</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/text/section_splitter.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Line-pattern section splitter for text content.</p>
+
+<p>Splits text content into sections based on a line pattern (regex).<br />
+Useful for documents with consistent structural markers like headings.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Split Markdown on level-2 headings</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_splitter'>splitter</span> <span class='op'>=</span> <span class='const'>LineSectionSplitter</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::Text::LineSectionSplitter#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^## (.+)$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_sections'>sections</span> <span class='op'>=</span> <span class='id identifier rubyid_splitter'>splitter</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='id identifier rubyid_markdown_content'>markdown_content</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Split on comment markers</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_splitter'>splitter</span> <span class='op'>=</span> <span class='const'>LineSectionSplitter</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::Text::LineSectionSplitter#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^# === (.+) ===\s*$</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_sections'>sections</span> <span class='op'>=</span> <span class='id identifier rubyid_splitter'>splitter</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='id identifier rubyid_config_file'>config_file</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+  <h2>Constant Summary</h2>
+  
+  <h3 class="inherited">Constants inherited
+     from <span class='object_link'><a href="SectionSplitter.html" title="Ast::Merge::Text::SectionSplitter (class)">SectionSplitter</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SectionSplitter.html#DEFAULT_PREFERENCE-constant" title="Ast::Merge::Text::SectionSplitter::DEFAULT_PREFERENCE (constant)">SectionSplitter::DEFAULT_PREFERENCE</a></span></p>
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name_capture-instance_method" title="#name_capture (instance method)">#<strong>name_capture</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Capture group index for section name (1-based).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pattern-instance_method" title="#pattern (instance method)">#<strong>pattern</strong>  &#x21d2; Regexp </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Pattern to match section headers.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="SectionSplitter.html" title="Ast::Merge::Text::SectionSplitter (class)">SectionSplitter</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SectionSplitter.html#options-instance_method" title="Ast::Merge::Text::SectionSplitter#options (method)">#options</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(pattern:, name_capture: 1, **options)  &#x21d2; LineSectionSplitter </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a line-based splitter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#join-instance_method" title="#join (instance method)">#<strong>join</strong>(sections)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Join sections back into text content.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#split-instance_method" title="#split (instance method)">#<strong>split</strong>(content)  &#x21d2; Array&lt;Section&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Split content on lines matching the pattern.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="SectionSplitter.html" title="Ast::Merge::Text::SectionSplitter (class)">SectionSplitter</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="SectionSplitter.html#merge-instance_method" title="Ast::Merge::Text::SectionSplitter#merge (method)">#merge</a></span>, <span class='object_link'><a href="SectionSplitter.html#merge_section_content-instance_method" title="Ast::Merge::Text::SectionSplitter#merge_section_content (method)">#merge_section_content</a></span>, <span class='object_link'><a href="SectionSplitter.html#merge_section_lists-instance_method" title="Ast::Merge::Text::SectionSplitter#merge_section_lists (method)">#merge_section_lists</a></span>, <span class='object_link'><a href="SectionSplitter.html#merge_sections-instance_method" title="Ast::Merge::Text::SectionSplitter#merge_sections (method)">#merge_sections</a></span>, <span class='object_link'><a href="SectionSplitter.html#normalize_name-instance_method" title="Ast::Merge::Text::SectionSplitter#normalize_name (method)">#normalize_name</a></span>, <span class='object_link'><a href="SectionSplitter.html#preference_for_section-instance_method" title="Ast::Merge::Text::SectionSplitter#preference_for_section (method)">#preference_for_section</a></span>, <span class='object_link'><a href="SectionSplitter.html#section_signature-instance_method" title="Ast::Merge::Text::SectionSplitter#section_signature (method)">#section_signature</a></span>, <span class='object_link'><a href="SectionSplitter.html#validate!-class_method" title="Ast::Merge::Text::SectionSplitter.validate! (method)">validate!</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(pattern:, name_capture: 1, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::Text::LineSectionSplitter (class)">LineSectionSplitter</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a line-based splitter.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match section header lines</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>name_capture</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>1</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Capture group for section name (default: 1)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+309
+310
+311
+312
+313</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 309</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>pattern:</span><span class='comma'>,</span> <span class='label'>name_capture:</span> <span class='int'>1</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='ivar'>@pattern</span> <span class='op'>=</span> <span class='id identifier rubyid_pattern'>pattern</span>
+  <span class='ivar'>@name_capture</span> <span class='op'>=</span> <span class='id identifier rubyid_name_capture'>name_capture</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="name_capture-instance_method">
+  
+    #<strong>name_capture</strong>  &#x21d2; <tt>Integer</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Capture group index for section name (1-based).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Capture group index for section name (1-based)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+302
+303
+304</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 302</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name_capture'>name_capture</span>
+  <span class='ivar'>@name_capture</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="pattern-instance_method">
+  
+    #<strong>pattern</strong>  &#x21d2; <tt>Regexp</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Pattern to match section headers.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match section headers</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+299
+300
+301</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 299</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pattern'>pattern</span>
+  <span class='ivar'>@pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="join-instance_method">
+  
+    #<strong>join</strong>(sections)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Join sections back into text content.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>sections</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Section.html" title="Ast::Merge::Text::Section (class)">Section</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Sections to join</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Reconstructed content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+380
+381
+382</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 380</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_sections'>sections</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_sections'>sections</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:full_text</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="split-instance_method">
+  
+    #<strong>split</strong>(content)  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Section.html" title="Ast::Merge::Text::Section (class)">Section</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Split content on lines matching the pattern.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Text content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Section.html" title="Ast::Merge::Text::Section (class)">Section</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Sections</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/text/section_splitter.rb', line 319</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
+  <span class='id identifier rubyid_sections'>sections</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_current_section'>current_section</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_preamble_lines'>preamble_lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='op'>|</span>
+    <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span> <span class='op'>+</span> <span class='int'>1</span>
+
+    <span class='kw'>if</span> <span class='lparen'>(</span><span class='id identifier rubyid_match'>match</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span><span class='lparen'>(</span><span class='id identifier rubyid_pattern'>pattern</span><span class='rparen'>)</span><span class='rparen'>)</span>
+      <span class='comment'># Start new section
+</span>      <span class='kw'>if</span> <span class='id identifier rubyid_current_section'>current_section</span>
+        <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_finalize_section'>finalize_section</span><span class='lparen'>(</span><span class='id identifier rubyid_current_section'>current_section</span><span class='rparen'>)</span>
+      <span class='kw'>elsif</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+        <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="Section.html" title="Ast::Merge::Text::Section (class)">Section</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+          <span class='label'>name:</span> <span class='symbol'>:preamble</span><span class='comma'>,</span>
+          <span class='label'>header:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+          <span class='label'>body:</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='comma'>,</span>
+          <span class='label'>start_line:</span> <span class='int'>1</span><span class='comma'>,</span>
+          <span class='label'>end_line:</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='op'>-</span> <span class='int'>1</span><span class='comma'>,</span>
+          <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:preamble</span><span class='rbrace'>}</span><span class='comma'>,</span>
+        <span class='rparen'>)</span>
+      <span class='kw'>end</span>
+
+      <span class='id identifier rubyid_section_name'>section_name</span> <span class='op'>=</span> <span class='id identifier rubyid_match'>match</span><span class='lbracket'>[</span><span class='id identifier rubyid_name_capture'>name_capture</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_match'>match</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+      <span class='id identifier rubyid_current_section'>current_section</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='label'>name:</span> <span class='id identifier rubyid_section_name'>section_name</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='comma'>,</span>
+        <span class='label'>header:</span> <span class='id identifier rubyid_line'>line</span><span class='comma'>,</span>
+        <span class='label'>body_lines:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='label'>start_line:</span> <span class='id identifier rubyid_line_num'>line_num</span><span class='comma'>,</span>
+      <span class='rbrace'>}</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_current_section'>current_section</span>
+      <span class='id identifier rubyid_current_section'>current_section</span><span class='lbracket'>[</span><span class='symbol'>:body_lines</span><span class='rbracket'>]</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_preamble_lines'>preamble_lines</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Finalize last section
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_current_section'>current_section</span>
+    <span class='id identifier rubyid_current_section'>current_section</span><span class='lbracket'>[</span><span class='symbol'>:end_line</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+    <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_finalize_section'>finalize_section</span><span class='lparen'>(</span><span class='id identifier rubyid_current_section'>current_section</span><span class='rparen'>)</span>
+  <span class='kw'>elsif</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_sections'>sections</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='comment'># Entire document is preamble (no sections found)
+</span>    <span class='id identifier rubyid_sections'>sections</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="Section.html" title="Ast::Merge::Text::Section (class)">Section</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+      <span class='label'>name:</span> <span class='symbol'>:preamble</span><span class='comma'>,</span>
+      <span class='label'>header:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+      <span class='label'>body:</span> <span class='id identifier rubyid_preamble_lines'>preamble_lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='comma'>,</span>
+      <span class='label'>start_line:</span> <span class='int'>1</span><span class='comma'>,</span>
+      <span class='label'>end_line:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+      <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>type:</span> <span class='symbol'>:preamble</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_sections'>sections</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:51 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

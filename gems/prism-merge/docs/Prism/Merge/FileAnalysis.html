@@ -1,0 +1,3043 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Prism::Merge::FileAnalysis
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Prism::Merge::FileAnalysis";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (F)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">FileAnalysis</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Prism::Merge::FileAnalysis
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Prism::Merge::FileAnalysis</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Ast::Merge::FileAnalyzable</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/prism/merge/file_analysis.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Simplified file analysis using Prism’s native comment attachment.<br />
+This version leverages parse_result.attach_comments! to automatically<br />
+attach comments to nodes, eliminating the need for manual comment tracking<br />
+and the CommentNode class.</p>
+
+<p>Key improvements over V1:</p>
+<ul>
+  <li>Uses Prism’s native node.location.leading_comments and trailing_comments</li>
+  <li>No manual comment tracking or CommentNode class</li>
+  <li>Simpler freeze block extraction via comment scanning</li>
+  <li>Better performance (one attach_comments! call vs multiple iterations)</li>
+  <li>Enhanced freeze block validation (detects partial nodes and non-class/module contexts)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter (class)">NativeCommentAugmenter</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_FREEZE_TOKEN-constant" class="">DEFAULT_FREEZE_TOKEN =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default freeze token for identifying freeze blocks</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism-merge</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="GEMSPEC_VAR_PLACEHOLDER-constant" class="">GEMSPEC_VAR_PLACEHOLDER =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Canonical placeholder used in signatures to normalize the gemspec block variable.<br />
+When <code>Gem::Specification.new do |spec|</code> uses a different name from the template<br />
+(e.g. <code>|gem|</code>), assignment nodes such as <code>spec.name = "foo"</code> and <code>gem.name = "foo"</code><br />
+would otherwise produce different signatures and never match.  We normalize both to<br />
+this placeholder so they match regardless of the variable name chosen by the author.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:__gemspec_var__</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#gemspec_block_var-instance_method" title="#gemspec_block_var (instance method)">#<strong>gemspec_block_var</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The block parameter name used in <code>Gem::Specification.new do |X|</code> (e.g. “spec”, “gem”, “s”).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_result-instance_method" title="#parse_result (instance method)">#<strong>parse_result</strong>  &#x21d2; Prism::ParseResult </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The underlying Prism parse result (via TreeHaver routing).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tree-instance_method" title="#tree (instance method)">#<strong>tree</strong>  &#x21d2; TreeHaver::Tree </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The tree_haver parse tree (includes normalized comment objects).</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#attach_comments_safely!-class_method" title="attach_comments_safely! (class method)">.<strong>attach_comments_safely!</strong>(parse_result)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Safely attach comments to nodes, handling JRuby compatibility issues.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#claimed_lines-instance_method" title="#claimed_lines (instance method)">#<strong>claimed_lines</strong>  &#x21d2; Set&lt;Integer&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Lines claimed by promoted BlockDirective nodes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_attachment_for-instance_method" title="#comment_attachment_for (instance method)">#<strong>comment_attachment_for</strong>(owner, **options)  &#x21d2; Ast::Merge::Comment::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a native shared comment attachment for an owner.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_augmenter-instance_method" title="#comment_augmenter (instance method)">#<strong>comment_augmenter</strong>(owners: nil, **options)  &#x21d2; NativeCommentAugmenter </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a native shared comment augmenter for this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_capability-instance_method" title="#comment_capability (instance method)">#<strong>comment_capability</strong>  &#x21d2; Ast::Merge::Comment::Capability </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get shared comment capability information for this analysis.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_node_at-instance_method" title="#comment_node_at (instance method)">#<strong>comment_node_at</strong>(line_num)  &#x21d2; Prism::Merge::Comment::Line<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get a shared/native Ruby comment node at a specific line.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_nodes-instance_method" title="#comment_nodes (instance method)">#<strong>comment_nodes</strong>  &#x21d2; Array&lt;Prism::Merge::Comment::Line&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get all supported comments converted to shared/native Ruby comment nodes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_region_for_range-instance_method" title="#comment_region_for_range (instance method)">#<strong>comment_region_for_range</strong>(range, kind:, full_line_only: false)  &#x21d2; Ast::Merge::Comment::Region </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get comments in a line range converted to a shared comment region.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_support_style-instance_method" title="#comment_support_style (instance method)">#<strong>comment_support_style</strong>  &#x21d2; Ast::Merge::Comment::SupportStyle </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Describe how Prism merges own and emit comments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#errors-instance_method" title="#errors (instance method)">#<strong>errors</strong>  &#x21d2; Array&lt;Prism::ParseError&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get parse errors for compatibility with SmartMergerBase.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fallthrough_node%3F-instance_method" title="#fallthrough_node? (instance method)">#<strong>fallthrough_node?</strong>(value)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Override to detect Prism nodes for signature generator fallthrough.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#freeze_block_at-instance_method" title="#freeze_block_at (instance method)">#<strong>freeze_block_at</strong>(line_num)  &#x21d2; Ast::Merge::NodeTyping::FrozenWrapper<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Return the frozen Prism-owned statement covering the given line.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#frozen_node%3F-instance_method" title="#frozen_node? (instance method)">#<strong>frozen_node?</strong>(node, claimed_lines: Set.new)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Determine if a node is frozen (has a freeze marker in its leading comments).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#frozen_nodes-instance_method" title="#frozen_nodes (instance method)">#<strong>frozen_nodes</strong>  &#x21d2; Array&lt;Ast::Merge::NodeTyping::FrozenWrapper&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get nodes that are frozen (have a freeze marker).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#in_freeze_block%3F-instance_method" title="#in_freeze_block? (instance method)">#<strong>in_freeze_block?</strong>(line_num)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line falls within a frozen Prism-owned statement.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **options)  &#x21d2; FileAnalysis </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize file analysis with Prism’s native comment handling.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#layout_attachment_for-instance_method" title="#layout_attachment_for (instance method)">#<strong>layout_attachment_for</strong>(owner, **options)  &#x21d2; Ast::Merge::Layout::Attachment </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a shared layout attachment for an owner using native Prism locations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#layout_augmenter-instance_method" title="#layout_augmenter (instance method)">#<strong>layout_augmenter</strong>(owners: nil, **options)  &#x21d2; Ast::Merge::Layout::Augmenter </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a shared layout augmenter for this analysis using native Prism locations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#nodes_with_comments-instance_method" title="#nodes_with_comments (instance method)">#<strong>nodes_with_comments</strong>  &#x21d2; Array&lt;Hash&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get nodes with their associated comments and metadata Comments are now accessed via Prism’s native node.location API.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruby_doc_surface_analyzer-instance_method" title="#ruby_doc_surface_analyzer (instance method)">#<strong>ruby_doc_surface_analyzer</strong>  &#x21d2; Prism::Merge::RubyDocSurfaceAnalyzer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build a semantic sidecar that exposes Ruby doc-comment surfaces without taking ownership of reconstruction away from Prism source spans.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_delegation_policies-instance_method" title="#ruleset_delegation_policies (instance method)">#<strong>ruleset_delegation_policies</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_owner_selector-instance_method" title="#ruleset_owner_selector (instance method)">#<strong>ruleset_owner_selector</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_render_family-instance_method" title="#ruleset_render_family (instance method)">#<strong>ruleset_render_family</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_repair_policies-instance_method" title="#ruleset_repair_policies (instance method)">#<strong>ruleset_repair_policies</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ruleset_surfaces-instance_method" title="#ruleset_surfaces (instance method)">#<strong>ruleset_surfaces</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid%3F-instance_method" title="#valid? (instance method)">#<strong>valid?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if parse was successful.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize file analysis with Prism’s native comment handling</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>source</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Ruby source code to analyze</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_FREEZE_TOKEN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Token for freeze block markers (default: “prism-merge”)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 204</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_FREEZE_TOKEN-constant" title="Prism::Merge::FileAnalysis::DEFAULT_FREEZE_TOKEN (constant)">DEFAULT_FREEZE_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
+  <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
+  <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+  <span class='ivar'>@source_label</span> <span class='op'>=</span> <span class='id identifier rubyid_source_label'>source_label</span>
+  <span class='comment'># **options captured for forward compatibility
+</span>  <span class='comment'># Route through the Prism backend that Prism::Merge registers with TreeHaver
+</span>  <span class='comment'># during bootstrap rather than calling Prism.parse directly.
+</span>  <span class='comment'># Store the full tree_haver result so downstream code can use @tree.comments
+</span>  <span class='comment'># (normalized, deduplicated, with attachment hints) rather than accessing raw
+</span>  <span class='comment'># Prism::Comment objects via @parse_result.comments or node.location.leading_comments.
+</span>  <span class='ivar'>@tree</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_time'>time</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis#parse</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span>
+    <span class='const'>TreeHaver</span><span class='period'>.</span><span class='id identifier rubyid_parser_for'>parser_for</span><span class='lparen'>(</span><span class='symbol'>:ruby</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+  <span class='ivar'>@parse_result</span> <span class='op'>=</span> <span class='ivar'>@tree</span><span class='period'>.</span><span class='id identifier rubyid_parse_result'>parse_result</span>
+  <span class='ivar'>@gemspec_block_var</span> <span class='op'>=</span> <span class='id identifier rubyid_detect_gemspec_block_var'>detect_gemspec_block_var</span>
+
+  <span class='comment'># Use Prism&#39;s native comment attachment
+</span>  <span class='comment'># On JRuby, the Comments class may not be loaded yet, so we need to require it
+</span>  <span class='id identifier rubyid_attach_comments_safely!'>attach_comments_safely!</span>
+
+  <span class='comment'># Extract and validate structure
+</span>  <span class='ivar'>@statements</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_and_integrate_all_nodes'>extract_and_integrate_all_nodes</span>
+
+  <span class='const'><span class='object_link'><a href="DebugLogger.html" title="Prism::Merge::DebugLogger (module)">DebugLogger</a></span></span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FileAnalysis initialized</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span>
+    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>custom</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>default</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>statements_count:</span> <span class='ivar'>@statements</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>frozen_nodes_count:</span> <span class='id identifier rubyid_frozen_nodes'>frozen_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id="gemspec_block_var=-instance_method"></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="gemspec_block_var-instance_method">
+  
+    #<strong>gemspec_block_var</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>The block parameter name used in <code>Gem::Specification.new do |X|</code> (e.g. “spec”,<br />
+“gem”, “s”).  nil for non-gemspec files.  Exposed so callers can override it for<br />
+nested body merges where the outer wrapper is not present in the body text.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+177
+178
+179</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 177</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_gemspec_block_var'>gemspec_block_var</span>
+  <span class='ivar'>@gemspec_block_var</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="parse_result-instance_method">
+  
+    #<strong>parse_result</strong>  &#x21d2; <tt>Prism::ParseResult</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The underlying Prism parse result (via TreeHaver routing).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Prism::ParseResult</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The underlying Prism parse result (via TreeHaver routing)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+172
+173
+174</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 172</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parse_result'>parse_result</span>
+  <span class='ivar'>@parse_result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="tree-instance_method">
+  
+    #<strong>tree</strong>  &#x21d2; <tt>TreeHaver::Tree</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The tree_haver parse tree (includes normalized comment objects).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>TreeHaver::Tree</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The tree_haver parse tree (includes normalized comment objects)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_tree'>tree</span>
+  <span class='ivar'>@tree</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="attach_comments_safely!-class_method">
+  
+    .<strong>attach_comments_safely!</strong>(parse_result)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Safely attach comments to nodes, handling JRuby compatibility issues.<br />
+On JRuby, the Prism::ParseResult::Comments class may not be autoloaded,<br />
+so we need to explicitly require it.</p>
+
+<p>This is a class method so it can be used anywhere in prism-merge code<br />
+that needs to attach comments to a parse result.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>parse_result</span>
+      
+      
+        <span class='type'>(<tt>Prism::ParseResult</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The parse result to attach comments to</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 519</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_attach_comments_safely!'>attach_comments_safely!</span><span class='lparen'>(</span><span class='id identifier rubyid_parse_result'>parse_result</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_attach_comments!'>attach_comments!</span>
+<span class='comment'># :nocov: defensive - JRuby compatibility for Comments class autoloading
+</span><span class='kw'>rescue</span> <span class='const'>NameError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Comments</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='comment'># On JRuby, the Comments class needs to be explicitly required
+</span>    <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>prism/parse_result/comments</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_parse_result'>parse_result</span><span class='period'>.</span><span class='id identifier rubyid_attach_comments!'>attach_comments!</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_raise'>raise</span>
+  <span class='kw'>end</span>
+  <span class='comment'># :nocov:
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="claimed_lines-instance_method">
+  
+    #<strong>claimed_lines</strong>  &#x21d2; <tt>Set&lt;Integer&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Lines claimed by promoted BlockDirective nodes.<br />
+These lines appear in the source as comment-only directive markers (e.g.<br />
+<code># token:freeze</code>) that Prism hoists onto the next code node’s leading_comments.<br />
+The claimed_lines set is used by the emission pipeline to avoid re-emitting<br />
+those comment lines as leading_comments of adjacent code nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line numbers claimed by BlockDirective promotions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+194
+195
+196</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 194</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_claimed_lines'>claimed_lines</span>
+  <span class='ivar'>@claimed_lines</span> <span class='op'>||=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_attachment_for-instance_method">
+  
+    #<strong>comment_attachment_for</strong>(owner, **options)  &#x21d2; <tt>Ast::Merge::Comment::Attachment</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a native shared comment attachment for an owner.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Structural owner for the attachment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional metadata preserved on the attachment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Comment::Attachment</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 336</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_attachment_for'>comment_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_leading_entries'>leading_entries</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_leading_comment_entries'>owner_leading_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_split_preamble'>split_preamble</span> <span class='op'>=</span> <span class='id identifier rubyid_split_first_owner_preamble?'>split_first_owner_preamble?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span>
+    <span class='id identifier rubyid__preamble_entries'>_preamble_entries</span><span class='comma'>,</span> <span class='id identifier rubyid_leading_entries'>leading_entries</span> <span class='op'>=</span> <span class='id identifier rubyid_split_first_owner_preamble_entries'>split_first_owner_preamble_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_leading_region'>leading_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span>
+    <span class='symbol'>:leading</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_leading_entries'>leading_entries</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_split_preamble'>split_preamble</span> <span class='op'>?</span> <span class='lbrace'>{</span><span class='label'>floating:</span> <span class='kw'>true</span><span class='rbrace'>}</span> <span class='op'>:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_inline_region'>inline_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='symbol'>:inline</span><span class='comma'>,</span> <span class='id identifier rubyid_owner_inline_comment_entries'>owner_inline_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_trailing_region'>trailing_region</span> <span class='op'>=</span> <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='symbol'>:trailing</span><span class='comma'>,</span> <span class='id identifier rubyid_owner_trailing_comment_entries'>owner_trailing_comment_entries</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_layout_attachment'>layout_attachment</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+
+  <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Comment</span><span class='op'>::</span><span class='const'>Attachment</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>leading_region:</span> <span class='id identifier rubyid_leading_region'>leading_region</span><span class='comma'>,</span>
+    <span class='label'>inline_region:</span> <span class='id identifier rubyid_inline_region'>inline_region</span><span class='comma'>,</span>
+    <span class='label'>trailing_region:</span> <span class='id identifier rubyid_trailing_region'>trailing_region</span><span class='comma'>,</span>
+    <span class='label'>leading_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='period'>.</span><span class='id identifier rubyid_leading_gap'>leading_gap</span><span class='comma'>,</span>
+    <span class='label'>trailing_gap:</span> <span class='id identifier rubyid_layout_attachment'>layout_attachment</span><span class='period'>.</span><span class='id identifier rubyid_trailing_gap'>trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:prism_native</span><span class='comma'>,</span>
+      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_augmenter-instance_method">
+  
+    #<strong>comment_augmenter</strong>(owners: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter (class)">NativeCommentAugmenter</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a native shared comment augmenter for this analysis.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;#start_line,#end_line&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Owners used for attachment exposure</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional capability details</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter (class)">NativeCommentAugmenter</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+371
+372
+373</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 371</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_augmenter'>comment_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter (class)">NativeCommentAugmenter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="FileAnalysis/NativeCommentAugmenter.html#initialize-instance_method" title="Prism::Merge::FileAnalysis::NativeCommentAugmenter#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='comma'>,</span> <span class='label'>owners:</span> <span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_comment_augmenter_default_owners'>comment_augmenter_default_owners</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_capability-instance_method">
+  
+    #<strong>comment_capability</strong>  &#x21d2; <tt>Ast::Merge::Comment::Capability</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get shared comment capability information for this analysis.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Comment::Capability</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+251
+252
+253
+254
+255
+256
+257
+258
+259</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 251</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_capability'>comment_capability</span>
+  <span class='ivar'>@comment_capability</span> <span class='op'>||=</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Comment</span><span class='op'>::</span><span class='const'>Capability</span><span class='period'>.</span><span class='id identifier rubyid_native_full'>native_full</span><span class='lparen'>(</span>
+    <span class='label'>source:</span> <span class='symbol'>:prism</span><span class='comma'>,</span>
+    <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
+    <span class='label'>attachment_hints:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>comment_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>comment_count:</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_node_at-instance_method">
+  
+    #<strong>comment_node_at</strong>(line_num)  &#x21d2; <tt><span class='object_link'><a href="Comment/Line.html" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span></tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get a shared/native Ruby comment node at a specific line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Comment/Line.html" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span></tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+315
+316
+317</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 315</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_node_at'>comment_node_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_native_comment_entries'>native_comment_entries</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:line</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_line_num'>line_num</span> <span class='rbrace'>}</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:node</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_nodes-instance_method">
+  
+    #<strong>comment_nodes</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="Comment/Line.html" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get all supported comments converted to shared/native Ruby comment nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="Comment/Line.html" title="Prism::Merge::Comment::Line (class)">Prism::Merge::Comment::Line</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_nodes'>comment_nodes</span>
+  <span class='id identifier rubyid_native_comment_entries'>native_comment_entries</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:node</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_region_for_range-instance_method">
+  
+    #<strong>comment_region_for_range</strong>(range, kind:, full_line_only: false)  &#x21d2; <tt>Ast::Merge::Comment::Region</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get comments in a line range converted to a shared comment region.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>range</span>
+      
+      
+        <span class='type'>(<tt>Range</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Range of 1-based line numbers</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>kind</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Region kind (:leading, :inline, :orphan, etc.)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>full_line_only</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to keep only full-line comments</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Comment::Region</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+325
+326
+327
+328
+329</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 325</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_region_for_range'>comment_region_for_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>kind:</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_native_comment_entries_in_range'>native_comment_entries_in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range'>range</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='lbracket'>[</span><span class='symbol'>:full_line</span><span class='rbracket'>]</span> <span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span>
+  <span class='id identifier rubyid_build_comment_region'>build_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_kind'>kind</span><span class='comma'>,</span> <span class='id identifier rubyid_entries'>entries</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='label'>range:</span> <span class='id identifier rubyid_range'>range</span><span class='comma'>,</span> <span class='label'>full_line_only:</span> <span class='id identifier rubyid_full_line_only'>full_line_only</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="comment_support_style-instance_method">
+  
+    #<strong>comment_support_style</strong>  &#x21d2; <tt>Ast::Merge::Comment::SupportStyle</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Describe how Prism merges own and emit comments.</p>
+
+<p>Prism exposes native owned comments and attachment hints, but merge output<br />
+still flows through ast-merge’s synthetic ownership/emission layer.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Comment::SupportStyle</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+267
+268
+269
+270
+271
+272
+273</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 267</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_support_style'>comment_support_style</span>
+  <span class='ivar'>@comment_support_style</span> <span class='op'>||=</span> <span class='id identifier rubyid_shared_comment_support_style'>shared_comment_support_style</span><span class='lparen'>(</span>
+    <span class='label'>source:</span> <span class='symbol'>:prism</span><span class='comma'>,</span>
+    <span class='label'>style:</span> <span class='symbol'>:hash_comment</span><span class='comma'>,</span>
+    <span class='label'>read_strategy:</span> <span class='symbol'>:native_read_portable_write</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="errors-instance_method">
+  
+    #<strong>errors</strong>  &#x21d2; <tt>Array&lt;Prism::ParseError&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get parse errors for compatibility with SmartMergerBase.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Prism::ParseError&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of parse errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+244
+245
+246</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 244</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
+  <span class='ivar'>@parse_result</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fallthrough_node?-instance_method">
+  
+    #<strong>fallthrough_node?</strong>(value)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Override to detect Prism nodes for signature generator fallthrough</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The value to check</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if this is a fallthrough node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+428
+429
+430</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 428</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fallthrough_node?'>fallthrough_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:canonical_type</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span><span class='op'>::</span><span class='const'>Node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>super</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="freeze_block_at-instance_method">
+  
+    #<strong>freeze_block_at</strong>(line_num)  &#x21d2; <tt>Ast::Merge::NodeTyping::FrozenWrapper</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Return the frozen Prism-owned statement covering the given line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::NodeTyping::FrozenWrapper</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+487
+488
+489
+490
+491
+492
+493
+494</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 487</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_block'>block</span><span class='op'>|</span>
+    <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_end_line'>owner_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='id identifier rubyid_start_line'>start_line</span><span class='op'>..</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_cover?'>cover?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="frozen_node?-instance_method">
+  
+    #<strong>frozen_node?</strong>(node, claimed_lines: Set.new)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Determine if a node is frozen (has a freeze marker in its leading comments).</p>
+
+<p>For Ruby AST nodes, a freeze marker applies only to the node it directly<br />
+precedes in leading comments. If a freeze marker appears INSIDE a block<br />
+(nested in the body), it applies to that nested statement, NOT the outer<br />
+block. This is different from comment-only formats like Markdown where<br />
+checking content containment makes sense.</p>
+
+<p>Nested freeze markers inside the node’s body are handled during recursive<br />
+body merging, where each nested statement gets its own freeze detection.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt>Prism::Node</tt>, <tt>Ast::Merge::NodeTyping::FrozenWrapper</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The node to check</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>claimed_lines</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>Set.new</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Line numbers already claimed by promoted BlockDirective nodes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if the node has an unclaimed freeze marker in its leading comments</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 446</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_frozen_node?'>frozen_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='label'>claimed_lines:</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span>
+  <span class='comment'># Already wrapped as frozen
+</span>  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Freezable</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='ivar'>@freeze_token</span>
+
+  <span class='comment'># Get the actual node (in case it&#39;s a Wrapper)
+</span>  <span class='id identifier rubyid_actual_node'>actual_node</span> <span class='op'>=</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span>
+
+  <span class='id identifier rubyid_freeze_pattern'>freeze_pattern</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='ivar'>@freeze_token</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>:freeze</span><span class='regexp_end'>/i</span></span>
+
+  <span class='comment'># BlockDirectiveDetector has already promoted balanced freeze/unfreeze pairs
+</span>  <span class='comment'># to FreezeNode synthetic nodes. Any remaining freeze marker in leading
+</span>  <span class='comment'># comments is unbalanced (node-level freeze marker), so use simple any? check.
+</span>  <span class='comment'># Exclude markers at lines already claimed by promoted BlockDirective nodes
+</span>  <span class='comment'># (those were hoisted onto this node by Prism&#39;s attach_comments!).
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_actual_node'>actual_node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:location</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_actual_node'>actual_node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:leading_comments</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_actual_node'>actual_node</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_leading_comments'>leading_comments</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_c'>c</span><span class='op'>|</span>
+      <span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_slice'>slice</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_pattern'>freeze_pattern</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_claimed_lines'>claimed_lines</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_c'>c</span><span class='period'>.</span><span class='id identifier rubyid_location'>location</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="frozen_nodes-instance_method">
+  
+    #<strong>frozen_nodes</strong>  &#x21d2; <tt>Array&lt;Ast::Merge::NodeTyping::FrozenWrapper&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get nodes that are frozen (have a freeze marker).<br />
+Returns FrozenWrapper instances that include the Freezable behavior,<br />
+allowing them to satisfy both is_a?(Freezable) and is_a?(NodeTyping::Wrapper).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Ast::Merge::NodeTyping::FrozenWrapper&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Wrapped frozen nodes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+501
+502
+503
+504
+505
+506
+507</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 501</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_frozen_nodes'>frozen_nodes</span>
+  <span class='comment'># Return the underlying Prism nodes for tests and callers that expect
+</span>  <span class='comment'># Prism node types. Statements may be wrapped in FrozenWrapper; unwrap
+</span>  <span class='comment'># them here.
+</span>  <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Freezable</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='op'>|</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_respond_to?'>respond_to?</span><span class='lparen'>(</span><span class='symbol'>:unwrap</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span> <span class='op'>:</span> <span class='id identifier rubyid_node'>node</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="in_freeze_block?-instance_method">
+  
+    #<strong>in_freeze_block?</strong>(line_num)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line falls within a frozen Prism-owned statement.</p>
+
+<p>Prism wrapped frozen nodes expose native locations with start/end lines,<br />
+but Prism::Location does not implement Range#cover?. Use explicit line<br />
+range checks rather than the FileAnalyzable default.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line_num</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>1-based line number</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+479
+480
+481</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 479</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_in_freeze_block?'>in_freeze_block?</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span>
+  <span class='op'>!</span><span class='id identifier rubyid_freeze_block_at'>freeze_block_at</span><span class='lparen'>(</span><span class='id identifier rubyid_line_num'>line_num</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="layout_attachment_for-instance_method">
+  
+    #<strong>layout_attachment_for</strong>(owner, **options)  &#x21d2; <tt>Ast::Merge::Layout::Attachment</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a shared layout attachment for an owner using native Prism locations.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Structural owner for the attachment</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional metadata preserved on the attachment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Layout::Attachment</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 380</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_layout_attachment_for'>layout_attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_owners'>owners</span> <span class='op'>=</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span>
+  <span class='id identifier rubyid_augmenter'>augmenter</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_candidate'>candidate</span><span class='op'>|</span> <span class='id identifier rubyid_candidate'>candidate</span><span class='period'>.</span><span class='id identifier rubyid_equal?'>equal?</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_owner'>owner</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_augmenter'>augmenter</span><span class='period'>.</span><span class='id identifier rubyid_attachment_for'>attachment_for</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Layout</span><span class='op'>::</span><span class='const'>Attachment</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+    <span class='label'>owner:</span> <span class='id identifier rubyid_owner'>owner</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:prism_native</span><span class='comma'>,</span>
+      <span class='label'>line_num:</span> <span class='id identifier rubyid_owner_start_line'>owner_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_owner'>owner</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="layout_augmenter-instance_method">
+  
+    #<strong>layout_augmenter</strong>(owners: nil, **options)  &#x21d2; <tt>Ast::Merge::Layout::Augmenter</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a shared layout augmenter for this analysis using native Prism locations.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>owners</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Object&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Owners used for gap inference</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional metadata preserved on the augmenter</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Ast::Merge::Layout::Augmenter</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+402
+403
+404
+405
+406
+407
+408</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 402</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_layout_augmenter'>layout_augmenter</span><span class='lparen'>(</span><span class='label'>owners:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_owners'>owners</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='ivar'>@layout_augmenter</span> <span class='op'>||=</span> <span class='id identifier rubyid_build_layout_augmenter'>build_layout_augmenter</span><span class='lparen'>(</span><span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_build_layout_augmenter'>build_layout_augmenter</span><span class='lparen'>(</span><span class='id identifier rubyid_owners'>owners</span> <span class='op'>||</span> <span class='id identifier rubyid_layout_augmenter_default_owners'>layout_augmenter_default_owners</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="nodes_with_comments-instance_method">
+  
+    #<strong>nodes_with_comments</strong>  &#x21d2; <tt>Array&lt;Hash&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get nodes with their associated comments and metadata<br />
+Comments are now accessed via Prism’s native node.location API</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of node info hashes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+413
+414
+415</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 413</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_nodes_with_comments'>nodes_with_comments</span>
+  <span class='ivar'>@nodes_with_comments</span> <span class='op'>||=</span> <span class='id identifier rubyid_extract_nodes_with_comments'>extract_nodes_with_comments</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruby_doc_surface_analyzer-instance_method">
+  
+    #<strong>ruby_doc_surface_analyzer</strong>  &#x21d2; <tt><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html" title="Prism::Merge::RubyDocSurfaceAnalyzer (class)">Prism::Merge::RubyDocSurfaceAnalyzer</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build a semantic sidecar that exposes Ruby doc-comment surfaces without<br />
+taking ownership of reconstruction away from Prism source spans.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html" title="Prism::Merge::RubyDocSurfaceAnalyzer (class)">Prism::Merge::RubyDocSurfaceAnalyzer</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+421
+422
+423</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 421</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruby_doc_surface_analyzer'>ruby_doc_surface_analyzer</span>
+  <span class='ivar'>@ruby_doc_surface_analyzer</span> <span class='op'>||=</span> <span class='const'><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html" title="Prism::Merge::RubyDocSurfaceAnalyzer (class)">RubyDocSurfaceAnalyzer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="RubyDocSurfaceAnalyzer.html#initialize-instance_method" title="Prism::Merge::RubyDocSurfaceAnalyzer#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_delegation_policies-instance_method">
+  
+    #<strong>ruleset_delegation_policies</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+297
+298
+299
+300
+301
+302</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 297</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_delegation_policies'>ruleset_delegation_policies</span>
+  <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span><span class='label'>surface_name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='label'>surface_name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>strategy:</span> <span class='symbol'>:same_ruleset</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_owner_selector-instance_method">
+  
+    #<strong>ruleset_owner_selector</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+275
+276
+277</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 275</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_owner_selector'>ruleset_owner_selector</span>
+  <span class='symbol'>:prism_statement_sequence</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_render_family-instance_method">
+  
+    #<strong>ruleset_render_family</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+279
+280
+281</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 279</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_render_family'>ruleset_render_family</span>
+  <span class='symbol'>:prism_ruby_source</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_repair_policies-instance_method">
+  
+    #<strong>ruleset_repair_policies</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+283
+284
+285
+286
+287
+288</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 283</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_repair_policies'>ruleset_repair_policies</span>
+  <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:comment_ownership_overlap</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='label'>kind:</span> <span class='symbol'>:duplicate_template_leading_prefix</span><span class='comma'>,</span> <span class='label'>handling:</span> <span class='symbol'>:heal</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ruleset_surfaces-instance_method">
+  
+    #<strong>ruleset_surfaces</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+290
+291
+292
+293
+294
+295</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 290</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ruleset_surfaces'>ruleset_surfaces</span>
+  <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span><span class='label'>name:</span> <span class='symbol'>:ruby_doc_comment</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:native_attachment</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='label'>name:</span> <span class='symbol'>:yard_example_block</span><span class='comma'>,</span> <span class='label'>selector:</span> <span class='symbol'>:yard_example_tag</span><span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid?-instance_method">
+  
+    #<strong>valid?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if parse was successful</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+238
+239
+240</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/file_analysis.rb', line 238</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
+  <span class='ivar'>@parse_result</span><span class='period'>.</span><span class='id identifier rubyid_success?'>success?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:09 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::TokenMatchRefiner
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::TokenMatchRefiner";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">TokenMatchRefiner</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::TokenMatchRefiner
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName"><span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">MatchRefinerBase</a></span></span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next"><span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">MatchRefinerBase</a></span></li>
+          
+            <li class="next">Ast::Merge::TokenMatchRefiner</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">JaccardSimilarity</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/token_match_refiner.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Match refiner using Jaccard token-overlap similarity.</p>
+
+<p>Pairs unmatched nodes by extracting significant tokens from their text<br />
+content and computing the Jaccard similarity index. Useful for matching<br />
+nodes with minor wording differences (e.g., “Commit changes” vs<br />
+“Commit your changes”).</p>
+
+<p>Uses <code>greedy_match</code> from MatchRefinerBase for optimal 1:1 pairing.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_refiner'>refiner</span> <span class='op'>=</span> <span class='const'>TokenMatchRefiner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::TokenMatchRefiner#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='float'>0.35</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='id identifier rubyid_refiner'>refiner</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With specific node types</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_refiner'>refiner</span> <span class='op'>=</span> <span class='const'>TokenMatchRefiner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::TokenMatchRefiner#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>threshold:</span> <span class='float'>0.4</span><span class='comma'>,</span>
+  <span class='label'>node_types:</span> <span class='lbracket'>[</span><span class='symbol'>:list_item</span><span class='comma'>,</span> <span class='symbol'>:paragraph</span><span class='rbracket'>]</span><span class='comma'>,</span>
+<span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With custom text extraction</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_refiner'>refiner</span> <span class='op'>=</span> <span class='const'>TokenMatchRefiner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Ast::Merge::TokenMatchRefiner#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>text_extractor:</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_inner_text'>inner_text</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">Base class with greedy matching</a></span></li>
+    
+      <li><span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">Token extraction and Jaccard computation</a></span></li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_TOKEN_THRESHOLD-constant" class="">DEFAULT_TOKEN_THRESHOLD =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default threshold for Jaccard token overlap</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='float'>0.35</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+  
+  
+  <h3 class="inherited">Constants included
+     from <span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">JaccardSimilarity</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="JaccardSimilarity.html#DEFAULT_MIN_TOKEN_LENGTH-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_MIN_TOKEN_LENGTH (constant)">JaccardSimilarity::DEFAULT_MIN_TOKEN_LENGTH</a></span>, <span class='object_link'><a href="JaccardSimilarity.html#DEFAULT_STOPWORDS-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_STOPWORDS (constant)">JaccardSimilarity::DEFAULT_STOPWORDS</a></span></p>
+
+  
+  
+  <h3 class="inherited">Constants inherited
+     from <span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">MatchRefinerBase</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="MatchRefinerBase.html#DEFAULT_THRESHOLD-constant" title="Ast::Merge::MatchRefinerBase::DEFAULT_THRESHOLD (constant)">MatchRefinerBase::DEFAULT_THRESHOLD</a></span></p>
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#stopwords-instance_method" title="#stopwords (instance method)">#<strong>stopwords</strong>  &#x21d2; Set&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Stopwords to exclude from token extraction.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#text_extractor-instance_method" title="#text_extractor (instance method)">#<strong>text_extractor</strong>  &#x21d2; Proc<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Custom function to extract text from a node.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+  
+  
+  <h3 class="inherited">Attributes inherited from <span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">MatchRefinerBase</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="MatchRefinerBase.html#node_types-instance_method" title="Ast::Merge::MatchRefinerBase#node_types (method)">#node_types</a></span>, <span class='object_link'><a href="MatchRefinerBase.html#threshold-instance_method" title="Ast::Merge::MatchRefinerBase#threshold (method)">#threshold</a></span></p>
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Match unmatched nodes by Jaccard token similarity.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **options)  &#x21d2; TokenMatchRefiner </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a token match refiner.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">JaccardSimilarity</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="JaccardSimilarity.html#extract_tokens-class_method" title="Ast::Merge::JaccardSimilarity.extract_tokens (method)">extract_tokens</a></span>, <span class='object_link'><a href="JaccardSimilarity.html#jaccard-class_method" title="Ast::Merge::JaccardSimilarity.jaccard (method)">jaccard</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods inherited from <span class='object_link'><a href="MatchRefinerBase.html" title="Ast::Merge::MatchRefinerBase (class)">MatchRefinerBase</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="MatchRefinerBase.html#handles_type%3F-instance_method" title="Ast::Merge::MatchRefinerBase#handles_type? (method)">#handles_type?</a></span></p>
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(threshold: DEFAULT_TOKEN_THRESHOLD, node_types: [], text_extractor: nil, stopwords: JaccardSimilarity::DEFAULT_STOPWORDS, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::TokenMatchRefiner (class)">TokenMatchRefiner</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a token match refiner.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>threshold</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_TOKEN_THRESHOLD</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Minimum Jaccard score to accept a match (default: 0.35)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_types</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>[]</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node types to process (empty = all)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>text_extractor</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom function to extract text from a node.<br />
+Should accept a node and return a String. Default uses <code>node.text.to_s</code>.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>stopwords</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;String&gt;</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>JaccardSimilarity::DEFAULT_STOPWORDS</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Words to exclude (default: JaccardSimilarity::DEFAULT_STOPWORDS)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/token_match_refiner.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='label'>threshold:</span> <span class='const'><span class='object_link'><a href="#DEFAULT_TOKEN_THRESHOLD-constant" title="Ast::Merge::TokenMatchRefiner::DEFAULT_TOKEN_THRESHOLD (constant)">DEFAULT_TOKEN_THRESHOLD</a></span></span><span class='comma'>,</span>
+  <span class='label'>node_types:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+  <span class='label'>text_extractor:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>stopwords:</span> <span class='const'><span class='object_link'><a href="JaccardSimilarity.html" title="Ast::Merge::JaccardSimilarity (module)">JaccardSimilarity</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="JaccardSimilarity.html#DEFAULT_STOPWORDS-constant" title="Ast::Merge::JaccardSimilarity::DEFAULT_STOPWORDS (constant)">DEFAULT_STOPWORDS</a></span></span><span class='comma'>,</span>
+  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+<span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='id identifier rubyid_threshold'>threshold</span><span class='comma'>,</span> <span class='label'>node_types:</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='rparen'>)</span>
+  <span class='ivar'>@text_extractor</span> <span class='op'>=</span> <span class='id identifier rubyid_text_extractor'>text_extractor</span>
+  <span class='ivar'>@stopwords</span> <span class='op'>=</span> <span class='id identifier rubyid_stopwords'>stopwords</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="stopwords-instance_method">
+  
+    #<strong>stopwords</strong>  &#x21d2; <tt>Set&lt;String&gt;</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Stopwords to exclude from token extraction.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Set&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Stopwords to exclude from token extraction</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/token_match_refiner.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_stopwords'>stopwords</span>
+  <span class='ivar'>@stopwords</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="text_extractor-instance_method">
+  
+    #<strong>text_extractor</strong>  &#x21d2; <tt>Proc</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Custom function to extract text from a node.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom function to extract text from a node</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/token_match_refiner.rb', line 38</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_text_extractor'>text_extractor</span>
+  <span class='ivar'>@text_extractor</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="call-instance_method">
+  
+    #<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Match unmatched nodes by Jaccard token similarity.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Unmatched template nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Unmatched destination nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>context</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional context (unused)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="MatchRefinerBase/MatchResult.html" title="Ast::Merge::MatchRefinerBase::MatchResult (class)">MatchResult</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Matched pairs</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/token_match_refiner.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_t_filtered'>t_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span> <span class='op'>:</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_d_filtered'>d_filtered</span> <span class='op'>=</span> <span class='id identifier rubyid_node_types'>node_types</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span> <span class='op'>:</span> <span class='id identifier rubyid_filter_nodes'>filter_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_greedy_match'>greedy_match</span><span class='lparen'>(</span><span class='id identifier rubyid_t_filtered'>t_filtered</span><span class='comma'>,</span> <span class='id identifier rubyid_d_filtered'>d_filtered</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t_node'>t_node</span><span class='comma'>,</span> <span class='id identifier rubyid_d_node'>d_node</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t_tokens'>t_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_node_tokens'>node_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_t_node'>t_node</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_d_tokens'>d_tokens</span> <span class='op'>=</span> <span class='id identifier rubyid_node_tokens'>node_tokens</span><span class='lparen'>(</span><span class='id identifier rubyid_d_node'>d_node</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_jaccard'>jaccard</span><span class='lparen'>(</span><span class='id identifier rubyid_t_tokens'>t_tokens</span><span class='comma'>,</span> <span class='id identifier rubyid_d_tokens'>d_tokens</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:51 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

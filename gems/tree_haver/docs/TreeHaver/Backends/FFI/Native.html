@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: TreeHaver::Backends::FFI::Native
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "TreeHaver::Backends::FFI::Native";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (N)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span>
+     &raquo; 
+    <span class="title">Native</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: TreeHaver::Backends::FFI::Native
+  
+  
+  <span class="private note title">Private</span>
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/tree_haver/backends/ffi.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This module is part of a private API.</strong>
+  You should avoid using this module if possible, as it may be removed or be changed in the future.
+</p>
+<p>Native FFI bindings to libtree-sitter</p>
+
+<p>This module handles loading the tree-sitter runtime library and defining<br />
+FFI function attachments for the core tree-sitter API.</p>
+
+<p>All FFI operations are lazy - nothing is loaded until actually needed.<br />
+This prevents polluting the Ruby environment at require time.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#define_ts_node_struct!-class_method" title="define_ts_node_struct! (class method)">.<strong>define_ts_node_struct!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Define the TSNode struct lazily.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#define_ts_point_struct!-class_method" title="define_ts_point_struct! (class method)">.<strong>define_ts_point_struct!</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Define the TSPoint struct lazily.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ensure_ffi_extended!-class_method" title="ensure_ffi_extended! (class method)">.<strong>ensure_ffi_extended!</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Lazily extend with FFI::Library only when needed.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#lib_candidates-class_method" title="lib_candidates (class method)">.<strong>lib_candidates</strong>  &#x21d2; Array&lt;String&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get list of candidate library names for loading libtree-sitter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#loaded%3F-class_method" title="loaded? (class method)">.<strong>loaded?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#try_load!-class_method" title="try_load! (class method)">.<strong>try_load!</strong>  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Load the tree-sitter runtime library.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ts_node_class-class_method" title="ts_node_class (class method)">.<strong>ts_node_class</strong>  &#x21d2; Class </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the TSNode class, ensuring it’s defined.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="define_ts_node_struct!-class_method">
+  
+    .<strong>define_ts_node_struct!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Define the TSNode struct lazily</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 183</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_define_ts_node_struct!'>define_ts_node_struct!</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_const_defined?'>const_defined?</span><span class='lparen'>(</span><span class='symbol'>:TSNode</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span>
+
+  <span class='comment'># FFI struct representation of TSNode
+</span>  <span class='comment'># Mirrors the C struct layout used by tree-sitter
+</span>  <span class='id identifier rubyid_ts_node_class'>ts_node_class</span> <span class='op'>=</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Struct</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_layout'>layout</span> <span class='symbol'>:context</span><span class='comma'>,</span>
+      <span class='lbracket'>[</span><span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='symbol'>:id</span><span class='comma'>,</span>
+      <span class='symbol'>:pointer</span><span class='comma'>,</span>
+      <span class='symbol'>:tree</span><span class='comma'>,</span>
+      <span class='symbol'>:pointer</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='symbol'>:TSNode</span><span class='comma'>,</span> <span class='id identifier rubyid_ts_node_class'>ts_node_class</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_typedef'>typedef</span><span class='lparen'>(</span><span class='id identifier rubyid_ts_node_class'>ts_node_class</span><span class='period'>.</span><span class='id identifier rubyid_by_value'>by_value</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="define_ts_point_struct!-class_method">
+  
+    .<strong>define_ts_point_struct!</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Define the TSPoint struct lazily</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_define_ts_point_struct!'>define_ts_point_struct!</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='id identifier rubyid_const_defined?'>const_defined?</span><span class='lparen'>(</span><span class='symbol'>:TSPoint</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span>
+
+  <span class='comment'># FFI struct representation of TSPoint
+</span>  <span class='comment'># Mirrors the C struct layout: struct { uint32_t row; uint32_t column; }
+</span>  <span class='id identifier rubyid_ts_point_class'>ts_point_class</span> <span class='op'>=</span> <span class='const'>Class</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Struct</span><span class='rparen'>)</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_layout'>layout</span> <span class='symbol'>:row</span><span class='comma'>,</span>
+      <span class='symbol'>:uint32</span><span class='comma'>,</span>
+      <span class='symbol'>:column</span><span class='comma'>,</span>
+      <span class='symbol'>:uint32</span>
+  <span class='kw'>end</span>
+  <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='symbol'>:TSPoint</span><span class='comma'>,</span> <span class='id identifier rubyid_ts_point_class'>ts_point_class</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_typedef'>typedef</span><span class='lparen'>(</span><span class='id identifier rubyid_ts_point_class'>ts_point_class</span><span class='period'>.</span><span class='id identifier rubyid_by_value'>by_value</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ensure_ffi_extended!-class_method">
+  
+    .<strong>ensure_ffi_extended!</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Lazily extend with FFI::Library only when needed</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if FFI was successfully extended</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 150</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ensure_ffi_extended!'>ensure_ffi_extended!</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='ivar'>@ffi_extended</span>
+
+  <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="../FFI.html" title="TreeHaver::Backends::FFI (module)">FFI</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ffi_gem_available?'><span class='object_link'><a href="../FFI.html#ffi_gem_available%3F-class_method" title="TreeHaver::Backends::FFI.ffi_gem_available? (method)">ffi_gem_available?</a></span></span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>FFI gem is not available</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_extend'>extend</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>FFI</span><span class='op'>::</span><span class='const'>Library</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_define_ts_point_struct!'>define_ts_point_struct!</span>
+  <span class='id identifier rubyid_define_ts_node_struct!'>define_ts_node_struct!</span>
+  <span class='ivar'>@ffi_extended</span> <span class='op'>=</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="lib_candidates-class_method">
+  
+    .<strong>lib_candidates</strong>  &#x21d2; <tt>Array&lt;String&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>TREE_SITTER_LIB is intentionally NOT supported</p>
+</div>
+  </div>
+
+<p>Get list of candidate library names for loading libtree-sitter</p>
+
+<p>The list is built dynamically to respect environment variables set at runtime.<br />
+If TREE_SITTER_RUNTIME_LIB is set, it is tried first.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>list of library names to try</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_lib_candidates'>lib_candidates</span>
+  <span class='lbracket'>[</span>
+    <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree-sitter</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so.0</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.so</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.dylib</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>libtree-sitter.dll</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="loaded?-class_method">
+  
+    .<strong>loaded?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+313
+314
+315</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 313</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_loaded?'>loaded?</span>
+  <span class='op'>!</span><span class='op'>!</span><span class='ivar'>@loaded</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="try_load!-class_method">
+  
+    .<strong>try_load!</strong>  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p class="note returns_void">This method returns an undefined value.</p><p>Load the tree-sitter runtime library</p>
+
+<p>Tries each candidate library name in order until one succeeds.<br />
+After loading, attaches FFI function definitions for the tree-sitter API.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">TreeHaver::NotAvailable</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if no library can be loaded</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 232</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_try_load!'>try_load!</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='ivar'>@loaded</span>
+
+  <span class='id identifier rubyid_ensure_ffi_extended!'>ensure_ffi_extended!</span>
+
+  <span class='comment'># Warn about potential conflicts with MRI backend
+</span>  <span class='kw'>if</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='kw'>defined?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>TreeSitter</span><span class='op'>::</span><span class='const'>Parser</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TreeHaver: FFI backend loading after ruby_tree_sitter (MRI backend). </span><span class='tstring_end'>&quot;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This may cause symbol conflicts due to different libtree-sitter versions. </span><span class='tstring_end'>&quot;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Consider using only one backend per process, or set TREE_SITTER_RUNTIME_LIB </span><span class='tstring_end'>&quot;</span></span> \
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>to match the version used by ruby_tree_sitter.</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='gvar'>$VERBOSE</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_last_error'>last_error</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_candidates'>candidates</span> <span class='op'>=</span> <span class='id identifier rubyid_lib_candidates'>lib_candidates</span>
+  <span class='id identifier rubyid_lib_loaded'>lib_loaded</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='id identifier rubyid_candidates'>candidates</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span>
+    <span class='id identifier rubyid_ffi_lib'>ffi_lib</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_lib_loaded'>lib_loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>break</span>
+  <span class='kw'>rescue</span> <span class='const'>LoadError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+    <span class='comment'># Note: FFI::NotFoundError inherits from LoadError, so it&#39;s caught here too
+</span>    <span class='id identifier rubyid_last_error'>last_error</span> <span class='op'>=</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>unless</span> <span class='id identifier rubyid_lib_loaded'>lib_loaded</span>
+    <span class='comment'># :nocov:
+</span>    <span class='id identifier rubyid_tried'>tried</span> <span class='op'>=</span> <span class='id identifier rubyid_candidates'>candidates</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>, </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_env_hint'>env_hint</span> <span class='op'>=</span> <span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> TREE_SITTER_RUNTIME_LIB=</span><span class='embexpr_beg'>#{</span><span class='const'>ENV</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>TREE_SITTER_RUNTIME_LIB</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>.</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_msg'>msg</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_last_error'>last_error</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_last_error'>last_error</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+      <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load libtree-sitter (tried: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tried'>tried</span><span class='embexpr_end'>}</span><span class='tstring_content'>).</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_env_hint'>env_hint</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../NotAvailable.html" title="TreeHaver::NotAvailable (class)">NotAvailable</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_msg'>msg</span>
+    <span class='comment'># :nocov:
+</span>  <span class='kw'>end</span>
+
+  <span class='comment'># Attach functions after lib is selected
+</span>  <span class='comment'># Note: TruffleRuby&#39;s FFI doesn&#39;t support STRUCT_BY_VALUE return types,
+</span>  <span class='comment'># so these attach_function calls will fail on TruffleRuby.
+</span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_new</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_delete</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:void</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_set_language</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_parser_parse_string</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:pointer</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_tree_delete</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:void</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_tree_root_node</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:pointer</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_type</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child_count</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_child_by_field_name</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:string</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_start_byte</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_end_byte</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_start_point</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_end_point</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_is_null</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_is_named</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_is_missing</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_has_error</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:bool</span><span class='rparen'>)</span>
+
+  <span class='comment'># Node navigation functions
+</span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_parent</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_next_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_prev_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_next_named_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_prev_named_sibling</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_child</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_child_count</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rparen'>)</span>
+
+  <span class='comment'># Descendant lookup functions
+</span>  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_byte_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_descendant_for_point_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_byte_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='comma'>,</span> <span class='symbol'>:uint32</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_attach_function'>attach_function</span><span class='lparen'>(</span><span class='symbol'>:ts_node_named_descendant_for_point_range</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='symbol'>:ts_node</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='comma'>,</span> <span class='symbol'>:ts_point</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:ts_node</span><span class='rparen'>)</span>
+
+  <span class='comment'># Only mark as fully loaded after all attach_function calls succeed
+</span>  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ts_node_class-class_method">
+  
+    .<strong>ts_node_class</strong>  &#x21d2; <tt>Class</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p>Get the TSNode class, ensuring it’s defined</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Class</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the TSNode FFI struct class</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+202
+203
+204
+205</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/ffi.rb', line 202</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ts_node_class'>ts_node_class</span>
+  <span class='id identifier rubyid_ensure_ffi_extended!'>ensure_ffi_extended!</span>
+  <span class='id identifier rubyid_const_get'>const_get</span><span class='lparen'>(</span><span class='symbol'>:TSNode</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:39 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

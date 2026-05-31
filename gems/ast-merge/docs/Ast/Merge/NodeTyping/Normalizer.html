@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::NodeTyping::Normalizer
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::NodeTyping::Normalizer";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (N)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span>
+     &raquo; 
+    <span class="title">Normalizer</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::NodeTyping::Normalizer
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/node_typing/normalizer.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Thread-safe backend registration and type normalization for AST merge libraries.</p>
+
+<p>Normalizer provides a shared, thread-safe mechanism for registering backend-specific<br />
+node type mappings and normalizing them to canonical types. This enables portable<br />
+merge rules across different parsers/backends for the same file format.</p>
+
+<h2 id="thread-safety">Thread Safety</h2>
+
+<p>All registration and lookup operations are protected by a mutex to ensure<br />
+thread-safe access to the backend mappings. This follows the same pattern<br />
+used in TreeHaver::LanguageRegistry and TreeHaver::PathValidator.</p>
+
+<h2 id="usage-pattern">Usage Pattern</h2>
+
+<p>File-format-specific merge libraries (e.g., toml-merge, markdown-merge) should:</p>
+<ol>
+  <li>Create their own NodeTypeNormalizer module</li>
+  <li>Include or extend Ast::Merge::NodeTyping::Normalizer</li>
+  <li>Define their canonical types and default backend mappings</li>
+  <li>Call <code>configure_normalizer</code> with their initial mappings</li>
+</ol>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Creating a format-specific normalizer</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>module</span> <span class='const'>Toml</span>
+  <span class='kw'>module</span> <span class='const'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+    <span class='kw'>module</span> <span class='const'>NodeTypeNormalizer</span>
+      <span class='id identifier rubyid_extend'>extend</span> <span class='const'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span><span class='op'>::</span><span class='const'>Normalizer</span>
+
+      <span class='id identifier rubyid_configure_normalizer'>configure_normalizer</span><span class='lparen'>(</span>
+        <span class='label'>tree_sitter_toml:</span> <span class='lbrace'>{</span>
+          <span class='label'>table_array_element:</span> <span class='symbol'>:array_of_tables</span><span class='comma'>,</span>
+          <span class='label'>pair:</span> <span class='symbol'>:pair</span><span class='comma'>,</span>
+          <span class='comment'># ...
+</span>        <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+        <span class='label'>citrus_toml:</span> <span class='lbrace'>{</span>
+          <span class='label'>table_array_element:</span> <span class='symbol'>:array_of_tables</span><span class='comma'>,</span>
+          <span class='label'>pair:</span> <span class='symbol'>:pair</span><span class='comma'>,</span>
+          <span class='comment'># ...
+</span>        <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+      <span class='rparen'>)</span>
+
+      <span class='comment'># Optional: Add format-specific helper methods
+</span>      <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_table_type?'>table_type?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+        <span class='qsymbols_beg'>%i[</span><span class='tstring_content'>table</span><span class='words_sep'> </span><span class='tstring_content'>array_of_tables</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_type'>type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rparen'>)</span>
+      <span class='kw'>end</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>TreeHaver::LanguageRegistry</li>
+    
+      <li>TreeHaver::PathValidator</li>
+    
+  </ul>
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extended-class_method" title="extended (class method)">.<strong>extended</strong>(base)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize storage on a format-specific normalizer module.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#backend_registered%3F-instance_method" title="#backend_registered? (instance method)">#<strong>backend_registered?</strong>(backend)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a backend is registered.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#canonical_type-instance_method" title="#canonical_type (instance method)">#<strong>canonical_type</strong>(backend_type, backend = nil)  &#x21d2; Symbol<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the canonical type for a backend-specific type.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#canonical_types-instance_method" title="#canonical_types (instance method)">#<strong>canonical_types</strong>  &#x21d2; Array&lt;Symbol&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get all canonical types across all backends.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#configure_normalizer-instance_method" title="#configure_normalizer (instance method)">#<strong>configure_normalizer</strong>(**mappings)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Configure the normalizer with initial backend mappings.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mappings_for-instance_method" title="#mappings_for (instance method)">#<strong>mappings_for</strong>(backend)  &#x21d2; Hash{Symbol =&gt; Symbol}<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the mappings for a specific backend.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register_backend-instance_method" title="#register_backend (instance method)">#<strong>register_backend</strong>(backend, mappings)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Register type mappings for a new backend.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#registered_backends-instance_method" title="#registered_backends (instance method)">#<strong>registered_backends</strong>  &#x21d2; Array&lt;Symbol&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get all registered backends.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#wrap-instance_method" title="#wrap (instance method)">#<strong>wrap</strong>(node, backend)  &#x21d2; Ast::Merge::NodeTyping::Wrapper </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Wrap a node with its canonical type as merge_type.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="extended-class_method">
+  
+    .<strong>extended</strong>(base)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Initialize storage on a format-specific normalizer module.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>base</span>
+      
+      
+        <span class='type'>(<tt>Module</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>module extending this shared normalizer</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extended'>extended</span><span class='lparen'>(</span><span class='id identifier rubyid_base'>base</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_instance_variable_set'>instance_variable_set</span><span class='lparen'>(</span><span class='symbol'>:@normalizer_mutex</span><span class='comma'>,</span> <span class='const'>Mutex</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_base'>base</span><span class='period'>.</span><span class='id identifier rubyid_instance_variable_set'>instance_variable_set</span><span class='lparen'>(</span><span class='symbol'>:@backend_mappings</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="backend_registered?-instance_method">
+  
+    #<strong>backend_registered?</strong>(backend)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a backend is registered.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend identifier</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+174
+175
+176
+177
+178</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 174</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_backend_registered?'>backend_registered?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="canonical_type-instance_method">
+  
+    #<strong>canonical_type</strong>(backend_type, backend = nil)  &#x21d2; <tt>Symbol</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the canonical type for a backend-specific type.</p>
+
+<p>If no mapping exists, returns the original type unchanged (passthrough).<br />
+This allows backend-specific types to pass through for backend-specific<br />
+merge rules.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'>NodeTypeNormalizer</span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='symbol'>:table_array_element</span><span class='comma'>,</span> <span class='symbol'>:tree_sitter_toml</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; :array_of_tables
+</span>
+<span class='const'>NodeTypeNormalizer</span><span class='period'>.</span><span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='symbol'>:unknown_type</span><span class='comma'>,</span> <span class='symbol'>:tree_sitter_toml</span><span class='rparen'>)</span>
+<span class='comment'># =&gt; :unknown_type (passthrough)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>backend_type</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The backend’s node type</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>The backend identifier</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Canonical type (or original if no mapping), nil if input was nil</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+132
+133
+134
+135
+136
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 132</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_backend_type'>backend_type</span><span class='comma'>,</span> <span class='id identifier rubyid_backend'>backend</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_backend_type'>backend_type</span> <span class='kw'>if</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_type_sym'>type_sym</span> <span class='op'>=</span> <span class='id identifier rubyid_backend_type'>backend_type</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='comma'>,</span> <span class='id identifier rubyid_type_sym'>type_sym</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_type_sym'>type_sym</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="canonical_types-instance_method">
+  
+    #<strong>canonical_types</strong>  &#x21d2; <tt>Array&lt;Symbol&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get all canonical types across all backends.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Unique canonical type symbols</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+193
+194
+195
+196
+197</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 193</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_canonical_types'>canonical_types</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="configure_normalizer-instance_method">
+  
+    #<strong>configure_normalizer</strong>(**mappings)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Configure the normalizer with initial backend mappings.</p>
+
+<p>This should be called once when defining the format-specific normalizer,<br />
+providing the default backend mappings. Additional backends can be<br />
+registered later via <code>register_backend</code>.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_configure_normalizer'>configure_normalizer</span><span class='lparen'>(</span>
+  <span class='label'>tree_sitter_toml:</span> <span class='lbrace'>{</span> <span class='label'>table_array_element:</span> <span class='symbol'>:array_of_tables</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+  <span class='label'>citrus_toml:</span> <span class='lbrace'>{</span> <span class='label'>table_array_element:</span> <span class='symbol'>:array_of_tables</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>mappings</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Hash{Symbol =&gt; Symbol}}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Initial backend mappings<br />
+Keys are backend identifiers, values are hashes mapping backend types to canonical types</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+86
+87
+88
+89
+90
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 86</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_configure_normalizer'>configure_normalizer</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_mappings'>mappings</span><span class='rparen'>)</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='id identifier rubyid_mappings'>mappings</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_backend'>backend</span><span class='comma'>,</span> <span class='id identifier rubyid_type_mappings'>type_mappings</span><span class='op'>|</span>
+      <span class='ivar'>@backend_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_type_mappings'>type_mappings</span><span class='period'>.</span><span class='id identifier rubyid_frozen?'>frozen?</span> <span class='op'>?</span> <span class='id identifier rubyid_type_mappings'>type_mappings</span> <span class='op'>:</span> <span class='id identifier rubyid_type_mappings'>type_mappings</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mappings_for-instance_method">
+  
+    #<strong>mappings_for</strong>(backend)  &#x21d2; <tt>Hash{Symbol =&gt; Symbol}</tt><sup>?</sup> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the mappings for a specific backend.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend identifier</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Symbol}</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The mappings or nil if not registered</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+184
+185
+186
+187
+188</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 184</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mappings_for'>mappings_for</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register_backend-instance_method">
+  
+    #<strong>register_backend</strong>(backend, mappings)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Register type mappings for a new backend.</p>
+
+<p>This allows extending the normalizer to support additional parsers<br />
+beyond those configured initially. Thread-safe for runtime registration.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'>NodeTypeNormalizer</span><span class='period'>.</span><span class='id identifier rubyid_register_backend'>register_backend</span><span class='lparen'>(</span><span class='symbol'>:my_parser</span><span class='comma'>,</span> <span class='lbrace'>{</span>
+  <span class='label'>my_table:</span> <span class='symbol'>:table</span><span class='comma'>,</span>
+  <span class='label'>my_pair:</span> <span class='symbol'>:pair</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend identifier (e.g., :my_parser)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>mappings</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Symbol}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend type → canonical type mappings</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111
+112
+113
+114</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register_backend'>register_backend</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='comma'>,</span> <span class='id identifier rubyid_mappings'>mappings</span><span class='rparen'>)</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_backend'>backend</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_mappings'>mappings</span><span class='period'>.</span><span class='id identifier rubyid_frozen?'>frozen?</span> <span class='op'>?</span> <span class='id identifier rubyid_mappings'>mappings</span> <span class='op'>:</span> <span class='id identifier rubyid_mappings'>mappings</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+  <span class='kw'>end</span>
+  <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="registered_backends-instance_method">
+  
+    #<strong>registered_backends</strong>  &#x21d2; <tt>Array&lt;Symbol&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get all registered backends.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend identifiers</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+164
+165
+166
+167
+168</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 164</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_registered_backends'>registered_backends</span>
+  <span class='ivar'>@normalizer_mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span>
+    <span class='ivar'>@backend_mappings</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="wrap-instance_method">
+  
+    #<strong>wrap</strong>(node, backend)  &#x21d2; <tt><span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Ast::Merge::NodeTyping::Wrapper</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Wrap a node with its canonical type as merge_type.</p>
+
+<p>Uses Ast::Merge::NodeTyping.with_merge_type to create a wrapper<br />
+that delegates all methods to the underlying node while adding<br />
+a canonical merge_type attribute.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='id identifier rubyid_wrapped'>wrapped</span> <span class='op'>=</span> <span class='const'>NodeTypeNormalizer</span><span class='period'>.</span><span class='id identifier rubyid_wrap'>wrap</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='symbol'>:tree_sitter_toml</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_wrapped'>wrapped</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>        <span class='comment'># =&gt; :table_array_element (original)
+</span><span class='id identifier rubyid_wrapped'>wrapped</span><span class='period'>.</span><span class='id identifier rubyid_merge_type'>merge_type</span>  <span class='comment'># =&gt; :array_of_tables (canonical)
+</span><span class='id identifier rubyid_wrapped'>wrapped</span><span class='period'>.</span><span class='id identifier rubyid_unwrap'>unwrap</span>      <span class='comment'># =&gt; node (original node)</span></code></pre>
+    
+  </div>
+<p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The backend node to wrap (must respond to #type)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The backend identifier</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Wrapper.html" title="Ast::Merge::NodeTyping::Wrapper (class)">Ast::Merge::NodeTyping::Wrapper</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Wrapped node with canonical merge_type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+156
+157
+158
+159</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/node_typing/normalizer.rb', line 156</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_wrap'>wrap</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_canonical'>canonical</span> <span class='op'>=</span> <span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
+  <span class='const'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../NodeTyping.html" title="Ast::Merge::NodeTyping (module)">NodeTyping</a></span></span><span class='period'>.</span><span class='id identifier rubyid_with_merge_type'><span class='object_link'><a href="../NodeTyping.html#with_merge_type-class_method" title="Ast::Merge::NodeTyping.with_merge_type (method)">with_merge_type</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_canonical'>canonical</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

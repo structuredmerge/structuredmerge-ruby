@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Crispr::SelectionProfile
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Crispr::SelectionProfile";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Crispr.html" title="Ast::Crispr (module)">Crispr</a></span></span>
+     &raquo; 
+    <span class="title">SelectionProfile</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Crispr::SelectionProfile
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Crispr::SelectionProfile</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="ProfileReportCompatibility.html" title="Ast::Crispr::ProfileReportCompatibility (module)">ProfileReportCompatibility</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/crispr.rb<span class="defines">,<br>
+  lib/ast/crispr.rb</span>
+
+</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="KNOWN_SELECTION_INTENTS-constant" class="">KNOWN_SELECTION_INTENTS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>predicate_filter:</span> <span class='lbrace'>{</span>
+    <span class='label'>family:</span> <span class='symbol'>:predicate</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Predicate-based structural owner filtering</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>comment_anchored_owner:</span> <span class='lbrace'>{</span>
+    <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Comment-region marker anchored owner selection</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>section_branch:</span> <span class='lbrace'>{</span>
+    <span class='label'>family:</span> <span class='symbol'>:section_branch</span><span class='comma'>,</span>
+    <span class='label'>description:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Heading-owned section branch selection</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="KNOWN_SELECTOR_KINDS-constant" class="">KNOWN_SELECTOR_KINDS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>owner_filter:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:owner_filter</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>comment_region_owner:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>comment_region_owned_owner:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:comment_anchor</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>heading_section:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:section_branch</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="KNOWN_COMMENT_REGIONS-constant" class="">KNOWN_COMMENT_REGIONS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>leading:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:leading</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>trailing:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:trailing</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>inline:</span> <span class='lbrace'>{</span> <span class='label'>family:</span> <span class='symbol'>:inline</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="COMPAT_SELECTION_INTENT_FAMILIES-constant" class="">COMPAT_SELECTION_INTENT_FAMILIES =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>predicate_filter:</span> <span class='symbol'>:predicate</span><span class='comma'>,</span>
+  <span class='label'>comment_anchored_owner:</span> <span class='symbol'>:comment_anchor</span><span class='comma'>,</span>
+  <span class='label'>comment_region_filter:</span> <span class='symbol'>:comment</span><span class='comma'>,</span>
+  <span class='label'>section_branch:</span> <span class='symbol'>:section_branch</span><span class='comma'>,</span>
+  <span class='label'>section_heading:</span> <span class='symbol'>:section</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_region-instance_method" title="#comment_region (instance method)">#<strong>comment_region</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute comment_region.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#include_trailing_gap-instance_method" title="#include_trailing_gap (instance method)">#<strong>include_trailing_gap</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute include_trailing_gap.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#metadata-instance_method" title="#metadata (instance method)">#<strong>metadata</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute metadata.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_scope-instance_method" title="#owner_scope (instance method)">#<strong>owner_scope</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute owner_scope.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#selection_intent-instance_method" title="#selection_intent (instance method)">#<strong>selection_intent</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute selection_intent.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#selector_kind-instance_method" title="#selector_kind (instance method)">#<strong>selector_kind</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute selector_kind.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#structure_profile-instance_method" title="#structure_profile (instance method)">#<strong>structure_profile</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute structure_profile.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#comment_anchored%3F-instance_method" title="#comment_anchored? (instance method)">#<strong>comment_anchored?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil, comment_region: nil, include_trailing_gap: false, metadata: {}, **options)  &#x21d2; SelectionProfile </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of SelectionProfile.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#known_selection_intent%3F-instance_method" title="#known_selection_intent? (instance method)">#<strong>known_selection_intent?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_comment_region-instance_method" title="#normalize_comment_region (instance method)">#<strong>normalize_comment_region</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_owner_selector-instance_method" title="#normalize_owner_selector (instance method)">#<strong>normalize_owner_selector</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_selection_intent-instance_method" title="#normalize_selection_intent (instance method)">#<strong>normalize_selection_intent</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#normalize_selector_kind-instance_method" title="#normalize_selector_kind (instance method)">#<strong>normalize_selector_kind</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_selector-instance_method" title="#owner_selector (instance method)">#<strong>owner_selector</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#owner_selector_family-instance_method" title="#owner_selector_family (instance method)">#<strong>owner_selector_family</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#report-instance_method" title="#report (instance method)">#<strong>report</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#selection_intent_family-instance_method" title="#selection_intent_family (instance method)">#<strong>selection_intent_family</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#selection_intent_metadata-instance_method" title="#selection_intent_metadata (instance method)">#<strong>selection_intent_metadata</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_h-instance_method" title="#to_h (instance method)">#<strong>to_h</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil, comment_region: nil, include_trailing_gap: false, metadata: {}, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Crispr::SelectionProfile (class)">SelectionProfile</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of SelectionProfile.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+502
+503
+504
+505
+506
+507
+508
+509
+510</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 502</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>owner_scope:</span><span class='comma'>,</span> <span class='label'>selector_kind:</span><span class='comma'>,</span> <span class='label'>selection_intent:</span><span class='comma'>,</span> <span class='label'>structure_profile:</span><span class='comma'>,</span> <span class='label'>comment_region:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>include_trailing_gap:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>metadata:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='ivar'>@owner_scope</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@selector_kind</span> <span class='op'>=</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@selection_intent</span> <span class='op'>=</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@comment_region</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='ivar'>@include_trailing_gap</span> <span class='op'>=</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span> <span class='op'>?</span> <span class='kw'>true</span> <span class='op'>:</span> <span class='kw'>false</span>
+  <span class='ivar'>@structure_profile</span> <span class='op'>=</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span>
+  <span class='ivar'>@metadata</span> <span class='op'>=</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="comment_region-instance_method">
+  
+    #<strong>comment_region</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute comment_region.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_region'>comment_region</span>
+  <span class='ivar'>@comment_region</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="include_trailing_gap-instance_method">
+  
+    #<strong>include_trailing_gap</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute include_trailing_gap.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span>
+  <span class='ivar'>@include_trailing_gap</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="metadata-instance_method">
+  
+    #<strong>metadata</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute metadata.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_metadata'>metadata</span>
+  <span class='ivar'>@metadata</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="owner_scope-instance_method">
+  
+    #<strong>owner_scope</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute owner_scope.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span>
+  <span class='ivar'>@owner_scope</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="selection_intent-instance_method">
+  
+    #<strong>selection_intent</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute selection_intent.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span>
+  <span class='ivar'>@selection_intent</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="selector_kind-instance_method">
+  
+    #<strong>selector_kind</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute selector_kind.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span>
+  <span class='ivar'>@selector_kind</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="structure_profile-instance_method">
+  
+    #<strong>structure_profile</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute structure_profile.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+500
+501
+502</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 500</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span>
+  <span class='ivar'>@structure_profile</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="comment_anchored?-instance_method">
+  
+    #<strong>comment_anchored?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+532
+533
+534</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 532</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span>
+  <span class='op'>!</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="known_selection_intent?-instance_method">
+  
+    #<strong>known_selection_intent?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+528
+529
+530</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 528</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_known_selection_intent?'>known_selection_intent?</span>
+  <span class='const'><span class='object_link'><a href="#KNOWN_SELECTION_INTENTS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTION_INTENTS (constant)">KNOWN_SELECTION_INTENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_comment_region-instance_method">
+  
+    #<strong>normalize_comment_region</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1462
+1463
+1464
+1465
+1466</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1462</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_comment_region'>normalize_comment_region</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_owner_selector-instance_method">
+  
+    #<strong>normalize_owner_selector</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1450
+1451
+1452</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1450</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_owner_selector'>normalize_owner_selector</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_selection_intent-instance_method">
+  
+    #<strong>normalize_selection_intent</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1458
+1459
+1460</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1458</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_selection_intent'>normalize_selection_intent</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="normalize_selector_kind-instance_method">
+  
+    #<strong>normalize_selector_kind</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1454
+1455
+1456</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1454</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_normalize_selector_kind'>normalize_selector_kind</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_value'>value</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_selector-instance_method">
+  
+    #<strong>owner_selector</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+516
+517
+518</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 516</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_selector'>owner_selector</span>
+  <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector'>owner_selector</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="owner_selector_family-instance_method">
+  
+    #<strong>owner_selector_family</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+520
+521
+522</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 520</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span>
+  <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="report-instance_method">
+  
+    #<strong>report</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+1430
+1431
+1432
+1433
+1434
+1435
+1436
+1437
+1438
+1439
+1440
+1441
+1442
+1443
+1444
+1445
+1446
+1447
+1448</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 1430</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_report'>report</span>
+  <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='id identifier rubyid_selector_kind_family'>selector_kind_family</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#KNOWN_SELECTOR_KINDS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTOR_KINDS (constant)">KNOWN_SELECTOR_KINDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_comment_region_family'>comment_region_family</span> <span class='op'>=</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='symbol'>:none</span> <span class='op'>:</span> <span class='const'><span class='object_link'><a href="#KNOWN_COMMENT_REGIONS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_COMMENT_REGIONS (constant)">KNOWN_COMMENT_REGIONS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span> <span class='op'>=</span> <span class='id identifier rubyid_owner_selector'>owner_selector</span> <span class='op'>==</span> <span class='symbol'>:heading_sections</span> <span class='op'>?</span> <span class='symbol'>:section</span> <span class='op'>:</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span>
+  <span class='id identifier rubyid_known_comment_region'>known_comment_region</span> <span class='op'>=</span> <span class='op'>!</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='const'><span class='object_link'><a href="#KNOWN_COMMENT_REGIONS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_COMMENT_REGIONS (constant)">KNOWN_COMMENT_REGIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_comment_region'>comment_region</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span>
+    <span class='label'>owner_selector_family:</span> <span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
+    <span class='label'>known_owner_selector:</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_known_owner_selector?'>known_owner_selector?</span><span class='comma'>,</span>
+    <span class='label'>selector_kind_family:</span> <span class='id identifier rubyid_selector_kind_family'>selector_kind_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
+    <span class='label'>known_selector_kind:</span> <span class='const'><span class='object_link'><a href="#KNOWN_SELECTOR_KINDS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTOR_KINDS (constant)">KNOWN_SELECTOR_KINDS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>selection_intent_family:</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='comma'>,</span> <span class='symbol'>:unknown</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>known_selection_intent:</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>comment_region_family:</span> <span class='id identifier rubyid_comment_region_family'>comment_region_family</span> <span class='op'>||</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
+    <span class='label'>known_comment_region:</span> <span class='id identifier rubyid_known_comment_region'>known_comment_region</span><span class='comma'>,</span>
+    <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_known_comment_region'>known_comment_region</span> <span class='op'>||</span> <span class='id identifier rubyid_selector_kind_family'>selector_kind_family</span> <span class='op'>==</span> <span class='symbol'>:comment_anchor</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#COMPAT_SELECTION_INTENT_FAMILIES-constant" title="Ast::Crispr::SelectionProfile::COMPAT_SELECTION_INTENT_FAMILIES (constant)">COMPAT_SELECTION_INTENT_FAMILIES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:comment</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='id identifier rubyid_stringified_report'>stringified_report</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="selection_intent_family-instance_method">
+  
+    #<strong>selection_intent_family</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+524
+525
+526</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 524</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_selection_intent_family'>selection_intent_family</span>
+  <span class='id identifier rubyid_selection_intent_metadata'>selection_intent_metadata</span><span class='op'>&amp;.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:family</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="selection_intent_metadata-instance_method">
+  
+    #<strong>selection_intent_metadata</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+512
+513
+514</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 512</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_selection_intent_metadata'>selection_intent_metadata</span>
+  <span class='const'><span class='object_link'><a href="#KNOWN_SELECTION_INTENTS-constant" title="Ast::Crispr::SelectionProfile::KNOWN_SELECTION_INTENTS (constant)">KNOWN_SELECTION_INTENTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='rbracket'>]</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dup'>dup</span><span class='op'>&amp;.</span><span class='id identifier rubyid_freeze'>freeze</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_h-instance_method">
+  
+    #<strong>to_h</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+536
+537
+538
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/crispr.rb', line 536</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_h'>to_h</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>owner_scope:</span> <span class='id identifier rubyid_owner_scope'>owner_scope</span><span class='comma'>,</span>
+    <span class='label'>owner_selector:</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector'>owner_selector</span><span class='comma'>,</span>
+    <span class='label'>owner_selector_family:</span> <span class='id identifier rubyid_structure_profile'>structure_profile</span><span class='period'>.</span><span class='id identifier rubyid_owner_selector_family'>owner_selector_family</span><span class='comma'>,</span>
+    <span class='label'>selector_kind:</span> <span class='id identifier rubyid_selector_kind'>selector_kind</span><span class='comma'>,</span>
+    <span class='label'>selection_intent:</span> <span class='id identifier rubyid_selection_intent'>selection_intent</span><span class='comma'>,</span>
+    <span class='label'>selection_intent_family:</span> <span class='id identifier rubyid_selection_intent_family'>selection_intent_family</span><span class='comma'>,</span>
+    <span class='label'>known_selection_intent:</span> <span class='id identifier rubyid_known_selection_intent?'>known_selection_intent?</span><span class='comma'>,</span>
+    <span class='label'>comment_region:</span> <span class='id identifier rubyid_comment_region'>comment_region</span><span class='comma'>,</span>
+    <span class='label'>include_trailing_gap:</span> <span class='id identifier rubyid_include_trailing_gap'>include_trailing_gap</span><span class='comma'>,</span>
+    <span class='label'>comment_anchored:</span> <span class='id identifier rubyid_comment_anchored?'>comment_anchored?</span><span class='comma'>,</span>
+    <span class='label'>metadata:</span> <span class='id identifier rubyid_metadata'>metadata</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:42 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -225,7 +225,7 @@ min_divergence_threshold:
 templates:
   root: packaged
   apply: true
-  profile: monorepo-subgem
+  profile: monorepo-subgem-package
   entries:
     - README.md
     - source: gem.gemspec
@@ -330,7 +330,7 @@ files:
   README.md:
     strategy: merge
   ast-crispr.gemspec:
-    strategy: merge
+    strategy: keep_destination
   AGENTS.md:
     strategy: accept_template
   .github:

@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markdown::Merge::Cleanse::BlockSpacing
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markdown::Merge::Cleanse::BlockSpacing";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (B)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Markdown.html" title="Markdown (module)">Markdown</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Cleanse.html" title="Markdown::Merge::Cleanse (module)">Cleanse</a></span></span>
+     &raquo; 
+    <span class="title">BlockSpacing</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markdown::Merge::Cleanse::BlockSpacing
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Markdown::Merge::Cleanse::BlockSpacing</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markdown/merge/cleanse/block_spacing.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Fixes missing blank lines between block elements in Markdown.</p>
+
+<p>Markdown best practices require blank lines between:</p>
+<ul>
+  <li>List items and headings</li>
+  <li>Thematic breaks (—) and following content</li>
+  <li>HTML blocks (like &lt;/details&gt;) and following markdown</li>
+  <li>Nested list items and headings</li>
+</ul>
+
+<p>This class detects and fixes these issues without using a full<br />
+markdown parser, making it safe to use on documents that might<br />
+have syntax issues.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_fixer'>fixer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Cleanse.html" title="Markdown::Merge::Cleanse (module)">Cleanse</a></span></span><span class='op'>::</span><span class='const'>BlockSpacing</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::Cleanse::BlockSpacing#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+<span class='kw'>if</span> <span class='id identifier rubyid_fixer'>fixer</span><span class='period'>.</span><span class='id identifier rubyid_malformed?'>malformed?</span>
+  <span class='id identifier rubyid_fixed_content'>fixed_content</span> <span class='op'>=</span> <span class='id identifier rubyid_fixer'>fixer</span><span class='period'>.</span><span class='id identifier rubyid_fix'>fix</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Check specific issues</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_fixer'>fixer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Cleanse.html" title="Markdown::Merge::Cleanse (module)">Cleanse</a></span></span><span class='op'>::</span><span class='const'>BlockSpacing</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::Cleanse::BlockSpacing#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_fixer'>fixer</span><span class='period'>.</span><span class='id identifier rubyid_issues'>issues</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_issue'>issue</span><span class='op'>|</span>
+  <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Line </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_issue'>issue</span><span class='lbracket'>[</span><span class='symbol'>:line</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_issue'>issue</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="THEMATIC_BREAK-constant" class="">THEMATIC_BREAK =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Patterns for block elements that should have blank lines after them</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*(?:---+|\*\*\*+|___+)\s*\z</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="HEADING-constant" class="">HEADING =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*\#{1,6}\s+</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="LIST_ITEM-constant" class="">LIST_ITEM =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*(?:[-*+]|\d+\.)\s+</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="HTML_CLOSE_TAG-constant" class="">HTML_CLOSE_TAG =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/[a-zA-Z][a-zA-Z0-9]*&gt;\s*\z</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="HTML_OPEN_TAG-constant" class="">HTML_OPEN_TAG =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;[a-zA-Z][a-zA-Z0-9]*(?:\s|&gt;)</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="HTML_ANY_TAG-constant" class="">HTML_ANY_TAG =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/?[a-zA-Z]</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="LINK_REF_DEF-constant" class="">LINK_REF_DEF =
+          <div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*\[[^\]]+\]:\s*</span><span class='regexp_end'>/</span></span></pre></dd>
+      
+        <dt id="HTML_BLOCK_ELEMENTS-constant" class="">HTML_BLOCK_ELEMENTS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Block-level HTML elements that can span multiple lines<br />
+These create a context where we shouldn’t insert blank lines</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>ul</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>ol</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>li</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>dl</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>dt</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>dd</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>div</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>table</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>thead</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>tbody</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>tfoot</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>tr</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>th</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>td</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>blockquote</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>pre</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>figure</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>figcaption</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>details</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>summary</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>section</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>article</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>aside</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>nav</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>header</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>footer</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>main</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>address</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>form</span><span class='words_sep'>
+</span><span class='words_sep'>  </span><span class='tstring_content'>fieldset</span><span class='words_sep'>
+</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="HTML_BLOCK_OPEN-constant" class="">HTML_BLOCK_OPEN =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Pattern to match opening block-level HTML tags</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)(?:\s|&gt;)</span><span class='regexp_end'>/i</span></span></pre></dd>
+      
+        <dt id="HTML_BLOCK_CLOSE-constant" class="">HTML_BLOCK_CLOSE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Pattern to match closing block-level HTML tags</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#HTML_BLOCK_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::HTML_BLOCK_ELEMENTS (constant)">HTML_BLOCK_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>/i</span></span></pre></dd>
+      
+        <dt id="MARKDOWN_CONTAINER_ELEMENTS-constant" class="">MARKDOWN_CONTAINER_ELEMENTS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>HTML elements that contain markdown content (not HTML content)<br />
+These should have blank lines before their closing tags</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>details</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="MARKDOWN_CONTAINER_CLOSE-constant" class="">MARKDOWN_CONTAINER_CLOSE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Pattern to match closing tags for markdown containers</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s*&lt;\/(</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#MARKDOWN_CONTAINER_ELEMENTS-constant" title="Markdown::Merge::Cleanse::BlockSpacing::MARKDOWN_CONTAINER_ELEMENTS (constant)">MARKDOWN_CONTAINER_ELEMENTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>|</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>)&gt;</span><span class='regexp_end'>/i</span></span></pre></dd>
+      
+        <dt id="MARKDOWN_CONTENT-constant" class="">MARKDOWN_CONTENT =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Markdown content: anything that’s not blank, not HTML, and not a link ref def</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+  <span class='id identifier rubyid_stripped'>stripped</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_stripped'>stripped</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#LINK_REF_DEF-constant" title="Markdown::Merge::Cleanse::BlockSpacing::LINK_REF_DEF (constant)">LINK_REF_DEF</a></span></span><span class='rparen'>)</span>
+  <span class='kw'>true</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#issues-instance_method" title="#issues (instance method)">#<strong>issues</strong>  &#x21d2; Array&lt;Hash&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Issues found.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source-instance_method" title="#source (instance method)">#<strong>source</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The original content.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fix-instance_method" title="#fix (instance method)">#<strong>fix</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Fix the block spacing issues.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(source)  &#x21d2; BlockSpacing </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a new BlockSpacing fixer.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#issue_count-instance_method" title="#issue_count (instance method)">#<strong>issue_count</strong>  &#x21d2; Integer </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get the count of issues found.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#malformed%3F-instance_method" title="#malformed? (instance method)">#<strong>malformed?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if the content has block spacing issues.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(source)  &#x21d2; <tt><span class='object_link'><a href="" title="Markdown::Merge::Cleanse::BlockSpacing (class)">BlockSpacing</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a new BlockSpacing fixer.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>source</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The markdown content to analyze</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_source'>source</span><span class='rparen'>)</span>
+  <span class='ivar'>@source</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='ivar'>@issues</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_analyze'>analyze</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="issues-instance_method">
+  
+    #<strong>issues</strong>  &#x21d2; <tt>Array&lt;Hash&gt;</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Issues found.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Issues found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 103</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_issues'>issues</span>
+  <span class='ivar'>@issues</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="source-instance_method">
+  
+    #<strong>source</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The original content.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The original content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 100</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span>
+  <span class='ivar'>@source</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="fix-instance_method">
+  
+    #<strong>fix</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Fix the block spacing issues.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Content with blank lines added where needed</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fix'>fix</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_source'>source</span> <span class='kw'>unless</span> <span class='id identifier rubyid_malformed?'>malformed?</span>
+
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_source'>source</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_insertions'>insertions</span> <span class='op'>=</span> <span class='ivar'>@issues</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span> <span class='id identifier rubyid_i'>i</span><span class='lbracket'>[</span><span class='symbol'>:line</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
+
+  <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_line'>line</span>
+    <span class='comment'># If this line needs a blank line after it, add one
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_insertions'>insertions</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='comment'># issues use 1-based line numbers
+</span>      <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="issue_count-instance_method">
+  
+    #<strong>issue_count</strong>  &#x21d2; <tt>Integer</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get the count of issues found.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>number of issues</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+124
+125
+126</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 124</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_issue_count'>issue_count</span>
+  <span class='ivar'>@issues</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="malformed?-instance_method">
+  
+    #<strong>malformed?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if the content has block spacing issues.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if issues were found</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/cleanse/block_spacing.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_malformed?'>malformed?</span>
+  <span class='ivar'>@issues</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:06 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

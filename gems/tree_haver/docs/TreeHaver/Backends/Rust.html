@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: TreeHaver::Backends::Rust
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "TreeHaver::Backends::Rust";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (R)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span>
+     &raquo; 
+    <span class="title">Rust</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: TreeHaver::Backends::Rust
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/tree_haver/backends/rust.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Rust backend using the tree_stump gem</p>
+
+<p>This backend wraps the tree_stump gem, which provides Ruby bindings to<br />
+tree-sitter written in Rust. It offers native performance with Rust’s<br />
+safety guarantees and includes precompiled binaries for common platforms.</p>
+
+<p>tree_stump supports incremental parsing and the Query API, making it<br />
+suitable for editor/IDE use cases where performance is critical.</p>
+
+<p>== Tree/Node Architecture</p>
+
+<p>This backend (like all tree-sitter backends: MRI, Rust, FFI, Java) does NOT<br />
+define its own Tree or Node classes. Instead:</p>
+
+<ul>
+  <li>Parser#parse returns raw <code>::TreeStump::Tree</code> objects</li>
+  <li>These are wrapped by <code>TreeHaver::Tree</code> (inherits from <code>Base::Tree</code>)</li>
+  <li><code>TreeHaver::Tree#root_node</code> wraps raw nodes in <code>TreeHaver::Node</code></li>
+</ul>
+
+<p>This differs from pure-Ruby backends (Citrus, Prism, Psych) which define<br />
+their own <code>Backend::X::Tree</code> and <code>Backend::X::Node</code> classes.</p>
+
+<p>== Platform Compatibility</p>
+
+<ul>
+  <li>MRI Ruby: ✓ Full support</li>
+  <li>JRuby: ✗ Cannot load native extensions (runs on JVM)</li>
+  <li>TruffleRuby: ✗ magnus/rb-sys incompatible with TruffleRuby’s C API emulation</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="../Tree.html" title="TreeHaver::Tree (class)">The wrapper class for tree-sitter Tree objects</a></span></li>
+    
+      <li><span class='object_link'><a href="../Node.html" title="TreeHaver::Node (class)">The wrapper class for tree-sitter Node objects</a></span></li>
+    
+      <li><span class='object_link'><a href="../Base/Tree.html" title="TreeHaver::Base::Tree (class)">Base class documenting the Tree API contract</a></span></li>
+    
+      <li><span class='object_link'><a href="../Base/Node.html" title="TreeHaver::Base::Node (class)">Base class documenting the Node API contract</a></span></li>
+    
+      <li><a href="https://github.com/joker1007/tree_stump" target="_parent" title="tree_stump">tree_stump</a></li>
+    
+  </ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Rust/Language.html" title="TreeHaver::Backends::Rust::Language (class)">Language</a></span>, <span class='object_link'><a href="Rust/Parser.html" title="TreeHaver::Backends::Rust::Parser (class)">Parser</a></span>
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#available%3F-class_method" title="available? (class method)">.<strong>available?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#capabilities-class_method" title="capabilities (class method)">.<strong>capabilities</strong>  &#x21d2; Hash{Symbol =&gt; Object} </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get capabilities supported by this backend.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reset!-class_method" title="reset! (class method)">.<strong>reset!</strong>  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  <span class="private note title">private</span>
+
+  
+    <span class="summary_desc"><div class='inline'><p>Reset the load state (primarily for testing).</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="available?-class_method">
+  
+    .<strong>available?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_available?'>available?</span>
+  <span class='kw'>return</span> <span class='ivar'>@loaded</span> <span class='kw'>if</span> <span class='ivar'>@load_attempted</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>  <span class='kw'>begin</span>
+    <span class='comment'># tree_stump uses magnus which requires MRI&#39;s C API
+</span>    <span class='comment'># It doesn&#39;t work on JRuby or TruffleRuby
+</span>    <span class='kw'>if</span> <span class='const'>RUBY_ENGINE</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&quot;</span></span>
+      <span class='id identifier rubyid_require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tree_stump</span><span class='tstring_end'>&quot;</span></span>
+      <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>    <span class='kw'>else</span>
+      <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>    <span class='kw'>end</span>
+  <span class='kw'>rescue</span> <span class='const'>LoadError</span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>  <span class='kw'>rescue</span> <span class='const'>StandardError</span>
+    <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>  <span class='kw'>end</span>
+  <span class='ivar'>@loaded</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="capabilities-class_method">
+  
+    .<strong>capabilities</strong>  &#x21d2; <tt>Hash{Symbol =&gt; Object}</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get capabilities supported by this backend</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+      <pre class="example code"><code><span class='const'><span class='object_link'><a href="../../TreeHaver.html" title="TreeHaver (module)">TreeHaver</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Backends.html" title="TreeHaver::Backends (module)">Backends</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="" title="TreeHaver::Backends::Rust (module)">Rust</a></span></span><span class='period'>.</span><span class='id identifier rubyid_capabilities'>capabilities</span>
+<span class='comment'># =&gt; { backend: :rust, query: true, bytes_field: true, incremental: false, comment_support: :nodes_only }</span></code></pre>
+    
+  </div>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Object}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>capability map</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_capabilities'>capabilities</span>
+  <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='id identifier rubyid_available?'>available?</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>backend:</span> <span class='symbol'>:rust</span><span class='comma'>,</span>
+    <span class='label'>query:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>bytes_field:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>incremental:</span> <span class='kw'>false</span><span class='comma'>,</span>  <span class='comment'># TreeStump doesn&#39;t currently expose incremental parsing to Ruby
+</span>    <span class='label'>comment_support:</span> <span class='symbol'>:nodes_only</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reset!-class_method">
+  
+    .<strong>reset!</strong>  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note private">
+  <strong>This method is part of a private API.</strong>
+  You should avoid using this method if possible, as it may be removed or be changed in the future.
+</p>
+<p class="note returns_void">This method returns an undefined value.</p><p>Reset the load state (primarily for testing)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/tree_haver/backends/rust.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reset!'>reset!</span>
+  <span class='ivar'>@load_attempted</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span>  <span class='ivar'>@loaded</span> <span class='op'>=</span> <span class='kw'>false</span> <span class='comment'># rubocop:disable ThreadSafety/ClassInstanceVariable
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:39 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

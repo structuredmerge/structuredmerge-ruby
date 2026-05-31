@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markdown::Merge::ListMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markdown::Merge::ListMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (L)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">ListMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markdown::Merge::ListMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Markdown::Merge::ListMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Ast::Merge::JaccardSimilarity</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markdown/merge/list_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Merges two Markdown list nodes at the item level.</p>
+
+<p>When a template list and destination list are matched (e.g., via fuzzy matching<br />
+or a shared content fingerprint), this merger produces a result that is smarter<br />
+than simply picking one whole list as the winner:</p>
+
+<ul>
+  <li>Items that appear in both lists are resolved by preference (template or dest).</li>
+  <li>Items that only appear in the destination are kept (project customisations).</li>
+  <li>Items that only appear in the template are added (new canonical steps).</li>
+</ul>
+
+<p>Item matching uses significant-token Jaccard overlap so minor wording differences<br />
+(e.g., “Commit changes” vs “Commit your changes”) still produce a match.</p>
+
+<p>The merged list is emitted as plain Markdown text (ordered <code>1. …</code> lines) and<br />
+passed to the caller via <code>add_raw</code> on the OutputBuilder.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>ListMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge_lists'>merge_lists</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+                            <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+                            <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
+                            <span class='label'>template_analysis:</span> <span class='id identifier rubyid_t_analysis'>t_analysis</span><span class='comma'>,</span>
+                            <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='rparen'>)</span>
+<span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:merged</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_builder'>builder</span><span class='period'>.</span><span class='id identifier rubyid_add_raw'>add_raw</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:content</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'>SmartMergerBase#try_inner_merge_list_to_builder</span></li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="ITEM_MATCH_THRESHOLD-constant" class="">ITEM_MATCH_THRESHOLD =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Minimum Jaccard token overlap to consider two list items as matching.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='float'>0.35</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_lists-instance_method" title="#merge_lists (instance method)">#<strong>merge_lists</strong>(template_node, dest_node, preference:, add_template_only_nodes: true, template_analysis: nil, dest_analysis: nil, resolution_mode: :eager, unresolved_policy: nil)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge two list nodes.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge_lists-instance_method">
+  
+    #<strong>merge_lists</strong>(template_node, dest_node, preference:, add_template_only_nodes: true, template_analysis: nil, dest_analysis: nil, resolution_mode: :eager, unresolved_policy: nil)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge two list nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template list node (tree_haver / Markly node)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination list node</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>:template or :destination — which wins for matched items</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_template_only_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to append template-only items</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>template_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysisBase.html" title="Markdown::Merge::FileAnalysisBase (class)">FileAnalysisBase</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Template file analysis (for source text)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysisBase.html" title="Markdown::Merge::FileAnalysisBase (class)">FileAnalysisBase</a></span></tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination file analysis (for source text)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>{ merged: Boolean, content: String } or { merged: false, reason: String }</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/list_merger.rb', line 48</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_lists'>merge_lists</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+  <span class='label'>preference:</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>template_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>dest_analysis:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>resolution_mode:</span> <span class='symbol'>:eager</span><span class='comma'>,</span>
+  <span class='label'>unresolved_policy:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_t_items'>t_items</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_items'>extract_items</span><span class='lparen'>(</span><span class='id identifier rubyid_template_node'>template_node</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_d_items'>d_items</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_items'>extract_items</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_node'>dest_node</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>empty list</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_t_items'>t_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_d_items'>d_items</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_alignment'>alignment</span> <span class='op'>=</span> <span class='id identifier rubyid_align_items'>align_items</span><span class='lparen'>(</span><span class='id identifier rubyid_t_items'>t_items</span><span class='comma'>,</span> <span class='id identifier rubyid_d_items'>d_items</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span> <span class='op'>=</span> <span class='id identifier rubyid_emit_lines'>emit_lines</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_alignment'>alignment</span><span class='comma'>,</span>
+    <span class='label'>template_node:</span> <span class='id identifier rubyid_template_node'>template_node</span><span class='comma'>,</span>
+    <span class='label'>dest_node:</span> <span class='id identifier rubyid_dest_node'>dest_node</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only:</span> <span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
+    <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span>
+    <span class='label'>resolution_mode:</span> <span class='id identifier rubyid_resolution_mode'>resolution_mode</span><span class='comma'>,</span>
+    <span class='label'>unresolved_policy:</span> <span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>UnresolvedPolicy</span><span class='period'>.</span><span class='id identifier rubyid_coerce'>coerce</span><span class='lparen'>(</span><span class='id identifier rubyid_unresolved_policy'>unresolved_policy</span><span class='rparen'>)</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_not_merged'>not_merged</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no lines emitted</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>merged:</span> <span class='kw'>true</span><span class='comma'>,</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>+</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>stats:</span> <span class='lbrace'>{</span><span class='label'>decision:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='symbol'>:merged</span> <span class='op'>:</span> <span class='symbol'>:unresolved</span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>unresolved_cases:</span> <span class='id identifier rubyid_unresolved_cases'>unresolved_cases</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:05 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

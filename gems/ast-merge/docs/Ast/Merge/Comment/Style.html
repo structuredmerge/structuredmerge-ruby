@@ -1,0 +1,2607 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::Comment::Style
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::Comment::Style";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Comment.html" title="Ast::Merge::Comment (module)">Comment</a></span></span>
+     &raquo; 
+    <span class="title">Style</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::Comment::Style
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::Comment::Style</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/comment/style.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Configuration for different comment syntax styles.</p>
+
+<p>Supports multiple comment syntax patterns used across programming languages:</p>
+<ul>
+  <li><code>:hash_comment</code> - Ruby/Python/YAML/Shell style (<code># comment</code>)</li>
+  <li><code>:html_comment</code> - HTML/XML/Markdown style (<code>&lt;!-- comment --&gt;</code>)</li>
+  <li><code>:c_style_line</code> - C/JavaScript/Go line comments (<code>// comment</code>)</li>
+  <li><code>:c_style_block</code> - C/JavaScript/CSS block comments (<code>/* comment */</code>)</li>
+  <li><code>:semicolon_comment</code> - Lisp/Clojure/Assembly style (<code>; comment</code>)</li>
+  <li><code>:double_dash_comment</code> - SQL/Haskell/Lua style (<code>-- comment</code>)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Using a predefined style</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_style'>style</span> <span class='op'>=</span> <span class='const'>Style</span><span class='period'>.</span><span class='id identifier rubyid_for'><span class='object_link'><a href="#for-class_method" title="Ast::Merge::Comment::Style.for (method)">for</a></span></span><span class='lparen'>(</span><span class='symbol'>:hash_comment</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_style'>style</span><span class='period'>.</span><span class='id identifier rubyid_line_start'>line_start</span> <span class='comment'>#=&gt; &quot;#&quot;
+</span><span class='id identifier rubyid_style'>style</span><span class='period'>.</span><span class='id identifier rubyid_match_line?'>match_line?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># hello</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='comment'>#=&gt; true</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Registering a custom style</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='const'>Style</span><span class='period'>.</span><span class='id identifier rubyid_register'><span class='object_link'><a href="#register-class_method" title="Ast::Merge::Comment::Style.register (method)">register</a></span></span><span class='lparen'>(</span><span class='symbol'>:percent_comment</span><span class='comma'>,</span>
+  <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+  <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*%</span><span class='regexp_end'>/</span></span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="STYLES-constant" class="">STYLES =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Predefined comment styles.<br />
+Mutable to allow runtime registration of custom styles.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol =&gt; Hash}</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Registered comment styles</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>hash_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*#</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>html_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;!--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--&gt;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--.*--&gt;\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*&lt;!--</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>--&gt;\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>c_style_line:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>//</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*//</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>c_style_block:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/*</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*/</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>^\s*/\*</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>\*/\s*$</span><span class='regexp_end'>}</span></span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>semicolon_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*;</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>double_dash_comment:</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*--</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span><span class='comma'>,</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="DEFAULT_STYLE-constant" class="">DEFAULT_STYLE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default style when none specified</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:hash_comment</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#block_end-instance_method" title="#block_end (instance method)">#<strong>block_end</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Block comment end delimiter (e.g., “*/”).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#block_end_pattern-instance_method" title="#block_end_pattern (instance method)">#<strong>block_end_pattern</strong>  &#x21d2; Regexp<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Pattern to match block comment end.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#block_start-instance_method" title="#block_start (instance method)">#<strong>block_start</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Block comment start delimiter (e.g., “/*”).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#block_start_pattern-instance_method" title="#block_start_pattern (instance method)">#<strong>block_start_pattern</strong>  &#x21d2; Regexp<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Pattern to match block comment start.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#line_end-instance_method" title="#line_end (instance method)">#<strong>line_end</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Line comment end delimiter (for HTML-style: “–&gt;”).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#line_pattern-instance_method" title="#line_pattern (instance method)">#<strong>line_pattern</strong>  &#x21d2; Regexp </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Pattern to match a single comment line.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#line_start-instance_method" title="#line_start (instance method)">#<strong>line_start</strong>  &#x21d2; String<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Line comment start delimiter (e.g., “#”, “//”).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#name-instance_method" title="#name (instance method)">#<strong>name</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The style identifier.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#available_styles-class_method" title="available_styles (class method)">.<strong>available_styles</strong>  &#x21d2; Array&lt;Symbol&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>List all registered style names.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#for-class_method" title="for (class method)">.<strong>for</strong>(name)  &#x21d2; Style </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get a Style instance for a given style name.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#register-class_method" title="register (class method)">.<strong>register</strong>(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil, line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Register a custom comment style.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_block_comments%3F-class_method" title="supports_block_comments? (class method)">.<strong>supports_block_comments?</strong>(name)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a style supports block comments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_line_comments%3F-class_method" title="supports_line_comments? (class method)">.<strong>supports_line_comments?</strong>(name)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a style supports line comments.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extract_line_content-instance_method" title="#extract_line_content (instance method)">#<strong>extract_line_content</strong>(line)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Extract content from a line comment, removing the delimiter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil, line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)  &#x21d2; Style </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a new Style.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#inspect-instance_method" title="#inspect (instance method)">#<strong>inspect</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Human-readable representation.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match_block_end%3F-instance_method" title="#match_block_end? (instance method)">#<strong>match_block_end?</strong>(line)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line ends a block comment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match_block_start%3F-instance_method" title="#match_block_start? (instance method)">#<strong>match_block_start?</strong>(line)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line starts a block comment.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match_line%3F-instance_method" title="#match_line? (instance method)">#<strong>match_line?</strong>(line)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if a line matches this style’s line comment pattern.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_block_comments%3F-instance_method" title="#supports_block_comments? (instance method)">#<strong>supports_block_comments?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if this style supports block comments.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#supports_line_comments%3F-instance_method" title="#supports_line_comments? (instance method)">#<strong>supports_line_comments?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if this style supports line comments.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil, line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::Comment::Style (class)">Style</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a new Style.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Style identifier</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_start</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment start delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_end</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment end delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_start</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment start delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_end</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment end delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match comment lines</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_start_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block start</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_end_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block end</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 205</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='ivar'>@line_start</span> <span class='op'>=</span> <span class='id identifier rubyid_line_start'>line_start</span>
+  <span class='ivar'>@line_end</span> <span class='op'>=</span> <span class='id identifier rubyid_line_end'>line_end</span>
+  <span class='ivar'>@block_start</span> <span class='op'>=</span> <span class='id identifier rubyid_block_start'>block_start</span>
+  <span class='ivar'>@block_end</span> <span class='op'>=</span> <span class='id identifier rubyid_block_end'>block_end</span>
+  <span class='ivar'>@line_pattern</span> <span class='op'>=</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span>
+  <span class='ivar'>@block_start_pattern</span> <span class='op'>=</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span>
+  <span class='ivar'>@block_end_pattern</span> <span class='op'>=</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="block_end-instance_method">
+  
+    #<strong>block_end</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Block comment end delimiter (e.g., “*/”).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment end delimiter (e.g., “*/”)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_block_end'>block_end</span>
+  <span class='ivar'>@block_end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="block_end_pattern-instance_method">
+  
+    #<strong>block_end_pattern</strong>  &#x21d2; <tt>Regexp</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Pattern to match block comment end.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block comment end</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span>
+  <span class='ivar'>@block_end_pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="block_start-instance_method">
+  
+    #<strong>block_start</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Block comment start delimiter (e.g., “/*”).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment start delimiter (e.g., “/*”)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+38
+39
+40</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 38</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_block_start'>block_start</span>
+  <span class='ivar'>@block_start</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="block_start_pattern-instance_method">
+  
+    #<strong>block_start_pattern</strong>  &#x21d2; <tt>Regexp</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Pattern to match block comment start.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block comment start</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span>
+  <span class='ivar'>@block_start_pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="line_end-instance_method">
+  
+    #<strong>line_end</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Line comment end delimiter (for HTML-style: “–&gt;”).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment end delimiter (for HTML-style: “–&gt;”)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_line_end'>line_end</span>
+  <span class='ivar'>@line_end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="line_pattern-instance_method">
+  
+    #<strong>line_pattern</strong>  &#x21d2; <tt>Regexp</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Pattern to match a single comment line.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match a single comment line</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span>
+  <span class='ivar'>@line_pattern</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="line_start-instance_method">
+  
+    #<strong>line_start</strong>  &#x21d2; <tt>String</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Line comment start delimiter (e.g., “#”, “//”).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment start delimiter (e.g., “#”, “//”)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 32</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_line_start'>line_start</span>
+  <span class='ivar'>@line_start</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="name-instance_method">
+  
+    #<strong>name</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The style identifier.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The style identifier</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+29
+30
+31</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 29</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_name'>name</span>
+  <span class='ivar'>@name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="available_styles-class_method">
+  
+    .<strong>available_styles</strong>  &#x21d2; <tt>Array&lt;Symbol&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>List all registered style names.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;Symbol&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Available style names</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+172
+173
+174</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 172</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_available_styles'>available_styles</span>
+  <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="for-class_method">
+  
+    .<strong>for</strong>(name)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::Comment::Style (class)">Style</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get a Style instance for a given style name.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Style name (e.g., :hash_comment, :c_style_line)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="" title="Ast::Merge::Comment::Style (class)">Style</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The style configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if style name is not registered</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+122
+123
+124
+125
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 122</span>
+
+<span class='kw'>def</span> <span class='kw'>for</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#DEFAULT_STYLE-constant" title="Ast::Merge::Comment::Style::DEFAULT_STYLE (constant)">DEFAULT_STYLE</a></span></span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Unknown comment style: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_config'>config</span>
+
+  <span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_config'>config</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="register-class_method">
+  
+    .<strong>register</strong>(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil, line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Register a custom comment style.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Style identifier</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_start</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment start delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_end</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Line comment end delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_start</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment start delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_end</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Block comment end delimiter</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>line_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match comment lines</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_start_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block start</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>block_end_pattern</span>
+      
+      
+        <span class='type'>(<tt>Regexp</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Pattern to match block end</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The registered style configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if name already exists</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 142</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>line_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>line_end:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>line_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_start_pattern:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>block_end_pattern:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_name'>name</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+  <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Style :</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> already registered</span><span class='tstring_end'>&quot;</span></span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>line_start:</span> <span class='id identifier rubyid_line_start'>line_start</span><span class='comma'>,</span>
+    <span class='label'>line_end:</span> <span class='id identifier rubyid_line_end'>line_end</span><span class='comma'>,</span>
+    <span class='label'>block_start:</span> <span class='id identifier rubyid_block_start'>block_start</span><span class='comma'>,</span>
+    <span class='label'>block_end:</span> <span class='id identifier rubyid_block_end'>block_end</span><span class='comma'>,</span>
+    <span class='label'>line_pattern:</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span><span class='comma'>,</span>
+    <span class='label'>block_start_pattern:</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span><span class='comma'>,</span>
+    <span class='label'>block_end_pattern:</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+
+  <span class='comment'># Modify STYLES (it&#39;s frozen, so we need to work around)
+</span>  <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span><span class='period'>.</span><span class='id identifier rubyid_tap'>tap</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_styles'>styles</span><span class='op'>|</span>
+    <span class='id identifier rubyid_styles'>styles</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_config'>config</span>
+    <span class='id identifier rubyid_remove_const'>remove_const</span><span class='lparen'>(</span><span class='symbol'>:STYLES</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_const_set'>const_set</span><span class='lparen'>(</span><span class='symbol'>:STYLES</span><span class='comma'>,</span> <span class='id identifier rubyid_styles'>styles</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_config'>config</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_block_comments?-class_method">
+  
+    .<strong>supports_block_comments?</strong>(name)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a style supports block comments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Style name</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if style has block comment support</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+189
+190
+191
+192</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 189</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_block_comments?'>supports_block_comments?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:block_start_pattern</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_line_comments?-class_method">
+  
+    .<strong>supports_line_comments?</strong>(name)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a style supports line comments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>name</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Style name</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if style has line comment support</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+180
+181
+182
+183</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 180</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_line_comments?'>supports_line_comments?</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#STYLES-constant" title="Ast::Merge::Comment::Style::STYLES (constant)">STYLES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_config'>config</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_config'>config</span><span class='lbracket'>[</span><span class='symbol'>:line_pattern</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="extract_line_content-instance_method">
+  
+    #<strong>extract_line_content</strong>(line)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Extract content from a line comment, removing the delimiter.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The comment line</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The comment content without delimiters</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 251</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extract_line_content'>extract_line_content</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>unless</span> <span class='id identifier rubyid_line_start'>line_start</span>
+
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_start'>line_start</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s?</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_line_end'>line_end</span>
+    <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s*</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id identifier rubyid_escape'>escape</span><span class='lparen'>(</span><span class='id identifier rubyid_line_end'>line_end</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\s*$</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+  <span class='comment'># Content extraction normalizes trailing spaces for comparison/parsing.
+</span>  <span class='comment'># Callers that need source-preserving output should use the raw line.
+</span>  <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_rstrip'>rstrip</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="inspect-instance_method">
+  
+    #<strong>inspect</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Human-readable representation.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Human-readable representation</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+278
+279
+280</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 278</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_inspect'>inspect</span>
+  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>#&lt;Comment::Style:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match_block_end?-instance_method">
+  
+    #<strong>match_block_end?</strong>(line)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line ends a block comment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The line to check</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if line ends a block comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+241
+242
+243
+244
+245</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 241</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match_block_end?'>match_block_end?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span>
+
+  <span class='id identifier rubyid_block_end_pattern'>block_end_pattern</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match_block_start?-instance_method">
+  
+    #<strong>match_block_start?</strong>(line)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line starts a block comment.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The line to check</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if line starts a block comment</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+231
+232
+233
+234
+235</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 231</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match_block_start?'>match_block_start?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span>
+
+  <span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="match_line?-instance_method">
+  
+    #<strong>match_line?</strong>(line)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if a line matches this style’s line comment pattern.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>line</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The line to check</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if line is a comment in this style</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+221
+222
+223
+224
+225</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 221</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match_line?'>match_line?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_line_pattern'>line_pattern</span>
+
+  <span class='id identifier rubyid_line_pattern'>line_pattern</span><span class='period'>.</span><span class='id identifier rubyid_match?'>match?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_block_comments?-instance_method">
+  
+    #<strong>supports_block_comments?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if this style supports block comments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if block comments are supported</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+273
+274
+275</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 273</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_block_comments?'>supports_block_comments?</span>
+  <span class='op'>!</span><span class='id identifier rubyid_block_start_pattern'>block_start_pattern</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="supports_line_comments?-instance_method">
+  
+    #<strong>supports_line_comments?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if this style supports line comments.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if line comments are supported</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+266
+267
+268</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/comment/style.rb', line 266</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_supports_line_comments?'>supports_line_comments?</span>
+  <span class='op'>!</span><span class='id identifier rubyid_line_pattern'>line_pattern</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:49 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

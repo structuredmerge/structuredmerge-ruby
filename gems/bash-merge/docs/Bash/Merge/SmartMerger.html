@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Bash::Merge::SmartMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Bash::Merge::SmartMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Bash.html" title="Bash (module)">Bash</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Bash::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">SmartMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Bash::Merge::SmartMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::SmartMergerBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::SmartMergerBase</li>
+          
+            <li class="next">Bash::Merge::SmartMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Ast::Merge::Runtime::RootSessionSupport, Ast::Merge::StructuredEmitterProvenanceSupport, Ast::Merge::TrailingGroups::DestIterate</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/bash/merge/smart_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Main entry point for intelligent Bash script merging.<br />
+SmartMerger orchestrates the merge process using FileAnalysis<br />
+and MergeResult to merge two Bash scripts intelligently.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic merge (destination customizations preserved)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_bash'>template_bash</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_bash'>dest_bash</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>
+<span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_write'>write</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>output.sh</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Template updates win</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_bash'>template_bash</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_bash'>dest_bash</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With custom signature generator</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_sig_gen'>sig_gen</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span>
+  <span class='kw'>if</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="NodeWrapper.html" title="Bash::Merge::NodeWrapper (class)">NodeWrapper</a></span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_function_definition?'>function_definition?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_function_name'>function_name</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>main</span><span class='tstring_end'>&quot;</span></span>
+    <span class='lbracket'>[</span><span class='symbol'>:special_main</span><span class='rbracket'>]</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_node'>node</span> <span class='comment'># Fall through to default
+</span>  <span class='kw'>end</span>
+<span class='rbrace'>}</span>
+<span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='label'>signature_generator:</span> <span class='id identifier rubyid_sig_gen'>sig_gen</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With node_typing for per-node-type preferences</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Bash::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>function_definition</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_with_merge_type'>with_merge_type</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='symbol'>:func</span><span class='rparen'>)</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='lbrace'>{</span> <span class='label'>default:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>func:</span> <span class='symbol'>:template</span> <span class='rbrace'>}</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#corruption_handling-instance_method" title="#corruption_handling (instance method)">#<strong>corruption_handling</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute corruption_handling.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#remove_template_missing_nodes-instance_method" title="#remove_template_missing_nodes (instance method)">#<strong>remove_template_missing_nodes</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute remove_template_missing_nodes.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#runtime_session-instance_method" title="#runtime_session (instance method)">#<strong>runtime_session</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute runtime_session.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#errors-instance_method" title="#errors (instance method)">#<strong>errors</strong>  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get any parse errors from template or destination.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, corruption_handling: :heal, freeze_token: nil, match_refiner: nil, regions: nil, region_placeholder: nil, node_typing: nil, **options)  &#x21d2; SmartMerger </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new SmartMerger for intelligent Bash script merging.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge-instance_method" title="#merge (instance method)">#<strong>merge</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the merge and return the result as a Bash string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_result-instance_method" title="#merge_result (instance method)">#<strong>merge_result</strong>  &#x21d2; MergeResult </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the merge operation and return the full MergeResult object.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge_with_debug-instance_method" title="#merge_with_debug (instance method)">#<strong>merge_with_debug</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the merge and return detailed results including debug info.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#valid%3F-instance_method" title="#valid? (instance method)">#<strong>valid?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if both files were parsed successfully.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, corruption_handling: :heal, freeze_token: nil, match_refiner: nil, regions: nil, region_placeholder: nil, node_typing: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Bash::Merge::SmartMerger (class)">SmartMerger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+  <div class="note notetag">
+    <strong>Note:</strong>
+    <div class='inline'><p>To specify a custom parser path, use the TREE_SITTER_BASH_PATH environment<br />
+variable. This is handled by tree_haver’s GrammarFinder.</p>
+</div>
+  </div>
+
+<p>Creates a new SmartMerger for intelligent Bash script merging.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template Bash source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination Bash source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:destination</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>:destination, :template, or per-type Hash</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_template_only_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to add nodes only in template</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Token for freeze block markers</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>match_refiner</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Match refiner for fuzzy matching</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>regions</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Region configurations for nested merging</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>region_placeholder</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom placeholder for regions</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,String =&gt; #call}</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="TemplateParseError.html" title="Bash::Merge::TemplateParseError (class)">TemplateParseError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template has syntax errors</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="DestinationParseError.html" title="Bash::Merge::DestinationParseError (class)">DestinationParseError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If destination has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span>
+  <span class='label'>freeze_token:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>regions:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>region_placeholder:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+<span class='rparen'>)</span>
+  <span class='ivar'>@remove_template_missing_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
+  <span class='ivar'>@corruption_handling</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Healer</span><span class='period'>.</span><span class='id identifier rubyid_normalize_mode'>normalize_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_corruption_handling'>corruption_handling</span><span class='rparen'>)</span>
+
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
+    <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span>
+    <span class='label'>match_refiner:</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span><span class='comma'>,</span>
+    <span class='label'>regions:</span> <span class='id identifier rubyid_regions'>regions</span><span class='comma'>,</span>
+    <span class='label'>region_placeholder:</span> <span class='id identifier rubyid_region_placeholder'>region_placeholder</span><span class='comma'>,</span>
+    <span class='label'>node_typing:</span> <span class='id identifier rubyid_node_typing'>node_typing</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="corruption_handling-instance_method">
+  
+    #<strong>corruption_handling</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute corruption_handling.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
+  <span class='ivar'>@corruption_handling</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="remove_template_missing_nodes-instance_method">
+  
+    #<strong>remove_template_missing_nodes</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute remove_template_missing_nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
+  <span class='ivar'>@remove_template_missing_nodes</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="runtime_session-instance_method">
+  
+    #<strong>runtime_session</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute runtime_session.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 42</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span>
+  <span class='ivar'>@runtime_session</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="errors-instance_method">
+  
+    #<strong>errors</strong>  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get any parse errors from template or destination.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_errors'>errors</span>
+  <span class='id identifier rubyid_errors'>errors</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_errors'>errors</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>error:</span> <span class='id identifier rubyid_e'>e</span><span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_errors'>errors</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge-instance_method">
+  
+    #<strong>merge</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the merge and return the result as a Bash string.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merged Bash content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
+  <span class='id identifier rubyid_merge_result'>merge_result</span><span class='period'>.</span><span class='id identifier rubyid_to_bash'>to_bash</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_result-instance_method">
+  
+    #<strong>merge_result</strong>  &#x21d2; <tt><span class='object_link'><a href="MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the merge operation and return the full MergeResult object.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="MergeResult.html" title="Bash::Merge::MergeResult (class)">MergeResult</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merge result containing merged Bash content and metadata</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='kw'>return</span> <span class='ivar'>@merge_result</span> <span class='kw'>if</span> <span class='ivar'>@merge_result</span>
+
+  <span class='id identifier rubyid_root_operation'>root_operation</span> <span class='op'>=</span> <span class='id identifier rubyid_start_runtime_session!'>start_runtime_session!</span>
+  <span class='ivar'>@merge_result</span> <span class='op'>=</span> <span class='kw'>super</span>
+  <span class='id identifier rubyid_complete_runtime_session!'>complete_runtime_session!</span><span class='lparen'>(</span><span class='id identifier rubyid_root_operation'>root_operation</span><span class='comma'>,</span> <span class='ivar'>@merge_result</span><span class='rparen'>)</span>
+  <span class='ivar'>@merge_result</span>
+<span class='kw'>rescue</span> <span class='const'>StandardError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+  <span class='id identifier rubyid_fail_runtime_session!'>fail_runtime_session!</span><span class='lparen'>(</span><span class='id identifier rubyid_root_operation'>root_operation</span><span class='comma'>,</span> <span class='id identifier rubyid_e'>e</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="merge_with_debug-instance_method">
+  
+    #<strong>merge_with_debug</strong>  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the merge and return detailed results including debug info.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Hash containing :content, :statistics, :decisions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 124</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge_with_debug'>merge_with_debug</span>
+  <span class='id identifier rubyid_result_obj'>result_obj</span> <span class='op'>=</span> <span class='id identifier rubyid_merge_result'>merge_result</span>
+  <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>valid:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
+    <span class='label'>nodes:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+    <span class='label'>valid:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='comma'>,</span>
+    <span class='label'>nodes:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_nodes'>nodes</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+    <span class='label'>freeze_blocks:</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_freeze_blocks'>freeze_blocks</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+
+  <span class='lbrace'>{</span>
+    <span class='label'>content:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_to_bash'>to_bash</span><span class='comma'>,</span>
+    <span class='label'>debug:</span> <span class='lbrace'>{</span>
+      <span class='label'>template_nodes:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='lbracket'>[</span><span class='symbol'>:nodes</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>dest_nodes:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='lbracket'>[</span><span class='symbol'>:nodes</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>preference:</span> <span class='ivar'>@preference</span><span class='comma'>,</span>
+      <span class='label'>add_template_only_nodes:</span> <span class='ivar'>@add_template_only_nodes</span><span class='comma'>,</span>
+      <span class='label'>remove_template_missing_nodes:</span> <span class='ivar'>@remove_template_missing_nodes</span><span class='comma'>,</span>
+      <span class='label'>resolution_mode:</span> <span class='ivar'>@resolution_mode</span><span class='comma'>,</span>
+      <span class='label'>corruption_handling:</span> <span class='ivar'>@corruption_handling</span><span class='comma'>,</span>
+      <span class='label'>freeze_token:</span> <span class='ivar'>@freeze_token</span><span class='comma'>,</span>
+      <span class='label'>runtime_operation_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_operations'>operations</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+      <span class='label'>runtime_diagnostic_count:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='op'>&amp;.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>||</span> <span class='int'>0</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>runtime:</span> <span class='id identifier rubyid_runtime_session'>runtime_session</span><span class='op'>&amp;.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='comma'>,</span>
+    <span class='label'>statistics:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_statistics'>statistics</span><span class='comma'>,</span>
+    <span class='label'>decisions:</span> <span class='id identifier rubyid_result_obj'>result_obj</span><span class='period'>.</span><span class='id identifier rubyid_decision_summary'>decision_summary</span><span class='comma'>,</span>
+    <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis_debug'>template_analysis_debug</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis_debug'>dest_analysis_debug</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="valid?-instance_method">
+  
+    #<strong>valid?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if both files were parsed successfully.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+162
+163
+164</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/bash/merge/smart_merger.rb', line 162</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_valid?'>valid?</span>
+  <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span> <span class='op'>&amp;&amp;</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:54 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

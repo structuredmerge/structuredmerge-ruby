@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Ast::Merge::PartialTemplateMergerBase
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::PartialTemplateMergerBase";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Ast::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">PartialTemplateMergerBase</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Ast::Merge::PartialTemplateMergerBase
+  <span class="abstract note title">Abstract</span>
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::PartialTemplateMergerBase</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/partial_template_merger_base.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <div class="note abstract">
+  <strong>This class is abstract.</strong>
+  <div class='inline'><p>Subclass and implement parser-specific methods</p>
+</div>
+</div>
+<p>Base class for merging a partial template into a specific section of a destination document.</p>
+
+<p>Unlike the full SmartMerger which merges entire documents, PartialTemplateMergerBase:</p>
+<ol>
+  <li>Finds a specific section in the destination (using InjectionPoint)</li>
+  <li>Replaces/merges only that section with the template</li>
+  <li>Leaves the rest of the destination unchanged</li>
+</ol>
+
+<p>Ownership boundary:</p>
+<ul>
+  <li>this base class owns the shared structural contract for locating,<br />
+replacing, and recombining partial content</li>
+  <li>syntax-aware cleanup after recomposition belongs in the relevant family<br />
+layer or concrete partial merger unless it is truly syntax-agnostic</li>
+</ul>
+
+<p>This is an abstract base class. Subclasses must implement:</p>
+<ul>
+  <li>#create_analysis(content) - Create a FileAnalysis for the given content</li>
+  <li>#create_smart_merger(template, section) - Create a SmartMerger for the section merge</li>
+  <li>#find_section_end(statements, injection_point) - Find where the section ends</li>
+  <li>#node_to_text(node, analysis) - Convert a node to source text</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>For markdown implementation</li>
+    
+  </ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="PartialTemplateMergerBase/Result.html" title="Ast::Merge::PartialTemplateMergerBase::Result (class)">Result</a></span>
+    
+  
+</p>
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_missing-instance_method" title="#add_missing (instance method)">#<strong>add_missing</strong>  &#x21d2; Boolean, Proc </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Whether to add template-only nodes.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#anchor-instance_method" title="#anchor (instance method)">#<strong>anchor</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Anchor matcher configuration.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#boundary-instance_method" title="#boundary (instance method)">#<strong>boundary</strong>  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Boundary matcher configuration.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#destination-instance_method" title="#destination (instance method)">#<strong>destination</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The destination content.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#match_refiner-instance_method" title="#match_refiner (instance method)">#<strong>match_refiner</strong>  &#x21d2; Object<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Match refiner for fuzzy matching unmatched nodes.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#node_typing-instance_method" title="#node_typing (instance method)">#<strong>node_typing</strong>  &#x21d2; Hash<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Node typing configuration for per-type preferences.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#preference-instance_method" title="#preference (instance method)">#<strong>preference</strong>  &#x21d2; Symbol, Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge preference (:template, :destination, or per-type hash).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#signature_generator-instance_method" title="#signature_generator (instance method)">#<strong>signature_generator</strong>  &#x21d2; Proc<sup>?</sup> </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Custom signature generator for node matching.</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#template-instance_method" title="#template (instance method)">#<strong>template</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>The template content (the section to inject).</p>
+</div></span>
+  
+</li>
+
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#when_missing-instance_method" title="#when_missing (instance method)">#<strong>when_missing</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>What to do when section not found (:skip, :append, :prepend).</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template:, destination:, anchor:, boundary: nil, preference: :template, add_missing: true, when_missing: :skip, replace_mode: false, signature_generator: nil, node_typing: nil, match_refiner: nil)  &#x21d2; PartialTemplateMergerBase </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a PartialTemplateMergerBase.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge-instance_method" title="#merge (instance method)">#<strong>merge</strong>  &#x21d2; Result </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the partial template merge.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template:, destination:, anchor:, boundary: nil, preference: :template, add_missing: true, when_missing: :skip, replace_mode: false, signature_generator: nil, node_typing: nil, match_refiner: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Ast::Merge::PartialTemplateMergerBase (class)">PartialTemplateMergerBase</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a PartialTemplateMergerBase.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The template content (the section to merge in)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destination</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The destination content</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>anchor</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Anchor matcher: { type: :heading, text: /pattern/ }</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>boundary</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Boundary matcher (defaults to same type as anchor)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:template</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Which content wins (:template, :destination, or per-type hash)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_missing</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>, <tt>Proc</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to add template nodes not in destination</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>when_missing</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:skip</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>What to do if section not found (:skip, :append, :prepend)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>replace_mode</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, template replaces section entirely (no merge)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator for SmartMerger</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration for per-type preferences</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>match_refiner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Match refiner for fuzzy matching (e.g., ContentMatchRefiner)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='label'>template:</span><span class='comma'>,</span>
+  <span class='label'>destination:</span><span class='comma'>,</span>
+  <span class='label'>anchor:</span><span class='comma'>,</span>
+  <span class='label'>boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+  <span class='label'>add_missing:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>when_missing:</span> <span class='symbol'>:skip</span><span class='comma'>,</span>
+  <span class='label'>replace_mode:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>match_refiner:</span> <span class='kw'>nil</span>
+<span class='rparen'>)</span>
+  <span class='ivar'>@template</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span>
+  <span class='ivar'>@destination</span> <span class='op'>=</span> <span class='id identifier rubyid_destination'>destination</span>
+  <span class='ivar'>@anchor</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_matcher'>normalize_matcher</span><span class='lparen'>(</span><span class='id identifier rubyid_anchor'>anchor</span><span class='rparen'>)</span>
+  <span class='ivar'>@boundary</span> <span class='op'>=</span> <span class='id identifier rubyid_boundary'>boundary</span> <span class='op'>?</span> <span class='id identifier rubyid_normalize_matcher'>normalize_matcher</span><span class='lparen'>(</span><span class='id identifier rubyid_boundary'>boundary</span><span class='rparen'>)</span> <span class='op'>:</span> <span class='kw'>nil</span>
+  <span class='ivar'>@preference</span> <span class='op'>=</span> <span class='id identifier rubyid_preference'>preference</span>
+  <span class='ivar'>@add_missing</span> <span class='op'>=</span> <span class='id identifier rubyid_add_missing'>add_missing</span>
+  <span class='ivar'>@when_missing</span> <span class='op'>=</span> <span class='id identifier rubyid_when_missing'>when_missing</span>
+  <span class='ivar'>@replace_mode</span> <span class='op'>=</span> <span class='id identifier rubyid_replace_mode'>replace_mode</span>
+  <span class='ivar'>@signature_generator</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+  <span class='ivar'>@node_typing</span> <span class='op'>=</span> <span class='id identifier rubyid_node_typing'>node_typing</span>
+  <span class='ivar'>@match_refiner</span> <span class='op'>=</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="add_missing-instance_method">
+  
+    #<strong>add_missing</strong>  &#x21d2; <tt>Boolean</tt>, <tt>Proc</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Whether to add template-only nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>, <tt>Proc</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to add template-only nodes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+79
+80
+81</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 79</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_missing'>add_missing</span>
+  <span class='ivar'>@add_missing</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="anchor-instance_method">
+  
+    #<strong>anchor</strong>  &#x21d2; <tt>Hash</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Anchor matcher configuration.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Anchor matcher configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_anchor'>anchor</span>
+  <span class='ivar'>@anchor</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="boundary-instance_method">
+  
+    #<strong>boundary</strong>  &#x21d2; <tt>Hash</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Boundary matcher configuration.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Boundary matcher configuration</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_boundary'>boundary</span>
+  <span class='ivar'>@boundary</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="destination-instance_method">
+  
+    #<strong>destination</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The destination content.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The destination content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_destination'>destination</span>
+  <span class='ivar'>@destination</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="match_refiner-instance_method">
+  
+    #<strong>match_refiner</strong>  &#x21d2; <tt>Object</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Match refiner for fuzzy matching unmatched nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Match refiner for fuzzy matching unmatched nodes</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 91</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span>
+  <span class='ivar'>@match_refiner</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="node_typing-instance_method">
+  
+    #<strong>node_typing</strong>  &#x21d2; <tt>Hash</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Node typing configuration for per-type preferences.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration for per-type preferences</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_node_typing'>node_typing</span>
+  <span class='ivar'>@node_typing</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="preference-instance_method">
+  
+    #<strong>preference</strong>  &#x21d2; <tt>Symbol</tt>, <tt>Hash</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Merge preference (:template, :destination, or per-type hash).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Merge preference (:template, :destination, or per-type hash)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_preference'>preference</span>
+  <span class='ivar'>@preference</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="signature_generator-instance_method">
+  
+    #<strong>signature_generator</strong>  &#x21d2; <tt>Proc</tt><sup>?</sup>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Custom signature generator for node matching.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator for node matching</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span>
+  <span class='ivar'>@signature_generator</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="template-instance_method">
+  
+    #<strong>template</strong>  &#x21d2; <tt>String</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns The template content (the section to inject).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The template content (the section to inject)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64
+65
+66</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_template'>template</span>
+  <span class='ivar'>@template</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      
+      <span id=""></span>
+      <div class="method_details ">
+  <h3 class="signature " id="when_missing-instance_method">
+  
+    #<strong>when_missing</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns What to do when section not found (:skip, :append, :prepend).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>What to do when section not found (:skip, :append, :prepend)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+82
+83
+84</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 82</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_when_missing'>when_missing</span>
+  <span class='ivar'>@when_missing</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge-instance_method">
+  
+    #<strong>merge</strong>  &#x21d2; <tt><span class='object_link'><a href="PartialTemplateMergerBase/Result.html" title="Ast::Merge::PartialTemplateMergerBase::Result (class)">Result</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the partial template merge.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="PartialTemplateMergerBase/Result.html" title="Ast::Merge::PartialTemplateMergerBase::Result (class)">Result</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/partial_template_merger_base.rb', line 135</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
+  <span class='comment'># Parse destination and find injection point
+</span>  <span class='id identifier rubyid_d_analysis'>d_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_create_analysis'>create_analysis</span><span class='lparen'>(</span><span class='id identifier rubyid_destination'>destination</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_d_statements'>d_statements</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Navigable.html" title="Ast::Merge::Navigable (module)">Navigable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Navigable/Statement.html" title="Ast::Merge::Navigable::Statement (class)">Statement</a></span></span><span class='period'>.</span><span class='id identifier rubyid_build_list'><span class='object_link'><a href="Navigable/Statement.html#build_list-class_method" title="Ast::Merge::Navigable::Statement.build_list (method)">build_list</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_navigable_statements_for'>navigable_statements_for</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='rparen'>)</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_finder'>finder</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Navigable.html" title="Ast::Merge::Navigable (module)">Navigable</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Navigable/InjectionPointFinder.html" title="Ast::Merge::Navigable::InjectionPointFinder (class)">InjectionPointFinder</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Navigable/InjectionPointFinder.html#initialize-instance_method" title="Ast::Merge::Navigable::InjectionPointFinder#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_d_statements'>d_statements</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_injection_point'>injection_point</span> <span class='op'>=</span> <span class='id identifier rubyid_finder'>finder</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span><span class='lparen'>(</span>
+    <span class='label'>type:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>text:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='label'>position:</span> <span class='symbol'>:replace</span><span class='comma'>,</span>
+    <span class='label'>boundary_type:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:type</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>boundary_text:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:text</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>boundary_same_or_shallower:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='op'>&amp;.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='symbol'>:same_or_shallower</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_injection_point'>injection_point</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='kw'>return</span> <span class='id identifier rubyid_handle_missing_section'>handle_missing_section</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Found the section - now merge
+</span>  <span class='id identifier rubyid_perform_section_merge'>perform_section_merge</span><span class='lparen'>(</span><span class='id identifier rubyid_d_analysis'>d_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_d_statements'>d_statements</span><span class='comma'>,</span> <span class='id identifier rubyid_injection_point'>injection_point</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:52 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

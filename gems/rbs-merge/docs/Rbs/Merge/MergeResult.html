@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Rbs::Merge::MergeResult
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Rbs::Merge::MergeResult";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (M)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Rbs.html" title="Rbs (module)">Rbs</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Rbs::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">MergeResult</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Rbs::Merge::MergeResult
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::MergeResultBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::MergeResultBase</li>
+          
+            <li class="next">Rbs::Merge::MergeResult</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/rbs/merge/merge_result.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Result container for RBS file merge operations.<br />
+Inherits from Ast::Merge::MergeResultBase for shared functionality.</p>
+
+<p>Tracks merged content, decisions made during merge, and provides<br />
+methods to reconstruct the final merged RBS file.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='const'>MergeResult</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::MergeResult#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_add_from_template'>add_from_template</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_add_from_destination'>add_from_destination</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_merged_content'>merged_content</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>Ast::Merge::MergeResultBase</li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DECISION_FREEZE_BLOCK-constant" class="">DECISION_FREEZE_BLOCK =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Decision indicating content was preserved from a freeze block</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:freeze_block</span></pre></dd>
+      
+        <dt id="DECISION_TEMPLATE-constant" class="">DECISION_TEMPLATE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Decision indicating content came from the template</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:template</span></pre></dd>
+      
+        <dt id="DECISION_DESTINATION-constant" class="">DECISION_DESTINATION =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Decision indicating content came from the destination (customization preserved)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:destination</span></pre></dd>
+      
+        <dt id="DECISION_ADDED-constant" class="">DECISION_ADDED =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Decision indicating content was added from template (new in template)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:added</span></pre></dd>
+      
+        <dt id="DECISION_RECURSIVE-constant" class="">DECISION_RECURSIVE =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Decision indicating content was recursively merged</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='symbol'>:recursive</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_freeze_block-instance_method" title="#add_freeze_block (instance method)">#<strong>add_freeze_block</strong>(freeze_node)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add content from a freeze block.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_from_destination-instance_method" title="#add_from_destination (instance method)">#<strong>add_from_destination</strong>(index, decision: DECISION_DESTINATION, comment_source_statement: nil, comment_source_analysis: nil)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add content from the destination at the given statement index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_from_template-instance_method" title="#add_from_template (instance method)">#<strong>add_from_template</strong>(index, decision: DECISION_TEMPLATE, comment_source_statement: nil, comment_source_analysis: nil)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add content from the template at the given statement index.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_raw-instance_method" title="#add_raw (instance method)">#<strong>add_raw</strong>(lines, decision:)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add raw content lines.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#add_recursive_merge-instance_method" title="#add_recursive_merge (instance method)">#<strong>add_recursive_merge</strong>(merged_content, template_index:, dest_index:)  &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Add recursively merged content.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#empty%3F-instance_method" title="#empty? (instance method)">#<strong>empty?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if any content has been added.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_analysis, dest_analysis, **options)  &#x21d2; MergeResult </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a new merge result.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#summary-instance_method" title="#summary (instance method)">#<strong>summary</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Get summary of merge decisions.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_s-instance_method" title="#to_s (instance method)">#<strong>to_s</strong>  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Convert the merged result to a string.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template_analysis, dest_analysis, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::MergeResult (class)">MergeResult</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a new merge result</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Analysis of the template file</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Analysis of the destination file</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span> <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='ivar'>@emitted_freeze_blocks</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="add_freeze_block-instance_method">
+  
+    #<strong>add_freeze_block</strong>(freeze_node)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Add content from a freeze block</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>freeze_node</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FreezeNode.html" title="Rbs::Merge::FreezeNode (class)">FreezeNode</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The freeze block to add</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_freeze_block'>add_freeze_block</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='rparen'>)</span>
+  <span class='comment'># Use the freeze_node&#39;s own analysis to get the correct content
+</span>  <span class='comment'># (template freeze blocks should use template lines, dest freeze blocks use dest lines)
+</span>  <span class='id identifier rubyid_source_analysis'>source_analysis</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='period'>.</span><span class='id identifier rubyid_analysis'>analysis</span>
+  <span class='id identifier rubyid_freeze_key'>freeze_key</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='comma'>,</span> <span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span> <span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>if</span> <span class='ivar'>@emitted_freeze_blocks</span><span class='lbracket'>[</span><span class='id identifier rubyid_freeze_key'>freeze_key</span><span class='rbracket'>]</span>
+
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_lines'>extract_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='comma'>,</span> <span class='id identifier rubyid_source_analysis'>source_analysis</span><span class='rparen'>)</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_deduplicate_leading_comment_overlap'>deduplicate_leading_comment_overlap</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@emitted_freeze_blocks</span><span class='lbracket'>[</span><span class='id identifier rubyid_freeze_key'>freeze_key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+  <span class='comment'># Determine source based on which analysis the freeze_node belongs to
+</span>  <span class='id identifier rubyid_source'>source</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_source_analysis'>source_analysis</span> <span class='op'>==</span> <span class='ivar'>@template_analysis</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='symbol'>:template</span> <span class='op'>:</span> <span class='symbol'>:destination</span>
+
+  <span class='ivar'>@decisions</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span>
+    <span class='label'>decision:</span> <span class='const'><span class='object_link'><a href="#DECISION_FREEZE_BLOCK-constant" title="Rbs::Merge::MergeResult::DECISION_FREEZE_BLOCK (constant)">DECISION_FREEZE_BLOCK</a></span></span><span class='comma'>,</span>
+    <span class='label'>source:</span> <span class='id identifier rubyid_source'>source</span><span class='comma'>,</span>
+    <span class='label'>start_line:</span> <span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span><span class='comma'>,</span>
+    <span class='label'>end_line:</span> <span class='id identifier rubyid_freeze_node'>freeze_node</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span><span class='comma'>,</span>
+    <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_from_destination-instance_method">
+  
+    #<strong>add_from_destination</strong>(index, decision: DECISION_DESTINATION, comment_source_statement: nil, comment_source_analysis: nil)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Add content from the destination at the given statement index</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Statement index in destination</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decision</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DECISION_DESTINATION</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Decision type (default: DECISION_DESTINATION)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_from_destination'>add_from_destination</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'><span class='object_link'><a href="#DECISION_DESTINATION-constant" title="Rbs::Merge::MergeResult::DECISION_DESTINATION (constant)">DECISION_DESTINATION</a></span></span><span class='comma'>,</span> <span class='label'>comment_source_statement:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comment_source_analysis:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_statement'>statement</span> <span class='op'>=</span> <span class='ivar'>@dest_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_statement'>statement</span>
+
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_lines'>extract_lines</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_statement'>statement</span><span class='comma'>,</span>
+    <span class='ivar'>@dest_analysis</span><span class='comma'>,</span>
+    <span class='label'>comment_source_statement:</span> <span class='id identifier rubyid_comment_source_statement'>comment_source_statement</span><span class='comma'>,</span>
+    <span class='label'>comment_source_analysis:</span> <span class='id identifier rubyid_comment_source_analysis'>comment_source_analysis</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_deduplicate_leading_comment_overlap'>deduplicate_leading_comment_overlap</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@decisions</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span><span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_from_template-instance_method">
+  
+    #<strong>add_from_template</strong>(index, decision: DECISION_TEMPLATE, comment_source_statement: nil, comment_source_analysis: nil)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Add content from the template at the given statement index</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Statement index in template</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decision</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DECISION_TEMPLATE</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Decision type (default: DECISION_TEMPLATE)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_from_template'>add_from_template</span><span class='lparen'>(</span><span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'><span class='object_link'><a href="#DECISION_TEMPLATE-constant" title="Rbs::Merge::MergeResult::DECISION_TEMPLATE (constant)">DECISION_TEMPLATE</a></span></span><span class='comma'>,</span> <span class='label'>comment_source_statement:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>comment_source_analysis:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_statement'>statement</span> <span class='op'>=</span> <span class='ivar'>@template_analysis</span><span class='period'>.</span><span class='id identifier rubyid_statements'>statements</span><span class='lbracket'>[</span><span class='id identifier rubyid_index'>index</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_statement'>statement</span>
+
+  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_lines'>extract_lines</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_statement'>statement</span><span class='comma'>,</span>
+    <span class='ivar'>@template_analysis</span><span class='comma'>,</span>
+    <span class='label'>comment_source_statement:</span> <span class='id identifier rubyid_comment_source_statement'>comment_source_statement</span><span class='comma'>,</span>
+    <span class='label'>comment_source_analysis:</span> <span class='id identifier rubyid_comment_source_analysis'>comment_source_analysis</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_deduplicate_leading_comment_overlap'>deduplicate_leading_comment_overlap</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@decisions</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span><span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_raw-instance_method">
+  
+    #<strong>add_raw</strong>(lines, decision:)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Add raw content lines</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>lines</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lines to add</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decision</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Decision type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+134
+135
+136
+137</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 134</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_raw'>add_raw</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='label'>decision:</span><span class='rparen'>)</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_deduplicate_leading_comment_overlap'>deduplicate_leading_comment_overlap</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@decisions</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span><span class='label'>decision:</span> <span class='id identifier rubyid_decision'>decision</span><span class='comma'>,</span> <span class='label'>source:</span> <span class='symbol'>:raw</span><span class='comma'>,</span> <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="add_recursive_merge-instance_method">
+  
+    #<strong>add_recursive_merge</strong>(merged_content, template_index:, dest_index:)  &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Add recursively merged content</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>merged_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merged content string</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>template_index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template statement index</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination statement index</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 115</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_add_recursive_merge'>add_recursive_merge</span><span class='lparen'>(</span><span class='id identifier rubyid_merged_content'>merged_content</span><span class='comma'>,</span> <span class='label'>template_index:</span><span class='comma'>,</span> <span class='label'>dest_index:</span><span class='rparen'>)</span>
+  <span class='comment'># Split without trailing newlines for consistency with other methods
+</span>  <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_merged_content'>merged_content</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+  <span class='comment'># Remove trailing empty element if content ended with newline
+</span>  <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span> <span class='kw'>if</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_deduplicate_leading_comment_overlap'>deduplicate_leading_comment_overlap</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='rparen'>)</span><span class='rparen'>)</span>
+  <span class='ivar'>@decisions</span> <span class='op'>&lt;&lt;</span> <span class='lbrace'>{</span>
+    <span class='label'>decision:</span> <span class='const'><span class='object_link'><a href="#DECISION_RECURSIVE-constant" title="Rbs::Merge::MergeResult::DECISION_RECURSIVE (constant)">DECISION_RECURSIVE</a></span></span><span class='comma'>,</span>
+    <span class='label'>source:</span> <span class='symbol'>:merged</span><span class='comma'>,</span>
+    <span class='label'>template_index:</span> <span class='id identifier rubyid_template_index'>template_index</span><span class='comma'>,</span>
+    <span class='label'>dest_index:</span> <span class='id identifier rubyid_dest_index'>dest_index</span><span class='comma'>,</span>
+    <span class='label'>lines:</span> <span class='id identifier rubyid_lines'>lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="empty?-instance_method">
+  
+    #<strong>empty?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if any content has been added</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+153
+154
+155</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 153</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
+  <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="summary-instance_method">
+  
+    #<strong>summary</strong>  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Get summary of merge decisions</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Summary with counts by decision type</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+159
+160
+161
+162
+163
+164
+165
+166</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 159</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_summary'>summary</span>
+  <span class='id identifier rubyid_counts'>counts</span> <span class='op'>=</span> <span class='ivar'>@decisions</span><span class='period'>.</span><span class='id identifier rubyid_group_by'>group_by</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_d'>d</span><span class='op'>|</span> <span class='id identifier rubyid_d'>d</span><span class='lbracket'>[</span><span class='symbol'>:decision</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_transform_values'>transform_values</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:count</span><span class='rparen'>)</span>
+  <span class='lbrace'>{</span>
+    <span class='label'>total_decisions:</span> <span class='ivar'>@decisions</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>total_lines:</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span>
+    <span class='label'>by_decision:</span> <span class='id identifier rubyid_counts'>counts</span><span class='comma'>,</span>
+  <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="to_s-instance_method">
+  
+    #<strong>to_s</strong>  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Convert the merged result to a string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merged RBS content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+141
+142
+143
+144
+145
+146
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/merge_result.rb', line 141</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_to_s'>to_s</span>
+  <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='comment'># Lines are stored without trailing newlines, so join with newlines
+</span>  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='ivar'>@lines</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='comment'># Ensure file ends with newline if content is non-empty
+</span>  <span class='id identifier rubyid_result'>result</span> <span class='op'>+=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_end_with?'>end_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_result'>result</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:12 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

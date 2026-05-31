@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::Detector::Mergeable
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::Detector::Mergeable";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (M)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Detector.html" title="Ast::Merge::Detector (module)">Detector</a></span></span>
+     &raquo; 
+    <span class="title">Mergeable</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::Detector::Mergeable
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="../SmartMergerBase.html" title="Ast::Merge::SmartMergerBase (class)">SmartMergerBase</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/detector/mergeable.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Mixin for adding region support to SmartMerger classes.</p>
+
+<p>This module provides functionality for detecting and handling regions<br />
+within documents that should be merged with different strategies.<br />
+Regions are portions of a document (like YAML frontmatter or fenced<br />
+code blocks) that may require specialized merging.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic region configuration</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='kw'>class</span> <span class='const'>SmartMerger</span>
+  <span class='id identifier rubyid_include'>include</span> <span class='const'><span class='object_link'><a href="../Detector.html" title="Ast::Merge::Detector (module)">Detector</a></span></span><span class='op'>::</span><span class='const'>Mergeable</span>
+
+  <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span> <span class='label'>regions:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>region_placeholder:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='ivar'>@template_content</span> <span class='op'>=</span> <span class='id identifier rubyid_template'>template</span>
+    <span class='ivar'>@dest_content</span> <span class='op'>=</span> <span class='id identifier rubyid_dest'>dest</span>
+    <span class='id identifier rubyid_setup_regions'>setup_regions</span><span class='lparen'>(</span><span class='label'>regions:</span> <span class='id identifier rubyid_regions'>regions</span><span class='comma'>,</span> <span class='label'>region_placeholder:</span> <span class='id identifier rubyid_region_placeholder'>region_placeholder</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With YAML frontmatter regions</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+  <span class='label'>regions:</span> <span class='lbracket'>[</span>
+    <span class='lbrace'>{</span>
+      <span class='label'>detector:</span> <span class='const'><span class='object_link'><a href="../Detector.html" title="Ast::Merge::Detector (module)">Detector</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="YamlFrontmatter.html" title="Ast::Merge::Detector::YamlFrontmatter (class)">YamlFrontmatter</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
+      <span class='label'>merger_class:</span> <span class='const'>SomeYamlMerger</span><span class='comma'>,</span>
+      <span class='label'>merger_options:</span> <span class='lbrace'>{</span> <span class='label'>preserve_order:</span> <span class='kw'>true</span> <span class='rbrace'>}</span>
+    <span class='rbrace'>}</span>
+  <span class='rbracket'>]</span>
+<span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With nested regions (code blocks in markdown)</p>
+</div></h5>
+      
+      <pre class="example code"><code>merger = SmartMerger.new(
+  template,
+  dest,
+  regions: [
+    {
+      detector: Detector::FencedCodeBlock.ruby,
+      merger_class: Prism::Merge::SmartMerger,
+      regions: [...]  # Nested regions!
+    }
+  ]
+)</code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Base.html" title="Ast::Merge::Detector::Base (class)">For implementing custom detectors</a></span></li>
+    
+      <li><span class='object_link'><a href="Region.html" title="Ast::Merge::Detector::Region (class)">The data struct for detected regions</a></span></li>
+    
+  </ul>
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="Mergeable/Config.html" title="Ast::Merge::Detector::Mergeable::Config (class)">Config</a></span>, <span class='object_link'><a href="Mergeable/ExtractedRegion.html" title="Ast::Merge::Detector::Mergeable::ExtractedRegion (class)">ExtractedRegion</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_PLACEHOLDER_PREFIX-constant" class="">DEFAULT_PLACEHOLDER_PREFIX =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default placeholder prefix for extracted regions</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;&lt;&lt;AST_MERGE_REGION_</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+        <dt id="DEFAULT_PLACEHOLDER_SUFFIX-constant" class="">DEFAULT_PLACEHOLDER_SUFFIX =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default placeholder suffix for extracted regions.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&gt;&gt;&gt;</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extract_dest_regions-instance_method" title="#extract_dest_regions (instance method)">#<strong>extract_dest_regions</strong>(content)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Extract regions from the destination content, replacing with placeholders.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#extract_template_regions-instance_method" title="#extract_template_regions (instance method)">#<strong>extract_template_regions</strong>(content)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Extract regions from the template content, replacing with placeholders.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#regions_configured%3F-instance_method" title="#regions_configured? (instance method)">#<strong>regions_configured?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if this merger has region configurations.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#setup_regions-instance_method" title="#setup_regions (instance method)">#<strong>setup_regions</strong>(regions:, region_placeholder: nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Set up region handling for this merger instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#substitute_merged_regions-instance_method" title="#substitute_merged_regions (instance method)">#<strong>substitute_merged_regions</strong>(merged_content)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Merge extracted regions and substitute them back into the merged content.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="extract_dest_regions-instance_method">
+  
+    #<strong>extract_dest_regions</strong>(content)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Extract regions from the destination content, replacing with placeholders.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Content with regions replaced by placeholders</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../PlaceholderCollisionError.html" title="Ast::Merge::PlaceholderCollisionError (class)">PlaceholderCollisionError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if content contains placeholder text</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+132
+133
+134
+135
+136</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/detector/mergeable.rb', line 132</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extract_dest_regions'>extract_dest_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_content'>content</span> <span class='kw'>unless</span> <span class='id identifier rubyid_regions_configured?'>regions_configured?</span>
+
+  <span class='id identifier rubyid_extract_regions'>extract_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='ivar'>@extracted_dest_regions</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="extract_template_regions-instance_method">
+  
+    #<strong>extract_template_regions</strong>(content)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Extract regions from the template content, replacing with placeholders.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template content</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Content with regions replaced by placeholders</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../PlaceholderCollisionError.html" title="Ast::Merge::PlaceholderCollisionError (class)">PlaceholderCollisionError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if content contains placeholder text</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+119
+120
+121
+122
+123</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/detector/mergeable.rb', line 119</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_extract_template_regions'>extract_template_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_content'>content</span> <span class='kw'>unless</span> <span class='id identifier rubyid_regions_configured?'>regions_configured?</span>
+
+  <span class='id identifier rubyid_extract_regions'>extract_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='ivar'>@extracted_template_regions</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="regions_configured?-instance_method">
+  
+    #<strong>regions_configured?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if this merger has region configurations.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if regions are configured</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/detector/mergeable.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_regions_configured?'>regions_configured?</span>
+  <span class='ivar'>@region_configs</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='ivar'>@region_configs</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="setup_regions-instance_method">
+  
+    #<strong>setup_regions</strong>(regions:, region_placeholder: nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Set up region handling for this merger instance.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>regions</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of region configurations</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>region_placeholder</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom placeholder prefix (optional)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>ArgumentError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if regions configuration is invalid</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96
+97
+98
+99
+100
+101</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/detector/mergeable.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_setup_regions'>setup_regions</span><span class='lparen'>(</span><span class='label'>regions:</span><span class='comma'>,</span> <span class='label'>region_placeholder:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@region_configs</span> <span class='op'>=</span> <span class='id identifier rubyid_build_region_configs'>build_region_configs</span><span class='lparen'>(</span><span class='id identifier rubyid_regions'>regions</span><span class='rparen'>)</span>
+  <span class='ivar'>@region_placeholder_prefix</span> <span class='op'>=</span> <span class='id identifier rubyid_region_placeholder'>region_placeholder</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="#DEFAULT_PLACEHOLDER_PREFIX-constant" title="Ast::Merge::Detector::Mergeable::DEFAULT_PLACEHOLDER_PREFIX (constant)">DEFAULT_PLACEHOLDER_PREFIX</a></span></span>
+  <span class='ivar'>@extracted_template_regions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='ivar'>@extracted_dest_regions</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="substitute_merged_regions-instance_method">
+  
+    #<strong>substitute_merged_regions</strong>(merged_content)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Merge extracted regions and substitute them back into the merged content.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>merged_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merged content with placeholders</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Content with placeholders replaced by merged regions</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+144
+145
+146
+147
+148
+149
+150
+151
+152</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/detector/mergeable.rb', line 144</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_substitute_merged_regions'>substitute_merged_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_merged_content'>merged_content</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_merged_content'>merged_content</span> <span class='kw'>unless</span> <span class='id identifier rubyid_regions_configured?'>regions_configured?</span>
+
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merged_content'>merged_content</span>
+
+  <span class='comment'># Process regions in reverse order of extraction to handle nested placeholders
+</span>  <span class='comment'># We need to merge template and dest regions by their placeholder index
+</span>  <span class='id identifier rubyid_merge_and_substitute_regions'>merge_and_substitute_regions</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

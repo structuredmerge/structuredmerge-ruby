@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Ast::Merge::TrailingGroups::DestIterate
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Ast::Merge::TrailingGroups::DestIterate";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (D)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../Ast.html" title="Ast (module)">Ast</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Merge.html" title="Ast::Merge (module)">Merge</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../TrailingGroups.html" title="Ast::Merge::TrailingGroups (module)">TrailingGroups</a></span></span>
+     &raquo; 
+    <span class="title">DestIterate</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Ast::Merge::TrailingGroups::DestIterate
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="Core.html" title="Ast::Merge::TrailingGroups::Core (module)">Core</a></span></dd>
+  </dl>
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="../Text/ConflictResolver.html" title="Ast::Merge::Text::ConflictResolver (class)">Ast::Merge::Text::ConflictResolver</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/ast/merge/trailing_groups/dest_iterate.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Pattern A — Destination-iterate trailing groups.</p>
+
+<p>Convenience wrapper around {Core} for gems that iterate destination<br />
+nodes and match them against template nodes by signature.  This is the<br />
+pattern used by prism-merge, psych-merge, json-merge, jsonc-merge,<br />
+toml-merge, and bash-merge.</p>
+
+<h2 id="typical-usage">Typical usage</h2>
+
+<p>include Ast::Merge::TrailingGroups::DestIterate</p>
+
+<p># 1. Build groups<br />
+  groups, matched = build_dest_iterate_trailing_groups(<br />
+    template_nodes: t_nodes,<br />
+    dest_sigs: dest_sig_set,<br />
+    signature_for: -&gt;(node) { analysis.generate_signature(node) },<br />
+  )</p>
+
+<p># 2. Emit prefix<br />
+  emit_prefix_trailing_group(groups, consumed) { |info| emit(info[:node]) }</p>
+
+<p># 3. Inside dest loop, after each match:<br />
+  flush_ready_trailing_groups(<br />
+    trailing_groups: groups,<br />
+    matched_indices: matched,<br />
+    consumed_indices: consumed,<br />
+  ) { |info| emit(info[:node]) }</p>
+
+<p># 4. After dest loop:<br />
+  emit_remaining_trailing_groups(<br />
+    trailing_groups: groups,<br />
+    consumed_indices: consumed,<br />
+  ) { |info| emit(info[:node]) }</p>
+
+<h2 id="hooks">Hooks</h2>
+
+<p>Override <span class='object_link'><a href="#trailing_group_node_matched%3F-instance_method" title="Ast::Merge::TrailingGroups::DestIterate#trailing_group_node_matched? (method)">#trailing_group_node_matched?</a></span> to add format-specific match<br />
+criteria (e.g. freeze-node detection, refined-match IDs).</p>
+
+<p>Override the +entry_builder:+ parameter on <span class='object_link'><a href="#build_dest_iterate_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::DestIterate#build_dest_iterate_trailing_groups (method)">#build_dest_iterate_trailing_groups</a></span><br />
+to add extra keys to each entry (e.g. +:item+ for psych-merge sequences).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="Core.html" title="Ast::Merge::TrailingGroups::Core (module)">The underlying primitives</a></span></li>
+    
+      <li><span class='object_link'><a href="AlignmentSort.html" title="Ast::Merge::TrailingGroups::AlignmentSort (module)">Alternative pattern for alignment-based gems</a></span></li>
+    
+  </ul>
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#build_dest_iterate_trailing_groups-instance_method" title="#build_dest_iterate_trailing_groups (instance method)">#<strong>build_dest_iterate_trailing_groups</strong>(template_nodes:, dest_sigs:, signature_for:, refined_template_ids: ::Set.new, entry_builder: nil, add_template_only_nodes: true)  &#x21d2; Array(Hash, Set) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Build trailing groups using destination signatures for match detection.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#emit_prefix_trailing_group-instance_method" title="#emit_prefix_trailing_group (instance method)">#<strong>emit_prefix_trailing_group</strong>(trailing_groups, consumed_indices) {|info| ... } &#x21d2; void </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Emit the +:prefix+ trailing group (template-only nodes before the first matched template node).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#trailing_group_node_matched%3F-instance_method" title="#trailing_group_node_matched? (instance method)">#<strong>trailing_group_node_matched?</strong>(_node, _signature)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Hook: additional match criteria for a template node.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="Core.html" title="Ast::Merge::TrailingGroups::Core (module)">Core</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="Core.html#build_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#build_trailing_groups (method)">#build_trailing_groups</a></span>, <span class='object_link'><a href="Core.html#emit_remaining_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#emit_remaining_trailing_groups (method)">#emit_remaining_trailing_groups</a></span>, <span class='object_link'><a href="Core.html#flush_ready_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#flush_ready_trailing_groups (method)">#flush_ready_trailing_groups</a></span></p>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="build_dest_iterate_trailing_groups-instance_method">
+  
+    #<strong>build_dest_iterate_trailing_groups</strong>(template_nodes:, dest_sigs:, signature_for:, refined_template_ids: ::Set.new, entry_builder: nil, add_template_only_nodes: true)  &#x21d2; <tt>Array(Hash, Set)</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Build trailing groups using destination signatures for match detection.</p>
+
+<p>This is the standard Pattern A builder.  A template node is considered<br />
+“matched” when any of the following is true:</p>
+
+<ol>
+  <li>Its signature exists in +dest_sigs+</li>
+  <li>Its +object_id+ is in +refined_template_ids+</li>
+  <li><span class='object_link'><a href="#trailing_group_node_matched%3F-instance_method" title="Ast::Merge::TrailingGroups::DestIterate#trailing_group_node_matched? (method)">#trailing_group_node_matched?</a></span> returns true (override hook)</li>
+</ol>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Ordered template nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_sigs</span>
+      
+      
+        <span class='type'>(<tt>Set</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Set of destination node signatures</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_for</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Lambda receiving +(node)+ returning signature</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>refined_template_ids</span>
+      
+      
+        <span class='type'>(<tt>Set</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>::Set.new</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Object IDs of refined-match template nodes</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>entry_builder</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom entry builder (see <span class='object_link'><a href="Core.html#build_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::Core#build_trailing_groups (method)">Core#build_trailing_groups</a></span>)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_template_only_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Gate — returns empty results when false</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array(Hash, Set)</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Tuple of +[trailing_groups, matched_indices]+</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/dest_iterate.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_build_dest_iterate_trailing_groups'>build_dest_iterate_trailing_groups</span><span class='lparen'>(</span>
+  <span class='label'>template_nodes:</span><span class='comma'>,</span>
+  <span class='label'>dest_sigs:</span><span class='comma'>,</span>
+  <span class='label'>signature_for:</span><span class='comma'>,</span>
+  <span class='label'>refined_template_ids:</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='comma'>,</span>
+  <span class='label'>entry_builder:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span>
+<span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span>
+
+  <span class='id identifier rubyid_predicate'>predicate</span> <span class='op'>=</span> <span class='id identifier rubyid_lambda'>lambda</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid__idx'>_idx</span><span class='op'>|</span>
+    <span class='id identifier rubyid_sig'>sig</span> <span class='op'>=</span> <span class='id identifier rubyid_signature_for'>signature_for</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span>
+    <span class='lparen'>(</span><span class='id identifier rubyid_sig'>sig</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_dest_sigs'>dest_sigs</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_sig'>sig</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='op'>||</span>
+      <span class='id identifier rubyid_refined_template_ids'>refined_template_ids</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_object_id'>object_id</span><span class='rparen'>)</span> <span class='op'>||</span>
+      <span class='id identifier rubyid_trailing_group_node_matched?'>trailing_group_node_matched?</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='comma'>,</span> <span class='id identifier rubyid_sig'>sig</span><span class='rparen'>)</span>
+  <span class='rbrace'>}</span>
+
+  <span class='id identifier rubyid_build_trailing_groups'>build_trailing_groups</span><span class='lparen'>(</span>
+    <span class='label'>template_nodes:</span> <span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span>
+    <span class='label'>matched_predicate:</span> <span class='id identifier rubyid_predicate'>predicate</span><span class='comma'>,</span>
+    <span class='label'>entry_builder:</span> <span class='id identifier rubyid_entry_builder'>entry_builder</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="emit_prefix_trailing_group-instance_method">
+  
+    #<strong>emit_prefix_trailing_group</strong>(trailing_groups, consumed_indices) {|info| ... } &#x21d2; <tt>void</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p class="note returns_void">This method returns an undefined value.</p><p>Emit the +:prefix+ trailing group (template-only nodes before the<br />
+first matched template node).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>trailing_groups</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Groups built by <span class='object_link'><a href="#build_dest_iterate_trailing_groups-instance_method" title="Ast::Merge::TrailingGroups::DestIterate#build_dest_iterate_trailing_groups (method)">#build_dest_iterate_trailing_groups</a></span></p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>consumed_indices</span>
+      
+      
+        <span class='type'>(<tt>Set&lt;Integer&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Indices consumed so far</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Yields:</p>
+<ul class="yield">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>info</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Called for each prefix entry</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>info</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Entry hash with at least +:node+ and +:index+</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/dest_iterate.rb', line 101</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_emit_prefix_trailing_group'>emit_prefix_trailing_group</span><span class='lparen'>(</span><span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='comma'>,</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_emit_block'>emit_block</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_group'>group</span> <span class='op'>=</span> <span class='id identifier rubyid_trailing_groups'>trailing_groups</span><span class='lbracket'>[</span><span class='symbol'>:prefix</span><span class='rbracket'>]</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_group'>group</span>
+
+  <span class='id identifier rubyid_group'>group</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_info'>info</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_consumed_indices'>consumed_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_emit_block'>emit_block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_info'>info</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_consumed_indices'>consumed_indices</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:index</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="trailing_group_node_matched?-instance_method">
+  
+    #<strong>trailing_group_node_matched?</strong>(_node, _signature)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Hook: additional match criteria for a template node.</p>
+
+<p>Override in including classes to recognize format-specific “always<br />
+matched” nodes (e.g. freeze nodes in psych-merge, bash-merge).</p>
+
+<p>The default implementation returns +false+.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>_node</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template node</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>_signature</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The node’s computed signature</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if the node should be treated as matched</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ast/merge/trailing_groups/dest_iterate.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_trailing_group_node_matched?'>trailing_group_node_matched?</span><span class='lparen'>(</span><span class='id identifier rubyid__node'>_node</span><span class='comma'>,</span> <span class='id identifier rubyid__signature'>_signature</span><span class='rparen'>)</span>
+  <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:47 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

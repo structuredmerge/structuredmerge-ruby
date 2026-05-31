@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Markdown::Merge::PartialTemplateMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Markdown::Merge::PartialTemplateMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">PartialTemplateMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Markdown::Merge::PartialTemplateMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::PartialTemplateMergerBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::PartialTemplateMergerBase</li>
+          
+            <li class="next">Markdown::Merge::PartialTemplateMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd><span class='object_link'><a href="PreservationSupport.html" title="Markdown::Merge::PreservationSupport (module)">PreservationSupport</a></span></dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/markdown/merge/partial_template_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Markdown-specific implementation of PartialTemplateMerger.</p>
+
+<p>Merges a partial template into a specific section of a destination markdown document.<br />
+This class extends the parser-agnostic base with markdown-specific logic for:</p>
+<ul>
+  <li>Heading-level-aware section boundaries</li>
+  <li>Source-based text extraction to preserve link references and table formatting</li>
+  <li>Backend-specific parser initialization (Markly, Commonmarker)</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'>PartialTemplateMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::PartialTemplateMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>template:</span> <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='label'>destination:</span> <span class='id identifier rubyid_destination_content'>destination_content</span><span class='comma'>,</span>
+  <span class='label'>anchor:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:heading</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Gem Family</span><span class='regexp_end'>/</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>backend:</span> <span class='symbol'>:markly</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span>
+<span class='id identifier rubyid_puts'>puts</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With boundary</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../Markdown.html" title="Markdown (module)">Markdown</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Merge.html" title="Markdown::Merge (module)">Merge</a></span></span><span class='op'>::</span><span class='const'>PartialTemplateMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::PartialTemplateMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>template:</span> <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='label'>destination:</span> <span class='id identifier rubyid_destination_content'>destination_content</span><span class='comma'>,</span>
+  <span class='label'>anchor:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:heading</span><span class='comma'>,</span> <span class='label'>text:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>Installation</span><span class='regexp_end'>/</span></span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>boundary:</span> <span class='lbrace'>{</span> <span class='label'>type:</span> <span class='symbol'>:heading</span> <span class='rbrace'>}</span><span class='comma'>,</span>  <span class='comment'># Stop at next heading
+</span>  <span class='label'>backend:</span> <span class='symbol'>:markly</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="Result-constant" class="">Result =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Re-export Result class from base for convenience</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>PartialTemplateMergerBase</span><span class='op'>::</span><span class='const'>Result</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#backend-instance_method" title="#backend (instance method)">#<strong>backend</strong>  &#x21d2; Symbol </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Backend to use (:markly, :commonmarker).</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_backend-class_method" title="default_backend (class method)">.<strong>default_backend</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#file_analysis_class-class_method" title="file_analysis_class (class method)">.<strong>file_analysis_class</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#smart_merger_class-class_method" title="smart_merger_class (class method)">.<strong>smart_merger_class</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template:, destination:, anchor:, boundary: nil, backend: self.class.default_backend, preference: :template, add_missing: true, when_missing: :skip, replace_mode: false, signature_generator: nil, node_typing: nil, match_refiner: nil, normalize_whitespace: false, rehydrate_link_references: false)  &#x21d2; PartialTemplateMerger </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a markdown PartialTemplateMerger.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#merge-instance_method" title="#merge (instance method)">#<strong>merge</strong>  &#x21d2; Result </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Perform the partial template merge with post-processing.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template:, destination:, anchor:, boundary: nil, backend: self.class.default_backend, preference: :template, add_missing: true, when_missing: :skip, replace_mode: false, signature_generator: nil, node_typing: nil, match_refiner: nil, normalize_whitespace: false, rehydrate_link_references: false)  &#x21d2; <tt><span class='object_link'><a href="" title="Markdown::Merge::PartialTemplateMerger (class)">PartialTemplateMerger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a markdown PartialTemplateMerger.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The template content (the section to merge in)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>destination</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The destination content</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>anchor</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Anchor matcher: { type: :heading, text: /pattern/ }</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>boundary</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Boundary matcher (defaults to same type as anchor)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>backend</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>self.class.default_backend</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend to use (:markly, :commonmarker)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:template</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Which content wins (:template, :destination, or per-type hash)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_missing</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>, <tt>Proc</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>true</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Whether to add template nodes not in destination</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>when_missing</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:skip</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>What to do if section not found (:skip, :append, :prepend)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>replace_mode</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, template replaces section entirely (no merge)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom signature generator for SmartMerger</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration for per-type preferences</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>match_refiner</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Match refiner for fuzzy matching (e.g., ContentMatchRefiner)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>normalize_whitespace</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, collapse excessive blank lines. Default: false</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>rehydrate_link_references</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>If true, convert inline links to reference style. Default: false</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 71</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='label'>template:</span><span class='comma'>,</span>
+  <span class='label'>destination:</span><span class='comma'>,</span>
+  <span class='label'>anchor:</span><span class='comma'>,</span>
+  <span class='label'>boundary:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>backend:</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_default_backend'>default_backend</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+  <span class='label'>add_missing:</span> <span class='kw'>true</span><span class='comma'>,</span>
+  <span class='label'>when_missing:</span> <span class='symbol'>:skip</span><span class='comma'>,</span>
+  <span class='label'>replace_mode:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>normalize_whitespace:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>rehydrate_link_references:</span> <span class='kw'>false</span>
+<span class='rparen'>)</span>
+  <span class='id identifier rubyid_validate_backend!'>validate_backend!</span><span class='lparen'>(</span><span class='id identifier rubyid_backend'>backend</span><span class='rparen'>)</span>
+  <span class='ivar'>@backend</span> <span class='op'>=</span> <span class='id identifier rubyid_backend'>backend</span>
+  <span class='ivar'>@normalize_whitespace</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_whitespace'>normalize_whitespace</span>
+  <span class='ivar'>@rehydrate_link_references</span> <span class='op'>=</span> <span class='id identifier rubyid_rehydrate_link_references'>rehydrate_link_references</span>
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='label'>template:</span> <span class='id identifier rubyid_template'>template</span><span class='comma'>,</span>
+    <span class='label'>destination:</span> <span class='id identifier rubyid_destination'>destination</span><span class='comma'>,</span>
+    <span class='label'>anchor:</span> <span class='id identifier rubyid_anchor'>anchor</span><span class='comma'>,</span>
+    <span class='label'>boundary:</span> <span class='id identifier rubyid_boundary'>boundary</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_missing:</span> <span class='id identifier rubyid_add_missing'>add_missing</span><span class='comma'>,</span>
+    <span class='label'>when_missing:</span> <span class='id identifier rubyid_when_missing'>when_missing</span><span class='comma'>,</span>
+    <span class='label'>replace_mode:</span> <span class='id identifier rubyid_replace_mode'>replace_mode</span><span class='comma'>,</span>
+    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span>
+    <span class='label'>node_typing:</span> <span class='id identifier rubyid_node_typing'>node_typing</span><span class='comma'>,</span>
+    <span class='label'>match_refiner:</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span><span class='comma'>,</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="backend-instance_method">
+  
+    #<strong>backend</strong>  &#x21d2; <tt>Symbol</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Backend to use (:markly, :commonmarker).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Backend to use (:markly, :commonmarker)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+53
+54
+55</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 53</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_backend'>backend</span>
+  <span class='ivar'>@backend</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="default_backend-class_method">
+  
+    .<strong>default_backend</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 39</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_backend'>default_backend</span>
+  <span class='symbol'>:markly</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="file_analysis_class-class_method">
+  
+    .<strong>file_analysis_class</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_file_analysis_class'>file_analysis_class</span>
+  <span class='const'><span class='object_link'><a href="FileAnalysis.html" title="Markdown::Merge::FileAnalysis (class)">FileAnalysis</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="smart_merger_class-class_method">
+  
+    .<strong>smart_merger_class</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_smart_merger_class'>smart_merger_class</span>
+  <span class='const'><span class='object_link'><a href="SmartMerger.html" title="Markdown::Merge::SmartMerger (class)">SmartMerger</a></span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="merge-instance_method">
+  
+    #<strong>merge</strong>  &#x21d2; <tt><span class='object_link'><a href="#Result-constant" title="Markdown::Merge::PartialTemplateMerger::Result (constant)">Result</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Perform the partial template merge with post-processing.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="#Result-constant" title="Markdown::Merge::PartialTemplateMerger::Result (constant)">Result</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The merge result</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/markdown/merge/partial_template_merger.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_merge'>merge</span>
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>super</span>
+
+  <span class='comment'># Apply post-processing if enabled
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span> <span class='op'>&amp;&amp;</span> <span class='lparen'>(</span><span class='ivar'>@normalize_whitespace</span> <span class='op'>||</span> <span class='ivar'>@rehydrate_link_references</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_content'>content</span>
+    <span class='id identifier rubyid_problems'>problems</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="DocumentProblems.html" title="Markdown::Merge::DocumentProblems (class)">DocumentProblems</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="DocumentProblems.html#initialize-instance_method" title="Markdown::Merge::DocumentProblems#initialize (method)">new</a></span></span>
+
+    <span class='kw'>if</span> <span class='ivar'>@normalize_whitespace</span>
+      <span class='id identifier rubyid_normalizer'>normalizer</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="WhitespaceNormalizer.html" title="Markdown::Merge::WhitespaceNormalizer (class)">WhitespaceNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="WhitespaceNormalizer.html#initialize-instance_method" title="Markdown::Merge::WhitespaceNormalizer#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_normalizer'>normalizer</span><span class='period'>.</span><span class='id identifier rubyid_normalize'>normalize</span>
+      <span class='id identifier rubyid_problems'>problems</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_normalizer'>normalizer</span><span class='period'>.</span><span class='id identifier rubyid_problems'>problems</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='ivar'>@rehydrate_link_references</span>
+      <span class='id identifier rubyid_rehydrator'>rehydrator</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="LinkReferenceRehydrator.html" title="Markdown::Merge::LinkReferenceRehydrator (class)">LinkReferenceRehydrator</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="LinkReferenceRehydrator.html#initialize-instance_method" title="Markdown::Merge::LinkReferenceRehydrator#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='id identifier rubyid_rehydrator'>rehydrator</span><span class='period'>.</span><span class='id identifier rubyid_rehydrate'>rehydrate</span>
+      <span class='id identifier rubyid_problems'>problems</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='id identifier rubyid_rehydrator'>rehydrator</span><span class='period'>.</span><span class='id identifier rubyid_problems'>problems</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Return new result with transformed content and problems
+</span>    <span class='const'><span class='object_link'><a href="#Result-constant" title="Markdown::Merge::PartialTemplateMerger::Result (constant)">Result</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Markdown::Merge::PartialTemplateMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+      <span class='label'>content:</span> <span class='id identifier rubyid_content'>content</span><span class='comma'>,</span>
+      <span class='label'>has_section:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_has_section'>has_section</span><span class='comma'>,</span>
+      <span class='label'>changed:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_changed'>changed</span><span class='comma'>,</span>
+      <span class='label'>stats:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_stats'>stats</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>problems:</span> <span class='id identifier rubyid_problems'>problems</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span><span class='rparen'>)</span><span class='comma'>,</span>
+      <span class='label'>injection_point:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_injection_point'>injection_point</span><span class='comma'>,</span>
+      <span class='label'>message:</span> <span class='id identifier rubyid_result'>result</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='comma'>,</span>
+    <span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='id identifier rubyid_result'>result</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:06 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

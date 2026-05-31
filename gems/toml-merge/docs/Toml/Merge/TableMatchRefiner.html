@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Toml::Merge::TableMatchRefiner
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Toml::Merge::TableMatchRefiner";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (T)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Toml.html" title="Toml (module)">Toml</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Toml::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">TableMatchRefiner</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Toml::Merge::TableMatchRefiner
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::MatchRefinerBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::MatchRefinerBase</li>
+          
+            <li class="next">Toml::Merge::TableMatchRefiner</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/toml/merge/table_match_refiner.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Match refiner for TOML tables that didn’t match by exact signature.</p>
+
+<p>This refiner uses string similarity to pair tables that have:</p>
+<ul>
+  <li>Similar but not identical names</li>
+  <li>Similar structure (key counts)</li>
+  <li>Similar key names</li>
+</ul>
+
+<p>Tables are matched using a multi-factor scoring algorithm that considers:</p>
+<ul>
+  <li>Table/section name similarity</li>
+  <li>Key name overlap</li>
+  <li>Position in document</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_refiner'>refiner</span> <span class='op'>=</span> <span class='const'>TableMatchRefiner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Toml::Merge::TableMatchRefiner#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='float'>0.5</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_matches'>matches</span> <span class='op'>=</span> <span class='id identifier rubyid_refiner'>refiner</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With custom weights</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_refiner'>refiner</span> <span class='op'>=</span> <span class='const'>TableMatchRefiner</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Toml::Merge::TableMatchRefiner#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>threshold:</span> <span class='float'>0.6</span><span class='comma'>,</span>
+  <span class='label'>weights:</span> <span class='lbrace'>{</span>
+    <span class='label'>name_match:</span> <span class='float'>0.5</span><span class='comma'>,</span>
+    <span class='label'>key_overlap:</span> <span class='float'>0.3</span><span class='comma'>,</span>
+    <span class='label'>position:</span> <span class='float'>0.2</span>
+  <span class='rbrace'>}</span>
+<span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li>Ast::Merge::MatchRefinerBase</li>
+    
+  </ul>
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="DEFAULT_WEIGHTS-constant" class="">DEFAULT_WEIGHTS =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default weights for match scoring</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+  <span class='label'>name_match:</span> <span class='float'>0.5</span><span class='comma'>,</span>   <span class='comment'># Weight for table name similarity
+</span>  <span class='label'>key_overlap:</span> <span class='float'>0.3</span><span class='comma'>,</span>  <span class='comment'># Weight for shared keys
+</span>  <span class='label'>position:</span> <span class='float'>0.2</span><span class='comma'>,</span>     <span class='comment'># Weight for position similarity
+</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#weights-instance_method" title="#weights (instance method)">#<strong>weights</strong>  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Weights for similarity computation.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#call-instance_method" title="#call (instance method)">#<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; Array&lt;MatchResult&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Find matches between unmatched table nodes.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(threshold: DEFAULT_THRESHOLD, weights: {}, **options)  &#x21d2; TableMatchRefiner </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a table match refiner.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(threshold: DEFAULT_THRESHOLD, weights: {}, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Toml::Merge::TableMatchRefiner (class)">TableMatchRefiner</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a table match refiner.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>threshold</span>
+      
+      
+        <span class='type'>(<tt>Float</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>DEFAULT_THRESHOLD</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Minimum score to accept a match (default: 0.5)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>weights</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom weights for similarity factors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/table_match_refiner.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='const'>DEFAULT_THRESHOLD</span><span class='comma'>,</span> <span class='label'>weights:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span><span class='label'>threshold:</span> <span class='id identifier rubyid_threshold'>threshold</span><span class='comma'>,</span> <span class='label'>node_types:</span> <span class='lbracket'>[</span><span class='symbol'>:table</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='ivar'>@weights</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#DEFAULT_WEIGHTS-constant" title="Toml::Merge::TableMatchRefiner::DEFAULT_WEIGHTS (constant)">DEFAULT_WEIGHTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_weights'>weights</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="weights-instance_method">
+  
+    #<strong>weights</strong>  &#x21d2; <tt>Hash</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns Weights for similarity computation.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Weights for similarity computation</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/table_match_refiner.rb', line 41</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_weights'>weights</span>
+  <span class='ivar'>@weights</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="call-instance_method">
+  
+    #<strong>call</strong>(template_nodes, dest_nodes, context = {})  &#x21d2; <tt>Array&lt;MatchResult&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Find matches between unmatched table nodes.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Unmatched nodes from template</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_nodes</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Unmatched nodes from destination</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>context</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional context</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;MatchResult&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Array of table matches</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/toml/merge/table_match_refiner.rb', line 58</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_context'>context</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_template_tables'>template_tables</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_tables'>extract_tables</span><span class='lparen'>(</span><span class='id identifier rubyid_template_nodes'>template_nodes</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dest_tables'>dest_tables</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_tables'>extract_tables</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_nodes'>dest_nodes</span><span class='rparen'>)</span>
+
+  <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id identifier rubyid_template_tables'>template_tables</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='id identifier rubyid_dest_tables'>dest_tables</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='comment'># Build position information for better matching
+</span>  <span class='id identifier rubyid_total_template'>total_template</span> <span class='op'>=</span> <span class='id identifier rubyid_template_tables'>template_tables</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+  <span class='id identifier rubyid_total_dest'>total_dest</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_tables'>dest_tables</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
+
+  <span class='id identifier rubyid_greedy_match'>greedy_match</span><span class='lparen'>(</span><span class='id identifier rubyid_template_tables'>template_tables</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_tables'>dest_tables</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_t_node'>t_node</span><span class='comma'>,</span> <span class='id identifier rubyid_d_node'>d_node</span><span class='op'>|</span>
+    <span class='id identifier rubyid_t_idx'>t_idx</span> <span class='op'>=</span> <span class='id identifier rubyid_template_tables'>template_tables</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_t_node'>t_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_d_idx'>d_idx</span> <span class='op'>=</span> <span class='id identifier rubyid_dest_tables'>dest_tables</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='id identifier rubyid_d_node'>d_node</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_compute_table_similarity'>compute_table_similarity</span><span class='lparen'>(</span><span class='id identifier rubyid_t_node'>t_node</span><span class='comma'>,</span> <span class='id identifier rubyid_d_node'>d_node</span><span class='comma'>,</span> <span class='id identifier rubyid_t_idx'>t_idx</span><span class='comma'>,</span> <span class='id identifier rubyid_d_idx'>d_idx</span><span class='comma'>,</span> <span class='id identifier rubyid_total_template'>total_template</span><span class='comma'>,</span> <span class='id identifier rubyid_total_dest'>total_dest</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:16 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

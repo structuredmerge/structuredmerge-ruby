@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Rbs::Merge::SmartMerger
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Rbs::Merge::SmartMerger";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Rbs.html" title="Rbs (module)">Rbs</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Rbs::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">SmartMerger</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Rbs::Merge::SmartMerger
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::SmartMergerBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::SmartMergerBase</li>
+          
+            <li class="next">Rbs::Merge::SmartMerger</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/rbs/merge/smart_merger.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Orchestrates the smart merge process for RBS type signature files.<br />
+Uses FileAnalysis, FileAligner, ConflictResolver, and MergeResult to<br />
+merge two RBS files intelligently.</p>
+
+<p>SmartMerger provides flexible configuration for different merge scenarios.<br />
+When matching class or module definitions are found in both files, the merger<br />
+can perform recursive merging of their members.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic merge (destination customizations preserved)</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_content'>dest_content</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Template updates win</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:template</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>true</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_merger'>merger</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Custom signature matching</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_sig_gen'>sig_gen</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_node'>node</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='lbracket'>[</span><span class='symbol'>:decl</span><span class='comma'>,</span> <span class='id identifier rubyid_node'>node</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+<span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='id identifier rubyid_sig_gen'>sig_gen</span>
+<span class='rparen'>)</span></code></pre>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>With node_typing for per-node-type preferences</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_merger'>merger</span> <span class='op'>=</span> <span class='const'>SmartMerger</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::SmartMerger#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template'>template</span><span class='comma'>,</span> <span class='id identifier rubyid_dest'>dest</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ClassDecl</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='const'>NodeTyping</span><span class='period'>.</span><span class='id identifier rubyid_with_merge_type'>with_merge_type</span><span class='lparen'>(</span><span class='id identifier rubyid_n'>n</span><span class='comma'>,</span> <span class='symbol'>:model</span><span class='rparen'>)</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='lbrace'>{</span> <span class='label'>default:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>model:</span> <span class='symbol'>:template</span> <span class='rbrace'>}</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></li>
+    
+      <li><span class='object_link'><a href="FileAligner.html" title="Rbs::Merge::FileAligner (class)">FileAligner</a></span></li>
+    
+      <li><span class='object_link'><a href="ConflictResolver.html" title="Rbs::Merge::ConflictResolver (class)">ConflictResolver</a></span></li>
+    
+      <li><span class='object_link'><a href="MergeResult.html" title="Rbs::Merge::MergeResult (class)">MergeResult</a></span></li>
+    
+  </ul>
+
+</div>
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#corruption_handling-instance_method" title="#corruption_handling (instance method)">#<strong>corruption_handling</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Returns the value of attribute corruption_handling.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, corruption_handling: :heal, freeze_token: nil, match_refiner: nil, regions: nil, region_placeholder: nil, node_typing: nil, max_recursion_depth: Float::INFINITY, **options)  &#x21d2; SmartMerger </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Creates a new SmartMerger for intelligent RBS file merging.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(template_content, dest_content, signature_generator: nil, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, corruption_handling: :heal, freeze_token: nil, match_refiner: nil, regions: nil, region_placeholder: nil, node_typing: nil, max_recursion_depth: Float::INFINITY, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::SmartMerger (class)">SmartMerger</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Creates a new SmartMerger for intelligent RBS file merging.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template RBS source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_content</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination RBS source code</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>signature_generator</span>
+      
+      
+        <span class='type'>(<tt>Proc</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional proc to generate custom node signatures.<br />
+The proc receives an RBS declaration and should return one of:</p>
+<ul>
+  <li>An array representing the node’s signature</li>
+  <li><code>nil</code> to indicate the node should have no signature</li>
+  <li>The original node to fall through to default signature computation</li>
+</ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:destination</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Controls which version to use when nodes<br />
+have matching signatures but different content:</p>
+<ul>
+  <li><code>:destination</code> (default) - Use destination version (preserves customizations)</li>
+  <li><code>:template</code> - Use template version (applies updates)</li>
+  <li>Hash for per-type preferences</li>
+</ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>add_template_only_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Controls whether to add nodes that only<br />
+exist in template:</p>
+<ul>
+  <li><code>false</code> (default) - Skip template-only nodes</li>
+  <li><code>true</code> - Add template-only nodes to result</li>
+</ul>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>remove_template_missing_nodes</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Controls whether to remove<br />
+destination-only declarations while promoting their leading comments</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>corruption_handling</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>:heal</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>How to handle detected historical<br />
+duplicate-prefix corruption (:heal, :warn, :error, :skip)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Token to use for freeze block markers.<br />
+Default: “rbs-merge” (looks for # rbs-merge:freeze / # rbs-merge:unfreeze)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>match_refiner</span>
+      
+      
+        <span class='type'>(<tt>#call</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Match refiner for fuzzy matching</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>regions</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Hash&gt;</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Region configurations for nested merging</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>region_placeholder</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Custom placeholder for regions</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,String =&gt; #call}</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>max_recursion_depth</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>, <tt>Float</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>Float::INFINITY</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Maximum depth for recursive body merging.<br />
+Default: Float::INFINITY (no limit)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="TemplateParseError.html" title="Rbs::Merge::TemplateParseError (class)">TemplateParseError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If template has syntax errors</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="DestinationParseError.html" title="Rbs::Merge::DestinationParseError (class)">DestinationParseError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>If destination has syntax errors</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/smart_merger.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span>
+  <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+  <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+  <span class='label'>signature_generator:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span>
+  <span class='label'>add_template_only_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>remove_template_missing_nodes:</span> <span class='kw'>false</span><span class='comma'>,</span>
+  <span class='label'>corruption_handling:</span> <span class='symbol'>:heal</span><span class='comma'>,</span>
+  <span class='label'>freeze_token:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>match_refiner:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>regions:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>region_placeholder:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span>
+  <span class='label'>max_recursion_depth:</span> <span class='const'>Float</span><span class='op'>::</span><span class='const'>INFINITY</span><span class='comma'>,</span>
+  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+<span class='rparen'>)</span>
+  <span class='ivar'>@max_recursion_depth</span> <span class='op'>=</span> <span class='id identifier rubyid_max_recursion_depth'>max_recursion_depth</span>
+  <span class='ivar'>@remove_template_missing_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span>
+  <span class='ivar'>@corruption_handling</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Ast</span><span class='op'>::</span><span class='const'>Merge</span><span class='op'>::</span><span class='const'>Healer</span><span class='period'>.</span><span class='id identifier rubyid_normalize_mode'>normalize_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_corruption_handling'>corruption_handling</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='id identifier rubyid_template_content'>template_content</span><span class='comma'>,</span>
+    <span class='id identifier rubyid_dest_content'>dest_content</span><span class='comma'>,</span>
+    <span class='label'>signature_generator:</span> <span class='id identifier rubyid_signature_generator'>signature_generator</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>add_template_only_nodes:</span> <span class='id identifier rubyid_add_template_only_nodes'>add_template_only_nodes</span><span class='comma'>,</span>
+    <span class='label'>remove_template_missing_nodes:</span> <span class='id identifier rubyid_remove_template_missing_nodes'>remove_template_missing_nodes</span><span class='comma'>,</span>
+    <span class='label'>freeze_token:</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span><span class='comma'>,</span>
+    <span class='label'>match_refiner:</span> <span class='id identifier rubyid_match_refiner'>match_refiner</span><span class='comma'>,</span>
+    <span class='label'>regions:</span> <span class='id identifier rubyid_regions'>regions</span><span class='comma'>,</span>
+    <span class='label'>region_placeholder:</span> <span class='id identifier rubyid_region_placeholder'>region_placeholder</span><span class='comma'>,</span>
+    <span class='label'>node_typing:</span> <span class='id identifier rubyid_node_typing'>node_typing</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="corruption_handling-instance_method">
+  
+    #<strong>corruption_handling</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns the value of attribute corruption_handling.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/smart_merger.rb', line 46</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_corruption_handling'>corruption_handling</span>
+  <span class='ivar'>@corruption_handling</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:12 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

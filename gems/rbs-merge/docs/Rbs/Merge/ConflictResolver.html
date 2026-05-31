@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Rbs::Merge::ConflictResolver
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Rbs::Merge::ConflictResolver";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Rbs.html" title="Rbs (module)">Rbs</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Rbs::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">ConflictResolver</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Rbs::Merge::ConflictResolver
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Ast::Merge::ConflictResolverBase</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Ast::Merge::ConflictResolverBase</li>
+          
+            <li class="next">Rbs::Merge::ConflictResolver</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/rbs/merge/conflict_resolver.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Resolves conflicts between template and destination declarations.<br />
+Determines which version to use when both files have declarations<br />
+with matching signatures but different content.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+  <div class="examples">
+    <h4 class="tag_title">Examples:</h4>
+    
+      
+        <h5 class="example_title"><div class='inline'><p>Basic usage</p>
+</div></h5>
+      
+      <pre class="example code"><code><span class='id identifier rubyid_resolver'>resolver</span> <span class='op'>=</span> <span class='const'>ConflictResolver</span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="#initialize-instance_method" title="Rbs::Merge::ConflictResolver#initialize (method)">new</a></span></span><span class='lparen'>(</span>
+  <span class='label'>preference:</span> <span class='symbol'>:destination</span><span class='comma'>,</span>
+  <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span>
+  <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span>
+<span class='rparen'>)</span>
+<span class='id identifier rubyid_winner'>winner</span> <span class='op'>=</span> <span class='id identifier rubyid_resolver'>resolver</span><span class='period'>.</span><span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span></code></pre>
+    
+  </div>
+
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#can_recursive_merge%3F-instance_method" title="#can_recursive_merge? (instance method)">#<strong>can_recursive_merge?</strong>(template_decl, dest_decl)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if declarations can be recursively merged.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#declarations_identical%3F-instance_method" title="#declarations_identical? (instance method)">#<strong>declarations_identical?</strong>(decl1, decl2)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Check if two declarations are identical.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(preference:, template_analysis:, dest_analysis:, node_typing: nil, **options)  &#x21d2; ConflictResolver </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Initialize a conflict resolver.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#resolve-instance_method" title="#resolve (instance method)">#<strong>resolve</strong>(template_decl, dest_decl, template_index:, dest_index:)  &#x21d2; Hash </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Resolve a conflict between template and destination declarations.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+
+  <div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(preference:, template_analysis:, dest_analysis:, node_typing: nil, **options)  &#x21d2; <tt><span class='object_link'><a href="" title="Rbs::Merge::ConflictResolver (class)">ConflictResolver</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Initialize a conflict resolver</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>preference</span>
+      
+      
+        <span class='type'>(<tt>Symbol</tt>, <tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Which version wins on conflict (:template or :destination)<br />
+or per-node-type Hash when used with node_typing</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>template_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Analysis of the template file</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Rbs::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Analysis of the destination file</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>node_typing</span>
+      
+      
+        <span class='type'>(<tt>Hash{Symbol,String =&gt; #call}</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Node typing configuration<br />
+for per-node-type preferences</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>options</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Additional options for forward compatibility</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 26</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>preference:</span><span class='comma'>,</span> <span class='label'>template_analysis:</span><span class='comma'>,</span> <span class='label'>dest_analysis:</span><span class='comma'>,</span> <span class='label'>node_typing:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+  <span class='kw'>super</span><span class='lparen'>(</span>
+    <span class='label'>strategy:</span> <span class='symbol'>:node</span><span class='comma'>,</span>
+    <span class='label'>preference:</span> <span class='id identifier rubyid_preference'>preference</span><span class='comma'>,</span>
+    <span class='label'>template_analysis:</span> <span class='id identifier rubyid_template_analysis'>template_analysis</span><span class='comma'>,</span>
+    <span class='label'>dest_analysis:</span> <span class='id identifier rubyid_dest_analysis'>dest_analysis</span><span class='comma'>,</span>
+    <span class='op'>**</span><span class='id identifier rubyid_options'>options</span>
+  <span class='rparen'>)</span>
+  <span class='ivar'>@node_typing</span> <span class='op'>=</span> <span class='id identifier rubyid_node_typing'>node_typing</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="can_recursive_merge?-instance_method">
+  
+    #<strong>can_recursive_merge?</strong>(template_decl, dest_decl)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if declarations can be recursively merged</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_decl</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template declaration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_decl</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination declaration</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 99</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_can_recursive_merge?'>can_recursive_merge?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+  <span class='comment'># Only container types can be recursively merged
+</span>  <span class='comment'># Container types are: class, module, interface
+</span>
+  <span class='id identifier rubyid_template_type'>template_type</span> <span class='op'>=</span> <span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_dest_type'>dest_type</span> <span class='op'>=</span> <span class='id identifier rubyid_canonical_type'>canonical_type</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+
+  <span class='comment'># Both must be the same container type
+</span>  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='id identifier rubyid_template_type'>template_type</span> <span class='op'>==</span> <span class='id identifier rubyid_dest_type'>dest_type</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="NodeTypeNormalizer.html" title="Rbs::Merge::NodeTypeNormalizer (module)">NodeTypeNormalizer</a></span></span><span class='period'>.</span><span class='id identifier rubyid_container_type?'><span class='object_link'><a href="NodeTypeNormalizer.html#container_type%3F-class_method" title="Rbs::Merge::NodeTypeNormalizer.container_type? (method)">container_type?</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_template_type'>template_type</span><span class='rparen'>)</span>
+
+  <span class='comment'># At least one side must have members so recursive merging can preserve
+</span>  <span class='comment'># destination-only or template-only nested members inside the matched shell.
+</span>  <span class='id identifier rubyid_has_members?'>has_members?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_has_members?'>has_members?</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="declarations_identical?-instance_method">
+  
+    #<strong>declarations_identical?</strong>(decl1, decl2)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Check if two declarations are identical</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>decl1</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>First declaration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>decl2</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Second declaration</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87
+88
+89
+90
+91
+92
+93</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_declarations_identical?'>declarations_identical?</span><span class='lparen'>(</span><span class='id identifier rubyid_decl1'>decl1</span><span class='comma'>,</span> <span class='id identifier rubyid_decl2'>decl2</span><span class='rparen'>)</span>
+  <span class='comment'># Compare text content for backend-agnostic comparison
+</span>  <span class='id identifier rubyid_text1'>text1</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_declaration_text'>extract_declaration_text</span><span class='lparen'>(</span><span class='id identifier rubyid_decl1'>decl1</span><span class='comma'>,</span> <span class='ivar'>@template_analysis</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_text2'>text2</span> <span class='op'>=</span> <span class='id identifier rubyid_extract_declaration_text'>extract_declaration_text</span><span class='lparen'>(</span><span class='id identifier rubyid_decl2'>decl2</span><span class='comma'>,</span> <span class='ivar'>@dest_analysis</span><span class='rparen'>)</span>
+
+  <span class='comment'># Normalize whitespace for comparison
+</span>  <span class='id identifier rubyid_normalize_text'>normalize_text</span><span class='lparen'>(</span><span class='id identifier rubyid_text1'>text1</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_normalize_text'>normalize_text</span><span class='lparen'>(</span><span class='id identifier rubyid_text2'>text2</span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span>
+    <span class='id identifier rubyid_leading_gap_line_count_for'>leading_gap_line_count_for</span><span class='lparen'>(</span><span class='id identifier rubyid_decl1'>decl1</span><span class='comma'>,</span> <span class='ivar'>@template_analysis</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='id identifier rubyid_leading_gap_line_count_for'>leading_gap_line_count_for</span><span class='lparen'>(</span><span class='id identifier rubyid_decl2'>decl2</span><span class='comma'>,</span> <span class='ivar'>@dest_analysis</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="resolve-instance_method">
+  
+    #<strong>resolve</strong>(template_decl, dest_decl, template_index:, dest_index:)  &#x21d2; <tt>Hash</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Resolve a conflict between template and destination declarations</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>template_decl</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Template declaration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_decl</span>
+      
+      
+        <span class='type'>(<tt>Object</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Destination declaration</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>template_index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Index in template statements</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>dest_index</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Index in destination statements</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Resolution result with :source and :declaration keys</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/rbs/merge/conflict_resolver.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>template_index:</span><span class='comma'>,</span> <span class='label'>dest_index:</span><span class='rparen'>)</span>
+  <span class='comment'># Freeze blocks always win (they represent protected content)
+</span>  <span class='comment'># Template freeze blocks take precedence - frozen content from template is preserved
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Destination freeze blocks also win (though less common)
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_freeze_node?'>freeze_node?</span><span class='lparen'>(</span><span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_FREEZE_BLOCK</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Check if declarations are identical
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_declarations_identical?'>declarations_identical?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+    <span class='comment'># Prefer destination to minimize diffs
+</span>    <span class='kw'>return</span> <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Check if we should recursively merge (for container types)
+</span>  <span class='kw'>if</span> <span class='id identifier rubyid_can_recursive_merge?'>can_recursive_merge?</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+    <span class='kw'>return</span> <span class='lbrace'>{</span>
+      <span class='label'>source:</span> <span class='symbol'>:recursive</span><span class='comma'>,</span>
+      <span class='label'>template_declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span>
+      <span class='label'>dest_declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span>
+      <span class='label'>decision:</span> <span class='const'>DECISION_RECURSIVE</span><span class='comma'>,</span>
+    <span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+
+  <span class='comment'># Apply preference (supports per-node-type preferences with node_typing)
+</span>  <span class='kw'>case</span> <span class='id identifier rubyid_resolve_preference'>resolve_preference</span><span class='lparen'>(</span><span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='rparen'>)</span>
+  <span class='kw'>when</span> <span class='symbol'>:template</span>
+    <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:template</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_template_decl'>template_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_TEMPLATE</span><span class='rbrace'>}</span>
+  <span class='kw'>else</span> <span class='comment'># :destination (validated in initialize)
+</span>    <span class='lbrace'>{</span><span class='label'>source:</span> <span class='symbol'>:destination</span><span class='comma'>,</span> <span class='label'>declaration:</span> <span class='id identifier rubyid_dest_decl'>dest_decl</span><span class='comma'>,</span> <span class='label'>decision:</span> <span class='const'>DECISION_DESTINATION</span><span class='rbrace'>}</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:13 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

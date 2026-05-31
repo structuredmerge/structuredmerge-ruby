@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Prism::Merge::BlockDirectiveDetector
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "Prism::Merge::BlockDirectiveDetector";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (B)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Prism.html" title="Prism (module)">Prism</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Merge.html" title="Prism::Merge (module)">Merge</a></span></span>
+     &raquo; 
+    <span class="title">BlockDirectiveDetector</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Prism::Merge::BlockDirectiveDetector
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Prism::Merge::BlockDirectiveDetector</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>lib/prism/merge/block_directive_detector.rb
+</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>Detects block directive pairs (freeze and nocov) in source lines and<br />
+promotes them to synthetic BlockDirective tree nodes in the statements array.</p>
+
+<p>A block directive is an open/close comment pair that wraps content:</p>
+<ul>
+  <li>Freeze: <code># token:freeze</code> … <code># token:unfreeze</code></li>
+  <li>Nocov:  <code># :nocov:</code> … <code># :nocov:</code> (same marker toggles)</li>
+</ul>
+
+<p>The detector runs AFTER Prism’s <code>attach_comments!</code> to avoid being fooled by<br />
+Prism’s leading-comment attachment, which hoists all preceding comment lines<br />
+onto the first code node as leading comments.</p>
+
+<p>Rules enforced:</p>
+<ul>
+  <li>Directives must form a clean tree (proper nesting, no offset overlap)</li>
+  <li>Directives must open and close at the same syntactic level</li>
+  <li>Violations emit a warning and fall back to plain comment emission</li>
+</ul>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="BlockDirectiveDetector/Span.html" title="Prism::Merge::BlockDirectiveDetector::Span (class)">Span</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="NOCOV_TOKEN-constant" class="">NOCOV_TOKEN =
+          <div class="docstring">
+  <div class="discussion">
+    <p>Default nocov token (SimpleCov convention)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>:nocov:</span><span class='tstring_end'>&quot;</span></span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#detect_spans-instance_method" title="#detect_spans (instance method)">#<strong>detect_spans</strong>  &#x21d2; Array&lt;Span&gt; </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Detect all directive spans in the source lines.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(lines, freeze_token: nil, nocov_token: NOCOV_TOKEN, source_label: nil)  &#x21d2; BlockDirectiveDetector </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>A new instance of BlockDirectiveDetector.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#promote_spans_to_nodes-instance_method" title="#promote_spans_to_nodes (instance method)">#<strong>promote_spans_to_nodes</strong>(statements, spans, analysis:)  &#x21d2; Array </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>Post-process a statements array: replace content covered by each span with a synthetic BlockDirective node.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+    
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(lines, freeze_token: nil, nocov_token: NOCOV_TOKEN, source_label: nil)  &#x21d2; <tt><span class='object_link'><a href="" title="Prism::Merge::BlockDirectiveDetector (class)">BlockDirectiveDetector</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Returns a new instance of BlockDirectiveDetector.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>lines</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;String&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Raw source lines (1-indexed via [line_num - 1])</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>freeze_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Freeze token (e.g. “kettle-jem”). nil disables freeze detection.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>nocov_token</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>NOCOV_TOKEN</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Nocov token (default “:nocov:”)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>source_label</span>
+      
+      
+        <span class='type'>(<tt>String</tt>, <tt>nil</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>Optional file path or label included in warning messages.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34
+35
+36</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/block_directive_detector.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_lines'>lines</span><span class='comma'>,</span> <span class='label'>freeze_token:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>nocov_token:</span> <span class='const'><span class='object_link'><a href="#NOCOV_TOKEN-constant" title="Prism::Merge::BlockDirectiveDetector::NOCOV_TOKEN (constant)">NOCOV_TOKEN</a></span></span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+  <span class='ivar'>@lines</span> <span class='op'>=</span> <span class='id identifier rubyid_lines'>lines</span>
+  <span class='ivar'>@freeze_token</span> <span class='op'>=</span> <span class='id identifier rubyid_freeze_token'>freeze_token</span>
+  <span class='ivar'>@nocov_token</span> <span class='op'>=</span> <span class='id identifier rubyid_nocov_token'>nocov_token</span>
+  <span class='ivar'>@source_label</span> <span class='op'>=</span> <span class='id identifier rubyid_source_label'>source_label</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="detect_spans-instance_method">
+  
+    #<strong>detect_spans</strong>  &#x21d2; <tt>Array&lt;<span class='object_link'><a href="BlockDirectiveDetector/Span.html" title="Prism::Merge::BlockDirectiveDetector::Span (class)">Span</a></span>&gt;</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Detect all directive spans in the source lines.<br />
+Returns a flat array of Span structs sorted by start_line.<br />
+Crossing/invalid spans are excluded with a warning.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="BlockDirectiveDetector/Span.html" title="Prism::Merge::BlockDirectiveDetector::Span (class)">Span</a></span>&gt;</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45
+46
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/block_directive_detector.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_detect_spans'>detect_spans</span>
+  <span class='id identifier rubyid_raw_spans'>raw_spans</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_raw_spans'>raw_spans</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_detect_freeze_spans'>detect_freeze_spans</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@freeze_token</span>
+  <span class='id identifier rubyid_raw_spans'>raw_spans</span><span class='period'>.</span><span class='id identifier rubyid_concat'>concat</span><span class='lparen'>(</span><span class='id identifier rubyid_detect_nocov_spans'>detect_nocov_spans</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_sorted'>sorted</span> <span class='op'>=</span> <span class='id identifier rubyid_raw_spans'>raw_spans</span><span class='period'>.</span><span class='id identifier rubyid_sort_by'>sort_by</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:start_line</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_validate_no_crossing'>validate_no_crossing</span><span class='lparen'>(</span><span class='id identifier rubyid_sorted'>sorted</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="promote_spans_to_nodes-instance_method">
+  
+    #<strong>promote_spans_to_nodes</strong>(statements, spans, analysis:)  &#x21d2; <tt>Array</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Post-process a statements array: replace content covered by each span<br />
+with a synthetic BlockDirective node. Spans must be pre-validated (no crossing).</p>
+
+<p>Spans that fall entirely INSIDE a top-level statement are skipped — those<br />
+are nested directives handled by recursive body merging, not top-level promotions.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>statements</span>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Prism statements (may include FrozenWrapper etc.)</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>spans</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;<span class='object_link'><a href="BlockDirectiveDetector/Span.html" title="Prism::Merge::BlockDirectiveDetector::Span (class)">Span</a></span>&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Validated spans from detect_spans</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>analysis</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="FileAnalysis.html" title="Prism::Merge::FileAnalysis (class)">FileAnalysis</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>The owning FileAnalysis (passed to node constructors)</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Array</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>Modified statements array</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/prism/merge/block_directive_detector.rb', line 62</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_promote_spans_to_nodes'>promote_spans_to_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span> <span class='id identifier rubyid_spans'>spans</span><span class='comma'>,</span> <span class='label'>analysis:</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='id identifier rubyid_statements'>statements</span> <span class='kw'>if</span> <span class='id identifier rubyid_spans'>spans</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_validate_same_syntactic_level!'>validate_same_syntactic_level!</span><span class='lparen'>(</span><span class='id identifier rubyid_spans'>spans</span><span class='comma'>,</span> <span class='id identifier rubyid_statements'>statements</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_top_level'>top_level</span> <span class='op'>=</span> <span class='id identifier rubyid_top_level_spans_only'>top_level_spans_only</span><span class='lparen'>(</span><span class='id identifier rubyid_spans'>spans</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_span'>span</span><span class='op'>|</span>
+    <span class='comment'># Skip spans that are wholly inside a top-level code node.
+</span>    <span class='comment'># Those are handled during recursive body merging.
+</span>    <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='op'>|</span>
+      <span class='id identifier rubyid_sl'>sl</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_start_line'>stmt_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_el'>el</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_end_line'>stmt_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_sl'>sl</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_el'>el</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_sl'>sl</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_el'>el</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>return</span> <span class='id identifier rubyid_statements'>statements</span> <span class='kw'>if</span> <span class='id identifier rubyid_top_level'>top_level</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+
+  <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id identifier rubyid_used_indices'>used_indices</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+  <span class='id identifier rubyid_top_level'>top_level</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_span'>span</span><span class='op'>|</span>
+    <span class='id identifier rubyid_inner_stmts'>inner_stmts</span> <span class='op'>=</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span>
+      <span class='kw'>next</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_used_indices'>used_indices</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_idx'>idx</span><span class='rparen'>)</span>
+
+      <span class='id identifier rubyid_sl'>sl</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_start_line'>stmt_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_el'>el</span> <span class='op'>=</span> <span class='id identifier rubyid_stmt_end_line'>stmt_end_line</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_sl'>sl</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_el'>el</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_sl'>sl</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_el'>el</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span>
+    <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='comma'>,</span> <span class='id identifier rubyid_idx'>idx</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_idx'>idx</span><span class='comma'>,</span> <span class='id identifier rubyid_stmt'>stmt</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_inner_indices'>inner_indices</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_stmts'>inner_stmts</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:first</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_inner_nodes'>inner_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_inner_stmts'>inner_stmts</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:last</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_nested'>nested</span> <span class='op'>=</span> <span class='id identifier rubyid_spans'>spans</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_s'>s</span><span class='op'>|</span> <span class='id identifier rubyid_s'>s</span> <span class='op'>!=</span> <span class='id identifier rubyid_span'>span</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_s'>s</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='op'>&lt;=</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_end_line'>end_line</span> <span class='rbrace'>}</span>
+
+    <span class='kw'>unless</span> <span class='id identifier rubyid_nested'>nested</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+      <span class='id identifier rubyid_inner_nodes'>inner_nodes</span> <span class='op'>=</span> <span class='id identifier rubyid_promote_spans_to_nodes'>promote_spans_to_nodes</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_nodes'>inner_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_nested'>nested</span><span class='comma'>,</span> <span class='label'>analysis:</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_directive_node'>directive_node</span> <span class='op'>=</span> <span class='id identifier rubyid_build_directive_node'>build_directive_node</span><span class='lparen'>(</span><span class='id identifier rubyid_span'>span</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_nodes'>inner_nodes</span><span class='comma'>,</span> <span class='id identifier rubyid_analysis'>analysis</span><span class='rparen'>)</span>
+    <span class='comment'># Determine insertion position:
+</span>    <span class='comment'># - If inner nodes exist: insert at the first covered index (replacing them)
+</span>    <span class='comment'># - If no inner nodes (span covers only comment lines): insert at the position
+</span>    <span class='comment'>#   of the first statement whose start_line is AFTER the span&#39;s start_line,
+</span>    <span class='comment'>#   or append at the end if no such statement exists.
+</span>    <span class='id identifier rubyid_insert_at'>insert_at</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_inner_indices'>inner_indices</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span>
+      <span class='id identifier rubyid_inner_indices'>inner_indices</span><span class='period'>.</span><span class='id identifier rubyid_min'>min</span>
+    <span class='kw'>else</span>
+      <span class='id identifier rubyid_idx_after'>idx_after</span> <span class='op'>=</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_each_with_index'>each_with_index</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_stmt'>stmt</span><span class='comma'>,</span> <span class='id identifier rubyid__'>_</span><span class='op'>|</span> <span class='id identifier rubyid_stmt_start_line'>stmt_start_line</span><span class='lparen'>(</span><span class='id identifier rubyid_stmt'>stmt</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;</span> <span class='id identifier rubyid_span'>span</span><span class='period'>.</span><span class='id identifier rubyid_start_line'>start_line</span> <span class='rbrace'>}</span>
+      <span class='id identifier rubyid_idx_after'>idx_after</span> <span class='op'>?</span> <span class='id identifier rubyid_idx_after'>idx_after</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span> <span class='op'>:</span> <span class='id identifier rubyid_statements'>statements</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>&lt;&lt;</span> <span class='lbracket'>[</span><span class='id identifier rubyid_insert_at'>insert_at</span><span class='comma'>,</span> <span class='id identifier rubyid_directive_node'>directive_node</span><span class='comma'>,</span> <span class='id identifier rubyid_inner_indices'>inner_indices</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_used_indices'>used_indices</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_inner_indices'>inner_indices</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+
+  <span class='id identifier rubyid_rebuild_statements'>rebuild_statements</span><span class='lparen'>(</span><span class='id identifier rubyid_statements'>statements</span><span class='comma'>,</span> <span class='id identifier rubyid_result'>result</span><span class='comma'>,</span> <span class='id identifier rubyid_used_indices'>used_indices</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:29:10 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>

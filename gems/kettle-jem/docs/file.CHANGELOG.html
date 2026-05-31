@@ -101,6 +101,9 @@ can make the published runtime Ruby floor explicit.</li>
   <li>Runtime dependency <code>token-resolver</code> now requires the released 2.x line.</li>
   <li>Development lockfile generation now uses Bundler 4.0.12.</li>
   <li>Rake task specs now run from a sandboxed temporary project root.</li>
+  <li>Ruby, engine, Bundler, RubyGems, RuboCop, and Rails compatibility choices now<br>
+come from an <code>RRRRB_MATRIX</code> source of truth so generated workflows and<br>
+appraisals can select the newest stable compatible toolchain per Ruby.</li>
 </ul>
 
 <h3 id="deprecated">Deprecated</h3>
@@ -110,9 +113,17 @@ can make the published runtime Ruby floor explicit.</li>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>Monorepo-root templating now applies without a root gemspec, detects root<br>
+license files ahead of stale config values, installs the generated Rakefile<br>
+task plumbing, and syncs root Gemfile tooling dependencies without duplicating<br>
+local nomono declarations.</li>
   <li>Generated <code>gemfiles/modular/x_std_libs.gemfile</code> now selects the extracted<br>
 stdlib dependency set from the active Ruby version, so dependency solvers<br>
 running on Ruby 3.1 do not receive Ruby 4-only stdlib requirements.</li>
+  <li>README merging now preserves a destination front <code>## Important</code>/warning<br>
+section before Synopsis when that section encloses the badge cloud.</li>
+  <li>Same-named destination gemspecs loaded from different project directories no<br>
+longer bleed metadata into one another during templating.</li>
   <li>
 <code>kettle-jem install</code> now strips inherited Bundler activation variables before<br>
 running destination setup commands, so generated <code>bin/setup</code> can run<br>
@@ -138,11 +149,25 @@ framework matrix.</li>
   <li>Standard Appraisal gemfile injection now skips blocks already enriched by a<br>
 collapsed framework/appraisal matrix dependency gemfile, avoiding duplicate<br>
 broad and version-pinned framework dependency declarations.</li>
+  <li>Standard Appraisal gemfile injection now distinguishes ordinary modular<br>
+support gemfiles from framework matrix fragments, so coverage and dependency<br>
+test appraisals still receive required framework dependencies.</li>
+  <li>TOML recipe merging now loads the concrete TOML backend provider with<br>
+kettle-jem, so <code>.toml</code> template merges have a registered parser in ordinary<br>
+bundle contexts.</li>
   <li>The generated <code>.kettle-jem.yml</code> keeps <code>Appraisal.root.gemfile</code><br>
 template-owned so stale root-appraisal content is replaced cleanly.</li>
   <li>Simple <code>workflows.framework_matrix</code> version entries can now target an<br>
 existing appraisal with <code>appraisal</code>, <code>appraisal_name</code>, or<br>
 <code>standard_appraisal</code>, allowing explicit collapse onto standard appraisals.</li>
+  <li>Collapsed <code>workflows.framework_matrix</code> appraisals now preserve configured<br>
+per-version environment variables, can skip framework workflow generation,<br>
+respect <code>keep_destination</code> framework gemfiles, and remove replaced standalone<br>
+framework appraisal blocks.</li>
+  <li>Collapsed framework matrix environment variables now render into generated<br>
+GitHub workflow matrices instead of mutating <code>ENV</code> from <code>Appraisals</code>, so each<br>
+appraisal run receives its own framework version without definition-order<br>
+leakage.</li>
   <li>README merge preservation now keeps configured destination-only sections<br>
 instead of dropping them when the packaged README template has no matching<br>
 heading.</li>
@@ -194,7 +219,19 @@ templating and local sibling overrides disabled, so dependency template<br>
 updates are fully re-resolved against released gems.</li>
   <li>Added curated <code>rbs</code> and <code>rspec-core</code> binstubs because generated CI templates<br>
 call <code>bin/rbs</code> and <code>bin/rspec</code> directly through appraisals.</li>
+  <li>Generated optional Gemfiles now include <code>rbs</code> and <code>stone_checksums</code>,<br>
+matching the curated binstubs generated during <code>kettle-jem install</code>.</li>
   <li>Updated the generated coverage bundle to require <code>kettle-soup-cover</code> 1.1.3 or newer.</li>
+  <li>Removed the generated CodeQL workflow so templated repositories can rely on<br>
+GitHub CodeQL default setup instead of failing from duplicate advanced setup.</li>
+  <li>Generated workflow pruning now treats TruffleRuby 23.1 as Ruby 3.1<br>
+compatible, matching README compatibility pruning and removing that stale<br>
+workflow from Ruby 3.2+ projects.</li>
+  <li>Generated JRuby 9.3 workflows now use RubyGems 3.4.22 and Bundler 2.4.22,<br>
+matching Ruby 2.6 compatibility workflows and avoiding default-gem activation<br>
+conflicts during Appraisal setup.</li>
+  <li>Monorepo-root template bootstrap now falls back to package-derived namespace<br>
+and entrypoint tokens when no gemspec-backed RubyGems config is present.</li>
   <li>Updated the generated documentation bundle to require <code>yard-fence</code> 0.9.1 or newer.</li>
   <li>Removed <code>--plugin timekeeper</code> from generated <code>.yardopts</code> because<br>
 yard-timekeeper is installed through the rake <code>yard</code> task hook.</li>
@@ -222,7 +259,16 @@ version-derived gemspec metadata such as <code>source_code_uri</code> does not s
   <li>Updated the generated development dependency on <code>kettle-test</code> to require<br>
 2.0.1 or newer.</li>
   <li>Updated the generated development dependency on <code>kettle-dev</code> to require<br>
-2.0.1 or newer.</li>
+2.0.5 or newer.</li>
+  <li>Monorepo-root bootstrap now keeps existing changelogs instead of replacing<br>
+release history with a blank generated template.</li>
+  <li>Monorepo-root Rakefiles no longer lose existing RSpec/default tasks during<br>
+scaffold cleanup before plugin task injection runs.</li>
+  <li>StructuredMerge family templating now runs child gem updates under the<br>
+kettle-jem bundle so child directories without a Gemfile do not inherit the<br>
+workspace root bundle.</li>
+  <li>StructuredMerge family templating now uses a gitmoji-prefixed default commit<br>
+message so scripted commits satisfy the local commit hook.</li>
   <li>Generated framework CI now uses an explicit framework matrix axis instead<br>
 of GitHub Actions <code>include</code> expansion.</li>
   <li>Scrubbed parent Bundler activation variables before the post-template<br>
@@ -240,6 +286,14 @@ normalizing them to a single blank line.</li>
 include VCR/WebMock recording gemfiles for projects that opt in.</li>
   <li>Applied configured <code>rubygems.min_ruby</code> to generated gemspec<br>
 <code>required_ruby_version</code> instead of preserving a stale destination value.</li>
+  <li>Preserved heredoc gemspec descriptions when applying project emoji<br>
+normalization so templating does not corrupt valid <code>&lt;&lt;~</code> assignments.</li>
+  <li>Generated local templating Gemfiles now wire <code>tree_sitter_language_pack</code> from<br>
+the sibling StructuredMerge checkout when iterating on unreleased<br>
+<code>kettle-jem</code>, avoiding broken released native gem materialization.</li>
+  <li>Generated <code>spec/spec_helper.rb</code> now starts <code>kettle-soup-cover</code>/SimpleCov<br>
+before loading the library so <code>kettle-test</code> produces the canonical<br>
+<code>coverage/coverage.json</code> consumed by <code>kettle-changelog</code>.</li>
   <li>VersionGem-managed <code>version.rb</code> and <code>version.rbs</code> packaged template targets<br>
 now default to whole-file replacement, preventing legacy version constants<br>
 from being merged into the generated shape.</li>
@@ -260,7 +314,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu May 28 02:15:02 2026 by
+  Generated on Sun May 31 04:29:01 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.44
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+
+  <link rel="stylesheet" href="css/common.css" type="text/css">
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div id="main_progress" aria-hidden="true"></div>
+
+    <div class="nav_wrap">
+      <iframe id="nav" src="file_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-192px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-192px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0"></a></p>
+
+<h1 id="️-jsonmerge">☯️ Json::Merge</h1>
+
+<p><a href="https://bestgems.org/gems/json-merge"><img src="https://img.shields.io/gem/v/json-merge.svg" alt="Version"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/releases"><img src="https://img.shields.io/github/tag/structuredmerge/structuredmerge-ruby.svg" alt="GitHub tag (latest SemVer)"></a> <a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://bestgems.org/gems/json-merge"><img src="https://img.shields.io/gem/rd/json-merge.svg" alt="Downloads Rank"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml/badge.svg" alt="CI Current"></a></p>
+
+<p><code>if ci_badges.map(&amp;:color).detect { it != "green"}</code> ☝️ <a href="https://discord.gg/3qme4XHNKN">let me know</a>, as I may have missed the <a href="https://discord.gg/3qme4XHNKN">discord notification</a>.</p>
+
+<hr>
+
+<p><code>if ci_badges.map(&amp;:color).all? { it == "green"}</code> 👇️ send money so I can do more of this. FLOSS maintenance is now my full-time job.</p>
+
+<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://polar.sh/pboling"><img src="https://img.shields.io/badge/polar-donate-a51611.svg?style=flat" alt="Donate on Polar"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
+
+<details>
+ <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
+
+I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo).
+
+</details>
+
+<h2 id="-synopsis">🌻 Synopsis</h2>
+
+<p>Json::Merge intelligently merges two versions of a JSON or JSONC file using the StructuredMerge Ruby stack. It is built on <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge">ast-merge</a> and <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver">tree_haver</a>, with parser capability reported through the shared backend registry.</p>
+
+<p>JSONC support uses the same <code>Json::Merge</code> API as JSON; use <code>require "json/merge"</code> for both dialects.</p>
+
+<h3 id="jsonc-support">JSONC Support</h3>
+
+<p>The JSON merge provider supports both JSON and JSONC dialects through <code>Json::Merge</code>. Pass JSONC content to the same merger API used for JSON.</p>
+
+<p>JSONC-specific behavior:</p>
+
+<ul>
+  <li>
+<strong>Single API</strong>: JSON and JSONC both use <code>Json::Merge</code>
+</li>
+  <li>
+<strong>Comment-Aware</strong>: Preserves <code>//</code> and <code>/* */</code> comments when the parser exposes them</li>
+  <li>
+<strong>Freeze Blocks</strong>: Uses the <code>json-merge</code> freeze token by default, with a custom token available when needed</li>
+</ul>
+
+<h3 id="key-features">Key Features</h3>
+
+<ul>
+  <li>
+<strong>Tree-Sitter Powered</strong>: Uses tree-sitter-json for accurate AST parsing</li>
+  <li>
+<strong>JSONC-Aware</strong>: Preserves <code>//</code> and <code>/* */</code> comments when the parser exposes them</li>
+  <li>
+<strong>Intelligent</strong>: Matches objects and arrays by structural signatures</li>
+  <li>
+<strong>Fuzzy Property Matching</strong>: <code>ObjectMatchRefiner</code> matches similar property names<br>
+(e.g., <code>databaseUrl</code> ↔ <code>database_url</code>) using Levenshtein distance for naming convention differences</li>
+  <li>
+<strong>Full Provenance</strong>: Tracks origin of every node</li>
+  <li>
+<strong>StructuredMerge Native</strong>: Depends on <code>ast-merge</code> and <code>tree_haver</code>; parser availability comes from registered backend providers</li>
+  <li>
+<strong>Customizable</strong>:
+    <ul>
+      <li>
+<code>signature_generator</code> - callable custom signature generators</li>
+      <li>
+<code>preference</code> - setting of <code>:template</code>, <code>:destination</code>, or a Hash for per-node-type preferences</li>
+      <li>
+<code>node_splitter</code> - Hash mapping node types to callables for per-node-type merge customization (see <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge">ast-merge</a> docs)</li>
+      <li>
+<code>add_template_only_nodes</code> - setting to retain nodes that do not exist in destination</li>
+      <li>
+<code>match_refiners</code> - array of refiners for fuzzy matching (e.g., <code>ObjectMatchRefiner</code>)</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="supported-node-types">Supported Node Types</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Node Type</th>
+      <th>Signature Format</th>
+      <th>Matching Behavior</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Object</td>
+      <td><code>[:object, key_signatures...]</code></td>
+      <td>Objects match by their key structure</td>
+    </tr>
+    <tr>
+      <td>Array</td>
+      <td><code>[:array, element_count]</code></td>
+      <td>Arrays match by position and type</td>
+    </tr>
+    <tr>
+      <td>Pair</td>
+      <td><code>[:pair, key_name]</code></td>
+      <td>Key-value pairs match by key name</td>
+    </tr>
+    <tr>
+      <td>String</td>
+      <td><code>[:string, value]</code></td>
+      <td>Strings match by value</td>
+    </tr>
+    <tr>
+      <td>Number</td>
+      <td><code>[:number, value]</code></td>
+      <td>Numbers match by value</td>
+    </tr>
+    <tr>
+      <td>Boolean</td>
+      <td><code>[:boolean, value]</code></td>
+      <td>Booleans match by value</td>
+    </tr>
+    <tr>
+      <td>Null</td>
+      <td><code>[:null]</code></td>
+      <td>Null values always match</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="example">Example</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;json/merge&quot;
+
+template = File.read(&quot;template.json&quot;)
+destination = File.read(&quot;destination.json&quot;)
+
+merger = Json::Merge::SmartMerger.new(template, destination)
+result = merger.merge
+
+File.write(&quot;merged.json&quot;, result.to_json)
+</code></pre>
+
+<h2 id="-info-you-can-shake-a-stick-at">💡 Info you can shake a stick at</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tokens to Remember</th>
+      <th>
+<a href="https://bestgems.org/gems/json-merge"><img src="https://img.shields.io/badge/name-json--merge-3C2D2D.svg?style=square&amp;logo=rubygems&amp;logoColor=red" alt="Gem name"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/json-merge"><img src="https://img.shields.io/badge/namespace-Json::Merge-3C2D2D.svg?style=square&amp;logo=ruby&amp;logoColor=white" alt="Gem namespace"></a>
+</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Works with MRI Ruby 4</td>
+      <td>
+<a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Ruby 4.0 Compat"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Support &amp; Community</td>
+      <td>
+<a href="https://app.daily.dev/squads/rubyfriends"><img src="https://img.shields.io/badge/daily.dev-%F0%9F%92%8E_Ruby_Friends-0A0A0A?style=for-the-badge&amp;logo=dailydotdev&amp;logoColor=white" alt="Join Me on Daily.dev's RubyFriends"></a> <a href="https://discord.gg/3qme4XHNKN"><img src="https://img.shields.io/discord/1373797679469170758?style=for-the-badge&amp;logo=discord" alt="Live Chat on Discord"></a> <a href="https://www.upwork.com/freelancers/~014942e9b056abdf86?mp_source=share"><img src="https://img.shields.io/badge/UpWork-13544E?style=for-the-badge&amp;logo=Upwork&amp;logoColor=white" alt="Get help from me on Upwork"></a> <a href="https://www.codementor.io/peterboling?utm_source=github&amp;utm_medium=button&amp;utm_term=peterboling&amp;utm_campaign=github"><img src="https://img.shields.io/badge/CodeMentor-Get_Help-1abc9c?style=for-the-badge&amp;logo=CodeMentor&amp;logoColor=white" alt="Get help from me on Codementor"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Source</td>
+      <td>
+<a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/json-merge"><img src="https://img.shields.io/badge/GitLab-FBA326?style=for-the-badge&amp;logo=Gitlab&amp;logoColor=orange" alt="Source on GitLab.com"></a> <a href="https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/json-merge"><img src="https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&amp;logo=CodeBerg&amp;logoColor=blue" alt="Source on CodeBerg.org"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/json-merge"><img src="https://img.shields.io/badge/GitHub-238636?style=for-the-badge&amp;logo=Github&amp;logoColor=green" alt="Source on Github.com"></a> <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"><img src="https://img.shields.io/badge/KLOC-5.053-FFDD67.svg?style=for-the-badge&amp;logo=YouTube&amp;logoColor=blue" alt="The best SHA: dQw4w9WgXcQ!"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Documentation</td>
+      <td>
+<a href="http://rubydoc.info/gems/json-merge"><img src="https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="Current release on RubyDoc.info"></a> <a href="https://json-merge.galtzo.com"><img src="https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&amp;logo=readthedocs&amp;logoColor=white" alt="YARD on Galtzo.com"></a> <a href="http://www.railsbling.com/tags/json-merge"><img src="https://img.shields.io/badge/blog-railsbling-0093D0.svg?style=for-the-badge&amp;logo=rubyonrails&amp;logoColor=orange" alt="Maintainer Blog"></a> <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/wikis/home"><img src="https://img.shields.io/badge/wiki-gitlab-943CD2.svg?style=for-the-badge&amp;logo=gitlab&amp;logoColor=white" alt="GitLab Wiki"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/wiki"><img src="https://img.shields.io/badge/wiki-github-943CD2.svg?style=for-the-badge&amp;logo=github&amp;logoColor=white" alt="GitHub Wiki"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Compliance</td>
+      <td>
+<a href="LICENSE.md"><img src="https://img.shields.io/badge/License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0-259D6C.svg" alt="License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"></a> <a href="https://www.apache.org/legal/resolved.html#category-x"><img src="https://img.shields.io/badge/Apache_Incompatible:_Category_X-%E2%9C%97-C0392B.svg?style=flat&amp;logo=Apache" alt="Apache license compatibility: Category X"></a> <a href="https://www.ilo.org/declaration/lang--en/index.htm"><img src="https://img.shields.io/badge/ILO_Fundamental_Principles-%E2%9C%93-259D6C.svg?style=flat" alt="📄ilo-declaration-img"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md"><img src="https://img.shields.io/badge/security-policy-259D6C.svg?style=flat" alt="Security Policy"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg" alt="Contributor Covenant 2.1"></a> <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="SemVer 2.0.0"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Style</td>
+      <td>
+<a href="https://github.com/rubocop-lts/rubocop-lts"><img src="https://img.shields.io/badge/code_style_&amp;_linting-rubocop--lts-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Enforced Code Style Linter"></a> <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep-A-Changelog 1.0.0"></a> <a href="https://gitmoji.dev"><img src="https://img.shields.io/badge/gitmoji_commits-%20%F0%9F%98%9C%20%F0%9F%98%8D-34495e.svg?style=flat-square" alt="Gitmoji Commits"></a> <a href="https://github.com/appraisal-rb/appraisal2"><img src="https://img.shields.io/badge/appraised_by-appraisal2-34495e.svg?plastic&amp;logo=ruby&amp;logoColor=white" alt="Compatibility appraised by: appraisal2"></a>
+</td>
+    </tr>
+    <tr>
+      <td>Maintainer 🎖️</td>
+      <td>
+<a href="http://www.linkedin.com/in/peterboling"><img src="https://img.shields.io/badge/LinkedIn-Profile-0B66C2?style=flat&amp;logo=newjapanprowrestling" alt="Follow Me on LinkedIn"></a> <a href="https://ruby.social/@galtzo"><img src="https://img.shields.io/mastodon/follow/109447111526622197?domain=https://ruby.social&amp;style=flat&amp;logo=mastodon&amp;label=Ruby%20@galtzo" alt="Follow Me on Ruby.Social"></a> <a href="https://bsky.app/profile/galtzo.com"><img src="https://img.shields.io/badge/@galtzo.com-0285FF?style=flat&amp;logo=bluesky&amp;logoColor=white" alt="Follow Me on Bluesky"></a> <a href="http://www.railsbling.com/contact"><img src="https://img.shields.io/badge/Contact-Maintainer-0093D0.svg?style=flat&amp;logo=rubyonrails&amp;logoColor=red" alt="Contact Maintainer"></a> <a href="https://dev.to/galtzo"><img src="https://img.shields.io/badge/dev.to-0A0A0A?style=flat&amp;logo=devdotto&amp;logoColor=white" alt="My technical writing"></a>
+</td>
+    </tr>
+    <tr>
+      <td>
+<code>...</code> 💖</td>
+      <td>
+<a href="https://wellfound.com/u/peter-boling"><img src="https://img.shields.io/badge/peter--boling-orange?style=flat&amp;logo=wellfound" alt="Find Me on WellFound:"></a> <a href="https://www.crunchbase.com/person/peter-boling"><img src="https://img.shields.io/badge/peter--boling-purple?style=flat&amp;logo=crunchbase" alt="Find Me on CrunchBase"></a> <a href="https://linktr.ee/galtzo"><img src="https://img.shields.io/badge/galtzo-purple?style=flat&amp;logo=linktree" alt="My LinkTree"></a> <a href="https://about.me/peter.boling"><img src="https://img.shields.io/badge/about.me-0A0A0A?style=flat&amp;logo=aboutme&amp;logoColor=white" alt="More About Me"></a> <a href="https://codeberg.org/pboling">🧊</a> <a href="https://github.org/pboling">🐙</a> <a href="https://sr.ht/~galtzo/">🛖</a> <a href="https://gitlab.com/pboling">🧪</a>
+</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="compatibility">Compatibility</h3>
+
+<p>Compatible with MRI Ruby 4.0.0+, and concordant releases of JRuby, and TruffleRuby.<br>
+CI workflows and Appraisals are generated for MRI Ruby 4.0.0+.<br>
+This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle-jem.yml</code> and<br>
+may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
+not practical for the current toolchain.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>🚚 <em>Amazing</em> test matrix was brought to you by</th>
+      <th>🔎 appraisal2 🔎 and the color 💚 green 💚</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>👟 Check it out!</td>
+      <td>✨ <a href="https://github.com/appraisal-rb/appraisal2">github.com/appraisal-rb/appraisal2</a> ✨</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="-installation">✨ Installation</h2>
+
+<p>Install the gem and add to the application’s Gemfile by executing:</p>
+
+<pre class="code language-console"><code class="language-console">bundle add json-merge
+</code></pre>
+
+<p>If bundler is not being used to manage dependencies, install the gem by executing:</p>
+
+<pre class="code language-console"><code class="language-console">gem install json-merge
+</code></pre>
+
+<h2 id="️-configuration">⚙️ Configuration</h2>
+
+<h3 id="signature-match-preference">Signature Match Preference</h3>
+
+<p>Control which version to use when nodes have matching signatures but different content:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Use template version (for config updates)
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  preference: :template,
+)
+
+# Use destination version (default - preserve customizations)
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  preference: :destination,
+)
+</code></pre>
+
+<h3 id="template-only-nodes">Template-Only Nodes</h3>
+
+<p>Control whether to add nodes that only exist in the template:</p>
+
+<pre class="code language-ruby"><code class="language-ruby"># Add template-only nodes
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  add_template_only_nodes: true,
+)
+</code></pre>
+
+<h3 id="object-match-refiner">Object Match Refiner</h3>
+
+<p>When JSON object properties (key-value pairs) don’t match by exact key name, the<br>
+<code>ObjectMatchRefiner</code> uses fuzzy matching to pair entries with:</p>
+
+<ul>
+  <li>Similar key names (e.g., <code>databaseUrl</code> vs <code>database_url</code>)</li>
+  <li>Keys with typos or different naming conventions (camelCase vs snake_case)</li>
+  <li>Array elements with similar structure or content</li>
+</ul>
+
+<!-- end list -->
+
+<pre class="code language-ruby"><code class="language-ruby"># Enable object fuzzy matching
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [
+    Json::Merge::ObjectMatchRefiner.new(threshold: 0.5),
+  ],
+)
+</code></pre>
+
+<h4 id="objectmatchrefiner-options">ObjectMatchRefiner Options</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Option</th>
+      <th>Default</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>threshold</code></td>
+      <td>0.5</td>
+      <td>Minimum similarity score (0.0-1.0) to accept a match</td>
+    </tr>
+    <tr>
+      <td><code>key_weight</code></td>
+      <td>0.7</td>
+      <td>Weight for key name similarity</td>
+    </tr>
+    <tr>
+      <td><code>value_weight</code></td>
+      <td>0.3</td>
+      <td>Weight for value similarity</td>
+    </tr>
+  </tbody>
+</table>
+
+<pre class="code language-ruby"><code class="language-ruby"># Custom weights for key-centric matching
+refiner = Json::Merge::ObjectMatchRefiner.new(
+  threshold: 0.6,
+  key_weight: 0.8,   # Focus more on key names
+  value_weight: 0.2,  # Less focus on values
+)
+</code></pre>
+
+<h3 id="debug-logging">Debug Logging</h3>
+
+<p>Enable debug logging to see merge decisions:</p>
+
+<pre class="code language-bash"><code class="language-bash">export JSON_MERGE_DEBUG=1
+</code></pre>
+
+<h3 id="jsonc-options">JSONC Options</h3>
+
+<p>JSONC files use the same options as JSON files:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">merger = Json::Merge::SmartMerger.new(
+  template_content,
+  dest_content,
+  # Which version to prefer when nodes match
+  # :destination (default) - keep destination values
+  # :template - use template values
+  preference: :destination,
+
+  # Whether to add template-only nodes to the result
+  # false (default) - only include properties that exist in destination
+  # true - include all template properties
+  add_template_only_nodes: false,
+
+  # Token for freeze block markers
+  # Default: &quot;json-merge&quot;
+  # Looks for: // json-merge:freeze / // json-merge:unfreeze
+  freeze_token: &quot;json-merge&quot;,
+
+  # Custom signature generator (optional)
+  # Receives a node, returns a signature array or nil
+  signature_generator: -&gt;(node) { [:pair, node.key] if node.type == :pair },
+)
+</code></pre>
+
+<h2 id="-basic-usage">🔧 Basic Usage</h2>
+
+<h3 id="merging-two-json-files">Merging Two JSON Files</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;json/merge&quot;
+
+template_content = File.read(&quot;template.json&quot;)
+dest_content = File.read(&quot;destination.json&quot;)
+
+merger = Json::Merge::SmartMerger.new(template_content, dest_content)
+result = merger.merge
+
+File.write(&quot;merged.json&quot;, result.to_json)
+</code></pre>
+
+<h3 id="analyzing-a-json-file">Analyzing a JSON File</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;json/merge&quot;
+
+source = File.read(&quot;config.json&quot;)
+analysis = Json::Merge::FileAnalysis.new(source)
+
+# Iterate over all top-level nodes
+analysis.statements.each do |node|
+  sig = analysis.generate_signature(node)
+  puts &quot;#{node.class}: #{sig.inspect}&quot;
+end
+</code></pre>
+
+<h3 id="fuzzy-property-matching">Fuzzy Property Matching</h3>
+
+<p>When property names differ between template and destination (e.g., naming convention changes),<br>
+use the <code>ObjectMatchRefiner</code>:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;json/merge&quot;
+
+template = &lt;&lt;~JSON
+  {
+    &quot;databaseUrl&quot;: &quot;postgres://localhost/app&quot;,
+    &quot;cacheTimeout&quot;: 3600,
+    &quot;apiEndpoint&quot;: &quot;https://api.example.com&quot;
+  }
+JSON
+
+destination = &lt;&lt;~JSON
+  {
+    &quot;database_url&quot;: &quot;postgres://localhost/custom&quot;,
+    &quot;cache_ttl&quot;: 7200,
+    &quot;api_endpoint&quot;: &quot;https://custom.example.com&quot;
+  }
+JSON
+
+# Default merge won&#39;t match keys (names differ - camelCase vs snake_case)
+# Use ObjectMatchRefiner for fuzzy matching
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [
+    Json::Merge::ObjectMatchRefiner.new(threshold: 0.5),
+  ],
+)
+result = merger.merge
+
+# Properties are matched despite naming convention differences:
+# - databaseUrl ↔ database_url (similar when normalized)
+# - cacheTimeout ↔ cache_ttl (similar: &quot;cache&quot;)
+# - apiEndpoint ↔ api_endpoint (similar when normalized)
+</code></pre>
+
+<h3 id="array-element-matching">Array Element Matching</h3>
+
+<p>The <code>ObjectMatchRefiner</code> also handles array elements with similar structure:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">template = &lt;&lt;~JSON
+  {
+    &quot;users&quot;: [
+      { &quot;id&quot;: 1, &quot;userName&quot;: &quot;alice&quot; },
+      { &quot;id&quot;: 2, &quot;userName&quot;: &quot;bob&quot; }
+    ]
+  }
+JSON
+
+destination = &lt;&lt;~JSON
+  {
+    &quot;users&quot;: [
+      { &quot;id&quot;: 1, &quot;user_name&quot;: &quot;alice_custom&quot; },
+      { &quot;id&quot;: 3, &quot;user_name&quot;: &quot;charlie&quot; }
+    ]
+  }
+JSON
+
+merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  match_refiners: [
+    Json::Merge::ObjectMatchRefiner.new(threshold: 0.5),
+  ],
+)
+# Array elements with matching IDs or similar structure are paired
+</code></pre>
+
+<h3 id="merging-jsonc-files">Merging JSONC Files</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">require &quot;json/merge&quot;
+
+template = File.read(&quot;template.jsonc&quot;)
+destination = File.read(&quot;destination.jsonc&quot;)
+
+merger = Json::Merge::SmartMerger.new(template, destination)
+result = merger.merge
+
+File.write(&quot;merged.jsonc&quot;, result)
+</code></pre>
+
+<h3 id="jsonc-freeze-blocks">JSONC Freeze Blocks</h3>
+
+<p>Freeze blocks protect sections from being overwritten during merge:</p>
+
+<pre class="code language-jsonc"><code class="language-jsonc">{
+  &quot;name&quot;: &quot;my-app&quot;,
+
+  // json-merge:freeze Secret configuration
+  &quot;api_key&quot;: &quot;my_production_api_key&quot;,
+  &quot;api_secret&quot;: &quot;super_secret_value&quot;,
+  // json-merge:unfreeze
+
+  &quot;debug&quot;: false
+}
+</code></pre>
+
+<p>Content between <code>// json-merge:freeze</code> and <code>// json-merge:unfreeze</code> markers is preserved from the destination file, regardless of what the template contains.</p>
+
+<h3 id="adding-template-only-jsonc-properties">Adding Template-Only JSONC Properties</h3>
+
+<pre class="code language-ruby"><code class="language-ruby">merger = Json::Merge::SmartMerger.new(
+  template,
+  destination,
+  add_template_only_nodes: true,
+)
+result = merger.merge
+# Result includes properties from template that do not exist in destination
+</code></pre>
+
+<h2 id="-security">🔐 Security</h2>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+
+<h2 id="-contributing">🤝 Contributing</h2>
+
+<p>If you need some ideas of where to help, you could work on adding more code coverage,<br>
+or if it is already 💯 (see <a href="#code-coverage">below</a>) check <a href="https://github.com/structuredmerge/structuredmerge-ruby/issues">issues</a> or <a href="https://github.com/structuredmerge/structuredmerge-ruby/pulls">PRs</a>,<br>
+or use the gem and think about how it could be better.</p>
+
+<p>We <a href="https://keepachangelog.com/en/1.0.0/"><img src="https://img.shields.io/badge/keep--a--changelog-1.0.0-34495e.svg?style=flat" alt="Keep A Changelog"></a> so if you make changes, remember to update it.</p>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for more detailed instructions.</p>
+
+<h2 id="-versioning">📌 Versioning</h2>
+
+<p>This library follows <a href="https://semver.org/spec/v2.0.0.html"><img src="https://img.shields.io/badge/semver-2.0.0-259D6C.svg?style=flat" alt="Semantic Versioning 2.0.0"></a> for its public API where practical.<br>
+For most applications, prefer the <a href="http://guides.rubygems.org/patterns/#pessimistic-version-constraint">Pessimistic Version Constraint</a> with two digits of precision.</p>
+
+<p>For example:</p>
+
+<pre class="code language-ruby"><code class="language-ruby">spec.add_dependency(&quot;json-merge&quot;, &quot;~&gt; 7.0&quot;)
+</code></pre>
+
+<details>
+  <summary>📌 Is "Platform Support" part of the public API? More details inside.</summary>
+
+  <p>Dropping support for a platform can be a breaking change for affected users.
+If a release changes supported platforms, it should be called out clearly in the changelog and versioned with that impact in mind.</p>
+
+  <p>To get a better understanding of how SemVer is intended to work over a project’s lifetime,
+read this article from the creator of SemVer:</p>
+
+  <ul>
+    <li><a href="https://tom.preston-werner.com/2022/05/23/major-version-numbers-are-not-sacred.html">“Major Version Numbers are Not Sacred”</a></li>
+  </ul>
+
+</details>
+
+<p>See <a href="https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CHANGELOG.md">CHANGELOG.md</a> for a list of releases.</p>
+
+<h2 id="-license">📄 License</h2>
+
+<p>The gem is available under the following licenses: <a href="AGPL-3.0-only.md">AGPL-3.0-only</a>, <a href="PolyForm-Small-Business-1.0.0.md">PolyForm-Small-Business-1.0.0</a>.<br>
+See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
+
+<p>If none of the available licenses suit your use case, please <a href="mailto:floss@galtzo.com">contact us</a> to discuss a custom commercial license.</p>
+
+</div></div>
+
+      <div id="footer">
+  Generated on Sun May 31 04:28:58 2026 by
+  <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.44 (ruby-4.0.5).
+</div>
+
+    </div>
+  </body>
+</html>
