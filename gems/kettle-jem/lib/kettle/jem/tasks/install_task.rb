@@ -847,6 +847,7 @@ module Kettle
             merge_command: "smorg-rs merge-driver %O %A %B %P",
           },
         ].freeze
+        GIT_DRIVER_LANGUAGE_REGISTRY = DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] }.freeze
 
         BUILTIN_GIT_DIFF_ATTRIBUTES = [
           {path: ".gitattributes", pattern: "*.rb", attributes: {"diff" => "ruby"}},
@@ -899,7 +900,21 @@ module Kettle
               profile: "semantic-diff",
               scope: "global",
               commands: git_driver_global_commands(manifest, "semantic-diff"),
+              diagnostics: [git_driver_forge_warning_diagnostic],
               reason: dry_run ? "dry_run_global_git_drivers" : "ready_for_global_git_drivers",
+            }
+          when "include-file"
+            {
+              name: "git_drivers",
+              status: dry_run ? "planned" : "ready",
+              mode: mode,
+              profile: "semantic-diff",
+              scope: "include-file",
+              include_file: ".git/smorg/config",
+              config_entries: git_driver_global_commands(manifest, "semantic-diff").map { |command| {key: command[3], value: command[4]} },
+              commands: [["git", "config", "--local", "include.path", ".git/smorg/config"]],
+              diagnostics: [git_driver_forge_warning_diagnostic],
+              reason: dry_run ? "dry_run_git_driver_include_file" : "ready_for_git_driver_include_file",
             }
           when "builtin-diff"
             updates = git_driver_attribute_updates(manifest, "builtin-diff")
@@ -928,7 +943,7 @@ module Kettle
               attribute_updates: updates,
               managed_block: "structuredmerge:git-drivers",
               commands: [],
-              diagnostics: diagnostics,
+              diagnostics: diagnostics + [git_driver_forge_warning_diagnostic],
               reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_driver_attributes"),
             }
           end
@@ -940,6 +955,7 @@ module Kettle
           return "none" if %w[0 false f no n none off skip].include?(normalized)
           return "local" if %w[1 true t yes y on l local semantic semantic-diff].include?(normalized)
           return "global" if %w[g global].include?(normalized)
+          return "include-file" if %w[include include-file].include?(normalized)
           return "builtin-diff" if %w[b builtin builtin-diff].include?(normalized)
           return "check" if normalized == "check"
           return "undo" if normalized == "undo"
@@ -948,13 +964,22 @@ module Kettle
         end
 
         def semantic_git_driver_attribute_updates
-          DEFAULT_GIT_DRIVER_DEFINITIONS.map do |definition|
+          GIT_DRIVER_LANGUAGE_REGISTRY.values.map do |definition|
             {
               path: ".gitattributes",
               pattern: definition.fetch(:pattern),
               attributes: {"diff" => definition.fetch(:diff)},
             }
           end
+        end
+
+        def git_driver_forge_warning_diagnostic
+          {
+            key: "forge_ignores_external_diff_drivers",
+            severity: "advisory",
+            blocking: false,
+            message: "External StructuredMerge diff drivers are local Git configuration and are generally not honored by hosted forges.",
+          }
         end
 
         def git_driver_attribute_updates(manifest, profile)
@@ -1033,6 +1058,7 @@ module Kettle
         end
 
         def validate_git_driver_profile!(profile_name, profile)
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile name is required" if profile_name.to_s.empty?
           raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} must be a mapping" unless profile.is_a?(Hash)
 
           Array(profile.fetch("attributes", [])).each do |entry|
@@ -1041,6 +1067,9 @@ module Kettle
           Array(profile.fetch("git_config", [])).each do |entry|
             raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} git_config scope must be global" unless entry["scope"] == "global"
             raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} git_config key is required" if entry["key"].to_s.empty?
+            if entry["key"].to_s.end_with?(".cachetextconv") && !profile_name.to_s.include?("textconv")
+              raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: cachetextconv requires an explicit textconv profile"
+            end
             value = entry["value"].to_s
             raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: unsafe command interpolation" if unsafe_git_driver_command_value?(value)
           end
@@ -1307,6 +1336,16 @@ module Kettle
           end
 
           changed_files = []
+          if step.fetch(:mode) == "include-file"
+            include_path = File.join(project_root.to_s, step.fetch(:include_file))
+            FileUtils.mkdir_p(File.dirname(include_path))
+            before = File.file?(include_path) ? File.read(include_path) : ""
+            after = render_git_driver_include_config(step.fetch(:config_entries))
+            if before != after
+              File.write(include_path, after)
+              changed_files << step.fetch(:include_file)
+            end
+          end
           Array(step[:attribute_removals]).each do |removal|
             path = File.join(project_root.to_s, removal.fetch(:path))
             next unless File.file?(path)
@@ -1357,6 +1396,17 @@ module Kettle
           return report if missing.empty?
 
           raise Kettle::Jem::Error, "git_drivers check failed: #{missing.map { |entry| entry.fetch(:kind) }.uniq.join(", ")} missing"
+        end
+
+        def render_git_driver_include_config(config_entries)
+          lines = ["# Generated by kettle-jem; do not commit this file."]
+          Array(config_entries).each do |entry|
+            section, name = entry.fetch(:key).split(".", 2)
+            lines << ""
+            lines << "[#{section} \"#{name.split(".").first}\"]"
+            lines << "\t#{name.split(".").drop(1).join(".")} = #{entry.fetch(:value).inspect}"
+          end
+          "#{lines.join("\n")}\n"
         end
 
         def render_git_attributes(content, updates, managed_block:)

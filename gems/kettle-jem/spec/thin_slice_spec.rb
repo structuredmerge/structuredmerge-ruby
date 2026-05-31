@@ -3595,6 +3595,32 @@ RSpec.describe Kettle::Jem do
       ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
       ["git", "config", "--global", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
     )
+    expect(step.fetch(:diagnostics)).to include(hash_including(key: "forge_ignores_external_diff_drivers"))
+  end
+
+  it "writes include-file Git driver configuration when requested" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-include", tmp_root) do |root|
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {git_drivers: "include-file"})
+      commands = []
+      command_runner = lambda do |command, **|
+        commands << command
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {},
+        run_options: {},
+        command_runner: command_runner,
+      ).first
+
+      expect(result).to include(status: "succeeded", changed_files: [".git/smorg/config"])
+      expect(commands).to include(["git", "config", "--local", "include.path", ".git/smorg/config"])
+      expect(File.read(File.join(root, ".git", "smorg", "config"))).to include("[diff \"smorg-ruby\"]")
+    end
   end
 
   it "loads project Git driver manifests for attribute and command planning" do
@@ -3652,6 +3678,29 @@ RSpec.describe Kettle::Jem do
       expect do
         Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
       end.to raise_error(Kettle::Jem::Error, /unsafe command interpolation/)
+    end
+  end
+
+  it "rejects cachetextconv outside explicit textconv profiles" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-cachetextconv", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+
+          [profiles.semantic-diff]
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.cachetextconv"
+          value = "true"
+        TOML
+      })
+
+      expect do
+        Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      end.to raise_error(Kettle::Jem::Error, /cachetextconv requires an explicit textconv profile/)
     end
   end
 
