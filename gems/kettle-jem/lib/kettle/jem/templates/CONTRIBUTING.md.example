@@ -106,6 +106,7 @@ Git diff driver setup
 - Local setup writes repository `.gitattributes` entries so this checkout uses StructuredMerge semantic diffs.
 - Global setup registers `diff.smorg-*` commands once in the user Git config; use it when you work across several StructuredMerge-enabled repositories.
 - Include-file setup writes `.git/smorg/config` and includes it from local Git config, keeping command registrations out of the repository files.
+- Git hosting forges generally ignore external diff drivers, so pull request views may still show raw textual diffs even when local `git diff` uses semantic drivers.
 
 For a quick starting point, this repository’s `mise.toml` defines the shared defaults, and `.env.local` can override them locally. Copy `.env.local.example` to `.env.local`, use `KEY=value` lines, and either activate `mise` in your shell or run commands through `mise exec -C /path/to/project -- ...`.
 
