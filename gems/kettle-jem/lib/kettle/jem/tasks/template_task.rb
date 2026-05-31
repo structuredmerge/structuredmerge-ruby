@@ -42,6 +42,7 @@ module Kettle
             git_drivers: env["git_drivers"] || env["KETTLE_JEM_GIT_DRIVERS"],
             only: env["only"],
             include: env["include"],
+            dry_run: truthy?(env["KETTLE_JEM_DRY_RUN"]),
             skip_commit: truthy?(env["KETTLE_JEM_SKIP_COMMIT"]),
             skip_lock_normalization: truthy?(env["KETTLE_JEM_SKIP_LOCK_NORMALIZATION"]),
             accept_config: truthy?(env["KETTLE_JEM_ACCEPT_CONFIG"]),

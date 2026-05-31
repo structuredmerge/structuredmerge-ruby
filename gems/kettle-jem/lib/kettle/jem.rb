@@ -6724,6 +6724,7 @@ module Kettle
         include: normalize_list_option(option_hash.fetch(:include, env_hash["include"])),
         template_profile: normalize_template_profile(option_hash.fetch(:template_profile, env_hash["KETTLE_JEM_TEMPLATE_PROFILE"])),
         skip_commit: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_commit, env_hash["KETTLE_JEM_SKIP_COMMIT"])),
+        dry_run: DecisionPolicy.value_to_boolean(option_hash.fetch(:dry_run, env_hash["KETTLE_JEM_DRY_RUN"])),
         accept_config: DecisionPolicy.value_to_boolean(option_hash.fetch(:accept_config, env_hash["KETTLE_JEM_ACCEPT_CONFIG"])),
         bootstrap_mode: DecisionPolicy.value_to_boolean(option_hash.fetch(:bootstrap_mode, env_hash["KETTLE_JEM_BOOTSTRAP_MODE"])),
         quiet: DecisionPolicy.value_to_boolean(option_hash.fetch(:quiet, env_hash["KETTLE_JEM_QUIET"])),

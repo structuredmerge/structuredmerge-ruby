@@ -111,6 +111,15 @@ module Kettle
           opts.on("--git_drivers VALUE", "Alias for --git-drivers.") do |value|
             options[:run_options][:git_drivers] = value
           end
+          opts.on("--dry-run", "Plan supported post-template actions without applying them.") do
+            options[:run_options][:dry_run] = true
+          end
+          opts.on("--check", "Verify supported post-template setup without changing files.") do
+            options[:run_options][:git_drivers] = "check"
+          end
+          opts.on("--undo", "Undo supported post-template setup.") do
+            options[:run_options][:git_drivers] = "undo"
+          end
           opts.on("--only PATHS", "Restrict templating to comma-separated paths or patterns.") do |value|
             (options[:run_options][:only] ||= []) << value
           end

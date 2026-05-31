@@ -3487,16 +3487,16 @@ RSpec.describe Kettle::Jem do
 
     expect(step).to include(
       name: "git_drivers",
-      status: "planned",
+      status: "ready",
       mode: "local",
       profile: "semantic-diff",
       scope: "local",
       reason: "ready_for_local_git_driver_attributes",
     )
-    expect(step.fetch(:attribute_updates)).to include(
+    expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
       attributes: {"diff" => "smorg-ruby"},
-    )
+    ))
     expect(step.fetch(:commands)).to eq([])
   end
 
@@ -3505,15 +3505,79 @@ RSpec.describe Kettle::Jem do
 
     expect(step).to include(
       name: "git_drivers",
-      status: "planned",
+      status: "ready",
       mode: "builtin-diff",
       profile: "builtin-diff",
       scope: "local",
     )
-    expect(step.fetch(:attribute_updates)).to include(
+    expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
       attributes: {"diff" => "ruby"},
-    )
+    ))
+  end
+
+  it "writes managed .gitattributes for local semantic Git driver setup" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-drivers", tmp_root) do |root|
+      write_tree(root, {".gitattributes" => "*.md diff=markdown\n"})
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      command_runner = lambda do |_command, **|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {},
+        run_options: {},
+        command_runner: command_runner,
+      ).first
+
+      expect(result).to include(status: "succeeded", changed_files: [".gitattributes"])
+      expect(File.read(File.join(root, ".gitattributes"))).to eq(<<~ATTRIBUTES)
+        *.md diff=markdown
+        # <<structuredmerge:git-drivers>> do not edit below this line
+        *.rb diff=smorg-ruby
+        *.go diff=smorg-go
+        *.rs diff=smorg-rs
+        # <</structuredmerge:git-drivers>>
+      ATTRIBUTES
+    end
+  end
+
+  it "reports conflicting unmanaged .gitattributes entries" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-conflict", tmp_root) do |root|
+      write_tree(root, {".gitattributes" => "*.rb diff=ruby\n"})
+
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+
+      expect(step).to include(
+        status: "blocked",
+        reason: "git_driver_attribute_conflict",
+      )
+      expect(step.fetch(:diagnostics)).to include(hash_including(
+        key: "conflicting_attributes",
+        path: ".gitattributes",
+        pattern: "*.rb",
+        blocking: true,
+      ))
+    end
+  end
+
+  it "plans local Git driver setup without writing attributes in dry-run mode" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-dry-run", tmp_root) do |root|
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {dry_run: true})
+
+      expect(step).to include(
+        status: "planned",
+        reason: "dry_run_git_driver_attributes",
+      )
+    end
   end
 
   it "plans global Git driver command registration when requested" do

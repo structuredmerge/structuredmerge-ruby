@@ -809,13 +809,14 @@ module Kettle
         ].freeze
 
         BUILTIN_GIT_DIFF_ATTRIBUTES = [
-          {pattern: "*.rb", attributes: {"diff" => "ruby"}},
-          {pattern: "*.go", attributes: {"diff" => "golang"}},
-          {pattern: "*.rs", attributes: {"diff" => "rust"}},
+          {path: ".gitattributes", pattern: "*.rb", attributes: {"diff" => "ruby"}},
+          {path: ".gitattributes", pattern: "*.go", attributes: {"diff" => "golang"}},
+          {path: ".gitattributes", pattern: "*.rs", attributes: {"diff" => "rust"}},
         ].freeze
 
-        def git_drivers_step(_project_root, run_options)
+        def git_drivers_step(project_root, run_options)
           mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
+          dry_run = Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:dry_run])
           return {
             name: "git_drivers",
             status: "skipped",
@@ -827,45 +828,67 @@ module Kettle
           when "check"
             {
               name: "git_drivers",
-              status: "planned",
+              status: "ready",
               mode: mode,
               profile: "semantic-diff",
               scope: "check",
+              attribute_updates: semantic_git_driver_attribute_updates,
+              config_checks: git_driver_global_config_checks,
               reason: "ready_for_git_driver_check",
+            }
+          when "undo"
+            {
+              name: "git_drivers",
+              status: dry_run ? "planned" : "ready",
+              mode: mode,
+              profile: "all",
+              scope: "local",
+              attribute_removals: [
+                {path: ".gitattributes", managed_block: "structuredmerge:git-drivers"},
+                {path: ".gitattributes", managed_block: "structuredmerge:git-builtins"},
+              ],
+              commands: git_driver_global_unset_commands,
+              reason: dry_run ? "dry_run_git_driver_undo" : "ready_for_git_driver_undo",
             }
           when "global"
             {
               name: "git_drivers",
-              status: "ready",
+              status: dry_run ? "planned" : "ready",
               mode: mode,
               profile: "semantic-diff",
               scope: "global",
               commands: git_driver_global_commands,
-              reason: "ready_for_global_git_drivers",
+              reason: dry_run ? "dry_run_global_git_drivers" : "ready_for_global_git_drivers",
             }
           when "builtin-diff"
+            updates = BUILTIN_GIT_DIFF_ATTRIBUTES
+            diagnostics = git_driver_attribute_diagnostics(project_root, updates, managed_block: "structuredmerge:git-builtins")
             {
               name: "git_drivers",
-              status: "planned",
+              status: git_driver_attribute_status(diagnostics, dry_run: dry_run),
               mode: mode,
               profile: "builtin-diff",
               scope: "local",
-              attribute_updates: BUILTIN_GIT_DIFF_ATTRIBUTES,
+              attribute_updates: updates,
+              managed_block: "structuredmerge:git-builtins",
               commands: [],
-              reason: "ready_for_builtin_git_attributes",
+              diagnostics: diagnostics,
+              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_builtin_git_attributes"),
             }
           else
+            updates = semantic_git_driver_attribute_updates
+            diagnostics = git_driver_attribute_diagnostics(project_root, updates, managed_block: "structuredmerge:git-drivers")
             {
               name: "git_drivers",
-              status: "planned",
+              status: git_driver_attribute_status(diagnostics, dry_run: dry_run),
               mode: "local",
               profile: "semantic-diff",
               scope: "local",
-              attribute_updates: DEFAULT_GIT_DRIVER_DEFINITIONS.map do |definition|
-                {pattern: definition.fetch(:pattern), attributes: {"diff" => definition.fetch(:diff)}}
-              end,
+              attribute_updates: updates,
+              managed_block: "structuredmerge:git-drivers",
               commands: [],
-              reason: "ready_for_local_git_driver_attributes",
+              diagnostics: diagnostics,
+              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_driver_attributes"),
             }
           end
         end
@@ -878,8 +901,19 @@ module Kettle
           return "global" if %w[g global].include?(normalized)
           return "builtin-diff" if %w[b builtin builtin-diff].include?(normalized)
           return "check" if normalized == "check"
+          return "undo" if normalized == "undo"
 
           normalized
+        end
+
+        def semantic_git_driver_attribute_updates
+          DEFAULT_GIT_DRIVER_DEFINITIONS.map do |definition|
+            {
+              path: ".gitattributes",
+              pattern: definition.fetch(:pattern),
+              attributes: {"diff" => definition.fetch(:diff)},
+            }
+          end
         end
 
         def git_driver_global_commands
@@ -889,6 +923,88 @@ module Kettle
               ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.driver", definition.fetch(:merge_command)],
               ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.name", "StructuredMerge #{definition.fetch(:language)} merge driver"],
             ]
+          end
+        end
+
+        def git_driver_global_unset_commands
+          DEFAULT_GIT_DRIVER_DEFINITIONS.flat_map do |definition|
+            [
+              ["git", "config", "--global", "--unset", "diff.#{definition.fetch(:diff)}.command"],
+              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.driver"],
+              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.name"],
+            ]
+          end
+        end
+
+        def git_driver_global_config_checks
+          git_driver_global_commands.map do |command|
+            {key: command[3], expected: command[4], argv: ["git", "config", "--global", "--get", command[3]]}
+          end
+        end
+
+        def git_driver_attribute_status(diagnostics, dry_run:)
+          return "blocked" if diagnostics.any? { |diagnostic| diagnostic.fetch(:blocking, false) }
+
+          dry_run ? "planned" : "ready"
+        end
+
+        def git_driver_attribute_reason(diagnostics, dry_run:, ready:)
+          return "git_driver_attribute_conflict" if diagnostics.any? { |diagnostic| diagnostic.fetch(:key) == "conflicting_attributes" }
+          return "dirty_managed_block" if diagnostics.any? { |diagnostic| diagnostic.fetch(:key) == "dirty_managed_block" }
+
+          dry_run ? "dry_run_git_driver_attributes" : ready
+        end
+
+        def git_driver_attribute_diagnostics(project_root, updates, managed_block:)
+          path = File.join(project_root.to_s, ".gitattributes")
+          return [] unless File.file?(path)
+
+          content = File.read(path)
+          diagnostics = []
+          diagnostics << {
+            key: "dirty_managed_block",
+            severity: "error",
+            blocking: true,
+            path: ".gitattributes",
+            managed_block: managed_block,
+          } if dirty_git_attribute_managed_block?(content, managed_block)
+          diagnostics.concat(conflicting_git_attribute_diagnostics(content, updates, managed_block: managed_block))
+          diagnostics
+        end
+
+        def dirty_git_attribute_managed_block?(content, managed_block)
+          start_line = git_attribute_block_start(managed_block)
+          end_line = git_attribute_block_end(managed_block)
+          content.lines.any? { |line| line.chomp == start_line } &&
+            content.lines.none? { |line| line.chomp == end_line }
+        end
+
+        def conflicting_git_attribute_diagnostics(content, updates, managed_block:)
+          lines = remove_git_attribute_managed_block(content, managed_block: managed_block).fetch(:lines)
+          updates.filter_map do |update|
+            conflict = lines.find { |line| git_attribute_line_conflicts?(line, update) }
+            next unless conflict
+
+            {
+              key: "conflicting_attributes",
+              severity: "error",
+              blocking: true,
+              path: update.fetch(:path, ".gitattributes"),
+              pattern: update.fetch(:pattern),
+              line: conflict,
+            }
+          end
+        end
+
+        def git_attribute_line_conflicts?(line, update)
+          parts = line.to_s.strip.split
+          return false if parts.empty? || parts.first.start_with?("#")
+          return false unless parts.first == update.fetch(:pattern)
+
+          attributes = update.fetch(:attributes)
+          parts.drop(1).any? do |token|
+            key, value = token.split("=", 2)
+            attributes.key?(key) && attributes.fetch(key) != value
           end
         end
 
@@ -975,6 +1091,7 @@ module Kettle
           argv << "--force" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:force])
           argv << "--accept" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:accept])
           argv << "--interactive" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:interactive])
+          argv << "--dry-run" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:dry_run])
           argv.concat(value_arg("--failure-mode", options[:failure_mode]))
           argv.concat(value_arg("--allowed", options[:allowed]))
           argv.concat(value_arg("--hook-templates", options[:hook_templates]))
@@ -1075,7 +1192,106 @@ module Kettle
         end
 
         def execute_git_drivers_step(step, project_root:, env:, quiet:, command_runner:)
-          execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+          return step unless step.fetch(:status) == "ready"
+
+          if step.fetch(:mode) == "check"
+            return execute_git_drivers_check_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+          end
+
+          changed_files = []
+          Array(step[:attribute_removals]).each do |removal|
+            path = File.join(project_root.to_s, removal.fetch(:path))
+            next unless File.file?(path)
+
+            before = File.read(path)
+            after = remove_git_attribute_managed_block(before, managed_block: removal.fetch(:managed_block)).fetch(:lines).join("\n")
+            after = "#{after}\n" unless after.empty?
+            next if after == before
+
+            File.write(path, after)
+            changed_files << removal.fetch(:path)
+          end
+
+          unless Array(step[:attribute_updates]).empty?
+            path = File.join(project_root.to_s, ".gitattributes")
+            before = File.file?(path) ? File.read(path) : ""
+            after = render_git_attributes(before, step.fetch(:attribute_updates), managed_block: step.fetch(:managed_block))
+            if after != before
+              File.write(path, after)
+              changed_files << ".gitattributes"
+            end
+          end
+
+          command_step = execute_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+          command_step.merge(
+            status: "succeeded",
+            changed_files: changed_files.uniq,
+            reason: "executed"
+          )
+        end
+
+        def execute_git_drivers_check_step(step, project_root:, env:, quiet:, command_runner:)
+          missing = []
+          content = File.file?(File.join(project_root.to_s, ".gitattributes")) ? File.read(File.join(project_root.to_s, ".gitattributes")) : ""
+          Array(step[:attribute_updates]).each do |update|
+            next if content.include?(render_git_attribute_line(update))
+
+            missing << {kind: "attributes", path: update.fetch(:path), pattern: update.fetch(:pattern)}
+          end
+          Array(step[:config_checks]).each do |check|
+            result = command_runner.call(check.fetch(:argv), chdir: project_root, env: env, quiet: quiet)
+            next if result.fetch(:success) && result.fetch(:stdout).to_s.strip == check.fetch(:expected)
+
+            missing << {kind: "global_config", key: check.fetch(:key)}
+          end
+          status = missing.empty? ? "succeeded" : "failed"
+          report = step.merge(status: status, ok: missing.empty?, missing: missing, reason: "checked")
+          return report if missing.empty?
+
+          raise Kettle::Jem::Error, "git_drivers check failed: #{missing.map { |entry| entry.fetch(:kind) }.uniq.join(", ")} missing"
+        end
+
+        def render_git_attributes(content, updates, managed_block:)
+          unmanaged_lines = remove_git_attribute_managed_block(content, managed_block: managed_block).fetch(:lines)
+          rendered_lines = unmanaged_lines.reject { |line| line.empty? && unmanaged_lines.last == line }
+          rendered_lines << git_attribute_block_start(managed_block)
+          updates.each { |update| rendered_lines << render_git_attribute_line(update) }
+          rendered_lines << git_attribute_block_end(managed_block)
+          "#{rendered_lines.join("\n")}\n"
+        end
+
+        def remove_git_attribute_managed_block(content, managed_block:)
+          start_line = git_attribute_block_start(managed_block)
+          end_line = git_attribute_block_end(managed_block)
+          skipping = false
+          removed = false
+          lines = []
+          content.lines(chomp: true).each do |line|
+            if line == start_line
+              skipping = true
+              removed = true
+              next
+            end
+            if skipping
+              skipping = false if line == end_line
+              next
+            end
+            lines << line
+          end
+          {lines: lines, removed: removed}
+        end
+
+        def render_git_attribute_line(update)
+          attributes = update.fetch(:attributes).map { |key, value| "#{key}=#{value}" }.join(" ")
+          "#{update.fetch(:pattern)} #{attributes}"
+        end
+
+        def git_attribute_block_start(managed_block)
+          "# <<#{managed_block}>> do not edit below this line"
+        end
+
+        def git_attribute_block_end(managed_block)
+          "# <</#{managed_block}>>"
         end
 
         def run_system_command(command, chdir:, env:, quiet:)
