@@ -3597,6 +3597,64 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "loads project Git driver manifests for attribute and command planning" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-manifest", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+          driver_namespace = "smorg"
+
+          [profiles.semantic-diff]
+          description = "Custom Ruby driver"
+
+          [[profiles.semantic-diff.attributes]]
+          pattern = "*.rake"
+          diff = "smorg-ruby"
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.command"
+          value = "bundle exec smorg-ruby diff-driver"
+        TOML
+      })
+
+      local = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      global = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {git_drivers: "global"})
+
+      expect(local.fetch(:attribute_updates)).to eq([
+        {path: ".gitattributes", pattern: "*.rake", attributes: {"diff" => "smorg-ruby"}},
+      ])
+      expect(global.fetch(:commands)).to eq([
+        ["git", "config", "--global", "diff.smorg-ruby.command", "bundle exec smorg-ruby diff-driver"],
+      ])
+    end
+  end
+
+  it "rejects unsafe interpolation in committed Git driver manifests" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-unsafe-manifest", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+
+          [profiles.semantic-diff]
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.command"
+          value = "smorg-ruby $(danger)"
+        TOML
+      })
+
+      expect do
+        Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      end.to raise_error(Kettle::Jem::Error, /unsafe command interpolation/)
+    end
+  end
+
   it "skips Git driver setup when explicitly disabled" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "none"})
 

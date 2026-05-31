@@ -1,0 +1,22 @@
+version = 1
+driver_namespace = "smorg"
+
+[profiles.builtin-diff]
+description = "Use Git built-in hunk and word-diff drivers where available."
+
+[[profiles.builtin-diff.attributes]]
+pattern = "*.rb"
+diff = "ruby"
+
+[profiles.semantic-diff]
+description = "Use StructuredMerge external diff drivers for local CLI diffs."
+
+[[profiles.semantic-diff.attributes]]
+pattern = "*.rb"
+diff = "smorg-ruby"
+
+[[profiles.semantic-diff.git_config]]
+scope = "global"
+key = "diff.smorg-ruby.command"
+value = "smorg-ruby diff-driver"
+

@@ -3,6 +3,7 @@
 require "fileutils"
 require "open3"
 require "pathname"
+require "toml-rb"
 require "yaml"
 
 module Kettle
@@ -856,6 +857,7 @@ module Kettle
         def git_drivers_step(project_root, run_options)
           mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
           dry_run = Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:dry_run])
+          manifest = git_driver_manifest(project_root)
           return {
             name: "git_drivers",
             status: "skipped",
@@ -871,8 +873,8 @@ module Kettle
               mode: mode,
               profile: "semantic-diff",
               scope: "check",
-              attribute_updates: semantic_git_driver_attribute_updates,
-              config_checks: git_driver_global_config_checks,
+              attribute_updates: git_driver_attribute_updates(manifest, "semantic-diff"),
+              config_checks: git_driver_global_config_checks(manifest, "semantic-diff"),
               reason: "ready_for_git_driver_check",
             }
           when "undo"
@@ -896,11 +898,11 @@ module Kettle
               mode: mode,
               profile: "semantic-diff",
               scope: "global",
-              commands: git_driver_global_commands,
+              commands: git_driver_global_commands(manifest, "semantic-diff"),
               reason: dry_run ? "dry_run_global_git_drivers" : "ready_for_global_git_drivers",
             }
           when "builtin-diff"
-            updates = BUILTIN_GIT_DIFF_ATTRIBUTES
+            updates = git_driver_attribute_updates(manifest, "builtin-diff")
             diagnostics = git_driver_attribute_diagnostics(project_root, updates, managed_block: "structuredmerge:git-builtins")
             {
               name: "git_drivers",
@@ -915,7 +917,7 @@ module Kettle
               reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_builtin_git_attributes"),
             }
           else
-            updates = semantic_git_driver_attribute_updates
+            updates = git_driver_attribute_updates(manifest, "semantic-diff")
             diagnostics = git_driver_attribute_diagnostics(project_root, updates, managed_block: "structuredmerge:git-drivers")
             {
               name: "git_drivers",
@@ -955,7 +957,27 @@ module Kettle
           end
         end
 
-        def git_driver_global_commands
+        def git_driver_attribute_updates(manifest, profile)
+          profile_hash = git_driver_manifest_profile(manifest, profile)
+          return semantic_git_driver_attribute_updates if profile == "semantic-diff" && !profile_hash
+          return BUILTIN_GIT_DIFF_ATTRIBUTES if profile == "builtin-diff" && !profile_hash
+
+          Array(profile_hash.fetch("attributes", [])).map do |entry|
+            attributes = entry.reject { |key, _value| key == "pattern" }.transform_values(&:to_s)
+            {path: ".gitattributes", pattern: entry.fetch("pattern"), attributes: attributes}
+          end
+        end
+
+        def git_driver_global_commands(manifest = nil, profile = "semantic-diff")
+          profile_hash = git_driver_manifest_profile(manifest, profile)
+          return default_git_driver_global_commands unless profile_hash
+
+          Array(profile_hash.fetch("git_config", [])).map do |entry|
+            ["git", "config", "--global", entry.fetch("key"), entry.fetch("value")]
+          end
+        end
+
+        def default_git_driver_global_commands
           DEFAULT_GIT_DRIVER_DEFINITIONS.flat_map do |definition|
             [
               ["git", "config", "--global", "diff.#{definition.fetch(:diff)}.command", definition.fetch(:diff_command)],
@@ -975,10 +997,57 @@ module Kettle
           end
         end
 
-        def git_driver_global_config_checks
-          git_driver_global_commands.map do |command|
+        def git_driver_global_config_checks(manifest = nil, profile = "semantic-diff")
+          git_driver_global_commands(manifest, profile).map do |command|
             {key: command[3], expected: command[4], argv: ["git", "config", "--global", "--get", command[3]]}
           end
+        end
+
+        def git_driver_manifest(project_root)
+          path = File.join(project_root.to_s, ".structuredmerge", "git-drivers.toml")
+          return nil unless File.file?(path)
+
+          manifest = TomlRB.parse(File.read(path))
+          validate_git_driver_manifest!(manifest)
+          manifest
+        rescue TomlRB::ParseError => error
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: #{error.message}"
+        end
+
+        def git_driver_manifest_profile(manifest, profile)
+          return nil unless manifest
+
+          manifest.fetch("profiles").fetch(profile)
+        end
+
+        def validate_git_driver_manifest!(manifest)
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: root must be a mapping" unless manifest.is_a?(Hash)
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: version must be 1" unless manifest["version"] == 1
+
+          profiles = manifest["profiles"]
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profiles must be a mapping" unless profiles.is_a?(Hash)
+
+          profiles.each do |profile_name, profile|
+            validate_git_driver_profile!(profile_name, profile)
+          end
+        end
+
+        def validate_git_driver_profile!(profile_name, profile)
+          raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} must be a mapping" unless profile.is_a?(Hash)
+
+          Array(profile.fetch("attributes", [])).each do |entry|
+            raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} attribute pattern is required" if entry["pattern"].to_s.empty?
+          end
+          Array(profile.fetch("git_config", [])).each do |entry|
+            raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} git_config scope must be global" unless entry["scope"] == "global"
+            raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: profile #{profile_name} git_config key is required" if entry["key"].to_s.empty?
+            value = entry["value"].to_s
+            raise Kettle::Jem::Error, "Invalid .structuredmerge/git-drivers.toml: unsafe command interpolation" if unsafe_git_driver_command_value?(value)
+          end
+        end
+
+        def unsafe_git_driver_command_value?(value)
+          value.include?("$(") || value.include?("${") || value.include?("`")
         end
 
         def git_driver_attribute_status(diagnostics, dry_run:)
