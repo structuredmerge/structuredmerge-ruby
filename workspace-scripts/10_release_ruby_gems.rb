@@ -42,6 +42,7 @@ GEMS = %w[
 ].freeze
 
 options = {
+  changelog: true,
   execute: false,
   local_path_gems: false,
   readiness: true,
@@ -73,6 +74,10 @@ parser = OptionParser.new do |opts|
 
   opts.on("--[no-]readiness", "Run release-readiness checks before release planning/execution. Default: true.") do |value|
     options[:readiness] = value
+  end
+
+  opts.on("--[no-]changelog", "Run the root/family kettle-changelog step before per-gem release. Default: true.") do |value|
+    options[:changelog] = value
   end
 end
 
@@ -121,6 +126,8 @@ if options[:readiness]
 end
 
 command_env = release_env(local_path_gems: options[:local_path_gems])
+changelog_env = command_env.merge("K_CHANGELOG_VERSION_FILE" => "gems/tree_haver/lib/tree_haver/version.rb")
+changelog_command = ["mise", "exec", "-C", RUBY_REPO, "--", "bundle", "exec", "kettle-changelog"]
 release_args = ["bundle", "exec", "kettle-release"]
 release_args << "start_step=#{options[:start_step]}" if options[:start_step]
 
@@ -128,6 +135,15 @@ selected = selected_gems(options)
 puts "Selected gems: #{selected.join(", ")}"
 puts "Dependency mode: #{options[:local_path_gems] ? "local path gems" : "released gems only"}"
 puts "Execution: #{options[:execute] ? "enabled" : "plan only; pass --execute to run"}"
+
+if options[:changelog]
+  if options[:execute]
+    run!(changelog_command, chdir: RUBY_REPO, env: changelog_env)
+  else
+    env_prefix = changelog_env.map { |key, value| "#{key}=#{value}" }
+    puts sh([*env_prefix, *changelog_command])
+  end
+end
 
 selected.each do |gem_name|
   gem_dir = File.join(GEMS_ROOT, gem_name)
