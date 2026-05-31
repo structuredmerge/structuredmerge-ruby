@@ -1874,11 +1874,11 @@ RSpec.describe Kettle::Jem do
         report.fetch(:recipe_name) == "kettle_config_bootstrap"
       end
       expect(bootstrap_report.fetch(:changed)).to be(true)
-      expect(bootstrap_report.fetch(:relative_path)).to eq(".kettle-jem.yml")
+      expect(bootstrap_report.fetch(:relative_path)).to eq(".structuredmerge/kettle-jem.yml")
       expect(bootstrap_report.dig(:metadata, :bootstrap_file)).to be(true)
       expect(bootstrap_report.dig(:metadata, :template_source_preference)).to include(
-        selected_source: ".kettle-jem.yml.example",
-        source_relative_path: ".kettle-jem.yml.example",
+        selected_source: ".structuredmerge/kettle-jem.yml.example",
+        source_relative_path: ".structuredmerge/kettle-jem.yml.example",
         source_root: "packaged",
       )
       expect(bootstrap_report.fetch(:final_content)).to include("# kettle-jem configuration file")
@@ -1886,7 +1886,7 @@ RSpec.describe Kettle::Jem do
       expect(bootstrap_report.fetch(:final_content)).to include("#   tokens    - values for {KJ|...} placeholders used across template files")
 
       described_class.apply_project(root, env: {"KJ_MIN_DIVERGENCE_THRESHOLD" => "7"})
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(bootstrap_report.fetch(:final_content))
+      expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(bootstrap_report.fetch(:final_content))
     end
   end
 

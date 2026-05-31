@@ -335,7 +335,7 @@ module Kettle
           env_value = (env || {})["KJ_PROJECT_EMOJI"].to_s.strip
           return first_grapheme(env_value) unless env_value.empty? || Kettle::Jem::DecisionPolicy.falsey?(env_value)
 
-          config_path = File.join(project_root.to_s, ".kettle-jem.yml")
+          config_path = Kettle::Jem.kettle_jem_config_path(project_root.to_s)
           return nil unless File.file?(config_path)
 
           config = YAML.safe_load(File.read(config_path), permitted_classes: [], aliases: false)

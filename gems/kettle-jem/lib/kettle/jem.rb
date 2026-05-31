@@ -3279,9 +3279,9 @@ module Kettle
       bootstrap_only = selection[:bootstrap_mode] || (!config_existed && !selection[:accept_config])
 
       if bootstrap_only
-        bootstrap_report = plan.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == ".kettle-jem.yml" }
+        bootstrap_report = plan.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == KETTLE_CONFIG_PATH }
         apply_recipe_report(root, bootstrap_report) if bootstrap_report&.fetch(:changed, false)
-        changed_files = bootstrap_report&.fetch(:changed, false) ? [".kettle-jem.yml"] : []
+        changed_files = bootstrap_report&.fetch(:changed, false) ? [KETTLE_CONFIG_PATH] : []
         return plan.merge(
           mode: "setup",
           setup_status: config_existed ? "bootstrap_config_already_present" : "bootstrap_config_written",
@@ -4076,7 +4076,7 @@ module Kettle
       end
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts)
-        return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
+        return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
         return finalize_github_workflow_template(merged, facts) if github_workflow_template_recipe?(recipe)
 
@@ -4085,7 +4085,7 @@ module Kettle
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
-        accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == ".kettle-jem.yml"
+        accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
         accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
         return (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
       end
@@ -6836,9 +6836,9 @@ module Kettle
       {
         severity: "advisory",
         message: if config_existed
-                   "Kettle/Jem setup bootstrap mode found existing .kettle-jem.yml; run kettle-jem apply to template the project."
+                   "Kettle/Jem setup bootstrap mode found existing #{KETTLE_CONFIG_PATH}; run kettle-jem apply to template the project."
                  else
-                   "Created .kettle-jem.yml. Review it, then run kettle-jem --accept-config to continue setup."
+                   "Created #{KETTLE_CONFIG_PATH}. Review it, then run kettle-jem --accept-config to continue setup."
                  end,
       }
     end
@@ -7330,7 +7330,7 @@ module Kettle
     def phase_for_recipe(recipe_name, relative_path)
       path = relative_path.to_s
       name = recipe_name.to_s
-      return :config_sync if path == ".kettle-jem.yml" || name.include?("kettle_config")
+      return :config_sync if path == KETTLE_CONFIG_PATH || path == LEGACY_KETTLE_CONFIG_PATH || name.include?("kettle_config")
       return :dev_container if path.start_with?(".devcontainer/")
       return :github_workflows if path.start_with?(".github/workflows/") || path == ".github/FUNDING.yml"
       return :modular_gemfiles if path.start_with?("gemfiles/modular/")
@@ -9280,7 +9280,7 @@ module Kettle
     end
 
     def unresolved_template_scan?(recipe)
-      return false if recipe.fetch(:target_path).to_s == ".kettle-jem.yml"
+      return false if recipe.fetch(:target_path).to_s == KETTLE_CONFIG_PATH
       return false if recipe.dig(:template_preference, :skip_unresolved_scan)
 
       true
@@ -9600,7 +9600,7 @@ module Kettle
 
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
-      return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == ".kettle-jem.yml"
+      return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == KETTLE_CONFIG_PATH
       return {strategy: :accept_template} if target_path.to_s == "Rakefile"
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
       return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")
@@ -9628,18 +9628,18 @@ module Kettle
       return if File.exist?(File.join(project_root, KETTLE_CONFIG_PATH))
       return if File.exist?(File.join(project_root, LEGACY_KETTLE_CONFIG_PATH))
 
-      selected_source = preferred_template_source(PACKAGED_TEMPLATE_ROOT, ".kettle-jem.yml")
+      selected_source = preferred_template_source(PACKAGED_TEMPLATE_ROOT, KETTLE_CONFIG_PATH)
       return unless selected_source
 
       {
         template_preference: {
-          target_path: ".kettle-jem.yml",
-          configured_source: ".kettle-jem.yml",
+          target_path: KETTLE_CONFIG_PATH,
+          configured_source: KETTLE_CONFIG_PATH,
           selected_source: selected_source,
           source_relative_path: selected_source,
           source_root: "packaged",
           source_root_path: PACKAGED_TEMPLATE_ROOT,
-          selection_reason: template_source_selection_reason(".kettle-jem.yml", selected_source),
+          selection_reason: template_source_selection_reason(KETTLE_CONFIG_PATH, selected_source),
           apply: true,
         },
         min_divergence_threshold: preferred_template_token_value(nil, nil, env, "KJ_MIN_DIVERGENCE_THRESHOLD").to_s,
@@ -9650,7 +9650,7 @@ module Kettle
     def kettle_config_bootstrap_recipe(bootstrap)
       recipe = recipe_entry(
         "kettle_config_bootstrap",
-        ".kettle-jem.yml",
+        KETTLE_CONFIG_PATH,
         "yaml",
         "supplied_kettle_config_bootstrap",
         facts: %w[kettle_config_bootstrap],
@@ -9682,7 +9682,7 @@ module Kettle
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
       return unless selected_source
 
-      strategy_config = if template_root.fetch(:kind) == "packaged" && target_path.to_s == ".kettle-jem.yml"
+      strategy_config = if template_root.fetch(:kind) == "packaged" && target_path.to_s == KETTLE_CONFIG_PATH
         default_template_strategy_config(template_root, target_path)
       else
         template_strategy_config(config, target_path) ||

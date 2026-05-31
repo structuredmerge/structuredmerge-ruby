@@ -65,7 +65,7 @@ RSpec.describe "kettle-jem release packaging" do
 
     package = Gem::Package.new(gem_path.to_s)
     package_spec = package.spec
-    expected_template = "lib/kettle/jem/templates/.kettle-jem.yml.example"
+    expected_template = "lib/kettle/jem/templates/.structuredmerge/kettle-jem.yml.example"
     expect(package_spec.executables).to include("kettle-jem")
     expect(package_spec.files).to include(expected_template)
     expect(package_spec.files).to include("lib/kettle/jem/rakelib/selftest.rake")
