@@ -2012,10 +2012,10 @@ RSpec.describe Kettle::Jem do
         env: {},
         run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
       )
-      config = File.read(File.join(root, ".kettle-jem.yml"))
+      config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       config_yaml = YAML.safe_load(config)
 
-      expect(setup.fetch(:changed_files)).to include(".kettle-jem.yml")
+      expect(setup.fetch(:changed_files)).to include(".structuredmerge/kettle-jem.yml")
       expect(config).to include("project_emoji: 💎\n")
       expect(config_yaml.dig("templates", "root")).to eq("packaged")
       expect(config_yaml.dig("templates", "apply")).to be(true)
@@ -2190,10 +2190,10 @@ RSpec.describe Kettle::Jem do
         env: {},
         run_options: {bootstrap_mode: true, template_profile: "monorepo-root", skip_commit: true},
       )
-      config = File.read(File.join(root, ".kettle-jem.yml"))
+      config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       config_yaml = YAML.safe_load(config)
 
-      expect(setup.fetch(:changed_files)).to include(".kettle-jem.yml")
+      expect(setup.fetch(:changed_files)).to include(".structuredmerge/kettle-jem.yml")
       expect(config_yaml.dig("templates", "root")).to eq("packaged")
       expect(config_yaml.dig("templates", "apply")).to be(true)
       expect(config_yaml.dig("templates", "profile")).to eq("monorepo-root")
@@ -2211,6 +2211,7 @@ RSpec.describe Kettle::Jem do
         "Rakefile",
         "SECURITY.md",
         ".github/FUNDING.yml",
+        ".structuredmerge/git-drivers.toml",
       )
       expect(config_yaml.dig("files", "CHANGELOG.md", "strategy")).to eq("keep_destination")
       expect(config_yaml.dig("files", "Gemfile", "strategy")).to eq("keep_destination")

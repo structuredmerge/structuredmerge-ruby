@@ -154,6 +154,7 @@ module Kettle
       "Rakefile",
       "SECURITY.md",
       ".github/FUNDING.yml",
+      ".structuredmerge/git-drivers.toml",
     ].freeze
     MONOREPO_SUBGEM_TEMPLATE_ENTRIES = [
       "README.md",
