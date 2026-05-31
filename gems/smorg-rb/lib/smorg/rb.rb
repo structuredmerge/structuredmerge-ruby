@@ -74,6 +74,7 @@ module Smorg
         command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command),
       ).first
       report = {
+        report_version: 1,
         ok: step.fetch(:status) != "failed",
         profile: step.fetch(:profile, "semantic-diff"),
         scope: step.fetch(:scope, run_options.fetch(:git_drivers, "local")),

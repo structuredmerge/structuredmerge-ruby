@@ -77,6 +77,7 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     report = JSON.parse(stdout.string)
+    expect(report.fetch("report_version")).to eq(1)
     expect(report.fetch("profile")).to eq("semantic-diff")
     expect(report.fetch("scope")).to eq("local")
     expect(File.read(".gitattributes")).to include("*.rb diff=smorg-ruby")
