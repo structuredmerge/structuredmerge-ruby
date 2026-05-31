@@ -3608,6 +3608,65 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "loads canonical structuredmerge kettle-jem config before legacy root config" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-discovery", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => "templates:\n  root: legacy\n",
+        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n",
+      })
+
+      expect(Kettle::Jem.kettle_jem_config(root).fetch("templates").fetch("root")).to eq("canonical")
+    end
+  end
+
+  it "migrates legacy kettle-jem config to the structuredmerge directory" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-migration", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => "templates:\n  root: packaged\n",
+      })
+
+      step = Kettle::Jem::Tasks::InstallTask.kettle_config_migration_step(root)
+
+      expect(step).to include(
+        name: "kettle_config_migration",
+        status: "migrated",
+        reason: "legacy_kettle_config_migrated",
+        canonical_path: ".structuredmerge/kettle-jem.yml",
+        legacy_path: ".kettle-jem.yml",
+      )
+      expect(File).not_to exist(File.join(root, ".kettle-jem.yml"))
+      expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to eq("templates:\n  root: packaged\n")
+    end
+  end
+
+  it "reports a conflict when canonical and legacy kettle-jem configs both exist" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-migration-conflict", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => "templates:\n  root: legacy\n",
+        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n",
+      })
+
+      step = Kettle::Jem::Tasks::InstallTask.kettle_config_migration_step(root)
+
+      expect(step).to include(
+        name: "kettle_config_migration",
+        status: "blocked",
+        reason: "legacy_kettle_config_conflict",
+      )
+      expect(step.fetch(:diagnostics)).to include(hash_including(
+        key: "legacy_kettle_config_conflict",
+        path: ".kettle-jem.yml",
+        canonical_path: ".structuredmerge/kettle-jem.yml",
+      ))
+    end
+  end
+
   it "reports gemspec dependency sync through the install task" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

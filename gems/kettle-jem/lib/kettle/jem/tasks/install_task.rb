@@ -34,8 +34,10 @@ module Kettle
 
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
           effective_run_options = install_run_options(env, run_options)
+          config_migration_step = kettle_config_migration_step(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
           install_steps = []
+          install_steps << config_migration_step if config_migration_step
           install_steps << gemspec_dependency_sync_step(report)
           version_step = version_gem_bootstrap_step(project_root, report)
           install_steps << version_step if version_step
@@ -67,6 +69,42 @@ module Kettle
 
         def install_run_options(env, run_options)
           Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
+        end
+
+        def kettle_config_migration_step(project_root)
+          canonical_relative = Kettle::Jem::KETTLE_CONFIG_PATH
+          legacy_relative = Kettle::Jem::LEGACY_KETTLE_CONFIG_PATH
+          canonical = File.join(project_root.to_s, canonical_relative)
+          legacy = File.join(project_root.to_s, legacy_relative)
+          return nil unless File.exist?(legacy)
+
+          if File.exist?(canonical)
+            return {
+              name: "kettle_config_migration",
+              status: "blocked",
+              reason: "legacy_kettle_config_conflict",
+              canonical_path: canonical_relative,
+              legacy_path: legacy_relative,
+              diagnostics: [{
+                key: "legacy_kettle_config_conflict",
+                severity: "warning",
+                blocking: false,
+                path: legacy_relative,
+                canonical_path: canonical_relative,
+              }],
+            }
+          end
+
+          FileUtils.mkdir_p(File.dirname(canonical))
+          FileUtils.mv(legacy, canonical)
+          {
+            name: "kettle_config_migration",
+            status: "migrated",
+            reason: "legacy_kettle_config_migrated",
+            canonical_path: canonical_relative,
+            legacy_path: legacy_relative,
+            changed_files: [legacy_relative, canonical_relative],
+          }
         end
 
         def gemspec_dependency_sync_step(report)
@@ -103,6 +141,7 @@ module Kettle
           phases = {
             "template_apply" => %w[gemspec_dependency_sync],
             "post_template" => %w[
+              kettle_config_migration
               version_gem_bootstrap
               mise_trust
               legacy_ruby_version_file_cleanup

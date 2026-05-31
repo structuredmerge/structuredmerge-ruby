@@ -37,6 +37,8 @@ module Kettle
 
     PACKAGE_NAME = "kettle-jem"
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
+    KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
+    LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     OBSOLETE_GITHUB_WORKFLOWS = %w[
@@ -3269,7 +3271,7 @@ module Kettle
 
     def setup_project(project_root, env: ENV, run_options: {}, command_runner: nil)
       root = File.expand_path(project_root.to_s)
-      config_path = File.join(root, ".kettle-jem.yml")
+      config_path = kettle_jem_config_path(root)
       config_existed = File.exist?(config_path)
       execution_context = setup_execution_context(env, run_options)
       plan = plan_project(root, env: env, run_options: run_options)
@@ -7160,27 +7162,39 @@ module Kettle
     end
 
     def kettle_jem_config(project_root)
-      path = File.join(project_root, ".kettle-jem.yml")
+      path = kettle_jem_config_path(project_root)
       return {} unless File.exist?(path)
 
       config = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
       validate_kettle_jem_config!(config)
       config
     rescue Psych::SyntaxError => error
-      raise Error, "Invalid .kettle-jem.yml: #{error.message}"
+      raise Error, "Invalid #{kettle_jem_config_relative_path(project_root)}: #{error.message}"
+    end
+
+    def kettle_jem_config_path(project_root)
+      canonical = File.join(project_root, KETTLE_CONFIG_PATH)
+      return canonical if File.exist?(canonical)
+
+      File.join(project_root, LEGACY_KETTLE_CONFIG_PATH)
+    end
+
+    def kettle_jem_config_relative_path(project_root)
+      path = kettle_jem_config_path(project_root)
+      File.expand_path(path).delete_prefix("#{File.expand_path(project_root.to_s)}/")
     end
 
     def validate_kettle_jem_config!(config)
-      raise Error, "Invalid .kettle-jem.yml: root must be a mapping" unless config.is_a?(Hash)
+      raise Error, "Invalid kettle-jem config: root must be a mapping" unless config.is_a?(Hash)
 
       templates = config["templates"]
       if templates && !templates.is_a?(Hash)
-        raise Error, "Invalid .kettle-jem.yml: templates must be a mapping"
+        raise Error, "Invalid kettle-jem config: templates must be a mapping"
       end
       return unless templates&.key?("entries")
       return if templates["entries"].is_a?(Array)
 
-      raise Error, "Invalid .kettle-jem.yml: templates.entries must be a list"
+      raise Error, "Invalid kettle-jem config: templates.entries must be a list"
     end
 
     def plugin_registry_for_project(project_root)
@@ -9611,7 +9625,8 @@ module Kettle
     end
 
     def kettle_config_bootstrap_facts(project_root, env, template_selection: {})
-      return if File.exist?(File.join(project_root, ".kettle-jem.yml"))
+      return if File.exist?(File.join(project_root, KETTLE_CONFIG_PATH))
+      return if File.exist?(File.join(project_root, LEGACY_KETTLE_CONFIG_PATH))
 
       selected_source = preferred_template_source(PACKAGED_TEMPLATE_ROOT, ".kettle-jem.yml")
       return unless selected_source
