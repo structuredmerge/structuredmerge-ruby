@@ -8539,10 +8539,11 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include(
         "We run rubocop on the latest version of Ruby",
       )
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.0"')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.2.0"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0.0"')
       expect(template_report.dig(:metadata, :template_tokens)).to include(
-        "KJ|RUBOCOP_LTS_CONSTRAINT" => "~> 22.0",
+        "KJ|RUBOCOP_LTS_CONSTRAINT" => "~> 22.2.0",
+        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "~> 3.0.0",
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1",
       )
     end
