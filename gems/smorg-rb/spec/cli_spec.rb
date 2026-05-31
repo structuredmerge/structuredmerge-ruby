@@ -21,6 +21,11 @@ RSpec.describe Smorg::RB do
     JSON.parse(File.read(path))
   end
 
+  def git_install_report_fixture
+    path = File.expand_path("../../../../fixtures/diagnostics/slice-1017-git-driver-opt-in-setup/git-install-report.json", __dir__)
+    JSON.parse(File.read(path))
+  end
+
   def run_git(dir, *args)
     return skip("git executable is required for repository integration fixture") unless system("git", "--version", out: File::NULL, err: File::NULL)
 
@@ -70,6 +75,7 @@ RSpec.describe Smorg::RB do
   end
 
   it "installs local Git diff driver attributes" do
+    fixture = git_install_report_fixture
     stdout = StringIO.new
     stderr = StringIO.new
 
@@ -77,10 +83,15 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     report = JSON.parse(stdout.string)
-    expect(report.fetch("report_version")).to eq(1)
-    expect(report.fetch("profile")).to eq("semantic-diff")
-    expect(report.fetch("scope")).to eq("local")
-    expect(File.read(".gitattributes")).to include("*.rb diff=smorg-ruby")
+    expected = fixture.fetch("report")
+    expect(report.fetch("report_version")).to eq(expected.fetch("report_version"))
+    expect(report.fetch("ok")).to eq(expected.fetch("ok"))
+    expect(report.fetch("profile")).to eq(expected.fetch("profile"))
+    expect(report.fetch("scope")).to eq(expected.fetch("scope"))
+    expect(report.fetch("install_steps").first).to include(expected.fetch("step"))
+    diagnostic_keys = report.fetch("install_steps").flat_map { |step| step.fetch("diagnostics", []) }.map { |diagnostic| diagnostic.fetch("key") }
+    expect(diagnostic_keys).to include(*expected.fetch("diagnostic_keys"))
+    expect(File.read(".gitattributes")).to include(fixture.dig("implementations", "ruby", "attribute_contains"))
   end
 
   it "supports builtin Git diff driver install profile" do
