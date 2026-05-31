@@ -6085,9 +6085,9 @@ RSpec.describe Kettle::Jem do
 
     Dir.mktmpdir("kettle-jem-spec-helper-coverage", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example-gem.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
-            spec.name = "example"
+            spec.name = "example-gem"
             spec.summary = "Example gem"
             spec.required_ruby_version = ">= 3.2"
           end
@@ -6095,7 +6095,7 @@ RSpec.describe Kettle::Jem do
         ".kettle-jem.yml" => <<~YAML,
           project_emoji: 🧪
           rubygems:
-            entrypoint_require: "example/custom"
+            entrypoint_require: "example/gem"
             namespace: "Example::Custom"
           templates:
             root: packaged
@@ -6159,7 +6159,7 @@ RSpec.describe Kettle::Jem do
           require_relative "config/vcr"
 
           require "kettle/test/rspec"
-          require "example/custom"
+          require "example-gem"
 
           # Internal RSpec & related config
           require_relative "support/shared_contexts/with_rake"
@@ -6178,10 +6178,11 @@ RSpec.describe Kettle::Jem do
       content = report.fetch(:final_content)
 
       expect(content).to include('require "kettle-soup-cover"')
-      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
+      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
       expect(content).to include('require "simplecov" if Kettle::Soup::Cover::DO_COV')
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
-      expect(content.scan('require "example/custom"').size).to eq(1)
+      expect(content.scan('require "example-gem"').size).to eq(1)
+      expect(content).not_to include('require "example/gem"')
       expect(content).to include('require_relative "config/debug"')
       expect(content).to include('require_relative "config/vcr"')
       expect(content).to include('require_relative "support/shared_contexts/with_rake"')

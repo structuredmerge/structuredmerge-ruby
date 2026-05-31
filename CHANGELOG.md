@@ -24,6 +24,9 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 - Ruby merges now place template-only top-level nodes at their template anchor by
   default instead of appending them to the destination tail.
+- Ruby merges now defer template-only top-level groups behind later destination
+  matches and skip crossed duplicate require aliases, preventing library
+  requires from moving ahead of coverage bootstrap code.
 ### Security
 
 ## [7.0.0] - 2026-05-05

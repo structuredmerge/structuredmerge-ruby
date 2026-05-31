@@ -94,6 +94,12 @@ module Prism
             signature_for: ->(node) { merger.template_analysis.generate_signature(node) },
             add_template_only_nodes: merger.add_template_only_nodes,
           )
+          destination_template_indices = destination_template_index_sequence(
+            template_by_signature: template_by_signature,
+          )
+          destination_signatures = merger.dest_analysis.statements.map do |dest_node|
+            merger.dest_analysis.generate_signature(dest_node)
+          end
 
           unless destination_tail_template_only_placement?
             emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
@@ -101,7 +107,7 @@ module Prism
             end
           end
 
-          merger.dest_analysis.statements.each do |dest_node|
+          merger.dest_analysis.statements.each_with_index do |dest_node, dest_position|
             last_output_dest_line = process_dest_node(
               dest_node: dest_node,
               template_by_signature: template_by_signature,
@@ -109,8 +115,16 @@ module Prism
               sig_cursor: sig_cursor,
               output_dest_line_ranges: output_dest_line_ranges,
               last_output_dest_line: last_output_dest_line,
-              trailing_groups: trailing_groups,
+              dest_position: dest_position,
+              destination_signatures: destination_signatures,
+              destination_template_indices: destination_template_indices,
             )
+            emit_available_trailing_groups(
+              trailing_groups: trailing_groups,
+              consumed_indices: consumed_template_indices,
+              dest_position: dest_position,
+              destination_template_indices: destination_template_indices,
+            ) unless destination_tail_template_only_placement?
           end
 
           # Safety net: emit any trailing groups whose anchor was never consumed
@@ -916,6 +930,47 @@ module Prism
         node.is_a?(::Prism::CallNode) && %i[require require_relative].include?(node.name)
       end
 
+      def destination_template_index_sequence(template_by_signature:)
+        sig_cursor = Hash.new(0)
+        merger.dest_analysis.statements.map do |dest_node|
+          signature = merger.dest_analysis.generate_signature(dest_node)
+          next unless signature
+
+          candidates = template_by_signature[signature]
+          next unless candidates
+
+          candidate = candidates[sig_cursor[signature]]
+          sig_cursor[signature] += 1 if candidate
+          candidate&.fetch(:index)
+        end
+      end
+
+      def emit_available_trailing_groups(trailing_groups:, consumed_indices:, dest_position:, destination_template_indices:)
+        trailing_groups.each do |anchor_index, group|
+          next if anchor_index == :prefix
+          next unless consumed_indices.include?(anchor_index)
+          next unless trailing_group_safe_to_emit?(group, consumed_indices, dest_position, destination_template_indices)
+
+          group.each do |info|
+            next if consumed_indices.include?(info[:index])
+
+            emit_template_only_node(info, consumed_indices)
+          end
+        end
+      end
+
+      def trailing_group_safe_to_emit?(group, consumed_indices, dest_position, destination_template_indices)
+        pending_group_indices = group.filter_map do |info|
+          index = info.fetch(:index)
+          index unless consumed_indices.include?(index)
+        end
+        return false if pending_group_indices.empty?
+
+        first_group_index = pending_group_indices.min
+        future_indices = destination_template_indices[(dest_position + 1)..] || []
+        future_indices.compact.none? { |future_index| future_index < first_group_index && !consumed_indices.include?(future_index) }
+      end
+
       def retained_owner_plan(template_by_signature:, dest_by_signature:)
         matched_template_indices = Set.new
         retained_dest_indices = Set.new
@@ -961,11 +1016,40 @@ module Prism
         }
       end
 
-      def process_dest_node(dest_node:, template_by_signature:, consumed_template_indices:, sig_cursor:, output_dest_line_ranges:, last_output_dest_line:, trailing_groups: {})
+      def process_dest_node(
+        dest_node:,
+        template_by_signature:,
+        consumed_template_indices:,
+        sig_cursor:,
+        output_dest_line_ranges:,
+        last_output_dest_line:,
+        dest_position:,
+        destination_signatures:,
+        destination_template_indices:
+      )
         node_range = node_offset_range(dest_node)
         return last_output_dest_line if already_output?(node_range, output_dest_line_ranges)
 
         dest_signature = merger.dest_analysis.generate_signature(dest_node)
+        if dest_signature && template_by_signature.key?(dest_signature)
+          template_info, = peek_template_match(
+            candidates: template_by_signature[dest_signature],
+            signature: dest_signature,
+            sig_cursor: sig_cursor,
+          )
+          if defer_duplicate_destination_node?(
+            dest_signature: dest_signature,
+            template_info: template_info,
+            dest_position: dest_position,
+            destination_signatures: destination_signatures,
+            destination_template_indices: destination_template_indices,
+            consumed_template_indices: consumed_template_indices,
+          )
+            output_dest_line_ranges << node_range
+            return dest_node.location.end_line
+          end
+        end
+
         last_output_dest_line = merger.send(:emit_dest_gap_lines, merger.result, merger.dest_analysis, last_output_dest_line, dest_node)
         output_node = dest_node
         output_analysis = merger.dest_analysis
@@ -994,16 +1078,6 @@ module Prism
             output_node = emission[:output_node]
             output_analysis = emission[:output_analysis]
 
-            # Emit template-only nodes that follow this matched template node
-            matched_template_index = template_info[:index]
-            group = trailing_groups[matched_template_index]
-            unless destination_tail_template_only_placement?
-              group&.each do |info|
-                next if consumed_template_indices.include?(info[:index])
-
-                emit_template_only_node(info, consumed_template_indices)
-              end
-            end
           else
             if merger.remove_template_missing_nodes
               emission = merger.send(:emit_removed_destination_node_comments, merger.result, dest_node, merger.dest_analysis)
@@ -1074,6 +1148,27 @@ module Prism
         return [candidate, cursor] if candidate
 
         [nil, cursor]
+      end
+
+      def peek_template_match(candidates:, signature:, sig_cursor:)
+        cursor = sig_cursor[signature]
+        [candidates[cursor], cursor]
+      end
+
+      def defer_duplicate_destination_node?(
+        dest_signature:,
+        template_info:,
+        dest_position:,
+        destination_signatures:,
+        destination_template_indices:,
+        consumed_template_indices:
+      )
+        return false unless template_info
+        return false unless destination_signatures[(dest_position + 1)..]&.include?(dest_signature)
+
+        template_index = template_info.fetch(:index)
+        future_indices = destination_template_indices[(dest_position + 1)..] || []
+        future_indices.compact.any? { |future_index| future_index < template_index && !consumed_template_indices.include?(future_index) }
       end
 
       def process_matched_node(dest_node:, dest_signature:, template_info:, cursor:, consumed_template_indices:, sig_cursor:, output_dest_line_ranges:, node_range:, last_output_dest_line:)

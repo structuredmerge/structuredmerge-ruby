@@ -4609,7 +4609,7 @@ module Kettle
       when :appraisals
         return merge_appraisals_template_source(template_content, destination_content, facts: facts)
       when :ruby, :gemfile, :rakefile
-        merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content)
+        merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: facts)
       when :yaml
         merge_result = Psych::Merge.merge_yaml(
           template_content,
@@ -4935,7 +4935,7 @@ module Kettle
       options
     end
 
-    def merge_ruby_template_source(file_type, recipe, template_content, destination_content)
+    def merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: nil)
       return merge_prism_gemfile_template_source(template_content, destination_content) if file_type == :gemfile
 
       result = Prism::Merge.merge_ruby(
@@ -4944,7 +4944,7 @@ module Kettle
         "ruby",
         preference: :destination,
         add_template_only_nodes: true,
-        signature_generator: Prism::Merge.ruby_dsl_signature_generator,
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator(require_aliases: ruby_require_aliases(recipe, facts)),
         **prism_ruby_merge_options(recipe),
       )
       result
@@ -4967,6 +4967,19 @@ module Kettle
         merge_template_requires: true,
         template_only_placement: :after_anchor,
       }
+    end
+
+    def ruby_require_aliases(recipe, facts = nil)
+      facts ||= recipe[:facts] || recipe["facts"]
+      return [] unless facts.is_a?(Hash)
+
+      package = facts[:package] || facts["package"] || {}
+      rubygems = facts[:rubygems] || facts["rubygems"] || {}
+      package_name = (package[:name] || package["name"]).to_s.strip
+      entrypoint = (rubygems[:entrypoint_require] || rubygems["entrypoint_require"]).to_s.strip
+      return [] if package_name.empty? || entrypoint.empty? || package_name == entrypoint
+
+      [[package_name, entrypoint]]
     end
 
     def merge_gemfile_template_policy(content, facts:, template_content: nil, preserve_self_word_entries: false)

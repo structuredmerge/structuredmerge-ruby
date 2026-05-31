@@ -669,23 +669,52 @@ module Prism
       }
     end
 
-    def ruby_dsl_signature_generator
-      @ruby_dsl_signature_generator ||= lambda do |node|
+    def ruby_dsl_signature_generator(require_aliases: nil)
+      normalized_require_aliases = normalize_ruby_require_aliases(require_aliases)
+      return @ruby_dsl_signature_generator ||= lambda do |node|
         ruby_dsl_signature_for(node) || node
+      end if normalized_require_aliases.empty?
+
+      lambda do |node|
+        ruby_dsl_signature_for(node, require_aliases: normalized_require_aliases) || node
       end
     end
 
-    def ruby_dsl_signature_for(node)
+    def ruby_dsl_signature_for(node, require_aliases: nil)
       call = ruby_dsl_call_node(node)
       return unless call
 
       case call.name
       when :source, :gemspec
         [:ruby_dsl_singleton, call.name]
+      when :require
+        first_argument = ruby_dsl_first_argument(call)
+        [:call, call.name, (require_aliases || {}).fetch(first_argument, first_argument)]
       when :git_source, :gem, :eval_gemfile, :platform, :group, :task
         [:ruby_dsl_call, call.name, ruby_dsl_first_argument(call)]
       when :desc
         [:ruby_dsl_desc, call.slice]
+      end
+    end
+
+    def normalize_ruby_require_aliases(require_aliases)
+      Array(require_aliases).each_with_object({}) do |entry, aliases|
+        case entry
+        when Hash
+          from = entry[:from] || entry["from"]
+          to = entry[:to] || entry["to"]
+        when Array
+          from, to = entry
+        else
+          next
+        end
+        from = from.to_s.strip
+        to = to.to_s.strip
+        next if from.empty? || to.empty?
+
+        canonical = [from, to].min
+        aliases[from] = canonical
+        aliases[to] = canonical
       end
     end
 

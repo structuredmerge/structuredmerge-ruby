@@ -109,6 +109,63 @@ RSpec.describe "Prism::Merge" do
     expect(result[:output]).to include('config.include_context "with mocked git adapter"')
   end
 
+  it "does not move template-only requires before a later matched coverage bootstrap" do
+    result = PRISM_MERGE.merge_ruby(
+      <<~RUBY,
+        # frozen_string_literal: true
+
+        begin
+          require "kettle-soup-cover"
+          require "simplecov"
+        rescue LoadError
+        end
+
+        require "kettle/test/rspec"
+
+        # This library
+        require "example/gem"
+
+        RSpec.configure do |config|
+          config.example_status_persistence_file_path = ".rspec_status"
+        end
+      RUBY
+      <<~RUBY,
+        # frozen_string_literal: true
+
+        require "kettle/test/rspec"
+
+        # This library
+        require "example/gem"
+
+        # Internal ENV config
+        require_relative "config/debug"
+
+        begin
+          require "kettle-soup-cover"
+          require "simplecov"
+        rescue LoadError
+        end
+
+        # this library
+        require "example-gem"
+
+        RSpec.configure do |config|
+          config.include_context "with mocked git adapter"
+        end
+      RUBY
+      "ruby",
+      preference: :destination,
+      add_template_only_nodes: true,
+      merge_template_requires: true,
+      signature_generator: PRISM_MERGE.ruby_dsl_signature_generator(require_aliases: [["example-gem", "example/gem"]])
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).not_to include('require "example/gem"')
+    expect(result[:output].scan('require "example-gem"').size).to eq(1)
+    expect(result[:output].index('require "kettle-soup-cover"')).to be < result[:output].index('require "example-gem"')
+  end
+
   it "projects the structured-edit provider profile through Prism" do
     fixture = read_json(
       fixtures_root.join(
