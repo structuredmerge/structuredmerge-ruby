@@ -632,7 +632,7 @@ module Prism
       add_template_only_nodes: true,
       signature_generator: nil,
       merge_template_requires: false,
-      template_only_placement: :destination_tail,
+      template_only_placement: :after_anchor,
       **options
     )
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s

@@ -68,6 +68,47 @@ RSpec.describe "Prism::Merge" do
     expect(result[:output]).to include('gem "rake"')
   end
 
+  it "adds template-only top-level nodes at their template anchor" do
+    result = PRISM_MERGE.merge_ruby(
+      <<~RUBY,
+        # frozen_string_literal: true
+
+        begin
+          require "kettle-soup-cover"
+          require "simplecov"
+        rescue LoadError
+        end
+
+        require "kettle/test/rspec"
+
+        RSpec.configure do |config|
+          config.example_status_persistence_file_path = ".rspec_status"
+        end
+      RUBY
+      <<~RUBY,
+        # frozen_string_literal: true
+
+        require "example/custom"
+
+        RSpec.configure do |config|
+          config.include_context "with mocked git adapter"
+        end
+      RUBY
+      "ruby",
+      preference: :destination,
+      add_template_only_nodes: true,
+      merge_template_requires: true,
+      signature_generator: PRISM_MERGE.ruby_dsl_signature_generator
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output].index('require "kettle-soup-cover"')).to be < result[:output].index('require "example/custom"')
+    expect(result[:output]).to include('require "simplecov"')
+    expect(result[:output]).to include('require "kettle/test/rspec"')
+    expect(result[:output]).to include('require "example/custom"')
+    expect(result[:output]).to include('config.include_context "with mocked git adapter"')
+  end
+
   it "projects the structured-edit provider profile through Prism" do
     fixture = read_json(
       fixtures_root.join(

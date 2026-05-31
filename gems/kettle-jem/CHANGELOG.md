@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Ruby template merges now preserve template-only require/bootstrap nodes and
+  place them at their template anchor instead of deleting them after merge.
 - Generated style Gemfiles now include released `rubocop-lts-rspec` in the
   non-local RuboCop-LTS bundle instead of requiring `rubocop-rspec` directly.
 - Fixed generated documentation URLs for standalone gems so template-owned

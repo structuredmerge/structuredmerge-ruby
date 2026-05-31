@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Deprecated
 ### Removed
 ### Fixed
+- Ruby merges now place template-only top-level nodes at their template anchor by
+  default instead of appending them to the destination tail.
 ### Security
 
 ## [7.0.0] - 2026-05-05

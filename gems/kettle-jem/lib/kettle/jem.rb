@@ -4947,9 +4947,6 @@ module Kettle
         signature_generator: Prism::Merge.ruby_dsl_signature_generator,
         **prism_ruby_merge_options(recipe),
       )
-      if file_type == :ruby && result[:ok]
-        result = result.merge(output: remove_template_only_require_calls(template_content, destination_content, result.fetch(:output)))
-      end
       result
     end
 
@@ -4967,6 +4964,8 @@ module Kettle
     def prism_ruby_merge_options(recipe)
       {
         method_move_policy: ruby_method_move_policy(recipe),
+        merge_template_requires: true,
+        template_only_placement: :after_anchor,
       }
     end
 
@@ -5122,36 +5121,6 @@ module Kettle
 
     def gemfile_gem_call_records(content)
       ruby_call_records(content, :gem).filter_map do |call|
-        name = ruby_string_argument(call)
-        next unless name
-
-        {
-          name: name,
-          start_line: call.location.start_line,
-          end_line: call.location.end_line,
-        }
-      end
-    end
-
-    def remove_template_only_require_calls(template_content, destination_content, merged_content)
-      template_requires = ruby_require_call_records(template_content).map { |record| record.fetch(:name) }
-      destination_requires = ruby_require_call_records(destination_content).map { |record| record.fetch(:name) }
-      removable = template_requires - destination_requires
-      return merged_content if removable.empty?
-
-      remove_indexes = Set.new
-      ruby_require_call_records(merged_content).each do |record|
-        next unless removable.include?(record.fetch(:name))
-
-        (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
-      end
-      ensure_trailing_newline(
-        merged_content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"),
-      )
-    end
-
-    def ruby_require_call_records(content)
-      ruby_call_records(content, :require).filter_map do |call|
         name = ruby_string_argument(call)
         next unless name
 
@@ -9742,7 +9711,6 @@ module Kettle
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
       return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")
       return {strategy: :accept_template} if target_path.to_s.start_with?("gemfiles/modular/")
-      return {strategy: :accept_template} if target_path.to_s == "spec/spec_helper.rb"
 
       nil
     end
