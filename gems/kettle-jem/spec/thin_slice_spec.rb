@@ -3747,6 +3747,40 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps textconv projections display-only and out of merge inputs" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-textconv-display-only", tmp_root) do |root|
+      write_tree(root, {
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+
+          [profiles.textconv-normalized]
+
+          [[profiles.textconv-normalized.attributes]]
+          pattern = "*.json"
+          diff = "smorg-json-textconv"
+
+          [[profiles.textconv-normalized.git_config]]
+          scope = "global"
+          key = "diff.smorg-json-textconv.textconv"
+          value = "smorg-rb textconv --format json"
+        TOML
+      })
+
+      manifest = Kettle::Jem::Tasks::InstallTask.git_driver_manifest(root)
+      attributes = Kettle::Jem::Tasks::InstallTask.git_driver_attribute_updates(manifest, "textconv-normalized")
+      commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
+
+      expect(attributes).to eq([
+        {path: ".gitattributes", pattern: "*.json", attributes: {"diff" => "smorg-json-textconv"}},
+      ])
+      expect(attributes.flat_map { |update| update.fetch(:attributes).keys }).not_to include("merge")
+      expect(commands.map { |command| command[3] }).to contain_exactly("diff.smorg-json-textconv.textconv")
+      expect(commands.map { |command| command[3] }).not_to include(a_string_matching(/\Amerge\./))
+    end
+  end
+
   it "skips Git driver setup when explicitly disabled" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "none"})
 
