@@ -62,10 +62,25 @@ value = "smorg-rb textconv --format json"
 
 [[profiles.textconv-normalized.git_config]]
 scope = "global"
+key = "diff.smorg-json-textconv.cachetextconv"
+value = "true"
+
+[[profiles.textconv-normalized.git_config]]
+scope = "global"
 key = "diff.smorg-yaml-textconv.textconv"
 value = "smorg-rb textconv --format yaml"
 
 [[profiles.textconv-normalized.git_config]]
 scope = "global"
+key = "diff.smorg-yaml-textconv.cachetextconv"
+value = "true"
+
+[[profiles.textconv-normalized.git_config]]
+scope = "global"
 key = "diff.smorg-toml-textconv.textconv"
 value = "smorg-rb textconv --format toml"
+
+[[profiles.textconv-normalized.git_config]]
+scope = "global"
+key = "diff.smorg-toml-textconv.cachetextconv"
+value = "true"
