@@ -4,9 +4,10 @@ K_JEM_TEMPLATING=true bundle exec kettle-jem install
 K_JEM_TEMPLATING=true bundle exec kettle-jem selftest
 ```
 
-`kettle-jem` setup creates or updates `.kettle-jem.yml`, installs template
-support, and runs the template workflow. `kettle-jem install` reapplies full
-template updates and regenerates local finishing artifacts such as binstubs.
+`kettle-jem` setup creates or updates `.structuredmerge/kettle-jem.yml`,
+installs template support, and runs the template workflow. `kettle-jem install`
+reapplies full template updates and regenerates local finishing artifacts such
+as binstubs.
 Use `kettle-jem template --only PATH` for scoped file updates. `kettle-jem
 selftest` checks template drift in a temporary workspace. The `kettle:jem:*`
 rake tasks are internal targets used by the executable after it prepares the
@@ -24,3 +25,4 @@ Useful runtime controls:
 | `only=glob,glob` | Limit the template run to matching paths. |
 | `include=glob,glob` | Add matching paths to the run. |
 | `hook_templates=l|g|n` | Install local hooks, global hooks, or no hooks. |
+| `git_drivers=semantic-diff|builtin-diff|global|include-file|check|undo|none` | Install, verify, remove, or skip StructuredMerge Git diff driver setup. |

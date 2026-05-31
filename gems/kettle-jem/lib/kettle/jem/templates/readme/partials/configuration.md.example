@@ -1,6 +1,8 @@
-`kettle-jem` reads `.kettle-jem.yml` from the project root. The config controls
-template sources, README section partials, token values, merge defaults,
-per-file strategies, workflow generation, and plugin loading.
+`kettle-jem` reads `.structuredmerge/kettle-jem.yml` from the project root. When
+only the legacy root `.kettle-jem.yml` exists, `kettle-jem install` migrates it
+to the structured config directory. The config controls template sources, README
+section partials, token values, merge defaults, per-file strategies, workflow
+generation, Git driver setup, and plugin loading.
 
 <details markdown="1">
 <summary>Configuration shape</summary>
@@ -34,6 +36,7 @@ files:
   Rakefile:
     strategy: merge
     preference: destination
+git_drivers: semantic-diff
 plugins:
   - kettle-drift
 ```
@@ -56,8 +59,9 @@ Merge entries may set `preference`, `add_template_only_nodes`, `freeze_token`,
 `file_type`, and `recipe`. `files` entries match exact paths. `patterns`
 entries are glob-based and the first match wins.
 
-Tokens use `{KJ\|TOKEN}` syntax. Environment values win over `.kettle-jem.yml`,
-and config values win over safe gemspec-derived defaults.
+Tokens use `{KJ\|TOKEN}` syntax. Environment values win over
+`.structuredmerge/kettle-jem.yml`, and config values win over safe
+gemspec-derived defaults.
 
 Freeze blocks use the configured token, defaulting to `kettle-jem`:
 
@@ -88,6 +92,12 @@ workflows and Appraisals. It defaults to `2.4`, and the effective generated
 floor is never lower than the gemspec `required_ruby_version`.
 `workflows.coverage` enables coverage workflow generation. Existing custom
 workflows can receive pinned-action snippets without replacing the whole file.
+
+`git_drivers` defaults to `semantic-diff` during `kettle-jem install`. Use
+`builtin-diff` to keep Git's built-in language drivers, `global` to register
+driver commands once per user, `include-file` to write `.git/smorg/config`, and
+`none` to opt out. `check` verifies the local setup, and `undo` removes managed
+driver entries.
 
 `plugins` lists extension gems. A plugin is required by gem name, resolved to a
 constant, and called through `register_kettle_jem_plugin(registrar)`. The
