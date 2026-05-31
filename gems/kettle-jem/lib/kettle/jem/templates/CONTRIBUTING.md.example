@@ -108,6 +108,10 @@ Git diff driver setup
 - Include-file setup writes `.git/smorg/config` and includes it from local Git config, keeping command registrations out of the repository files.
 - Git hosting forges generally ignore external diff drivers, so pull request views may still show raw textual diffs even when local `git diff` uses semantic drivers.
 
+```console
+K_JEM_TEMPLATING=true bundle exec kettle-jem install
+```
+
 For a quick starting point, this repository’s `mise.toml` defines the shared defaults, and `.env.local` can override them locally. Copy `.env.local.example` to `.env.local`, use `KEY=value` lines, and either activate `mise` in your shell or run commands through `mise exec -C /path/to/project -- ...`.
 
 ## Appraisals
