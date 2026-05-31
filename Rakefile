@@ -91,7 +91,7 @@ if Dir.exist?(File.join(__dir__, "gems")) && Dir.exist?(File.join(__dir__, "work
 
     desc "Run release readiness checks for the Ruby gem family"
     task :readiness do
-      run_family_script("11_release_readiness_check.rb")
+      run_family_script("10_release_readiness_check.rb")
     end
 
     desc "Run tests for the Ruby gem family"
@@ -111,12 +111,12 @@ if Dir.exist?(File.join(__dir__, "gems")) && Dir.exist?(File.join(__dir__, "work
 
     desc "Run the Ruby gem family release planner"
     task :release do
-      run_family_script("10_release_ruby_gems.rb")
+      run_family_script("11_release_ruby_gems.rb")
     end
 
     desc "Execute the Ruby gem family release"
     task :release_execute do
-      run_family_script("10_release_ruby_gems.rb", "--execute")
+      run_family_script("11_release_ruby_gems.rb", "--execute")
     end
   end
 end

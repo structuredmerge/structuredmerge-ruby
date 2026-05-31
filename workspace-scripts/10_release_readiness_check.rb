@@ -20,6 +20,36 @@ README_SHARED_LINKS = {
   "CONTRIBUTING.md" => "CONTRIBUTING.md",
   "SECURITY.md" => "SECURITY.md",
 }.freeze
+GEM_RELEASE_HARNESS_FILES = %w[
+  Gemfile
+  Gemfile.lock
+  Rakefile
+  .rspec
+  .simplecov
+  .yardignore
+  .yardopts
+  bin/setup
+  spec/spec_helper.rb
+  gemfiles/modular/documentation.gemfile
+  gemfiles/modular/x_std_libs.gemfile
+].freeze
+GEM_RELEASE_BINSTUBS = %w[
+  bin/gem_checksums
+  bin/kettle-changelog
+  bin/kettle-pre-release
+  bin/kettle-release
+  bin/kettle-test
+  bin/rake
+  bin/rspec
+  bin/yard
+].freeze
+STANDALONE_ONLY_DIRS = %w[
+  .devcontainer
+  .git-hooks
+  .github
+  .idea
+  .qlty
+].freeze
 
 def gem_dirs
   Dir.glob(File.join(GEMS_ROOT, "*", "*.gemspec"))
@@ -34,6 +64,11 @@ end
 
 def relative_path(path)
   path.delete_prefix("#{RUBY_REPO}/")
+end
+
+def tracked_path?(path)
+  relative = relative_path(path)
+  system("git", "-C", RUBY_REPO, "ls-files", "--error-unmatch", relative, out: File::NULL, err: File::NULL)
 end
 
 failures = []
@@ -67,6 +102,27 @@ gem_dirs.each do |dir|
   %w[README.md LICENSE.md].each do |doc|
     path = File.join(dir, doc)
     failures << "#{relative_path(path)}: missing required packaged gem document" unless File.file?(path)
+  end
+
+  GEM_RELEASE_HARNESS_FILES.each do |relative|
+    path = File.join(dir, relative)
+    failures << "#{relative_path(path)}: missing per-gem release harness file" unless File.file?(path)
+  end
+
+  GEM_RELEASE_BINSTUBS.each do |relative|
+    path = File.join(dir, relative)
+    failures << "#{relative_path(path)}: missing per-gem release binstub" unless File.file?(path)
+    failures << "#{relative_path(path)}: release binstub is not executable" if File.file?(path) && !File.executable?(path)
+  end
+
+  docs_dir = File.join(dir, "docs")
+  failures << "#{relative_path(docs_dir)}: missing generated YARD docs; run workspace-scripts/6_docs_ruby_gems.sh" unless Dir.exist?(docs_dir)
+
+  next if File.basename(dir) == "kettle-jem"
+
+  STANDALONE_ONLY_DIRS.each do |relative|
+    path = File.join(dir, relative)
+    failures << "#{relative_path(path)}: standalone-only directory should not be committed in monorepo release profile" if Dir.exist?(path) && tracked_path?(path)
   end
 
   readme = File.join(dir, "README.md")

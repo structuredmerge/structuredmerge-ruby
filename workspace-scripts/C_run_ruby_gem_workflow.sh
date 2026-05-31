@@ -34,5 +34,6 @@ Run release sequence steps explicitly when ready:
   7_version_license_ruby_gems.rb
   8_git_push_ruby_gems.sh
   9_bump_family_version.rb
-  10_release_ruby_gems.rb
+  10_release_readiness_check.rb
+  11_release_ruby_gems.rb
 NOTE

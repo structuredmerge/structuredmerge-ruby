@@ -50,7 +50,7 @@ options = {
 }
 
 parser = OptionParser.new do |opts|
-  opts.banner = "Usage: 10_release_ruby_gems.rb [options]"
+  opts.banner = "Usage: 11_release_ruby_gems.rb [options]"
 
   opts.on("--execute", "Run kettle-release for each selected gem. Default is plan-only.") do
     options[:execute] = true
@@ -122,7 +122,7 @@ def run!(command, chdir:, env: nil)
 end
 
 if options[:readiness]
-  run!([File.join(SCRIPT_DIR, "11_release_readiness_check.rb")], chdir: RUBY_REPO)
+  run!([File.join(SCRIPT_DIR, "10_release_readiness_check.rb")], chdir: RUBY_REPO)
 end
 
 command_env = release_env(local_path_gems: options[:local_path_gems])

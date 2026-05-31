@@ -2319,7 +2319,7 @@ RSpec.describe Kettle::Jem do
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
-      expect(rakefile).to include('run_family_script("11_release_readiness_check.rb")')
+      expect(rakefile).to include('run_family_script("10_release_readiness_check.rb")')
     end
   end
 
