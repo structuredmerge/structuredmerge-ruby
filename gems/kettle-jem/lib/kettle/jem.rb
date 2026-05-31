@@ -8558,8 +8558,9 @@ module Kettle
       return facts unless monorepo_subproject
 
       package_path = git_worktree_prefix(project_root)
-      package_path = "gems/#{package_name}" if package_path.empty?
       package_path = package_path[0...-1] while package_path.end_with?("/")
+      return facts.merge(local_root: local_root) if package_path.empty?
+
       facts.merge(
         local_root: local_root,
         package_path: package_path,
@@ -9736,6 +9737,7 @@ module Kettle
     def default_template_strategy_config(template_root, target_path)
       return unless template_root.fetch(:kind) == "packaged"
       return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == KETTLE_CONFIG_PATH
+      return {strategy: :accept_template} if target_path.to_s == "CITATION.cff"
       return {strategy: :accept_template} if target_path.to_s == "Rakefile"
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
       return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")

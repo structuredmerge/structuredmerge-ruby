@@ -6168,6 +6168,54 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "treats packaged CITATION.cff as template-owned metadata by default" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-packaged-citation-default-strategy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.authors = ["Ada Lovelace"]
+            spec.email = ["ada@example.com"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          repository:
+            topology: standalone
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - CITATION.cff
+          tokens:
+            author:
+              orcid: 0000-0001-2345-6789
+        YAML
+        "CITATION.cff" => <<~YAML,
+          cff-version: 1.2.0
+          title: "example"
+          identifiers:
+            - type: url
+              value: 'https://github.com/acme/example/tree/main/gems/example'
+          repository-code: 'https://github.com/acme/example/tree/main/gems/example'
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "CITATION.cff"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
+      expect(content).to include("repository-code: 'https://github.com/acme/example'")
+      expect(content).not_to include("/gems/example")
+    end
+  end
+
   it "removes the destination package from arbitrary modular Gemfile dependency lists" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -8787,6 +8835,54 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :repository, :mode)).to eq("monorepo_subproject")
       expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to include("[🖼️structuredmerge-structuredmerge-ruby-kettle-jem-i]: https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-192px.svg")
       expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to include("[🖼️structuredmerge-structuredmerge-ruby-kettle-jem]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem")
+    end
+  end
+
+  it "does not invent a gems path for a monorepo topology when the project is the git root" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-root-monorepo-topology-slice", tmp_root) do |root|
+      write_tree(root, {
+        "nomono.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "nomono"
+            spec.summary = "Bundler path helper"
+            spec.metadata["source_code_uri"] = "https://github.com/kettle-rb/nomono"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          repository:
+            topology: monorepo-subproject
+          templates:
+            root: template
+            apply: true
+            profile: full
+            entries:
+              - README.md
+        YAML
+      })
+      expect(system("git", "-C", root, "init", "-q")).to be(true)
+      expect(system("git", "-C", root, "remote", "add", "origin", "git@github.com:kettle-rb/nomono.git")).to be(true)
+
+      repository = described_class.send(
+        :repository_facts,
+        root,
+        "https://github.com/kettle-rb/nomono",
+        package_name: "nomono",
+        repository_topology: "monorepo-subproject",
+      )
+      tokens = described_class.send(:readme_url_template_tokens, repository, "nomono", "kettle-rb")
+
+      expect(repository[:mode]).to eq("monorepo_subproject")
+      expect(repository).not_to have_key(:package_path)
+      expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq("https://gitlab.com/kettle-rb/nomono")
+      expect(tokens.fetch("KJ|README:CB_PACKAGE_SOURCE_URL")).to eq("https://codeberg.org/kettle-rb/nomono")
+      expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq("https://github.com/kettle-rb/nomono")
+      expect(tokens.values_at(
+        "KJ|README:GL_PACKAGE_SOURCE_URL",
+        "KJ|README:CB_PACKAGE_SOURCE_URL",
+        "KJ|README:GH_PACKAGE_SOURCE_URL",
+      ).join("\n")).not_to include("/gems/nomono")
     end
   end
 
