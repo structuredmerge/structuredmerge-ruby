@@ -56,6 +56,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- README logo templating now preserves generated H1 logo HTML during README
+  heading normalization, migrates legacy combined `top_logos` config into
+  `top_logos` plus `h1_logos`, and removes unused old logo link definitions.
 - Ruby template merges now preserve template-only require/bootstrap nodes and
   place them at their template anchor instead of deleting them after merge.
 - Ruby template merges now preserve coverage bootstrap ordering when the

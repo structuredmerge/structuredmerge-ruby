@@ -8713,20 +8713,22 @@ RSpec.describe Kettle::Jem do
             root: packaged
             apply: true
             entries:
-              - .kettle-jem.yml
+              - .structuredmerge/kettle-jem.yml
         YAML
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
-      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".kettle-jem.yml" }
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
       config = YAML.safe_load(report.fetch(:final_content))
 
-      expect(config.dig("readme", "top_logos")).to eq("related-org,ruby,org")
+      expect(config.dig("readme", "top_logos")).to eq("org")
+      expect(config.dig("readme", "h1_logos")).to eq("related-org,ruby")
       expect(config.fetch("readme")).not_to have_key("top_logo_mode")
       expect(report.fetch(:final_content)).not_to include("top_logo_mode:")
       expect(report.fetch(:final_content)).to include("# README top logos.")
+      expect(report.fetch(:final_content)).to include("# top_logos render above the title; h1_logos render inline with the H1.")
       expect(report.fetch(:final_content)).to include("# Supported values: related-org, ruby, org, project")
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
+      expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(report.fetch(:final_content))
     end
   end
 
@@ -8743,32 +8745,48 @@ RSpec.describe Kettle::Jem do
             spec.email = ["jane@example.test"]
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
           defaults:
-            preference: template
+            preference: destination
             add_template_only_nodes: true
           project_emoji: "🫖"
           repository:
             topology: standalone
           readme:
-            top_logos: related-org,ruby,org,project
+            top_logos: org,project
+            h1_logos: related-org,ruby
           templates:
             root: packaged
             apply: true
             entries:
-              - .kettle-jem.yml
+              - .structuredmerge/kettle-jem.yml
         YAML
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
-      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".kettle-jem.yml" }
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
       config = YAML.safe_load(report.fetch(:final_content))
 
       expect(config.fetch("project_emoji")).to eq("🫖")
       expect(config.dig("repository", "topology")).to eq("standalone")
-      expect(config.dig("readme", "top_logos")).to eq("related-org,ruby,org,project")
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
+      expect(config.dig("readme", "top_logos")).to eq("org,project")
+      expect(config.dig("readme", "h1_logos")).to eq("related-org,ruby")
+      expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(report.fetch(:final_content))
     end
+  end
+
+  it "normalizes combined top logo config even when h1 logos already exist" do
+    content = <<~YAML
+      readme:
+        top_logos: related-org,ruby,org
+        h1_logos: related-org,ruby
+    YAML
+
+    migrated = described_class.send(:sync_kettle_config_env_overrides, content, {})
+    config = YAML.safe_load(migrated)
+
+    expect(config.dig("readme", "top_logos")).to eq("org")
+    expect(config.dig("readme", "h1_logos")).to eq("related-org,ruby")
   end
 
   it "derives source and forge tokens from git origin when gemspec metadata is absent" do
@@ -8851,12 +8869,67 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="10%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
-      expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
+      expect(final_content).not_to include("[🖼️acme-example-gem]:")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
-        "KJ|README:TOP_LOGO_REFS" => a_string_including("https://github.com/acme/example-gem"),
+        "KJ|README:TOP_LOGO_REFS" => "",
         "KJ|README:TOP_LOGO_ROW" => a_string_including("example-gem Logo by Aboling0"),
         "KJ|README:H1_LOGO_ROW" => a_string_including("ruby-lang Logo"),
       )
+    end
+  end
+
+  it "keeps generated H1 logo HTML when normalizing existing README headings and prunes stale logo refs" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-h1-logo-merge-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🫖"
+          readme:
+            top_logos: org
+            h1_logos: related-org,ruby
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "README.md" => <<~MARKDOWN,
+          [🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN
+          [🖼️ruby-lang]: https://ruby-toolbox.com
+
+          # Old Title
+
+          ## 🌻 Synopsis
+
+          Existing synopsis.
+        MARKDOWN
+        "template/README.md.example" => <<~MARKDOWN,
+          {KJ|README:TOP_LOGO_ROW}
+
+          {KJ|README:TOP_LOGO_REFS}
+
+          # {KJ|PROJECT_EMOJI} {KJ|NAMESPACE} {KJ|README:H1_LOGO_ROW}
+
+          ## 🌻 Synopsis
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "README.md" }
+      final_content = report.fetch(:final_content)
+
+      expect(final_content).to include("# 🫖 Example::Gem <a href=\"https://discord.gg/3qme4XHNKN\"")
+      expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo,))
+      expect(final_content).not_to include("[🖼️galtzo-floss]:")
+      expect(final_content).not_to include("[🖼️ruby-lang]:")
     end
   end
 
@@ -8902,7 +8975,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :template_profile)).to eq("full")
       expect(plan.dig(:facts, :repository, :mode)).to eq("monorepo_subproject")
       expect(plan.dig(:facts, :readme_logo, :top_logo_row)).to include("structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg")
-      expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to include("[🖼️structuredmerge-structuredmerge-ruby-kettle-jem]: https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem")
+      expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to eq("")
     end
   end
 
@@ -8994,8 +9067,8 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" align="right"/></a>))
-      expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
-      expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
+      expect(final_content).not_to include("[🖼️galtzo-floss]:")
+      expect(final_content).not_to include("[🖼️acme-example-gem]:")
       expect(final_content).not_to include("unknown")
     end
   end
@@ -9036,7 +9109,7 @@ RSpec.describe Kettle::Jem do
         report.fetch(:recipe_name) == "template_source_application_README_md"
       end
       final_content = template_report.fetch(:final_content)
-      expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
+      expect(final_content).not_to include("[🖼️galtzo-floss]:")
       expect(final_content).not_to include("[🖼️galtzo-floss]: https://github.com/galtzo-floss")
       expect(final_content.scan("galtzo-floss/avatar-128px.svg").length).to eq(2)
       expect(final_content).to include(%(<a href="https://github.com/galtzo-floss/turbo_tests2"><img alt="turbo_tests2 Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/turbo_tests2/avatar-128px.svg" align="right"/></a>))

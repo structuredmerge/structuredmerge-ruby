@@ -4256,10 +4256,22 @@ module Kettle
       processed = normalize_readme_project_heading(processed, facts)
       processed = apply_readme_conditional_blocks(processed, facts)
       processed = apply_readme_badge_policy(processed, facts)
+      processed = prune_unused_readme_logo_link_definitions(processed)
       processed = apply_readme_kloc_badge(processed, facts, project_root)
       processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
       processed = apply_monorepo_subgem_readme_recipe(processed, facts)
       replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
+    end
+
+    def prune_unused_readme_logo_link_definitions(content)
+      referenced = ReadmePostProcessor.markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).to_set
+      labels = ReadmePostProcessor.markdown_link_definition_owners(content).filter_map do |owner|
+        label = owner.label.to_s
+        label if label.start_with?("🖼️") && !referenced.include?(label)
+      end
+      return content if labels.empty?
+
+      ReadmePostProcessor.delete_markdown_link_definitions(content, labels)
     end
 
     def apply_readme_kloc_badge(content, facts, project_root)
@@ -4506,7 +4518,8 @@ module Kettle
       return content unless h1
 
       index = h1.location.start_line - 1
-      lines[index] = "# #{emoji} #{namespace}"
+      logo_row = facts.dig(:readme_logo, :h1_logo_row).to_s
+      lines[index] = ["# #{emoji} #{namespace}", logo_row].reject(&:empty?).join(" ")
       lines.join("\n")
     end
 
@@ -6445,6 +6458,7 @@ module Kettle
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
       end
       synced = sync_kettle_config_internal_values(synced)
+      synced = migrate_readme_logo_config(synced)
       synced = prune_legacy_kettle_config_keys(synced)
       sync_kettle_config_documentation_comments(synced)
     end
@@ -6461,13 +6475,37 @@ module Kettle
       end
     end
 
+    def migrate_readme_logo_config(content)
+      config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
+      readme_config = config["readme"]
+      return content unless readme_config.is_a?(Hash)
+
+      configured = normalized_readme_top_logo_options(readme_config["top_logos"] || readme_config["top_logo_options"])
+      return content if configured.empty?
+
+      top_logos = configured & README_TOP_LOGO_DEFAULTS
+      h1_logos = normalized_readme_top_logo_options(readme_config["h1_logos"] || readme_config["heading_logos"])
+      h1_logos = configured & README_H1_LOGO_DEFAULTS if h1_logos.empty?
+      return content if h1_logos.empty? && top_logos == configured
+
+      migrated = replace_yaml_scalar_path(content, %w[readme top_logos], top_logos.join(","))
+      return migrated if readme_config.key?("h1_logos") || readme_config.key?("heading_logos")
+
+      insert_yaml_scalar_after_path(migrated, %w[readme top_logos], "h1_logos", h1_logos.join(","))
+    rescue Psych::Exception
+      content
+    end
+
     def sync_kettle_config_documentation_comments(content)
       sync_readme_top_logos_documentation_comment(content)
     end
 
     def sync_readme_top_logos_documentation_comment(content)
       lines = content.to_s.lines
-      start_index = lines.index { |line| line.strip == "# README top logo mode." }
+      start_index = lines.index do |line|
+        stripped = line.strip
+        stripped == "# README top logo mode." || stripped == "# README top logos."
+      end
       return content unless start_index
       return content unless lines.any? { |line| line.strip.start_with?("top_logos:") }
 
@@ -6486,6 +6524,17 @@ module Kettle
         "#   org_and_project => related-org,ruby,org,project\n",
       ]
       lines[start_index...readme_index] = replacement
+      lines.join
+    end
+
+    def insert_yaml_scalar_after_path(content, path, key, value)
+      lines = content.to_s.lines
+      entry = yaml_scalar_path_entries(content).find { |candidate| candidate.fetch(:path) == path }
+      return content unless entry
+
+      line_index = entry.fetch(:line)
+      indent = lines[line_index].to_s[/\A\s*/].to_s
+      lines.insert(line_index + 1, "#{indent}#{key}: #{yaml_config_scalar_literal(value, path: path[0...-1] + [key])}\n")
       lines.join
     end
 
@@ -8951,11 +9000,7 @@ module Kettle
     end
 
     def readme_top_logo_refs(entries)
-      entries.flat_map do |entry|
-        [
-          "[🖼️#{entry[:link_ref]}]: #{entry[:href]}",
-        ]
-      end.uniq.join("\n")
+      ""
     end
 
     def readme_logo_html(entry, align:, width: nil)

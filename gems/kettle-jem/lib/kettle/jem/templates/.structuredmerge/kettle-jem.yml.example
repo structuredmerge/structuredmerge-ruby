@@ -171,14 +171,16 @@ workflows:
 
 # README top logos.
 # Comma-separated list of optional logo entries for the generated README header.
+# top_logos render above the title; h1_logos render inline with the H1.
 # Supported values: related-org, ruby, org, project
-# Default (when key is absent): related-org,ruby,org,project
+# Default (when keys are absent): top_logos: org,project; h1_logos: related-org,ruby
 # Legacy top_logo_mode values map as:
 #   org => related-org,ruby,org
 #   project => related-org,ruby,project
 #   org_and_project => related-org,ruby,org,project
 readme:
-  top_logos: related-org,ruby,org
+  top_logos: org
+  h1_logos: related-org,ruby
   # Optional package-family README block.
   # Supported values: structuredmerge
   # Leave unset for standalone kettle-rb gems and most projects.
