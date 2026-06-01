@@ -300,6 +300,7 @@ module Kettle
       KJ|README:FOSSA_REFS
       KJ|README:LICENSE_INTRO
       KJ|README:LICENSE_REFS
+      KJ|README:H1_LOGO_ROW
       KJ|README:TOP_LOGO_REFS
       KJ|README:TOP_LOGO_ROW
       KJ|SH:USER
@@ -313,7 +314,8 @@ module Kettle
     BOT_NAME_SUFFIX = /\[bot\]\z/i
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
-    README_TOP_LOGO_DEFAULTS = %w[related_org ruby org project].freeze
+    README_TOP_LOGO_DEFAULTS = %w[org project].freeze
+    README_H1_LOGO_DEFAULTS = %w[related_org ruby].freeze
     README_TOP_LOGO_OPTIONS = %w[related_org ruby org project].freeze
     README_TOP_LOGO_LEGACY_MODE_MAP = {
       "org" => %w[related_org ruby org],
@@ -3531,6 +3533,7 @@ module Kettle
         "KJ|README:LICENSE_COMPAT_BADGE" => "",
         "KJ|README:LICENSE_INTRO" => "",
         "KJ|README:LICENSE_REFS" => "",
+        "KJ|README:H1_LOGO_ROW" => "",
         "KJ|README:TOP_LOGO_REFS" => "",
         "KJ|README:TOP_LOGO_ROW" => "",
         "KJ|SH:USER" => "",
@@ -6474,8 +6477,9 @@ module Kettle
       replacement = [
         "# README top logos.\n",
         "# Comma-separated list of optional logo entries for the generated README header.\n",
+        "# top_logos render above the title; h1_logos render inline with the H1.\n",
         "# Supported values: related-org, ruby, org, project\n",
-        "# Default (when key is absent): related-org,ruby,org,project\n",
+        "# Default (when keys are absent): top_logos: org,project; h1_logos: related-org,ruby\n",
         "# Legacy top_logo_mode values map as:\n",
         "#   org => related-org,ruby,org\n",
         "#   project => related-org,ruby,project\n",
@@ -8697,31 +8701,70 @@ module Kettle
     end
 
     def readme_logo_facts(config, package_name:, github_org:, repository: {})
-      entries = readme_top_logo_entries(
+      top_entries = readme_top_logo_entries(
         config,
         org: github_org.to_s,
         gem_name: package_name.to_s,
         repository: repository || {},
       )
+      h1_entries = readme_h1_logo_entries(
+        config,
+        org: github_org.to_s,
+        gem_name: package_name.to_s,
+        repository: repository || {},
+      )
+      all_entries = deduplicate_readme_top_logo_entries(top_entries + h1_entries)
       compact_hash(
         top_logos: readme_top_logo_options(config).join(","),
-        top_logo_row: readme_top_logo_row(entries),
-        top_logo_refs: readme_top_logo_refs(entries),
+        h1_logos: readme_h1_logo_options(config).join(","),
+        top_logo_row: readme_top_logo_row(top_entries),
+        h1_logo_row: readme_h1_logo_row(h1_entries),
+        top_logo_refs: readme_top_logo_refs(all_entries),
       )
     end
 
     def readme_top_logo_options(config)
-      raw_config = config.is_a?(Hash) ? config["readme"] : nil
-      readme_config = raw_config.is_a?(Hash) ? raw_config : {}
-      top_logos = readme_config["top_logos"] || readme_config["top_logo_options"]
-      normalized = normalized_readme_top_logo_options(top_logos)
+      readme_logo_options_from_config(config, "top_logos", "top_logo_options", README_TOP_LOGO_DEFAULTS)
+    end
+
+    def readme_h1_logo_options(config)
+      readme_config = readme_config_hash(config)
+      h1_logos = readme_config["h1_logos"] || readme_config["heading_logos"]
+      normalized = normalized_readme_top_logo_options(h1_logos)
       return normalized unless normalized.empty?
+
+      raw_top_logos = readme_config["top_logos"] || readme_config["top_logo_options"]
+      normalized_top_logos = normalized_readme_top_logo_options(raw_top_logos)
+      h1_from_top_logos = normalized_top_logos & README_H1_LOGO_DEFAULTS
+      return h1_from_top_logos unless h1_from_top_logos.empty?
 
       legacy_mode = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
       legacy_options = README_TOP_LOGO_LEGACY_MODE_MAP[legacy_mode]
-      return legacy_options if legacy_options
+      h1_from_legacy = Array(legacy_options) & README_H1_LOGO_DEFAULTS
+      return h1_from_legacy unless h1_from_legacy.empty?
 
-      README_TOP_LOGO_DEFAULTS
+      raw_top_logos ? [] : README_H1_LOGO_DEFAULTS
+    end
+
+    def readme_logo_options_from_config(config, primary_key, secondary_key, defaults)
+      readme_config = readme_config_hash(config)
+      raw_logos = readme_config[primary_key] || readme_config[secondary_key]
+      normalized = normalized_readme_top_logo_options(raw_logos)
+      selected = normalized & README_TOP_LOGO_DEFAULTS
+      return selected unless selected.empty?
+      return [] if raw_logos
+
+      legacy_mode = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
+      legacy_options = README_TOP_LOGO_LEGACY_MODE_MAP[legacy_mode]
+      selected_legacy = Array(legacy_options) & README_TOP_LOGO_DEFAULTS
+      return selected_legacy unless selected_legacy.empty?
+
+      defaults
+    end
+
+    def readme_config_hash(config)
+      raw_config = config.is_a?(Hash) ? config["readme"] : nil
+      raw_config.is_a?(Hash) ? raw_config : {}
     end
 
     def normalized_readme_top_logo_options(value)
@@ -8750,10 +8793,17 @@ module Kettle
       readme_top_logo_entries_with_asset_size(entries)
     end
 
+    def readme_h1_logo_entries(config, org:, gem_name:, repository: {})
+      entries = readme_h1_logo_options(config).filter_map do |option|
+        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
+      end
+      entries = deduplicate_readme_top_logo_entries(entries)
+      readme_top_logo_entries_with_asset_size(entries)
+    end
+
     def readme_top_logo_entries_with_asset_size(entries)
-      size = (entries.length == 4) ? 128 : 192
       entries.map do |entry|
-        image_url = entry.fetch(:image_url).to_s.sub(%r{/avatar-\d+px\.svg\z}, "/avatar-#{size}px.svg")
+        image_url = entry.fetch(:image_url).to_s.sub(%r{/avatar-\d+px\.svg\z}, "/avatar-128px.svg")
         entry.merge(image_url: image_url)
       end
     end
@@ -8773,7 +8823,9 @@ module Kettle
     end
 
     def deduplicate_readme_top_logo_entries(entries)
-      entries.uniq { |entry| entry[:image_url].to_s }
+      entries.group_by { |entry| entry[:image_url].to_s }.values.map do |group|
+        group.find { |entry| entry[:type] == "related_org" } || group.first
+      end
     end
 
     def readme_top_logo_entry_from_config(logo, org:, gem_name:, repository: {})
@@ -8795,6 +8847,7 @@ module Kettle
       credit = default_readme_top_logo_credit(type) if credit.empty?
       ref_slug = slug.tr("/", "-")
       {
+        type: type,
         label: alt.sub(/\s+logo\z/i, ""),
         credit: credit,
         credit_separator: readme_top_logo_credit_separator(type),
@@ -8887,21 +8940,41 @@ module Kettle
 
     def readme_top_logo_row(entries)
       entries.map do |entry|
-        "[![#{entry[:label]} Logo#{entry[:credit_separator]}#{entry[:credit]}][🖼️#{entry[:image_ref]}]][🖼️#{entry[:link_ref]}]"
+        readme_logo_html(entry, align: "right")
+      end.join(" ")
+    end
+
+    def readme_h1_logo_row(entries)
+      entries.map do |entry|
+        readme_logo_html(entry, align: "right", width: "10%")
       end.join(" ")
     end
 
     def readme_top_logo_refs(entries)
       entries.flat_map do |entry|
         [
-          "[🖼️#{entry[:image_ref]}]: #{entry[:image_url]}",
           "[🖼️#{entry[:link_ref]}]: #{entry[:href]}",
         ]
-      end.join("\n")
+      end.uniq.join("\n")
+    end
+
+    def readme_logo_html(entry, align:, width: nil)
+      attributes = [
+        %(alt="#{html_attribute_escape("#{entry[:label]} Logo#{entry[:credit_separator]}#{entry[:credit]}")}"),
+        %(src="#{html_attribute_escape(entry[:image_url])}"),
+      ]
+      attributes << %(width="#{html_attribute_escape(width)}") if width
+      attributes << %(align="#{html_attribute_escape(align)}")
+      %(<a href="#{html_attribute_escape(entry[:href])}"><img #{attributes.join(" ")}/></a>)
+    end
+
+    def html_attribute_escape(value)
+      value.to_s.gsub("&", "&amp;").gsub("\"", "&quot;").gsub("<", "&lt;").gsub(">", "&gt;")
     end
 
     def readme_logo_template_tokens(readme_logo)
       {
+        "KJ|README:H1_LOGO_ROW" => readme_logo[:h1_logo_row].to_s,
         "KJ|README:TOP_LOGO_ROW" => readme_logo[:top_logo_row].to_s,
         "KJ|README:TOP_LOGO_REFS" => readme_logo[:top_logo_refs].to_s,
       }
