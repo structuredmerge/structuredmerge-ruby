@@ -143,7 +143,7 @@ GEM
       simplecov-rcov (~> 0.3, >= 0.3.7)
       simplecov_json_formatter (~> 0.1, >= 0.1.4)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-test (2.0.1)
+    kettle-test (2.0.2)
       appraisal2 (~> 3.0, >= 3.0.2)
       backports (~> 3.0)
       rspec (~> 3.0)
@@ -153,7 +153,7 @@ GEM
       rspec_junit_formatter (~> 0.6)
       silent_stream (~> 1.0, >= 1.0.12)
       timecop-rspec (~> 1.0, >= 1.0.3)
-      turbo_tests2 (~> 3.0)
+      turbo_tests2 (~> 3.1, >= 3.1.0)
       version_gem (~> 1.1, >= 1.1.9)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
@@ -296,7 +296,7 @@ GEM
       rubocop-ruby3_2 (>= 3.0.0, < 4)
       standard-rubocop-lts (>= 2.0.2, < 3)
       version_gem (>= 1.1.2, < 3)
-    rubocop-lts-rspec (1.0.1)
+    rubocop-lts-rspec (1.0.2)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-env (~> 0.1, >= 0.1.0)
       rubocop-factory_bot (~> 2.27, >= 2.27.1)
@@ -424,7 +424,7 @@ GEM
     tsort (0.2.0)
     ttfunk (1.8.0)
       bigdecimal (~> 3.1)
-    turbo_tests2 (3.1.0)
+    turbo_tests2 (3.1.1)
       parallel_tests (>= 3.3.0, < 6)
       rspec (>= 3.10)
       version_gem (~> 1.1, >= 1.1.9)
@@ -481,7 +481,7 @@ DEPENDENCIES
   irb (~> 1.17)
   kettle-jem!
   kettle-soup-cover (~> 1.0, >= 1.1.3)
-  kettle-test (~> 2.0, >= 2.0.1)
+  kettle-test (~> 2.0, >= 2.0.2)
   kramdown (~> 2.5, >= 2.5.1)
   kramdown-parser-gfm (~> 1.1)
   mutex_m (~> 0.2)
@@ -557,7 +557,7 @@ CHECKSUMS
   kettle-dev (2.0.6) sha256=648e970e39f7eb38ee3ebc9619b71bd5e72ea0727415ac350908fa4ced10855c
   kettle-jem (7.0.0)
   kettle-soup-cover (1.1.3) sha256=a373827da22a7131d093afd32945e5b7d7a10a01ebfdded8fd2cb8230d69c8ad
-  kettle-test (2.0.1) sha256=1aa4ca9eae6bce39b2d54a60fef20dfe82de32ea37b9114047f6117388dee5b9
+  kettle-test (2.0.2) sha256=dc8eed3a6277fad78f7589c3dbe55891f140dbb7675748bdb6c6cd4ea29006a4
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-merge (7.0.0) sha256=43eb86fda4805c5047e77527dc12472110d43be8df4e1c77171aceb15bb60f84
   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
@@ -617,7 +617,7 @@ CHECKSUMS
   rubocop-factory_bot (2.28.0) sha256=4b17fc02124444173317e131759d195b0d762844a71a29fe8139c1105d92f0cb
   rubocop-gradual (0.3.6) sha256=d70505a81b63f95ff7d987afe66adf559c53708e4abf06328f6e6026b6571993
   rubocop-lts (24.1.0) sha256=9dcad4db2da2fe2f1f77f98c917d70e7c43eded703da14cd201d4be52a9272aa
-  rubocop-lts-rspec (1.0.1) sha256=09c2416076ee0ecf7b9f59f379af530b8e7e4f55c16b966222c909fa7af2048b
+  rubocop-lts-rspec (1.0.2) sha256=ad6325f0a30972e0727888e52514b81e98d1d03ff680ab103e7bef48354b36ec
   rubocop-md (1.2.4) sha256=3e481bb08e2d7479eeba3d02359737074f58dd5694f7a57de4ad8d807fdaf6ff
   rubocop-on-rbs (2.0.0) sha256=ce74d1b3d5daead19f4b611623656c185821dfc9aed9c7079bb1e5d7d7c464be
   rubocop-packaging (0.6.0) sha256=fb92bd0fb48e6f8cdb1648d2249b0cd51c2497dcc87340132d22f01edbf558a7
@@ -662,7 +662,7 @@ CHECKSUMS
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   ttfunk (1.8.0) sha256=a7cbc7e489cc46e979dde04d34b5b9e4f5c8f1ee5fc6b1a7be39b829919d20ca
-  turbo_tests2 (3.1.0) sha256=a240a30fbd6fd6a92c959d2c7994c87aa057b23500dce7d11d41571ddf58e8c2
+  turbo_tests2 (3.1.1)
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
   version_gem (1.1.9) sha256=0c1a0962ae543c84a00889bb018d9f14d8f8af6029d26b295d98774e3d2eb9a4
