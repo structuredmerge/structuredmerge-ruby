@@ -2357,6 +2357,24 @@ module Ast
       resolver.resolve(document, normalize_template_replacements(replacements))
     end
 
+    def normalize_blank_line_runs(content, max: 1)
+      max = Integer(max)
+      raise ArgumentError, "max must be >= 0" if max.negative?
+
+      blank_count = 0
+      content.to_s.lines.filter_map do |line|
+        if line.to_s.strip.empty?
+          blank_count += 1
+          next if blank_count > max
+        else
+          blank_count = 0
+        end
+
+        line
+      end.join
+    end
+    module_function :normalize_blank_line_runs
+
     def select_template_strategy(path, default_strategy = "merge", overrides = [])
       normalized_path = path.to_s.delete_prefix("./")
       override = overrides.find do |entry|

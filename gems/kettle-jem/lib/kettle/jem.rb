@@ -4261,7 +4261,14 @@ module Kettle
       processed = apply_readme_kloc_badge(processed, facts, project_root)
       processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
       processed = apply_monorepo_subgem_readme_recipe(processed, facts)
-      replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
+      processed = replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
+      normalize_readme_blank_line_runs(processed)
+    end
+
+    def normalize_readme_blank_line_runs(content)
+      return Ast::Merge.normalize_blank_line_runs(content) if Ast::Merge.respond_to?(:normalize_blank_line_runs)
+
+      collapse_excess_blank_lines(content)
     end
 
     def prune_unused_readme_logo_link_definitions(content)

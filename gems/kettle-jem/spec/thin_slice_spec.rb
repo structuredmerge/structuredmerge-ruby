@@ -9017,6 +9017,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo,))
       expect(final_content).not_to include("[🖼️galtzo-floss]:")
       expect(final_content).not_to include("[🖼️ruby-lang]:")
+      expect(final_content).not_to include("\n\n\n")
     end
   end
 
