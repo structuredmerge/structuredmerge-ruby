@@ -7043,7 +7043,7 @@ RSpec.describe Kettle::Jem do
             spec.require_paths = ["lib"]
             spec.bindir = "exe"
             spec.executables = ["#{contract_case.fetch(:executable)}"]
-            spec.add_development_dependency("gitmoji-regex", "~> 2.0")
+            spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.1")
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -7088,7 +7088,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include(contract_case.fetch(:summary))
       expect(gemspec_content).to include(contract_case.fetch(:description))
       expect(gemspec_content).to include(%(spec.executables = ["#{contract_case.fetch(:executable)}"]))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("gitmoji-regex", "~> 2.0")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.1")))
       expect(gemspec_content).not_to include("# Hence.")
       expect(gemspec_content).not_to include("add_development_dependency(\"#{package_name}\"")
       expect(File.read(File.join(root, "#{package_name}.gemspec"))).to eq(gemspec_content)

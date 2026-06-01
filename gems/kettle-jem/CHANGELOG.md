@@ -60,6 +60,7 @@ Please file a bug if you notice a violation of semantic versioning.
   command config as well as managed `.gitattributes`, so local `git diff`
   can actually invoke StructuredMerge drivers after templating.
 - Runtime dependency `token-resolver` now requires 2.0.1 or newer.
+- Gem templates now require `gitmoji-regex` >= 2.0.1.
 
 ### Deprecated
 
