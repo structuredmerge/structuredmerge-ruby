@@ -54,6 +54,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Ruby, engine, Bundler, RubyGems, RuboCop, and Rails compatibility choices now
   come from an `RRRRB_MATRIX` source of truth so generated workflows and
   appraisals can select the newest stable compatible toolchain per Ruby.
+- Generated main Gemfiles now install `nomono` >= 1.0.2 so local workspace
+  override Gemfiles can load `nomono/bundler` from the released gem.
 
 ### Deprecated
 

@@ -6233,6 +6233,38 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "generates nomono in the main Gemfile before local workspace overrides need it" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "Gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.2", require: false')
+      expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
   it "treats packaged CITATION.cff as template-owned metadata by default" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
