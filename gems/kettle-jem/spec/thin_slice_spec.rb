@@ -3593,13 +3593,16 @@ RSpec.describe Kettle::Jem do
       mode: "local",
       profile: "semantic-diff",
       scope: "local",
-      reason: "ready_for_local_git_driver_attributes",
+      reason: "ready_for_local_git_drivers",
     )
     expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
       attributes: {"diff" => "smorg-ruby"},
     ))
-    expect(step.fetch(:commands)).to eq([])
+    expect(step.fetch(:commands)).to include(
+      ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+      ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+    )
   end
 
   it "plans builtin Git diff attributes when requested" do
@@ -3618,13 +3621,15 @@ RSpec.describe Kettle::Jem do
     ))
   end
 
-  it "writes managed .gitattributes for local semantic Git driver setup" do
+  it "writes managed .gitattributes and local config for local semantic Git driver setup" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-drivers", tmp_root) do |root|
       write_tree(root, {".gitattributes" => "*.md diff=markdown\n"})
       step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
-      command_runner = lambda do |_command, **|
+      commands = []
+      command_runner = lambda do |command, **|
+        commands << command
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
       end
 
@@ -3645,6 +3650,10 @@ RSpec.describe Kettle::Jem do
         *.rs diff=smorg-rs
         # <</structuredmerge:git-drivers>>
       ATTRIBUTES
+      expect(commands).to include(
+        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+        ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+      )
     end
   end
 
@@ -3837,10 +3846,14 @@ RSpec.describe Kettle::Jem do
 
       manifest = Kettle::Jem::Tasks::InstallTask.git_driver_manifest(root)
       semantic_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "semantic-diff")
+      semantic_local_commands = Kettle::Jem::Tasks::InstallTask.git_driver_local_commands(manifest, "semantic-diff")
       textconv_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
 
       expect(semantic_commands).to eq([
         ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+      ])
+      expect(semantic_local_commands).to eq([
+        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
       ])
       expect(textconv_commands).to contain_exactly(
         ["git", "config", "--global", "diff.smorg-json-textconv.textconv", "smorg-rb textconv --format json"],

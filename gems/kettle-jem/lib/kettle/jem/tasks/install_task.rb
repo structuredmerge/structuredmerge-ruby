@@ -875,7 +875,7 @@ module Kettle
               profile: "semantic-diff",
               scope: "check",
               attribute_updates: git_driver_attribute_updates(manifest, "semantic-diff"),
-              config_checks: git_driver_global_config_checks(manifest, "semantic-diff"),
+              config_checks: git_driver_local_config_checks(manifest, "semantic-diff"),
               reason: "ready_for_git_driver_check",
             }
           when "undo"
@@ -942,9 +942,9 @@ module Kettle
               scope: "local",
               attribute_updates: updates,
               managed_block: "structuredmerge:git-drivers",
-              commands: [],
+              commands: git_driver_local_commands(manifest, "semantic-diff"),
               diagnostics: diagnostics + [git_driver_forge_warning_diagnostic],
-              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_driver_attributes"),
+              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_drivers"),
             }
           end
         end
@@ -1002,6 +1002,12 @@ module Kettle
           end
         end
 
+        def git_driver_local_commands(manifest = nil, profile = "semantic-diff")
+          git_driver_global_commands(manifest, profile).map do |command|
+            ["git", "config", "--local", command[3], command[4]]
+          end
+        end
+
         def default_git_driver_global_commands
           DEFAULT_GIT_DRIVER_DEFINITIONS.flat_map do |definition|
             [
@@ -1025,6 +1031,12 @@ module Kettle
         def git_driver_global_config_checks(manifest = nil, profile = "semantic-diff")
           git_driver_global_commands(manifest, profile).map do |command|
             {key: command[3], expected: command[4], argv: ["git", "config", "--global", "--get", command[3]]}
+          end
+        end
+
+        def git_driver_local_config_checks(manifest = nil, profile = "semantic-diff")
+          git_driver_local_commands(manifest, profile).map do |command|
+            {key: command[3], expected: command[4], argv: ["git", "config", "--local", "--get", command[3]]}
           end
         end
 
@@ -1389,7 +1401,7 @@ module Kettle
             result = command_runner.call(check.fetch(:argv), chdir: project_root, env: env, quiet: quiet)
             next if result.fetch(:success) && result.fetch(:stdout).to_s.strip == check.fetch(:expected)
 
-            missing << {kind: "global_config", key: check.fetch(:key)}
+            missing << {kind: "local_config", key: check.fetch(:key)}
           end
           status = missing.empty? ? "succeeded" : "failed"
           report = step.merge(status: status, ok: missing.empty?, missing: missing, reason: "checked")

@@ -93,8 +93,9 @@ floor is never lower than the gemspec `required_ruby_version`.
 `workflows.coverage` enables coverage workflow generation. Existing custom
 workflows can receive pinned-action snippets without replacing the whole file.
 
-`git_drivers` defaults to `semantic-diff` during `kettle-jem install`. Use
-`builtin-diff` to keep Git's built-in language drivers, `global` to register
+`git_drivers` defaults to `semantic-diff` during `kettle-jem install`, writing
+managed `.gitattributes` entries plus repo-local `diff.smorg-*` command config.
+Use `builtin-diff` to keep Git's built-in language drivers, `global` to register
 driver commands once per user, `include-file` to write `.git/smorg/config`, and
 `none` to opt out. `check` verifies the local setup, and `undo` removes managed
 driver entries.
