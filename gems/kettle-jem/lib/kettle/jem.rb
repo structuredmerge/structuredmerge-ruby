@@ -8894,7 +8894,7 @@ module Kettle
       when "related_org"
         "https://discord.gg/3qme4XHNKN"
       when "ruby"
-        "https://www.ruby-lang.org/"
+        "https://ruby-toolbox.com"
       when "org"
         org.to_s.empty? ? "#{LOGOS_GALTZO_BASE_URL}/#{slug}/" : "https://github.com/#{org}"
       when "project"

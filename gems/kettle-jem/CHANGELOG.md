@@ -37,6 +37,7 @@ Please file a bug if you notice a violation of semantic versioning.
   `ruby.test_minimum` value used when the project was templated.
 - README logo templating now splits config-driven `top_logos` from `h1_logos`,
   renders logos as aligned HTML images, and normalizes logo assets to 128px.
+- README Ruby language logos now link to Ruby Toolbox.
 - Documented `rubygems.min_ruby` in the generated `.kettle-jem.yml` so projects
   can make the published runtime Ruby floor explicit.
 - Documentation templates now require `yard-yaml` >= 0.1.2.

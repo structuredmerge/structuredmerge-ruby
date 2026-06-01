@@ -8850,7 +8850,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="10%" align="right"/></a>))
-      expect(final_content).to include(%(<a href="https://www.ruby-lang.org/"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
       expect(final_content).to include("[🖼️acme-example-gem]: https://github.com/acme/example-gem")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|README:TOP_LOGO_REFS" => a_string_including("https://github.com/acme/example-gem"),
@@ -8991,7 +8991,7 @@ RSpec.describe Kettle::Jem do
       end
       final_content = template_report.fetch(:final_content)
       expect(final_content).to include(%(<a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="10%" align="right"/></a>))
-      expect(final_content).to include(%(<a href="https://www.ruby-lang.org/"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="10%" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="acme Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="example-gem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/example-gem/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include("[🖼️galtzo-floss]: https://discord.gg/3qme4XHNKN")
@@ -9132,7 +9132,7 @@ RSpec.describe Kettle::Jem do
         report.fetch(:recipe_name) == "template_source_application_README_md"
       end
       final_content = template_report.fetch(:final_content)
-      expect(final_content).to include(%(<a href="https://www.ruby-lang.org/"><img alt="Ruby language Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" align="right"/></a>))
+      expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="Ruby language Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme"><img alt="Acme org Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/"><img alt="Tree-sitter project Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/tree-sitter/tree-sitter/avatar-128px.svg" align="right"/></a>))
       expect(final_content).to include(%(<a href="https://github.com/acme/example-gem"><img alt="Ignored fourth Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/acme/ignored/avatar-128px.svg" align="right"/></a>))
