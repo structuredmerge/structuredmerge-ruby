@@ -59,6 +59,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Default semantic Git driver setup now writes repo-local `diff.smorg-*`
   command config as well as managed `.gitattributes`, so local `git diff`
   can actually invoke StructuredMerge drivers after templating.
+- Runtime dependency `token-resolver` now requires 2.0.1 or newer.
 
 ### Deprecated
 
