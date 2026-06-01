@@ -9341,10 +9341,10 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.2.0"')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.1"')
       expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0.0"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0.1"')
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|RUBOCOP_LTS_CONSTRAINT" => "~> 22.2.0",
-        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "~> 3.0.0",
+        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "~> 3.0.1",
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1",
       )
     end

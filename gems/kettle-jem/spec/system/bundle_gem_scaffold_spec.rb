@@ -210,7 +210,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(style_gemfile).to include('gem "rubocop-lts", "~> 24.1.0"')
     expect(style_gemfile).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.1"')
     expect(style_gemfile).not_to include('gem "rubocop-rspec", "~> 3.6"')
-    expect(style_gemfile).to include('gem "rubocop-ruby3_2", "~> 3.0.0"')
+    expect(style_gemfile).to include('gem "rubocop-ruby3_2", "~> 3.0.1"')
 
     gemfile = File.read(File.join(gem_root, "Gemfile"))
     expect(gemfile).to include('source "https://gem.coop"')
