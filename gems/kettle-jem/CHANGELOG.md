@@ -35,8 +35,11 @@ Please file a bug if you notice a violation of semantic versioning.
   and RubyGems specification objects instead of parsing gemspec source.
 - README and CONTRIBUTING templates now document the effective
   `ruby.test_minimum` value used when the project was templated.
-- README logo templating now splits config-driven `top_logos` from `h1_logos`,
-  renders logos as aligned HTML images, and normalizes logo assets to 128px.
+- README logo templating now splits config-driven `top_logos` from
+  `h2_synopsis_logos`, renders logos as aligned HTML images, and normalizes logo
+  assets to 128px.
+- README logo config now accepts optional per-logo widths with `type|width`
+  entries, such as `org|12%` or `ruby|96px`.
 - README Ruby language logos now link to Ruby Toolbox.
 - Documented `rubygems.min_ruby` in the generated `.kettle-jem.yml` so projects
   can make the published runtime Ruby floor explicit.
@@ -56,9 +59,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- README logo templating now preserves generated H1 logo HTML during README
-  heading normalization, migrates legacy combined `top_logos` config into
-  `top_logos` plus `h1_logos`, and removes unused old logo link definitions.
+- README logo templating now preserves generated Synopsis H2 logo HTML during
+  README heading normalization, migrates legacy combined `top_logos` config into
+  `top_logos` plus `h2_synopsis_logos`, and removes unused old logo link
+  definitions.
 - Ruby template merges now preserve template-only require/bootstrap nodes and
   place them at their template anchor instead of deleting them after merge.
 - Ruby template merges now preserve coverage bootstrap ordering when the

@@ -298,9 +298,9 @@ module Kettle
       KJ|README:LICENSE_EYE_WORKFLOW_BADGE
       KJ|README:FOSSA_BADGE
       KJ|README:FOSSA_REFS
+      KJ|README:H2_SYNOPSIS_LOGO_ROW
       KJ|README:LICENSE_INTRO
       KJ|README:LICENSE_REFS
-      KJ|README:H1_LOGO_ROW
       KJ|README:TOP_LOGO_REFS
       KJ|README:TOP_LOGO_ROW
       KJ|SH:USER
@@ -315,7 +315,7 @@ module Kettle
     NOT_COMMITTED_EMAIL = "not.committed.yet"
     LOGOS_GALTZO_BASE_URL = "https://logos.galtzo.com/assets/images"
     README_TOP_LOGO_DEFAULTS = %w[org project].freeze
-    README_H1_LOGO_DEFAULTS = %w[related_org ruby].freeze
+    README_H2_SYNOPSIS_LOGO_DEFAULTS = %w[related_org ruby].freeze
     README_TOP_LOGO_OPTIONS = %w[related_org ruby org project].freeze
     README_TOP_LOGO_LEGACY_MODE_MAP = {
       "org" => %w[related_org ruby org],
@@ -3533,7 +3533,7 @@ module Kettle
         "KJ|README:LICENSE_COMPAT_BADGE" => "",
         "KJ|README:LICENSE_INTRO" => "",
         "KJ|README:LICENSE_REFS" => "",
-        "KJ|README:H1_LOGO_ROW" => "",
+        "KJ|README:H2_SYNOPSIS_LOGO_ROW" => "",
         "KJ|README:TOP_LOGO_REFS" => "",
         "KJ|README:TOP_LOGO_ROW" => "",
         "KJ|SH:USER" => "",
@@ -4254,6 +4254,7 @@ module Kettle
         engines: facts.dig(:rubygems, :engines),
       )
       processed = normalize_readme_project_heading(processed, facts)
+      processed = normalize_readme_synopsis_heading(processed, facts)
       processed = apply_readme_conditional_blocks(processed, facts)
       processed = apply_readme_badge_policy(processed, facts)
       processed = prune_unused_readme_logo_link_definitions(processed)
@@ -4518,8 +4519,22 @@ module Kettle
       return content unless h1
 
       index = h1.location.start_line - 1
-      logo_row = facts.dig(:readme_logo, :h1_logo_row).to_s
-      lines[index] = ["# #{emoji} #{namespace}", logo_row].reject(&:empty?).join(" ")
+      lines[index] = "# #{emoji} #{namespace}"
+      lines.join("\n")
+    end
+
+    def normalize_readme_synopsis_heading(content, facts)
+      logo_row = facts.dig(:readme_logo, :h2_synopsis_logo_row).to_s
+      return content if logo_row.empty?
+
+      lines = content.to_s.split("\n", -1)
+      h2 = markdown_heading_owners(content, source_label: "README.md").find do |owner|
+        owner.level == 2 && owner.base.to_s == "synopsis"
+      end
+      return content unless h2
+
+      index = h2.location.start_line - 1
+      lines[index] = "## 🌻 Synopsis #{logo_row}"
       lines.join("\n")
     end
 
@@ -6480,20 +6495,28 @@ module Kettle
       readme_config = config["readme"]
       return content unless readme_config.is_a?(Hash)
 
-      configured = normalized_readme_top_logo_options(readme_config["top_logos"] || readme_config["top_logo_options"])
+      configured_specs = normalized_readme_logo_specs(readme_config["top_logos"] || readme_config["top_logo_options"])
+      configured = configured_specs.map { |spec| spec.fetch(:type) }
       return content if configured.empty?
 
-      top_logos = configured & README_TOP_LOGO_DEFAULTS
-      h1_logos = normalized_readme_top_logo_options(readme_config["h1_logos"] || readme_config["heading_logos"])
-      h1_logos = configured & README_H1_LOGO_DEFAULTS if h1_logos.empty?
-      return content if h1_logos.empty? && top_logos == configured
+      top_logo_specs = configured_specs.select { |spec| README_TOP_LOGO_DEFAULTS.include?(spec.fetch(:type)) }
+      h2_synopsis_logo_specs = normalized_readme_logo_specs(readme_config["h2_synopsis_logos"])
+      h2_synopsis_logo_specs = configured_specs.select { |spec| README_H2_SYNOPSIS_LOGO_DEFAULTS.include?(spec.fetch(:type)) } if h2_synopsis_logo_specs.empty?
+      top_logos = top_logo_specs.map { |spec| readme_logo_config_value(spec) }
+      h2_synopsis_logos = h2_synopsis_logo_specs.map { |spec| readme_logo_config_value(spec) }
+      return content if h2_synopsis_logos.empty? && top_logos == configured
 
       migrated = replace_yaml_scalar_path(content, %w[readme top_logos], top_logos.join(","))
-      return migrated if readme_config.key?("h1_logos") || readme_config.key?("heading_logos")
+      return replace_yaml_scalar_path(migrated, %w[readme h2_synopsis_logos], h2_synopsis_logos.join(",")) if readme_config.key?("h2_synopsis_logos")
 
-      insert_yaml_scalar_after_path(migrated, %w[readme top_logos], "h1_logos", h1_logos.join(","))
+      insert_yaml_scalar_after_path(migrated, %w[readme top_logos], "h2_synopsis_logos", h2_synopsis_logos.join(","))
     rescue Psych::Exception
       content
+    end
+
+    def readme_logo_config_value(spec)
+      width = spec[:width].to_s
+      width.empty? ? spec.fetch(:type).tr("_", "-") : "#{spec.fetch(:type).tr("_", "-")}|#{width}"
     end
 
     def sync_kettle_config_documentation_comments(content)
@@ -6515,9 +6538,11 @@ module Kettle
       replacement = [
         "# README top logos.\n",
         "# Comma-separated list of optional logo entries for the generated README header.\n",
-        "# top_logos render above the title; h1_logos render inline with the H1.\n",
-        "# Supported values: related-org, ruby, org, project\n",
-        "# Default (when keys are absent): top_logos: org,project; h1_logos: related-org,ruby\n",
+        "# top_logos render above the title; h2_synopsis_logos render inline with the Synopsis H2.\n",
+        "# Supported values: related-org, ruby, org, project, optionally followed by |width.\n",
+        "# Examples: org|12%, ruby|96px\n",
+        "# Default widths: top 1 logo => 14%, top 2 logos => 12%, Synopsis 1 logo => 10%, Synopsis 2 logos => 8%.\n",
+        "# Default (when keys are absent): top_logos: org,project; h2_synopsis_logos: related-org,ruby\n",
         "# Legacy top_logo_mode values map as:\n",
         "#   org => related-org,ruby,org\n",
         "#   project => related-org,ruby,project\n",
@@ -8756,18 +8781,18 @@ module Kettle
         gem_name: package_name.to_s,
         repository: repository || {},
       )
-      h1_entries = readme_h1_logo_entries(
+      h2_synopsis_entries = readme_h2_synopsis_logo_entries(
         config,
         org: github_org.to_s,
         gem_name: package_name.to_s,
         repository: repository || {},
       )
-      all_entries = deduplicate_readme_top_logo_entries(top_entries + h1_entries)
+      all_entries = deduplicate_readme_top_logo_entries(top_entries + h2_synopsis_entries)
       compact_hash(
         top_logos: readme_top_logo_options(config).join(","),
-        h1_logos: readme_h1_logo_options(config).join(","),
+        h2_synopsis_logos: readme_h2_synopsis_logo_options(config).join(","),
         top_logo_row: readme_top_logo_row(top_entries),
-        h1_logo_row: readme_h1_logo_row(h1_entries),
+        h2_synopsis_logo_row: readme_h2_synopsis_logo_row(h2_synopsis_entries),
         top_logo_refs: readme_top_logo_refs(all_entries),
       )
     end
@@ -8776,39 +8801,51 @@ module Kettle
       readme_logo_options_from_config(config, "top_logos", "top_logo_options", README_TOP_LOGO_DEFAULTS)
     end
 
-    def readme_h1_logo_options(config)
+    def readme_h2_synopsis_logo_options(config)
+      readme_h2_synopsis_logo_specs(config).map { |spec| spec.fetch(:type) }
+    end
+
+    def readme_h2_synopsis_logo_specs(config)
       readme_config = readme_config_hash(config)
-      h1_logos = readme_config["h1_logos"] || readme_config["heading_logos"]
-      normalized = normalized_readme_top_logo_options(h1_logos)
+      h2_synopsis_logos = readme_config["h2_synopsis_logos"]
+      normalized = normalized_readme_logo_specs(h2_synopsis_logos)
       return normalized unless normalized.empty?
 
       raw_top_logos = readme_config["top_logos"] || readme_config["top_logo_options"]
-      normalized_top_logos = normalized_readme_top_logo_options(raw_top_logos)
-      h1_from_top_logos = normalized_top_logos & README_H1_LOGO_DEFAULTS
-      return h1_from_top_logos unless h1_from_top_logos.empty?
+      normalized_top_logos = normalized_readme_logo_specs(raw_top_logos)
+      synopsis_from_top_logos = normalized_top_logos.select { |spec| README_H2_SYNOPSIS_LOGO_DEFAULTS.include?(spec.fetch(:type)) }
+      return synopsis_from_top_logos unless synopsis_from_top_logos.empty?
 
       legacy_mode = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
       legacy_options = README_TOP_LOGO_LEGACY_MODE_MAP[legacy_mode]
-      h1_from_legacy = Array(legacy_options) & README_H1_LOGO_DEFAULTS
-      return h1_from_legacy unless h1_from_legacy.empty?
+      synopsis_from_legacy = Array(legacy_options).filter_map do |option|
+        {type: option, width: nil} if README_H2_SYNOPSIS_LOGO_DEFAULTS.include?(option)
+      end
+      return synopsis_from_legacy unless synopsis_from_legacy.empty?
 
-      raw_top_logos ? [] : README_H1_LOGO_DEFAULTS
+      raw_top_logos ? [] : README_H2_SYNOPSIS_LOGO_DEFAULTS.map { |option| {type: option, width: nil} }
     end
 
     def readme_logo_options_from_config(config, primary_key, secondary_key, defaults)
+      readme_logo_specs_from_config(config, primary_key, secondary_key, defaults).map { |spec| spec.fetch(:type) }
+    end
+
+    def readme_logo_specs_from_config(config, primary_key, secondary_key, defaults)
       readme_config = readme_config_hash(config)
       raw_logos = readme_config[primary_key] || readme_config[secondary_key]
-      normalized = normalized_readme_top_logo_options(raw_logos)
-      selected = normalized & README_TOP_LOGO_DEFAULTS
+      normalized = normalized_readme_logo_specs(raw_logos)
+      selected = normalized.select { |spec| defaults.include?(spec.fetch(:type)) }
       return selected unless selected.empty?
       return [] if raw_logos
 
       legacy_mode = readme_config["top_logo_mode"].to_s.strip.downcase.tr("-", "_")
       legacy_options = README_TOP_LOGO_LEGACY_MODE_MAP[legacy_mode]
-      selected_legacy = Array(legacy_options) & README_TOP_LOGO_DEFAULTS
+      selected_legacy = Array(legacy_options).filter_map do |option|
+        {type: option, width: nil} if defaults.include?(option)
+      end
       return selected_legacy unless selected_legacy.empty?
 
-      defaults
+      defaults.map { |option| {type: option, width: nil} }
     end
 
     def readme_config_hash(config)
@@ -8817,6 +8854,10 @@ module Kettle
     end
 
     def normalized_readme_top_logo_options(value)
+      normalized_readme_logo_specs(value).map { |spec| spec.fetch(:type) }
+    end
+
+    def normalized_readme_logo_specs(value)
       raw_values = case value
       when String
         value.split(",")
@@ -8826,25 +8867,35 @@ module Kettle
         []
       end
       raw_values.filter_map do |raw_value|
-        normalized = raw_value.to_s.strip.downcase.tr("-", "_")
-        normalized if README_TOP_LOGO_OPTIONS.include?(normalized)
+        raw_type, raw_width = raw_value.to_s.split("|", 2)
+        normalized = raw_type.to_s.strip.downcase.tr("-", "_")
+        next unless README_TOP_LOGO_OPTIONS.include?(normalized)
+
+        {type: normalized, width: normalized_readme_logo_width(raw_width)}
       end.uniq
+    end
+
+    def normalized_readme_logo_width(value)
+      clean = value.to_s.strip
+      return nil if clean.empty?
+
+      clean
     end
 
     def readme_top_logo_entries(config, org:, gem_name:, repository: {})
       configured = configured_readme_top_logo_entries(config, org: org, gem_name: gem_name, repository: repository)
       return readme_top_logo_entries_with_asset_size(configured) if configured
 
-      entries = readme_top_logo_options(config).filter_map do |option|
-        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
+      entries = readme_logo_specs_from_config(config, "top_logos", "top_logo_options", README_TOP_LOGO_DEFAULTS).filter_map do |spec|
+        readme_top_logo_entry_from_option(spec.fetch(:type), org: org, gem_name: gem_name, repository: repository)&.merge(width: spec[:width])
       end
       entries = deduplicate_readme_top_logo_entries(entries)
       readme_top_logo_entries_with_asset_size(entries)
     end
 
-    def readme_h1_logo_entries(config, org:, gem_name:, repository: {})
-      entries = readme_h1_logo_options(config).filter_map do |option|
-        readme_top_logo_entry_from_option(option, org: org, gem_name: gem_name, repository: repository)
+    def readme_h2_synopsis_logo_entries(config, org:, gem_name:, repository: {})
+      entries = readme_h2_synopsis_logo_specs(config).filter_map do |spec|
+        readme_top_logo_entry_from_option(spec.fetch(:type), org: org, gem_name: gem_name, repository: repository)&.merge(width: spec[:width])
       end
       entries = deduplicate_readme_top_logo_entries(entries)
       readme_top_logo_entries_with_asset_size(entries)
@@ -8988,15 +9039,26 @@ module Kettle
     end
 
     def readme_top_logo_row(entries)
+      default_width = readme_default_logo_width(entries, one: "14%", two: "12%")
       entries.map do |entry|
-        readme_logo_html(entry, align: "right")
+        readme_logo_html(entry, align: "right", width: entry[:width] || default_width)
       end.join(" ")
     end
 
-    def readme_h1_logo_row(entries)
+    def readme_h2_synopsis_logo_row(entries)
+      default_width = readme_default_logo_width(entries, one: "10%", two: "8%")
       entries.map do |entry|
-        readme_logo_html(entry, align: "right", width: "10%")
+        readme_logo_html(entry, align: "right", width: entry[:width] || default_width)
       end.join(" ")
+    end
+
+    def readme_default_logo_width(entries, one:, two:)
+      case entries.length
+      when 1
+        one
+      when 2
+        two
+      end
     end
 
     def readme_top_logo_refs(entries)
@@ -9019,7 +9081,7 @@ module Kettle
 
     def readme_logo_template_tokens(readme_logo)
       {
-        "KJ|README:H1_LOGO_ROW" => readme_logo[:h1_logo_row].to_s,
+        "KJ|README:H2_SYNOPSIS_LOGO_ROW" => readme_logo[:h2_synopsis_logo_row].to_s,
         "KJ|README:TOP_LOGO_ROW" => readme_logo[:top_logo_row].to_s,
         "KJ|README:TOP_LOGO_REFS" => readme_logo[:top_logo_refs].to_s,
       }
