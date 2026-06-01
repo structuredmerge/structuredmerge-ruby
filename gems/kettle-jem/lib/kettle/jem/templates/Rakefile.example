@@ -62,6 +62,7 @@ task :default do
   puts "Default task complete."
 end
 
+# :nocov:
 ### MONOREPO FAMILY TASKS
 if Dir.exist?(File.join(__dir__, "gems")) && Dir.exist?(File.join(__dir__, "workspace-scripts"))
   def family_script_path(script_name)
@@ -120,6 +121,7 @@ if Dir.exist?(File.join(__dir__, "gems")) && Dir.exist?(File.join(__dir__, "work
     end
   end
 end
+# :nocov:
 
 # External gems that define tasks - add here!
 begin
