@@ -75,6 +75,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Workflow templating now normalizes obsolete Appraisal-relative `kettle-test`
+  commands to the canonical project-root `kettle-test` command.
 - Local override Gemfile and gemspec templates no longer emit RuboCop-Gradual
   regressions from trailing commas or unnecessary encoding comments.
 - README logo templating now preserves generated Synopsis H2 logo HTML during

@@ -166,7 +166,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/current.yml
         YAML
-        "template/.github/workflows/current.yml.example" => <<~YAML,
+        "template/.github/workflows/current.yml.example" => <<~YAML
           name: Current
           jobs:
             test:
@@ -181,6 +181,50 @@ RSpec.describe Kettle::Jem do
       })
 
       apply = described_class.apply_project(root, env: {"KJ_EXEC_CMD" => "kettle-test"})
+      workflow_report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/current.yml"
+      end
+
+      expect(workflow_report.fetch(:final_content)).to include('exec_cmd: "kettle-test"')
+    end
+  end
+
+  it "normalizes obsolete Appraisal-relative workflow exec_cmd values" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-obsolete-exec-cmd-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            exec_cmd: env KETTLE_TEST_RUNNER=rspec kettle-test -I ../spec --options ../.rspec ../spec
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .github/workflows/current.yml
+        YAML
+        "template/.github/workflows/current.yml.example" => <<~YAML,
+          name: Current
+          jobs:
+            test:
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "3.2"
+                      exec_cmd: "{KJ|CI:EXEC_CMD}"
+              steps:
+                - run: bundle exec ${{ matrix.exec_cmd }}
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
       workflow_report = apply.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:relative_path) == ".github/workflows/current.yml"
       end

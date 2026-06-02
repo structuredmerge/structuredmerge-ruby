@@ -52,6 +52,11 @@ module Kettle
     ].freeze
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze
+    OBSOLETE_APPRAISAL_SPEC_EXEC_CMDS = [
+      "env KETTLE_TEST_RUNNER=rspec kettle-test -I ../spec --options ../.rspec ../spec",
+      "KETTLE_TEST_RUNNER=rspec kettle-test -I ../spec --options ../.rspec ../spec",
+      "kettle-test -I ../spec --options ../.rspec ../spec"
+    ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
     RRRRBMatrixEntry = Struct.new(
       :ruby,
@@ -10450,7 +10455,16 @@ module Kettle
       workflows = config["workflows"]
       workflows = {} unless workflows.is_a?(Hash)
 
-      preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
+      normalize_github_actions_exec_cmd(
+        preferred_template_token_value("kettle-test", workflows["exec_cmd"], env, "KJ_EXEC_CMD").to_s
+      )
+    end
+
+    def normalize_github_actions_exec_cmd(command)
+      normalized = command.to_s.strip
+      return "kettle-test" if OBSOLETE_APPRAISAL_SPEC_EXEC_CMDS.include?(normalized)
+
+      normalized
     end
 
     def appraisal_recording_enabled?(config)
