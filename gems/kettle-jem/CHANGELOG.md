@@ -57,6 +57,9 @@ Please file a bug if you notice a violation of semantic versioning.
   appraisals can select the newest stable compatible toolchain per Ruby.
 - Generated main Gemfiles now install `nomono` >= 1.0.2 so local workspace
   override Gemfiles can load `nomono/bundler` from the released gem.
+- Generated coverage workflows now pass `K_SOUP_COV_MIN_LINE` and
+  `K_SOUP_COV_MIN_BRANCH` through to Code Coverage Summary thresholds instead
+  of hardcoding `100 100`.
 - Default semantic Git driver setup now writes repo-local `diff.smorg-*`
   command config as well as managed `.gitattributes`, so local `git diff`
   can actually invoke StructuredMerge drivers after templating.

@@ -11055,7 +11055,7 @@ module Kettle
             hide_complexity: true
             indicators: true
             output: both
-            thresholds: '100 100'
+            thresholds: '${{ env.K_SOUP_COV_MIN_LINE }} ${{ env.K_SOUP_COV_MIN_BRANCH }}'
           continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
 
         - name: Add Coverage PR Comment
