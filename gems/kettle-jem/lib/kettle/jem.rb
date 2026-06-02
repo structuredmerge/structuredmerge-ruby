@@ -4245,9 +4245,6 @@ module Kettle
       preserved = content
       preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_BRANCH", branch) if branch
       preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_LINE", line) if line
-      if branch && line
-        preserved = replace_yaml_scalar_line(preserved, "thresholds", "'#{line} #{branch}'")
-      end
       preserved
     end
 
@@ -11039,7 +11036,7 @@ module Kettle
           with:
             use_oidc: true
             disable_search: true
-            fail_ci_if_error: true
+            fail_ci_if_error: false
             files: coverage/lcov.info,coverage/coverage.xml
             verbose: true
 

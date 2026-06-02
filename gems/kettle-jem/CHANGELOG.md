@@ -81,6 +81,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Workflow templating no longer rewrites coverage summary thresholds back to
+  literal numbers after applying destination-specific coverage env values.
+- Generated coverage workflows now keep Codecov upload failures non-gating, so
+  generated coverage reports remain the authoritative CI gate.
+- Generated style workflows now run `rbs validate` through the appraisal bundle
+  instead of the project `bin/rbs` wrapper.
 - Workflow templating now normalizes obsolete Appraisal-relative `kettle-test`
   commands to the canonical project-root `kettle-test` command.
 - Local override Gemfile and gemspec templates no longer emit RuboCop-Gradual
