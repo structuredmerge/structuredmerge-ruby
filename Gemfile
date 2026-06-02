@@ -59,7 +59,7 @@ gemspec path: "gems/smorg-rb"
 
 gem "rake"
 gem "rspec"
-gem "token-resolver", "~> 2.0", ">= 2.0.0"
+gem "token-resolver", "~> 2.0", ">= 2.0.1"
 
 gem "appraisal2", "~> 3.0", ">= 3.0.6"
 

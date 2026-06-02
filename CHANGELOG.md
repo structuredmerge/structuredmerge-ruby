@@ -19,6 +19,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ## [Unreleased]
 ### Added
 ### Changed
+- `ast-merge` now requires `token-resolver` 2.0.1 or newer.
 ### Deprecated
 ### Removed
 ### Fixed

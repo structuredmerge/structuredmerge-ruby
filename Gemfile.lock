@@ -34,6 +34,7 @@ PATH
   specs:
     ast-merge (7.0.0)
       benchmark
+      token-resolver (~> 2.0, >= 2.0.1)
       tree_haver (= 7.0.0)
       version_gem (~> 1.1, >= 1.1.9)
 
@@ -111,7 +112,7 @@ PATH
       commonmarker-merge (= 7.0.0)
       dotenv-merge (= 7.0.0)
       json-merge (= 7.0.0)
-      kettle-dev (~> 2.0, >= 2.0.5)
+      kettle-dev (~> 2.0, >= 2.0.7)
       kramdown-merge (= 7.0.0)
       markdown-merge (= 7.0.0)
       markly-merge (= 7.0.0)
@@ -119,7 +120,7 @@ PATH
       psych-merge (= 7.0.0)
       rbs-merge (= 7.0.0)
       ruby-merge (= 7.0.0)
-      token-resolver (~> 2.0, >= 2.0.0)
+      token-resolver (~> 2.0, >= 2.0.1)
       toml-merge (= 7.0.0)
       toml-rb (~> 4.2)
       tree_haver (= 7.0.0)
@@ -282,24 +283,24 @@ GEM
     commonmarker (2.8.2-x86_64-linux-musl)
     delegate (0.6.1)
     diff-lcs (1.6.2)
-    gitmoji-regex (2.0.0)
+    gitmoji-regex (2.0.1)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-dev (2.0.5)
-      kettle-test (~> 2.0, >= 2.0.1)
+    kettle-dev (2.0.7)
+      kettle-test (~> 2.0, >= 2.0.2)
       version_gem (~> 1.1, >= 1.1.9)
     kettle-drift (1.0.1)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-test (2.0.1)
-      appraisal2 (~> 3.0, >= 3.0.2)
+    kettle-test (2.0.3)
+      appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
       rspec (~> 3.0)
       rspec-block_is_expected (~> 1.0, >= 1.0.6)
-      rspec-pending_for (~> 0.1, >= 0.1.19)
+      rspec-pending_for (~> 0.1, >= 0.1.20)
       rspec-stubbed_env (~> 1.0, >= 1.0.4)
       rspec_junit_formatter (~> 0.6)
       silent_stream (~> 1.0, >= 1.0.12)
       timecop-rspec (~> 1.0, >= 1.0.3)
-      turbo_tests2 (~> 3.0)
+      turbo_tests2 (~> 3.1, >= 3.1.1)
       version_gem (~> 1.1, >= 1.1.9)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
@@ -357,7 +358,7 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
-    token-resolver (2.0.0)
+    token-resolver (2.0.1)
       parslet (~> 2.0)
       version_gem (~> 1.1, >= 1.1.9)
     toml (0.3.0)
@@ -370,7 +371,7 @@ GEM
     tree_sitter_language_pack (1.8.1-x86_64-darwin)
     tree_sitter_language_pack (1.8.1-x86_64-linux)
     tsort (0.2.0)
-    turbo_tests2 (3.1.0)
+    turbo_tests2 (3.1.1)
       parallel_tests (>= 3.3.0, < 6)
       rspec (>= 3.10)
       version_gem (~> 1.1, >= 1.1.9)
@@ -422,9 +423,10 @@ DEPENDENCIES
   rust-merge!
   smorg-rb!
   stone_checksums (~> 1.0, >= 1.0.3)
-  token-resolver (~> 2.0, >= 2.0.0)
+  token-resolver (~> 2.0, >= 2.0.1)
   toml-merge!
   tree_haver!
+  turbo_tests2 (~> 3.1, >= 3.1.1)
   typescript-merge!
   yaml-merge!
   zip-merge!
@@ -455,13 +457,13 @@ CHECKSUMS
   delegate (0.6.1) sha256=54cf946cacfe05b1c23114edd8fbd8d54e9cea7abf36b95130ab53cc88b8f7e4
   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
   dotenv-merge (7.0.0)
-  gitmoji-regex (2.0.0) sha256=cffeeadaedc1a4fda390d5d1e93b0809feceb444087a84e227add8d1aac5166f
+  gitmoji-regex (2.0.1) sha256=a0afe78c4a2cb4590068c3007a1172ac3f12a73fb289bbc8c7a73c759cf8a2f5
   go-merge (7.0.0)
   json-merge (7.0.0)
-  kettle-dev (2.0.5) sha256=bcefc71737bbf992cc1651b08571bbbe3d8d75995fea5c4d3f8f932ba8e65f24
+  kettle-dev (2.0.7) sha256=748b51e4f257fff4da15402a94d952178d43a2c07ddd9f88c2925ac35829b23a
   kettle-drift (1.0.1) sha256=7438856b85cd0d044f6a5a9349786be2649937c18a7112758fc18379a08904fe
   kettle-jem (7.0.0)
-  kettle-test (2.0.1) sha256=1aa4ca9eae6bce39b2d54a60fef20dfe82de32ea37b9114047f6117388dee5b9
+  kettle-test (2.0.3) sha256=db616394605eaab0f6369b03476d854e66c5d4d9c7a798975837a43685c2a293
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-merge (7.0.0)
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
@@ -503,7 +505,7 @@ CHECKSUMS
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
-  token-resolver (2.0.0) sha256=843a40593c350efe3f381151c142f60132a513c271da9da64baad834b8fa48a5
+  token-resolver (2.0.1) sha256=91d11fbbc0c2c3529fd034a37147480dd589b41d480f88e5429a36d982ff967c
   toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9
   toml-merge (7.0.0)
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
@@ -513,7 +515,7 @@ CHECKSUMS
   tree_sitter_language_pack (1.8.1-x86_64-darwin) sha256=0f1dc08cf951be5702bafc1c9a382ca55c9ac9297b73baed7d68b72d62e4a9d0
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
-  turbo_tests2 (3.1.0) sha256=a240a30fbd6fd6a92c959d2c7994c87aa057b23500dce7d11d41571ddf58e8c2
+  turbo_tests2 (3.1.1) sha256=5b4b03d626f3e5757ef3c450710c9a71f9886f3f421a719e14008ebc1d6b5aa3
   typescript-merge (7.0.0)
   version_gem (1.1.9) sha256=0c1a0962ae543c84a00889bb018d9f14d8f8af6029d26b295d98774e3d2eb9a4
   yaml-merge (7.0.0)
