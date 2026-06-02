@@ -292,10 +292,10 @@ GEM
       parallel (~> 1.10)
       rainbow (>= 2.2.2, < 4.0)
       rubocop (~> 1.0)
-    rubocop-lts (24.1.0)
-      rubocop-ruby3_2 (>= 3.0.0, < 4)
-      standard-rubocop-lts (>= 2.0.2, < 3)
-      version_gem (>= 1.1.2, < 3)
+    rubocop-lts (24.2.0)
+      rubocop-ruby3_2 (~> 3.0, >= 3.0.1)
+      standard-rubocop-lts (~> 2.0, >= 2.0.3)
+      version_gem (~> 1.1, >= 1.1.9)
     rubocop-lts-rspec (1.0.2)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-env (~> 0.1, >= 0.1.0)
@@ -305,8 +305,9 @@ GEM
       standard (>= 1.38, < 2)
       standard-rspec (~> 0.3, >= 0.3.1)
       version_gem (>= 1.1.9, < 3)
-    rubocop-md (1.2.4)
-      rubocop (>= 1.45)
+    rubocop-md (2.0.4)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.72.1)
     rubocop-on-rbs (2.0.0)
       lint_roller (~> 1.1)
       rbs (~> 4.0)
@@ -332,13 +333,13 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-rspec (~> 3.5)
-    rubocop-ruby3_2 (3.0.1)
-      rubocop-gradual (~> 0.3, >= 0.3.4)
-      rubocop-md (~> 1.2, >= 1.2.1)
-      rubocop-rake (~> 0.6)
-      rubocop-thread_safety (~> 0.5, >= 0.5.1)
-      standard-rubocop-lts (~> 2.0, >= 2.0.2)
-      version_gem (>= 1.1.9, < 3)
+    rubocop-ruby3_2 (3.0.2)
+      rubocop-gradual (~> 0.3, >= 0.3.6)
+      rubocop-md (~> 2.0, >= 2.0.4)
+      rubocop-rake (~> 0.7, >= 0.7.1)
+      rubocop-thread_safety (~> 0.7, >= 0.7.3)
+      standard-rubocop-lts (~> 2.0, >= 2.0.3)
+      version_gem (~> 1.1, >= 1.1.9)
     rubocop-thread_safety (0.7.3)
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
@@ -491,11 +492,11 @@ DEPENDENCIES
   rdoc (~> 6.11)
   reek (~> 6.5)
   require_bench (~> 1.0, >= 1.0.4)
-  rubocop-lts (~> 24.1.0)
+  rubocop-lts (~> 24.2.0)
   rubocop-lts-rspec (~> 1.0, >= 1.0.1)
   rubocop-on-rbs (~> 2.0)
   rubocop-packaging (~> 0.6, >= 0.6.0)
-  rubocop-ruby3_2 (~> 3.0.1)
+  rubocop-ruby3_2 (~> 3.0.2)
   ruby-progressbar (~> 1.13)
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
@@ -616,9 +617,9 @@ CHECKSUMS
   rubocop-env (0.1.0) sha256=5ab9a259e71822bf514c8e900a9b68cc2f74ccc87d5493efcd03213f3068e718
   rubocop-factory_bot (2.28.0) sha256=4b17fc02124444173317e131759d195b0d762844a71a29fe8139c1105d92f0cb
   rubocop-gradual (0.3.6) sha256=d70505a81b63f95ff7d987afe66adf559c53708e4abf06328f6e6026b6571993
-  rubocop-lts (24.1.0) sha256=9dcad4db2da2fe2f1f77f98c917d70e7c43eded703da14cd201d4be52a9272aa
+  rubocop-lts (24.2.0) sha256=19a57857ba99cc576ae7f6cb89b612ef7e69102180bd755fd664f78e083c5b1d
   rubocop-lts-rspec (1.0.2) sha256=ad6325f0a30972e0727888e52514b81e98d1d03ff680ab103e7bef48354b36ec
-  rubocop-md (1.2.4) sha256=3e481bb08e2d7479eeba3d02359737074f58dd5694f7a57de4ad8d807fdaf6ff
+  rubocop-md (2.0.4) sha256=0d076b6b5e99dea2ddc928c4bd702497decb9a8400da7808091e02ebcafcfb93
   rubocop-on-rbs (2.0.0) sha256=ce74d1b3d5daead19f4b611623656c185821dfc9aed9c7079bb1e5d7d7c464be
   rubocop-packaging (0.6.0) sha256=fb92bd0fb48e6f8cdb1648d2249b0cd51c2497dcc87340132d22f01edbf558a7
   rubocop-performance (1.26.1) sha256=cd19b936ff196df85829d264b522fd4f98b6c89ad271fa52744a8c11b8f71834
@@ -626,7 +627,7 @@ CHECKSUMS
   rubocop-rspec (3.9.0) sha256=8fa70a3619408237d789aeecfb9beef40576acc855173e60939d63332fdb55e2
   rubocop-rspec-extra (0.3.0) sha256=ee4b6484d0332a0d23c4a465eeb607e41888eb3d4ed479f850b9f5212514f787
   rubocop-rspec_rails (2.32.0) sha256=4a0d641c72f6ebb957534f539d9d0a62c47abd8ce0d0aeee1ef4701e892a9100
-  rubocop-ruby3_2 (3.0.1) sha256=51d6508f991d0b6657dc6aff16914071b4128356822417bc0cceaaec2b113409
+  rubocop-ruby3_2 (3.0.2) sha256=538f70b374ea40b1955b5a93b8bc3afe35af70f27c723c6bf59bc324a515f74f
   rubocop-thread_safety (0.7.3) sha256=067cdd52fbf5deffc18995437e45b5194236eaff4f71de3375a1f6052e48f431
   ruby-merge (7.0.0) sha256=2f3d1f000fa87daae8f86419868fd8647b3b2fbdac92051e665dc1c5efd897d6
   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33

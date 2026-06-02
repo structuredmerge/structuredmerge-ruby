@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates now require `gitmoji-regex` >= 2.0.1.
 - Generated style Gemfiles now use the latest released `rubocop-ruby*`
   wrapper patch constraints for the RuboCop-LTS family.
+- Generated style Gemfiles now use the latest released `rubocop-lts` track
+  constraints for every supported Ruby floor.
 
 ### Deprecated
 
