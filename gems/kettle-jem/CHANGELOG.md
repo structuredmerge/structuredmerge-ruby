@@ -75,6 +75,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Local override Gemfile and gemspec templates no longer emit RuboCop-Gradual
+  regressions from trailing commas or unnecessary encoding comments.
 - README logo templating now preserves generated Synopsis H2 logo HTML during
   README heading normalization, migrates legacy combined `top_logos` config into
   `top_logos` plus `h2_synopsis_logos`, and removes unused old logo link
