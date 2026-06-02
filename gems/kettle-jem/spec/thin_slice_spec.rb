@@ -2315,7 +2315,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:facts).dig(:license, :spdx)).to eq(["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"])
       expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.6"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.7"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.2"')
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
@@ -2369,7 +2369,7 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.6"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.7"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.2"')
     end
   end
@@ -6856,7 +6856,7 @@ RSpec.describe Kettle::Jem do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.6")
+            spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.7")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -6870,7 +6870,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include(%(spec.add_dependency("json", "~> 2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("custom-dev", ">= 1")))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.6")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0", ">= 2.0.7")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.1")))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0")\n))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("rake", "~> 13.0")))
