@@ -194,7 +194,7 @@ Please file a bug if you notice a violation of semantic versioning.
   call `bin/rbs` and `bin/rspec` directly through appraisals.
 - Generated optional Gemfiles now include `rbs` and `stone_checksums`,
   matching the curated binstubs generated during `kettle-jem install`.
-- Updated the generated coverage bundle to require `kettle-soup-cover` 1.1.3 or newer.
+- Updated the generated coverage bundle to require `kettle-soup-cover` 2.0.0 or newer.
 - Removed the generated CodeQL workflow so templated repositories can rely on
   GitHub CodeQL default setup instead of failing from duplicate advanced setup.
 - Generated workflow pruning now treats TruffleRuby 23.1 as Ruby 3.1
