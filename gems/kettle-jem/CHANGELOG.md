@@ -62,6 +62,8 @@ Please file a bug if you notice a violation of semantic versioning.
   can actually invoke StructuredMerge drivers after templating.
 - Runtime dependency `token-resolver` now requires 2.0.1 or newer.
 - Gem templates now require `gitmoji-regex` >= 2.0.1.
+- Gem templates now require `turbo_tests2` >= 3.1.1 for the default
+  `kettle-test` runner.
 - Generated style Gemfiles now use the latest released `rubocop-ruby*`
   wrapper patch constraints for the RuboCop-LTS family.
 - Generated style Gemfiles now use the latest released `rubocop-lts` track

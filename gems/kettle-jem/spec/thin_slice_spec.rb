@@ -2361,6 +2361,7 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
       expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.7"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.2"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.1"')
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
@@ -2415,6 +2416,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:changed_files)).to include("Gemfile")
       expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.7"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.2"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.1"')
     end
   end
 
