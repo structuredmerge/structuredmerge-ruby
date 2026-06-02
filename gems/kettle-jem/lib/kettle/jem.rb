@@ -1121,19 +1121,19 @@ module Kettle
     VAR_HOME_PREFIX = %r{\A/var/home(?=/|\z)}
     VAR_HOME_TEXT = %r{/var/home(?=/|\z)}
     RUBOCOP_VERSION_MAP = [
-      [Gem::Version.new("1.8"), "~> 0.3.0", "rubocop-ruby1_8", "~> 2.0.2"],
-      [Gem::Version.new("1.9"), "~> 2.3.0", "rubocop-ruby1_9", "~> 3.0.2"],
-      [Gem::Version.new("2.0"), "~> 4.2.0", "rubocop-ruby2_0", "~> 3.0.2"],
-      [Gem::Version.new("2.1"), "~> 6.3.0", "rubocop-ruby2_1", "~> 3.0.2"],
-      [Gem::Version.new("2.2"), "~> 8.3.0", "rubocop-ruby2_2", "~> 3.0.2"],
-      [Gem::Version.new("2.3"), "~> 10.3.0", "rubocop-ruby2_3", "~> 3.0.2"],
-      [Gem::Version.new("2.4"), "~> 12.3.0", "rubocop-ruby2_4", "~> 3.0.2"],
-      [Gem::Version.new("2.5"), "~> 14.3.0", "rubocop-ruby2_5", "~> 3.0.2"],
-      [Gem::Version.new("2.6"), "~> 16.3.0", "rubocop-ruby2_6", "~> 3.0.2"],
-      [Gem::Version.new("2.7"), "~> 18.4.0", "rubocop-ruby2_7", "~> 3.0.2"],
-      [Gem::Version.new("3.0"), "~> 20.4.0", "rubocop-ruby3_0", "~> 3.0.2"],
-      [Gem::Version.new("3.1"), "~> 22.3.0", "rubocop-ruby3_1", "~> 3.0.2"],
-      [Gem::Version.new("3.2"), "~> 24.2.0", "rubocop-ruby3_2", "~> 3.0.2"],
+      [Gem::Version.new("1.8"), "\"~> 0.3\", \">= 0.3.0\"", "rubocop-ruby1_8", "\"~> 2.0\", \">= 2.0.2\""],
+      [Gem::Version.new("1.9"), "\"~> 2.3\", \">= 2.3.0\"", "rubocop-ruby1_9", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.0"), "\"~> 4.2\", \">= 4.2.0\"", "rubocop-ruby2_0", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.1"), "\"~> 6.3\", \">= 6.3.0\"", "rubocop-ruby2_1", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.2"), "\"~> 8.3\", \">= 8.3.0\"", "rubocop-ruby2_2", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.3"), "\"~> 10.3\", \">= 10.3.0\"", "rubocop-ruby2_3", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.4"), "\"~> 12.3\", \">= 12.3.0\"", "rubocop-ruby2_4", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.5"), "\"~> 14.3\", \">= 14.3.0\"", "rubocop-ruby2_5", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.6"), "\"~> 16.3\", \">= 16.3.0\"", "rubocop-ruby2_6", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("2.7"), "\"~> 18.4\", \">= 18.4.0\"", "rubocop-ruby2_7", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("3.0"), "\"~> 20.4\", \">= 20.4.0\"", "rubocop-ruby3_0", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("3.1"), "\"~> 22.3\", \">= 22.3.0\"", "rubocop-ruby3_1", "\"~> 3.0\", \">= 3.0.2\""],
+      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.2\""],
     ].freeze
     FORGE_USER_ENV_KEYS = {
       gh_user: "KJ_GH_USER",
