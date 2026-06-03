@@ -83,6 +83,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Framework CI workflow templating no longer emits duplicate matrix environment
+  keys when generated matrix entries are visited through overlapping YAML nodes.
 - Workflow templating no longer rewrites coverage summary thresholds back to
   literal numbers after applying destination-specific coverage env values.
 - Generated coverage workflows now keep Codecov upload failures non-gating, so

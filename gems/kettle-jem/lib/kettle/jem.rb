@@ -4866,6 +4866,7 @@ module Kettle
 
       lines = content.to_s.lines
       inserted_keys = Set.new
+      inserted_locations = Set.new
       yaml_mapping_nodes(content).sort_by { |mapping| -mapping.start_line }.each do |mapping|
         appraisal = yaml_mapping_scalar_value(mapping, "appraisal")
         matrix_env = env_by_appraisal[appraisal]
@@ -4876,9 +4877,11 @@ module Kettle
 
         indent = workflow_matrix_env_indent(lines, mapping)
         additions = matrix_env.reject { |key, _value| yaml_mapping_scalar_value(mapping, key) }
+        additions.reject! { |key, _value| inserted_locations.include?([insert_index, key.to_s]) }
         next if additions.empty?
 
         additions.each_key { |key| inserted_keys << key }
+        additions.each_key { |key| inserted_locations << [insert_index, key.to_s] }
         lines.insert(insert_index, *additions.map { |key, value| %(#{indent}#{key}: #{yaml_double_quoted_scalar(value)}\n) })
       end
       return content if inserted_keys.empty?

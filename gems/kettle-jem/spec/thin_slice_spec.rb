@@ -5830,6 +5830,7 @@ RSpec.describe Kettle::Jem do
       expect(workflow_content).to include("KJ_FRAMEWORK_MATRIX_GEM: ${{ matrix.KJ_FRAMEWORK_MATRIX_GEM || '' }}")
       expect(workflow_content).to include("RAILS_MAJOR_MINOR: ${{ matrix.RAILS_MAJOR_MINOR || '' }}")
       expect(workflow_content).to include('KJ_FRAMEWORK_MATRIX_GEM: "rails"')
+      expect(workflow_content.scan(/KJ_FRAMEWORK_MATRIX_GEM: "rails"/).size).to eq(1)
       expect(workflow_content).to include('RAILS_MAJOR_MINOR: "7.2"')
       expect(File.read(File.join(root, "gemfiles/rails_7_2.gemfile"))).to include('gem "combustion", "~> 1.5"')
       expect(File).not_to exist(File.join(root, ".github/workflows/framework-ci.yml"))
