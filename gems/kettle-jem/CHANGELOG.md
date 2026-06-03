@@ -27,6 +27,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated auto-assign workflows now pin `pozil/auto-assign-issue` to the
+  immutable SHA for v4.
 - Documented `kettle-jem install` as the canonical full templating entrypoint
   and marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
 - Bare `kettle-jem template` now aliases to the full install path; use
