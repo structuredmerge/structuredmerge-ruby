@@ -4200,13 +4200,16 @@ module Kettle
         merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root) if template_file_type(recipe) == :toml
         return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
-        return finalize_github_workflow_template(merged, facts) if github_workflow_template_recipe?(recipe)
+        if github_workflow_template_recipe?(recipe)
+          merged = preserve_github_workflow_project_settings(recipe, merged, original, project_root: project_root)
+          return finalize_github_workflow_template(merged, facts)
+        end
 
         return merged
       end
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
-        accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
+        accepted = preserve_github_workflow_project_settings(recipe, accepted, original, project_root: project_root) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
         accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
         return (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
@@ -4296,15 +4299,32 @@ module Kettle
       synchronize_github_actions_framework_ci(content, facts)
     end
 
-    def preserve_github_workflow_project_settings(recipe, content, destination_content)
+    def preserve_github_workflow_project_settings(recipe, content, destination_content, project_root:)
       return content unless recipe.fetch(:target_path).to_s == ".github/workflows/coverage.yml"
 
-      branch = yaml_scalar_line_value(destination_content, "K_SOUP_COV_MIN_BRANCH")
-      line = yaml_scalar_line_value(destination_content, "K_SOUP_COV_MIN_LINE")
+      thresholds = coverage_thresholds_from_project_mise(project_root)
+      thresholds = coverage_thresholds_from_yaml_workflow(destination_content) if thresholds.empty?
       preserved = content
-      preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_BRANCH", branch) if branch
-      preserved = replace_yaml_scalar_line(preserved, "K_SOUP_COV_MIN_LINE", line) if line
+      thresholds.each do |key, value|
+        preserved = replace_yaml_scalar_line(preserved, key, value)
+      end
       preserved
+    end
+
+    def coverage_thresholds_from_project_mise(project_root)
+      return {} if project_root.to_s.empty?
+
+      path = File.join(project_root.to_s, "mise.toml")
+      return {} unless File.file?(path)
+
+      coverage_thresholds_from_mise(File.read(path))
+    end
+
+    def coverage_thresholds_from_yaml_workflow(content)
+      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+        value = yaml_scalar_line_value(content, key)
+        thresholds[key] = value if value
+      end
     end
 
     def postprocess_readme_content(content, facts, project_root: nil)

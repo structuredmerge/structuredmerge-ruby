@@ -86,6 +86,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Coverage workflow templating now preserves `K_SOUP_COV_MIN_LINE` and
+  `K_SOUP_COV_MIN_BRANCH` from `mise.toml`, keeping the generated SimpleCov
+  hard gate aligned with the project's configured thresholds.
 - Framework CI workflow templating no longer emits duplicate matrix environment
   keys when generated matrix entries are visited through overlapping YAML nodes.
 - Gemspec templating no longer preserves stale `kettle-soup-cover` development

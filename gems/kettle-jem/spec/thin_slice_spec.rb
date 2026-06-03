@@ -4624,6 +4624,48 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves coverage thresholds from mise.toml in generated coverage workflow" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-coverage-thresholds", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        "mise.toml" => <<~TOML,
+          [env]
+          K_SOUP_COV_MIN_BRANCH = "76"
+          K_SOUP_COV_MIN_LINE = "100"
+        TOML
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: .github/workflows/coverage.yml
+                target: .github/workflows/coverage.yml
+        YAML
+        "template/.github/workflows/coverage.yml" => <<~YAML,
+          name: Test Coverage
+
+          env:
+            K_SOUP_COV_MIN_BRANCH: 100
+            K_SOUP_COV_MIN_LINE: 100
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {only: ".github/workflows/coverage.yml", skip_commit: true})
+      workflow = File.read(File.join(root, ".github", "workflows", "coverage.yml"))
+
+      expect(apply.fetch(:changed_files)).to include(".github/workflows/coverage.yml")
+      expect(workflow).to include("K_SOUP_COV_MIN_BRANCH: 76")
+      expect(workflow).to include("K_SOUP_COV_MIN_LINE: 100")
+    end
+  end
+
   it "bootstraps version_gem touchpoints before bundled setup" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
