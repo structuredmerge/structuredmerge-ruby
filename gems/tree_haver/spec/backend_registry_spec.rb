@@ -19,6 +19,23 @@ RSpec.describe TreeHaver::BackendRegistry do
     end
   end
 
+  it "loads MRI tree-sitter languages with a string language name" do
+    stub_const("TreeSitter", Module.new)
+    language_class = class_double("TreeSitter::Language")
+    stub_const("TreeSitter::Language", language_class)
+    allow(TreeHaver::Backends::MRI).to receive(:available?).and_return(true)
+
+    expect(language_class).to receive(:load).with("json", "/workspace/libtree-sitter-json.so").and_return(:native_language)
+
+    language = TreeHaver::Backends::MRI::Language.from_library(
+      "/workspace/libtree-sitter-json.so",
+      symbol: "tree_sitter_json",
+      name: :json,
+    )
+
+    expect(language).to be_a(TreeHaver::Backends::MRI::Language)
+  end
+
   describe ".register_tag" do
     let(:tag_name) { :example_backend }
     let(:backend_name) { :example }

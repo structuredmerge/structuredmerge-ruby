@@ -2713,6 +2713,7 @@ module Kettle
         bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
         project_emoji = preferred_template_token_value(nil, nil, env, "KJ_PROJECT_EMOJI")
         project_emoji ||= readme_project_emoji(project_root)
+        project_emoji ||= gemspec_project_emoji(gemspec_metadata)
         project_emoji ||= "💎" if monorepo_subgem_template_profile_value?(template_selection[:template_profile])
         bootstrap[:project_emoji] = project_emoji
       end
@@ -4196,6 +4197,7 @@ module Kettle
       end
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts)
+        merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root) if template_file_type(recipe) == :toml
         return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
         return finalize_github_workflow_template(merged, facts) if github_workflow_template_recipe?(recipe)
@@ -4203,7 +4205,7 @@ module Kettle
         return merged
       end
       if strategy == "accept_template"
-        accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts)
+        accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
         accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
@@ -4214,7 +4216,7 @@ module Kettle
       (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
     end
 
-    def finalize_accepted_template_source(recipe, content, destination_content, facts:)
+    def finalize_accepted_template_source(recipe, content, destination_content, facts:, project_root: nil)
       case template_file_type(recipe)
       when :gemfile
         finalize_gemfile_template_source(recipe, content, destination_content, facts: facts, template_content: content)
@@ -4225,9 +4227,66 @@ module Kettle
         receiver = gemspec_block_param(content) || "spec"
         pruned = remove_gemspec_self_dependency_lines(content, package_name, receiver: receiver)
         rewrite_gemspec_version_loader(pruned, facts: facts)
+      when :toml
+        preserve_mise_project_settings(recipe, content, destination_content, project_root: project_root)
       else
         content
       end
+    end
+
+    def preserve_mise_project_settings(recipe, content, destination_content, project_root:)
+      return content unless recipe.fetch(:target_path).to_s == "mise.toml"
+
+      thresholds = coverage_thresholds_from_mise(destination_content)
+      thresholds = coverage_thresholds_from_workflow(project_root) if thresholds.empty?
+      thresholds.reduce(content.to_s) do |preserved, (key, value)|
+        replace_toml_string_scalar_line(preserved, key, value)
+      end
+    end
+
+    def coverage_thresholds_from_mise(content)
+      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+        value = toml_string_scalar_line_value(content, key)
+        thresholds[key] = value if value
+      end
+    end
+
+    def coverage_thresholds_from_workflow(project_root)
+      return {} if project_root.to_s.empty?
+
+      path = File.join(project_root.to_s, ".github", "workflows", "coverage.yml")
+      return {} unless File.file?(path)
+
+      content = File.read(path)
+      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+        value = yaml_scalar_line_value(content, key)
+        thresholds[key] = value.to_s.delete_prefix("\"").delete_suffix("\"") if value
+      end
+    end
+
+    def toml_string_scalar_line_value(content, key)
+      content.to_s.lines.each do |line|
+        stripped = line.strip
+        next if stripped.start_with?("#")
+        next unless stripped.start_with?("#{key} ")
+
+        value = stripped.split("=", 2).last.to_s.strip
+        return value[1...-1] if value.start_with?("\"") && value.end_with?("\"")
+        return value unless value.empty?
+      end
+      nil
+    end
+
+    def replace_toml_string_scalar_line(content, key, value)
+      lines = content.to_s.lines
+      lines.each_with_index do |line, index|
+        next unless line.strip.start_with?("#{key} ")
+
+        indent = line[/\A\s*/]
+        lines[index] = "#{indent}#{key} = #{JSON.generate(value.to_s)}\n"
+        return lines.join
+      end
+      content
     end
 
     def prepare_github_workflow_template(content, recipe, facts)
@@ -6879,6 +6938,17 @@ module Kettle
       h1 = markdown_heading_owners(File.read(readme_path), source_label: "README.md").find { |owner| owner.level == 1 }
       candidate = first_grapheme(h1&.heading_text)
       decorative_grapheme?(candidate) ? candidate : nil
+    end
+
+    def gemspec_project_emoji(gemspec_metadata)
+      [
+        metadata_value(gemspec_metadata, :summary),
+        metadata_value(gemspec_metadata, :description),
+      ].each do |value|
+        candidate = first_grapheme(value)
+        return candidate if decorative_grapheme?(candidate)
+      end
+      nil
     end
 
     def first_grapheme(text)

@@ -5,6 +5,7 @@ require "fileutils"
 require "open3"
 require "optparse"
 require "set"
+require "shellwords"
 require "rubygems"
 require "tsort"
 
@@ -100,6 +101,12 @@ def run!(argv, env: {}, chdir: nil)
   raise "Command failed (#{status.exitstatus}): #{argv.shelljoin}"
 end
 
+def run(argv, env: {}, chdir: nil)
+  options = {}
+  options[:chdir] = chdir if chdir
+  Open3.capture3(env, *argv, **options)
+end
+
 def gemspecs_under(root)
   Dir.glob(File.join(root, "*", "*.gemspec")).sort
 end
@@ -164,8 +171,19 @@ def build_and_install(entry)
 
   puts "== build #{spec.name} #{spec.version}"
   run!(["gem", "build", gemspec, "--output", gem_path], env: {"SKIP_GEM_SIGNING" => "true"}, chdir: dir)
+  uninstall_existing(spec.name)
   puts "== install #{File.basename(gem_path)}"
   run!(["gem", "install", "--force", "--no-document", "--local", gem_path])
+end
+
+def uninstall_existing(name)
+  stdout, stderr, status = run(["gem", "uninstall", name, "--all", "--ignore-dependencies", "--executables"])
+  return if status.success?
+  return if stdout.include?("not installed") || stderr.include?("not installed")
+
+  warn stdout unless stdout.empty?
+  warn stderr unless stderr.empty?
+  raise "Command failed (#{status.exitstatus}): gem uninstall #{name.shellescape} --all --ignore-dependencies --executables"
 end
 
 specs_by_name = local_specs(options.fetch(:roots).uniq, options.fetch(:gem_names).uniq)

@@ -209,6 +209,7 @@ module Json
         @ast = parser.parse(@source)
 
         collect_parse_errors(@ast.root_node) if @ast&.root_node
+        parse_synthetic_json(@errors.dup) unless @errors.empty?
       rescue TreeHaver::Error => e
         parse_synthetic_json(e)
       rescue StandardError => e
@@ -216,10 +217,12 @@ module Json
       end
 
       def parse_synthetic_json(original_error)
-        JSON.parse(Json::Merge.send(:strip_json_comments, @source))
+        normalized = Json::Merge.send(:strip_json_comments, @source)
+        JSON.parse(Json::Merge.send(:strip_trailing_commas, normalized))
+        @errors = []
         @ast = SyntheticParser.new(@source).parse
       rescue StandardError
-        @errors << original_error
+        @errors.concat(Array(original_error))
         @ast = nil
       end
 

@@ -32,6 +32,11 @@ Please file a bug if you notice a violation of semantic versioning.
   nodes, so semantic Ruby merges do not leave duplicate interstitial blank lines
   after de-duplicating requires.
 - `ast-merge` now declares its runtime `token-resolver` dependency explicitly.
+- `tree_haver` now passes string language names to ruby_tree_sitter when loading
+  MRI backend grammars, fixing Ruby 4 parser setup for local shared-library
+  grammars.
+- `json-merge` now accepts devcontainer-style JSONC files with comments and
+  trailing commas through its synthetic parser fallback.
 ### Security
 
 ## [7.0.0] - 2026-05-05

@@ -236,7 +236,7 @@ module TreeHaver
             # and path_to_so is the full path to the .so file
             #
             # If name is not provided, derive it from symbol using shared utility
-            language_name = name || LibraryPathUtils.derive_language_name_from_symbol(symbol)
+            language_name = (name || LibraryPathUtils.derive_language_name_from_symbol(symbol)).to_s
             ts_lang = ::TreeSitter::Language.load(language_name, path)
             new(ts_lang, path: path, symbol: symbol)
           rescue NameError => e

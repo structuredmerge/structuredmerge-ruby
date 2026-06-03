@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
   command config as well as managed `.gitattributes`, so local `git diff`
   can actually invoke StructuredMerge drivers after templating.
 - Runtime dependency `token-resolver` now requires 2.0.1 or newer.
+- Generated gemspecs now require `version_gem` >= 1.0.10 while allowing the
+  released 1.0 line.
 - Gem templates now require `gitmoji-regex` >= 2.0.1.
 - Gem templates now require `turbo_tests2` >= 3.1.1 for the default
   `kettle-test` runner.
@@ -206,6 +208,16 @@ Please file a bug if you notice a violation of semantic versioning.
 - Changed post-template lockfile normalization to run `bundle update` with
   templating and local sibling overrides disabled, so dependency template
   updates are fully re-resolved against released gems.
+- `kettle-jem install --accept-config` now immediately applies the newly
+  bootstrapped canonical config before running bundle setup and bundled handoff,
+  so first-time templating installs generate the Gemfile templating wiring that
+  makes `bundle exec kettle-jem` available.
+- First-time config bootstrap now seeds `project_emoji` from the destination
+  gemspec summary or description when the README does not expose a leading H1
+  emoji.
+- Generated `mise.toml` files now preserve existing coverage thresholds from
+  the destination `mise.toml` or legacy coverage workflow, so local
+  `kettle-test` runs keep the project's established coverage floor.
 - Added curated `rbs` and `rspec-core` binstubs because generated CI templates
   call `bin/rbs` and `bin/rspec` directly through appraisals.
 - Generated optional Gemfiles now include `rbs` and `stone_checksums`,

@@ -37,6 +37,7 @@ module Kettle
           effective_run_options = install_run_options(env, run_options)
           config_migration_step = kettle_config_migration_step(project_root)
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: effective_run_options)
+          report = followup_apply_after_config_bootstrap(project_root, env: env, run_options: effective_run_options, report: report)
           install_steps = []
           install_steps << config_migration_step if config_migration_step
           install_steps << gemspec_dependency_sync_step(report)
@@ -70,6 +71,37 @@ module Kettle
 
         def install_run_options(env, run_options)
           Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
+        end
+
+        def followup_apply_after_config_bootstrap(project_root, env:, run_options:, report:)
+          return report unless config_bootstrap_changed?(report)
+
+          followup = Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
+          merge_apply_reports(report, followup).merge(
+            bootstrap_followup_apply: {
+              status: "applied",
+              reason: "canonical_config_bootstrapped",
+            },
+          )
+        end
+
+        def config_bootstrap_changed?(report)
+          report.fetch(:recipe_reports, []).any? do |recipe_report|
+            recipe_report.fetch(:relative_path, nil) == Kettle::Jem::KETTLE_CONFIG_PATH &&
+              recipe_report.fetch(:recipe_name, nil) == "kettle_config_bootstrap" &&
+              recipe_report.fetch(:changed, false)
+          end
+        end
+
+        def merge_apply_reports(initial, followup)
+          merged = followup.merge(
+            changed_files: (initial.fetch(:changed_files, []) + followup.fetch(:changed_files, [])).uniq,
+            recipe_reports: initial.fetch(:recipe_reports, []) + followup.fetch(:recipe_reports, []),
+            post_apply_steps: initial.fetch(:post_apply_steps, []) + followup.fetch(:post_apply_steps, []),
+            diagnostics: initial.fetch(:diagnostics, []) + followup.fetch(:diagnostics, []),
+          )
+          merged[:changed] = initial.fetch(:changed, false) || followup.fetch(:changed, false) if initial.key?(:changed) || followup.key?(:changed)
+          merged
         end
 
         def kettle_config_migration_step(project_root)

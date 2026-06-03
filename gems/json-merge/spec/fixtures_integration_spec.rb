@@ -47,6 +47,25 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
+  it "analyzes devcontainer-style JSONC with comments and trailing commas through the synthetic fallback" do
+    source = <<~JSON
+      {
+        // devcontainer files commonly use JSONC comments.
+        "name": "Ruby",
+        "customizations": {
+          "jetbrains": {
+            "backend": "RubyMine"
+          }
+        },
+      }
+    JSON
+
+    analysis = described_class::FileAnalysis.new(source)
+
+    expect(analysis).to be_valid
+    expect(analysis.root_object).not_to be_nil
+  end
+
   it "conforms to the structure fixtures" do
     object_fixture = json_fixture("structure_json")
     object_result = described_class.parse_json(object_fixture[:source], object_fixture[:dialect])

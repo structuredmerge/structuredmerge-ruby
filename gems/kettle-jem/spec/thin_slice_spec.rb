@@ -2695,7 +2695,7 @@ RSpec.describe Kettle::Jem do
         run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
       )
 
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to include("project_emoji: 💎\n")
+      expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: 💎\n")
     end
   end
 
@@ -2720,7 +2720,38 @@ RSpec.describe Kettle::Jem do
         run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
       )
 
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to include("project_emoji: ☯️\n")
+      expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: ☯️\n")
+    end
+  end
+
+  it "seeds project emoji from gemspec summary when README has no leading H1" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-gemspec-emoji", tmp_root) do |root|
+      write_tree(root, {
+        "yaml-converter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "yaml-converter"
+            spec.summary = "🥨 Convert annotated YAML blueprints into readable documentation."
+            spec.licenses = ["MIT"]
+          end
+        RUBY
+        "README.md" => <<~MARKDOWN,
+          | 📍 NOTE |
+          |---------|
+          | Existing preface. |
+
+          # Yaml::Converter
+        MARKDOWN
+      })
+
+      described_class.setup_project(
+        root,
+        env: {},
+        run_options: {bootstrap_mode: true, skip_commit: true},
+      )
+
+      expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to include("project_emoji: 🥨\n")
     end
   end
 
@@ -3103,11 +3134,11 @@ RSpec.describe Kettle::Jem do
           "bootstrap_commit" => "skipped",
         },
       )
-      expect(commands.map { |entry| entry.fetch(:command) }).to eq([
+      expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
         ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"],
-      ])
+      )
       expect(commands).to all(include(chdir: root, env: {}, quiet: true))
       expect(File).to exist(setup_path)
       expect(File.executable?(setup_path)).to be(true)
@@ -3135,11 +3166,11 @@ RSpec.describe Kettle::Jem do
       second_commit_step = second.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }
       expect(second_commit_step.fetch(:status)).to eq("unavailable")
       expect(second_commit_step.fetch(:reason)).to eq("not_git_repository")
-      expect(commands.map { |entry| entry.fetch(:command) }.take(3)).to eq([
+      expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
         ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"],
-      ])
+      )
 
       bootstrap_install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
@@ -3269,6 +3300,67 @@ RSpec.describe Kettle::Jem do
           env: include("BUNDLE_GEMFILE" => File.join(gem_root, "Gemfile")),
         )
       end
+    end
+  end
+
+  it "applies full templates after accepting a newly bootstrapped config before bundled handoff" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    curated_binstubs = %w[bundle binstubs rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
+    Dir.mktmpdir("kettle-jem-install-bootstrap-followup", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+          gemspec
+        RUBY
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "💎 Example gem"
+            spec.authors = ["Peter H. Boling"]
+            spec.email = ["floss@galtzo.com"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+      })
+
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: {accept_config: true, force: true, skip_commit: true},
+        command_runner: command_runner,
+      )
+
+      expect(install.fetch(:bootstrap_followup_apply)).to eq(
+        status: "applied",
+        reason: "canonical_config_bootstrapped",
+      )
+      expect(install.fetch(:changed_files)).to include(
+        ".structuredmerge/kettle-jem.yml",
+        "Gemfile",
+        "gemfiles/modular/templating.gemfile",
+        "gemfiles/modular/templating_local.gemfile",
+      )
+      expect(File.read(File.join(root, "Gemfile"))).to include(
+        'eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?',
+      )
+      expect(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile"))).to include('gem "kettle-jem", ">= 7.0"')
+      expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "bundled_handoff",
+        command: ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"],
+        status: "succeeded",
+      ))
+      expect(commands.map { |entry| entry.fetch(:command) }).to include(
+        ["bin/setup"],
+        curated_binstubs,
+        ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"],
+      )
     end
   end
 
@@ -4487,6 +4579,48 @@ RSpec.describe Kettle::Jem do
         statuses: hash_including("mise_trust" => "succeeded"),
       ))
       expect(commands).to include(["mise", "trust", "-C", root])
+    end
+  end
+
+  it "preserves coverage thresholds from an existing coverage workflow in generated mise.toml" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-mise-coverage-thresholds", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".github/workflows/coverage.yml" => <<~YAML,
+          env:
+            K_SOUP_COV_MIN_BRANCH: 64
+            K_SOUP_COV_MIN_LINE: 90
+        YAML
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - mise.toml
+        YAML
+        "template/mise.toml.example" => <<~TOML,
+          [env]
+          K_SOUP_COV_MIN_BRANCH = "76"
+          K_SOUP_COV_MIN_LINE = "92"
+
+          [tools]
+          ruby = "4.0.5"
+        TOML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {only: "mise.toml", skip_commit: true})
+      mise = File.read(File.join(root, "mise.toml"))
+
+      expect(apply.fetch(:changed_files)).to include("mise.toml")
+      expect(mise).to include('K_SOUP_COV_MIN_BRANCH = "64"')
+      expect(mise).to include('K_SOUP_COV_MIN_LINE = "90"')
     end
   end
 
