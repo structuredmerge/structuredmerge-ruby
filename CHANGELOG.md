@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem` JRuby 9.4 workflow templates now install RubyGems 3.6.9 and
+  Bundler 2.6.9 instead of using the default JRuby toolchain.
 - Local template stack reinstalls now uninstall the selected StructuredMerge Ruby
   gems before reinstalling them, and no longer install sibling `kettle-rb` or
   `galtzo-floss` gems by default.
