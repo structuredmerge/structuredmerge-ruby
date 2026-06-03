@@ -115,7 +115,7 @@ module Kettle
     ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = RRRRB_MATRIX.each_with_object({}) do |(name, entry), result|
       result[name] = entry.workflow_ruby if entry.workflow_ruby
     end.freeze
-    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift].freeze
+    RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover].freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
       supplied_opt_in_workflow_deletion
@@ -11263,7 +11263,7 @@ module Kettle
         "github/codeql-action/init" => "github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
         "github/codeql-action/autobuild" => "github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
         "github/codeql-action/analyze" => "github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
-        "pozil/auto-assign-issue" => "pozil/auto-assign-issue@70adb98ca8b3941524e9ecde48e89067c4f96736 # v3.0.0",
+        "pozil/auto-assign-issue" => "pozil/auto-assign-issue@07fe6dc0e9771842b428f5739098d6140734e226 # v4",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0",
         "kettle-rb/ts-grammar-action" => "kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0",

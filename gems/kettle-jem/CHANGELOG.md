@@ -87,6 +87,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Framework CI workflow templating no longer emits duplicate matrix environment
   keys when generated matrix entries are visited through overlapping YAML nodes.
+- Gemspec templating no longer preserves stale `kettle-soup-cover` development
+  dependencies now that coverage dependencies are owned by the modular coverage
+  Gemfile.
+- Workflow action pin normalization now keeps `pozil/auto-assign-issue` on the
+  pinned v4 ref.
 - Workflow templating no longer rewrites coverage summary thresholds back to
   literal numbers after applying destination-specific coverage env values.
 - Generated coverage workflows now keep Codecov upload failures non-gating, so
