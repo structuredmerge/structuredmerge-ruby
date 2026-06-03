@@ -22,6 +22,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `kettle-jem` gem templates now require `kettle-dev` 2.0.8 or newer.
 - `ast-merge` now requires `token-resolver` 2.0.1 or newer.
 
 ### Deprecated
