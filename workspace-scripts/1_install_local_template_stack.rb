@@ -14,9 +14,6 @@ RUBY_WORKSPACE = File.expand_path("..", SCRIPT_DIR)
 KETTLE_ROOT = File.expand_path("../..", RUBY_WORKSPACE)
 DEFAULT_ROOTS = [
   File.join(RUBY_WORKSPACE, "gems"),
-  File.join(KETTLE_ROOT, "kettle-rb"),
-  File.join(KETTLE_ROOT, "galtzo-floss"),
-  File.expand_path("~/src/galtzo-floss"),
 ].uniq.freeze
 
 DEFAULT_GEMS = %w[
@@ -34,16 +31,10 @@ DEFAULT_GEMS = %w[
   dotenv-merge
   go-merge
   json-merge
-  kettle-dev
-  kettle-drift
   kettle-jem
-  kettle-jem-appraisals
-  kettle-soup-cover
-  kettle-test
   kramdown-merge
   markdown-merge
   markly-merge
-  nomono
   parslet-toml-merge
   plain-merge
   prism-merge
@@ -52,16 +43,9 @@ DEFAULT_GEMS = %w[
   ruby-merge
   rust-merge
   smorg-rb
-  stone_checksums
-  token-resolver
   toml-merge
-  turbo_tests2
   typescript-merge
-  yaml-converter
   yaml-merge
-  yard-fence
-  yard-timekeeper
-  yard-yaml
   zip-merge
 ].freeze
 
@@ -171,7 +155,6 @@ def build_and_install(entry)
 
   puts "== build #{spec.name} #{spec.version}"
   run!(["gem", "build", gemspec, "--output", gem_path], env: {"SKIP_GEM_SIGNING" => "true"}, chdir: dir)
-  uninstall_existing(spec.name)
   puts "== install #{File.basename(gem_path)}"
   run!(["gem", "install", "--force", "--no-document", "--local", gem_path])
 end
@@ -192,4 +175,5 @@ warn "Skipping missing local gems: #{missing.join(", ")}" unless missing.empty?
 selected = options.fetch(:gem_names).uniq & specs_by_name.keys
 ordered = dependency_order(selected, specs_by_name)
 
+ordered.each { |name| uninstall_existing(name) }
 ordered.each { |name| build_and_install(specs_by_name.fetch(name)) }

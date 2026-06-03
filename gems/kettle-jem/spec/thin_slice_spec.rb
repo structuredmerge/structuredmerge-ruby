@@ -2155,7 +2155,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -2199,7 +2199,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
           end
         RUBY
         "lib/example/gem/version.rb" => <<~RUBY,
@@ -2243,7 +2243,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "turbo_tests2"
             spec.version = "3.0.0"
             spec.summary = "Turbo tests"
-            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -4649,7 +4649,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.9"
+            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
           end
         RUBY
       })
@@ -6975,7 +6975,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 4.0"
-            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")
+            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
@@ -7031,7 +7031,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 3.2"
-            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")
+            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
@@ -7084,7 +7084,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 2.4"
-            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")
+            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
@@ -8190,6 +8190,50 @@ RSpec.describe Kettle::Jem do
         "KJ|FUNDING:PAYPAL" => "env-paypal",
         "KJ|FUNDING:POLAR" => "config-polar",
       )
+    end
+  end
+
+  it "normalizes SECURITY.md supported version token from the gem version" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    {
+      "0.2.0" => "0.latest",
+      "2.5.7" => "2.5.latest",
+    }.each do |gem_version, supported_version|
+      Dir.mktmpdir("kettle-jem-security-version-token-slice", tmp_root) do |root|
+        write_tree(root, {
+          "example.gemspec" => <<~RUBY,
+            Gem::Specification.new do |spec|
+              spec.name = "example"
+              spec.summary = "Example gem"
+              spec.version = "#{gem_version}"
+            end
+          RUBY
+          ".kettle-jem.yml" => <<~YAML,
+            templates:
+              root: template
+              apply: true
+              entries:
+                - SECURITY.md
+          YAML
+          "template/SECURITY.md.example" => <<~MARKDOWN,
+            | Version  | Supported |
+            |----------|-----------|
+            | {KJ|SECURITY:SUPPORTED_VERSION} | ✅         |
+          MARKDOWN
+        })
+
+        plan = described_class.plan_project(root, env: {})
+        template_report = plan[:recipe_reports].find do |report|
+          report.fetch(:recipe_name).start_with?("template_source_") &&
+            report.fetch(:recipe_name).end_with?("_SECURITY_md")
+        end
+        expect(template_report.fetch(:final_content)).to include("| #{supported_version} | ✅")
+        expect(template_report.dig(:metadata, :template_tokens)).to include(
+          "KJ|SECURITY:SUPPORTED_VERSION" => supported_version,
+        )
+      end
     end
   end
 

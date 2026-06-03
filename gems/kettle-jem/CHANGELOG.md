@@ -302,8 +302,11 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Security
 
 ## [7.0.0] - 2026-05-05
+
 - TAG: [v7.0.0][7.0.0t]
+
 ### Added
+
 - Released kettle-jem as part of the initial StructuredMerge Ruby 7.0.0 gem set.
 - Included packaged templates and parser-backed merge support for Ruby gem templating.
 

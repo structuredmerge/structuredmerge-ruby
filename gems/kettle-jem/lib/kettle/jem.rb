@@ -7785,6 +7785,7 @@ module Kettle
         "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require, package.fetch(:name).to_s.tr("-", "/")).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
         "KJ|GEM_MAJOR" => gem_major_token(facts.fetch(:project_runtime, {})[:version]),
+        "KJ|SECURITY:SUPPORTED_VERSION" => security_supported_version_token(facts.fetch(:project_runtime, {})[:version]),
         "KJ|GH_ORG" => github_org,
         "KJ|NAMESPACE" => rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s,
         "KJ|NAMESPACE_SHIELD" => shield_token(rubygems.fetch(:namespace, package.fetch(:name).to_s).to_s),
@@ -7957,6 +7958,17 @@ module Kettle
       Gem::Version.new(version.to_s).segments.first.to_s
     rescue ArgumentError
       "0"
+    end
+
+    def security_supported_version_token(version)
+      parsed = Gem::Version.new(version.to_s)
+      major = parsed.segments.fetch(0, 0).to_i
+      return "0.latest" if major.zero?
+
+      minor = parsed.segments.fetch(1, 0).to_i
+      "#{major}.#{minor}.latest"
+    rescue ArgumentError
+      "0.latest"
     end
 
     def valid_gem_version?(version)

@@ -17,12 +17,22 @@ Please file a bug if you notice a violation of semantic versioning.
 [📗keep-changelog-img]: https://img.shields.io/badge/keep--a--changelog-1.0.0-FFDD67.svg?style=flat
 
 ## [Unreleased]
+
 ### Added
+
 ### Changed
+
 - `ast-merge` now requires `token-resolver` 2.0.1 or newer.
+
 ### Deprecated
+
 ### Removed
+
 ### Fixed
+
+- Local template stack reinstalls now uninstall the selected StructuredMerge Ruby
+  gems before reinstalling them, and no longer install sibling `kettle-rb` or
+  `galtzo-floss` gems by default.
 - Ruby merges now place template-only top-level nodes at their template anchor by
   default instead of appending them to the destination tail.
 - Ruby merges now defer template-only top-level groups behind later destination
@@ -37,11 +47,15 @@ Please file a bug if you notice a violation of semantic versioning.
   grammars.
 - `json-merge` now accepts devcontainer-style JSONC files with comments and
   trailing commas through its synthetic parser fallback.
+
 ### Security
 
 ## [7.0.0] - 2026-05-05
+
 - TAG: [v7.0.0][7.0.0t]
+
 ### Added
+
 - Released the initial StructuredMerge Ruby gem set at version 7.0.0.
 - Published the parser-backed merge gems and kettle-jem templating tool from this monorepo.
 
