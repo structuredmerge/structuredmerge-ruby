@@ -376,7 +376,7 @@ For GitHub Actions workflows, the template always wins for `uses:` lines
 
 ```yaml
 # Template updates this SHA automatically:
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0
 
 # Your matrix customizations are preserved:
 matrix:

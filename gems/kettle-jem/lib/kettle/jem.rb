@@ -10888,7 +10888,7 @@ module Kettle
 
             steps:
               - name: Checkout #{package.fetch(:name)}
-                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -10960,7 +10960,7 @@ module Kettle
 
             steps:
               - name: Checkout
-                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -11061,7 +11061,7 @@ module Kettle
 
             steps:
               - name: Checkout
-                uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -11138,7 +11138,7 @@ module Kettle
 
         - name: Upload coverage to QLTY
           if: ${{ !env.ACT }}
-          uses: qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0
+          uses: qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1
           with:
             token: ${{secrets.QLTY_COVERAGE_TOKEN}}
             files: coverage/lcov.info
@@ -11281,10 +11281,10 @@ module Kettle
 
     def github_actions_step_pins
       {
-        "actions/checkout" => "actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2",
+        "actions/checkout" => "actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3",
         "ruby/setup-ruby" => "ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
-        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@a19242102d17e497f437d7466aa01b528537e899 # v2.2.0",
+        "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1",
         "codecov/codecov-action" => "codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
         "marocchino/sticky-pull-request-comment" => "marocchino/sticky-pull-request-comment@0ea0beb66eb9baf113663a64ec522f60e49231c0 # v3.0.4",
