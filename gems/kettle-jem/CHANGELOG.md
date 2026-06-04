@@ -52,7 +52,7 @@ Please file a bug if you notice a violation of semantic versioning.
   can make the published runtime Ruby floor explicit.
 - Documentation templates now require `yard-yaml` >= 0.2.0.
 - Documentation templates now require `yard-fence` >= 0.9.2.
-- Documentation templates now require `yard-timekeeper` >= 0.2.0.
+- Documentation templates now require `yard-timekeeper` >= 0.2.1.
 - Gem templates now require `kettle-dev` >= 2.0.8.
 - Gem templates now require `kettle-test` >= 2.0.3.
 - Generated templating Gemfiles now require `kettle-drift` >= 1.0.1.
