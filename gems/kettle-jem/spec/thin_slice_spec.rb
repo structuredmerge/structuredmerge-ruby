@@ -1934,6 +1934,59 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "removes explicit RuboCop TargetRubyVersion when templating rubocop-lts config" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubocop-target-ruby-version-cleanup", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .rubocop.yml
+        YAML
+        ".rubocop.yml" => <<~YAML,
+          inherit_gem:
+            rubocop-lts: config/rubygem_rspec.yml
+          AllCops:
+            Exclude:
+              - tmp/**/*
+            TargetRubyVersion: 3.2
+          Style/StringLiterals:
+            EnforcedStyle: double_quotes
+        YAML
+        "template/.rubocop.yml.example" => <<~YAML,
+          inherit_gem:
+            rubocop-lts: config/rubygem_rspec.yml
+          AllCops:
+            Exclude:
+              - vendor/**/*
+          RBS:
+            Enabled: true
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".rubocop.yml" }
+      config = YAML.safe_load(report.fetch(:final_content))
+
+      expect(report.fetch(:changed)).to be(true)
+      expect(config.fetch("AllCops")).not_to have_key("TargetRubyVersion")
+      expect(config.dig("AllCops", "Exclude")).to eq(["tmp/**/*"])
+      expect(config.dig("Style/StringLiterals", "EnforcedStyle")).to eq("double_quotes")
+      expect(config.dig("RBS", "Enabled")).to be(true)
+      expect(report.fetch(:final_content)).not_to include("TargetRubyVersion")
+      expect(File.read(File.join(root, ".rubocop.yml"))).to eq(report.fetch(:final_content))
+    end
+  end
+
   it "seeds bootstrap config licenses from the gemspec" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

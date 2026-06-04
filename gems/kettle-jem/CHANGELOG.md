@@ -93,6 +93,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- RuboCop config templating now removes destination `AllCops.TargetRubyVersion`
+  settings so Ruby target selection remains owned by the `rubocop-lts` family.
 - Coverage workflow templating now preserves `K_SOUP_COV_MIN_LINE` and
   `K_SOUP_COV_MIN_BRANCH` from `mise.toml`, keeping the generated SimpleCov
   hard gate aligned with the project's configured thresholds.

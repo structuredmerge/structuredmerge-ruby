@@ -4172,7 +4172,7 @@ module Kettle
 
       content = recipe_template_content(project_root, recipe)
       return finalize_github_workflow_template(content, facts) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
-      return content if strategy == "raw_copy"
+      return finalize_template_source_content(recipe, content) if strategy == "raw_copy"
 
       resolved = resolve_template_tokens(
         content,
@@ -4206,18 +4206,32 @@ module Kettle
           return finalize_github_workflow_template(merged, facts)
         end
 
-        return merged
+        return finalize_template_source_content(recipe, merged)
       end
       if strategy == "accept_template"
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original, project_root: project_root) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
         accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
-        return (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(accepted, facts, project_root: project_root) : accepted
+        return postprocess_readme_content(accepted, facts, project_root: project_root) if recipe.fetch(:target_path) == "README.md"
+
+        return finalize_template_source_content(recipe, accepted)
       end
 
       resolved = finalize_github_workflow_template(resolved, facts) if github_workflow_template_recipe?(recipe)
-      (recipe.fetch(:target_path) == "README.md") ? postprocess_readme_content(resolved, facts, project_root: project_root) : resolved
+      return postprocess_readme_content(resolved, facts, project_root: project_root) if recipe.fetch(:target_path) == "README.md"
+
+      finalize_template_source_content(recipe, resolved)
+    end
+
+    def finalize_template_source_content(recipe, content)
+      return finalize_rubocop_config(content) if recipe.fetch(:target_path).to_s == ".rubocop.yml"
+
+      content
+    end
+
+    def finalize_rubocop_config(content)
+      remove_yaml_scalar_path(content, %w[AllCops TargetRubyVersion])
     end
 
     def finalize_accepted_template_source(recipe, content, destination_content, facts:, project_root: nil)
