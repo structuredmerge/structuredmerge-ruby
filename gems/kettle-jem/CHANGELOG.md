@@ -27,6 +27,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated gemspec version-loader fallbacks now use `require_relative` for
+  gems whose runtime Ruby floor is 2.2 or newer, reserving `$LOAD_PATH`
+  mutation for gems that still target older Rubies.
 - Generated auto-assign workflows now pin `pozil/auto-assign-issue` to the
   immutable SHA for v4.
 - Documented `kettle-jem install` as the canonical full templating entrypoint

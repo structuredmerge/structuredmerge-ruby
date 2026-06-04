@@ -6903,9 +6903,7 @@ RSpec.describe Kettle::Jem do
             if Gem.ruby_version >= Gem::Version.new("3.1")
               Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/{KJ|GEM_NAME_PATH}/version.rb", mod) }::{KJ|NAMESPACE}::Version::VERSION
             else
-              lib = File.expand_path("lib", __dir__)
-              $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-              require "{KJ|GEM_NAME_PATH}/version"
+              require_relative "lib/{KJ|GEM_NAME_PATH}/version"
               {KJ|NAMESPACE}::Version::VERSION
             end
 
@@ -6943,7 +6941,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "keeps gemspec legacy version loading when minimum Ruby is below 3.1" do
+  it "keeps gemspec legacy version loading with require_relative when minimum Ruby is below 3.1 and at least 2.2" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-gemspec-legacy-version-loader-slice", tmp_root) do |root|
@@ -6981,11 +6979,60 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include("gem_version =")
       expect(gemspec_content).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
-      expect(gemspec_content).to include('require "my/gem/version"')
+      expect(gemspec_content).to include('require_relative "lib/my/gem/version"')
+      expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
+      expect(gemspec_content).not_to include('require "my/gem/version"')
       expect(gemspec_content).to include("My::Gem::Version::VERSION")
       expect(gemspec_content).to include("spec.version = gem_version")
       expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
         include(operation: "rewrite_version_loader", min_ruby: "3.0", mode: "legacy", legacy_preamble_present: true),
+      )
+      expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "keeps load-path gemspec legacy version loading only when minimum Ruby is below 2.2" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-pre-require-relative-version-loader-slice", tmp_root) do |root|
+      write_tree(root, {
+        "my-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "my-gem"
+            gem.version = "0.1.0"
+            gem.summary = "Pre require_relative loader"
+            gem.required_ruby_version = ">= 2.1"
+            gem.homepage = "https://github.com/acme/my-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - my-gem.gemspec
+        YAML
+        "template/my-gem.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_my_gem_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).to include("gem_version =")
+      expect(gemspec_content).to include("$LOAD_PATH.unshift(lib)")
+      expect(gemspec_content).to include('require "my/gem/version"')
+      expect(gemspec_content).not_to include('require_relative "lib/my/gem/version"')
+      expect(gemspec_content).to include("spec.version = gem_version")
+      expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
+        include(operation: "rewrite_version_loader", min_ruby: "2.1", mode: "legacy", legacy_preamble_present: true),
       )
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end

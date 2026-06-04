@@ -365,6 +365,7 @@ module Kettle
     APPRAISAL_ALWAYS_EXCLUDED_GEMS = %w[version_gem].freeze
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
     DEFAULT_TEST_MINIMUM_RUBY = Gem::Version.new("2.4")
+    REQUIRE_RELATIVE_MIN_RUBY = Gem::Version.new("2.2").freeze
     MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY = Gem::Version.new("3.1").freeze
     APPRAISAL_DEFAULT_FRESHNESS_TTL = 604_800
     DECISION_ACTIONS = %w[create merge replace keep delete skip].freeze
@@ -5907,10 +5908,11 @@ module Kettle
       return content if namespace.empty? || entrypoint_require.empty?
 
       receiver = gemspec_block_param(content) || "spec"
-      modern = Gem::Version.new(min_ruby) >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
+      min_ruby_version = Gem::Version.new(min_ruby)
+      modern = min_ruby_version >= MODERN_GEMSPEC_VERSION_LOADER_MIN_RUBY
       rhs = modern ? gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace) : "gem_version"
       rewritten = replace_gemspec_version_assignment(content, receiver: receiver, rhs: rhs)
-      modern ? remove_gemspec_legacy_version_loader_preamble(rewritten) : ensure_gemspec_legacy_version_loader_preamble(rewritten, entrypoint_require: entrypoint_require, namespace: namespace)
+      modern ? remove_gemspec_legacy_version_loader_preamble(rewritten) : ensure_gemspec_legacy_version_loader_preamble(rewritten, entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby_version)
     rescue ArgumentError, Ast::Crispr::Error
       content
     end
@@ -5930,7 +5932,21 @@ module Kettle
       %(Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/#{entrypoint_require}/version.rb", mod) }::#{namespace}::Version::VERSION)
     end
 
-    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:)
+    def gemspec_legacy_version_loader_block(entrypoint_require:, namespace:, min_ruby:)
+      legacy_require =
+        if min_ruby >= REQUIRE_RELATIVE_MIN_RUBY
+          %(require_relative "lib/#{entrypoint_require}/version")
+        else
+          <<~RUBY.chomp
+            # NOTE: Use __FILE__ or __dir__ until removal of Ruby 1.x support
+            # __dir__ introduced in Ruby 1.9.1
+            # lib = File.expand_path("../lib", __FILE__)
+            lib = File.expand_path("lib", __dir__)
+            $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+            require "#{entrypoint_require}/version"
+          RUBY
+        end
+
       <<~RUBY
         gem_version =
           if Gem.ruby_version >= Gem::Version.new("3.1")
@@ -5939,12 +5955,7 @@ module Kettle
             # See: https://github.com/panorama-ed/memo_wise/pull/397
             #{gemspec_modern_version_loader_expression(entrypoint_require: entrypoint_require, namespace: namespace)}
           else
-            # NOTE: Use __FILE__ or __dir__ until removal of Ruby 1.x support
-            # __dir__ introduced in Ruby 1.9.1
-            # lib = File.expand_path("../lib", __FILE__)
-            lib = File.expand_path("lib", __dir__)
-            $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-            require "#{entrypoint_require}/version"
+            #{legacy_require.gsub("\n", "\n    ")}
             #{namespace}::Version::VERSION
           end
       RUBY
@@ -5982,8 +5993,8 @@ module Kettle
       {start_line: start_index + 1, end_line: end_line}
     end
 
-    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:)
-      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace)}\n"
+    def ensure_gemspec_legacy_version_loader_preamble(content, entrypoint_require:, namespace:, min_ruby:)
+      block = "#{gemspec_legacy_version_loader_block(entrypoint_require: entrypoint_require, namespace: namespace, min_ruby: min_ruby)}\n"
       node = gemspec_top_level_gem_version_node(content)
       return replace_source_range_lines(content, node.location.start_line, expand_line_range_through_following_blanks(content, node.location.end_line), block) if node
 
