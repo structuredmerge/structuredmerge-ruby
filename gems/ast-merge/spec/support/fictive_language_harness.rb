@@ -362,12 +362,16 @@ module SpecSupport
 
       def preserve_removed_destination_comments(result, dest_node)
         attachment = @dest_analysis.comment_attachment_for(dest_node)
+        leading_region = attachment.leading_region || removable_preamble_region_for(dest_node)
 
-        emit_region_lines(result, attachment.leading_region || removable_preamble_region_for(dest_node))
-        Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
-          result: result,
-          attachment: attachment,
-        )
+        if emit_region_lines(result, leading_region)
+          emit_layout_gap(result, attachment.leading_gap)
+        else
+          Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
+            result: result,
+            attachment: attachment,
+          )
+        end
 
         if attachment.inline_region
           result.add_line(
@@ -382,14 +386,16 @@ module SpecSupport
       end
 
       def emit_region_lines(result, region)
-        return unless region
-        return if duplicate_comment_region?(region)
+        return false unless region
+        return false if duplicate_comment_region?(region)
 
         remember_comment_region(region)
 
         region.text.split("\n").each do |line|
           result.add_line(line)
         end
+
+        true
       end
 
       def emit_layout_gap(result, gap)

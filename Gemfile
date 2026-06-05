@@ -61,7 +61,7 @@ gem "rake"
 gem "rspec"
 gem "token-resolver", "~> 2.0", ">= 2.0.1"
 
-gem "appraisal2", "~> 3.0", ">= 3.0.6"
+gem "appraisal2", "~> 3.0", ">= 3.0.7"
 
 gem "bundler-audit", "~> 0.9.3"
 
@@ -69,6 +69,6 @@ gem "kettle-dev", "~> 2.0", ">= 2.0.5"
 
 gem "kettle-drift", "~> 1.0", ">= 1.0.1"
 
-gem "kettle-test", "~> 2.0", ">= 2.0.1"
+gem "kettle-test", "~> 2.0", ">= 2.0.3"
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"

@@ -30,4 +30,6 @@ RSpec.configure do |config|
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
+
+  config.filter_run_excluding(bash_grammar: true) unless Bash::Merge.available?
 end

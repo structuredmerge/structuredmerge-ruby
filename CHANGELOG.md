@@ -31,8 +31,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- Current CI now uses an explicit setup-ruby Bundler cache version to avoid
-  restoring stale bundles after local path gemspec dependency floors change.
+- Current CI now aligns the root Gemfile dependency floors with local path
+  gemspec floors and uses an explicit setup-ruby Bundler cache version to avoid
+  stale bundle restores after dependency floor changes.
+- Root aggregate RSpec runs now load subgem support helpers consistently and
+  skip Bash parser-dependent examples when no native TreeHaver Bash parser is
+  available.
 - `kettle-jem` JRuby 9.4 workflow templates now install RubyGems 3.6.9 and
   Bundler 2.6.9 instead of using the default JRuby toolchain.
 - Local template stack reinstalls now uninstall the selected StructuredMerge Ruby

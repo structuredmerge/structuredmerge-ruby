@@ -33,3 +33,11 @@ require_relative "../gems/typescript-merge/spec/spec_helper"
 require_relative "../gems/rust-merge/spec/spec_helper"
 require_relative "../gems/go-merge/spec/spec_helper"
 require_relative "../gems/smorg-rb/spec/spec_helper"
+
+# Aggregate root specs load every subgem in one process, so shared contracts
+# normally loaded by an individual subgem's focused specs must be registered here.
+require "ast/crispr/rspec"
+require "ast/merge/rspec/shared_examples"
+require_relative "../gems/ast-merge/spec/support/fictive_language_harness"
+require_relative "../gems/bash-merge/spec/support/shared_examples/file_analysis_examples"
+require_relative "../gems/bash-merge/spec/support/shared_examples/smart_merger_examples"
