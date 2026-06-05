@@ -5574,10 +5574,11 @@ module Kettle
 
     def inject_appraisal_gemfiles(block, gemfiles)
       lines = block.to_s.lines
-      existing_lines = appraisal_dependency_lines(block).to_set
+      existing_keys = appraisal_dependency_keys(block).to_set
       additions = gemfiles.filter_map do |gemfile|
-        line = %(  eval_gemfile "#{gemfile.to_s.sub(%r{\Agemfiles/}, "")}") + "\n"
-        line unless existing_lines.include?(line)
+        path = gemfile.to_s.sub(%r{\Agemfiles/}, "")
+        line = %(  eval_gemfile "#{path}") + "\n"
+        line unless existing_keys.include?([:eval_gemfile, path])
       end
       return block if additions.empty?
 
@@ -5805,7 +5806,16 @@ module Kettle
     end
 
     def merge_same_named_appraisal_block(template_block, destination_block)
-      addition_lines = appraisal_dependency_lines(destination_block) - appraisal_dependency_lines(template_block)
+      template_lines = appraisal_dependency_lines(template_block).to_set
+      template_keys = appraisal_dependency_keys(template_block).to_set
+      addition_lines = appraisal_dependency_records(destination_block).filter_map do |record|
+        source = record.fetch(:source)
+        key = record.fetch(:key)
+        next if template_lines.include?(source)
+        next if key && template_keys.include?(key)
+
+        source
+      end
       return template_block if addition_lines.empty?
 
       lines = template_block.to_s.lines
@@ -5817,13 +5827,34 @@ module Kettle
     end
 
     def appraisal_dependency_lines(block)
+      appraisal_dependency_records(block).map { |record| record.fetch(:source) }
+    end
+
+    def appraisal_dependency_keys(block)
+      appraisal_dependency_records(block).filter_map { |record| record.fetch(:key) }
+    end
+
+    def appraisal_dependency_records(block)
       calls = ruby_call_records(block, nil).select do |call|
         %i[gem eval_gemfile].include?(call.name)
       end
       lines = block.to_s.lines
       calls.map do |call|
-        (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
+        source = (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
+        {
+          source: source,
+          key: appraisal_dependency_key(call),
+        }
       end
+    end
+
+    def appraisal_dependency_key(call)
+      return unless call.name == :eval_gemfile
+
+      path = ruby_string_argument(call).to_s
+      return if path.empty?
+
+      [:eval_gemfile, path]
     end
 
     def appraisal_blocks(content)
@@ -7414,6 +7445,7 @@ module Kettle
 
       basename = File.basename(relative_path.to_s, File.extname(relative_path.to_s))
       basename.match?(/\Aruby-\d+\.\d+\z/) ||
+        basename.match?(/\Aruby-\d+-\d+\z/) ||
         basename.match?(/\Ajruby-\d+\.\d+\z/) ||
         basename.match?(/\Atruffleruby-\d+\.\d+\z/)
     end

@@ -95,6 +95,13 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Appraisals templating now treats `eval_gemfile "path"` and
+  `eval_gemfile("path")` as the same dependency when merging same-named
+  appraisal blocks.
+- Generated freeze-marker guidance now consistently names `kettle-jem` as the
+  templating tool instead of substituting the destination gem name.
+- Templating now prunes legacy dashed Ruby workflow filenames such as
+  `ruby-2-4.yml` when replacing them with dotted packaged workflow filenames.
 - RuboCop config templating now removes destination `AllCops.TargetRubyVersion`
   settings so Ruby target selection remains owned by the `rubocop-lts` family.
 - Coverage workflow templating now preserves `K_SOUP_COV_MIN_LINE` and
