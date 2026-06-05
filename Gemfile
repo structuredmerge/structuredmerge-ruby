@@ -72,3 +72,5 @@ gem "kettle-drift", "~> 1.0", ">= 1.0.1"
 gem "kettle-test", "~> 2.0", ">= 2.0.3"
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"
+
+gem "gitmoji-regex", "~> 2.0", ">= 2.0.1"
