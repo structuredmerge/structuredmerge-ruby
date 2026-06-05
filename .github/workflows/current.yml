@@ -36,5 +36,6 @@ jobs:
         with:
           ruby-version: 4.0.2
           bundler-cache: true
+          cache-version: current-20260605
       - name: Run checks
         run: bundle exec rspec
