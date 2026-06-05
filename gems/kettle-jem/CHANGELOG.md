@@ -74,6 +74,9 @@ Please file a bug if you notice a violation of semantic versioning.
   appraisals can select the newest stable compatible toolchain per Ruby.
 - Generated JRuby 9.1 and 9.2 workflows now install RubyGems 3.3.27 and
   Bundler 2.3.27 instead of using the default JRuby toolchain versions.
+- Generated TruffleRuby 23.1 workflows now bootstrap from the Ruby 3.2
+  appraisal Gemfile so Ruby 3.2-specific dependency restrictions apply before
+  Bundler cache installation.
 - Generated main Gemfiles now install `nomono` >= 1.0.2 so local workspace
   override Gemfiles can load `nomono/bundler` from the released gem.
 - Generated coverage workflows now pass `K_SOUP_COV_MIN_LINE` and
