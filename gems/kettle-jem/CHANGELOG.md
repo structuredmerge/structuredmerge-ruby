@@ -102,6 +102,8 @@ Please file a bug if you notice a violation of semantic versioning.
   templating tool instead of substituting the destination gem name.
 - Templating now prunes legacy dashed Ruby workflow filenames such as
   `ruby-2-4.yml` when replacing them with dotted packaged workflow filenames.
+- Gemspec freeze-block preservation now honors configured custom
+  `defaults.freeze_token` values.
 - RuboCop config templating now removes destination `AllCops.TargetRubyVersion`
   settings so Ruby target selection remains owned by the `rubocop-lts` family.
 - Coverage workflow templating now preserves `K_SOUP_COV_MIN_LINE` and

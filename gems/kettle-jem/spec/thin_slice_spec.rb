@@ -7595,6 +7595,62 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves gemspec freeze blocks with configured custom freeze tokens" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-custom-gemspec-freeze-block-policy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          # frozen_string_literal: true
+
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.version = "1.0.0"
+            spec.summary = "Freeze gem"
+
+            # custom-freeze:freeze
+            # Custom dependencies
+            # spec.add_dependency("custom_dep")
+            # custom-freeze:unfreeze
+
+            spec.require_paths = ["lib"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          defaults:
+            freeze_token: custom-freeze
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: gem.gemspec
+                target: example.gemspec
+        YAML
+        "template/gem.gemspec.example" => <<~RUBY,
+          # frozen_string_literal: true
+
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "2.0.0"
+            spec.summary = "Template summary"
+            spec.require_paths = ["lib"]
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "example.gemspec" }
+      gemspec_content = report.fetch(:final_content)
+
+      expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
+      expect(gemspec_content).to include("# custom-freeze:freeze")
+      expect(gemspec_content).to include('# spec.add_dependency("custom_dep")')
+      expect(gemspec_content).to include("# custom-freeze:unfreeze")
+      expect(gemspec_content).not_to include("# kettle-jem:freeze")
+      expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "ports old gemspec self-dependency removal while preserving project fields" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -5933,7 +5933,7 @@ module Kettle
         template_receiver: template_receiver,
         destination_receiver: destination_receiver,
       )
-      merged = preserve_gemspec_freeze_blocks(merged, destination_content, receiver: template_receiver)
+      merged = preserve_gemspec_freeze_blocks(merged, destination_content, facts: facts, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
       merged = apply_configured_gemspec_required_ruby_version(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
@@ -6214,8 +6214,8 @@ module Kettle
       append_missing_gemspec_dependency_lines(merged, additions, receiver: template_receiver)
     end
 
-    def preserve_gemspec_freeze_blocks(content, destination_content, receiver:)
-      blocks = freeze_marker_blocks(destination_content)
+    def preserve_gemspec_freeze_blocks(content, destination_content, facts:, receiver:)
+      blocks = freeze_marker_blocks(destination_content, freeze_token: facts.to_h.dig(:project_runtime, :freeze_token))
       return content if blocks.empty?
 
       merged = content.to_s
@@ -6233,12 +6233,13 @@ module Kettle
       ensure_trailing_newline(merged.gsub(/\n{3,}/, "\n\n"))
     end
 
-    def freeze_marker_blocks(content)
+    def freeze_marker_blocks(content, freeze_token: nil)
+      marker = freeze_token.to_s.empty? ? "kettle-jem" : freeze_token.to_s
       lines = content.to_s.lines
       blocks = []
       index = 0
       while index < lines.length
-        unless lines[index].include?("# kettle-jem:freeze")
+        unless lines[index].include?("# #{marker}:freeze")
           index += 1
           next
         end
@@ -6246,7 +6247,7 @@ module Kettle
         start_index = index
         while index < lines.length
           index += 1
-          break if lines[index - 1].include?("# kettle-jem:unfreeze")
+          break if lines[index - 1].include?("# #{marker}:unfreeze")
         end
         blocks << lines[start_index...index]
       end
