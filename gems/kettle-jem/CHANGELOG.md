@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
+  `appraisal2` executable.
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA
   README badges.
 - Added explicit `ruby.test_minimum` template configuration, defaulting to

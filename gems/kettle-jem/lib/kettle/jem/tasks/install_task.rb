@@ -12,8 +12,9 @@ module Kettle
       module InstallTask
         module_function
 
-        CURATED_BINSTUB_GEMS = %w[rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums].freeze
+        CURATED_BINSTUB_GEMS = %w[appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums].freeze
         CURATED_BINSTUB_EXECUTABLES = %w[
+          appraisal
           gem_checksums
           kettle-changelog
           kettle-check-eof
