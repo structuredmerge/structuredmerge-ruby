@@ -9317,7 +9317,7 @@ module Kettle
     end
 
     def license_copyright_notice(copyright_lines, copyright_prefix, author)
-      lines = copyright_notice_lines(copyright_lines, copyright_prefix, author)
+      lines = copyright_notice_lines(copyright_lines, copyright_prefix, author).map { |line| "- #{line}" }
       "## Copyright Notice\n\n#{lines.join("\n")}"
     end
 

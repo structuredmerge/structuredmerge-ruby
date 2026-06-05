@@ -8617,7 +8617,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("[PolyForm-Small-Business-1.0.0](PolyForm-Small-Business-1.0.0.md)")
       expect(final_content).to include("[Big-Time-Public-License](Big-Time-Public-License.md)")
       expect(final_content).to include("## Use-case guide")
-      expect(final_content).to include("Required Notice: Copyright")
+      expect(final_content).to include("- Required Notice: Copyright")
       expect(final_content).to include("Jane Q Public")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|COPYRIGHT_PREFIX" => "Required Notice: ",
@@ -8991,10 +8991,10 @@ RSpec.describe Kettle::Jem do
       expected_line = "Copyright (c) #{Time.now.utc.year} Jane Contributor"
       expect(plan.dig(:facts, :copyright, :lines)).to eq([expected_line])
       expect(license_report.fetch(:final_content)).to include("## Copyright Notice")
-      expect(license_report.fetch(:final_content)).to include(expected_line)
+      expect(license_report.fetch(:final_content)).to include("- #{expected_line}")
       expect(readme_report.fetch(:final_content)).to include("Copyright holders")
       expect(readme_report.fetch(:final_content)).to include("- #{expected_line}")
-      expect(license_report.dig(:metadata, :template_tokens, "KJ|LICENSE_COPYRIGHT_NOTICE")).to include(expected_line)
+      expect(license_report.dig(:metadata, :template_tokens, "KJ|LICENSE_COPYRIGHT_NOTICE")).to include("- #{expected_line}")
     end
   end
 
@@ -9043,7 +9043,7 @@ RSpec.describe Kettle::Jem do
 
       expect(plan.fetch(:facts)).not_to have_key(:copyright)
       expect(license_report.fetch(:final_content)).to include("## Copyright Notice")
-      expect(license_report.fetch(:final_content)).to include(expected_line)
+      expect(license_report.fetch(:final_content)).to include("- #{expected_line}")
       expect(readme_report.fetch(:final_content)).to include("Copyright holders")
       expect(readme_report.fetch(:final_content)).to include("- #{expected_line}")
     end

@@ -99,6 +99,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated `LICENSE.md` copyright notice lines now render as a Markdown list.
 - Appraisals templating now treats `eval_gemfile "path"` and
   `eval_gemfile("path")` as the same dependency when merging same-named
   appraisal blocks.
