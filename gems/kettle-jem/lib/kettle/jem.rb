@@ -2640,9 +2640,9 @@ module Kettle
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
       namespace = configured_namespace.empty? ? nil : configured_namespace
-      namespace ||= metadata_value(gemspec_metadata, :namespace) ||
-        existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
+      namespace ||= existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
         existing_version_namespace(project_root, version_path) ||
+        metadata_value(gemspec_metadata, :namespace) ||
         classify_namespace(name)
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)

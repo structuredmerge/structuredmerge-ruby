@@ -47,6 +47,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-jem template --only PATH` or `--include PATH` for scoped file updates.
 - `kettle-jem` project fact discovery now uses `Kettle::Jem::GemSpecReader`
   and RubyGems specification objects instead of parsing gemspec source.
+- `kettle-jem` namespace discovery now prefers existing source-tree version
+  namespaces before stale gemspec metadata so non-standard acronym namespaces
+  such as `OAuth2` and `OmniAuth` are preserved.
 - README and CONTRIBUTING templates now document the effective
   `ruby.test_minimum` value used when the project was templated.
 - README templates now include a closing note that identifies kettle-jem and

@@ -4923,6 +4923,60 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "discovers public entrypoint version namespace before stale gemspec metadata" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-version-gem-public-entrypoint-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "oauth2.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "oauth2"
+            spec.version = Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/oauth2/version.rb", mod) }::Oauth2::Version::VERSION
+            spec.summary = "OAuth2"
+            spec.required_ruby_version = ">= 2.2.0"
+          end
+        RUBY
+        "lib/oauth2.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require_relative "oauth2/version"
+
+          module OAuth2
+          end
+
+          OAuth2::Version.class_eval do
+            extend VersionGem::Basic
+          end
+
+          Oauth2::Version.class_eval do
+            extend VersionGem::Basic
+          end
+        RUBY
+        "lib/oauth2/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module OAuth2
+            module Version
+              VERSION = "2.0.20"
+            end
+            VERSION = Version::VERSION
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "🔐"
+          rubygems:
+            min_ruby: "2.2.0"
+        YAML
+      })
+
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+
+      expect(facts.dig(:rubygems, :namespace)).to eq("OAuth2")
+      expect(facts.dig(:rubygems, :namespace)).not_to eq("Oauth2")
+    end
+  end
+
   it "places version_gem entrypoint requires from top-level Ruby structure" do
     content = <<~RUBY
       # frozen_string_literal: true
