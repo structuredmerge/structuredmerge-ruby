@@ -39,6 +39,8 @@ Please file a bug if you notice a violation of semantic versioning.
   available.
 - Current CI now runs the root aggregate RSpec suite with progress output to
   avoid excessive documentation-format logs.
+- Current CI bounds the root aggregate RSpec command so long-running shutdown
+  or parser hangs produce actionable failure logs instead of indefinite jobs.
 - `kettle-jem` JRuby 9.4 workflow templates now install RubyGems 3.6.9 and
   Bundler 2.6.9 instead of using the default JRuby toolchain.
 - Local template stack reinstalls now uninstall the selected StructuredMerge Ruby

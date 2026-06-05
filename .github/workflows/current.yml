@@ -38,4 +38,4 @@ jobs:
           bundler-cache: true
           cache-version: current-20260605
       - name: Run checks
-        run: bundle exec rspec --format progress
+        run: timeout 12m bundle exec rspec --format progress
