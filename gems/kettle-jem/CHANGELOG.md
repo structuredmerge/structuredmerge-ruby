@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Appraisals template merging now delegates same-name DSL call reconciliation to
+  `Prism::Merge` instead of custom source-line dependency comparison.
 - Generated gemspec version-loader fallbacks now use `require_relative` for
   gems whose runtime Ruby floor is 2.2 or newer, reserving `$LOAD_PATH`
   mutation for gems that still target older Rubies.

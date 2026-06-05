@@ -42,6 +42,28 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  def prism_string_argument(call, index = 0)
+    argument = call&.arguments&.arguments&.[](index)
+    argument.unescaped if argument.is_a?(::Prism::StringNode)
+  end
+
+  def appraisals_eval_gemfile_paths(content, appraisal_name)
+    result = ::Prism.parse(content.to_s)
+    raise "invalid Appraisals fixture" unless result.success?
+
+    calls = result.value.breadth_first_search_all { |node| node.is_a?(::Prism::CallNode) }
+    appraise = calls.find { |call| call.name == :appraise && prism_string_argument(call) == appraisal_name }
+    return [] unless appraise
+
+    calls.filter_map do |call|
+      next unless call.name == :eval_gemfile
+      next unless call.location.start_line >= appraise.location.start_line
+      next unless call.location.end_line <= appraise.location.end_line
+
+      prism_string_argument(call)
+    end
+  end
+
   let(:fixture_path) { Pathname(__dir__).join("fixtures/thin_slice.json") }
   let(:fixture) { JSON.parse(fixture_path.read, symbolize_names: true) }
   let(:contract_path) do
@@ -5871,10 +5893,11 @@ RSpec.describe Kettle::Jem do
       report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
       appraisals_content = report.fetch(:final_content)
 
-      expect(appraisals_content).to include('eval_gemfile "modular/style.gemfile"')
-      expect(appraisals_content).to include('eval_gemfile "modular/activerecord/r3/v8.0.gemfile"')
-      expect(appraisals_content.scan('eval_gemfile "modular/x_std_libs/r3/libs.gemfile"').size).to eq(1)
-      expect(appraisals_content).not_to include('eval_gemfile("modular/x_std_libs/r3/libs.gemfile")')
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
+        "modular/style.gemfile",
+        "modular/activerecord/r3/v8.0.gemfile",
+        "modular/x_std_libs/r3/libs.gemfile",
+      )
     end
   end
 
@@ -6155,21 +6178,16 @@ RSpec.describe Kettle::Jem do
       report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
       appraisals_content = report.fetch(:final_content)
 
-      expect(appraisals_content).to include(<<~RUBY.strip)
-        appraise "coverage" do
-          eval_gemfile "modular/coverage.gemfile"
-          eval_gemfile "rails_7_2.gemfile"
-          eval_gemfile "modular/x_std_libs.gemfile"
-        end
-      RUBY
-      expect(appraisals_content).to include(<<~RUBY.strip)
-        appraise "ruby-3-2" do
-          eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
-          eval_gemfile "rails_8_0.gemfile"
-        end
-      RUBY
-      expect(appraisals_content).not_to include('eval_gemfile "rails_7_2.gemfile"' \
-        "\n  eval_gemfile \"rails_8_0.gemfile\"")
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "coverage")).to contain_exactly(
+        "modular/coverage.gemfile",
+        "rails_7_2.gemfile",
+        "modular/x_std_libs.gemfile",
+      )
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
+        "modular/x_std_libs/r3/libs.gemfile",
+        "rails_8_0.gemfile",
+      )
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-1")).to contain_exactly("rails_7_2.gemfile")
     end
   end
 

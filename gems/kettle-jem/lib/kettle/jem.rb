@@ -4741,9 +4741,7 @@ module Kettle
       case file_type
       when :gemspec
         return merge_gemspec_template_source(template_content, destination_content, facts: facts)
-      when :appraisals
-        return merge_appraisals_template_source(template_content, destination_content, facts: facts)
-      when :ruby, :gemfile, :rakefile
+      when :ruby, :gemfile, :rakefile, :appraisals
         merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: facts)
       when :yaml
         merge_result = Psych::Merge.merge_yaml(
@@ -5557,7 +5555,7 @@ module Kettle
       framework_matrix = facts.to_h.dig(:ci, :framework_matrix).to_h
       [
         *framework_matrix.fetch(:appraisals, []).flat_map { |entry| entry.fetch(:eval_gemfiles, []) },
-        *framework_matrix.fetch(:gemfiles, []).map { |entry| entry.fetch(:path).to_s.sub(%r{\Agemfiles/}, "") },
+        *framework_matrix.fetch(:gemfiles, []).map { |entry| entry.fetch(:path).to_s.delete_prefix("gemfiles/") },
       ].map(&:to_s).to_set
     end
 
@@ -5574,21 +5572,27 @@ module Kettle
 
     def inject_appraisal_gemfiles(block, gemfiles)
       lines = block.to_s.lines
-      existing_keys = appraisal_dependency_keys(block).to_set
+      existing_paths = ruby_call_records(block, :eval_gemfile).filter_map { |call| ruby_string_argument(call) }.to_set
       additions = gemfiles.filter_map do |gemfile|
-        path = gemfile.to_s.sub(%r{\Agemfiles/}, "")
+        path = gemfile.to_s.delete_prefix("gemfiles/")
         line = %(  eval_gemfile "#{path}") + "\n"
-        line unless existing_keys.include?([:eval_gemfile, path])
+        line unless existing_paths.include?(path)
       end
       return block if additions.empty?
 
-      insert_index =
-        lines.index { |line| line.include?(%(eval_gemfile "modular/x_std_libs)) } ||
-        lines.rindex { |line| line.strip == "end" }
+      insert_line = appraisal_x_stdlib_eval_gemfile_call(block)&.location&.start_line ||
+        ruby_call_records(block, :appraise).first&.location&.end_line
+      insert_index = insert_line ? insert_line - 1 : nil
       return block unless insert_index
 
       lines.insert(insert_index, *additions)
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def appraisal_x_stdlib_eval_gemfile_call(block)
+      ruby_call_records(block, :eval_gemfile).find do |call|
+        ruby_string_argument(call).to_s.start_with?("modular/x_std_libs")
+      end
     end
 
     def prune_appraisals_recording_entries(content, facts)
@@ -5638,7 +5642,7 @@ module Kettle
         emitted << name
         parsed_block = parsed.fetch(:blocks).fetch(name).rstrip
         generated_block = generated[name]
-        generated_block ? merge_same_named_appraisal_block(parsed_block, generated_block) : parsed_block
+        generated_block ? merge_appraisal_blocks_with_prism(generated_block, parsed_block) : parsed_block
       end.compact
       entries.each do |entry|
         name = entry.fetch(:name).to_s
@@ -5787,74 +5791,19 @@ module Kettle
       {ok: false, output: destination_content, diagnostics: [{kind: "bash_merge_failed", message: e.message}]}
     end
 
-    def merge_appraisals_template_source(template_content, destination_content, facts:)
-      template = appraisal_blocks(template_content)
-      destination = appraisal_blocks(destination_content)
-      ordered_blocks = template.fetch(:order).map do |name|
-        block = template.fetch(:blocks).fetch(name)
-        destination_block = destination.fetch(:blocks)[name]
-        destination_block ? merge_same_named_appraisal_block(block, destination_block) : block
-      end
-      destination.fetch(:order).each do |name|
-        next if template.fetch(:blocks).key?(name)
-
-        ordered_blocks << destination.fetch(:blocks).fetch(name)
-      end
-      prelude = template.fetch(:prelude).to_s.strip.empty? ? destination.fetch(:prelude) : template.fetch(:prelude)
-      merged = ([prelude.to_s.rstrip] + ordered_blocks.map { |block| block.rstrip }).reject(&:empty?).join("\n\n")
-      merge_appraisals_template_policy(ensure_trailing_newline(merged), facts: facts)
-    end
-
-    def merge_same_named_appraisal_block(template_block, destination_block)
-      template_lines = appraisal_dependency_lines(template_block).to_set
-      template_keys = appraisal_dependency_keys(template_block).to_set
-      addition_lines = appraisal_dependency_records(destination_block).filter_map do |record|
-        source = record.fetch(:source)
-        key = record.fetch(:key)
-        next if template_lines.include?(source)
-        next if key && template_keys.include?(key)
-
-        source
-      end
-      return template_block if addition_lines.empty?
-
-      lines = template_block.to_s.lines
-      end_index = lines.rindex { |line| line.strip == "end" }
-      return template_block if end_index.nil?
-
-      lines.insert(end_index, *addition_lines)
-      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
-    end
-
-    def appraisal_dependency_lines(block)
-      appraisal_dependency_records(block).map { |record| record.fetch(:source) }
-    end
-
-    def appraisal_dependency_keys(block)
-      appraisal_dependency_records(block).filter_map { |record| record.fetch(:key) }
-    end
-
-    def appraisal_dependency_records(block)
-      calls = ruby_call_records(block, nil).select do |call|
-        %i[gem eval_gemfile].include?(call.name)
-      end
-      lines = block.to_s.lines
-      calls.map do |call|
-        source = (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
-        {
-          source: source,
-          key: appraisal_dependency_key(call),
-        }
-      end
-    end
-
-    def appraisal_dependency_key(call)
-      return unless call.name == :eval_gemfile
-
-      path = ruby_string_argument(call).to_s
-      return if path.empty?
-
-      [:eval_gemfile, path]
+    def merge_appraisal_blocks_with_prism(template_block, destination_block)
+      result = Prism::Merge.merge_ruby(
+        template_block,
+        destination_block,
+        "ruby",
+        preference: :destination,
+        add_template_only_nodes: true,
+        signature_generator: Prism::Merge.ruby_dsl_signature_generator,
+        method_move_policy: ruby_method_move_policy({}),
+        merge_template_requires: true,
+        template_only_placement: :after_anchor,
+      )
+      result[:ok] ? result.fetch(:output) : template_block
     end
 
     def appraisal_blocks(content)
