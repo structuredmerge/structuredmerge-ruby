@@ -4,6 +4,7 @@ require "fileutils"
 require "open3"
 require "pathname"
 require "toml-rb"
+require "uri"
 require "yaml"
 
 module Kettle
@@ -507,7 +508,11 @@ module Kettle
           if (value.start_with?('"') && value.end_with?('"')) || (value.start_with?("'") && value.end_with?("'"))
             value = value[1..-2]
           end
-          !!value.match(%r{\Ahttps?://github\.com/[^/\s]+/[^/\s]+/?\z}i)
+          uri = URI.parse(value)
+          segments = uri.path.to_s.split("/").reject(&:empty?)
+          %w[http https].include?(uri.scheme) && uri.host == "github.com" && segments.length == 2
+        rescue URI::InvalidURIError
+          false
         end
 
         def github_org_from_env(env)
@@ -522,11 +527,25 @@ module Kettle
           stdout, _stderr, status = Open3.capture3("git", "-C", project_root.to_s, "remote", "get-url", "origin")
           return nil unless status.success?
 
-          stdout[%r{github\.com[/:]([^/\s:]+)/}i, 1]
+          remote = stdout.to_s.strip
+          path = if remote.start_with?("git@github.com:")
+            remote.split(":", 2).last
+          else
+            uri = URI.parse(remote)
+            return nil unless uri.host == "github.com"
+
+            uri.path
+          end
+          path.to_s.delete_prefix("/").split("/").first
+        rescue URI::InvalidURIError
+          nil
         end
 
         def gemspec_name(content, gemspec_path)
-          content[/\bspec\.name\s*=\s*["']([^"']+)["']/, 1] || File.basename(gemspec_path, ".gemspec")
+          Kettle::Jem.gemspec_assignment_records(content, receiver: "spec")
+            .find { |record| record.fetch(:field) == "name" }
+            &.fetch(:value) ||
+            File.basename(gemspec_path, ".gemspec")
         end
 
         def ensure_env_local_gitignore(project_root)

@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Gemfile and gemspec source checks now prefer Prism-backed call records instead
+  of regex/string fallback matching for dependency and project-name decisions.
 - Appraisals template merging now delegates same-name DSL call reconciliation to
   `Prism::Merge` instead of custom source-line dependency comparison.
 - Generated gemspec version-loader fallbacks now use `require_relative` for

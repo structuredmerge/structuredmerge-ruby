@@ -134,10 +134,11 @@ module Kettle
         end
 
         def expected_non_templated_path?(relative_path)
+          path_parts = relative_path.to_s.split("/")
           SKIPPED_FILES.include?(relative_path) ||
             SKIPPED_PREFIXES.any? { |prefix| relative_path.start_with?(prefix) } ||
-            relative_path.match?(%r{\Agemfiles/[^/]+\.gemfile\z}) ||
-            relative_path.end_with?(".gemspec")
+            (path_parts.length == 2 && path_parts.first == "gemfiles" && path_parts.last.end_with?(".gemfile")) ||
+            relative_path.to_s.end_with?(".gemspec")
         end
 
         def ignored_selftest_artifact?(relative_path)
@@ -182,6 +183,8 @@ module Kettle
         end
 
         def upsert_template_root_override(content, template_root)
+          # This is line-oriented instead of YAML round-tripping because the self-test fixture config must preserve
+          # comments, key order, and scalar spellings while injecting a temporary local template root.
           lines = content.to_s.lines
           template_index = lines.index { |line| line.match?(/\Atemplates:\s*(?:#.*)?\n?\z/) }
           if template_index

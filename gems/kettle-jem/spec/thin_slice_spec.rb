@@ -75,6 +75,18 @@ RSpec.describe Kettle::Jem do
   let(:old_spec_contract_path) { Pathname(__dir__).join("fixtures/old_spec_migration_contract.json").expand_path }
   let(:old_spec_contract) { JSON.parse(old_spec_contract_path.read, symbolize_names: true) }
 
+  it "normalizes GitHub remote source URLs structurally" do
+    expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
+      "https://github.com/rubythems/them-server",
+    )
+    expect(described_class.normalize_git_source_url("https://github.com/rubythems/them-server.git")).to eq(
+      "https://github.com/rubythems/them-server",
+    )
+    expect(described_class.normalize_git_source_url("https://gitlab.com/rubythems/them-server.git")).to eq(
+      "https://gitlab.com/rubythems/them-server.git",
+    )
+  end
+
   it "plans and applies the RubyGems thin vertical slice" do
     expected_recipe_names = contract.fetch(:canonical_recipes).map { |recipe| recipe.fetch(:name).to_s }
     expect(contract.fetch(:validated_ecosystems)).to include(fixture.fetch(:ecosystem))
@@ -2458,6 +2470,8 @@ RSpec.describe Kettle::Jem do
         "Gemfile" => <<~RUBY,
           source "https://gem.coop"
 
+          # gem "kettle-dev"
+          warn "kettle-test" if false
           gemspec path: "gems/kettle-jem"
           gem "rake"
         RUBY
@@ -2477,6 +2491,8 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
       expect(gemfile).to include('gem "kettle-dev", "~> 2.0", ">= 2.0.8"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.3"')
+      expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
+      expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
       expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.1"')
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
@@ -8155,6 +8171,7 @@ RSpec.describe Kettle::Jem do
         spec.add_runtime_dependency("erb", ">= 0")
         # spec.add_dependency "ignored"
         spec.add_runtime_dependency "sequel", ">= 5.0"
+        spec.add_development_dependency "dev_only", ">= 0"
       end
     RUBY
 

@@ -2405,12 +2405,10 @@ module Kettle
     end
 
     def appraisal_extract_runtime_dependencies(gemspec_content)
-      gemspec_content.to_s.lines.filter_map do |line|
-        stripped = line.lstrip
-        next if stripped.start_with?("#")
-
-        stripped[/add_(?:runtime_)?dependency\s*\(?\s*["']([^"']+)["']/, 1]
-      end.uniq
+      gemspec_dependency_records(gemspec_content)
+        .reject { |record| record.fetch(:kind) == "add_development_dependency" }
+        .map { |record| record.fetch(:name) }
+        .uniq
     end
 
     def appraisal_scaffold_config(gemspec_content:, existing_config: {}, exclusions: [], default_mode: "semver", freshness_ttl: APPRAISAL_DEFAULT_FRESHNESS_TTL)
@@ -3291,14 +3289,23 @@ module Kettle
     end
 
     def gemfile_declares_gem?(content, gem_name)
-      return true if content.to_s.include?(%(gemspec path: "gems/#{gem_name}"))
-      return true if content.to_s.include?(%(gemspec path: 'gems/#{gem_name}'))
+      ruby_call_records(content, nil).any? do |call|
+        next false unless call.receiver.nil?
 
-      ruby_call_records(content, :gem).any? do |call|
-        call.receiver.nil? && ruby_string_argument(call) == gem_name.to_s
+        case call.name
+        when :gem
+          ruby_string_argument(call) == gem_name.to_s
+        when :gemspec
+          gemspec_path_declares_gem?(ruby_keyword_string_argument(call, :path), gem_name)
+        else
+          false
+        end
       end
-    rescue StandardError
-      content.to_s.lines.any? { |line| line.include?(%("#{gem_name}")) || line.include?(%('#{gem_name}')) }
+    end
+
+    def gemspec_path_declares_gem?(path, gem_name)
+      normalized_path = path.to_s.delete_suffix("/")
+      normalized_path == "gems/#{gem_name}"
     end
 
     def detected_license_ids(project_root)
@@ -5357,6 +5364,15 @@ module Kettle
       end
     end
 
+    def ruby_keyword_string_argument(call, key)
+      keyword_hash = Array(call&.arguments&.arguments).find { |argument| argument.is_a?(::Prism::KeywordHashNode) }
+      assoc = keyword_hash&.elements&.find do |element|
+        element.respond_to?(:key) && element.key.respond_to?(:unescaped) && element.key.unescaped == key.to_s
+      end
+      value = assoc&.value
+      value.unescaped if value.is_a?(::Prism::StringNode)
+    end
+
     def prism_parse_success(content)
       result = ::Prism.parse(content.to_s)
       result if result.success?
@@ -7301,7 +7317,7 @@ module Kettle
         when "buy_me_a_coffee"
           "https://www.buymeacoffee.com/#{handle}"
         when "custom"
-          handle if handle.match?(%r{\Ahttps?://})
+          handle if http_url?(handle)
         when "github"
           "https://github.com/sponsors/#{handle}"
         when "issuehunt"
@@ -8886,13 +8902,19 @@ module Kettle
       value = url.to_s.strip
       return if value.empty?
 
-      if (match = value.match(/\Agit@github\.com:([^\/]+)\/(.+?)(?:\.git)?\z/))
-        return "https://github.com/#{match[1]}/#{match[2]}"
-      end
-      if (match = value.match(%r{\Ahttps?://github\.com/([^/]+)/(.+?)(?:\.git)?\z}))
-        return "https://github.com/#{match[1]}/#{match[2]}"
+      if value.start_with?("git@github.com:")
+        slug = value.split(":", 2).last.to_s.delete_suffix(".git")
+        return "https://github.com/#{slug}" if slug.split("/").length >= 2
       end
 
+      uri = URI.parse(value)
+      if %w[http https].include?(uri.scheme) && uri.host == "github.com"
+        slug = uri.path.to_s.delete_prefix("/").delete_suffix(".git")
+        return "https://github.com/#{slug}" if slug.split("/").length >= 2
+      end
+
+      value
+    rescue URI::InvalidURIError
       value
     end
 
@@ -11106,7 +11128,30 @@ module Kettle
     end
 
     def github_actions_coverage_enabled?(content)
-      content.match?(/K_SOUP_COV_DO:\s*["']?true["']?/)
+      yaml_contains_key_value?(YAML.safe_load(content.to_s, aliases: true), "K_SOUP_COV_DO", "true")
+    rescue Psych::Exception
+      false
+    end
+
+    def yaml_contains_key_value?(node, key, value)
+      case node
+      when Hash
+        node.any? do |candidate_key, candidate_value|
+          (candidate_key.to_s == key.to_s && candidate_value.to_s == value.to_s) ||
+            yaml_contains_key_value?(candidate_value, key, value)
+        end
+      when Array
+        node.any? { |candidate| yaml_contains_key_value?(candidate, key, value) }
+      else
+        false
+      end
+    end
+
+    def http_url?(value)
+      uri = URI.parse(value.to_s)
+      %w[http https].include?(uri.scheme)
+    rescue URI::InvalidURIError
+      false
     end
 
     def append_github_actions_coverage_steps(content)
