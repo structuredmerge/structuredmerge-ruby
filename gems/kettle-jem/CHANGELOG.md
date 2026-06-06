@@ -74,7 +74,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Documentation templates now require `yard-yaml` >= 0.2.0.
 - Documentation templates now require `yard-fence` >= 0.9.2.
 - Documentation templates now require `yard-timekeeper` >= 0.2.1.
-- Gem templates now require `kettle-dev` >= 2.0.8.
+- Gem templates now require `kettle-dev` >= 2.1.0.
 - Gem templates now require `kettle-test` >= 2.0.3.
 - Gem templates now require `appraisal2` >= 3.1.0.
 - Gem templates now require `version_gem` >= 1.1.10.
