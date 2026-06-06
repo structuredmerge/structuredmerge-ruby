@@ -67,7 +67,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Documentation templates now require `yard-timekeeper` >= 0.2.1.
 - Gem templates now require `kettle-dev` >= 2.0.8.
 - Gem templates now require `kettle-test` >= 2.0.3.
-- Gem templates now require `appraisal2` >= 3.0.8.
+- Gem templates now require `appraisal2` >= 3.0.9.
 - Gem templates now require `version_gem` >= 1.1.10.
 - Generated templating Gemfiles now require `kettle-drift` >= 1.0.1.
 - Runtime dependency `token-resolver` now requires the released 2.x line.
@@ -91,8 +91,8 @@ Please file a bug if you notice a violation of semantic versioning.
   command config as well as managed `.gitattributes`, so local `git diff`
   can actually invoke StructuredMerge drivers after templating.
 - Runtime dependency `token-resolver` now requires 2.0.1 or newer.
-- Generated gemspecs now require `version_gem` >= 1.0.10 while allowing the
-  released 1.0 line.
+- Generated gemspecs now require `version_gem` >= 1.1.10 while allowing the
+  released 1.1 line.
 - Gem templates now require `gitmoji-regex` >= 2.0.1.
 - Gem templates now require `turbo_tests2` >= 3.1.1 for the default
   `kettle-test` runner.
