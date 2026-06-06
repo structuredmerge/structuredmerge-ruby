@@ -2283,7 +2283,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.10"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -2327,7 +2327,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.10"
           end
         RUBY
         "lib/example/gem/version.rb" => <<~RUBY,
@@ -2371,7 +2371,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "turbo_tests2"
             spec.version = "3.0.0"
             spec.summary = "Turbo tests"
-            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.10"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -4826,7 +4826,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example-gem"
             spec.version = "1.2.3"
             spec.summary = "Example gem"
-            spec.add_dependency "version_gem", "~> 1.0", ">= 1.0.10"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.10"
           end
         RUBY
       })
@@ -7251,7 +7251,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 4.0"
-            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
@@ -7307,7 +7307,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 3.2"
-            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
@@ -7360,7 +7360,7 @@ RSpec.describe Kettle::Jem do
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
             spec.required_ruby_version = ">= 2.4"
-            spec.add_dependency("version_gem", "~> 1.0", ">= 1.0.10")
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.10")
 
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
