@@ -12,6 +12,10 @@
 gem "reek", "~> 6.5", ">= 6.5.0"
 
 platform :mri do
+  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
+    gem "appraisal2-rubocop", "~> 0.1", ">= 0.1.0", require: false
+  end
+
   gem "rubocop-on-rbs", "~> 2.0", ">= 2.0.0"        # ruby >= 3.2.0
   # gem "rubocop", "~> 1.73", ">= 1.73.2" # constrained by standard
   gem "rubocop-packaging", "~> 0.6", ">= 0.6.0"

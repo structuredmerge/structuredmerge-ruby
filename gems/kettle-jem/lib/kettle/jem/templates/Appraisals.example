@@ -6,8 +6,13 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # {KJ|FREEZE_TOKEN}:unfreeze
 
-# HOW TO UPDATE APPRAISALS (will run rubocop_gradual's autocorrect afterward):
+# HOW TO UPDATE APPRAISALS (Appraisal2 RuboCop hooks normalize generated gemfiles on modern Ruby):
 #   bin/rake appraisal:update
+
+begin
+  require "appraisal2/rubocop"
+rescue LoadError
+end
 
 # Lock/Unlock Deps Pattern
 #

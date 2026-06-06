@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
   immutable SHA for v2.2.1.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
+- Generated Appraisal/RuboCop templates now use `appraisal2-rubocop` v0.1.0
+  from the style toolchain to normalize generated Appraisal gemfiles in memory.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
   matrix entries experimental so native extension build failures do not fail
   the whole workflow.

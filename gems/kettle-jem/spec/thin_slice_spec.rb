@@ -9952,6 +9952,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.0"')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.3"')
       expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
+      expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.1", ">= 0.1.0", require: false')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2"')
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.0\"",
