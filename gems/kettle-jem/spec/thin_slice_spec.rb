@@ -1934,6 +1934,17 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps Ruby 2.3 in the untested README support badge set" do
+    template = File.read(File.join(__dir__, "..", "lib", "kettle", "jem", "templates", "README.md.example"))
+    ruby_2_line = template.lines.find { |line| line.start_with?("| Works with MRI Ruby 2") }
+
+    expect(ruby_2_line).to include("![Ruby 2.2 Compat][💎ruby-2.2i] ![Ruby 2.3 Compat][💎ruby-2.3i] <br/>")
+    expect(ruby_2_line).not_to include("[![Ruby 2.3 Compat][💎ruby-2.3i]][🚎ruby-2.3-wf]")
+    expect(template).to include("[💎ruby-2.3i]: https://img.shields.io/badge/Ruby-2.3_(%F0%9F%9A%ABCI)-AABBCC")
+    expect(template).not_to include("[🚎ruby-2.3-wf]:")
+    expect(template).not_to include("[🚎ruby-2.3-wfi]:")
+  end
+
   it "filters template recipes with old only/include semantics" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

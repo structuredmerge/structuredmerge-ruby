@@ -52,6 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
   such as `OAuth2` and `OmniAuth` are preserved.
 - README and CONTRIBUTING templates now document the effective
   `ruby.test_minimum` value used when the project was templated.
+- README templates now list Ruby 2.3 as supported but untested, matching Ruby
+  2.2 and older, instead of rendering a Ruby 2.3 CI workflow badge.
 - README templates now include a closing note that identifies kettle-jem and
   StructuredMerge as the templating and merge-contract tooling.
 - README logo templating now splits config-driven `top_logos` from
