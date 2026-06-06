@@ -135,6 +135,7 @@ RSpec.describe Kettle::Jem do
       expect(custom_ci_report.fetch(:final_content)).to include("ruby/setup-ruby@afeafc")
       expect(custom_ci_report.fetch(:final_content)).to include("Upload coverage to Coveralls")
       expect(custom_ci_report.fetch(:final_content)).to include("qltysh/qlty-action/coverage@fd52dc")
+      expect(custom_ci_report.fetch(:final_content)).to include("oidc: true")
       expect(custom_ci_report.fetch(:final_content)).to include("Code Coverage Summary Report")
       expect(custom_ci_report.fetch(:final_content)).to include("ruby: [\"3.2\", \"3.3\"]")
       obsolete_workflow_report = plan[:recipe_reports].find do |report|
@@ -4821,6 +4822,35 @@ RSpec.describe Kettle::Jem do
       expect(apply.fetch(:changed_files)).to include(".github/workflows/coverage.yml")
       expect(workflow).to include("K_SOUP_COV_MIN_BRANCH: 76")
       expect(workflow).to include("K_SOUP_COV_MIN_LINE: 100")
+    end
+  end
+
+  it "generates QLTY coverage uploads with OIDC in the packaged coverage workflow" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-coverage-qlty-oidc", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            apply: true
+            entries:
+              - source: .github/workflows/coverage.yml
+                target: .github/workflows/coverage.yml
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {only: ".github/workflows/coverage.yml", skip_commit: true})
+      workflow = File.read(File.join(root, ".github", "workflows", "coverage.yml"))
+
+      expect(apply.fetch(:changed_files)).to include(".github/workflows/coverage.yml")
+      expect(workflow).to include("qltysh/qlty-action/coverage@fd52dc")
+      expect(workflow).to include("oidc: true")
     end
   end
 
