@@ -131,7 +131,7 @@ RSpec.describe Kettle::Jem do
       end
       expect(custom_ci_report.fetch(:final_content)).to include("permissions:")
       expect(custom_ci_report.fetch(:final_content)).to include("concurrency:")
-      expect(custom_ci_report.fetch(:final_content)).to include("actions/checkout@9f698171")
+      expect(custom_ci_report.fetch(:final_content)).to include("actions/checkout@df4cb1c0")
       expect(custom_ci_report.fetch(:final_content)).to include("ruby/setup-ruby@afeafc")
       expect(custom_ci_report.fetch(:final_content)).to include("Upload coverage to Coveralls")
       expect(custom_ci_report.fetch(:final_content)).to include("qltysh/qlty-action/coverage@fd52dc")
@@ -419,7 +419,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:recipe_name)).to start_with("github_actions_workflow_snippets_")
       expect(content).to include("permissions:\n  contents: read")
       expect(content).to include("concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"")
-      expect(content).to include("actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3")
+      expect(content).to include("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3")
       expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
       expect(content).to include("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1")
       expect(content).to include("codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1")
@@ -479,7 +479,7 @@ RSpec.describe Kettle::Jem do
       content = report.fetch(:final_content)
 
       expect(report.fetch(:recipe_name)).to start_with("template_source_application_")
-      expect(content).to include("actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3")
+      expect(content).to include("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3")
       expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
       expect(content).not_to include("actions/checkout@v6")
       expect(content).not_to include("ruby/setup-ruby@v1")

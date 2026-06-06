@@ -10906,7 +10906,7 @@ module Kettle
 
             steps:
               - name: Checkout #{package.fetch(:name)}
-                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+                uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -10978,7 +10978,7 @@ module Kettle
 
             steps:
               - name: Checkout
-                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+                uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -11079,7 +11079,7 @@ module Kettle
 
             steps:
               - name: Checkout
-                uses: actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3
+                uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
                 uses: ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0
@@ -11322,7 +11322,7 @@ module Kettle
 
     def github_actions_step_pins
       {
-        "actions/checkout" => "actions/checkout@9f698171ed81b15d1823a05fc7211befd50c8ae0 # v6.0.3",
+        "actions/checkout" => "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3",
         "ruby/setup-ruby" => "ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1",

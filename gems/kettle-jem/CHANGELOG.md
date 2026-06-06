@@ -39,8 +39,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated auto-assign workflows now pin `pozil/auto-assign-issue` to the
   immutable SHA for v4.
 - Generated GitHub Actions workflow templates now pin `actions/checkout` to
-  the immutable SHA for v6.0.3 and `qltysh/qlty-action/coverage` to the
+  the peeled commit SHA for v6.0.3 and `qltysh/qlty-action/coverage` to the
   immutable SHA for v2.2.1.
+- Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
+  matrix entries experimental so native extension build failures do not fail
+  the whole workflow.
 - Documented `kettle-jem install` as the canonical full templating entrypoint
   and marked generated `kettle:jem:*` rake tasks as internal orchestration targets.
 - Bare `kettle-jem template` now aliases to the full install path; use
