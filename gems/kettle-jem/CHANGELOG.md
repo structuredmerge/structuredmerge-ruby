@@ -87,6 +87,9 @@ Please file a bug if you notice a violation of semantic versioning.
   appraisal Gemfile so Ruby 3.2-specific dependency restrictions apply before
   Bundler cache installation, then run tests directly under that bundle instead
   of regenerating the active appraisal Gemfile.
+- Generated Ruby 3.0 and Ruby 3.2 appraisal Gemfiles now include
+  TruffleRuby-only `json` modules that pin to the default `json` gem shipped
+  with EOL TruffleRuby releases instead of constraining MRI Ruby bundles.
 - Generated main Gemfiles now install `nomono` >= 1.0.2 so local workspace
   override Gemfiles can load `nomono/bundler` from the released gem.
 - Generated coverage workflows now pass `K_SOUP_COV_MIN_LINE` and

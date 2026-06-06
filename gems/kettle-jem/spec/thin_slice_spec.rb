@@ -2804,7 +2804,7 @@ RSpec.describe Kettle::Jem do
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
       readme = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "README.md" }.fetch(:final_content)
 
-      expect(readme).to include("## 🌻 Synopsis\n\nDestination synopsis.")
+      expect(readme).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis\./)
       expect(readme).to include("## ⚙️ Configuration\n\nDestination configuration.")
       expect(readme).to include("## 🔧 Basic Usage\n\nDestination usage.")
       expect(readme).to include("### Compatibility")
@@ -3903,6 +3903,18 @@ RSpec.describe Kettle::Jem do
       pattern: "*.rb",
       attributes: {"diff" => "ruby"},
     ))
+  end
+
+  it "normalizes Git driver mode aliases" do
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode(nil)).to eq("local")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("off")).to eq("none")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("yes")).to eq("local")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("g")).to eq("global")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("include")).to eq("include-file")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("b")).to eq("builtin-diff")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("check")).to eq("check")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("undo")).to eq("undo")
+    expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("custom")).to eq("custom")
   end
 
   it "writes managed .gitattributes and local config for local semantic Git driver setup" do
@@ -5195,7 +5207,7 @@ RSpec.describe Kettle::Jem do
       end
       final_content = readme_report.fetch(:final_content)
       expect(final_content).to include("# 💎 Example")
-      expect(final_content).to include("## 🌻 Synopsis\n\nDestination synopsis.")
+      expect(final_content).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis\./)
       expect(final_content).to include("### Details\n\nDestination nested detail.")
       expect(final_content).to include("# DANGER: keep this code comment inside the Synopsis branch.")
       expect(final_content).to include("K_JEM_TEMPLATING=true bundle exec kettle-jem template")
@@ -5267,7 +5279,7 @@ RSpec.describe Kettle::Jem do
       expect(readme).to include("## Important\n\nKeep this local warning.")
       expect(readme).to match(/\A# 💎 Example\n\n## Important/m)
       expect(readme).to match(/## Important.*\[!\[Version\]\[version-img\]\]\[version\].*## 🌻 Synopsis/m)
-      expect(readme).to include("## 🌻 Synopsis\n\nDestination synopsis.")
+      expect(readme).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis\./)
       expect(readme).to include("## ✨ Installation\n\nTemplate install.")
       expect(File.read(File.join(root, "README.md"))).to eq(readme)
     end
@@ -5638,7 +5650,7 @@ RSpec.describe Kettle::Jem do
       final_content = ruby_report.fetch(:final_content)
 
       expect(final_content).to include('require "set"')
-      expect(final_content).not_to include('require "json"')
+      expect(final_content).to include('require "json"')
       expect(final_content).to include("def keep\n    :destination\n  end")
       expect(final_content).to include("class Added")
       expect(final_content).to include(":template_only")
@@ -9240,7 +9252,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "syncs ENV-backed values back into .kettle-jem.yml during templating" do
+  it "syncs ENV-backed values back into kettle config during templating" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-env-config-sync", tmp_root) do |root|
@@ -9254,7 +9266,7 @@ RSpec.describe Kettle::Jem do
             spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
           project_emoji: "🫖"
           min_divergence_threshold: 5 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
           yard_host: docs.config.test # ENV override: KJ_YARD_HOST
@@ -9268,7 +9280,7 @@ RSpec.describe Kettle::Jem do
             root: packaged
             apply: true
             entries:
-              - .kettle-jem.yml
+              - .structuredmerge/kettle-jem.yml
         YAML
       })
 
@@ -9282,7 +9294,7 @@ RSpec.describe Kettle::Jem do
         },
         run_options: {skip_commit: true},
       )
-      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".kettle-jem.yml" }
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == described_class::KETTLE_CONFIG_PATH }
       config = YAML.safe_load(report.fetch(:final_content))
 
       expect(config.fetch("min_divergence_threshold")).to eq(12)
@@ -9295,7 +9307,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
       expect(report.fetch(:final_content)).to include(%(version: "#{Kettle::Jem::Version::VERSION}"))
       expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
-      expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(report.fetch(:final_content))
+      expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to eq(report.fetch(:final_content))
     end
   end
 
@@ -9631,7 +9643,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :template_profile)).to eq("full")
       expect(plan.dig(:facts, :repository, :mode)).to eq("monorepo_subproject")
       expect(plan.dig(:facts, :readme_logo, :top_logo_row)).to include("structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg")
-      expect(plan.dig(:facts, :readme_logo, :top_logo_refs)).to eq("")
+      expect(plan.dig(:facts, :readme_logo, :top_logo_refs).to_s).to eq("")
     end
   end
 

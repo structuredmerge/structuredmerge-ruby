@@ -57,7 +57,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(err).to eq("")
       expect(out).to include("setup: bootstrap_config_written")
       expect(out).to include("Review it, then run kettle-jem --accept-config")
-      expect(File).to exist(File.join(root, ".kettle-jem.yml"))
+      expect(File).to exist(File.join(root, Kettle::Jem::KETTLE_CONFIG_PATH))
       expect(File).not_to exist(File.join(root, ".github", "FUNDING.yml"))
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(status).to eq(0)
       expect(err).to eq("")
       expect(out).to include("setup: accepted_config_applied")
-      expect(File).to exist(File.join(root, ".kettle-jem.yml"))
+      expect(File).to exist(File.join(root, Kettle::Jem::KETTLE_CONFIG_PATH))
       expect(File).to exist(File.join(root, ".github", "FUNDING.yml"))
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
@@ -117,9 +117,9 @@ RSpec.describe Kettle::Jem::CLI do
       report = JSON.parse(File.read(report_path), symbolize_names: true)
       expect(payload.fetch(:mode)).to eq("plan")
       expect(payload.fetch(:decision_policy).fetch(:mode)).to eq("accept")
-      expect(payload.fetch(:changed_files)).to include(".kettle-jem.yml")
+      expect(payload.fetch(:changed_files)).to include(Kettle::Jem::KETTLE_CONFIG_PATH)
       expect(report.fetch(:changed_files)).to eq(payload.fetch(:changed_files))
-      expect(File.exist?(File.join(root, ".kettle-jem.yml"))).to be(false)
+      expect(File.exist?(File.join(root, Kettle::Jem::KETTLE_CONFIG_PATH))).to be(false)
     end
   end
 

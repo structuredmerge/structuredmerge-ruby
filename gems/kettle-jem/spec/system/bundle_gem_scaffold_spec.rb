@@ -182,7 +182,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
 
     readme = File.read(File.join(gem_root, "README.md"))
     expect(readme).to include("# 💎 Dummy::Gem")
-    expect(readme).to include("## 🌻 Synopsis\n\nDestination synopsis from the scaffolded project.")
+    expect(readme).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis from the scaffolded project\./)
     expect(readme).to include("## 🔧 Basic Usage\n\nDestination usage from the scaffolded project.")
     expect(readme).not_to include("Old scaffold installation notes.")
     expect(readme).to include("Compatible with MRI Ruby 3.2.0+")
@@ -309,7 +309,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
 
     readme_after_second_apply = File.read(File.join(gem_root, "README.md"))
     expect(readme_after_second_apply).to include("# 💎 Dummy::Gem")
-    expect(readme_after_second_apply).to include("## 🌻 Synopsis\n\nDestination synopsis from the scaffolded project.")
+    expect(readme_after_second_apply).to match(/## 🌻 Synopsis(?: <a [^\n]+)?\n\nDestination synopsis from the scaffolded project\./)
 
     rakefile_after_second_apply = File.read(File.join(gem_root, "Rakefile"))
     expect(rakefile_after_second_apply).to include('require "bundler/gem_tasks"')

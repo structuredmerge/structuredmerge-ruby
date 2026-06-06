@@ -2,14 +2,14 @@
   "case_id": "kettle-jem-bootstrap-preflight",
   "ecosystem": "rubygems",
   "expected": {
-    "bootstrap_target": ".kettle-jem.yml",
+    "bootstrap_target": ".structuredmerge/kettle-jem.yml",
     "non_interactive_mode": "accept",
     "parser_error_paths": [
       "Gemfile",
       "example.gemspec"
     ],
     "idempotent_selected_paths": [
-      ".kettle-jem.yml",
+      ".structuredmerge/kettle-jem.yml",
       ".github/workflows/current.yml",
       "Rakefile"
     ]
