@@ -15,7 +15,7 @@ source "https://gem.coop"
 
 gemspec
 
-if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")
   if respond_to?(:generator_only)
     generator_only do
       eval_gemfile "gemfiles/modular/style.gemfile"

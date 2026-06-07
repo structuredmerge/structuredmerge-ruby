@@ -51,6 +51,8 @@ Please file a bug if you notice a violation of semantic versioning.
   and `generator_only` DSLs to provide the full style toolchain from modern
   Appraisal root bundles without leaking style dependencies into old-Ruby
   appraisal bundles, while still evaluating the style toolchain for Bundler.
+- Generated Appraisal root Gemfiles now load the style toolchain only on Ruby
+  3.2+, matching the current RuboCop-LTS dependency floor.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
