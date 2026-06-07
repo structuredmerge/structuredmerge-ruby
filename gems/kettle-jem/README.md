@@ -250,6 +250,11 @@ better fit for Appraisals-style combinations.
 | `keep_destination`  | Skip entirely — no merge, no creation                                |
 | `raw_copy`         | Copy bytes as-is — no token resolution, no merge (for binary assets) |
 
+`raw_copy` exists for bootstrap files that may be needed before the full
+templating stack is available. Because it bypasses normal template processing,
+do not use it for templates that contain `{KJ|...}` tokens or require
+StructuredMerge normalization.
+
 ### Token Substitution
 
 Tokens use `{KJ|TOKEN}` syntax and are resolved in priority order:

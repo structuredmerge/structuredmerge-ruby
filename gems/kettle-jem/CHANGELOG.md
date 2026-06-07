@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated Appraisal/RuboCop templates now use `appraisal2-rubocop` v0.1.0
   from the style toolchain to normalize generated Appraisal gemfiles in memory.
+- Template strategy documentation now clarifies that `raw_copy` is a bootstrap
+  path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
   matrix entries experimental so native extension build failures do not fail
   the whole workflow.

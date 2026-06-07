@@ -55,6 +55,11 @@ Template strategies:
 | `keep_destination` | Leave the destination file untouched. |
 | `raw_copy` | Copy bytes exactly, with no token resolution or merge. |
 
+`raw_copy` exists for bootstrap files that may be needed before the full
+templating stack is available. Because it bypasses normal template processing,
+do not use it for templates that contain `{KJ\|...}` tokens or require
+StructuredMerge normalization.
+
 Merge entries may set `preference`, `add_template_only_nodes`, `freeze_token`,
 `file_type`, and `recipe`. `files` entries match exact paths. `patterns`
 entries are glob-based and the first match wins.
