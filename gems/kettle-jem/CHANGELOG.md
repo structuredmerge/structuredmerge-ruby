@@ -56,6 +56,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Open Collective backers workflows now skip the README update step
   when `README_UPDATER_TOKEN` is not configured instead of failing the workflow.
 - Generated style toolchains now use `appraisal2-rubocop` 0.2.0 as their floor.
+- Generated style toolchains now include `rubocop-minitest` so projects with
+  preserved Minitest RuboCop config can run `rubocop_gradual`.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
