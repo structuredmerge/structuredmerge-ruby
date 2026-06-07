@@ -11,11 +11,11 @@
 
 if respond_to?(:plugin)
   plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true
-else
-  begin
-    require "appraisal2/rubocop"
-  rescue LoadError
-  end
+end
+
+begin
+  require "appraisal2/rubocop" unless respond_to?(:plugin)
+rescue LoadError
 end
 
 # Lock/Unlock Deps Pattern

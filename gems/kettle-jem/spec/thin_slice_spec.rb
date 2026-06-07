@@ -9998,8 +9998,10 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_report.fetch(:final_content)).to include(
         'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true',
       )
-      expect(appraisals_report.fetch(:final_content)).to include('require "appraisal2/rubocop"')
       expect(appraisals_report.fetch(:final_content)).to include("if respond_to?(:plugin)")
+      expect(appraisals_report.fetch(:final_content)).to include(
+        'require "appraisal2/rubocop" unless respond_to?(:plugin)',
+      )
       expect(appraisal_root_report.fetch(:final_content)).to include(
         'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
       )
