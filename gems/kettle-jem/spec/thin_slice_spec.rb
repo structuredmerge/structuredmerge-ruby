@@ -136,6 +136,7 @@ RSpec.describe Kettle::Jem do
       expect(custom_ci_report.fetch(:final_content)).to include("Upload coverage to Coveralls")
       expect(custom_ci_report.fetch(:final_content)).to include("qltysh/qlty-action/coverage@fd52dc")
       expect(custom_ci_report.fetch(:final_content)).to include("oidc: true")
+      expect(custom_ci_report.fetch(:final_content)).not_to include("QLTY_COVERAGE_TOKEN")
       expect(custom_ci_report.fetch(:final_content)).to include("Code Coverage Summary Report")
       expect(custom_ci_report.fetch(:final_content)).to include("ruby: [\"3.2\", \"3.3\"]")
       obsolete_workflow_report = plan[:recipe_reports].find do |report|
@@ -4851,6 +4852,7 @@ RSpec.describe Kettle::Jem do
       expect(apply.fetch(:changed_files)).to include(".github/workflows/coverage.yml")
       expect(workflow).to include("qltysh/qlty-action/coverage@fd52dc")
       expect(workflow).to include("oidc: true")
+      expect(workflow).not_to include("QLTY_COVERAGE_TOKEN")
     end
   end
 
