@@ -9965,6 +9965,50 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "wires Appraisal2 RuboCop as a generator plugin without generated appraisal leakage" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisal-rubocop-plugin-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Appraisals
+              - Appraisal.root.gemfile
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      appraisals_report = plan[:recipe_reports].find do |report|
+        report.fetch(:relative_path) == "Appraisals"
+      end
+      appraisal_root_report = plan[:recipe_reports].find do |report|
+        report.fetch(:relative_path) == "Appraisal.root.gemfile"
+      end
+
+      expect(appraisals_report.fetch(:final_content)).to include(
+        'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true',
+      )
+      expect(appraisals_report.fetch(:final_content)).to include('require "appraisal2/rubocop"')
+      expect(appraisals_report.fetch(:final_content)).to include("if respond_to?(:plugin)")
+      expect(appraisal_root_report.fetch(:final_content)).to include(
+        'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
+      )
+      expect(appraisal_root_report.fetch(:final_content)).to include(
+        'gem "appraisal2-rubocop", "~> 0.1", ">= 0.1.0", :require => false',
+      )
+    end
+  end
+
   it "fails fast when template application leaves unresolved tokens" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
