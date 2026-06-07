@@ -50,7 +50,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Appraisal/RuboCop templates now use Appraisal2 3.1.1's `plugin`
   and `generator_only` DSLs to provide the full style toolchain from modern
   Appraisal root bundles without leaking style dependencies into old-Ruby
-  appraisal bundles.
+  appraisal bundles, while still evaluating the style toolchain for Bundler.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their

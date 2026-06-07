@@ -10004,6 +10004,9 @@ RSpec.describe Kettle::Jem do
         'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
+        "if respond_to?(:generator_only)",
+      )
+      expect(appraisal_root_report.fetch(:final_content)).to include(
         "generator_only do",
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
