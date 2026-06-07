@@ -16,5 +16,5 @@ source "https://gem.coop"
 gemspec
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
-  gem "appraisal2-rubocop", "~> 0.1", ">= 0.1.0", :require => false
+  eval_gemfile "gemfiles/modular/style.gemfile"
 end

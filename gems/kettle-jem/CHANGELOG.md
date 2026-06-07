@@ -46,10 +46,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated coverage workflow uploads now share the same template token as
   custom workflow injection, avoiding duplicate coverage upload step templates.
 - Generated Appraisal/RuboCop templates now load `appraisal2-rubocop` as an
-  optional Appraisal2 generator plugin and provide it from the style and modern
-  Appraisal root bundles so generated Appraisal gemfiles can be normalized in
-  memory without leaking the plugin into old-Ruby appraisal bundles, with a
-  compatibility fallback for Appraisal2 versions before the `plugin` DSL.
+  optional Appraisal2 generator plugin and provide the full style toolchain from
+  modern Appraisal root bundles so generated Appraisal gemfiles can be
+  normalized in memory without leaking style dependencies into old-Ruby
+  appraisal bundles, with a compatibility fallback for Appraisal2 versions
+  before the `plugin` DSL.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their

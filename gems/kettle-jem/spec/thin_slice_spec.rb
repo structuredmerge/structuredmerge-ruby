@@ -10006,7 +10006,7 @@ RSpec.describe Kettle::Jem do
         'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        'gem "appraisal2-rubocop", "~> 0.1", ">= 0.1.0", :require => false',
+        'eval_gemfile "gemfiles/modular/style.gemfile"',
       )
     end
   end
