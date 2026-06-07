@@ -53,6 +53,8 @@ Please file a bug if you notice a violation of semantic versioning.
   appraisal bundles, while still evaluating the style toolchain for Bundler.
 - Generated Appraisal root Gemfiles now load the style toolchain only on Ruby
   3.2+, matching the current RuboCop-LTS dependency floor.
+- Generated Open Collective backers workflows now skip the README update step
+  when `README_UPDATER_TOKEN` is not configured instead of failing the workflow.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
