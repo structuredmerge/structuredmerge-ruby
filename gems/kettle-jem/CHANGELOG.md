@@ -47,12 +47,10 @@ Please file a bug if you notice a violation of semantic versioning.
   custom workflow injection, avoiding duplicate coverage upload step templates.
 - Generated coverage workflows no longer gain an extra blank line after the
   shared coverage upload step token is expanded at end of file.
-- Generated Appraisal/RuboCop templates now load `appraisal2-rubocop` as an
-  optional Appraisal2 generator plugin and provide the full style toolchain from
-  modern Appraisal root bundles so generated Appraisal gemfiles can be
-  normalized in memory without leaking style dependencies into old-Ruby
-  appraisal bundles, with compatibility fallbacks for Appraisal2 versions
-  before the `plugin` and `generator_only` DSLs.
+- Generated Appraisal/RuboCop templates now use Appraisal2 3.1.1's `plugin`
+  and `generator_only` DSLs to provide the full style toolchain from modern
+  Appraisal root bundles without leaking style dependencies into old-Ruby
+  appraisal bundles.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their
@@ -86,7 +84,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Documentation templates now require `yard-timekeeper` >= 0.2.1.
 - Gem templates now require `kettle-dev` >= 2.1.0.
 - Gem templates now require `kettle-test` >= 2.0.3.
-- Gem templates now require `appraisal2` >= 3.1.0.
+- Gem templates now require `appraisal2` >= 3.1.1.
 - Gem templates now require `version_gem` >= 1.1.10.
 - Generated templating Gemfiles now require `kettle-drift` >= 1.0.1.
 - Runtime dependency `token-resolver` now requires the released 2.x line.

@@ -9998,22 +9998,18 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_report.fetch(:final_content)).to include(
         'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true',
       )
-      expect(appraisals_report.fetch(:final_content)).to include("if respond_to?(:plugin)")
-      expect(appraisals_report.fetch(:final_content)).to include(
-        'require "appraisal2/rubocop" unless respond_to?(:plugin)',
-      )
+      expect(appraisals_report.fetch(:final_content)).not_to include("respond_to?(:plugin)")
+      expect(appraisals_report.fetch(:final_content)).not_to include('require "appraisal2/rubocop"')
       expect(appraisal_root_report.fetch(:final_content)).to include(
         'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        "if respond_to?(:generator_only)",
+        "generator_only do",
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
         'eval_gemfile "gemfiles/modular/style.gemfile"',
       )
-      expect(appraisal_root_report.fetch(:final_content)).to include(
-        'elsif self.class.name.start_with?("Appraisal::")',
-      )
+      expect(appraisal_root_report.fetch(:final_content)).not_to include('self.class.name.start_with?("Appraisal::")')
     end
   end
 

@@ -3275,7 +3275,7 @@ module Kettle
 
     def monorepo_root_gemfile_dependency_lines
       [
-        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.1", ">= 3.1.0"\n)},
+        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.1", ">= 3.1.1"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.1", ">= 2.1.0"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.1"\n)},
