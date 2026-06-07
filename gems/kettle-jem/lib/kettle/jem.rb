@@ -2679,6 +2679,7 @@ module Kettle
           ecosystem: "rubygems",
           name: name,
           slug: name,
+          summary: metadata_value(gemspec_metadata, :summary),
           description: metadata_value(gemspec_metadata, :description) ||
             metadata_value(gemspec_metadata, :summary),
           homepage_url: homepage_url,
@@ -5903,13 +5904,14 @@ module Kettle
       merged = apply_configured_gemspec_required_ruby_version(merged, facts, receiver: template_receiver)
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
+      merged = remove_gemspec_version_gem_dependency_when_runtime_incompatible(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
     end
 
     def rewrite_gemspec_version_loader(content, facts:)
-      min_ruby = minimum_ruby_token(facts.to_h.dig(:rubygems, :min_ruby))
+      min_ruby = gemspec_runtime_floor_token(facts)
       return content if min_ruby.to_s.empty?
 
       namespace = facts.to_h.dig(:rubygems, :namespace).to_s
@@ -5950,8 +5952,7 @@ module Kettle
           <<~RUBY.chomp
             # NOTE: Use __FILE__ or __dir__ until removal of Ruby 1.x support
             # __dir__ introduced in Ruby 1.9.1
-            # lib = File.expand_path("../lib", __FILE__)
-            lib = File.expand_path("lib", __dir__)
+            lib = File.expand_path("lib", File.dirname(__FILE__))
             $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
             require "#{entrypoint_require}/version"
           RUBY
@@ -5959,7 +5960,7 @@ module Kettle
 
       <<~RUBY
         gem_version =
-          if Gem.ruby_version >= Gem::Version.new("3.1")
+          if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
             # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
             # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
             # See: https://github.com/panorama-ed/memo_wise/pull/397
@@ -6048,8 +6049,12 @@ module Kettle
     end
 
     def apply_configured_gemspec_required_ruby_version(content, facts, receiver:)
+      return remove_gemspec_assignment(content, receiver: receiver, field: "required_ruby_version") if explicit_zero_runtime_floor?(facts)
+
       min_ruby = minimum_ruby_token(facts.to_h.dig(:rubygems, :min_ruby))
-      return content if min_ruby.to_s.empty?
+      if min_ruby.to_s.empty?
+        return content
+      end
 
       replacement = %(#{receiver}.required_ruby_version = ">= #{min_ruby}")
       existing = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "required_ruby_version" }
@@ -6062,6 +6067,53 @@ module Kettle
       return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
 
       content
+    end
+
+    def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)
+      return content if version_gem_runtime_compatible?(facts)
+
+      remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
+    end
+
+    def remove_gemspec_assignment(content, receiver:, field:)
+      records_by_line = gemspec_assignment_records(content, receiver: receiver)
+        .select { |record| record.fetch(:field) == field.to_s }
+        .to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] }
+      return content if records_by_line.empty?
+
+      ensure_trailing_newline(replace_record_ranges(content, records_by_line).gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def remove_gemspec_dependency_lines(content, receiver:, names:, runtime_only: false)
+      wanted = names.map(&:to_s).to_set
+      records_by_line = gemspec_dependency_records(content, receiver: receiver)
+        .select { |record| wanted.include?(record.fetch(:name)) }
+        .select { |record| !runtime_only || record.fetch(:kind) != "add_development_dependency" }
+        .to_h { |record| [record.fetch(:start_line), record.merge(replacement: "")] }
+      return content if records_by_line.empty?
+
+      ensure_trailing_newline(replace_record_ranges(content, records_by_line).gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def version_gem_runtime_compatible?(facts)
+      min_ruby = gemspec_runtime_floor_token(facts)
+      return true if min_ruby.to_s.empty?
+
+      Gem::Version.new(min_ruby) >= Gem::Version.new("2.2")
+    rescue ArgumentError
+      true
+    end
+
+    def gemspec_runtime_floor_token(facts)
+      raw = facts.to_h.dig(:rubygems, :min_ruby).to_s.strip
+      token = minimum_ruby_token(raw)
+      return "0" if token.empty? && raw == "0"
+
+      token
+    end
+
+    def explicit_zero_runtime_floor?(facts)
+      facts.to_h.dig(:rubygems, :min_ruby).to_s.strip == "0"
     end
 
     def remove_duplicate_gemspec_assignments(content, receiver:, fields:)
@@ -7827,6 +7879,8 @@ module Kettle
       github_org = facts.fetch(:repository, {})[:slug].to_s.split("/", 2).first.to_s if github_org.empty?
       tokens = {
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
+        "KJ|PACKAGE_SUMMARY" => package.fetch(:summary, package.fetch(:description, "")).to_s,
+        "KJ|PACKAGE_DESCRIPTION" => package.fetch(:description, package.fetch(:summary, "")).to_s,
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
         "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require, package.fetch(:name).to_s.tr("-", "/")).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
@@ -7998,6 +8052,9 @@ module Kettle
     end
 
     def minimum_ruby_token(requirement)
+      text = requirement.to_s.strip
+      return "0" if text == "0"
+
       requirement.to_s[/\d+(?:\.\d+){1,2}/].to_s
     end
 

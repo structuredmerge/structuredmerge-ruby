@@ -76,6 +76,8 @@ Please file a bug if you notice a violation of semantic versioning.
   2.2 and older, instead of rendering a Ruby 2.3 CI workflow badge.
 - README templates now include a closing note that identifies kettle-jem and
   StructuredMerge as the templating and merge-contract tooling.
+- Generated gemspec summary and description assignments now use package
+  metadata tokens instead of emoji-only placeholders.
 - README logo templating now splits config-driven `top_logos` from
   `h2_synopsis_logos`, renders logos as aligned HTML images, and normalizes logo
   assets to 128px.
@@ -135,6 +137,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Explicit `rubygems.min_ruby: "0"` template configuration now renders the
+  zero runtime floor consistently while omitting `required_ruby_version` and
+  runtime dependencies that cannot support Ruby 1.x.
+- Generated Ruby 4/head extracted-stdlib Gemfiles now include `cgi` and
+  `webrick` so legacy suites that require extracted standard libraries can run
+  on modern Rubies.
 - `kettle-jem install` now ensures curated Bundler binstubs are executable,
   including legacy `bin/rake` and rewritten `bin/yard` binstubs used by
   `kettle-changelog`.

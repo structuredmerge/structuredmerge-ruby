@@ -6561,6 +6561,25 @@ RSpec.describe Kettle::Jem do
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
+  it "exposes package summary and description tokens for generated metadata" do
+    tokens = described_class.send(
+      :template_tokens,
+      {
+        package: {
+          name: "example",
+          summary: "Example summary",
+          description: "Example description",
+        },
+        rubygems: {},
+        project_runtime: {},
+      },
+      {},
+    )
+
+    expect(tokens.fetch("KJ|PACKAGE_SUMMARY")).to eq("Example summary")
+    expect(tokens.fetch("KJ|PACKAGE_DESCRIPTION")).to eq("Example description")
+  end
+
   it "templates spec helper coverage bootstrap before loading the library" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -7223,7 +7242,7 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
 
       expect(gemspec_content).to include("gem_version =")
-      expect(gemspec_content).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
+      expect(gemspec_content).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")')
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).to include('require_relative "lib/my/gem/version"')
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
@@ -7274,12 +7293,64 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include("gem_version =")
       expect(gemspec_content).to include("$LOAD_PATH.unshift(lib)")
+      expect(gemspec_content).to include('lib = File.expand_path("lib", File.dirname(__FILE__))')
       expect(gemspec_content).to include('require "my/gem/version"')
       expect(gemspec_content).not_to include('require_relative "lib/my/gem/version"')
       expect(gemspec_content).to include("spec.version = gem_version")
       expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
         include(operation: "rewrite_version_loader", min_ruby: "2.1", mode: "legacy", legacy_preamble_present: true),
       )
+      expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "keeps explicit zero runtime gemspec floor dependency-free for Ruby 1.x compatibility" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-zero-runtime-floor-slice", tmp_root) do |root|
+      write_tree(root, {
+        "my-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "my-gem"
+            gem.version = "0.1.0"
+            gem.summary = "Zero floor loader"
+            gem.homepage = "https://github.com/acme/my-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "0"
+            entrypoint_require: "my/gem"
+            namespace: "My::Gem"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - my-gem.gemspec
+        YAML
+        "template/my-gem.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.11")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_my_gem_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).to include("gem_version =")
+      expect(gemspec_content).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")')
+      expect(gemspec_content).to include('lib = File.expand_path("lib", File.dirname(__FILE__))')
+      expect(gemspec_content).to include('require "my/gem/version"')
+      expect(gemspec_content).not_to include("required_ruby_version")
+      expect(gemspec_content).not_to include("version_gem")
+      expect(gemspec_content).not_to include("require_relative")
+      expect(gemspec_content).to include("spec.version = gem_version")
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
   end
