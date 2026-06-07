@@ -11163,12 +11163,12 @@ module Kettle
       return content unless steps_sequence
 
       insert_index = steps_sequence.end_line
-      lines.insert(insert_index, github_actions_coverage_steps)
+      lines.insert(insert_index, "#{github_actions_coverage_steps}\n")
       lines.join
     end
 
     def github_actions_coverage_steps
-      <<~YAML.lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join
+      <<~YAML.lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join.chomp
         - name: Upload coverage to Coveralls
           if: ${{ !env.ACT }}
           uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7

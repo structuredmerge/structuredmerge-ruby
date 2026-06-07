@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated coverage workflow uploads now share the same template token as
   custom workflow injection, avoiding duplicate coverage upload step templates.
+- Generated coverage workflows no longer gain an extra blank line after the
+  shared coverage upload step token is expanded at end of file.
 - Generated Appraisal/RuboCop templates now load `appraisal2-rubocop` as an
   optional Appraisal2 generator plugin and provide the full style toolchain from
   modern Appraisal root bundles so generated Appraisal gemfiles can be
