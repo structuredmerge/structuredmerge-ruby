@@ -43,6 +43,8 @@ Please file a bug if you notice a violation of semantic versioning.
   immutable SHA for v2.2.1.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
+- Generated coverage workflow uploads now share the same template token as
+  custom workflow injection, avoiding duplicate coverage upload step templates.
 - Generated Appraisal/RuboCop templates now use `appraisal2-rubocop` v0.1.0
   from the style toolchain to normalize generated Appraisal gemfiles in memory.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap

@@ -7839,6 +7839,7 @@ module Kettle
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
+        "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps,
       }.merge(
         rubocop_template_tokens(rubygems[:min_ruby]),
       ).merge(

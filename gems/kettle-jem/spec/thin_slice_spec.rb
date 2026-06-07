@@ -4853,6 +4853,7 @@ RSpec.describe Kettle::Jem do
       expect(workflow).to include("qltysh/qlty-action/coverage@fd52dc")
       expect(workflow).to include("oidc: true")
       expect(workflow).not_to include("QLTY_COVERAGE_TOKEN")
+      expect(workflow).not_to include("KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS")
     end
   end
 
