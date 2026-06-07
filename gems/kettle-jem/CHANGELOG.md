@@ -135,6 +135,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem install` now ensures curated Bundler binstubs are executable,
+  including legacy `bin/rake` and rewritten `bin/yard` binstubs used by
+  `kettle-changelog`.
 - Generated `LICENSE.md` copyright notice lines now render as a Markdown list.
 - Appraisals templating now treats `eval_gemfile "path"` and
   `eval_gemfile("path")` as the same dependency when merging same-named

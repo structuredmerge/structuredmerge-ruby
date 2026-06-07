@@ -3408,8 +3408,6 @@ RSpec.describe Kettle::Jem do
               load Gem.bin_path("reek", "reek")
             RUBY
             FileUtils.chmod("+x", File.join(chdir, "bin", "appraisal"))
-            FileUtils.chmod("+x", File.join(chdir, "bin", "rake"))
-            FileUtils.chmod("+x", File.join(chdir, "bin", "yard"))
             FileUtils.chmod("+x", File.join(chdir, "bin", "reek"))
           end
           {success: true, exitstatus: 0, stdout: "", stderr: ""}
@@ -3432,6 +3430,12 @@ RSpec.describe Kettle::Jem do
           status: "updated",
           reason: "yard_plugins_require_rake_yard_postprocess_hooks",
           path: "bin/yard",
+        ))
+        expect(validated_install.fetch(:install_steps)).to include(hash_including(
+          name: "curated_binstubs_executable",
+          status: "updated",
+          path: "bin",
+          updated_binstubs: %w[rake yard],
         ))
         expect(validated_install.fetch(:install_steps)).to include(hash_including(
           name: "bundle_binstub_pruning",

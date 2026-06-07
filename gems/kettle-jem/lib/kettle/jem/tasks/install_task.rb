@@ -189,6 +189,7 @@ module Kettle
               bin_setup_executable
               bin_setup
               bundle_binstubs
+              curated_binstubs_executable
               bundle_binstub_pruning
               bundle_binstub_location_validation
               bundle_lock_normalization
@@ -597,6 +598,7 @@ module Kettle
           if steps.any? { |step| step.fetch(:name) == "bundle_binstubs" && step.fetch(:status) == "succeeded" }
             steps << rewrite_yard_binstub(project_root)
             steps << prune_unwanted_bundler_binstubs(project_root)
+            steps << ensure_curated_binstubs_executable(project_root)
             steps << validate_bundle_binstub_location(project_root)
           end
           steps
@@ -732,6 +734,26 @@ module Kettle
             # workflow with post-processing hooks.
             exec("bundle", "exec", "rake", "yard")
           RUBY
+        end
+
+        def ensure_curated_binstubs_executable(project_root)
+          bin_dir = File.join(project_root.to_s, "bin")
+          updated = CURATED_BINSTUB_EXECUTABLES.filter_map do |basename|
+            path = File.join(bin_dir, basename)
+            next unless File.file?(path)
+            next if File.executable?(path)
+
+            FileUtils.chmod("+x", path)
+            basename
+          end
+
+          {
+            name: "curated_binstubs_executable",
+            status: updated.empty? ? "already_executable" : "updated",
+            path: "bin",
+            executable_binstubs: CURATED_BINSTUB_EXECUTABLES.select { |basename| File.file?(File.join(bin_dir, basename)) }.sort,
+            updated_binstubs: updated.sort,
+          }
         end
 
         def prune_unwanted_bundler_binstubs(project_root)
