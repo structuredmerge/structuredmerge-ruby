@@ -49,8 +49,8 @@ Please file a bug if you notice a violation of semantic versioning.
   optional Appraisal2 generator plugin and provide the full style toolchain from
   modern Appraisal root bundles so generated Appraisal gemfiles can be
   normalized in memory without leaking style dependencies into old-Ruby
-  appraisal bundles, with a compatibility fallback for Appraisal2 versions
-  before the `plugin` DSL.
+  appraisal bundles, with compatibility fallbacks for Appraisal2 versions
+  before the `plugin` and `generator_only` DSLs.
 - Template strategy documentation now clarifies that `raw_copy` is a bootstrap
   path that bypasses token resolution and StructuredMerge normalization.
 - Generated EOL TruffleRuby 22.3, 23.0, and 23.1 workflows now mark their

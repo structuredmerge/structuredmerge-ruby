@@ -16,5 +16,14 @@ source "https://gem.coop"
 gemspec
 
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
-  eval_gemfile "gemfiles/modular/style.gemfile"
+  if respond_to?(:generator_only)
+    generator_only do
+      eval_gemfile "gemfiles/modular/style.gemfile"
+    end
+  elsif self.class.name.start_with?("Appraisal::")
+    # Appraisal2 parses this Gemfile to build generated appraisal gemfiles.
+    # Style dependencies are generator-only and must not leak into those files.
+  else
+    eval_gemfile "gemfiles/modular/style.gemfile"
+  end
 end

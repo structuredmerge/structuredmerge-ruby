@@ -10006,7 +10006,13 @@ RSpec.describe Kettle::Jem do
         'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")',
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
+        "if respond_to?(:generator_only)",
+      )
+      expect(appraisal_root_report.fetch(:final_content)).to include(
         'eval_gemfile "gemfiles/modular/style.gemfile"',
+      )
+      expect(appraisal_root_report.fetch(:final_content)).to include(
+        'elsif self.class.name.start_with?("Appraisal::")',
       )
     end
   end
