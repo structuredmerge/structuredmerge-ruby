@@ -7192,7 +7192,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
       expect(gemspec_content).not_to include('require "my/gem/version"')
-      expect(gemspec_content).to include(%{spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION})
+      expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
       version_loader_operation = gemspec_report.dig(
         :report_envelope,
         :report,
@@ -7804,7 +7804,7 @@ RSpec.describe Kettle::Jem do
       gemspec_line = lines.find_index { |line| line.include?("Gem::Specification.new") }
       freeze_line = lines.find_index { |line| line.include?(contract_case.fetch(:open_marker)) }
       close_line = lines.find_index { |line| line.include?(contract_case.fetch(:close_marker)) }
-      block_end_line = lines.each_index.reverse.find { |index| lines[index].strip == "end" }
+      block_end_line = lines.each_index.to_a.reverse.find { |index| lines[index].strip == "end" }
 
       expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
       expect(freeze_line).to be > gemspec_line
