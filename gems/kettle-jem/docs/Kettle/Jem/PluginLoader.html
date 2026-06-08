@@ -280,12 +280,12 @@
       <pre class="lines">
 
 
-1330
-1331
-1332</pre>
+1328
+1329
+1330</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1330</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1328</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_camelize'>camelize</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:capitalize</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span>
@@ -310,15 +310,15 @@
       <pre class="lines">
 
 
+1291
+1292
 1293
 1294
 1295
-1296
-1297
-1298</pre>
+1296</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1293</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1291</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load!'>load!</span><span class='lparen'>(</span><span class='label'>plugin_names:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_names'>names</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_plugin_names'>normalize_plugin_names</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span>
@@ -346,6 +346,8 @@
       <pre class="lines">
 
 
+1298
+1299
 1300
 1301
 1302
@@ -357,12 +359,10 @@
 1308
 1309
 1310
-1311
-1312
-1313</pre>
+1311</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1300</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1298</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_plugin!'>load_plugin!</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='comma'>,</span> <span class='label'>registry:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_require'>require</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_require_path'>plugin_require_path</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -373,7 +373,7 @@
 
   <span class='id identifier rubyid_handle'>handle</span><span class='period'>.</span><span class='id identifier rubyid_public_send'>public_send</span><span class='lparen'>(</span>
     <span class='const'><span class='object_link'><a href="#REGISTRATION_METHOD-constant" title="Kettle::Jem::PluginLoader::REGISTRATION_METHOD (constant)">REGISTRATION_METHOD</a></span></span><span class='comma'>,</span>
-    <span class='const'><span class='object_link'><a href="PluginRegistrar.html" title="Kettle::Jem::PluginRegistrar (class)">PluginRegistrar</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PluginRegistrar.html#initialize-instance_method" title="Kettle::Jem::PluginRegistrar#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>plugin_name:</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='comma'>,</span> <span class='label'>registry:</span> <span class='id identifier rubyid_registry'>registry</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='const'><span class='object_link'><a href="PluginRegistrar.html" title="Kettle::Jem::PluginRegistrar (class)">PluginRegistrar</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="PluginRegistrar.html#initialize-instance_method" title="Kettle::Jem::PluginRegistrar#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>plugin_name:</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='comma'>,</span> <span class='label'>registry:</span> <span class='id identifier rubyid_registry'>registry</span><span class='rparen'>)</span>
   <span class='rparen'>)</span>
 <span class='kw'>rescue</span> <span class='const'>LoadError</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="Error.html" title="Kettle::Jem::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Could not load plugin </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_message'>message</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -398,12 +398,12 @@
       <pre class="lines">
 
 
-1315
-1316
-1317</pre>
+1313
+1314
+1315</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1315</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1313</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_plugin_names'>normalize_plugin_names</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span>
   <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_names'>plugin_names</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_name'>name</span><span class='op'>|</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
@@ -428,15 +428,15 @@
       <pre class="lines">
 
 
+1321
+1322
 1323
 1324
 1325
-1326
-1327
-1328</pre>
+1326</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1323</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1321</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plugin_handle'>plugin_handle</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_constant_name'>constant_name</span> <span class='op'>=</span> <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_part'>part</span><span class='op'>|</span> <span class='id identifier rubyid_camelize'>camelize</span><span class='lparen'>(</span><span class='id identifier rubyid_part'>part</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>::</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -464,12 +464,12 @@
       <pre class="lines">
 
 
-1319
-1320
-1321</pre>
+1317
+1318
+1319</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1319</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_plugin_require_path'>plugin_require_path</span><span class='lparen'>(</span><span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_plugin_name'>plugin_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_tr'>tr</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -484,7 +484,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun  8 04:33:40 2026 by
+  Generated on Mon Jun  8 14:14:29 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

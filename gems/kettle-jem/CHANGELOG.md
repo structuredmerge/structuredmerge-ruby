@@ -44,6 +44,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated GitHub Actions workflow templates now refresh pins for
   `coverallsapp/github-action`, `codecov/codecov-action`, and
   `kettle-rb/ts-grammar-action`.
+- Generated coverage workflow templates now pin `coverallsapp/github-action`
+  and `codecov/codecov-action` to resolvable release SHAs instead of stripped
+  SemVer strings.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated coverage workflow uploads now share the same template token as

@@ -284,7 +284,7 @@
     <span class='label'>accept_config:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_ACCEPT_CONFIG</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>bootstrap_mode:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_BOOTSTRAP_MODE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
     <span class='label'>quiet:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_QUIET</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
-    <span class='label'>verbose:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_VERBOSE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='label'>verbose:</span> <span class='id identifier rubyid_truthy?'>truthy?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KETTLE_JEM_VERBOSE</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_compact'>compact</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -451,7 +451,7 @@
       <span class='label'>mode:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>apply</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
       <span class='label'>changed_files:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
       <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-      <span class='label'>recipe_reports:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+      <span class='label'>recipe_reports:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
     <span class='rbrace'>}</span>
   <span class='kw'>else</span>
     <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_apply_project'><span class='object_link'><a href="../../Jem.html#apply_project-class_method" title="Kettle::Jem.apply_project (method)">apply_project</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
@@ -465,7 +465,7 @@
     <span class='label'>project_root:</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span>
     <span class='label'>env:</span> <span class='id identifier rubyid_setup_env'>setup_env</span><span class='comma'>,</span>
     <span class='label'>run_options:</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='comma'>,</span>
-    <span class='label'>command_runner:</span> <span class='id identifier rubyid_command_runner'>command_runner</span><span class='comma'>,</span>
+    <span class='label'>command_runner:</span> <span class='id identifier rubyid_command_runner'>command_runner</span>
   <span class='rparen'>)</span>
   <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='label'>template_steps:</span> <span class='id identifier rubyid_template_steps'>template_steps</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
@@ -532,7 +532,7 @@
 </div>
 
       <div id="footer">
-  Generated on Mon Jun  8 04:33:40 2026 by
+  Generated on Mon Jun  8 14:14:30 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>
