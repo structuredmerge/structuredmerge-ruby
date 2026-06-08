@@ -5612,15 +5612,15 @@ module Kettle
     end
 
     def prune_appraisals_recording_entries(content, facts)
-      return content if facts.to_h.dig(:ci, :recording)
-
       remove_indexes = Set.new
       lines = content.to_s.lines
-      ruby_call_records(content, :eval_gemfile).each do |call|
-        path = ruby_string_argument(call)
-        next unless path.to_s.include?("modular/recording/")
+      unless facts.to_h.dig(:ci, :recording)
+        ruby_call_records(content, :eval_gemfile).each do |call|
+          path = ruby_string_argument(call)
+          next unless path.to_s.include?("modular/recording/")
 
-        (call.location.start_line..call.location.end_line).each { |line_number| remove_indexes << (line_number - 1) }
+          (call.location.start_line..call.location.end_line).each { |line_number| remove_indexes << (line_number - 1) }
+        end
       end
       head_appraisal = appraisal_call_records(content).find { |record| record.fetch(:name) == "head" }
       if head_appraisal

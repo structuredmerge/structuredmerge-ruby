@@ -5846,8 +5846,6 @@ RSpec.describe Kettle::Jem do
           end
 
           appraise "head" do
-            # Why is gem "cgi" here? See: https://github.com/vcr/vcr/issues/1057
-            gem "cgi", ">= 0.5"
             eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"
           end
 
@@ -5933,7 +5931,7 @@ RSpec.describe Kettle::Jem do
       end
       appraisals_content = appraisals_report.fetch(:final_content)
 
-      expect(appraisals_content).to include('gem "cgi", ">= 0.5"')
+      expect(appraisals_content).not_to include('gem "cgi"')
       expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"')
     end
   end

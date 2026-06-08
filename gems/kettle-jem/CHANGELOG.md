@@ -54,6 +54,9 @@ Please file a bug if you notice a violation of semantic versioning.
   and `generator_only` DSLs to provide the full style toolchain from modern
   Appraisal root bundles without leaking style dependencies into old-Ruby
   appraisal bundles, while still evaluating the style toolchain for Bundler.
+- Generated Appraisals no longer add a separate `cgi >= 0.5` declaration to
+  the `head` appraisal because the extracted stdlib gemfiles already provide
+  the Ruby-specific `cgi` dependency.
 - Generated Appraisal root Gemfiles now load the style toolchain only on Ruby
   3.2+, matching the current RuboCop-LTS dependency floor.
 - Generated Open Collective backers workflows now skip the README update step
