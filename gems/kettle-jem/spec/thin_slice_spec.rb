@@ -436,7 +436,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
       expect(content).to include("pozil/auto-assign-issue@07fe6dc0e9771842b428f5739098d6140734e226 # v4")
       expect(content).to include("apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0")
-      expect(content).to include("kettle-rb/ts-grammar-action@1.0.0 # v1.0.0")
+      expect(content).to include("kettle-rb/ts-grammar-action@4adf5a6f4960c7e8d0fcc1d05165e3647eb5cc8c # v1.0.0")
       expect(content).to include("sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
