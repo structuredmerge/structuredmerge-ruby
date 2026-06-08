@@ -8,12 +8,15 @@ RSpec.describe Kettle::Jem do
     previous_ceiling = ENV.fetch("GIT_CEILING_DIRECTORIES", nil)
     isolated_env_keys = ENV.keys.grep(/\AKJ_|KETTLE_JEM_|OPENCOLLECTIVE_HANDLE|FUNDING_ORG|K_JEM_TEMPLATING/)
     previous_env = isolated_env_keys.to_h { |key| [key, ENV[key]] }
+    # rubocop:disable Env/Assign
     isolated_env_keys.each { |key| ENV.delete(key) }
     ENV["GIT_CEILING_DIRECTORIES"] = [previous_ceiling, tmp_root].compact.reject(&:empty?).join(File::PATH_SEPARATOR)
+    # rubocop:enable Env/Assign
     described_class::GemSpecReader.clear_cache!
     example.run
   ensure
     described_class::GemSpecReader.clear_cache!
+    # rubocop:disable Env/Assign
     isolated_env_keys.to_a.each { |key| ENV.delete(key) }
     previous_env.to_h.each { |key, value| ENV[key] = value }
     if previous_ceiling.nil?
@@ -21,6 +24,7 @@ RSpec.describe Kettle::Jem do
     else
       ENV["GIT_CEILING_DIRECTORIES"] = previous_ceiling
     end
+    # rubocop:enable Env/Assign
   end
 
   def json_ready(value)
@@ -77,13 +81,13 @@ RSpec.describe Kettle::Jem do
 
   it "normalizes GitHub remote source URLs structurally" do
     expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
-      "https://github.com/rubythems/them-server",
+      "https://github.com/rubythems/them-server"
     )
     expect(described_class.normalize_git_source_url("https://github.com/rubythems/them-server.git")).to eq(
-      "https://github.com/rubythems/them-server",
+      "https://github.com/rubythems/them-server"
     )
     expect(described_class.normalize_git_source_url("https://gitlab.com/rubythems/them-server.git")).to eq(
-      "https://gitlab.com/rubythems/them-server.git",
+      "https://gitlab.com/rubythems/them-server.git"
     )
   end
 
@@ -92,7 +96,7 @@ RSpec.describe Kettle::Jem do
     expect(contract.fetch(:validated_ecosystems)).to include(fixture.fetch(:ecosystem))
     expect(fixture.fetch(:expected).fetch(:facts).keys).to include(
       *contract.fetch(:required_fact_groups).map(&:to_sym),
-      contract.fetch(:ecosystem_fact_groups).fetch(:rubygems).to_sym,
+      contract.fetch(:ecosystem_fact_groups).fetch(:rubygems).to_sym
     )
 
     tmp_root = File.join(__dir__, "tmp")
@@ -112,10 +116,10 @@ RSpec.describe Kettle::Jem do
       expect(recipe_names).to include(a_string_starting_with("github_actions_workflow_snippets_"))
       expect(plan[:changed_files]).to eq(fixture.fetch(:expected).fetch(:changed_files))
       expect(plan[:recipe_reports].map { |report| report[:request_envelope][:kind] }.uniq).to eq(
-        [contract.fetch(:report_contract).fetch(:request_envelope_kind)],
+        [contract.fetch(:report_contract).fetch(:request_envelope_kind)]
       )
       expect(plan[:recipe_reports].map { |report| report[:report_envelope][:kind] }.uniq).to eq(
-        [contract.fetch(:report_contract).fetch(:report_envelope_kind)],
+        [contract.fetch(:report_contract).fetch(:report_envelope_kind)]
       )
       rakefile_report = plan[:recipe_reports].find { |report| report.fetch(:recipe_name) == "rakefile_scaffold_cleanup" }
       expect(rakefile_report.dig(:request_envelope, :request, :runtime_context, :delete_selectors).length).to eq(4)
@@ -144,7 +148,7 @@ RSpec.describe Kettle::Jem do
       end
       expect(obsolete_workflow_report.fetch(:metadata).fetch(:delete_file)).to be(true)
       expect(obsolete_workflow_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :deleted_file)).to eq(
-        ".github/workflows/ancient.yml",
+        ".github/workflows/ancient.yml"
       )
 
       apply = described_class.apply_project(root, env: {})
@@ -165,7 +169,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           workflows:
             coverage:
               enabled: true
@@ -246,7 +250,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/current.yml
         YAML
-        "template/.github/workflows/current.yml.example" => <<~YAML,
+        "template/.github/workflows/current.yml.example" => <<~YAML
           name: Current
           jobs:
             test:
@@ -298,7 +302,7 @@ RSpec.describe Kettle::Jem do
           github: [template]
           tidelift: rubygems/example
         YAML
-        "template/.kettle-jem.yml.example" => <<~YAML,
+        "template/.kettle-jem.yml.example" => <<~YAML
           project: template
           generated: true
         YAML
@@ -308,9 +312,9 @@ RSpec.describe Kettle::Jem do
         diagnostics: [{
           severity: "error",
           category: "unsupported_feature",
-          message: "undefined method '[]' for an instance of TreeSitterLanguagePack::ProcessResult",
+          message: "undefined method '[]' for an instance of TreeSitterLanguagePack::ProcessResult"
         }],
-        policies: [],
+        policies: []
       )
 
       expect do
@@ -344,7 +348,7 @@ RSpec.describe Kettle::Jem do
           source "https://gem.coop"
           gem "example", path: "."
         RUBY
-        "template/Gemfile.example" => <<~RUBY,
+        "template/Gemfile.example" => <<~RUBY
           source "https://gem.coop"
           gemspec
           gem "appraisal"
@@ -357,9 +361,9 @@ RSpec.describe Kettle::Jem do
         diagnostics: [{
           severity: "error",
           category: "unsupported_feature",
-          message: "undefined method '[]' for an instance of TreeSitterLanguagePack::ProcessResult",
+          message: "undefined method '[]' for an instance of TreeSitterLanguagePack::ProcessResult"
         }],
-        policies: [],
+        policies: []
       )
 
       plan = described_class.plan_project(root, env: {})
@@ -386,7 +390,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".github/workflows/custom-ci.yml" => <<~YAML,
+        ".github/workflows/custom-ci.yml" => <<~YAML
           name: Custom CI
           on:
             pull_request:
@@ -424,15 +428,15 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3")
       expect(content).to include("ruby/setup-ruby@afeafc3d1ab54a631816aba4c914a0081c12ff2f # v1.310.0")
       expect(content).to include("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1")
-      expect(content).to include("codecov/codecov-action@e79a6962e0d4c0c17b229090214935d2e33f8354 # v6.0.1")
-      expect(content).to include("coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7")
+      expect(content).to include("codecov/codecov-action@6.0.2 # v6.0.2")
+      expect(content).to include("coverallsapp/github-action@2.3.6 # v2.3.6")
       expect(content).to include("actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0")
       expect(content).to include("github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
       expect(content).to include("github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
       expect(content).to include("github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
       expect(content).to include("pozil/auto-assign-issue@07fe6dc0e9771842b428f5739098d6140734e226 # v4")
       expect(content).to include("apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0")
-      expect(content).to include("kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1")
+      expect(content).to include("kettle-rb/ts-grammar-action@1.0.0 # v1.0.0")
       expect(content).to include("sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
@@ -461,7 +465,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/ruby-2.4.yml
         YAML
-        ".github/workflows/ruby-2.4.yml" => <<~YAML,
+        ".github/workflows/ruby-2.4.yml" => <<~YAML
           name: Ruby 2.4
           jobs:
             test:
@@ -509,7 +513,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/ruby-2.3.yml
         YAML
-        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+        ".github/workflows/ruby-2.3.yml" => <<~YAML
           name: Ruby 2.3
           jobs:
             test:
@@ -551,7 +555,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/ruby-2.4.yml
         YAML
-        ".github/workflows/ruby-2-4.yml" => <<~YAML,
+        ".github/workflows/ruby-2-4.yml" => <<~YAML
           name: MRI 2.4
           jobs:
             test:
@@ -592,7 +596,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/ruby-2.3.yml
         YAML
-        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+        ".github/workflows/ruby-2.3.yml" => <<~YAML
           name: Ruby 2.3
           jobs:
             test:
@@ -634,7 +638,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/ruby-2.3.yml
         YAML
-        ".github/workflows/ruby-2.3.yml" => <<~YAML,
+        ".github/workflows/ruby-2.3.yml" => <<~YAML
           name: Ruby 2.3
           jobs:
             test:
@@ -674,7 +678,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/discord-notifier.yml
         YAML
-        ".github/workflows/discord-notifier.yml" => "name: stale notifier\n",
+        ".github/workflows/discord-notifier.yml" => "name: stale notifier\n"
       })
 
       default_plan = described_class.plan_project(root, env: {})
@@ -688,7 +692,7 @@ RSpec.describe Kettle::Jem do
       included_plan = described_class.plan_project(
         root,
         env: {},
-        run_options: {include: ".github/workflows/discord-notifier.yml"},
+        run_options: {include: ".github/workflows/discord-notifier.yml"}
       )
       expect(included_plan.fetch(:changed_files)).to include(".github/workflows/discord-notifier.yml")
       included_report = included_plan.fetch(:recipe_reports).find do |report|
@@ -718,7 +722,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/framework-ci.yml
         YAML
-        ".github/workflows/framework-ci.yml" => "name: stale framework\n",
+        ".github/workflows/framework-ci.yml" => "name: stale framework\n"
       })
 
       unconfigured_plan = described_class.plan_project(root, env: {})
@@ -813,7 +817,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           engines:
             - ruby
           templates:
@@ -865,7 +869,7 @@ RSpec.describe Kettle::Jem do
               - .github/workflows/truffleruby-23.0.yml
               - .github/workflows/truffleruby-23.1.yml
         YAML
-        ".github/workflows/truffleruby-23.2.yml" => <<~YAML,
+        ".github/workflows/truffleruby-23.2.yml" => <<~YAML
           name: TruffleRuby 23.2
           jobs:
             test:
@@ -888,7 +892,7 @@ RSpec.describe Kettle::Jem do
       expect(paths).not_to include(".github/workflows/truffleruby-23.1.yml")
       expect(stale_report).to include(
         recipe_name: "github_actions_inactive_packaged_workflow_cleanup_github_workflows_truffleruby_23_2_yml",
-        changed: true,
+        changed: true
       )
       expect(stale_report.dig(:metadata, :delete_file)).to be(true)
     end
@@ -914,7 +918,7 @@ RSpec.describe Kettle::Jem do
               - gemfiles/modular/x_std_libs/r2.3/libs.gemfile
               - gemfiles/modular/x_std_libs/r2.4/libs.gemfile
         YAML
-        "gemfiles/modular/x_std_libs/r2.3/libs.gemfile" => "stale ruby 2.3 gemfile\n",
+        "gemfiles/modular/x_std_libs/r2.3/libs.gemfile" => "stale ruby 2.3 gemfile\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -949,7 +953,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - #{recording_path}
         YAML
-        recording_path => "stale recording gemfile\n",
+        recording_path => "stale recording gemfile\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -960,7 +964,7 @@ RSpec.describe Kettle::Jem do
       expect(cleanup_report.fetch(:metadata)).to include(delete_file: true)
 
       write_tree(root, {
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           workflows:
             recording: true
           templates:
@@ -1036,7 +1040,7 @@ RSpec.describe Kettle::Jem do
 
           Template usage.
         MARKDOWN
-        "README.md" => <<~MARKDOWN,
+        "README.md" => <<~MARKDOWN
           # 💎 Example
 
           ## 🌻 Synopsis
@@ -1076,7 +1080,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-readme-style-api-slice", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -1143,7 +1147,7 @@ RSpec.describe Kettle::Jem do
 
           [Unreleased]: https://example.com/template/compare/HEAD
         MARKDOWN
-        "CHANGELOG.md" => <<~MARKDOWN,
+        "CHANGELOG.md" => <<~MARKDOWN
           # Changelog
 
           Project intro.
@@ -1233,7 +1237,7 @@ RSpec.describe Kettle::Jem do
         "templates/readme/partials/synopsis.md.example" => "Generated synopsis for {KJ|GEM_NAME}.\\n",
         "templates/readme/partials/configuration.md.example" => "Generated configuration.\\n",
         "templates/readme/partials/basic_usage.md.example" => "Generated usage.\\n",
-        "README.md" => <<~MARKDOWN,
+        "README.md" => <<~MARKDOWN
           # 💎 Example
 
           ## 🌻 Synopsis
@@ -1258,7 +1262,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.fetch(:final_content)).not_to include("Old configuration.")
       expect(plan.fetch(:final_content)).not_to include("Old usage.")
       expect(plan.dig(:readme_style, :section_partials, "synopsis", :selected_source)).to eq(
-        "templates/readme/partials/synopsis.md.example",
+        "templates/readme/partials/synopsis.md.example"
       )
     end
   end
@@ -1277,7 +1281,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
           readme:
@@ -1325,7 +1329,7 @@ RSpec.describe Kettle::Jem do
         ".opencollective.yml" => <<~YAML,
           collective: example
         YAML
-        ".github/workflows/opencollective.yml" => <<~YAML,
+        ".github/workflows/opencollective.yml" => <<~YAML
           name: Open Collective
           on:
             workflow_dispatch:
@@ -1341,7 +1345,7 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :funding, :open_collective_disabled)).to be(true)
       expect(plan.dig(:facts, :funding, :open_collective_disabled_source)).to eq("config.funding.open_collective")
       expect(plan.dig(:facts, :funding, :open_collective_files)).to eq(
-        [".opencollective.yml", ".github/workflows/opencollective.yml"],
+        [".opencollective.yml", ".github/workflows/opencollective.yml"]
       )
       expect(plan.dig(:facts, :funding, :urls)).not_to include("https://opencollective.com/example")
       recipe_names = plan[:recipe_pack][:recipes].map { |recipe| recipe.fetch(:name) }
@@ -1356,7 +1360,7 @@ RSpec.describe Kettle::Jem do
           source_relative_path: "README.md.example",
           source_root: "packaged",
           selection_reason: "default_example_variant",
-          apply: false,
+          apply: false
         ),
         a_hash_including(
           target_path: "FUNDING.md",
@@ -1365,18 +1369,18 @@ RSpec.describe Kettle::Jem do
           source_relative_path: "FUNDING.md.no-osc.example",
           source_root: "packaged",
           selection_reason: "opencollective_disabled_no_osc_variant",
-          apply: false,
-        ),
+          apply: false
+        )
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_preference_README_md"
       end
       expect(template_report.fetch(:changed)).to be(false)
       expect(template_report.dig(:metadata, :template_source_preference, :selected_source)).to eq(
-        "README.md.example",
+        "README.md.example"
       )
       expect(template_report.dig(:request_envelope, :request, :runtime_context, :template_source_preference, :selection_reason)).to eq(
-        "default_example_variant",
+        "default_example_variant"
       )
       funding_report = plan[:recipe_reports].find { |report| report.fetch(:recipe_name) == "github_funding_yml" }
       expect(funding_report.fetch(:final_content)).not_to include("open_collective")
@@ -1385,7 +1389,7 @@ RSpec.describe Kettle::Jem do
         report.fetch(:recipe_name).start_with?("opencollective_disabled_file_cleanup_")
       end
       expect(open_collective_reports.map { |report| report.fetch(:relative_path) }).to eq(
-        [".opencollective.yml", ".github/workflows/opencollective.yml"],
+        [".opencollective.yml", ".github/workflows/opencollective.yml"]
       )
       expect(open_collective_reports).to all(satisfy { |report| report.fetch(:metadata).fetch(:delete_file) == true })
 
@@ -1410,7 +1414,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           funding:
             open_collective: false
           templates:
@@ -1486,7 +1490,7 @@ RSpec.describe Kettle::Jem do
 
           - COVERAGE: 91.09% -- 3644/4000 lines in 80 files
         MARKDOWN
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|GEM_NAME}
 
           spec.add_dependency("{KJ|GEM_NAME}", "~> {KJ|GEM_MAJOR}.0")
@@ -1534,7 +1538,7 @@ RSpec.describe Kettle::Jem do
             README.md:
               strategy: accept_template
         YAML
-        ".github/workflows/current.yml" => "name: Current\n",
+        ".github/workflows/current.yml" => "name: Current\n"
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
@@ -1575,7 +1579,7 @@ RSpec.describe Kettle::Jem do
           github: [example]
           open_collective: example
         YAML
-        ".opencollective.yml" => <<~YAML,
+        ".opencollective.yml" => <<~YAML
           collective: example
         YAML
       })
@@ -1604,7 +1608,7 @@ RSpec.describe Kettle::Jem do
           funding:
             open_collective: true
         YAML
-        ".github/FUNDING.yml" => <<~YAML,
+        ".github/FUNDING.yml" => <<~YAML
           github: [example]
           open_collective: example
         YAML
@@ -1627,7 +1631,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           funding:
             open_collective: config-org
         YAML
@@ -1646,7 +1650,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-opencollective-missing-org-slice", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -1682,7 +1686,7 @@ RSpec.describe Kettle::Jem do
         ".opencollective.yml" => <<~YAML,
           collective: yaml-org
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|OPENCOLLECTIVE_ORG}
         MARKDOWN
       })
@@ -1695,14 +1699,14 @@ RSpec.describe Kettle::Jem do
         "KJ|GEM_NAME" => "example",
         "KJ|GEM_NAME_PATH" => "example",
         "KJ|NAMESPACE" => "Example",
-        "KJ|OPENCOLLECTIVE_ORG" => "env-org",
+        "KJ|OPENCOLLECTIVE_ORG" => "env-org"
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_preference_README_md"
       end
       expect(template_report.dig(:metadata, :template_tokens)).to include("KJ|OPENCOLLECTIVE_ORG" => "env-org")
       expect(template_report.dig(:request_envelope, :request, :runtime_context, :template_tokens)).to include(
-        "KJ|OPENCOLLECTIVE_ORG" => "env-org",
+        "KJ|OPENCOLLECTIVE_ORG" => "env-org"
       )
     end
   end
@@ -1718,7 +1722,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".opencollective.yml" => <<~YAML,
+        ".opencollective.yml" => <<~YAML
           org: yaml-org
         YAML
       })
@@ -1758,7 +1762,7 @@ RSpec.describe Kettle::Jem do
         ".opencollective.yml" => <<~YAML,
           collective: yaml-org
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|GEM_NAME}
 
           Namespace: {KJ|NAMESPACE}
@@ -1802,7 +1806,7 @@ RSpec.describe Kettle::Jem do
         "KJ|GEM_NAME_PATH" => "example",
         "KJ|MIN_RUBY" => "3.2",
         "KJ|NAMESPACE" => "Example",
-        "KJ|OPENCOLLECTIVE_ORG" => "yaml-org",
+        "KJ|OPENCOLLECTIVE_ORG" => "yaml-org"
       )
 
       described_class.apply_project(root, env: {})
@@ -1823,7 +1827,7 @@ RSpec.describe Kettle::Jem do
             spec.metadata["source_code_uri"] = "https://github.com/acme/example"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
           tokens:
             forge:
@@ -1858,10 +1862,10 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_source_preference)).to include(
         selected_source: "README.md.example",
         source_relative_path: "README.md.example",
-        source_root: "packaged",
+        source_root: "packaged"
       )
       expect(template_report.dig(:metadata, :template_source_preference, :source_root_path)).to end_with(
-        "lib/kettle/jem/templates",
+        "lib/kettle/jem/templates"
       )
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include("# {KJ|PROJECT_EMOJI} {KJ|NAMESPACE}")
       expect(template_report.fetch(:final_content)).to include("# 💎 Example")
@@ -1898,7 +1902,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # Example
 
           | Works with MRI Ruby 3 | [![Ruby 3.0 Compat][💎ruby-3.0i]][🚎4-lg-wf] [![Ruby 3.2 Compat][💎ruby-3.2i]][🚎6-s-wf] [![Ruby current Compat][💎ruby-c-i]][🚎11-c-wf] |
@@ -1968,7 +1972,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => "# Example\n",
+        "template/README.md.example" => "# Example\n"
       })
 
       plan = described_class.plan_project(root, env: {}, run_options: {only: "README.md"})
@@ -1983,7 +1987,7 @@ RSpec.describe Kettle::Jem do
       expanded = described_class.plan_project(root, env: {}, run_options: {only: "README.md", include: ".github/**"})
       expect(expanded.fetch(:recipe_reports).map { |report| report.fetch(:relative_path) }).to include(
         "README.md",
-        ".github/FUNDING.yml",
+        ".github/FUNDING.yml"
       )
     end
   end
@@ -1993,7 +1997,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-slice", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -2011,7 +2015,7 @@ RSpec.describe Kettle::Jem do
       expect(bootstrap_report.dig(:metadata, :template_source_preference)).to include(
         selected_source: ".structuredmerge/kettle-jem.yml.example",
         source_relative_path: ".structuredmerge/kettle-jem.yml.example",
-        source_root: "packaged",
+        source_root: "packaged"
       )
       expect(bootstrap_report.fetch(:final_content)).to include("# kettle-jem configuration file")
       expect(bootstrap_report.fetch(:final_content)).to include("min_divergence_threshold: 7")
@@ -2050,7 +2054,7 @@ RSpec.describe Kettle::Jem do
           Style/StringLiterals:
             EnforcedStyle: double_quotes
         YAML
-        "template/.rubocop.yml.example" => <<~YAML,
+        "template/.rubocop.yml.example" => <<~YAML
           inherit_gem:
             rubocop-lts: config/rubygem_rspec.yml
           AllCops:
@@ -2080,7 +2084,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-licenses", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -2118,7 +2122,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-min-ruby", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -2156,7 +2160,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-ci-min-ruby", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -2189,13 +2193,13 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        "README.md" => "# 💎 Tree::Haver\n\nExisting README.\n",
+        "README.md" => "# 💎 Tree::Haver\n\nExisting README.\n"
       })
 
       setup = described_class.setup_project(
         root,
         env: {},
-        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true}
       )
       config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       config_yaml = YAML.safe_load(config)
@@ -2208,13 +2212,13 @@ RSpec.describe Kettle::Jem do
       expect(config_yaml.dig("templates", "entries")).to include(
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
-        "LICENSE.md",
+        "LICENSE.md"
       )
       expect(config).to include(
         "    - source: lib/gem/version.rb\n      " \
           "target: lib/tree_haver/version.rb\n    " \
           "- source: sig/gem/version.rbs\n      " \
-          "target: sig/tree_haver/version.rbs\n",
+          "target: sig/tree_haver/version.rbs\n"
       )
       expect(config).to include("    - certs/pboling.pem\n")
       expect(config).to include("    - tmp/.gitignore\n")
@@ -2242,7 +2246,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-monorepo-subgem-release", tmp_root) do |root|
       write_tree(root, {
-        "tree_haver.gemspec" => <<~RUBY,
+        "tree_haver.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "tree_haver"
             spec.summary = "Example gem"
@@ -2255,7 +2259,7 @@ RSpec.describe Kettle::Jem do
       setup = described_class.setup_project(
         root,
         env: {},
-        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem-release", skip_commit: true},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem-release", skip_commit: true}
       )
       config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       config_yaml = YAML.safe_load(config)
@@ -2271,7 +2275,7 @@ RSpec.describe Kettle::Jem do
         ".yardignore",
         "bin/setup",
         "spec/spec_helper.rb",
-        "gemfiles/modular/documentation.gemfile",
+        "gemfiles/modular/documentation.gemfile"
       )
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
 
@@ -2280,7 +2284,7 @@ RSpec.describe Kettle::Jem do
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
       expect(File).to exist(File.join(root, ".yardopts"))
-      updated_config = YAML.safe_load(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml")))
+      updated_config = YAML.safe_load_file(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
       expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yardopts")
     end
@@ -2299,7 +2303,7 @@ RSpec.describe Kettle::Jem do
             spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.11"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
           templates:
             root: packaged
@@ -2350,7 +2354,7 @@ RSpec.describe Kettle::Jem do
             end
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
           templates:
             root: packaged
@@ -2387,7 +2391,7 @@ RSpec.describe Kettle::Jem do
             spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.11"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "🚀"
           rubygems:
             entrypoint_require: "turbo_tests"
@@ -2422,7 +2426,7 @@ RSpec.describe Kettle::Jem do
       setup = described_class.setup_project(
         root,
         env: {},
-        run_options: {bootstrap_mode: true, template_profile: "monorepo-root", skip_commit: true},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-root", skip_commit: true}
       )
       config = File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       config_yaml = YAML.safe_load(config)
@@ -2445,7 +2449,7 @@ RSpec.describe Kettle::Jem do
         "Rakefile",
         "SECURITY.md",
         ".github/FUNDING.yml",
-        ".structuredmerge/git-drivers.toml",
+        ".structuredmerge/git-drivers.toml"
       )
       expect(config_yaml.dig("files", "CHANGELOG.md", "strategy")).to eq("keep_destination")
       expect(config_yaml.dig("files", "Gemfile", "strategy")).to eq("keep_destination")
@@ -2480,7 +2484,7 @@ RSpec.describe Kettle::Jem do
             Rakefile:
               strategy: accept_template
         YAML
-        "Gemfile" => <<~RUBY,
+        "Gemfile" => <<~RUBY
           source "https://gem.coop"
 
           # gem "kettle-dev"
@@ -2493,7 +2497,7 @@ RSpec.describe Kettle::Jem do
       report = described_class.apply_project(
         root,
         env: {},
-        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true}
       )
       gemfile = File.read(File.join(root, "Gemfile"))
       rakefile = File.read(File.join(root, "Rakefile"))
@@ -2533,7 +2537,7 @@ RSpec.describe Kettle::Jem do
             Gemfile:
               strategy: keep_destination
         YAML
-        "Gemfile" => <<~RUBY,
+        "Gemfile" => <<~RUBY
           source "https://gem.coop"
 
           unless ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
@@ -2554,7 +2558,7 @@ RSpec.describe Kettle::Jem do
       report = described_class.apply_project(
         root,
         env: {},
-        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true}
       )
       gemfile = File.read(File.join(root, "Gemfile"))
 
@@ -2578,7 +2582,7 @@ RSpec.describe Kettle::Jem do
             profile: monorepo-root
             entries: []
         YAML
-        "Rakefile" => <<~RUBY,
+        "Rakefile" => <<~RUBY
           require "rake/testtask"
           require "rspec/core/rake_task"
 
@@ -2591,11 +2595,11 @@ RSpec.describe Kettle::Jem do
       report = described_class.apply_project(
         root,
         env: {},
-        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true},
+        run_options: {accept: true, force: true, template_profile: "monorepo-root", skip_commit: true}
       )
       rakefile_report = report.fetch(:recipe_reports).find { |recipe| recipe.fetch(:recipe_name) == "rakefile_scaffold_cleanup" }
 
-      expect(rakefile_report.dig(:request_envelope, :request, :runtime_context, :delete_selectors)).to eq([])
+      expect(rakefile_report.dig(:request_envelope, :request, :runtime_context, :delete_selectors)).to be_empty
       expect(File.read(File.join(root, "Rakefile"))).to include("RSpec::Core::RakeTask.new(:spec)")
       expect(File.read(File.join(root, "Rakefile"))).to include("task default: :spec")
     end
@@ -2627,7 +2631,7 @@ RSpec.describe Kettle::Jem do
             README.md:
               strategy: accept_template
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|PROJECT_EMOJI} {KJ|NAMESPACE}
 
           ## 🤝 Contributing
@@ -2675,22 +2679,22 @@ RSpec.describe Kettle::Jem do
       package_source_url: "https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge",
       gitlab_package_source_url: "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge",
       codeberg_package_source_url: "https://codeberg.org/structuredmerge/structuredmerge-ruby/src/branch/main/gems/ast-merge",
-      checksums_url: "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/checksums",
+      checksums_url: "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/checksums"
     }
     tokens = described_class.send(:readme_url_template_tokens, repository, "ast-merge", "structuredmerge")
 
     expect(tokens.fetch("KJ|README:GH_REPOSITORY_URL")).to eq("https://github.com/structuredmerge/structuredmerge-ruby")
     expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq(
-      "https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge",
+      "https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge"
     )
     expect(tokens.fetch("KJ|README:GH_CONTRIBUTING_URL")).to eq(
-      "https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md",
+      "https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CONTRIBUTING.md"
     )
     expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq(
-      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge",
+      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tree/main/gems/ast-merge"
     )
     expect(tokens.fetch("KJ|CHANGELOG:GL_COMPARE_URL")).to eq(
-      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare",
+      "https://gitlab.com/structuredmerge/structuredmerge-ruby/-/compare"
     )
     expect(tokens.fetch("KJ|CHANGELOG:GL_TAGS_URL")).to eq("https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tags")
   end
@@ -2736,7 +2740,7 @@ RSpec.describe Kettle::Jem do
 
           Destination usage.
         MARKDOWN
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|PROJECT_EMOJI} {KJ|NAMESPACE}
 
           ## 🌻 Synopsis
@@ -2825,7 +2829,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-monorepo-subgem-emoji", tmp_root) do |root|
       write_tree(root, {
-        "ast-crispr.gemspec" => <<~RUBY,
+        "ast-crispr.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "ast-crispr"
             spec.summary = "Example gem"
@@ -2837,7 +2841,7 @@ RSpec.describe Kettle::Jem do
       described_class.setup_project(
         root,
         env: {},
-        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true}
       )
 
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: 💎\n")
@@ -2856,13 +2860,13 @@ RSpec.describe Kettle::Jem do
             spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
           end
         RUBY
-        "README.md" => "# 💎 Json::Merge\n\nExisting README.\n",
+        "README.md" => "# 💎 Json::Merge\n\nExisting README.\n"
       })
 
       described_class.setup_project(
         root,
         env: {"KJ_PROJECT_EMOJI" => "☯️"},
-        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true},
+        run_options: {bootstrap_mode: true, template_profile: "monorepo-subgem", skip_commit: true}
       )
 
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: ☯️\n")
@@ -2881,7 +2885,7 @@ RSpec.describe Kettle::Jem do
             spec.licenses = ["MIT"]
           end
         RUBY
-        "README.md" => <<~MARKDOWN,
+        "README.md" => <<~MARKDOWN
           | 📍 NOTE |
           |---------|
           | Existing preface. |
@@ -2893,7 +2897,7 @@ RSpec.describe Kettle::Jem do
       described_class.setup_project(
         root,
         env: {},
-        run_options: {bootstrap_mode: true, skip_commit: true},
+        run_options: {bootstrap_mode: true, skip_commit: true}
       )
 
       expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to include("project_emoji: 🥨\n")
@@ -2905,7 +2909,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-bootstrap-contract", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -2918,7 +2922,7 @@ RSpec.describe Kettle::Jem do
       bootstrap_target = bootstrap_contract.fetch(:expected).fetch(:bootstrap_target)
 
       expect(apply.fetch(:decision_policy).fetch(:mode)).to eq(
-        bootstrap_contract.fetch(:expected).fetch(:non_interactive_mode),
+        bootstrap_contract.fetch(:expected).fetch(:non_interactive_mode)
       )
       expect(apply.fetch(:changed_files)).to include(bootstrap_target)
       expect(File).to exist(File.join(root, bootstrap_target))
@@ -2930,13 +2934,13 @@ RSpec.describe Kettle::Jem do
       third_apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
 
       expect(third_apply.fetch(:decision_policy).fetch(:mode)).to eq(
-        bootstrap_contract.fetch(:expected).fetch(:non_interactive_mode),
+        bootstrap_contract.fetch(:expected).fetch(:non_interactive_mode)
       )
       expect(bootstrap_contract.fetch(:expected).fetch(:idempotent_selected_paths).to_h { |relative_path|
         [relative_path, File.exist?(File.join(root, relative_path)) ? File.read(File.join(root, relative_path)) : nil]
       }).to eq(selected)
       expect(third_apply.fetch(:changed_files)).not_to include(
-        *bootstrap_contract.fetch(:expected).fetch(:idempotent_selected_paths),
+        *bootstrap_contract.fetch(:expected).fetch(:idempotent_selected_paths)
       )
     end
   end
@@ -2949,7 +2953,7 @@ RSpec.describe Kettle::Jem do
     parser_error_paths.each do |relative_path|
       Dir.mktmpdir("kettle-jem-bootstrap-preflight", tmp_root) do |root|
         files = {
-          "example.gemspec" => <<~RUBY,
+          "example.gemspec" => <<~RUBY
             Gem::Specification.new do |spec|
               spec.name = "example"
               spec.summary = "Example gem"
@@ -2974,7 +2978,7 @@ RSpec.describe Kettle::Jem do
     {
       "root_scalar" => ["true\n", /root must be a mapping/],
       "templates_scalar" => ["templates: packaged\n", /templates must be a mapping/],
-      "entries_scalar" => ["templates:\n  entries: README.md\n", /templates\.entries must be a list/],
+      "entries_scalar" => ["templates:\n  entries: README.md\n", /templates\.entries must be a list/]
     }.each do |case_name, (config, message)|
       Dir.mktmpdir("kettle-jem-config-validation-#{case_name}", tmp_root) do |root|
         write_tree(root, {
@@ -2984,7 +2988,7 @@ RSpec.describe Kettle::Jem do
               spec.summary = "Example gem"
             end
           RUBY
-          ".kettle-jem.yml" => config,
+          ".kettle-jem.yml" => config
         })
 
         expect {
@@ -3020,7 +3024,7 @@ RSpec.describe Kettle::Jem do
               - source: certs/pboling.pem.example
                 target: certs/pboling.pem
         YAML
-        "README.md" => "# destination\n",
+        "README.md" => "# destination\n"
       })
 
       packaged_cert = File.read(File.join(__dir__, "../lib/kettle/jem/templates/certs/pboling.pem.example"))
@@ -3073,7 +3077,7 @@ RSpec.describe Kettle::Jem do
         "config/settings.yml" => <<~YAML,
           enabled: false
         YAML
-        "template/config/settings.yml.example" => <<~YAML,
+        "template/config/settings.yml.example" => <<~YAML
           enabled: true
         YAML
       })
@@ -3089,7 +3093,7 @@ RSpec.describe Kettle::Jem do
         add_template_only_nodes: true,
         freeze_token: "destination-token",
         skip_unresolved_scan: true,
-        max_recursion_depth: "7",
+        max_recursion_depth: "7"
       }
 
       expect(report.dig(:metadata, :template_source_preference)).to include(expected_policy)
@@ -3108,7 +3112,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           funding:
             open_collective: false
           patterns:
@@ -3160,7 +3164,7 @@ RSpec.describe Kettle::Jem do
               - .github/copilot_instructions.md
         YAML
         "bin/setup" => "custom setup\n",
-        ".github/COPILOT_INSTRUCTIONS.md" => "legacy copilot instructions\n",
+        ".github/COPILOT_INSTRUCTIONS.md" => "legacy copilot instructions\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -3176,14 +3180,14 @@ RSpec.describe Kettle::Jem do
 
       expect(setup_preference).to include(
         strategy: "keep_destination",
-        policy: "copy_only_when_missing",
+        policy: "copy_only_when_missing"
       )
       expect(setup_report.fetch(:changed)).to be(false)
       expect(setup_report.fetch(:final_content)).to eq("custom setup\n")
       expect(legacy_cleanup.dig(:metadata, :delete_file)).to be(true)
       expect(legacy_cleanup.dig(:report_envelope, :report, :step_reports, 0, :metadata)).to include(
         policy_kind: "delete_legacy_destination_file",
-        deleted_file: ".github/COPILOT_INSTRUCTIONS.md",
+        deleted_file: ".github/COPILOT_INSTRUCTIONS.md"
       )
 
       apply = described_class.apply_project(root, env: {})
@@ -3206,7 +3210,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -3225,7 +3229,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {only: "bin/setup", quiet: true, skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
       setup_path = File.join(root, "bin", "setup")
 
@@ -3235,31 +3239,31 @@ RSpec.describe Kettle::Jem do
       expect(install.fetch(:install_steps)).to include(
         name: "bin_setup_executable",
         path: "bin/setup",
-        status: "updated",
+        status: "updated"
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bin_setup",
         command: ["bin/setup", "--quiet"],
         status: "succeeded",
-        exitstatus: 0,
+        exitstatus: 0
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bundle_binstubs",
         command: curated_binstubs,
         status: "succeeded",
-        exitstatus: 0,
+        exitstatus: 0
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bundled_handoff",
         command: ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"],
         status: "succeeded",
         exitstatus: 0,
-        reason: "executed",
+        reason: "executed"
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bootstrap_commit",
         status: "skipped",
-        reason: "skip_commit",
+        reason: "skip_commit"
       )
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
@@ -3268,21 +3272,21 @@ RSpec.describe Kettle::Jem do
           "bin_setup_executable" => "updated",
           "bin_setup" => "succeeded",
           "bundle_binstubs" => "succeeded",
-          "bundle_binstub_pruning" => "already_current",
-        ),
+          "bundle_binstub_pruning" => "already_current"
+        )
       ))
       expect(install.fetch(:install_phase_reports)).to include(
         phase: "orchestration",
         steps: %w[bundled_handoff bootstrap_commit],
         statuses: {
           "bundled_handoff" => "succeeded",
-          "bootstrap_commit" => "skipped",
-        },
+          "bootstrap_commit" => "skipped"
+        }
       )
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"],
+        ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"]
       )
       expect(commands).to all(include(chdir: root, env: {}, quiet: true))
       expect(File).to exist(setup_path)
@@ -3293,20 +3297,20 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {only: "bin/setup", quiet: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
-      expect(second.fetch(:changed_files)).to eq([])
+      expect(second.fetch(:changed_files)).to be_empty
       expect(second.fetch(:install_steps)).to include(
         name: "bin_setup_executable",
         path: "bin/setup",
-        status: "already_executable",
+        status: "already_executable"
       )
       expect(second.fetch(:install_steps)).to include(
         name: "bundled_handoff",
         command: ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"],
         status: "succeeded",
         exitstatus: 0,
-        reason: "executed",
+        reason: "executed"
       )
       second_commit_step = second.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }
       expect(second_commit_step.fetch(:status)).to eq("unavailable")
@@ -3314,19 +3318,19 @@ RSpec.describe Kettle::Jem do
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"],
+        ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"]
       )
 
       bootstrap_install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
         env: {},
         run_options: {only: "bin/setup", bootstrap_mode: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
       expect(bootstrap_install.fetch(:install_steps)).to include(
         name: "bundled_handoff",
         status: "skipped",
-        reason: "bootstrap_mode",
+        reason: "bootstrap_mode"
       )
 
       expect(system("git", "init", root, out: File::NULL, err: File::NULL)).to be(true)
@@ -3334,20 +3338,20 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {only: "bin/setup"},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
       expect(git_ready.fetch(:install_steps)).to include(hash_including(
         name: "bootstrap_commit",
         status: "succeeded",
         commands: [
           %w[git add -A],
-          ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"],
+          ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
         ],
         command_results: [
           {command: %w[git add -A], exitstatus: 0},
-          {command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0},
+          {command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0}
         ],
-        reason: "executed",
+        reason: "executed"
       ))
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 
@@ -3365,7 +3369,7 @@ RSpec.describe Kettle::Jem do
               spec.summary = "Example gem"
             end
           RUBY
-          ".kettle-jem.yml" => <<~YAML,
+          ".kettle-jem.yml" => <<~YAML
             templates:
               root: packaged
               apply: true
@@ -3380,18 +3384,18 @@ RSpec.describe Kettle::Jem do
           project_root: gem_root,
           env: inherited_env,
           run_options: {only: "bin/setup"},
-          command_runner: command_runner,
+          command_runner: command_runner
         )
         expect(monorepo_install.fetch(:git_preflight)).to include(git_repository: true)
         expect(monorepo_install.fetch(:install_steps)).to include(hash_including(
           name: "bootstrap_commit",
           status: "succeeded",
-          reason: "executed",
+          reason: "executed"
         ))
         expect(commands.map { |entry| entry.fetch(:env).fetch("BUNDLE_GEMFILE") }.uniq).to eq([File.join(gem_root, "Gemfile")])
         expect(monorepo_install.fetch(:install_steps)).to include(hash_including(
           name: "bundled_handoff",
-          status: satisfy { |status| %w[succeeded already_bundled].include?(status) },
+          status: satisfy { |status| %w[succeeded already_bundled].include?(status) }
         ))
 
         commands.clear
@@ -3416,32 +3420,32 @@ RSpec.describe Kettle::Jem do
           project_root: gem_root,
           env: inherited_env,
           run_options: {only: "bin/setup", skip_commit: true},
-          command_runner: binstub_runner,
+          command_runner: binstub_runner
         )
         expect(validated_install.fetch(:install_steps)).to include(hash_including(
           name: "bundle_binstub_location_validation",
           status: "succeeded",
           reason: "destination_bin_has_binstubs",
           destination_bin: "bin",
-          destination_binstubs: include("appraisal", "rake"),
+          destination_binstubs: include("appraisal", "rake")
         ))
         expect(validated_install.fetch(:install_steps)).to include(hash_including(
           name: "yard_binstub_rake_handoff",
           status: "updated",
           reason: "yard_plugins_require_rake_yard_postprocess_hooks",
-          path: "bin/yard",
+          path: "bin/yard"
         ))
         expect(validated_install.fetch(:install_steps)).to include(hash_including(
           name: "curated_binstubs_executable",
           status: "updated",
           path: "bin",
-          updated_binstubs: %w[rake yard],
+          updated_binstubs: %w[rake yard]
         ))
         expect(validated_install.fetch(:install_steps)).to include(hash_including(
           name: "bundle_binstub_pruning",
           status: "pruned",
           reason: "removed_unwanted_bundler_binstubs",
-          removed_binstubs: ["reek"],
+          removed_binstubs: ["reek"]
         ))
         expect(File.read(File.join(gem_root, "bin", "yard"))).to include('exec("bundle", "exec", "rake", "yard")')
         expect(File).to exist(File.join(gem_root, "bin", "appraisal"))
@@ -3449,7 +3453,7 @@ RSpec.describe Kettle::Jem do
         expect(File).not_to exist(File.join(gem_root, "bin", "reek"))
         expect(commands.find { |entry| entry.fetch(:command) == curated_binstubs }).to include(
           chdir: gem_root,
-          env: include("BUNDLE_GEMFILE" => File.join(gem_root, "Gemfile")),
+          env: include("BUNDLE_GEMFILE" => File.join(gem_root, "Gemfile"))
         )
       end
     end
@@ -3465,7 +3469,7 @@ RSpec.describe Kettle::Jem do
           source "https://gem.coop"
           gemspec
         RUBY
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "💎 Example gem"
@@ -3486,39 +3490,39 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
         run_options: {accept_config: true, force: true, skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(install.fetch(:bootstrap_followup_apply)).to eq(
         status: "applied",
-        reason: "canonical_config_bootstrapped",
+        reason: "canonical_config_bootstrapped"
       )
       expect(install.fetch(:changed_files)).to include(
         ".structuredmerge/kettle-jem.yml",
         "Gemfile",
         "gemfiles/modular/templating.gemfile",
-        "gemfiles/modular/templating_local.gemfile",
+        "gemfiles/modular/templating_local.gemfile"
       )
       expect(File.read(File.join(root, "Gemfile"))).to include(
-        'eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?',
+        'eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
       expect(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile"))).to include('gem "kettle-jem", ">= 7.0"')
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundled_handoff",
         command: ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"],
-        status: "succeeded",
+        status: "succeeded"
       ))
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"],
+        ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"]
       )
     end
   end
 
   it "generates only curated documented binstubs" do
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
-      %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums],
+      %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
 
@@ -3534,7 +3538,7 @@ RSpec.describe Kettle::Jem do
           end
         RUBY
         "Gemfile" => "source \"https://gem.coop\"\n",
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -3556,7 +3560,7 @@ RSpec.describe Kettle::Jem do
           project_root: root,
           env: ENV,
           run_options: {only: "bin/setup", quiet: true, skip_commit: true},
-          command_runner: command_runner,
+          command_runner: command_runner
         )
       }.not_to raise_error
 
@@ -3578,7 +3582,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -3594,7 +3598,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
         "BUNDLER_VERSION" => "4.0.12",
         "RUBYLIB" => "/workspace/kettle-jem/lib",
-        "RUBYOPT" => "-rbundler/setup",
+        "RUBYOPT" => "-rbundler/setup"
       }
       command_envs = []
       command_runner = lambda do |_command, chdir:, env:, quiet:|
@@ -3608,7 +3612,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: inherited_env,
         run_options: {only: "bin/setup", quiet: true, skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(command_envs).not_to be_empty
@@ -3619,7 +3623,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLER_SETUP" => nil,
         "BUNDLER_VERSION" => nil,
         "RUBYLIB" => nil,
-        "RUBYOPT" => nil,
+        "RUBYOPT" => nil
       ))
     end
   end
@@ -3651,7 +3655,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -3665,7 +3669,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "true",
         "KETTLE_RB_DEV" => "/workspace/kettle-rb",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "SMORG_RB_DEV" => "/workspace/smorg-rb",
+        "SMORG_RB_DEV" => "/workspace/smorg-rb"
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|
@@ -3677,19 +3681,19 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: env,
         run_options: {only: "bin/setup"},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(install.fetch(:install_steps)).to include(
         name: "bootstrap_commit",
         status: "skipped",
-        reason: "skip_commit",
+        reason: "skip_commit"
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
         command: %w[bundle update],
         status: "succeeded",
-        reason: "executed",
+        reason: "executed"
       ))
       lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
       expect(lock_command).not_to be_nil
@@ -3698,7 +3702,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false",
+        "SMORG_RB_DEV" => "false"
       )
       expect(commands.map { |entry| entry.fetch(:command) }).not_to include(%w[git add -A])
     end
@@ -3711,7 +3715,7 @@ RSpec.describe Kettle::Jem do
       write_tree(root, {
         "Gemfile" => "source \"https://gem.coop\"\n",
         "Gemfile.lock" => "GEM\n  remote: https://gem.coop/\n  specs:\n",
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -3723,13 +3727,13 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {"KETTLE_JEM_SKIP_LOCK_NORMALIZATION" => "true"},
         run_options: {only: "example.gemspec", skip_commit: true},
-        command_runner: lambda { |_command, chdir:, env:, quiet:| {success: true, exitstatus: 0, stdout: "", stderr: ""} },
+        command_runner: lambda { |_command, chdir:, env:, quiet:| {success: true, exitstatus: 0, stdout: "", stderr: ""} }
       )
 
       expect(install.fetch(:install_steps)).to include(
         name: "bundle_lock_normalization",
         status: "skipped",
-        reason: "skip_lock_normalization",
+        reason: "skip_lock_normalization"
       )
     end
   end
@@ -3761,7 +3765,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -3779,7 +3783,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
         "BUNDLE_LOCKFILE" => "/workspace/kettle-jem/Gemfile.lock",
         "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
-        "BUNDLER_VERSION" => "4.0.12",
+        "BUNDLER_VERSION" => "4.0.12"
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|
@@ -3791,14 +3795,14 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: env,
         run_options: {quiet: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
         command: %w[bundle update],
         status: "succeeded",
-        reason: "executed",
+        reason: "executed"
       ))
       lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
       expect(lock_command).not_to be_nil
@@ -3807,7 +3811,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false",
+        "SMORG_RB_DEV" => "false"
       )
       expect(lock_command.fetch(:env)).to include(
         "RUBYOPT" => nil,
@@ -3815,7 +3819,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_BIN_PATH" => nil,
         "BUNDLE_LOCKFILE" => nil,
         "BUNDLER_SETUP" => nil,
-        "BUNDLER_VERSION" => nil,
+        "BUNDLER_VERSION" => nil
       )
     end
   end
@@ -3846,7 +3850,7 @@ RSpec.describe Kettle::Jem do
             entries: []
         YAML
         ".git-hooks/commit-msg" => "#!/bin/sh\n",
-        ".git-hooks/prepare-commit-msg" => "#!/bin/sh\n",
+        ".git-hooks/prepare-commit-msg" => "#!/bin/sh\n"
       })
 
       commands = []
@@ -3859,14 +3863,14 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
         run_options: {hook_templates: "l", quiet: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(report.fetch(:template_steps)).to include(hash_including(
         name: "hook_templates",
         command: %w[git config core.hooksPath .git-hooks],
         status: "succeeded",
-        reason: "executed",
+        reason: "executed"
       ))
       expect(commands.map { |entry| entry.fetch(:command) }).to include(%w[git config core.hooksPath .git-hooks])
       expect(File.stat(File.join(root, ".git-hooks", "commit-msg")).mode & 0o111).not_to eq(0)
@@ -3883,15 +3887,15 @@ RSpec.describe Kettle::Jem do
       mode: "local",
       profile: "semantic-diff",
       scope: "local",
-      reason: "ready_for_local_git_drivers",
+      reason: "ready_for_local_git_drivers"
     )
     expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
-      attributes: {"diff" => "smorg-ruby"},
+      attributes: {"diff" => "smorg-ruby"}
     ))
     expect(step.fetch(:commands)).to include(
       ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-      ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+      ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
     )
   end
 
@@ -3903,11 +3907,11 @@ RSpec.describe Kettle::Jem do
       status: "ready",
       mode: "builtin-diff",
       profile: "builtin-diff",
-      scope: "local",
+      scope: "local"
     )
     expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
-      attributes: {"diff" => "ruby"},
+      attributes: {"diff" => "ruby"}
     ))
   end
 
@@ -3940,7 +3944,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {},
-        command_runner: command_runner,
+        command_runner: command_runner
       ).first
 
       expect(result).to include(status: "succeeded", changed_files: [".gitattributes"])
@@ -3954,7 +3958,7 @@ RSpec.describe Kettle::Jem do
       ATTRIBUTES
       expect(commands).to include(
         ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-        ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+        ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
       )
     end
   end
@@ -3969,13 +3973,13 @@ RSpec.describe Kettle::Jem do
 
       expect(step).to include(
         status: "blocked",
-        reason: "git_driver_attribute_conflict",
+        reason: "git_driver_attribute_conflict"
       )
       expect(step.fetch(:diagnostics)).to include(hash_including(
         key: "conflicting_attributes",
         path: ".gitattributes",
         pattern: "*.rb",
-        blocking: true,
+        blocking: true
       ))
     end
   end
@@ -3988,7 +3992,7 @@ RSpec.describe Kettle::Jem do
 
       expect(step).to include(
         status: "planned",
-        reason: "dry_run_git_driver_attributes",
+        reason: "dry_run_git_driver_attributes"
       )
     end
   end
@@ -4002,11 +4006,11 @@ RSpec.describe Kettle::Jem do
       mode: "global",
       profile: "semantic-diff",
       scope: "global",
-      reason: "ready_for_global_git_drivers",
+      reason: "ready_for_global_git_drivers"
     )
     expect(step.fetch(:commands)).to include(
       ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-      ["git", "config", "--global", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"],
+      ["git", "config", "--global", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
     )
     expect(step.fetch(:diagnostics)).to include(hash_including(key: "forge_ignores_external_diff_drivers"))
   end
@@ -4027,7 +4031,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {},
-        command_runner: command_runner,
+        command_runner: command_runner
       ).first
 
       expect(result).to include(status: "succeeded", changed_files: [".git/smorg/config"])
@@ -4041,7 +4045,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-driver-manifest", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/git-drivers.toml" => <<~TOML,
+        ".structuredmerge/git-drivers.toml" => <<~TOML
           version = 1
           driver_namespace = "smorg"
 
@@ -4063,10 +4067,10 @@ RSpec.describe Kettle::Jem do
       global = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {git_drivers: "global"})
 
       expect(local.fetch(:attribute_updates)).to eq([
-        {path: ".gitattributes", pattern: "*.rake", attributes: {"diff" => "smorg-ruby"}},
+        {path: ".gitattributes", pattern: "*.rake", attributes: {"diff" => "smorg-ruby"}}
       ])
       expect(global.fetch(:commands)).to eq([
-        ["git", "config", "--global", "diff.smorg-ruby.command", "bundle exec smorg-ruby diff-driver"],
+        ["git", "config", "--global", "diff.smorg-ruby.command", "bundle exec smorg-ruby diff-driver"]
       ])
     end
   end
@@ -4076,7 +4080,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-driver-unsafe-manifest", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/git-drivers.toml" => <<~TOML,
+        ".structuredmerge/git-drivers.toml" => <<~TOML
           version = 1
 
           [profiles.semantic-diff]
@@ -4099,7 +4103,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-driver-cachetextconv", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/git-drivers.toml" => <<~TOML,
+        ".structuredmerge/git-drivers.toml" => <<~TOML
           version = 1
 
           [profiles.semantic-diff]
@@ -4122,7 +4126,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-driver-textconv-separation", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/git-drivers.toml" => <<~TOML,
+        ".structuredmerge/git-drivers.toml" => <<~TOML
           version = 1
 
           [profiles.semantic-diff]
@@ -4152,14 +4156,14 @@ RSpec.describe Kettle::Jem do
       textconv_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
 
       expect(semantic_commands).to eq([
-        ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+        ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"]
       ])
       expect(semantic_local_commands).to eq([
-        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
+        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"]
       ])
       expect(textconv_commands).to contain_exactly(
         ["git", "config", "--global", "diff.smorg-json-textconv.textconv", "smorg-rb textconv --format json"],
-        ["git", "config", "--global", "diff.smorg-json-textconv.cachetextconv", "true"],
+        ["git", "config", "--global", "diff.smorg-json-textconv.cachetextconv", "true"]
       )
     end
   end
@@ -4169,7 +4173,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-driver-textconv-display-only", tmp_root) do |root|
       write_tree(root, {
-        ".structuredmerge/git-drivers.toml" => <<~TOML,
+        ".structuredmerge/git-drivers.toml" => <<~TOML
           version = 1
 
           [profiles.textconv-normalized]
@@ -4190,7 +4194,7 @@ RSpec.describe Kettle::Jem do
       commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
 
       expect(attributes).to eq([
-        {path: ".gitattributes", pattern: "*.json", attributes: {"diff" => "smorg-json-textconv"}},
+        {path: ".gitattributes", pattern: "*.json", attributes: {"diff" => "smorg-json-textconv"}}
       ])
       expect(attributes.flat_map { |update| update.fetch(:attributes).keys }).not_to include("merge")
       expect(commands.map { |command| command[3] }).to contain_exactly("diff.smorg-json-textconv.textconv")
@@ -4205,7 +4209,7 @@ RSpec.describe Kettle::Jem do
       name: "git_drivers",
       status: "skipped",
       reason: "not_requested",
-      mode: "none",
+      mode: "none"
     )
   end
 
@@ -4215,10 +4219,10 @@ RSpec.describe Kettle::Jem do
     Dir.mktmpdir("kettle-jem-config-discovery", tmp_root) do |root|
       write_tree(root, {
         ".kettle-jem.yml" => "templates:\n  root: legacy\n",
-        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n",
+        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n"
       })
 
-      expect(Kettle::Jem.kettle_jem_config(root).fetch("templates").fetch("root")).to eq("canonical")
+      expect(described_class.kettle_jem_config(root).fetch("templates").fetch("root")).to eq("canonical")
     end
   end
 
@@ -4227,7 +4231,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-migration", tmp_root) do |root|
       write_tree(root, {
-        ".kettle-jem.yml" => "templates:\n  root: packaged\n",
+        ".kettle-jem.yml" => "templates:\n  root: packaged\n"
       })
 
       step = Kettle::Jem::Tasks::InstallTask.kettle_config_migration_step(root)
@@ -4237,7 +4241,7 @@ RSpec.describe Kettle::Jem do
         status: "migrated",
         reason: "legacy_kettle_config_migrated",
         canonical_path: ".structuredmerge/kettle-jem.yml",
-        legacy_path: ".kettle-jem.yml",
+        legacy_path: ".kettle-jem.yml"
       )
       expect(File).not_to exist(File.join(root, ".kettle-jem.yml"))
       expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to eq("templates:\n  root: packaged\n")
@@ -4250,7 +4254,7 @@ RSpec.describe Kettle::Jem do
     Dir.mktmpdir("kettle-jem-config-migration-conflict", tmp_root) do |root|
       write_tree(root, {
         ".kettle-jem.yml" => "templates:\n  root: legacy\n",
-        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n",
+        ".structuredmerge/kettle-jem.yml" => "templates:\n  root: canonical\n"
       })
 
       step = Kettle::Jem::Tasks::InstallTask.kettle_config_migration_step(root)
@@ -4258,12 +4262,12 @@ RSpec.describe Kettle::Jem do
       expect(step).to include(
         name: "kettle_config_migration",
         status: "blocked",
-        reason: "legacy_kettle_config_conflict",
+        reason: "legacy_kettle_config_conflict"
       )
       expect(step.fetch(:diagnostics)).to include(hash_including(
         key: "legacy_kettle_config_conflict",
         path: ".kettle-jem.yml",
-        canonical_path: ".structuredmerge/kettle-jem.yml",
+        canonical_path: ".structuredmerge/kettle-jem.yml"
       ))
     end
   end
@@ -4287,7 +4291,7 @@ RSpec.describe Kettle::Jem do
               - source: example.gemspec
                 target: example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "template"
             spec.summary = "Template gem"
@@ -4303,14 +4307,14 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {only: "example.gemspec", skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(install.fetch(:install_steps)).to include(
         name: "gemspec_dependency_sync",
         path: "example.gemspec",
         status: "applied",
-        development_dependencies: ["rake"],
+        development_dependencies: ["rake"]
       )
       expect(File.read(File.join(root, "example.gemspec"))).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
@@ -4337,7 +4341,7 @@ RSpec.describe Kettle::Jem do
               - source: example.gemspec
                 target: example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "template"
             spec.summary = "Template gem"
@@ -4397,7 +4401,7 @@ RSpec.describe Kettle::Jem do
         ".ruby-version" => "3.4.1\n",
         ".tool-versions" => "ruby 3.4.1\n",
         ".env.local.example" => "KETTLE_RB_DEV=false\n",
-        ".gitignore" => "tmp/\n",
+        ".gitignore" => "tmp/\n"
       })
       command_runner = lambda do |_command, **|
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
@@ -4407,30 +4411,30 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {"FORGE_ORG" => "example-org"},
         run_options: {only: "README.md", skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(install.fetch(:install_steps)).to include(
         name: "legacy_ruby_version_file_cleanup",
         status: "applied",
-        removed_files: [".ruby-version", ".tool-versions"],
+        removed_files: [".ruby-version", ".tool-versions"]
       )
       expect(install.fetch(:install_steps)).to include(
         name: "gemspec_homepage_literal",
         path: "example.gemspec",
         status: "applied",
-        homepage: "https://github.com/example-org/example",
+        homepage: "https://github.com/example-org/example"
       )
       expect(install.fetch(:install_steps)).to include(
         name: "env_local_gitignore",
         path: ".gitignore",
-        status: "applied",
+        status: "applied"
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "readme_gemspec_grapheme_sync",
         paths: ["README.md", "example.gemspec"],
         status: "applied",
-        grapheme: "🔧",
+        grapheme: "🔧"
       ))
       expect(File).not_to exist(File.join(root, ".ruby-version"))
       expect(File).not_to exist(File.join(root, ".tool-versions"))
@@ -4454,13 +4458,13 @@ RSpec.describe Kettle::Jem do
           "readme_compatibility_badges" => satisfy { |status| %w[applied already_current].include?(status) },
           "readme_gemspec_grapheme_sync" => "applied",
           "gemspec_homepage_literal" => "applied",
-          "env_local_gitignore" => "applied",
-        ),
+          "env_local_gitignore" => "applied"
+        )
       ))
       expect(install.fetch(:install_summary)).to include(
         steps: install.fetch(:install_steps).length,
         statuses: include("applied" => be >= 4),
-        summary: include("install steps"),
+        summary: include("install steps")
       )
     end
   end
@@ -4489,7 +4493,7 @@ RSpec.describe Kettle::Jem do
           KETTLE_RB_DEV=false
           DEBUG=false # keep debugging disabled by default
         ENV
-        ".env.local.example" => <<~ENV,
+        ".env.local.example" => <<~ENV
           # Local documentation must survive
           KETTLE_RB_DEV=true
         ENV
@@ -4533,7 +4537,7 @@ RSpec.describe Kettle::Jem do
             }
           }
         JSON
-        ".devcontainer/devcontainer.json" => <<~JSON,
+        ".devcontainer/devcontainer.json" => <<~JSON
           {
             "name": "destination"
           }
@@ -4574,7 +4578,7 @@ RSpec.describe Kettle::Jem do
             "files.trimTrailingWhitespace": true
           }
         JSONC
-        ".vscode/settings.jsonc" => <<~JSONC,
+        ".vscode/settings.jsonc" => <<~JSONC
           {
             // Local documentation must survive
             "editor.tabSize": 4
@@ -4623,7 +4627,7 @@ RSpec.describe Kettle::Jem do
             VERSION: String
           end
         RBS
-        "sig/example/version.rbs" => <<~RBS,
+        "sig/example/version.rbs" => <<~RBS
           module Example
             module Version
               VERSION: "1.2.3"
@@ -4668,7 +4672,7 @@ RSpec.describe Kettle::Jem do
           #!/usr/bin/env bash
           bundle install
         BASH
-        "scripts/setup" => <<~BASH,
+        "scripts/setup" => <<~BASH
           #!/usr/bin/env bash
           bundle check || bundle install
         BASH
@@ -4677,7 +4681,7 @@ RSpec.describe Kettle::Jem do
         grammar_path: nil,
         language_pack_process: true,
         node_parser: false,
-        diagnostics: [{kind: "bash_node_parser_unavailable", message: "missing node adapter"}],
+        diagnostics: [{kind: "bash_node_parser_unavailable", message: "missing node adapter"}]
       )
       allow(Bash::Merge).to receive(:availability).and_return(availability)
 
@@ -4710,7 +4714,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - mise.toml
         YAML
-        "template/mise.toml.example" => <<~TOML,
+        "template/mise.toml.example" => <<~TOML
           [tools]
           ruby = "3.4.1"
         TOML
@@ -4727,7 +4731,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: env,
         run_options: {only: "mise.toml", bootstrap_mode: true, skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
 
       expect(install.fetch(:install_steps)).to include(
@@ -4736,11 +4740,11 @@ RSpec.describe Kettle::Jem do
         command: ["mise", "trust", "-C", root],
         status: "succeeded",
         reason: "executed",
-        exitstatus: 0,
+        exitstatus: 0
       )
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
-        statuses: hash_including("mise_trust" => "succeeded"),
+        statuses: hash_including("mise_trust" => "succeeded")
       ))
       expect(commands).to include(["mise", "trust", "-C", root])
     end
@@ -4769,7 +4773,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - mise.toml
         YAML
-        "template/mise.toml.example" => <<~TOML,
+        "template/mise.toml.example" => <<~TOML
           [env]
           K_SOUP_COV_MIN_BRANCH = "76"
           K_SOUP_COV_MIN_LINE = "92"
@@ -4812,7 +4816,7 @@ RSpec.describe Kettle::Jem do
               - source: .github/workflows/coverage.yml
                 target: .github/workflows/coverage.yml
         YAML
-        "template/.github/workflows/coverage.yml" => <<~YAML,
+        "template/.github/workflows/coverage.yml" => <<~YAML
           name: Test Coverage
 
           env:
@@ -4841,7 +4845,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             apply: true
             entries:
@@ -4881,7 +4885,7 @@ RSpec.describe Kettle::Jem do
               - source: example-gem.gemspec
                 target: example-gem.gemspec
         YAML
-        "template/example-gem.gemspec.example" => <<~RUBY,
+        "template/example-gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example-gem"
             spec.version = "1.2.3"
@@ -4900,7 +4904,7 @@ RSpec.describe Kettle::Jem do
         project_root: root,
         env: {},
         run_options: {only: "example-gem.gemspec", skip_commit: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
       version_path = File.join(root, "lib", "example/gem/version.rb")
       entrypoint_path = File.join(root, "lib", "example/gem.rb")
@@ -4911,11 +4915,11 @@ RSpec.describe Kettle::Jem do
         changed_files: ["lib/example/gem/version.rb", "lib/example/gem.rb", "sig/example/gem/version.rbs"],
         version_path: "lib/example/gem/version.rb",
         entrypoint_path: "lib/example/gem.rb",
-        signature_path: "sig/example/gem/version.rbs",
+        signature_path: "sig/example/gem/version.rbs"
       )
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
-        statuses: hash_including("version_gem_bootstrap" => "applied"),
+        statuses: hash_including("version_gem_bootstrap" => "applied")
       ))
       expect(File.read(version_path)).to include("module Example")
       expect(File.read(version_path)).to include("module Gem")
@@ -4930,7 +4934,7 @@ RSpec.describe Kettle::Jem do
       expect(signature).to include("VERSION: String")
       expect(commands).to include(
         %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums],
-        ["bundle", "exec", "kettle-jem", "--skip-commit", "--only", "example-gem.gemspec"],
+        ["bundle", "exec", "kettle-jem", "--skip-commit", "--only", "example-gem.gemspec"]
       )
     end
   end
@@ -4953,7 +4957,7 @@ RSpec.describe Kettle::Jem do
             extend VersionGem::Basic
           end
         RUBY
-        "lib/oauth2/mcp/version.rb" => <<~RUBY,
+        "lib/oauth2/mcp/version.rb" => <<~RUBY
           # frozen_string_literal: true
 
           module OAuth2
@@ -4966,7 +4970,7 @@ RSpec.describe Kettle::Jem do
       facts = {
         package: {name: "oauth2-mcp"},
         rubygems: {entrypoint_require: "oauth2/mcp", namespace: "OAuth2::MCP"},
-        project_runtime: {version: "0.1.0"},
+        project_runtime: {version: "0.1.0"}
       }
 
       step = described_class.send(:version_gem_bootstrap_step, root, facts)
@@ -5023,7 +5027,7 @@ RSpec.describe Kettle::Jem do
             VERSION = Version::VERSION
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "🔐"
           rubygems:
             min_ruby: "2.2.0"
@@ -5050,7 +5054,7 @@ RSpec.describe Kettle::Jem do
       :version_gem_bootstrap_entrypoint_content,
       content,
       namespace: "Example::Gem",
-      entrypoint_require: "example/gem",
+      entrypoint_require: "example/gem"
     )
 
     expect(updated).to start_with(<<~RUBY)
@@ -5082,7 +5086,7 @@ RSpec.describe Kettle::Jem do
       :version_gem_bootstrap_entrypoint_content,
       content,
       namespace: "Example::Gem",
-      entrypoint_require: "example/gem",
+      entrypoint_require: "example/gem"
     )
 
     expect(updated).to include(<<~RUBY)
@@ -5104,7 +5108,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -5123,28 +5127,28 @@ RSpec.describe Kettle::Jem do
         root,
         env: {"BUNDLE_GEMFILE" => File.join(root, "Gemfile")},
         run_options: {only: "bin/setup", quiet: true},
-        command_runner: command_runner,
+        command_runner: command_runner
       )
       expect(bundled.fetch(:setup_execution_context)).to eq(
         bundled: true,
         source: "BUNDLE_GEMFILE",
-        bundle_gemfile: File.join(root, "Gemfile"),
+        bundle_gemfile: File.join(root, "Gemfile")
       )
       expect(bundled.fetch(:install_steps)).to include(
         name: "bundled_handoff",
         status: "already_bundled",
-        bundle_gemfile: File.join(root, "Gemfile"),
+        bundle_gemfile: File.join(root, "Gemfile")
       )
 
       bootstrap = described_class.setup_project(
         root,
         env: {"BUNDLE_GEMFILE" => File.join(root, "Gemfile")},
-        run_options: {only: "bin/setup", bootstrap_mode: true},
+        run_options: {only: "bin/setup", bootstrap_mode: true}
       )
       expect(bootstrap.fetch(:setup_execution_context)).to eq(
         bundled: false,
         source: "bootstrap_mode",
-        bundle_gemfile: nil,
+        bundle_gemfile: nil
       )
     end
   end
@@ -5213,7 +5217,7 @@ RSpec.describe Kettle::Jem do
 
           Old install.
         MARKDOWN
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # 💎 Example
 
           ## 🌻 Synopsis
@@ -5293,7 +5297,7 @@ RSpec.describe Kettle::Jem do
 
           Destination synopsis.
         MARKDOWN
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # 💎 Example
 
           [![Version][version-img]][version] [![CI][ci-img]][ci]
@@ -5444,7 +5448,7 @@ RSpec.describe Kettle::Jem do
           retries = 3
           timeout = 30
         TOML
-        "template/config/explicit.yml.example" => <<~YAML,
+        "template/config/explicit.yml.example" => <<~YAML
           nested:
             value: template
             template_only: true
@@ -5471,18 +5475,18 @@ RSpec.describe Kettle::Jem do
         "updates" => [
           {
             "directory" => "/",
-            "package-ecosystem" => "bundler",
-          },
+            "package-ecosystem" => "bundler"
+          }
         ],
-        "version" => 1,
+        "version" => 1
       )
       expect(YAML.safe_load(yaml_report.fetch(:final_content))).to eq(
         "engines" => ["ruby"],
         "nested" => {
           "template_only" => true,
-          "value" => "destination",
+          "value" => "destination"
         },
-        "version" => 1,
+        "version" => 1
       )
       expect(toml_report.fetch(:final_content)).to eq(<<~TOML)
         title = "destination"
@@ -5495,9 +5499,9 @@ RSpec.describe Kettle::Jem do
         "destination_only" => "keep",
         "nested" => {
           "template_only" => true,
-          "value" => "destination",
+          "value" => "destination"
         },
-        "template_only" => "added",
+        "template_only" => "added"
       )
       expect(explicit_report.dig(:metadata, :template_source_preference)).to include(file_type: "yaml")
     end
@@ -5521,7 +5525,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .kettle-jem.yml
         YAML
-        "template/.kettle-jem.yml.example" => <<~YAML,
+        "template/.kettle-jem.yml.example" => <<~YAML
           # kettle-jem configuration file
           templates:
             # Template root directory.
@@ -5576,7 +5580,7 @@ RSpec.describe Kettle::Jem do
           project:
             name: example
         YAML
-        "template/config/settings.yml.example" => <<~YAML,
+        "template/config/settings.yml.example" => <<~YAML
           # project settings
           project:
             # Project display name.
@@ -5657,7 +5661,7 @@ RSpec.describe Kettle::Jem do
             sh "bundle exec rspec"
           end
         RUBY
-        "template/lib/example.rb.example" => <<~RUBY,
+        "template/lib/example.rb.example" => <<~RUBY
           require "json"
 
           class Existing
@@ -5704,8 +5708,8 @@ RSpec.describe Kettle::Jem do
       expect(gemfile_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy)).to include(
         file_type: "gemfile",
         operations: include(
-          include(operation: "delete_dependency_declarations", deleted_gems: contain_exactly("appraisal", "example")),
-        ),
+          include(operation: "delete_dependency_declarations", deleted_gems: contain_exactly("appraisal", "example"))
+        )
       )
 
       rakefile_content = rakefile_report.fetch(:final_content)
@@ -5765,7 +5769,7 @@ RSpec.describe Kettle::Jem do
             end
           end
         RUBY
-        "template/lib/example.rb.example" => <<~RUBY,
+        "template/lib/example.rb.example" => <<~RUBY
           class Greeter
             def alpha
               :template_alpha
@@ -5794,7 +5798,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content.scan("def gamma").size).to eq(1)
       expect(report.dig(:metadata, :template_source_preference)).to include(
         file_type: "ruby",
-        method_move_policy: "destination_order",
+        method_move_policy: "destination_order"
       )
     end
   end
@@ -5834,7 +5838,7 @@ RSpec.describe Kettle::Jem do
             gem "simplecov"
           end
         RUBY
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           # frozen_string_literal: true
 
           appraise "ruby-3-2" do
@@ -5886,8 +5890,8 @@ RSpec.describe Kettle::Jem do
         operations: include(
           include(operation: "merge_appraisal_blocks", inserted_appraisals: include("style")),
           include(operation: "delete_self_dependency_declarations", deleted_dependency_count: 2),
-          include(operation: "prune_minimum_ruby_appraisals", deleted_appraisals: include("ruby-2-7")),
-        ),
+          include(operation: "prune_minimum_ruby_appraisals", deleted_appraisals: include("ruby-2-7"))
+        )
       )
       expect(File.read(File.join(root, "Appraisals"))).to eq(appraisals_content)
     end
@@ -5913,7 +5917,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - Appraisals
         YAML
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           # frozen_string_literal: true
 
           appraise "head" do
@@ -5961,7 +5965,7 @@ RSpec.describe Kettle::Jem do
             gem "local-only"
           end
         RUBY
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           appraise "#{contract_case.fetch(:template_appraisal)}" do
             gemfile "gemfiles/ruby_4.0.gemfile"
           end
@@ -5979,8 +5983,8 @@ RSpec.describe Kettle::Jem do
         include(
           operation: "merge_appraisal_blocks",
           inserted_appraisals: include(contract_case.fetch(:template_appraisal)),
-          preserved_destination_appraisals: include(contract_case.fetch(:destination_appraisal)),
-        ),
+          preserved_destination_appraisals: include(contract_case.fetch(:destination_appraisal))
+        )
       )
     end
   end
@@ -6011,7 +6015,7 @@ RSpec.describe Kettle::Jem do
             eval_gemfile("modular/x_std_libs/r3/libs.gemfile")
           end
         RUBY
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           appraise "ruby-3-2" do
             eval_gemfile "modular/style.gemfile"
             eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
@@ -6026,7 +6030,7 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
         "modular/style.gemfile",
         "modular/activerecord/r3/v8.0.gemfile",
-        "modular/x_std_libs/r3/libs.gemfile",
+        "modular/x_std_libs/r3/libs.gemfile"
       )
     end
   end
@@ -6108,7 +6112,7 @@ RSpec.describe Kettle::Jem do
                       appraisal: "ruby-3-2"
                       exec_cmd: "kettle-test"
         YAML
-        "template/gemfiles/rails_7_2.gemfile.example" => "gem \"rails\", \"~> 7.2.2\"\n",
+        "template/gemfiles/rails_7_2.gemfile.example" => "gem \"rails\", \"~> 7.2.2\"\n"
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
@@ -6123,7 +6127,7 @@ RSpec.describe Kettle::Jem do
       expect(workflow_content).to include("KJ_FRAMEWORK_MATRIX_GEM: ${{ matrix.KJ_FRAMEWORK_MATRIX_GEM || '' }}")
       expect(workflow_content).to include("RAILS_MAJOR_MINOR: ${{ matrix.RAILS_MAJOR_MINOR || '' }}")
       expect(workflow_content).to include('KJ_FRAMEWORK_MATRIX_GEM: "rails"')
-      expect(workflow_content.scan(/KJ_FRAMEWORK_MATRIX_GEM: "rails"/).size).to eq(1)
+      expect(workflow_content.scan('KJ_FRAMEWORK_MATRIX_GEM: "rails"').size).to eq(1)
       expect(workflow_content).to include('RAILS_MAJOR_MINOR: "7.2"')
       expect(File.read(File.join(root, "gemfiles/rails_7_2.gemfile"))).to include('gem "combustion", "~> 1.5"')
       expect(File).not_to exist(File.join(root, ".github/workflows/framework-ci.yml"))
@@ -6153,7 +6157,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - Appraisals
         YAML
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           appraise "current" do
             eval_gemfile "modular/x_std_libs.gemfile"
           end
@@ -6219,7 +6223,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - Appraisals
         YAML
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           appraise "current" do
             eval_gemfile "modular/x_std_libs.gemfile"
           end
@@ -6292,7 +6296,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - Appraisals
         YAML
-        "template/Appraisals.example" => <<~RUBY,
+        "template/Appraisals.example" => <<~RUBY
           appraise "coverage" do
             eval_gemfile "modular/coverage.gemfile"
             eval_gemfile "modular/x_std_libs.gemfile"
@@ -6311,11 +6315,11 @@ RSpec.describe Kettle::Jem do
       expect(appraisals_eval_gemfile_paths(appraisals_content, "coverage")).to contain_exactly(
         "modular/coverage.gemfile",
         "rails_7_2.gemfile",
-        "modular/x_std_libs.gemfile",
+        "modular/x_std_libs.gemfile"
       )
       expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
         "modular/x_std_libs/r3/libs.gemfile",
-        "rails_8_0.gemfile",
+        "rails_8_0.gemfile"
       )
       expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-1")).to contain_exactly("rails_7_2.gemfile")
     end
@@ -6339,7 +6343,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/appraisals.yml
         YAML
-        "template/.github/workflows/appraisals.yml.example" => <<~YAML,
+        "template/.github/workflows/appraisals.yml.example" => <<~YAML
           name: Appraisals
           on:
             pull_request:
@@ -6405,7 +6409,7 @@ RSpec.describe Kettle::Jem do
           "\n" + %(eval_gemfile "../../benchmark/r4/v0.5.gemfile"\n),
         "template/#{relative_path}.example" => contract_case.fetch(:template_eval_paths).map do |path|
           %(eval_gemfile "#{path}")
-        end.join("\n") + "\n",
+        end.join("\n") + "\n"
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
@@ -6447,7 +6451,7 @@ RSpec.describe Kettle::Jem do
           gem "example-gem"
           gem "destination-only"
         RUBY
-        "template/Gemfile.example" => <<~RUBY,
+        "template/Gemfile.example" => <<~RUBY
           # frozen_string_literal: true
 
           source "https://gem.coop"
@@ -6508,7 +6512,7 @@ RSpec.describe Kettle::Jem do
             kettle-jem
           ]
         RUBY
-        "template/gemfiles/modular/templating_local.gemfile.example" => <<~RUBY,
+        "template/gemfiles/modular/templating_local.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
 
           local_gems = %w[
@@ -6553,7 +6557,7 @@ RSpec.describe Kettle::Jem do
       author_domain: "example.test",
       min_ruby: ">= 3.2",
       test_min_ruby: Gem::Version.new("3.2"),
-      version: "0.1.0",
+      version: "0.1.0"
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
@@ -6568,12 +6572,12 @@ RSpec.describe Kettle::Jem do
         package: {
           name: "example",
           summary: "Example summary",
-          description: "Example description",
+          description: "Example description"
         },
         rubygems: {},
-        project_runtime: {},
+        project_runtime: {}
       },
-      {},
+      {}
     )
 
     expect(tokens.fetch("KJ|PACKAGE_SUMMARY")).to eq("Example summary")
@@ -6604,7 +6608,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - spec/spec_helper.rb
         YAML
-        "spec/spec_helper.rb" => <<~RUBY,
+        "spec/spec_helper.rb" => <<~RUBY
           # frozen_string_literal: true
 
           require "example/custom"
@@ -6652,7 +6656,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - spec/spec_helper.rb
         YAML
-        "spec/spec_helper.rb" => <<~RUBY,
+        "spec/spec_helper.rb" => <<~RUBY
           # frozen_string_literal: true
 
           # Internal ENV config
@@ -6711,7 +6715,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - gemfiles/modular/style_local.gemfile
         YAML
-        "gemfiles/modular/style_local.gemfile" => <<~RUBY,
+        "gemfiles/modular/style_local.gemfile" => <<~RUBY
           # frozen_string_literal: true
 
           local_gems = %w[
@@ -6745,7 +6749,7 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -6792,7 +6796,7 @@ RSpec.describe Kettle::Jem do
             author:
               orcid: 0000-0001-2345-6789
         YAML
-        "CITATION.cff" => <<~YAML,
+        "CITATION.cff" => <<~YAML
           cff-version: 1.2.0
           title: "example"
           identifiers:
@@ -6842,7 +6846,7 @@ RSpec.describe Kettle::Jem do
 
           gem "existing"
         RUBY
-        "template/gemfiles/modular/debug.gemfile.example" => <<~RUBY,
+        "template/gemfiles/modular/debug.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
 
           dependency_root = ENV["DEPENDENCY_ROOT"].to_s.strip
@@ -6908,7 +6912,7 @@ RSpec.describe Kettle::Jem do
             spec.add_development_dependency "rake", "~> 13.0"
           end
         RUBY
-        "gemfiles/modular/shunted.gemfile" => <<~RUBY,
+        "gemfiles/modular/shunted.gemfile" => <<~RUBY
           # frozen_string_literal: true
 
           # local notes remain outside the generated block
@@ -6994,7 +6998,7 @@ RSpec.describe Kettle::Jem do
           # Include dependencies from #{contract_case.fetch(:token)}.gemspec
           gemspec
         RUBY
-        "template/gemfiles/modular/debug.gemfile.example" => <<~RUBY,
+        "template/gemfiles/modular/debug.gemfile.example" => <<~RUBY
           # frozen_string_literal: true
 
           # Ex-Standard Library gems
@@ -7051,7 +7055,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
@@ -7079,8 +7083,8 @@ RSpec.describe Kettle::Jem do
         operations: include(
           include(operation: "preserve_project_fields", preserved_fields: include("required_ruby_version", "summary")),
           include(operation: "preserve_dependency_declarations", preserved_dependencies: include("json", "rubocop")),
-          include(operation: "normalize_gemspec_receiver", from: "gem", to: "spec"),
-        ),
+          include(operation: "normalize_gemspec_receiver", from: "gem", to: "spec")
+        )
       )
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
@@ -7106,7 +7110,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.required_ruby_version = ">= 3.1"
@@ -7160,7 +7164,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - my-gem.gemspec
         YAML
-        "template/my-gem.gemspec.example" => <<~RUBY,
+        "template/my-gem.gemspec.example" => <<~RUBY
           # coding: utf-8
           # frozen_string_literal: true
 
@@ -7190,7 +7194,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
       expect(gemspec_content).not_to include('require "my/gem/version"')
-      expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
+      expect(gemspec_content).to include(%{spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION})
       version_loader_operation = gemspec_report.dig(
         :report_envelope,
         :report,
@@ -7198,7 +7202,7 @@ RSpec.describe Kettle::Jem do
         0,
         :metadata,
         :ruby_template_policy,
-        :operations,
+        :operations
       ).find { |operation| operation[:operation] == "rewrite_version_loader" }
       expect(version_loader_operation).to include(mode: "modern", legacy_preamble_removed: true)
       expect(Gem::Version.new(version_loader_operation.fetch(:min_ruby))).to be >= Gem::Version.new("3.1")
@@ -7227,7 +7231,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - my-gem.gemspec
         YAML
-        "template/my-gem.gemspec.example" => <<~RUBY,
+        "template/my-gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.version = "0.0.0"
@@ -7250,7 +7254,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include("My::Gem::Version::VERSION")
       expect(gemspec_content).to include("spec.version = gem_version")
       expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
-        include(operation: "rewrite_version_loader", min_ruby: "3.0", mode: "legacy", legacy_preamble_present: true),
+        include(operation: "rewrite_version_loader", min_ruby: "3.0", mode: "legacy", legacy_preamble_present: true)
       )
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
@@ -7277,7 +7281,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - my-gem.gemspec
         YAML
-        "template/my-gem.gemspec.example" => <<~RUBY,
+        "template/my-gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.version = "0.0.0"
@@ -7298,7 +7302,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include('require_relative "lib/my/gem/version"')
       expect(gemspec_content).to include("spec.version = gem_version")
       expect(gemspec_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
-        include(operation: "rewrite_version_loader", min_ruby: "2.1", mode: "legacy", legacy_preamble_present: true),
+        include(operation: "rewrite_version_loader", min_ruby: "2.1", mode: "legacy", legacy_preamble_present: true)
       )
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
@@ -7328,7 +7332,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - my-gem.gemspec
         YAML
-        "template/my-gem.gemspec.example" => <<~RUBY,
+        "template/my-gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.version = "0.0.0"
@@ -7377,7 +7381,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
@@ -7433,7 +7437,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
@@ -7486,7 +7490,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
@@ -7536,7 +7540,7 @@ RSpec.describe Kettle::Jem do
               - REEK
         YAML
         "template/REEK" => "",
-        "REEK" => "",
+        "REEK" => ""
       })
 
       apply = described_class.apply_project(root, env: {})
@@ -7575,7 +7579,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - example.gemspec
         YAML
-        "template/example.gemspec.example" => <<~RUBY,
+        "template/example.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "TODO: Write a short summary"
@@ -7641,7 +7645,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: #{package_name}.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           # coding: utf-8
           # frozen_string_literal: true
 
@@ -7714,7 +7718,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: example.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           # frozen_string_literal: true
 
           Gem::Specification.new do |spec|
@@ -7781,7 +7785,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: #{package_name}.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           # frozen_string_literal: true
 
           Gem::Specification.new do |spec|
@@ -7802,7 +7806,7 @@ RSpec.describe Kettle::Jem do
       gemspec_line = lines.find_index { |line| line.include?("Gem::Specification.new") }
       freeze_line = lines.find_index { |line| line.include?(contract_case.fetch(:open_marker)) }
       close_line = lines.find_index { |line| line.include?(contract_case.fetch(:close_marker)) }
-      block_end_line = lines.each_index.select { |index| lines[index].strip == "end" }.last
+      block_end_line = lines.each_index.reverse.find { |index| lines[index].strip == "end" }
 
       expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
       expect(freeze_line).to be > gemspec_line
@@ -7845,7 +7849,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: example.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           # frozen_string_literal: true
 
           Gem::Specification.new do |spec|
@@ -7896,7 +7900,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: #{package_name}.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.summary = "Template summary"
@@ -7925,10 +7929,10 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include('spec.required_ruby_version = ">= 4.0"')
       expect(gemspec_content).to include(%(spec.add_dependency("#{contract_case.fetch(:preserved_dependency)}", ">= 2.8", "< 3")))
       expect(gemspec_content).not_to match(
-        /add_(?:development_)?dependency\s*\(?\s*["']#{Regexp.escape(contract_case.fetch(:removed_dependency))}["']/,
+        /add_(?:development_)?dependency\s*\(?\s*["']#{Regexp.escape(contract_case.fetch(:removed_dependency))}["']/
       )
       expect(report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
-        include(operation: "delete_self_dependency_declarations", deleted_dependency_count: 4),
+        include(operation: "delete_self_dependency_declarations", deleted_dependency_count: 4)
       )
     end
   end
@@ -7959,7 +7963,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: #{package_name}.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.summary = "{KJ|PROJECT_EMOJI} "
@@ -8011,7 +8015,7 @@ RSpec.describe Kettle::Jem do
               - source: gem.gemspec
                 target: #{package_name}.gemspec
         YAML
-        "template/gem.gemspec.example" => <<~RUBY,
+        "template/gem.gemspec.example" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.summary = "{KJ|PROJECT_EMOJI} "
@@ -8042,27 +8046,27 @@ RSpec.describe Kettle::Jem do
           tier1_version: "7.1",
           tier2_gem: "omniauth",
           tier2_version: "2.1",
-          ruby_series: "r3",
+          ruby_series: "r3"
         ),
         ruby_series: "r3",
         tier1_gemfile: "gemfiles/modular/activerecord/r3/v7.1.gemfile",
         tier2_gemfile: "gemfiles/modular/omniauth/r3/v2.1.gemfile",
-        x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r3/libs.gemfile",
+        x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r3/libs.gemfile"
       },
       {
         name: described_class.appraisal_name(
           tier1_gem: "mail",
           tier1_version: "2.8",
-          ruby_series: "r2",
+          ruby_series: "r2"
         ),
         ruby_series: "r2",
         tier1_gemfile: "gemfiles/modular/mail/r2/v2.8.gemfile",
-        x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r2/libs.gemfile",
-      },
+        x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r2/libs.gemfile"
+      }
     ]
     bucket_ranges = {
       "r2" => {floor: "2.7", ceiling: "2.99"},
-      "r3" => {floor: "3.2", ceiling: "3.99"},
+      "r3" => {floor: "3.2", ceiling: "3.99"}
     }
 
     expect(described_class.appraisal_gem_abbreviation("activerecord")).to eq("ar")
@@ -8070,12 +8074,12 @@ RSpec.describe Kettle::Jem do
     expect(described_class.appraisal_format_version("7.1.5")).to eq("7-1-5")
     expect(matrix_entries.map { |entry| entry.fetch(:name) }).to eq(["kja-ar-7-1-oa-2-1-r3", "kja-mail-2-8-r2"])
     expect(described_class.appraisal_modular_gemfile_path(gem_name: "activerecord", version: "7.1", ruby_series: "r3")).to eq(
-      "gemfiles/modular/activerecord/r3/v7.1.gemfile",
+      "gemfiles/modular/activerecord/r3/v7.1.gemfile"
     )
     expect(described_class.appraisal_modular_gemfile_content(
       gem_name: "activerecord",
       version: "7.1",
-      sub_dependencies: {"sqlite3" => "1.6.9"},
+      sub_dependencies: {"sqlite3" => "1.6.9"}
     )).to eq(<<~RUBY)
       # frozen_string_literal: true
 
@@ -8100,8 +8104,8 @@ RSpec.describe Kettle::Jem do
           appraisal: "kja-ar-7-1-oa-2-1-r3",
           exec_cmd: "kettle-test",
           rubygems: "latest",
-          bundler: "latest",
-        },
+          bundler: "latest"
+        }
       ],
       "unsupported" => [
         {
@@ -8109,12 +8113,12 @@ RSpec.describe Kettle::Jem do
           appraisal: "kja-mail-2-8-r2",
           exec_cmd: "kettle-test",
           rubygems: "latest",
-          bundler: "latest",
-        },
-      ],
+          bundler: "latest"
+        }
+      ]
     )
     expect(described_class.appraisal_workflow_yaml_snippets(matrix_entries, bucket_ranges: bucket_ranges).fetch("supported")).to include(
-      'appraisal: "kja-ar-7-1-oa-2-1-r3"',
+      'appraisal: "kja-ar-7-1-oa-2-1-r3"'
     )
     expect(described_class.appraisal_x_stdlib_exclusions(<<~RUBY)).to eq(["erb", "mutex_m", "version_gem"])
       eval_gemfile "../erb/vHEAD.gemfile"
@@ -8129,13 +8133,13 @@ RSpec.describe Kettle::Jem do
 
     expect(described_class.appraisal_select_versions(versions, mode: "major")).to eq(["5.2", "6.1", "7.2"])
     expect(described_class.appraisal_select_versions(versions, mode: "minor")).to eq(
-      ["5.0", "5.1", "5.2", "6.0", "6.1", "7.0", "7.1", "7.2"],
+      ["5.0", "5.1", "5.2", "6.0", "6.1", "7.0", "7.1", "7.2"]
     )
     expect(described_class.appraisal_select_versions(versions, mode: "patch")).to eq(
-      ["5.0.0", "5.1.0", "5.2.0", "6.0.0", "6.1.0", "7.0.0", "7.1.0", "7.2.0"],
+      ["5.0.0", "5.1.0", "5.2.0", "6.0.0", "6.1.0", "7.0.0", "7.1.0", "7.2.0"]
     )
     expect(described_class.appraisal_select_versions(versions, mode: "minor-minmax")).to eq(
-      ["5.0", "5.2", "6.0", "6.1", "7.0", "7.1", "7.2"],
+      ["5.0", "5.2", "6.0", "6.1", "7.0", "7.1", "7.2"]
     )
     expect(described_class.appraisal_select_versions(versions, mode: "semver")).to eq(["5.2", "6.1", "7.0", "7.1", "7.2"])
     expect(described_class.appraisal_select_versions(versions, mode: "minor", requirements: [">= 6.0", "< 7.0"])).to eq(["6.0", "6.1"])
@@ -8146,13 +8150,13 @@ RSpec.describe Kettle::Jem do
           name: "activerecord",
           assignments: [
             {version: "6.1", bucket: "r2"},
-            {version: "7.2", bucket: "r3"},
-          ],
-        },
+            {version: "7.2", bucket: "r3"}
+          ]
+        }
       ],
       tier2_gems: [
-        {name: "omniauth", versions: ["2.1"]},
-      ],
+        {name: "omniauth", versions: ["2.1"]}
+      ]
     )
 
     expect(entries).to eq(
@@ -8162,16 +8166,16 @@ RSpec.describe Kettle::Jem do
           tier1_gemfile: "gemfiles/modular/activerecord/r2/v6.1.gemfile",
           tier2_gemfile: "gemfiles/modular/omniauth/r2/v2.1.gemfile",
           x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r2/libs.gemfile",
-          ruby_series: "r2",
+          ruby_series: "r2"
         },
         {
           name: "kja-ar-7-2-oa-2-1-r3",
           tier1_gemfile: "gemfiles/modular/activerecord/r3/v7.2.gemfile",
           tier2_gemfile: "gemfiles/modular/omniauth/r3/v2.1.gemfile",
           x_std_libs_gemfile: "gemfiles/modular/x_std_libs/r3/libs.gemfile",
-          ruby_series: "r3",
-        },
-      ],
+          ruby_series: "r3"
+        }
+      ]
     )
   end
 
@@ -8182,7 +8186,7 @@ RSpec.describe Kettle::Jem do
       {number: "6.1.7", min_ruby: "2.5"},
       {number: "7.0.8", min_ruby: "2.7"},
       {number: "7.1.5", min_ruby: "2.7"},
-      {number: "7.2.2", min_ruby: "3.1"},
+      {number: "7.2.2", min_ruby: "3.1"}
     ]
 
     seams = described_class.appraisal_find_ruby_seams(versions)
@@ -8191,8 +8195,8 @@ RSpec.describe Kettle::Jem do
         {version: "5.2", min_ruby: Gem::Version.new("2.4")},
         {version: "6.0", min_ruby: Gem::Version.new("2.5")},
         {version: "7.0", min_ruby: Gem::Version.new("2.7")},
-        {version: "7.2", min_ruby: Gem::Version.new("3.1")},
-      ],
+        {version: "7.2", min_ruby: Gem::Version.new("3.1")}
+      ]
     )
 
     series = described_class.appraisal_ruby_series(versions)
@@ -8203,15 +8207,15 @@ RSpec.describe Kettle::Jem do
       seams: seams,
       buckets: series.fetch(:buckets),
       bucket_ranges: series.fetch(:bucket_ranges),
-      all_versions: ["5.2", "6.0", "6.1", "7.0", "7.1", "7.2"],
+      all_versions: ["5.2", "6.0", "6.1", "7.0", "7.1", "7.2"]
     )
     expect(assignments).to eq(
       [
         {version: "5.2", bucket: "r2.4"},
         {version: "6.1", bucket: "r2.6"},
         {version: "7.1", bucket: "r2", filler: true},
-        {version: "7.2", bucket: "r3"},
-      ],
+        {version: "7.2", bucket: "r3"}
+      ]
     )
   end
 
@@ -8226,17 +8230,17 @@ RSpec.describe Kettle::Jem do
           number: "7.1.3",
           runtime_dependencies: [
             {name: "sqlite3", requirements: "~> 1.6"},
-            {name: "erb", requirements: ">= 0"},
-          ],
-        },
+            {name: "erb", requirements: ">= 0"}
+          ]
+        }
       ],
       dependency_versions: {
         "sqlite3" => [
           {number: "1.6.8", min_ruby: "2.7"},
           {number: "1.6.9", min_ruby: "3.0"},
-          {number: "1.7.0", min_ruby: "3.2"},
-        ],
-      },
+          {number: "1.7.0", min_ruby: "3.2"}
+        ]
+      }
     )
 
     expect(resolved).to eq("sqlite3" => "1.6.9")
@@ -8252,7 +8256,7 @@ RSpec.describe Kettle::Jem do
         response.new("200", JSON.dump([
           {"number" => "7.1.0.beta1", "ruby_version" => ">= 3.0", "prerelease" => true, "created_at" => "2024-01-01"},
           {"number" => "6.1.7", "ruby_version" => ">= 2.5", "prerelease" => false, "created_at" => "2023-01-01"},
-          {"number" => "7.1.3", "ruby_version" => ">= 2.7", "prerelease" => false, "created_at" => "2024-02-01"},
+          {"number" => "7.1.3", "ruby_version" => ">= 2.7", "prerelease" => false, "created_at" => "2024-02-01"}
         ]))
       when "https://example.test/api/v2/rubygems/active+record/versions/7.1.3.json"
         response.new("200", JSON.dump({
@@ -8260,9 +8264,9 @@ RSpec.describe Kettle::Jem do
           "ruby_version" => ">= 2.7",
           "dependencies" => {
             "runtime" => [
-              {"name" => "sqlite3", "requirements" => "~> 1.6"},
-            ],
-          },
+              {"name" => "sqlite3", "requirements" => "~> 1.6"}
+            ]
+          }
         }))
       else
         response.new("404", "{}")
@@ -8272,37 +8276,37 @@ RSpec.describe Kettle::Jem do
     resolver = described_class::RubyGemsResolver.new(
       http_get: http_get,
       v1_api_base: "https://example.test/api/v1",
-      v2_api_base: "https://example.test/api/v2/rubygems",
+      v2_api_base: "https://example.test/api/v2/rubygems"
     )
 
     expect(resolver.versions("active record", requirements: ">= 7.0")).to eq(
       [
-        {number: "7.1.3", ruby_version: ">= 2.7", created_at: "2024-02-01", prerelease: false},
-      ],
+        {number: "7.1.3", ruby_version: ">= 2.7", created_at: "2024-02-01", prerelease: false}
+      ]
     )
     expect(resolver.versions("active record", include_prerelease: true).map { |entry| entry.fetch(:number) }).to eq(
-      ["6.1.7", "7.1.0.beta1", "7.1.3"],
+      ["6.1.7", "7.1.0.beta1", "7.1.3"]
     )
     expect(resolver.min_ruby_version("active record", "7.1.3")).to eq(Gem::Version.new("2.7"))
     expect(resolver.minor_versions_by_major("active record")).to eq(
       [
         {major: 6, minors: ["6.1"]},
-        {major: 7, minors: ["7.1"]},
-      ],
+        {major: 7, minors: ["7.1"]}
+      ]
     )
     expect(resolver.version_info("active record", "7.1.3")).to eq(
       {
         number: "7.1.3",
         ruby_version: ">= 2.7",
         runtime_dependencies: [
-          {name: "sqlite3", requirements: "~> 1.6"},
-        ],
-      },
+          {name: "sqlite3", requirements: "~> 1.6"}
+        ]
+      }
     )
     expect(resolver.version_info("active record", "7.1.3")).to be_a(Hash)
     expect(calls.tally).to eq(
       "https://example.test/api/v1/versions/active+record.json" => 1,
-      "https://example.test/api/v2/rubygems/active+record/versions/7.1.3.json" => 1,
+      "https://example.test/api/v2/rubygems/active+record/versions/7.1.3.json" => 1
     )
   end
 
@@ -8324,8 +8328,8 @@ RSpec.describe Kettle::Jem do
               spec.add_development_dependency "dev_dep", ">= 1"
             end
           RUBY
-          "lib/demo_tool/version.rb" => "module DemoTool; VERSION = '0.1.0'; end\n",
-        },
+          "lib/demo_tool/version.rb" => "module DemoTool; VERSION = '0.1.0'; end\n"
+        }
       )
 
       described_class::GemSpecReader.clear_cache!
@@ -8340,7 +8344,7 @@ RSpec.describe Kettle::Jem do
         gh_org: "example",
         gh_repo: "demo_tool",
         namespace: "DemoTool",
-        entrypoint_require: "demo_tool",
+        entrypoint_require: "demo_tool"
       )
       expect(metadata.fetch(:runtime_dependencies).map(&:name)).to eq(["runtime_dep"])
       expect(metadata.fetch(:development_dependencies).map(&:name)).to eq(["dev_dep"])
@@ -8366,38 +8370,38 @@ RSpec.describe Kettle::Jem do
         appraisal_matrix: {
           gems: {
             tier2: [
-              {name: "omniauth"},
-            ],
-          },
-        },
+              {name: "omniauth"}
+            ]
+          }
+        }
       },
       exclusions: ["erb"],
-      freshness_ttl: 86_400,
+      freshness_ttl: 86_400
     )
 
     expect(scaffold.fetch("appraisal_matrix")).to include(
       "mode" => "semver",
-      "freshness_ttl" => 86_400,
+      "freshness_ttl" => 86_400
     )
     expect(scaffold.dig("appraisal_matrix", "gems", "tier1")).to eq(
       [
         {"name" => "activerecord"},
-        {"name" => "sequel"},
-      ],
+        {"name" => "sequel"}
+      ]
     )
     expect(scaffold.dig("appraisal_matrix", "gems", "tier2")).to eq([{"name" => "omniauth"}])
 
     expect(described_class.appraisal_matrix_has_versions?(
       "gems" => {
         "tier1" => [{"name" => "activerecord", "versions" => []}],
-        "tier2" => [{"name" => "omniauth", "versions" => ["2.1"]}],
-      },
+        "tier2" => [{"name" => "omniauth", "versions" => ["2.1"]}]
+      }
     )).to be true
     expect(described_class.appraisal_matrix_fresh?({"resolved_at" => 100, "freshness_ttl" => 50}, now: 149)).to be true
     expect(described_class.appraisal_matrix_fresh?({"resolved_at" => 100, "freshness_ttl" => 50}, now: 150)).to be false
     expect(described_class.appraisal_time_ago(0, now: 90_000)).to eq("1d")
     expect(described_class.appraisal_finalize_versions(%w[7.1.0 7.1.1], include_versions: ["6.0.9"], exclude_versions: ["7.1.0"])).to eq(
-      %w[6.0.9 7.1.1],
+      %w[6.0.9 7.1.1]
     )
 
     resolver = Class.new do
@@ -8434,7 +8438,7 @@ RSpec.describe Kettle::Jem do
       mode: "patch",
       requirements: [">= 7.1", "< 7.2"],
       include_versions: ["6.0.9"],
-      exclude_versions: ["7.1.0"],
+      exclude_versions: ["7.1.0"]
     )).to eq(%w[6.0.9 7.1.1])
     expect(described_class.appraisal_all_versions_for(resolver: resolver, gem_name: "sequel", mode: "major")).to eq(%w[5.0 5.9])
     expect(described_class.appraisal_compatible_version_for_bucket?(
@@ -8442,7 +8446,7 @@ RSpec.describe Kettle::Jem do
       gem_name: "omniauth",
       version: "2.1",
       ruby_series: "r3.1",
-      bucket_ranges: {"r3.1" => {floor: "3.0", ceiling: "3.1"}},
+      bucket_ranges: {"r3.1" => {floor: "3.0", ceiling: "3.1"}}
     )).to be false
   end
 
@@ -8452,11 +8456,11 @@ RSpec.describe Kettle::Jem do
         "gemfiles/kja-ar-7-1-r3.gemfile",
         "gemfiles/kja-ar-6-1-r2.gemfile",
         "gemfiles/manual.gemfile",
-        "gemfiles/modular/activerecord/r3/v7.1.gemfile",
+        "gemfiles/modular/activerecord/r3/v7.1.gemfile"
       ],
       current_entries: [
-        {name: "kja-ar-7-1-r3"},
-      ],
+        {name: "kja-ar-7-1-r3"}
+      ]
     )
 
     expect(stale_paths).to eq(["gemfiles/kja-ar-6-1-r2.gemfile"])
@@ -8490,7 +8494,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Author: {KJ|AUTHOR:NAME}
           Given: {KJ|AUTHOR:GIVEN_NAMES}
           Family: {KJ|AUTHOR:FAMILY_NAMES}
@@ -8506,8 +8510,8 @@ RSpec.describe Kettle::Jem do
           "KJ_AUTHOR_NAME" => "Env A Writer",
           "KJ_AUTHOR_EMAIL" => "env@example.test",
           "KJ_AUTHOR_DOMAIN" => "env.example.test",
-          "KJ_AUTHOR_ORCID" => "0000-0002-1825-0097",
-        },
+          "KJ_AUTHOR_ORCID" => "0000-0002-1825-0097"
+        }
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
@@ -8526,7 +8530,7 @@ RSpec.describe Kettle::Jem do
         "KJ|AUTHOR:FAMILY_NAMES" => "Person",
         "KJ|AUTHOR:GIVEN_NAMES" => "Config",
         "KJ|AUTHOR:NAME" => "Env A Writer",
-        "KJ|AUTHOR:ORCID" => "0000-0002-1825-0097",
+        "KJ|AUTHOR:ORCID" => "0000-0002-1825-0097"
       )
     end
   end
@@ -8555,7 +8559,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           GitHub: {KJ|GH:USER}
           GitLab: {KJ|GL:USER}
           Codeberg: {KJ|CB:USER}
@@ -8567,8 +8571,8 @@ RSpec.describe Kettle::Jem do
         root,
         env: {
           "KJ_GH_USER" => "env-gh",
-          "KJ_CB_USER" => "env-cb",
-        },
+          "KJ_CB_USER" => "env-cb"
+        }
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
@@ -8583,7 +8587,7 @@ RSpec.describe Kettle::Jem do
         "KJ|CB:USER" => "env-cb",
         "KJ|GH:USER" => "env-gh",
         "KJ|GL:USER" => "config-gl",
-        "KJ|SH:USER" => "config-sh",
+        "KJ|SH:USER" => "config-sh"
       )
     end
   end
@@ -8615,7 +8619,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Patreon: {KJ|FUNDING:PATREON}
           Ko-fi: {KJ|FUNDING:KOFI}
           PayPal: {KJ|FUNDING:PAYPAL}
@@ -8630,8 +8634,8 @@ RSpec.describe Kettle::Jem do
         root,
         env: {
           "KJ_FUNDING_PATREON" => "env-patreon",
-          "KJ_FUNDING_PAYPAL" => "env-paypal",
-        },
+          "KJ_FUNDING_PAYPAL" => "env-paypal"
+        }
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
@@ -8652,7 +8656,7 @@ RSpec.describe Kettle::Jem do
         "KJ|FUNDING:LIBERAPAY" => "config-liberapay",
         "KJ|FUNDING:PATREON" => "env-patreon",
         "KJ|FUNDING:PAYPAL" => "env-paypal",
-        "KJ|FUNDING:POLAR" => "config-polar",
+        "KJ|FUNDING:POLAR" => "config-polar"
       )
     end
   end
@@ -8663,7 +8667,7 @@ RSpec.describe Kettle::Jem do
 
     {
       "0.2.0" => "0.latest",
-      "2.5.7" => "2.5.latest",
+      "2.5.7" => "2.5.latest"
     }.each do |gem_version, supported_version|
       Dir.mktmpdir("kettle-jem-security-version-token-slice", tmp_root) do |root|
         write_tree(root, {
@@ -8681,7 +8685,7 @@ RSpec.describe Kettle::Jem do
               entries:
                 - SECURITY.md
           YAML
-          "template/SECURITY.md.example" => <<~MARKDOWN,
+          "template/SECURITY.md.example" => <<~MARKDOWN
             | Version  | Supported |
             |----------|-----------|
             | {KJ|SECURITY:SUPPORTED_VERSION} | ✅         |
@@ -8695,7 +8699,7 @@ RSpec.describe Kettle::Jem do
         end
         expect(template_report.fetch(:final_content)).to include("| #{supported_version} | ✅")
         expect(template_report.dig(:metadata, :template_tokens)).to include(
-          "KJ|SECURITY:SUPPORTED_VERSION" => supported_version,
+          "KJ|SECURITY:SUPPORTED_VERSION" => supported_version
         )
       end
     end
@@ -8725,7 +8729,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Mastodon: {KJ|SOCIAL:MASTODON}
           Bluesky: {KJ|SOCIAL:BLUESKY}
           Linktree: {KJ|SOCIAL:LINKTREE}
@@ -8737,8 +8741,8 @@ RSpec.describe Kettle::Jem do
         root,
         env: {
           "KJ_SOCIAL_MASTODON" => "env-mastodon",
-          "KJ_SOCIAL_LINKTREE" => "env-linktree",
-        },
+          "KJ_SOCIAL_LINKTREE" => "env-linktree"
+        }
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
@@ -8753,7 +8757,7 @@ RSpec.describe Kettle::Jem do
         "KJ|SOCIAL:BLUESKY" => "config-bluesky",
         "KJ|SOCIAL:DEVTO" => "config-devto",
         "KJ|SOCIAL:LINKTREE" => "env-linktree",
-        "KJ|SOCIAL:MASTODON" => "env-mastodon",
+        "KJ|SOCIAL:MASTODON" => "env-mastodon"
       )
     end
   end
@@ -8772,7 +8776,7 @@ RSpec.describe Kettle::Jem do
             spec.licenses = ["MIT"]
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           licenses:
             - AGPL-3.0-only
             - PolyForm-Small-Business-1.0.0
@@ -8793,10 +8797,10 @@ RSpec.describe Kettle::Jem do
       end
       final_content = template_report.fetch(:final_content)
       expect(plan.dig(:facts, :license, :spdx)).to eq(
-        ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0", "LicenseRef-Big-Time-Public-License"],
+        ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0", "LicenseRef-Big-Time-Public-License"]
       )
       expect(plan.dig(:facts, :package, :license_expression)).to eq(
-        "AGPL-3.0-only OR PolyForm-Small-Business-1.0.0 OR LicenseRef-Big-Time-Public-License",
+        "AGPL-3.0-only OR PolyForm-Small-Business-1.0.0 OR LicenseRef-Big-Time-Public-License"
       )
       expect(final_content).to include("[AGPL-3.0-only](AGPL-3.0-only.md)")
       expect(final_content).to include("[PolyForm-Small-Business-1.0.0](PolyForm-Small-Business-1.0.0.md)")
@@ -8809,25 +8813,25 @@ RSpec.describe Kettle::Jem do
         "KJ|LICENSE:PRIMARY_SPDX" => "AGPL-3.0-only",
         "KJ|LICENSE_EYE:PRIMARY_SPDX" => "AGPL-3.0-only",
         "KJ|LICENSE_EYE:MODE" => "resolve",
-        "KJ|LICENSE_EYE:FLAGS" => "",
+        "KJ|LICENSE_EYE:FLAGS" => ""
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|LICENSE_MD_CONTENT")).to include(
-        "This project is made available under the following licenses.",
+        "This project is made available under the following licenses."
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:LICENSE_BADGE")).to eq(
-        "[![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0 OR LicenseRef-Big-Time-Public-License][📄license-img]][📄license]",
+        "[![License: AGPL-3.0-only OR PolyForm-Small-Business-1.0.0 OR LicenseRef-Big-Time-Public-License][📄license-img]][📄license]"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:LICENSE_REFS")).to include(
-        "[📄license-ref]: LICENSE.md",
+        "[📄license-ref]: LICENSE.md"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:LICENSE_REFS")).to include(
-        "License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0_OR_LicenseRef--Big--Time--Public--License",
+        "License-AGPL--3.0--only_OR_PolyForm--Small--Business--1.0.0_OR_LicenseRef--Big--Time--Public--License"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "https://github.com/structuredmerge/structuredmerge-ruby#package-family",
+        "https://github.com/structuredmerge/structuredmerge-ruby#package-family"
       )
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
-        "StructuredMerge Ruby package family",
+        "StructuredMerge Ruby package family"
       )
     end
   end
@@ -8846,7 +8850,7 @@ RSpec.describe Kettle::Jem do
             spec.licenses = ["AGPL-3.0-only"]
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           licenses:
             - AGPL-3.0-only
             - MIT
@@ -8886,14 +8890,14 @@ RSpec.describe Kettle::Jem do
         description: "Example gem",
         homepage_url: "https://example.test",
         source_url: "https://example.test/source",
-        license_expression: "AGPL-3.0-only OR PolyForm-Small-Business-1.0.0",
+        license_expression: "AGPL-3.0-only OR PolyForm-Small-Business-1.0.0"
       },
       license: {
-        spdx: ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"],
+        spdx: ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
       },
       funding: {
-        urls: [],
-      },
+        urls: []
+      }
     )
 
     expect(block).to include("| License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |")
@@ -8906,14 +8910,14 @@ RSpec.describe Kettle::Jem do
         description: "First line\n  Second | line\r\nThird line",
         homepage_url: "https://example.test",
         source_url: "https://example.test/source",
-        license_expression: "MIT",
+        license_expression: "MIT"
       },
       license: {
-        spdx: ["MIT"],
+        spdx: ["MIT"]
       },
       funding: {
-        urls: [],
-      },
+        urls: []
+      }
     )
 
     expect(block).to include("| Description | First line<br>Second \\| line<br>Third line |")
@@ -8928,13 +8932,13 @@ RSpec.describe Kettle::Jem do
         root,
         {"readme" => {"badges" => {"fossa" => false}}},
         {spdx: ["MIT"]},
-        repository: {slug: "galtzo-floss/example"},
+        repository: {slug: "galtzo-floss/example"}
       )
       enabled_style = described_class.readme_style_facts(
         root,
         {"readme" => {"badges" => {"fossa" => "git+github.com/pboling/flag_shih_tzu"}}},
         {spdx: ["MIT"]},
-        repository: {slug: "galtzo-floss/flag_shih_tzu"},
+        repository: {slug: "galtzo-floss/flag_shih_tzu"}
       )
 
       expect(disabled_style[:fossa_project]).to be_nil
@@ -8962,7 +8966,7 @@ RSpec.describe Kettle::Jem do
     RUBY
     facts = {
       package: {name: "example"},
-      license: {spdx: ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]},
+      license: {spdx: ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]}
     }
 
     output = described_class.merge_gemspec_template_source(template, destination, facts: facts)
@@ -8980,10 +8984,10 @@ RSpec.describe Kettle::Jem do
           description: "Example gem",
           homepage_url: "https://example.test",
           source_url: "https://github.com/structuredmerge/structuredmerge-ruby",
-          license_expression: "MIT",
+          license_expression: "MIT"
         },
         license: {spdx: ["MIT"]},
-        funding: {urls: ["https://tidelift.com/funding/github/rubygems/example"]},
+        funding: {urls: ["https://tidelift.com/funding/github/rubygems/example"]}
       )
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
@@ -9009,7 +9013,7 @@ RSpec.describe Kettle::Jem do
 
           #{metadata_block}
         MARKDOWN
-        "template/README.md.example" => "# {KJ|NAMESPACE}\n\nTemplate body.\n",
+        "template/README.md.example" => "# {KJ|NAMESPACE}\n\nTemplate body.\n"
       })
 
       described_class.apply_project(root, env: {}, run_options: {accept: true, force: true})
@@ -9053,7 +9057,7 @@ RSpec.describe Kettle::Jem do
         YAML
         "MIT.md" => "obsolete MIT license\n",
         "PolyForm-Noncommercial-1.0.0.md" => "obsolete PolyForm NC license\n",
-        "Big-Time-Public-License.md" => "obsolete Big Time license\n",
+        "Big-Time-Public-License.md" => "obsolete Big Time license\n"
       })
 
       apply = described_class.apply_project(root, env: {})
@@ -9070,7 +9074,7 @@ RSpec.describe Kettle::Jem do
         "PolyForm-Noncommercial-1.0.0.md",
         "Big-Time-Public-License.md",
         "AGPL-3.0-only.md",
-        "PolyForm-Small-Business-1.0.0.md",
+        "PolyForm-Small-Business-1.0.0.md"
       )
       expect(File).to exist(File.join(root, "AGPL-3.0-only.md"))
       expect(File).to exist(File.join(root, "PolyForm-Small-Business-1.0.0.md"))
@@ -9136,7 +9140,7 @@ RSpec.describe Kettle::Jem do
 
           Template usage.
         MARKDOWN
-        "README.md" => <<~MARKDOWN,
+        "README.md" => <<~MARKDOWN
           # 💎 Example
 
           ## 🌻 Synopsis
@@ -9162,7 +9166,7 @@ RSpec.describe Kettle::Jem do
         "GIT_AUTHOR_DATE" => "#{Time.now.utc.year}-01-02T00:00:00Z",
         "GIT_COMMITTER_NAME" => "Jane Contributor",
         "GIT_COMMITTER_EMAIL" => "jane@example.test",
-        "GIT_COMMITTER_DATE" => "#{Time.now.utc.year}-01-02T00:00:00Z",
+        "GIT_COMMITTER_DATE" => "#{Time.now.utc.year}-01-02T00:00:00Z"
       }
       tree = IO.popen(["git", "-C", root, "write-tree"], &:read).strip
       commit = IO.popen(commit_env, ["git", "-C", root, "commit-tree", tree, "-m", "initial"], &:read).strip
@@ -9218,7 +9222,7 @@ RSpec.describe Kettle::Jem do
         YAML
         "README.md" => "# Example\n",
         "template/LICENSE.md.example" => "{KJ|LICENSE_MD_CONTENT}\n\n{KJ|LICENSE_COPYRIGHT_NOTICE}\n",
-        "template/README.md.example" => "# Example\n\n## 📄 License\n\n{KJ|README:COPYRIGHT_NOTICE}\n",
+        "template/README.md.example" => "# Example\n\n## 📄 License\n\n{KJ|README:COPYRIGHT_NOTICE}\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -9261,7 +9265,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Gem shield: {KJ|GEM_SHIELD}
           Major: {KJ|GEM_MAJOR}
           GitHub org: {KJ|GH_ORG}
@@ -9284,8 +9288,8 @@ RSpec.describe Kettle::Jem do
         env: {
           "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
           "KJ_YARD_HOST" => "docs.example.test",
-          "KJ_HOMEPAGE_URI" => "https://homepage.example.test",
-        },
+          "KJ_HOMEPAGE_URI" => "https://homepage.example.test"
+        }
       )
       template_report = plan[:recipe_reports].find do |report|
         report.fetch(:recipe_name) == "template_source_application_README_md"
@@ -9315,7 +9319,7 @@ RSpec.describe Kettle::Jem do
         "KJ|NAMESPACE_SHIELD" => "Example%3A%3AGem",
         "KJ|PROJECT_EMOJI" => "🫖",
         "KJ|HOMEPAGE_URI" => "https://homepage.example.test",
-        "KJ|YARD_HOST" => "docs.example.test",
+        "KJ|YARD_HOST" => "docs.example.test"
       )
     end
   end
@@ -9344,7 +9348,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => "YARD: {KJ|YARD_HOST}\nHomepage URI: {KJ|HOMEPAGE_URI}\n",
+        "template/README.md.example" => "YARD: {KJ|YARD_HOST}\nHomepage URI: {KJ|HOMEPAGE_URI}\n"
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -9355,7 +9359,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to eq("YARD: docs.config.test\nHomepage URI: https://homepage.config.test\n")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|HOMEPAGE_URI" => "https://homepage.config.test",
-        "KJ|YARD_HOST" => "docs.config.test",
+        "KJ|YARD_HOST" => "docs.config.test"
       )
     end
   end
@@ -9374,7 +9378,7 @@ RSpec.describe Kettle::Jem do
             spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
           end
         RUBY
-        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
           project_emoji: "🫖"
           min_divergence_threshold: 5 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
           yard_host: docs.config.test # ENV override: KJ_YARD_HOST
@@ -9398,9 +9402,9 @@ RSpec.describe Kettle::Jem do
           "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
           "KJ_YARD_HOST" => "docs.env.test",
           "KJ_HOMEPAGE_URI" => "https://homepage.env.test",
-          "KJ_GH_USER" => "env-user",
+          "KJ_GH_USER" => "env-user"
         },
-        run_options: {skip_commit: true},
+        run_options: {skip_commit: true}
       )
       report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == described_class::KETTLE_CONFIG_PATH }
       config = YAML.safe_load(report.fetch(:final_content))
@@ -9432,7 +9436,7 @@ RSpec.describe Kettle::Jem do
             spec.email = ["jane@example.test"]
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project_emoji: "🫖"
           # README top logo mode.
           # Controls whether the generated README header includes the GitHub org logo,
@@ -9478,7 +9482,7 @@ RSpec.describe Kettle::Jem do
             spec.email = ["jane@example.test"]
           end
         RUBY
-        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
           defaults:
             preference: destination
             add_template_only_nodes: true
@@ -9540,7 +9544,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Source: {KJ|GH_ORG}
           GitHub user: {KJ|GH:USER}
         MARKDOWN
@@ -9557,7 +9561,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include("GitHub user: acme")
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|GH_ORG" => "acme",
-        "KJ|GH:USER" => "acme",
+        "KJ|GH:USER" => "acme"
       )
     end
   end
@@ -9581,7 +9585,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Synopsis:
@@ -9606,7 +9610,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|README:TOP_LOGO_REFS" => "",
         "KJ|README:TOP_LOGO_ROW" => a_string_including("example-gem Logo by Aboling0"),
-        "KJ|README:H2_SYNOPSIS_LOGO_ROW" => a_string_including("ruby-lang Logo"),
+        "KJ|README:H2_SYNOPSIS_LOGO_ROW" => a_string_including("ruby-lang Logo")
       )
     end
   end
@@ -9633,7 +9637,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Synopsis:
@@ -9685,7 +9689,7 @@ RSpec.describe Kettle::Jem do
 
           Existing synopsis.
         MARKDOWN
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           {KJ|README:TOP_LOGO_ROW}
 
           {KJ|README:TOP_LOGO_REFS}
@@ -9731,7 +9735,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Refs:
@@ -9745,8 +9749,8 @@ RSpec.describe Kettle::Jem do
         gem_root,
         env: {
           "KETTLE_JEM_TEMPLATE_PROFILE" => "full",
-          "KJ_REPOSITORY_TOPOLOGY" => "monorepo-subproject",
-        },
+          "KJ_REPOSITORY_TOPOLOGY" => "monorepo-subproject"
+        }
       )
       expect(plan.dig(:facts, :template_profile)).to eq("full")
       expect(plan.dig(:facts, :repository, :mode)).to eq("monorepo_subproject")
@@ -9767,7 +9771,7 @@ RSpec.describe Kettle::Jem do
             spec.metadata["source_code_uri"] = "https://github.com/kettle-rb/nomono"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           repository:
             topology: monorepo-subproject
           templates:
@@ -9786,7 +9790,7 @@ RSpec.describe Kettle::Jem do
         root,
         "https://github.com/kettle-rb/nomono",
         package_name: "nomono",
-        repository_topology: "monorepo-subproject",
+        repository_topology: "monorepo-subproject"
       )
       tokens = described_class.send(:readme_url_template_tokens, repository, "nomono", "kettle-rb")
 
@@ -9798,7 +9802,7 @@ RSpec.describe Kettle::Jem do
       expect(tokens.values_at(
         "KJ|README:GL_PACKAGE_SOURCE_URL",
         "KJ|README:CB_PACKAGE_SOURCE_URL",
-        "KJ|README:GH_PACKAGE_SOURCE_URL",
+        "KJ|README:GH_PACKAGE_SOURCE_URL"
       ).join("\n")).not_to include("/gems/nomono")
     end
   end
@@ -9824,7 +9828,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Synopsis:
@@ -9870,7 +9874,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Synopsis:
@@ -9913,7 +9917,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Synopsis:
@@ -9968,7 +9972,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           Row:
           {KJ|README:TOP_LOGO_ROW}
           Refs:
@@ -10006,7 +10010,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.1"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -10022,10 +10026,10 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_source_preference)).to include(
         selected_source: "gemfiles/modular/style.gemfile.example",
         source_relative_path: "gemfiles/modular/style.gemfile.example",
-        source_root: "packaged",
+        source_root: "packaged"
       )
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include(
-        "Style tasks run on the latest Ruby",
+        "Style tasks run on the latest Ruby"
       )
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.0"')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.3"')
@@ -10035,7 +10039,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.0\"",
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.2\"",
-        "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1",
+        "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"
       )
     end
   end
@@ -10052,7 +10056,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 2.4"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           templates:
             root: packaged
             apply: true
@@ -10071,21 +10075,21 @@ RSpec.describe Kettle::Jem do
       end
 
       expect(appraisals_report.fetch(:final_content)).to include(
-        'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true',
+        'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true'
       )
       expect(appraisals_report.fetch(:final_content)).not_to include("respond_to?(:plugin)")
       expect(appraisals_report.fetch(:final_content)).not_to include('require "appraisal2/rubocop"')
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")',
+        'if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")'
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        "if respond_to?(:generator_only)",
+        "if respond_to?(:generator_only)"
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        "generator_only do",
+        "generator_only do"
       )
       expect(appraisal_root_report.fetch(:final_content)).to include(
-        'eval_gemfile "gemfiles/modular/style.gemfile"',
+        'eval_gemfile "gemfiles/modular/style.gemfile"'
       )
       expect(appraisal_root_report.fetch(:final_content)).not_to include('self.class.name.start_with?("Appraisal::")')
     end
@@ -10109,7 +10113,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => <<~MARKDOWN,
+        "template/README.md.example" => <<~MARKDOWN
           # {KJ|UNKNOWN}
         MARKDOWN
       })
@@ -10127,7 +10131,7 @@ RSpec.describe Kettle::Jem do
       write_tree(root, {
         "templates/README.md.example" => "# Example\n",
         "templates/.github/FUNDING.yml.example" => "github: [example]\n",
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           project: example
 
           kettle-jem:
@@ -10146,22 +10150,22 @@ RSpec.describe Kettle::Jem do
       expect(drift).to eq(
         added: [".github/FUNDING.yml.example"],
         changed: ["README.md.example"],
-        removed: ["removed.md.example"],
+        removed: ["removed.md.example"]
       )
       expect(described_class::TemplateChecksums.diff_count(drift)).to eq(3)
       expect(described_class::TemplateChecksums.summary(drift)).to eq(
-        "3 template file(s) since last run: 1 added, 1 changed, 1 removed",
+        "3 template file(s) since last run: 1 added, 1 changed, 1 removed"
       )
       expect(described_class::TemplateChecksums.detail_lines(drift)).to eq([
         "  + .github/FUNDING.yml.example",
         "  ~ README.md.example",
-        "  - removed.md.example",
+        "  - removed.md.example"
       ])
 
       described_class::TemplateChecksums.write_to_config(
         config_path: File.join(root, ".kettle-jem.yml"),
         checksums: current,
-        version: "1.2.3",
+        version: "1.2.3"
       )
       rewritten = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
       expect(rewritten.fetch("kettle-jem").fetch("version")).to eq("1.2.3")
@@ -10187,7 +10191,7 @@ RSpec.describe Kettle::Jem do
             entries:
               - README.md
         YAML
-        "template/README.md.example" => "# Example\n",
+        "template/README.md.example" => "# Example\n"
       })
       calls = []
       runner = lambda do |project_root:, template_dir:|
@@ -10196,7 +10200,7 @@ RSpec.describe Kettle::Jem do
           warning_count: 1,
           json_path: File.join(project_root, "tmp", "kettle-jem", "dup-check.json"),
           lock_path: File.join(project_root, ".kettle-drift.lock"),
-          exit_code: 1,
+          exit_code: 1
         }
       end
 
@@ -10208,7 +10212,7 @@ RSpec.describe Kettle::Jem do
         warning_count: 1,
         json_path: File.join(root, "tmp", "kettle-jem", "dup-check.json"),
         lock_path: File.join(root, ".kettle-drift.lock"),
-        exit_code: 1,
+        exit_code: 1
       )
     end
   end
@@ -10219,7 +10223,7 @@ RSpec.describe Kettle::Jem do
     Dir.mktmpdir("kettle-jem-template-manifest", tmp_root) do |root|
       write_tree(root, {
         "template/README.md.example" => "# Example\n",
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -10234,7 +10238,7 @@ RSpec.describe Kettle::Jem do
       expect(manifest).to include(
         kind: "kettle_jem_template_manifest",
         version: 1,
-        template_root: File.join(root, "template"),
+        template_root: File.join(root, "template")
       )
       expect(manifest.fetch(:checksums).keys).to eq(["README.md.example"])
     end
@@ -10249,24 +10253,24 @@ RSpec.describe Kettle::Jem do
       write_tree(before, {
         "same.txt" => "same\n",
         "changed.txt" => "before\n",
-        "removed.txt" => "removed\n",
+        "removed.txt" => "removed\n"
       })
       write_tree(after, {
         "same.txt" => "same\n",
         "changed.txt" => "after\n",
-        "added.txt" => "added\n",
+        "added.txt" => "added\n"
       })
 
       comparison = described_class::SelfTest::Manifest.compare(
         described_class::SelfTest::Manifest.generate(before),
-        described_class::SelfTest::Manifest.generate(after),
+        described_class::SelfTest::Manifest.generate(after)
       ).merge(skipped: ["lib/internal.rb"])
       expect(comparison).to include(
         matched: ["same.txt"],
         changed: ["changed.txt"],
         added: ["added.txt"],
         removed: ["removed.txt"],
-        skipped: ["lib/internal.rb"],
+        skipped: ["lib/internal.rb"]
       )
 
       snapshot = {
@@ -10276,7 +10280,7 @@ RSpec.describe Kettle::Jem do
           version: "1.2.3",
           path: File.join(root, "installed", "kettle-jem"),
           local_path: false,
-          loaded: true,
+          loaded: true
         },
         merge_gems: [
           {
@@ -10284,16 +10288,16 @@ RSpec.describe Kettle::Jem do
             version: "2.0.0",
             path: File.join(root, "ast-merge"),
             local_path: true,
-            loaded: true,
+            loaded: true
           },
           {
             name: "json-merge",
             version: nil,
             path: nil,
             local_path: false,
-            loaded: false,
-          },
-        ],
+            loaded: false
+          }
+        ]
       }
 
       self_test_report = described_class::SelfTest::Reporter.summary(
@@ -10301,7 +10305,7 @@ RSpec.describe Kettle::Jem do
         output_dir: File.join(root, "output"),
         templating_environment: snapshot,
         diff_count: 1,
-        now: Time.utc(2026, 5, 14, 12, 0, 0),
+        now: Time.utc(2026, 5, 14, 12, 0, 0)
       )
       expect(self_test_report).to include("**Score**: 25.0% (1/4 files unchanged)")
       expect(self_test_report).to include("**Divergence**: 75.0% (3/4 files changed, added, or missing)")
@@ -10321,7 +10325,7 @@ RSpec.describe Kettle::Jem do
         warnings: ["missing service", "missing service"],
         error: RuntimeError.new("boom"),
         template_diff: {added: ["new.md"], changed: ["README.md"], removed: ["old.md"]},
-        template_commit_sha: "abc123",
+        template_commit_sha: "abc123"
       )
       expect(run_report).to include("# kettle-jem Templating Run Report")
       expect(run_report).to include("**Status**: `failed`")
@@ -10339,11 +10343,11 @@ RSpec.describe Kettle::Jem do
         {changed: true, metadata: {destination_existed: false}},
         {changed: true, metadata: {destination_existed: true}},
         {changed: false, metadata: {destination_existed: true}},
-        {changed: true, metadata: {delete_file: true, destination_existed: true}},
+        {changed: true, metadata: {delete_file: true, destination_existed: true}}
       ],
       diagnostics: [
-        {kind: "plugin_file_change", path: "PLUGIN.md", action: "replace"},
-      ],
+        {kind: "plugin_file_change", path: "PLUGIN.md", action: "replace"}
+      ]
     )
 
     expect(stats).to eq(
@@ -10354,7 +10358,7 @@ RSpec.describe Kettle::Jem do
       changed: 1,
       deleted: 1,
       plugin_file_changes: 1,
-      summary: "recipes 4 created 1 pre_existing 2 identical 1 changed 1 deleted 1 plugin_file_changes 1",
+      summary: "recipes 4 created 1 pre_existing 2 identical 1 changed 1 deleted 1 plugin_file_changes 1"
     )
   end
 
@@ -10378,7 +10382,7 @@ RSpec.describe Kettle::Jem do
               - README.md
         YAML
         "templates/README.md.example" => "# Example\n\nTemplate README.\n",
-        "README.md" => "# Example\n\nDestination README.\n",
+        "README.md" => "# Example\n\nDestination README.\n"
       })
 
       plan = described_class.plan_project(root, env: {"force" => "true"})
@@ -10387,7 +10391,7 @@ RSpec.describe Kettle::Jem do
         non_interactive: true,
         accept: true,
         interactive: false,
-        failure_mode: "error",
+        failure_mode: "error"
       )
       readme_decision = plan.fetch(:decision_evaluations).find do |decision|
         decision.fetch(:id) == "recipe:template_source_application_README_md"
@@ -10399,10 +10403,10 @@ RSpec.describe Kettle::Jem do
         selected_action: "replace",
         source: "default",
         severity: "advisory",
-        blocking: false,
+        blocking: false
       )
       expect(readme_decision.fetch(:diagnostics)).to include(
-        "Non-interactive runs apply the configured template source default and report the decision.",
+        "Non-interactive runs apply the configured template source default and report the decision."
       )
 
       apply = described_class.apply_project(root, env: {"force" => "false"})
@@ -10410,7 +10414,7 @@ RSpec.describe Kettle::Jem do
         mode: "interactive",
         non_interactive: false,
         accept: false,
-        interactive: true,
+        interactive: true
       )
       expect(apply.fetch(:decision_evaluations).map { |decision| decision.fetch(:selected_action) }).to include("replace")
       interactive_readme_decision = apply.fetch(:decision_evaluations).find do |decision|
@@ -10418,18 +10422,18 @@ RSpec.describe Kettle::Jem do
       end
       expect(interactive_readme_decision).to include(
         source: "interactive_default",
-        prompt_required: true,
+        prompt_required: true
       )
       expect(interactive_readme_decision.fetch(:prompt)).to include(
         id: "recipe:template_source_application_README_md",
         category: "apply_template_source",
         file: "README.md",
         default_action: "replace",
-        choices: include("create", "replace", "keep", "skip"),
+        choices: include("create", "replace", "keep", "skip")
       )
       expect(apply.fetch(:prompt_requests)).to include(interactive_readme_decision.fetch(:prompt))
       expect(interactive_readme_decision.fetch(:diagnostics)).to include(
-        "Interactive prompt transport is active; selected the configured default pending an external response.",
+        "Interactive prompt transport is active; selected the configured default pending an external response."
       )
 
       File.write(File.join(root, "README.md"), "# Example\n\nDestination README.\n")
@@ -10440,9 +10444,9 @@ RSpec.describe Kettle::Jem do
           interactive: true,
           prompt_answers: {
             "recipe:readme_metadata" => "keep",
-            "recipe:template_source_application_README_md" => "keep",
-          },
-        },
+            "recipe:template_source_application_README_md" => "keep"
+          }
+        }
       )
       answered_decision = answered_apply.fetch(:decision_evaluations).find do |decision|
         decision.fetch(:id) == "recipe:template_source_application_README_md"
@@ -10451,16 +10455,16 @@ RSpec.describe Kettle::Jem do
         mode: "interactive",
         prompt_answers: {
           "recipe:readme_metadata" => "keep",
-          "recipe:template_source_application_README_md" => "keep",
-        },
+          "recipe:template_source_application_README_md" => "keep"
+        }
       )
       expect(answered_decision).to include(
         selected_action: "keep",
         source: "interactive_answer",
-        prompt_required: true,
+        prompt_required: true
       )
       expect(answered_decision.fetch(:diagnostics)).to include(
-        "Interactive prompt answer supplied through the shared decision policy input contract.",
+        "Interactive prompt answer supplied through the shared decision policy input contract."
       )
       expect(answered_apply.fetch(:changed_files)).not_to include("README.md")
       expect(File.read(File.join(root, "README.md"))).to eq("# Example\n\nDestination README.\n")
@@ -10475,7 +10479,7 @@ RSpec.describe Kettle::Jem do
         category: "parse",
         file: "README.md",
         default_action: nil,
-        severity: :fatal,
+        severity: :fatal
       )
     end.to raise_error(Kettle::Jem::Error, /No safe default decision/)
   end
@@ -10485,7 +10489,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-git-preflight", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -10501,13 +10505,13 @@ RSpec.describe Kettle::Jem do
 
       plan = described_class.plan_project(root, env: {
         "KETTLE_JEM_REQUIRE_CLEAN" => "true",
-        "KETTLE_JEM_SKIP_COMMIT" => "true",
+        "KETTLE_JEM_SKIP_COMMIT" => "true"
       })
       expect(plan.fetch(:template_selection)).to include(skip_commit: true)
       expect(plan.fetch(:git_preflight)).to include(
         git_repository: true,
         clean_worktree: false,
-        skip_commit: true,
+        skip_commit: true
       )
       expect(plan.fetch(:git_preflight).fetch(:dirty_entries)).not_to be_empty
     end
@@ -10550,7 +10554,7 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
+        ".kettle-jem.yml" => <<~YAML
           plugins:
             - example-plugin
         YAML
@@ -10561,12 +10565,12 @@ RSpec.describe Kettle::Jem do
       plan_lifecycle = plan.fetch(:diagnostics).find { |diagnostic| diagnostic[:kind] == "plugin_lifecycle" }
       expect(plan_lifecycle).to include(
         loaded_plugins: ["example-plugin"],
-        callbacks_run: false,
+        callbacks_run: false
       )
-      expect(plan_lifecycle.fetch(:active_runner_phases)).to eq([])
+      expect(plan_lifecycle.fetch(:active_runner_phases)).to be_empty
       expect(plan.fetch(:phase_reports).map { |phase_report| phase_report.fetch(:phase) }).to include(
         "github_workflows",
-        "remaining_files",
+        "remaining_files"
       )
       github_phase = plan.fetch(:phase_reports).find { |phase_report| phase_report.fetch(:phase) == "github_workflows" }
       expect(github_phase.fetch(:changed_files)).to include(".github/FUNDING.yml")
@@ -10575,11 +10579,11 @@ RSpec.describe Kettle::Jem do
       apply = described_class.apply_project(root, env: {})
       expect(apply.fetch(:diagnostics)).to include(
         kind: "plugin_detail",
-        message: "before github_workflows: funding exists=false",
+        message: "before github_workflows: funding exists=false"
       )
       expect(apply.fetch(:diagnostics)).to include(
         kind: "plugin_detail",
-        message: "after github_workflows: funding exists=true",
+        message: "after github_workflows: funding exists=true"
       )
       expect(File.read(File.join(root, "PLUGIN.md"))).to include("plugin=example-plugin; phase=remaining_files; recipes=")
       expect(apply.fetch(:changed_files)).to include("PLUGIN.md")
@@ -10587,34 +10591,34 @@ RSpec.describe Kettle::Jem do
       expect(apply.fetch(:diagnostics)).to include(
         kind: "plugin_file_change",
         path: "PLUGIN.md",
-        action: "replace",
+        action: "replace"
       )
       expect(apply.fetch(:diagnostics)).to include(
         kind: "plugin_detail",
-        message: "plugin hook ran",
+        message: "plugin hook ran"
       )
-      apply_lifecycle = apply.fetch(:diagnostics).select { |diagnostic| diagnostic[:kind] == "plugin_lifecycle" }.last
+      apply_lifecycle = apply.fetch(:diagnostics).reverse.find { |diagnostic| diagnostic[:kind] == "plugin_lifecycle" }
       expect(apply_lifecycle).to include(
         loaded_plugins: ["example-plugin"],
-        callbacks_run: true,
+        callbacks_run: true
       )
       expect(apply_lifecycle.fetch(:active_runner_phases)).to eq(described_class::PHASE_ORDER.map(&:to_s))
       expect(apply_lifecycle.fetch(:registered_hooks)).to contain_exactly(
         {
           plugin_name: "example-plugin",
           phase: "github_workflows",
-          timing: "before",
+          timing: "before"
         },
         {
           plugin_name: "example-plugin",
           phase: "github_workflows",
-          timing: "after",
+          timing: "after"
         },
         {
           plugin_name: "example-plugin",
           phase: "remaining_files",
-          timing: "after",
-        },
+          timing: "after"
+        }
       )
     end
   end

@@ -6,7 +6,7 @@ RSpec.describe "old Kettle/Jem public spec audit" do
   it "records migration decisions for every old executable and task spec family" do
     audit = JSON.parse(
       File.read(File.join(__dir__, "fixtures", "old_public_spec_audit.json")),
-      symbolize_names: true,
+      symbolize_names: true
     )
 
     expect(audit.fetch(:case_id)).to eq("kettle-jem-old-public-spec-audit")
@@ -17,7 +17,7 @@ RSpec.describe "old Kettle/Jem public spec audit" do
       "old-prompt-adapters",
       "old-parser-specific-helper-classes",
       "old-phase-class-internals",
-      "old-template-helper-micro-apis",
+      "old-template-helper-micro-apis"
     )
     expect(superseded_decisions).to all(include(:source_paths, :decision, :rationale, :active_contract))
     expect(superseded_decisions.map { |entry| entry.fetch(:decision) }).to all(eq("superseded"))
@@ -36,7 +36,7 @@ RSpec.describe "old Kettle/Jem public spec audit" do
       "spec/kettle/jem/rakelib/selftest_spec.rb",
       "spec/kettle/jem/rakelib/tasks_spec.rb",
       "spec/kettle/jem/self_test/manifest_spec.rb",
-      "spec/kettle/jem/self_test/reporter_spec.rb",
+      "spec/kettle/jem/self_test/reporter_spec.rb"
     )
     expect(files).to all(include(:status, :active_specs))
     expect(files.map { |entry| entry.fetch(:status) }).to all(satisfy { |status| %w[ported partial superseded].include?(status) })
@@ -51,8 +51,8 @@ RSpec.describe "old Kettle/Jem public spec audit" do
       "legacy Markdown README H1, nested subsection, and fenced-code preservation",
       "appraisal matrix pruning parity against old generated workflow set",
       "RubyGems minimum-Ruby shunted.gemfile generation",
-      "duplicate drift checks during template/install runs",
+      "duplicate drift checks during template/install runs"
     )
-    expect(template_task.fetch(:remaining_behaviors)).to eq([])
+    expect(template_task.fetch(:remaining_behaviors)).to be_empty
   end
 end

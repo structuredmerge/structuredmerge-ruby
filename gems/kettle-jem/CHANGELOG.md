@@ -41,6 +41,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated GitHub Actions workflow templates now pin `actions/checkout` to
   the peeled commit SHA for v6.0.3 and `qltysh/qlty-action/coverage` to the
   immutable SHA for v2.2.1.
+- Generated GitHub Actions workflow templates now refresh pins for
+  `coverallsapp/github-action`, `codecov/codecov-action`, and
+  `kettle-rb/ts-grammar-action`.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated coverage workflow uploads now share the same template token as

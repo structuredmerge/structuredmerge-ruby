@@ -38,7 +38,7 @@ module Kettle
         err.puts(error.message)
         err.puts(USAGE)
         2
-      rescue StandardError => error
+      rescue => error
         err.puts("#{error.class}: #{error.message}")
         err.puts(error.backtrace.join("\n")) if debug_enabled?(env)
         1
@@ -67,7 +67,7 @@ module Kettle
       def parse_options(args)
         options = {
           json: false,
-          run_options: {},
+          run_options: {}
         }
         parser = OptionParser.new do |opts|
           opts.banner = USAGE
@@ -183,7 +183,7 @@ module Kettle
             destination_root: options[:destination_root] || project_root,
             template_root: options[:template_root],
             output_root: options[:selftest_output_root],
-            min_divergence_threshold: options[:min_divergence_threshold],
+            min_divergence_threshold: options[:min_divergence_threshold]
           )
         else
           raise ArgumentError, "Unsupported kettle-jem command #{command.inspect}"

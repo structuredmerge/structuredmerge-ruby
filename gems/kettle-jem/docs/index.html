@@ -59,7 +59,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><div id='filecontents'><p><a href="https://discord.gg/3qme4XHNKN"><img src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://www.ruby-lang.org/"><img src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5"></a> <a href="https://github.com/structuredmerge"><img src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg" alt="kettle-jem Logo by Aboling0, CC BY-SA 4.0"></a></p>
+      <div id="content"><div id='filecontents'><p><a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" width="12%" align="right"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem"><img alt="kettle-jem Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/kettle-jem/avatar-128px.svg" width="12%" align="right"></a></p>
 
 <h1 id="-kettlejem">🔮 Kettle::Jem</h1>
 
@@ -80,7 +80,8 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 </details>
 
-<h2 id="-synopsis">🌻 Synopsis</h2>
+<h2 id="-synopsis--">🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"></a>
+</h2>
 
 <p>Kettle::Jem is an AST-aware gem templating system that keeps hundreds of Ruby gems<br>
 in sync with a shared template while preserving each project’s customizations.<br>
@@ -447,6 +448,11 @@ better fit for Appraisals-style combinations.</p>
   </tbody>
 </table>
 
+<p><code>raw_copy</code> exists for bootstrap files that may be needed before the full<br>
+templating stack is available. Because it bypasses normal template processing,<br>
+do not use it for templates that contain <code>{KJ|...}</code> tokens or require<br>
+StructuredMerge normalization.</p>
+
 <h3 id="token-substitution">Token Substitution</h3>
 
 <p>Tokens use <code>{KJ|TOKEN}</code> syntax and are resolved in priority order:</p>
@@ -724,7 +730,7 @@ Output is condensed to two summary lines after the template run:</p>
 (SHA-pinned action references) while destination wins for job configuration:</p>
 
 <pre class="code language-yaml"><code class="language-yaml"># Template updates this SHA automatically:
-uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
 
 # Your matrix customizations are preserved:
 matrix:
@@ -1105,6 +1111,8 @@ Please consider sponsoring me or the project.</p>
 
 <h3 id="please-give-the-project-a-star--">Please give the project a star ⭐ ♥.</h3>
 
+<p>Many parts of this project are actively managed by a <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem">kettle-jem</a> smart template utilizing <a href="https://structuredmerge.org">StructuredMerge.org</a> merge contracts.</p>
+
 <p>Thanks for RTFM. ☺️</p>
 
 <!-- kettle-jem:metadata:start -->
@@ -1120,7 +1128,7 @@ Please consider sponsoring me or the project.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Sun May 31 04:29:01 2026 by
+  Generated on Mon Jun  8 04:33:37 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

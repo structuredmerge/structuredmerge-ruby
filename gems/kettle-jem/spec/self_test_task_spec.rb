@@ -21,7 +21,7 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
       result = described_class.run(
         project_root: root,
         template_root: File.join(root, "template"),
-        min_divergence_threshold: 100,
+        min_divergence_threshold: 100
       )
 
       expect(result.fetch(:mode)).to eq("selftest")
@@ -75,10 +75,12 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
     Dir.mktmpdir("kettle-jem-selftest-threshold", tmp_root) do |root|
       expect(described_class.selftest_threshold("12.5", root)).to eq(12.5)
 
+      # rubocop:disable Env/Assign
       ENV["KJ_MIN_DIVERGENCE_THRESHOLD"] = " 7.25 "
       expect(described_class.selftest_threshold(nil, root)).to eq(7.25)
 
       ENV.delete("KJ_MIN_DIVERGENCE_THRESHOLD")
+      # rubocop:enable Env/Assign
       expect(described_class.selftest_threshold(nil, root)).to be_nil
 
       write_file(root, ".kettle-jem.yml", "min_divergence_threshold: \"\"\n")
@@ -96,11 +98,13 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
       }.to raise_error(Kettle::Jem::Error, "Invalid selftest min_divergence_threshold")
     end
   ensure
+    # rubocop:disable Env/Assign
     if previous_threshold.nil?
       ENV.delete("KJ_MIN_DIVERGENCE_THRESHOLD")
     else
       ENV["KJ_MIN_DIVERGENCE_THRESHOLD"] = previous_threshold
     end
+    # rubocop:enable Env/Assign
   end
 
   it "upserts template root overrides into existing and new config content" do
@@ -160,15 +164,15 @@ RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
   it "appends drift summaries for available and unavailable drift results" do
     available = described_class.append_drift_summary(
       "Summary",
-      {available: true, warning_count: 2, json_path: "tmp/drift.json"},
+      {available: true, warning_count: 2, json_path: "tmp/drift.json"}
     )
     available_without_report = described_class.append_drift_summary(
       "Summary",
-      {available: true, warning_count: 0},
+      {available: true, warning_count: 0}
     )
     unavailable = described_class.append_drift_summary(
       "Summary",
-      {available: false, reason: "not installed"},
+      {available: false, reason: "not installed"}
     )
 
     expect(described_class.append_drift_summary("Summary", nil)).to eq("Summary")

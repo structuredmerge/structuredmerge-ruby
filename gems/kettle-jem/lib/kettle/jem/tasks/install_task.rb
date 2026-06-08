@@ -2,7 +2,6 @@
 
 require "fileutils"
 require "open3"
-require "pathname"
 require "toml-rb"
 require "uri"
 require "yaml"
@@ -66,7 +65,7 @@ module Kettle
             install_summary: install_step_summary(install_steps),
             diagnostics: report.fetch(:diagnostics) + [{
               severity: "advisory",
-              message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps.",
+              message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
           )
         end
@@ -82,8 +81,8 @@ module Kettle
           merge_apply_reports(report, followup).merge(
             bootstrap_followup_apply: {
               status: "applied",
-              reason: "canonical_config_bootstrapped",
-            },
+              reason: "canonical_config_bootstrapped"
+            }
           )
         end
 
@@ -100,7 +99,7 @@ module Kettle
             changed_files: (initial.fetch(:changed_files, []) + followup.fetch(:changed_files, [])).uniq,
             recipe_reports: initial.fetch(:recipe_reports, []) + followup.fetch(:recipe_reports, []),
             post_apply_steps: initial.fetch(:post_apply_steps, []) + followup.fetch(:post_apply_steps, []),
-            diagnostics: initial.fetch(:diagnostics, []) + followup.fetch(:diagnostics, []),
+            diagnostics: initial.fetch(:diagnostics, []) + followup.fetch(:diagnostics, [])
           )
           merged[:changed] = initial.fetch(:changed, false) || followup.fetch(:changed, false) if initial.key?(:changed) || followup.key?(:changed)
           merged
@@ -125,8 +124,8 @@ module Kettle
                 severity: "warning",
                 blocking: false,
                 path: legacy_relative,
-                canonical_path: canonical_relative,
-              }],
+                canonical_path: canonical_relative
+              }]
             }
           end
 
@@ -138,7 +137,7 @@ module Kettle
             reason: "legacy_kettle_config_migrated",
             canonical_path: canonical_relative,
             legacy_path: legacy_relative,
-            changed_files: [legacy_relative, canonical_relative],
+            changed_files: [legacy_relative, canonical_relative]
           }
         end
 
@@ -146,17 +145,19 @@ module Kettle
           gemspec_report = report.fetch(:recipe_reports, []).find do |recipe_report|
             recipe_report.fetch(:relative_path, "").end_with?(".gemspec")
           end
-          return {
-            name: "gemspec_dependency_sync",
-            status: "unavailable",
-            reason: "no_gemspec_recipe",
-          } unless gemspec_report
+          unless gemspec_report
+            return {
+              name: "gemspec_dependency_sync",
+              status: "unavailable",
+              reason: "no_gemspec_recipe"
+            }
+          end
 
           {
             name: "gemspec_dependency_sync",
             path: gemspec_report.fetch(:relative_path),
             status: gemspec_report.fetch(:changed, false) ? "applied" : "already_current",
-            development_dependencies: development_dependency_names(gemspec_report.fetch(:final_content, "")),
+            development_dependencies: development_dependency_names(gemspec_report.fetch(:final_content, ""))
           }
         end
 
@@ -194,14 +195,14 @@ module Kettle
               bundle_binstub_location_validation
               bundle_lock_normalization
             ],
-            "orchestration" => %w[bundled_handoff bootstrap_commit],
+            "orchestration" => %w[bundled_handoff bootstrap_commit]
           }
           phases.map do |phase, names|
             steps = install_steps.select { |step| names.include?(step.fetch(:name).to_s) }
             {
               phase: phase,
               steps: steps.map { |step| step.fetch(:name) },
-              statuses: steps.to_h { |step| [step.fetch(:name), step.fetch(:status)] },
+              statuses: steps.to_h { |step| [step.fetch(:name), step.fetch(:status)] }
             }
           end
         end
@@ -213,7 +214,7 @@ module Kettle
           {
             steps: install_steps.length,
             statuses: statuses,
-            summary: "install steps #{install_steps.length}; #{statuses.map { |status, count| "#{status} #{count}" }.join("; ")}",
+            summary: "install steps #{install_steps.length}; #{statuses.map { |status, count| "#{status} #{count}" }.join("; ")}"
           }
         end
 
@@ -227,7 +228,7 @@ module Kettle
           {
             name: "bin_setup_executable",
             path: "bin/setup",
-            status: (before == after ? "already_executable" : "updated"),
+            status: ((before == after) ? "already_executable" : "updated")
           }
         end
 
@@ -238,13 +239,15 @@ module Kettle
           return nil unless mise_report&.fetch(:changed, false)
 
           command = ["mise", "trust", "-C", project_root.to_s]
-          return {
-            name: "mise_trust",
-            path: "mise.toml",
-            command: command,
-            status: "ready",
-            reason: "mise_toml_changed",
-          } if mise_installed?(env)
+          if mise_installed?(env)
+            return {
+              name: "mise_trust",
+              path: "mise.toml",
+              command: command,
+              status: "ready",
+              reason: "mise_toml_changed"
+            }
+          end
 
           {
             name: "mise_trust",
@@ -252,7 +255,7 @@ module Kettle
             command: command,
             status: "unavailable",
             reason: "mise_not_installed",
-            install_url: "https://mise.jdx.dev/getting-started.html",
+            install_url: "https://mise.jdx.dev/getting-started.html"
           }
         end
 
@@ -271,7 +274,7 @@ module Kettle
             trim_readme_compatibility_badges(project_root, report),
             sync_readme_gemspec_grapheme(project_root, env),
             repair_gemspec_homepage(project_root, env),
-            ensure_env_local_gitignore(project_root),
+            ensure_env_local_gitignore(project_root)
           ].compact
         end
 
@@ -288,7 +291,7 @@ module Kettle
           {
             name: "legacy_ruby_version_file_cleanup",
             status: removed.empty? ? "already_current" : "applied",
-            removed_files: removed,
+            removed_files: removed
           }
         end
 
@@ -297,11 +300,13 @@ module Kettle
           return nil unless File.file?(readme_path)
 
           min_ruby = report.dig(:facts, :rubygems, :min_ruby)
-          return {
-            name: "readme_compatibility_badges",
-            status: "skipped",
-            reason: "missing_min_ruby",
-          } if min_ruby.to_s.empty?
+          if min_ruby.to_s.empty?
+            return {
+              name: "readme_compatibility_badges",
+              status: "skipped",
+              reason: "missing_min_ruby"
+            }
+          end
 
           before = File.read(readme_path)
           after = Kettle::Jem::ReadmePostProcessor.process(
@@ -314,14 +319,14 @@ module Kettle
           {
             name: "readme_compatibility_badges",
             path: "README.md",
-            status: after == before ? "already_current" : "applied",
+            status: (after == before) ? "already_current" : "applied"
           }
-        rescue StandardError => error
+        rescue => error
           {
             name: "readme_compatibility_badges",
             path: "README.md",
             status: "skipped",
-            reason: error.message,
+            reason: error.message
           }
         end
 
@@ -336,17 +341,19 @@ module Kettle
 
         def sync_readme_gemspec_grapheme(project_root, env)
           readme_path = File.join(project_root.to_s, "README.md")
-          gemspec_path = Dir.glob(File.join(project_root.to_s, "*.gemspec")).sort.first
+          gemspec_path = Dir.glob(File.join(project_root.to_s, "*.gemspec")).min
           return nil unless File.file?(readme_path) && gemspec_path
 
           readme = File.read(readme_path)
           gemspec = File.read(gemspec_path)
           grapheme = configured_project_grapheme(project_root, env) || readme_h1_grapheme(readme)
-          return {
-            name: "readme_gemspec_grapheme_sync",
-            status: "skipped",
-            reason: "missing_grapheme",
-          } if grapheme.to_s.empty?
+          if grapheme.to_s.empty?
+            return {
+              name: "readme_gemspec_grapheme_sync",
+              status: "skipped",
+              reason: "missing_grapheme"
+            }
+          end
 
           updated_readme = normalize_readme_h1_grapheme(readme, grapheme)
           updated_gemspec = normalize_gemspec_grapheme(gemspec, grapheme)
@@ -355,14 +362,14 @@ module Kettle
           {
             name: "readme_gemspec_grapheme_sync",
             paths: ["README.md", File.basename(gemspec_path)],
-            status: updated_readme == readme && updated_gemspec == gemspec ? "already_current" : "applied",
-            grapheme: grapheme,
+            status: (updated_readme == readme && updated_gemspec == gemspec) ? "already_current" : "applied",
+            grapheme: grapheme
           }
-        rescue StandardError => error
+        rescue => error
           {
             name: "readme_gemspec_grapheme_sync",
             status: "skipped",
-            reason: error.message,
+            reason: error.message
           }
         end
 
@@ -373,10 +380,10 @@ module Kettle
           config_path = Kettle::Jem.kettle_jem_config_path(project_root.to_s)
           return nil unless File.file?(config_path)
 
-          config = YAML.safe_load(File.read(config_path), permitted_classes: [], aliases: false)
+          config = YAML.safe_load_file(config_path, permitted_classes: [], aliases: false)
           value = config["project_emoji"].to_s.strip if config.is_a?(Hash)
           value.to_s.empty? ? nil : first_grapheme(value)
-        rescue StandardError
+        rescue
           nil
         end
 
@@ -416,7 +423,7 @@ module Kettle
             [
               argument.content_loc.start_character_offset,
               argument.content_loc.end_character_offset,
-              ruby_string_literal_content(replacement, argument.opening_loc&.slice),
+              ruby_string_literal_content(replacement, argument.opening_loc&.slice)
             ]
           end
         end
@@ -455,33 +462,39 @@ module Kettle
         end
 
         def repair_gemspec_homepage(project_root, env)
-          gemspec_path = Dir.glob(File.join(project_root.to_s, "*.gemspec")).sort.first
+          gemspec_path = Dir.glob(File.join(project_root.to_s, "*.gemspec")).min
           return nil unless gemspec_path
 
           content = File.read(gemspec_path)
           homepage_record = Kettle::Jem.gemspec_assignment_records(content, receiver: "spec")
             .find { |record| record.fetch(:field) == "homepage" }
-          return {
-            name: "gemspec_homepage_literal",
-            status: "skipped",
-            reason: "missing_homepage",
-          } unless homepage_record
+          unless homepage_record
+            return {
+              name: "gemspec_homepage_literal",
+              status: "skipped",
+              reason: "missing_homepage"
+            }
+          end
 
           assigned = homepage_record[:value]
-          return {
-            name: "gemspec_homepage_literal",
-            path: File.basename(gemspec_path),
-            status: "already_current",
-          } if literal_github_homepage?(assigned)
+          if literal_github_homepage?(assigned)
+            return {
+              name: "gemspec_homepage_literal",
+              path: File.basename(gemspec_path),
+              status: "already_current"
+            }
+          end
 
           org = github_org_from_env(env) || github_org_from_origin(project_root)
           gem_name = gemspec_name(content, gemspec_path)
-          return {
-            name: "gemspec_homepage_literal",
-            path: File.basename(gemspec_path),
-            status: "skipped",
-            reason: "missing_github_org",
-          } if org.to_s.empty? || gem_name.to_s.empty?
+          if org.to_s.empty? || gem_name.to_s.empty?
+            return {
+              name: "gemspec_homepage_literal",
+              path: File.basename(gemspec_path),
+              status: "skipped",
+              reason: "missing_github_org"
+            }
+          end
 
           homepage = "https://github.com/#{org}/#{gem_name}"
           receiver = homepage_record.fetch(:receiver)
@@ -497,8 +510,8 @@ module Kettle
           {
             name: "gemspec_homepage_literal",
             path: File.basename(gemspec_path),
-            status: updated == content ? "already_current" : "applied",
-            homepage: homepage,
+            status: (updated == content) ? "already_current" : "applied",
+            homepage: homepage
           }
         end
 
@@ -554,15 +567,17 @@ module Kettle
 
           gitignore_path = File.join(project_root.to_s, ".gitignore")
           content = File.file?(gitignore_path) ? File.read(gitignore_path) : ""
-          return {
-            name: "env_local_gitignore",
-            path: ".gitignore",
-            status: "already_current",
-          } if content.lines.any? { |line| line.strip == ".env.local" }
+          if content.lines.any? { |line| line.strip == ".env.local" }
+            return {
+              name: "env_local_gitignore",
+              path: ".gitignore",
+              status: "already_current"
+            }
+          end
 
           addition = [
             "# Local environment overrides (KEY=value, loaded by mise via dotenvy)",
-            ".env.local",
+            ".env.local"
           ].join("\n")
           updated = content.dup
           updated << "\n" unless updated.empty? || updated.end_with?("\n")
@@ -571,7 +586,7 @@ module Kettle
           {
             name: "env_local_gitignore",
             path: ".gitignore",
-            status: "applied",
+            status: "applied"
           }
         end
 
@@ -593,7 +608,7 @@ module Kettle
               env: env,
               quiet: quiet,
               command_runner: command_runner
-            ),
+            )
           ]
           if steps.any? { |step| step.fetch(:name) == "bundle_binstubs" && step.fetch(:status) == "succeeded" }
             steps << rewrite_yard_binstub(project_root)
@@ -613,22 +628,24 @@ module Kettle
             return {
               name: "bundle_lock_normalization",
               status: "skipped",
-              reason: "skip_lock_normalization",
+              reason: "skip_lock_normalization"
             }
           end
 
-          return {
-            name: "bundle_lock_normalization",
-            status: "skipped",
-            reason: "missing Gemfile.lock",
-          } unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+          unless File.file?(File.join(project_root.to_s, "Gemfile.lock"))
+            return {
+              name: "bundle_lock_normalization",
+              status: "skipped",
+              reason: "missing Gemfile.lock"
+            }
+          end
 
           {
             name: "bundle_lock_normalization",
             command: lockfile_normalization_command,
             status: "ready",
             env: normal_lockfile_env(env),
-            reason: "bundle_update_without_templating_overrides",
+            reason: "bundle_update_without_templating_overrides"
           }
         end
 
@@ -675,7 +692,7 @@ module Kettle
               reason: "parent_bin_has_binstubs_but_destination_bin_has_none",
               destination_bin: relative_or_absolute_path(destination_bin, project_root),
               parent_bin: relative_or_absolute_path(File.join(parent_root, "bin"), project_root),
-              parent_binstubs: parent_binstubs.map { |path| File.basename(path) }.sort,
+              parent_binstubs: parent_binstubs.map { |path| File.basename(path) }.sort
             }
           end
 
@@ -684,26 +701,30 @@ module Kettle
             status: destination_binstubs.empty? ? "unverified" : "succeeded",
             reason: destination_binstubs.empty? ? "no_destination_binstubs_found" : "destination_bin_has_binstubs",
             destination_bin: relative_or_absolute_path(destination_bin, project_root),
-            destination_binstubs: destination_binstubs.map { |path| File.basename(path) }.sort,
+            destination_binstubs: destination_binstubs.map { |path| File.basename(path) }.sort
           }
         end
 
         def rewrite_yard_binstub(project_root)
           yard_binstub = File.join(project_root.to_s, "bin", "yard")
-          return {
-            name: "yard_binstub_rake_handoff",
-            status: "skipped",
-            reason: "missing_yard_binstub",
-            path: "bin/yard",
-          } unless File.file?(yard_binstub)
+          unless File.file?(yard_binstub)
+            return {
+              name: "yard_binstub_rake_handoff",
+              status: "skipped",
+              reason: "missing_yard_binstub",
+              path: "bin/yard"
+            }
+          end
 
           content = yard_binstub_rake_handoff_content
-          return {
-            name: "yard_binstub_rake_handoff",
-            status: "already_current",
-            reason: "yard_binstub_already_runs_rake_yard",
-            path: "bin/yard",
-          } if File.read(yard_binstub) == content
+          if File.read(yard_binstub) == content
+            return {
+              name: "yard_binstub_rake_handoff",
+              status: "already_current",
+              reason: "yard_binstub_already_runs_rake_yard",
+              path: "bin/yard"
+            }
+          end
 
           executable = File.executable?(yard_binstub)
           File.write(yard_binstub, content)
@@ -712,7 +733,7 @@ module Kettle
             name: "yard_binstub_rake_handoff",
             status: "updated",
             reason: "yard_plugins_require_rake_yard_postprocess_hooks",
-            path: "bin/yard",
+            path: "bin/yard"
           }
         end
 
@@ -752,7 +773,7 @@ module Kettle
             status: updated.empty? ? "already_executable" : "updated",
             path: "bin",
             executable_binstubs: CURATED_BINSTUB_EXECUTABLES.select { |basename| File.file?(File.join(bin_dir, basename)) }.sort,
-            updated_binstubs: updated.sort,
+            updated_binstubs: updated.sort
           }
         end
 
@@ -771,7 +792,7 @@ module Kettle
             name: "bundle_binstub_pruning",
             status: removed.empty? ? "already_current" : "pruned",
             reason: removed.empty? ? "no_unwanted_bundler_binstubs" : "removed_unwanted_bundler_binstubs",
-            removed_binstubs: removed.sort,
+            removed_binstubs: removed.sort
           }
         end
 
@@ -784,14 +805,14 @@ module Kettle
 
             content = File.read(path, 256)
             content.start_with?("#!") && content.include?("ruby")
-          rescue StandardError
+          rescue
             false
           end
         end
 
         def bundler_generated_binstub?(path)
           File.read(path, 512).include?("This file was generated by Bundler")
-        rescue StandardError
+        rescue
           false
         end
 
@@ -854,34 +875,40 @@ module Kettle
 
         def hook_templates_step(project_root, run_options)
           mode = normalize_hook_templates_mode((run_options || {})[:hook_templates])
-          return {
-            name: "hook_templates",
-            status: "skipped",
-            reason: "not_requested",
-          } if mode.empty? || mode == "none"
+          if mode.empty? || mode == "none"
+            return {
+              name: "hook_templates",
+              status: "skipped",
+              reason: "not_requested"
+            }
+          end
 
-          return {
-            name: "hook_templates",
-            status: "unsupported",
-            reason: "global_hooks_not_implemented",
-            requested: mode,
-          } if mode == "global"
+          if mode == "global"
+            return {
+              name: "hook_templates",
+              status: "unsupported",
+              reason: "global_hooks_not_implemented",
+              requested: mode
+            }
+          end
 
           hooks_dir = File.join(project_root.to_s, ".git-hooks")
           missing_hooks = %w[commit-msg prepare-commit-msg].reject { |hook| File.file?(File.join(hooks_dir, hook)) }
-          return {
-            name: "hook_templates",
-            status: "unavailable",
-            reason: "missing_local_hook_templates",
-            missing_hooks: missing_hooks,
-          } unless missing_hooks.empty?
+          unless missing_hooks.empty?
+            return {
+              name: "hook_templates",
+              status: "unavailable",
+              reason: "missing_local_hook_templates",
+              missing_hooks: missing_hooks
+            }
+          end
 
           {
             name: "hook_templates",
             status: "ready",
             command: %w[git config core.hooksPath .git-hooks],
             chmod_paths: %w[.git-hooks/commit-msg .git-hooks/prepare-commit-msg],
-            reason: "ready_for_local_hooks",
+            reason: "ready_for_local_hooks"
           }
         end
 
@@ -902,7 +929,7 @@ module Kettle
             diff: "smorg-ruby",
             merge: "smorg-ruby",
             diff_command: "smorg-ruby diff-driver",
-            merge_command: "smorg-ruby merge-driver %O %A %B %P",
+            merge_command: "smorg-ruby merge-driver %O %A %B %P"
           },
           {
             language: "go",
@@ -910,7 +937,7 @@ module Kettle
             diff: "smorg-go",
             merge: "smorg-go",
             diff_command: "smorg-go diff-driver",
-            merge_command: "smorg-go merge-driver %O %A %B %P",
+            merge_command: "smorg-go merge-driver %O %A %B %P"
           },
           {
             language: "rust",
@@ -918,27 +945,29 @@ module Kettle
             diff: "smorg-rs",
             merge: "smorg-rs",
             diff_command: "smorg-rs diff-driver",
-            merge_command: "smorg-rs merge-driver %O %A %B %P",
-          },
+            merge_command: "smorg-rs merge-driver %O %A %B %P"
+          }
         ].freeze
         GIT_DRIVER_LANGUAGE_REGISTRY = DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] }.freeze
 
         BUILTIN_GIT_DIFF_ATTRIBUTES = [
           {path: ".gitattributes", pattern: "*.rb", attributes: {"diff" => "ruby"}},
           {path: ".gitattributes", pattern: "*.go", attributes: {"diff" => "golang"}},
-          {path: ".gitattributes", pattern: "*.rs", attributes: {"diff" => "rust"}},
+          {path: ".gitattributes", pattern: "*.rs", attributes: {"diff" => "rust"}}
         ].freeze
 
         def git_drivers_step(project_root, run_options)
           mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
           dry_run = Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:dry_run])
           manifest = git_driver_manifest(project_root)
-          return {
-            name: "git_drivers",
-            status: "skipped",
-            reason: "not_requested",
-            mode: mode,
-          } if mode == "none"
+          if mode == "none"
+            return {
+              name: "git_drivers",
+              status: "skipped",
+              reason: "not_requested",
+              mode: mode
+            }
+          end
 
           case mode
           when "check"
@@ -950,7 +979,7 @@ module Kettle
               scope: "check",
               attribute_updates: git_driver_attribute_updates(manifest, "semantic-diff"),
               config_checks: git_driver_local_config_checks(manifest, "semantic-diff"),
-              reason: "ready_for_git_driver_check",
+              reason: "ready_for_git_driver_check"
             }
           when "undo"
             {
@@ -961,10 +990,10 @@ module Kettle
               scope: "local",
               attribute_removals: [
                 {path: ".gitattributes", managed_block: "structuredmerge:git-drivers"},
-                {path: ".gitattributes", managed_block: "structuredmerge:git-builtins"},
+                {path: ".gitattributes", managed_block: "structuredmerge:git-builtins"}
               ],
               commands: git_driver_global_unset_commands,
-              reason: dry_run ? "dry_run_git_driver_undo" : "ready_for_git_driver_undo",
+              reason: dry_run ? "dry_run_git_driver_undo" : "ready_for_git_driver_undo"
             }
           when "global"
             {
@@ -975,7 +1004,7 @@ module Kettle
               scope: "global",
               commands: git_driver_global_commands(manifest, "semantic-diff"),
               diagnostics: [git_driver_forge_warning_diagnostic],
-              reason: dry_run ? "dry_run_global_git_drivers" : "ready_for_global_git_drivers",
+              reason: dry_run ? "dry_run_global_git_drivers" : "ready_for_global_git_drivers"
             }
           when "include-file"
             {
@@ -988,7 +1017,7 @@ module Kettle
               config_entries: git_driver_global_commands(manifest, "semantic-diff").map { |command| {key: command[3], value: command[4]} },
               commands: [["git", "config", "--local", "include.path", ".git/smorg/config"]],
               diagnostics: [git_driver_forge_warning_diagnostic],
-              reason: dry_run ? "dry_run_git_driver_include_file" : "ready_for_git_driver_include_file",
+              reason: dry_run ? "dry_run_git_driver_include_file" : "ready_for_git_driver_include_file"
             }
           when "builtin-diff"
             updates = git_driver_attribute_updates(manifest, "builtin-diff")
@@ -1003,7 +1032,7 @@ module Kettle
               managed_block: "structuredmerge:git-builtins",
               commands: [],
               diagnostics: diagnostics,
-              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_builtin_git_attributes"),
+              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_builtin_git_attributes")
             }
           else
             updates = git_driver_attribute_updates(manifest, "semantic-diff")
@@ -1018,7 +1047,7 @@ module Kettle
               managed_block: "structuredmerge:git-drivers",
               commands: git_driver_local_commands(manifest, "semantic-diff"),
               diagnostics: diagnostics + [git_driver_forge_warning_diagnostic],
-              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_drivers"),
+              reason: git_driver_attribute_reason(diagnostics, dry_run: dry_run, ready: "ready_for_local_git_drivers")
             }
           end
         end
@@ -1042,7 +1071,7 @@ module Kettle
             {
               path: ".gitattributes",
               pattern: definition.fetch(:pattern),
-              attributes: {"diff" => definition.fetch(:diff)},
+              attributes: {"diff" => definition.fetch(:diff)}
             }
           end
         end
@@ -1052,7 +1081,7 @@ module Kettle
             key: "forge_ignores_external_diff_drivers",
             severity: "advisory",
             blocking: false,
-            message: "External StructuredMerge diff drivers are local Git configuration and are generally not honored by hosted forges.",
+            message: "External StructuredMerge diff drivers are local Git configuration and are generally not honored by hosted forges."
           }
         end
 
@@ -1062,7 +1091,7 @@ module Kettle
           return BUILTIN_GIT_DIFF_ATTRIBUTES if profile == "builtin-diff" && !profile_hash
 
           Array(profile_hash.fetch("attributes", [])).map do |entry|
-            attributes = entry.reject { |key, _value| key == "pattern" }.transform_values(&:to_s)
+            attributes = entry.except("pattern").transform_values(&:to_s)
             {path: ".gitattributes", pattern: entry.fetch("pattern"), attributes: attributes}
           end
         end
@@ -1087,7 +1116,7 @@ module Kettle
             [
               ["git", "config", "--global", "diff.#{definition.fetch(:diff)}.command", definition.fetch(:diff_command)],
               ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.driver", definition.fetch(:merge_command)],
-              ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.name", "StructuredMerge #{definition.fetch(:language)} merge driver"],
+              ["git", "config", "--global", "merge.#{definition.fetch(:merge)}.name", "StructuredMerge #{definition.fetch(:language)} merge driver"]
             ]
           end
         end
@@ -1097,7 +1126,7 @@ module Kettle
             [
               ["git", "config", "--global", "--unset", "diff.#{definition.fetch(:diff)}.command"],
               ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.driver"],
-              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.name"],
+              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.name"]
             ]
           end
         end
@@ -1184,13 +1213,15 @@ module Kettle
 
           content = File.read(path)
           diagnostics = []
-          diagnostics << {
-            key: "dirty_managed_block",
-            severity: "error",
-            blocking: true,
-            path: ".gitattributes",
-            managed_block: managed_block,
-          } if dirty_git_attribute_managed_block?(content, managed_block)
+          if dirty_git_attribute_managed_block?(content, managed_block)
+            diagnostics << {
+              key: "dirty_managed_block",
+              severity: "error",
+              blocking: true,
+              path: ".gitattributes",
+              managed_block: managed_block
+            }
+          end
           diagnostics.concat(conflicting_git_attribute_diagnostics(content, updates, managed_block: managed_block))
           diagnostics
         end
@@ -1214,7 +1245,7 @@ module Kettle
               blocking: true,
               path: update.fetch(:path, ".gitattributes"),
               pattern: update.fetch(:pattern),
-              line: conflict,
+              line: conflict
             }
           end
         end
@@ -1236,7 +1267,7 @@ module Kettle
             return {
               name: "bundled_handoff",
               status: "skipped",
-              reason: "bootstrap_mode",
+              reason: "bootstrap_mode"
             }
           end
 
@@ -1246,7 +1277,7 @@ module Kettle
             return {
               name: "bundled_handoff",
               status: "already_bundled",
-              bundle_gemfile: bundle_gemfile,
+              bundle_gemfile: bundle_gemfile
             }
           end
 
@@ -1254,7 +1285,7 @@ module Kettle
             name: "bundled_handoff",
             command: ["bundle", "exec", "kettle-jem"] + handoff_argv(run_options),
             status: "ready",
-            reason: "ready_for_orchestration",
+            reason: "ready_for_orchestration"
           }
         end
 
@@ -1263,7 +1294,7 @@ module Kettle
             return {
               name: "bootstrap_commit",
               status: "skipped",
-              reason: "skip_commit",
+              reason: "skip_commit"
             }
           end
 
@@ -1271,16 +1302,18 @@ module Kettle
             return {
               name: "bootstrap_commit",
               status: "unavailable",
-              reason: "not_git_repository",
+              reason: "not_git_repository"
             }
           end
 
           dirty_entries = git_output(project_root, "status", "--porcelain").lines.map(&:chomp).reject(&:empty?)
-          return {
-            name: "bootstrap_commit",
-            status: "clean_noop",
-            dirty_entries: [],
-          } if dirty_entries.empty?
+          if dirty_entries.empty?
+            return {
+              name: "bootstrap_commit",
+              status: "clean_noop",
+              dirty_entries: []
+            }
+          end
 
           commands = []
           commands << %w[git add -A]
@@ -1290,7 +1323,7 @@ module Kettle
             status: "ready",
             dirty_entries: dirty_entries,
             commands: commands,
-            reason: "ready_for_orchestration",
+            reason: "ready_for_orchestration"
           }
         end
 
@@ -1345,18 +1378,20 @@ module Kettle
               name: name,
               command: command,
               status: "skipped",
-              reason: "missing bin/setup",
+              reason: "missing bin/setup"
             }
           end
 
           result = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
           success = result.fetch(:success)
-          return {
-            name: name,
-            command: command,
-            status: "succeeded",
-            exitstatus: result[:exitstatus],
-          } if success
+          if success
+            return {
+              name: name,
+              command: command,
+              status: "succeeded",
+              exitstatus: result[:exitstatus]
+            }
+          end
 
           raise Kettle::Jem::Error, "#{name} failed: #{command.join(" ")}\n#{result[:stderr]}"
         end
@@ -1366,11 +1401,13 @@ module Kettle
 
           command_env = step.fetch(:env, env)
           result = command_runner.call(step.fetch(:command), chdir: project_root, env: command_env, quiet: quiet)
-          return step.merge(
-            status: "succeeded",
-            exitstatus: result[:exitstatus],
-            reason: "executed"
-          ) if result.fetch(:success)
+          if result.fetch(:success)
+            return step.merge(
+              status: "succeeded",
+              exitstatus: result[:exitstatus],
+              reason: "executed"
+            )
+          end
 
           raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{step.fetch(:command).join(" ")}\n#{result[:stderr]}"
         end
@@ -1386,7 +1423,7 @@ module Kettle
             end
             {
               command: command,
-              exitstatus: result[:exitstatus],
+              exitstatus: result[:exitstatus]
             }
           end
           step.merge(
@@ -1546,7 +1583,7 @@ module Kettle
             success: status.success?,
             exitstatus: status.exitstatus,
             stdout: stdout,
-            stderr: stderr,
+            stderr: stderr
           }
         end
       end

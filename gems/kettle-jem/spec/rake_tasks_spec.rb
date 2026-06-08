@@ -64,7 +64,7 @@ RSpec.describe "kettle-jem Rake tasks" do
       "KETTLE_JEM_ACCEPT_CONFIG" => "true",
       "KETTLE_JEM_BOOTSTRAP_MODE" => "true",
       "KETTLE_JEM_QUIET" => "true",
-      "KETTLE_JEM_VERBOSE" => "true",
+      "KETTLE_JEM_VERBOSE" => "true"
     }
 
     expect(Kettle::Jem::Tasks::TemplateTask.env_run_options(env)).to include(
@@ -81,7 +81,7 @@ RSpec.describe "kettle-jem Rake tasks" do
       accept_config: true,
       bootstrap_mode: true,
       quiet: true,
-      verbose: true,
+      verbose: true
     )
   end
 end

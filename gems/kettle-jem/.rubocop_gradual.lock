@@ -1,102 +1,58 @@
 {
-  "kettle-jem.gemspec:4274457799": [
-    [99, 3, 70, "Gemspec/DependencyVersion: Dependency version specification is required.", 4023754366],
-    [100, 3, 65, "Gemspec/DependencyVersion: Dependency version specification is required.", 1638532368],
-    [101, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 897228968],
-    [102, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1601414454],
-    [104, 3, 62, "Gemspec/DependencyVersion: Dependency version specification is required.", 3348222081],
-    [105, 3, 56, "Gemspec/DependencyVersion: Dependency version specification is required.", 3843726476],
-    [106, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3293105462],
-    [108, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 670728969],
-    [109, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 1722946409],
-    [110, 3, 56, "Gemspec/DependencyVersion: Dependency version specification is required.", 2273926958],
-    [111, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 1475977371],
-    [112, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 3458446143],
-    [113, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 3112555885],
-    [114, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1663642130],
-    [116, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 527713396],
+  "kettle-jem.gemspec:495468594": [
+    [98, 3, 70, "Gemspec/DependencyVersion: Dependency version specification is required.", 4023754366],
+    [99, 3, 65, "Gemspec/DependencyVersion: Dependency version specification is required.", 1638532368],
+    [100, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 897228968],
+    [101, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1601414454],
+    [103, 3, 62, "Gemspec/DependencyVersion: Dependency version specification is required.", 3348222081],
+    [104, 3, 56, "Gemspec/DependencyVersion: Dependency version specification is required.", 3843726476],
+    [105, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3293105462],
+    [107, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 670728969],
+    [108, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 1722946409],
+    [109, 3, 56, "Gemspec/DependencyVersion: Dependency version specification is required.", 2273926958],
+    [110, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 1475977371],
+    [111, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 3458446143],
+    [112, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 3112555885],
+    [113, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1663642130],
+    [115, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 527713396],
     [117, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
     [119, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:1692339917": [
-    [380, 7, 1114, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 675371207],
-    [397, 7, 121, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 155654330],
-    [401, 7, 89, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 173395318],
-    [405, 7, 90, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 984413807],
-    [409, 7, 208, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 3164846020],
-    [418, 7, 401, "Style/ClassMethodsDefinitions: Use `class << self` to define a class method.", 2459866297],
-    [1007, 11, 58, "Style/InvertibleUnlessCondition: Prefer `if uri.host.to_s.casecmp(\"github.com\").nonzero?` over `unless uri.host.to_s.casecmp(\"github.com\").zero?`.", 2031525918],
-    [1733, 11, 36, "Style/InvertibleUnlessCondition: Prefer `if diff.fetch(key, []).none?` over `unless diff.fetch(key, []).any?`.", 486549428],
-    [2306, 11, 65, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 2246286248],
-    [3361, 16, 581, "Style/ConcatArrayLiterals: Use `push(\"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\", \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\", \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\", \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\")` instead of `concat([\n        \"## 🤝 Contributing\\n\\nContributions are welcome. Missing optional service integrations are reported by the generator instead of rendered as broken badges.\",\n        \"## 📌 Versioning\\n\\nThis project follows semantic versioning for its public API where practical.\",\n        \"## 📄 License\\n\\nThis project is made available under the following license expression: #{license_expression.empty? ? \"unspecified\" : license_expression}.\",\n        \"## 🤑 A request for help\\n\\nPlease support the project by using it, reporting issues, and contributing improvements.\",\n      ])`.", 745011514],
-    [4301, 9, 49, "Style/InvertibleUnlessCondition: Prefer `if candidate.level.to_i >= ancestor_level` over `unless candidate.level.to_i < ancestor_level`.", 201534072],
-    [5279, 89, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
-    [5375, 11, 74, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:start_line) < head_appraisal.fetch(:start_line)` over `unless record.fetch(:start_line) >= head_appraisal.fetch(:start_line)`.", 929913612],
-    [5376, 11, 70, "Style/InvertibleUnlessCondition: Prefer `if record.fetch(:end_line) > head_appraisal.fetch(:end_line)` over `unless record.fetch(:end_line) <= head_appraisal.fetch(:end_line)`.", 1222596142],
-    [5436, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5453, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5477, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5501, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5525, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
-    [5651, 79, 26, "Style/ComparableBetween: Prefer `char.between?(\"0\", \"9\")` over logical comparison.", 570392334],
-    [6631, 24, 90, "Style/ConcatArrayLiterals: Use `push(\"  #{gemspec}:\", \"    strategy: keep_destination\")` instead of `concat([\n          \"  #{gemspec}:\",\n          \"    strategy: keep_destination\",\n        ])`.", 96516132],
-    [7802, 19, 38, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 3603984863],
-    [9742, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
-    [9844, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835],
-    [10754, 35, 16, "Style/RedundantEach: Use `with_object` to remove redundant `each`.", 4071736605]
+  "lib/kettle/jem.rb:1955756060": [
+    [5690, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5707, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5731, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5755, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [5779, 10, 65, "Style/NonNilCheck: Prefer `!recipe.dig(:template_preference, :add_template_only_nodes).nil?` over `recipe.dig(:template_preference, :add_template_only_nodes) != nil`.", 1769038286],
+    [10263, 9, 6, "Lint/NonLocalExitFromIterator: Non-local exit from iterator, without return value. `next`, `break`, `Array#find`, `Array#any?`, etc. is preferred.", 2123913871],
+    [10365, 7, 33, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 4276656835]
   ],
-  "lib/kettle/jem/tasks/install_task.rb:2637530998": [
-    [63, 13, 2, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 5861509],
-    [153, 22, 50, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3851824993],
-    [161, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [202, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [220, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [234, 13, 51, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 4229559240],
-    [240, 21, 47, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3086109192],
-    [263, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [281, 21, 86, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3825791765],
-    [297, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [299, 25, 72, "Style/YAMLFileRead: Use `safe_load_file(config_path, permitted_classes: [], aliases: false)` instead.", 137896625],
-    [308, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [382, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [417, 13, 52, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1104220477],
-    [423, 21, 50, "Style/TernaryParentheses: Use parentheses for ternary expressions with complex conditions.", 3437159593],
-    [448, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [458, 11, 10, "Style/ReturnNil: Use `return` instead of `return nil`.", 1900003172],
-    [492, 15, 30, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 362255199],
-    [500, 15, 30, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 362255199],
-    [916, 13, 18, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1095916192],
-    [939, 13, 18, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1095916192],
-    [957, 13, 18, "Style/TrailingCommaInArguments: Put a comma after the last parameter of a multiline method call.", 1095916192]
-  ],
-  "spec/cli_spec.rb:3620238791": [
+  "spec/cli_spec.rb:2451476233": [
     [7, 1, 31, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem/cli*_spec.rb`.", 242933042]
   ],
-  "spec/old_public_spec_audit_spec.rb:964761921": [
+  "spec/old_public_spec_audit_spec.rb:53783039": [
     [5, 16, 34, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 3165191681]
   ],
-  "spec/rake_tasks_spec.rb:1173137372": [
+  "spec/rake_tasks_spec.rb:3709153509": [
     [6, 16, 23, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 2536257102],
     [13, 7, 15, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 131138375]
   ],
-  "spec/release_packaging_spec.rb:3855419": [
+  "spec/release_packaging_spec.rb:3514862897": [
     [7, 16, 30, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 385760763],
     [11, 5, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639],
     [20, 31, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
   ],
-  "spec/self_test_task_spec.rb:1473657129": [
+  "spec/self_test_task_spec.rb:4045302601": [
     [5, 1, 47, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem/tasks/self_test_task*_spec.rb`.", 363358509]
   ],
-  "spec/system/bundle_gem_scaffold_spec.rb:1969518699": [
-    [268, 7, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
+  "spec/system/bundle_gem_scaffold_spec.rb:2659578480": [
+    [270, 7, 19, "ThreadSafety/DirChdir: Avoid using `Dir.chdir` due to its process-wide effect.", 1195043639]
   ],
-  "spec/template_version_gem_bootstrap_spec.rb:3767460001": [
+  "spec/template_version_gem_bootstrap_spec.rb:3973455992": [
     [5, 16, 43, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 874562695]
   ],
-  "spec/thin_slice_spec.rb:459410828": [
-    [5, 1, 26, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*_spec.rb`.", 2213719156],
-    [6589, 41, 51, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2249056217],
-    [9053, 51, 68, "Performance/Detect: Use `reverse.find` instead of `select.last`.", 2025778683]
+  "spec/thin_slice_spec.rb:50658044": [
+    [5, 1, 26, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*_spec.rb`.", 2213719156]
   ],
   "spec/version_gem_pattern_spec.rb:4198176520": [
     [3, 16, 37, "RSpec/DescribeClass: The first argument to describe should be the class or module being tested.", 1528688504],

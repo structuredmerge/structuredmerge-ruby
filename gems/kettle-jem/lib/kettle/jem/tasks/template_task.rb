@@ -12,7 +12,7 @@ module Kettle
               mode: "apply",
               changed_files: [],
               diagnostics: [],
-              recipe_reports: [],
+              recipe_reports: []
             }
           else
             Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
@@ -26,7 +26,7 @@ module Kettle
             project_root: project_root,
             env: setup_env,
             run_options: run_options,
-            command_runner: command_runner,
+            command_runner: command_runner
           )
           report.merge(template_steps: template_steps)
         end
@@ -49,7 +49,7 @@ module Kettle
             accept_config: truthy?(env["KETTLE_JEM_ACCEPT_CONFIG"]),
             bootstrap_mode: truthy?(env["KETTLE_JEM_BOOTSTRAP_MODE"]),
             quiet: truthy?(env["KETTLE_JEM_QUIET"]),
-            verbose: truthy?(env["KETTLE_JEM_VERBOSE"]),
+            verbose: truthy?(env["KETTLE_JEM_VERBOSE"])
           }.compact
         end
 

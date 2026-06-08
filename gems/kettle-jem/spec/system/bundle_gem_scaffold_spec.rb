@@ -10,7 +10,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
   let(:env) do
     {
       "FUNDING_ORG" => "acme",
-      "KJ_MIN_DIVERGENCE_THRESHOLD" => "5",
+      "KJ_MIN_DIVERGENCE_THRESHOLD" => "5"
     }
   end
   let(:expected_hidden_directories) do
@@ -69,7 +69,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       "--no-changelog",
       "--no-linter",
       "--no-github-username",
-      chdir: sandbox_root,
+      chdir: sandbox_root
     )
     expect(status.success?).to be(true), "bundle gem failed\nstdout=#{stdout}\nstderr=#{stderr}"
   end
@@ -81,23 +81,23 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     content = content.sub('spec.email = ["TODO: Write your email address"]', 'spec.email = ["test@example.com"]')
     content = content.sub(
       'spec.summary = "TODO: Write a short summary, because RubyGems requires one."',
-      'spec.summary = "Dummy gem"',
+      'spec.summary = "Dummy gem"'
     )
     content = content.sub(
       'spec.description = "TODO: Write a longer description or delete this line."',
-      'spec.description = "Dummy gem for kettle-jem system testing."',
+      'spec.description = "Dummy gem for kettle-jem system testing."'
     )
     content = content.sub(
       'spec.homepage = "TODO: Put your gem\'s website or public repo URL here."',
-      'spec.homepage = "https://github.com/acme/dummy-gem"',
+      'spec.homepage = "https://github.com/acme/dummy-gem"'
     )
     content = content.sub(
       'spec.metadata["source_code_uri"] = "TODO: Put your gem\'s public repo URL here."',
-      'spec.metadata["source_code_uri"] = "https://github.com/acme/dummy-gem"',
+      'spec.metadata["source_code_uri"] = "https://github.com/acme/dummy-gem"'
     )
     content = content.sub(
       /^end$/,
-      <<~RUBY.chomp,
+      <<~RUBY.chomp
             # Destination runtime dependency
             spec.add_dependency("json", "~> 2.7") # preserve custom runtime dependency
             spec.add_development_dependency("rake", "~> 13.1") # preserve destination rake policy
@@ -160,7 +160,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(bootstrap.fetch(:changed_files)).to include(
       ".github/FUNDING.yml",
       ".structuredmerge/kettle-jem.yml",
-      "Rakefile",
+      "Rakefile"
     )
     expect(bootstrap.fetch(:changed_files)).not_to include(".github/workflows/ci.yml")
 
@@ -195,15 +195,15 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
           "directory" => "/",
           "ignore" => [
             {
-              "dependency-name" => "rubocop-lts",
-            },
+              "dependency-name" => "rubocop-lts"
+            }
           ],
           "open-pull-requests-limit" => 5,
           "package-ecosystem" => "bundler",
-          "schedule" => {"interval" => "daily"},
-        },
+          "schedule" => {"interval" => "daily"}
+        }
       ],
-      "version" => 2,
+      "version" => 2
     )
 
     style_gemfile = File.read(File.join(gem_root, "gemfiles/modular/style.gemfile"))
@@ -245,7 +245,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       previous_significant = stripped unless stripped.empty? || stripped.start_with?("#")
       line if orphaned
     end
-    expect(orphaned_task_requires).to eq([])
+    expect(orphaned_task_requires).to be_empty
     expect(rakefile.scan(/^task\s+:default\b/).size).to eq(1)
     expect(rakefile).to include('desc "Default tasks aggregator"')
     expect(rakefile.index('desc "Default tasks aggregator"')).to be < rakefile.index("task :default do")
@@ -295,7 +295,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
       "Gemfile",
       "certs/pboling.pem",
       "dummy-gem.gemspec",
-      "gemfiles/modular/style.gemfile",
+      "gemfiles/modular/style.gemfile"
     ]
     before_second_apply = selected_template_paths.to_h do |relative_path|
       [relative_path, File.read(File.join(gem_root, relative_path))]

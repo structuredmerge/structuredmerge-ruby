@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 # kettle-jem:freeze
@@ -63,7 +62,7 @@ Gem::Specification.new do |spec|
     # Public certs for gem signing
     *enumerate_package_files.call("certs"),
     # Signatures
-    *enumerate_package_files.call("sig"),
+    *enumerate_package_files.call("sig")
   ]
 
   # Automatically included with gem package, no need to list again in files.
@@ -77,7 +76,7 @@ Gem::Specification.new do |spec|
     "LICENSE.md",
     "README.md",
     "RUBOCOP.md",
-    "SECURITY.md",
+    "SECURITY.md"
   ]
   spec.rdoc_options += [
     "--title",
@@ -88,7 +87,7 @@ Gem::Specification.new do |spec|
     "^sig/",
     "--line-numbers",
     "--inline-source",
-    "--quiet",
+    "--quiet"
   ]
   spec.bindir = "exe"
   # Listed files are the relative paths from bindir above.

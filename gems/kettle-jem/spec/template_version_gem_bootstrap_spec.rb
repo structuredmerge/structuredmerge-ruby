@@ -43,8 +43,8 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge/version.rbs"),
-        ),
+          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge/version.rbs")
+        )
       )
       entrypoint = File.read(File.join(root, "lib/plain/merge.rb"))
       expect(entrypoint).to include(<<~RUBY)

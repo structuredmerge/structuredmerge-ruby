@@ -42,7 +42,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "uses no-subcommand invocation as first-run setup bootstrap" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -65,7 +65,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "continues setup when first-run config bootstrap is accepted" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -77,7 +77,7 @@ RSpec.describe Kettle::Jem::CLI do
         Kettle::Jem.apply_project(project_root, env: env, run_options: run_options).merge(
           mode: "install",
           installed: true,
-          install_steps: [],
+          install_steps: []
         )
       end
 
@@ -91,7 +91,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {},
-        run_options: include(accept_config: true),
+        run_options: include(accept_config: true)
       )
     end
   end
@@ -99,7 +99,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "plans a project and emits a machine-readable report" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -126,7 +126,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "maps old executable option semantics into the shared report contract" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -156,7 +156,7 @@ RSpec.describe Kettle::Jem::CLI do
         "Gemfile,Rakefile",
         "--include",
         "gemfiles/modular/**",
-        "--skip-commit",
+        "--skip-commit"
       ])
 
       expect(status).to eq(0)
@@ -164,7 +164,7 @@ RSpec.describe Kettle::Jem::CLI do
       payload = JSON.parse(out, symbolize_names: true)
       expect(payload.fetch(:decision_policy)).to include(
         mode: "accept",
-        failure_mode: "warn",
+        failure_mode: "warn"
       )
       expect(payload.fetch(:template_selection)).to eq(
         allowed: "env",
@@ -177,7 +177,7 @@ RSpec.describe Kettle::Jem::CLI do
         bootstrap_mode: true,
         template_profile: "",
         quiet: true,
-        verbose: true,
+        verbose: true
       )
     end
   end
@@ -185,7 +185,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "supports old underscore aliases and quiet text output" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -220,7 +220,7 @@ RSpec.describe Kettle::Jem::CLI do
               - README.md
         YAML
         "templates/README.md.example" => "# Example\n\nTemplate README.\n",
-        "README.md" => "# Example\n\nDestination README.\n",
+        "README.md" => "# Example\n\nDestination README.\n"
       })
 
       status, out, err = run_cli([
@@ -230,7 +230,7 @@ RSpec.describe Kettle::Jem::CLI do
         "--prompt-answer",
         "recipe:readme_metadata=keep",
         "--prompt-answer",
-        "recipe:template_source_application_README_md=keep",
+        "recipe:template_source_application_README_md=keep"
       ])
 
       expect(status).to eq(0)
@@ -240,8 +240,8 @@ RSpec.describe Kettle::Jem::CLI do
         mode: "interactive",
         prompt_answers: {
           "recipe:readme_metadata": "keep",
-          "recipe:template_source_application_README_md": "keep",
-        },
+          "recipe:template_source_application_README_md": "keep"
+        }
       )
       expect(payload.fetch(:changed_files)).not_to include("README.md")
       expect(File.read(File.join(root, "README.md"))).to eq("# Example\n\nDestination README.\n")
@@ -254,7 +254,7 @@ RSpec.describe Kettle::Jem::CLI do
         mode: "install",
         installed: true,
         changed_files: [],
-        install_steps: [],
+        install_steps: []
       )
       allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run)
 
@@ -266,7 +266,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true),
+        run_options: include(skip_commit: true)
       )
       expect(Kettle::Jem::Tasks::TemplateTask).not_to have_received(:run)
     end
@@ -280,8 +280,8 @@ RSpec.describe Kettle::Jem::CLI do
         template_steps: [{
           name: "bundle_lock_normalization",
           status: "succeeded",
-          reason: "executed",
-        }],
+          reason: "executed"
+        }]
       )
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run)
 
@@ -293,7 +293,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::TemplateTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true, only: ["README.md"]),
+        run_options: include(skip_commit: true, only: ["README.md"])
       )
       expect(Kettle::Jem::Tasks::InstallTask).not_to have_received(:run)
     end
@@ -319,7 +319,7 @@ RSpec.describe Kettle::Jem::CLI do
   it "applies a project through the template alias" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -333,7 +333,7 @@ RSpec.describe Kettle::Jem::CLI do
           mode: "install",
           changed_files: [".kettle-jem.yml"],
           install_steps: [],
-          install_phase_reports: [],
+          install_phase_reports: []
         }
       end
 
@@ -346,7 +346,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {},
-        run_options: include(force: true, skip_commit: true),
+        run_options: include(force: true, skip_commit: true)
       )
     end
   end
@@ -358,8 +358,8 @@ RSpec.describe Kettle::Jem::CLI do
           mode: "install",
           installed: false,
           changed_files: [],
-          diagnostics: [],
-        },
+          diagnostics: []
+        }
       )
 
       status, out, err = run_cli(["install", root, "--force"])
@@ -370,7 +370,7 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {},
-        run_options: include(force: true),
+        run_options: include(force: true)
       )
     end
   end
@@ -397,9 +397,9 @@ RSpec.describe Kettle::Jem::CLI do
             changed: ["Gemfile"],
             added: [],
             removed: [],
-            skipped: [],
-          },
-        },
+            skipped: []
+          }
+        }
       )
 
       template_root = File.join(root, "template")
@@ -417,7 +417,7 @@ RSpec.describe Kettle::Jem::CLI do
         "--selftest-output",
         output_root,
         "--min-divergence-threshold",
-        "75",
+        "75"
       ])
 
       expect(status).to eq(0)
@@ -427,7 +427,7 @@ RSpec.describe Kettle::Jem::CLI do
         destination_root: root,
         template_root: template_root,
         output_root: output_root,
-        min_divergence_threshold: 75.0,
+        min_divergence_threshold: 75.0
       )
       payload = JSON.parse(out, symbolize_names: true)
       expect(payload.fetch(:mode)).to eq("selftest")
