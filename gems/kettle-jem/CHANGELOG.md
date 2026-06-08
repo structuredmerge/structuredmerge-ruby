@@ -36,6 +36,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated gemspec version-loader fallbacks now use `require_relative` for
   gems whose runtime Ruby floor is 2.2 or newer, reserving `$LOAD_PATH`
   mutation for gems that still target older Rubies.
+- Generated gemspec version-loader guards now use `Gem.ruby_version`, avoiding
+  RuboCop `Gemspec/RubyVersionGlobalsUsage` violations.
 - Generated auto-assign workflows now pin `pozil/auto-assign-issue` to the
   immutable SHA for v4.
 - Generated GitHub Actions workflow templates now pin `actions/checkout` to

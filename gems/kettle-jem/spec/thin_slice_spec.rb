@@ -7244,7 +7244,7 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
 
       expect(gemspec_content).to include("gem_version =")
-      expect(gemspec_content).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")')
+      expect(gemspec_content).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).to include('require_relative "lib/my/gem/version"')
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
@@ -7346,7 +7346,7 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
 
       expect(gemspec_content).to include("gem_version =")
-      expect(gemspec_content).to include('if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")')
+      expect(gemspec_content).to include('if Gem.ruby_version >= Gem::Version.new("3.1")')
       expect(gemspec_content).to include('lib = File.expand_path("lib", File.dirname(__FILE__))')
       expect(gemspec_content).to include('require "my/gem/version"')
       expect(gemspec_content).not_to include("required_ruby_version")

@@ -5959,7 +5959,7 @@ module Kettle
 
       <<~RUBY
         gem_version =
-          if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.1")
+          if Gem.ruby_version >= Gem::Version.new("3.1")
             # Loading Version into an anonymous module allows version.rb to get code coverage from SimpleCov!
             # See: https://github.com/simplecov-ruby/simplecov/issues/557#issuecomment-2630782358
             # See: https://github.com/panorama-ed/memo_wise/pull/397
