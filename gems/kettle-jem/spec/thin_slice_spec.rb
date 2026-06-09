@@ -7411,6 +7411,13 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps the packaged gemspec template dependency floors current" do
+    template = File.read(File.expand_path("../lib/kettle/jem/templates/gem.gemspec.example", __dir__))
+
+    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.2", ">= 2.2.0")))
+    expect(template).not_to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.1", ">= 2.1.1")))
+  end
+
   it "keeps the greater version requirement for template-managed gemspec dependencies" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
