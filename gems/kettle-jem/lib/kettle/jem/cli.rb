@@ -17,7 +17,6 @@ module Kettle
           kettle-jem install [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem manifest [PROJECT_ROOT] [--json]
           kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
-          kettle-jem workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--upgrade LEVEL]
           kettle-jem version
       USAGE
 
@@ -62,7 +61,7 @@ module Kettle
       end
 
       def command_allowed?(command)
-        %w[setup plan apply template install manifest selftest workflow-pins help version].include?(command)
+        %w[setup plan apply template install manifest selftest help version].include?(command)
       end
 
       def parse_options(args)
@@ -117,13 +116,6 @@ module Kettle
           end
           opts.on("--check", "Verify supported post-template setup without changing files.") do
             options[:run_options][:git_drivers] = "check"
-            options[:run_options][:check] = true
-          end
-          opts.on("-w", "--write", "Write supported command changes.") do
-            options[:run_options][:write] = true
-          end
-          opts.on("--upgrade LEVEL", "Set workflow action pin upgrade strategy.") do |value|
-            options[:run_options][:upgrade] = value
           end
           opts.on("--undo", "Undo supported post-template setup.") do
             options[:run_options][:git_drivers] = "undo"
@@ -193,12 +185,6 @@ module Kettle
             output_root: options[:selftest_output_root],
             min_divergence_threshold: options[:min_divergence_threshold]
           )
-        when "workflow-pins"
-          Kettle::Jem::WorkflowPinsCLI.new(
-            project_root: project_root,
-            env: env,
-            options: options.fetch(:run_options)
-          ).run
         else
           raise ArgumentError, "Unsupported kettle-jem command #{command.inspect}"
         end
@@ -235,9 +221,6 @@ module Kettle
             comparison.fetch(:removed, []).size
           out.puts("selftest: #{divergent} divergent file#{"s" unless divergent == 1}")
           out.puts("  report: #{result.fetch(:report_path)}") if result[:report_path]
-        when "workflow-pins"
-          out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
-          result.fetch(:updated_actions, []).each { |action| out.puts("  #{action}") }
         else
           changed_files = result.fetch(:changed_files, [])
           out.puts("#{result.fetch(:mode)}: #{changed_files.length} changed file#{"s" unless changed_files.length == 1}")

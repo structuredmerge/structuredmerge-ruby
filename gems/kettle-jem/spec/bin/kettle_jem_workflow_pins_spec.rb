@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "kettle/jem/workflow_pins_cli"
 
-RSpec.describe Kettle::Jem::WorkflowPinsCLI do
+load File.expand_path("../../bin/kettle-jem-workflow-pins", __dir__)
+
+RSpec.describe KettleJemWorkflowPins do
   let(:project_root) { Dir.mktmpdir }
   let(:old_sha) { "a" * 40 }
   let(:new_sha) { "b" * 40 }
