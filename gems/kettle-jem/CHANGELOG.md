@@ -29,6 +29,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.0.
 - Gem templates now require `kettle-test` >= 2.0.4.
 - Gem templates now require `turbo_tests2` >= 3.1.2 for the default
   `kettle-test` runner dependency.
