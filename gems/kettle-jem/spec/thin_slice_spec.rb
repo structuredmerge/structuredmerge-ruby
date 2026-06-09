@@ -7192,7 +7192,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).not_to include("Gemspec/RubyVersionGlobalsUsage")
       expect(gemspec_content).not_to include("$LOAD_PATH.unshift(lib)")
       expect(gemspec_content).not_to include('require "my/gem/version"')
-      expect(gemspec_content).to include('spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/my/gem/version.rb", mod) }::My::Gem::Version::VERSION')
+      expect(gemspec_content).to include("spec.version = Module.new.tap { |mod| Kernel.load(\"\#{__dir__}/lib/my/gem/version.rb\", mod) }::My::Gem::Version::VERSION")
       version_loader_operation = gemspec_report.dig(
         :report_envelope,
         :report,
