@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Gem templates now require `turbo_tests2` >= 3.1.2 for the default
+  `kettle-test` runner dependency.
 - Gemfile and gemspec source checks now prefer Prism-backed call records instead
   of regex/string fallback matching for dependency and project-name decisions.
 - Appraisals template merging now delegates same-name DSL call reconciliation to
