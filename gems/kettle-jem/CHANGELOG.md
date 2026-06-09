@@ -109,7 +109,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Documented `rubygems.min_ruby` in the generated `.kettle-jem.yml` so projects
   can make the published runtime Ruby floor explicit.
 - Documentation templates now require `yard-yaml` >= 0.2.0.
-- Documentation templates now require `yard-fence` >= 0.9.2.
+- Documentation templates now require `yard-fence` >= 0.9.3.
 - Documentation templates now require `yard-timekeeper` >= 0.2.1.
 - Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.1.1.
 - Gem templates now require `kettle-test` >= 2.0.3.
