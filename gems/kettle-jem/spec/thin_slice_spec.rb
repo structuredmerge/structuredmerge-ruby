@@ -1829,6 +1829,8 @@ RSpec.describe Kettle::Jem do
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
+          funding:
+            open_collective: collective-acme
           tokens:
             forge:
               gh_user: acme
@@ -1852,6 +1854,7 @@ RSpec.describe Kettle::Jem do
             apply: true
             entries:
               - README.md
+              - FUNDING.md
         YAML
       })
 
@@ -1872,9 +1875,15 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include("Compatible with MRI Ruby 3.2+")
       expect(template_report.fetch(:final_content)).to include("https://patreon.com/acme")
       expect(template_report.fetch(:final_content)).to include("https://github.com/acme/example")
+      expect(template_report.fetch(:final_content)).to include("Sponsor collective-acme/example on Open Source Collective")
+      expect(template_report.fetch(:final_content)).to include("https://opencollective.com/collective-acme")
+      expect(template_report.fetch(:final_content)).not_to include("https://opencollective.com/acme")
 
       described_class.apply_project(root, env: {})
       expect(File.read(File.join(root, "README.md"))).to eq(template_report.fetch(:final_content))
+      expect(File.read(File.join(root, "FUNDING.md"))).to include(
+        "Sponsor collective-acme/example on Open Source Collective"
+      )
     end
   end
 

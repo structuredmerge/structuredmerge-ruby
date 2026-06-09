@@ -63,6 +63,8 @@ Please file a bug if you notice a violation of semantic versioning.
   v7.0.0 release comment.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
+- Generated README and FUNDING OpenCollective links now use the configured
+  OpenCollective slug instead of assuming it matches the GitHub organization.
 - Generated coverage workflow uploads now share the same template token as
   custom workflow injection, avoiding duplicate coverage upload step templates.
 - Generated coverage workflows no longer gain an extra blank line after the
