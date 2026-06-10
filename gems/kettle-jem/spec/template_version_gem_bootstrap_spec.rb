@@ -36,6 +36,13 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
           extend VersionGem::Basic
         end
       RUBY
+      write_file(root, "sig/plain/merge.rbs", <<~RBS)
+        module Plain
+          module Merge
+            VERSION: String
+          end
+        end
+      RBS
 
       result = Kettle::Jem.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
 
@@ -43,7 +50,7 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge/version.rbs")
+          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge.rbs", "sig/plain/merge/version.rbs")
         )
       )
       entrypoint = File.read(File.join(root, "lib/plain/merge.rb"))
@@ -58,6 +65,8 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
       expect(signature).to include("module Merge")
       expect(signature).to include("module Version")
       expect(signature.scan("VERSION: String").length).to eq(2)
+      root_signature = File.read(File.join(root, "sig/plain/merge.rbs"))
+      expect(root_signature).not_to include("VERSION: String")
     end
   end
 end

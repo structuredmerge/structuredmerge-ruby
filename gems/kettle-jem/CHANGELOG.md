@@ -36,6 +36,9 @@ Please file a bug if you notice a violation of semantic versioning.
   templating-only floors are validated in the normal gem bundle.
 - Restored `kettle-jem prepare` as a pre-flight dependency bootstrap mode for
   applying the minimal templating Gemfile payload before full templating.
+- Version-gem bootstrapping now removes stale top-level RBS `VERSION`
+  declarations and generated style workflows load the RBS environment so
+  duplicate declarations fail in CI.
 
 ### Changed
 

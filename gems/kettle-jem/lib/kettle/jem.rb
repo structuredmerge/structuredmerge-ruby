@@ -8539,6 +8539,7 @@ module Kettle
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       signature_path = File.join("sig", entrypoint_require, "version.rbs")
+      root_signature_path = File.join("sig", "#{entrypoint_require}.rbs")
       namespace = facts.dig(:rubygems, :namespace).to_s
       namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
       namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
@@ -8564,6 +8565,7 @@ module Kettle
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
       changes << write_if_changed(project_root, signature_path, version_gem_signature_file_content(namespace: namespace)) if manage_signature_file
+      changes << remove_legacy_version_signature_alias(project_root, root_signature_path)
       changed_files = changes.compact
 
       {
@@ -8574,6 +8576,16 @@ module Kettle
         entrypoint_path: entrypoint_path,
         signature_path: signature_path
       }
+    end
+
+    def remove_legacy_version_signature_alias(project_root, signature_path)
+      current = read_project_file(project_root, signature_path)
+      return nil if current.empty?
+
+      cleaned = current.lines.reject { |line| line.strip == "VERSION: String" }.join
+      return nil if cleaned == current
+
+      write_if_changed(project_root, signature_path, cleaned)
     end
 
     def version_gem_version_file_content(existing_version:, namespace:, version:)
