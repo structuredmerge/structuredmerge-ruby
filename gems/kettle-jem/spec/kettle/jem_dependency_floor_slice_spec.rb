@@ -25,6 +25,15 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gem.gemspec.example"
         ]
       },
+      "kettle-soup-cover" => {
+        declaration_names: ["kettle-soup-cover"],
+        requirement_args: %("~> 2.0", ">= 2.0.2"),
+        lock_version: "2.0.2",
+        requirement_surfaces: [
+          "gemfiles/modular/coverage.gemfile",
+          "lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example"
+        ]
+      },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
         requirement_args: %("~> 3.1", ">= 3.1.2"),
