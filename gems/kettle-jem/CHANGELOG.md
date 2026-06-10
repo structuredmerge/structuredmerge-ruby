@@ -34,6 +34,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - The fast dependency floor slice now covers `appraisal2`.
 - kettle-jem's own `mise` environment now enables templating dependencies so
   templating-only floors are validated in the normal gem bundle.
+- Restored `kettle-jem prepare` as a pre-flight dependency bootstrap mode for
+  applying the minimal templating Gemfile payload before full templating.
 
 ### Changed
 

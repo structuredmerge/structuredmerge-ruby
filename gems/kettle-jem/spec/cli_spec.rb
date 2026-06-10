@@ -30,6 +30,7 @@ RSpec.describe Kettle::Jem::CLI do
 
     expect(help_status).to eq(0)
     expect(help_out).to include("kettle-jem [PROJECT_ROOT]")
+    expect(help_out).to include("kettle-jem prepare")
     expect(help_out).to include("kettle-jem plan")
     expect(help_out).to include("kettle-jem install")
     expect(help_out).to include("kettle-jem selftest")
@@ -296,6 +297,28 @@ RSpec.describe Kettle::Jem::CLI do
         run_options: include(skip_commit: true, only: ["README.md"])
       )
       expect(Kettle::Jem::Tasks::InstallTask).not_to have_received(:run)
+    end
+  end
+
+  it "runs the prepare command through the pre-flight prepare task" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      allow(Kettle::Jem::Tasks::PrepareTask).to receive(:run).and_return(
+        mode: "prepare",
+        prepared: true,
+        changed_files: ["Gemfile", "gemfiles/modular/templating.gemfile"],
+        prepare_steps: [{name: "bundle_install", status: "succeeded"}]
+      )
+
+      status, out, err = run_cli(["prepare", root, "--force"], env: {"K_JEM_TEMPLATING" => "true"})
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      expect(out).to include("prepare: 2 changed files")
+      expect(Kettle::Jem::Tasks::PrepareTask).to have_received(:run).with(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: include(force: true)
+      )
     end
   end
 

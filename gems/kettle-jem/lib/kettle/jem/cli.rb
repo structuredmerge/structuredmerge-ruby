@@ -11,6 +11,7 @@ module Kettle
         Usage:
           kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
           kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
+          kettle-jem prepare [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force] [--quiet|--verbose]
           kettle-jem plan [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem apply [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem template [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
@@ -61,7 +62,7 @@ module Kettle
       end
 
       def command_allowed?(command)
-        %w[setup plan apply template install manifest selftest help version].include?(command)
+        %w[setup prepare plan apply template install manifest selftest help version].include?(command)
       end
 
       def parse_options(args)
@@ -162,6 +163,8 @@ module Kettle
         case command
         when "setup"
           Kettle::Jem.setup_project(project_root, env: env, run_options: options.fetch(:run_options))
+        when "prepare"
+          Kettle::Jem::Tasks::PrepareTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
         when "plan"
           Kettle::Jem.plan_project(project_root, env: env, run_options: options.fetch(:run_options))
         when "apply"
