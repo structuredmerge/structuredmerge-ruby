@@ -139,7 +139,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Ruby 3.0 and Ruby 3.2 appraisal Gemfiles now include
   TruffleRuby-only `json` modules that pin to the default `json` gem shipped
   with EOL TruffleRuby releases instead of constraining MRI Ruby bundles.
-- Generated main Gemfiles now install `nomono` >= 1.0.2 so local workspace
+- Generated main Gemfiles now install `nomono` >= 1.0.3 so local workspace
   override Gemfiles can load `nomono/bundler` from the released gem.
 - Generated coverage workflows now pass `K_SOUP_COV_MIN_LINE` and
   `K_SOUP_COV_MIN_BRANCH` through to Code Coverage Summary thresholds instead

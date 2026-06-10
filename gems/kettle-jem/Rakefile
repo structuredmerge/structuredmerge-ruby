@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-# kettle-jem Rakefile v7.0.0 - 2026-06-01
+# kettle-jem Rakefile v7.0.0 - 2026-06-10
 # Ruby 2.3 (Safe Navigation) or higher required
 #
 # See LICENSE.md for license information.
@@ -48,7 +48,6 @@
 # rake rubocop_gradual_debug:check            # Run RuboCop Gradual to check the lock file
 # rake rubocop_gradual_debug:force_update     # Run RuboCop Gradual to force update the l...
 # rake spec                                   # Run RSpec code examples
-# rake spec:dependency_floors                 # Run the fast dependency floor slice for temp...
 # rake test                                   # Run tests
 # rake yard                                   # Generate YARD Documentation
 #
@@ -63,6 +62,7 @@ task :default do
   puts "Default task complete."
 end
 
+# kettle-jem:freeze
 begin
   require "rspec/core/rake_task"
 
@@ -78,6 +78,7 @@ rescue LoadError
     warn("NOTE: rspec-core isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
   end
 end
+# kettle-jem:unfreeze
 
 # :nocov:
 ### MONOREPO FAMILY TASKS

@@ -34,6 +34,15 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example"
         ]
       },
+      "nomono" => {
+        declaration_names: ["nomono"],
+        requirement_args: %("~> 1.0", ">= 1.0.3"),
+        lock_version: "1.0.3",
+        requirement_surfaces: [
+          "Gemfile",
+          "lib/kettle/jem/templates/Gemfile.example"
+        ]
+      },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
         requirement_args: %("~> 3.1", ">= 3.1.2"),

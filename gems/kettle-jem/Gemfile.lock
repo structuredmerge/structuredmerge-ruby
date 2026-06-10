@@ -36,6 +36,10 @@ GEM
       rake (>= 10)
       thor (>= 0.14)
       version_gem (~> 1.1, >= 1.1.10)
+    appraisal2-rubocop (0.2.0)
+      appraisal2 (>= 3.1.1)
+      rubocop (>= 1.0)
+      version_gem (~> 1.1, >= 1.1.10)
     ast (2.4.3)
     ast-crispr (7.0.0)
       ast-merge (= 7.0.0)
@@ -61,6 +65,7 @@ GEM
     bundler-audit (0.9.3)
       bundler (>= 1.2.0)
       thor (~> 1.0)
+    cgi (0.5.1)
     citrus (3.0.2)
     citrus-toml-merge (7.0.0)
       toml-merge (= 7.0.0)
@@ -124,7 +129,7 @@ GEM
     geom2d (0.4.1)
     gitmoji-regex (2.0.1)
       version_gem (~> 1.1, >= 1.1.9)
-    hexapdf (1.8.0)
+    hexapdf (1.9.1)
       cmdparse (~> 3.0, >= 3.0.3)
       geom2d (~> 0.4, >= 0.4.1)
       openssl (>= 2.2.1)
@@ -193,8 +198,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-musl)
       racc (~> 1.4)
-    nomono (1.0.2)
-      version_gem (~> 1.1, >= 1.1.9)
+    nomono (1.0.3)
+      version_gem (~> 1.1, >= 1.1.11)
     openssl (4.0.2)
     ostruct (0.6.3)
     parallel (1.28.0)
@@ -311,6 +316,10 @@ GEM
     rubocop-md (2.0.4)
       lint_roller (~> 1.1)
       rubocop (>= 1.72.1)
+    rubocop-minitest (0.39.1)
+      lint_roller (~> 1.1)
+      rubocop (>= 1.75.0, < 2.0)
+      rubocop-ast (>= 1.38.0, < 2.0)
     rubocop-on-rbs (2.0.0)
       lint_roller (~> 1.1)
       rbs (~> 4.0)
@@ -392,11 +401,11 @@ GEM
       rubocop-factory_bot (~> 2.27)
       rubocop-rspec (~> 3.9)
       rubocop-rspec_rails (~> 2.31)
-    standard-rubocop-lts (2.0.4)
+    standard-rubocop-lts (2.0.5)
       standard (~> 1.54, >= 1.54.0)
       standard-custom (~> 1.0, >= 1.0.2)
       standard-performance (~> 1.9, >= 1.9.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      version_gem (~> 1.1, >= 1.1.11)
     stone_checksums (1.0.3)
       version_gem (~> 1.1, >= 1.1.9)
     stringio (3.2.0)
@@ -435,6 +444,7 @@ GEM
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
     version_gem (1.1.11)
+    webrick (1.9.2)
     yaml-converter (0.2.0)
       hexapdf (>= 1.8, < 2)
       kramdown (>= 2.4, < 3)
@@ -473,9 +483,11 @@ PLATFORMS
 
 DEPENDENCIES
   addressable (>= 2.8, < 3)
-  appraisal2 (~> 3.1, >= 3.1.0)
+  appraisal2 (~> 3.1, >= 3.1.1)
+  appraisal2-rubocop (~> 0.2, >= 0.2.0)
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
+  cgi (~> 0.5)
   debug (>= 1.1)
   erb (~> 6.0, >= 6.0.4)
   gem_bench (~> 2.0, >= 2.0.5)
@@ -487,7 +499,7 @@ DEPENDENCIES
   kramdown (~> 2.5, >= 2.5.1)
   kramdown-parser-gfm (~> 1.1)
   mutex_m (~> 0.2)
-  nomono (~> 1.0, >= 1.0.2)
+  nomono (~> 1.0, >= 1.0.3)
   rake (~> 13.0)
   rbs (>= 3.0)
   rdoc (~> 6.11)
@@ -495,6 +507,7 @@ DEPENDENCIES
   require_bench (~> 1.0, >= 1.0.4)
   rubocop-lts (~> 24.2, >= 24.2.0)
   rubocop-lts-rspec (~> 1.0, >= 1.0.3)
+  rubocop-minitest (~> 0.38, >= 0.38.1)
   rubocop-on-rbs (~> 2.0, >= 2.0.0)
   rubocop-packaging (~> 0.6, >= 0.6.0)
   rubocop-ruby3_2 (~> 3.0, >= 3.0.2)
@@ -503,6 +516,7 @@ DEPENDENCIES
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
   turbo_tests2 (~> 3.1, >= 3.1.2)
+  webrick (~> 1.9)
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
   yard-fence (~> 0.9, >= 0.9.3)
@@ -515,6 +529,7 @@ CHECKSUMS
   addressable (2.9.0) sha256=7fdf6ac3660f7f4e867a0838be3f6cf722ace541dd97767fa42bc6cfa980c7af
   ansi (1.6.0) sha256=ac9ea0c0ea8d32fb4e271348e609963ac78882f34b73836c2a02b3622e666658
   appraisal2 (3.1.1) sha256=920bc89c5530e4356cf18606ceb9036a55e49ee57ba1eb6ea6d41b302ce14044
+  appraisal2-rubocop (0.2.0) sha256=c3353136ad1e32e9084c6ede76997510b3b77cf7d2fe19ab4c54a3f5e16cb9c9
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   ast-crispr (7.0.0)
   ast-crispr-markdown-markly (7.0.0)
@@ -526,6 +541,7 @@ CHECKSUMS
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
   bundler (4.0.12) sha256=7f8b757d28dfb636e7b24fba2344ac6dd13b5b24f4b46d62573d483f211825ac
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
+  cgi (0.5.1) sha256=e93fcafc69b8a934fe1e6146121fa35430efa8b4a4047c4893764067036f18e9
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.0.0) sha256=b778943996390699abef3c55c1dc8662490f90a98d255aef6361baf0f6ea199a
   cmdparse (3.0.7) sha256=f7c5cace10bec6abf853370ae095e4b97a84ed9d847b3fb38f41cc4fbc950739
@@ -555,7 +571,7 @@ CHECKSUMS
   gem_bench (2.0.5) sha256=0dc0fb44a5a5eb7b2f5c1c68a5b0164d72007132822c012bac3abe976b199ead
   geom2d (0.4.1) sha256=ea0998ea90c4f2752e24fe13d85a4f89bee689d151316140ebcc6369bf634ed9
   gitmoji-regex (2.0.1) sha256=a0afe78c4a2cb4590068c3007a1172ac3f12a73fb289bbc8c7a73c759cf8a2f5
-  hexapdf (1.8.0) sha256=3437154213be17a3d0422bdb26638b739da20fce98db1cc3554b0a675eb50437
+  hexapdf (1.9.1) sha256=2d1f6a3622e6bc2a70a707d4c3f3fa44f5552ecd9d899f6283abb07398a84884
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.19.8) sha256=6354310fd76ef69b87d5bd1f38b40d730613baf90b6803d2d0a48f618d32dfaa
@@ -580,7 +596,7 @@ CHECKSUMS
   nokogiri (1.19.3-x86_64-darwin) sha256=77f3fba57d46c53ab31e62fc6c28f705109d1bf6264356c76f132b2be5728d4d
   nokogiri (1.19.3-x86_64-linux-gnu) sha256=2f5078620fe12e83669b5b17311b32532a8153d02eee7ad06948b926d6080976
   nokogiri (1.19.3-x86_64-linux-musl) sha256=248c906d2166eca5efb56d52fdee5f9a1f51d69a72e2b64fdac647b4ce39ea3f
-  nomono (1.0.2) sha256=49236d39350a66f28ed3f51ec2d94afb8278667576e37ed9763a591e15b65f80
+  nomono (1.0.3) sha256=8a64c6d26e2500097b4fa94eeea5bab717e7b01785853c4e60fe07b0529c8d99
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
   parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
@@ -623,6 +639,7 @@ CHECKSUMS
   rubocop-lts (24.2.0) sha256=19a57857ba99cc576ae7f6cb89b612ef7e69102180bd755fd664f78e083c5b1d
   rubocop-lts-rspec (1.0.3) sha256=4ced2fdb793c1eea69f935374ef520558c4a2b82154af95efd1dc8888e27b29c
   rubocop-md (2.0.4) sha256=0d076b6b5e99dea2ddc928c4bd702497decb9a8400da7808091e02ebcafcfb93
+  rubocop-minitest (0.39.1) sha256=998398d6da4026d297f0f9bf709a1eac5f2b6947c24431f94af08138510cf7ed
   rubocop-on-rbs (2.0.0) sha256=ce74d1b3d5daead19f4b611623656c185821dfc9aed9c7079bb1e5d7d7c464be
   rubocop-packaging (0.6.0) sha256=fb92bd0fb48e6f8cdb1648d2249b0cd51c2497dcc87340132d22f01edbf558a7
   rubocop-performance (1.26.1) sha256=cd19b936ff196df85829d264b522fd4f98b6c89ad271fa52744a8c11b8f71834
@@ -649,7 +666,7 @@ CHECKSUMS
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
   standard-rspec (0.5.0) sha256=64d396524a65af47f5331b423d8cdd313e0267401647bb7892489ca89dad2973
-  standard-rubocop-lts (2.0.4) sha256=42fff6c4f1284bb6064cc620fce104233313693ace49c30454868f98341ead07
+  standard-rubocop-lts (2.0.5) sha256=a379da7bcbe78bfd35e331e1ae0f2a656ded14ee1f5419a3a5284342d14923dc
   stone_checksums (1.0.3) sha256=1d7ee38b7c766c523cbf12ab886ffbae519a2c48288f9d8ecc7ca0deed0701fe
   stringio (3.2.0) sha256=c37cb2e58b4ffbd33fe5cd948c05934af997b36e0b6ca6fdf43afa234cf222e1
   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
@@ -670,6 +687,7 @@ CHECKSUMS
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
   version_gem (1.1.11) sha256=695df6464862b3dc976b4f6e0e089062517c8137ecd31078d8c378347f959c97
+  webrick (1.9.2) sha256=beb4a15fc474defed24a3bda4ffd88a490d517c9e4e6118c3edce59e45864131
   yaml-converter (0.2.0) sha256=0602148de1664ab701c7938a036987576c55e87fb6d4b3cb0fff19c4f7a91386
   yaml-merge (7.0.0) sha256=781f1abbd8e0af8e0bb45bf34fc06aeab8f0b092ea78df915cdcf6d4639de454
   yard (0.9.44) sha256=eb087e9b631ccd887b049f303d489963945452d5e2a7eb49a5a74a7cf6887f28
