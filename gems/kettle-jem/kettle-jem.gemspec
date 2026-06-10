@@ -111,7 +111,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("psych-merge", "= #{spec.version}")                # ruby >= 4.0.0
   spec.add_dependency("rbs-merge", "= #{spec.version}")                  # ruby >= 4.0.0
   spec.add_dependency("ruby-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("token-resolver", "~> 2.0", ">= 2.0.1")            # ruby >= 3.2.0
+  spec.add_dependency("token-resolver", "~> 2.0", ">= 2.0.2")            # ruby >= 3.2.0
   spec.add_dependency("toml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
