@@ -29,6 +29,8 @@ Please file a bug if you notice a violation of semantic versioning.
   README badges.
 - Added explicit `ruby.test_minimum` template configuration, defaulting to
   Ruby 2.4, for generated CI workflow and Appraisal floors.
+- Added `rake spec:dependency_floors` as a fast validation slice for recurring
+  non-StructuredMerge dependency floor bumps.
 
 ### Changed
 

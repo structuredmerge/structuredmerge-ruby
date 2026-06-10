@@ -1,0 +1,68 @@
+# frozen_string_literal: true
+
+require_relative "../spec_helper"
+
+RSpec.describe Kettle::Jem do
+  let(:root) { Pathname(__dir__).join("../..").expand_path }
+  let(:non_structuredmerge_floors) do
+    {
+      "kettle-dev" => {
+        declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
+        requirement_args: %("~> 2.2", ">= 2.2.3"),
+        lock_version: "2.2.3",
+        requirement_surfaces: [
+          "kettle-jem.gemspec",
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gem.gemspec.example"
+        ]
+      },
+      "kettle-test" => {
+        declaration_names: ["kettle-test"],
+        requirement_args: %("~> 2.0", ">= 2.0.4"),
+        lock_version: "2.0.4",
+        requirement_surfaces: [
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gem.gemspec.example"
+        ]
+      },
+      "turbo_tests2" => {
+        declaration_names: ["turbo_tests2"],
+        requirement_args: %("~> 3.1", ">= 3.1.2"),
+        lock_version: "3.1.2",
+        requirement_surfaces: [
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gem.gemspec.example"
+        ]
+      },
+      "yard-fence" => {
+        declaration_names: ["yard-fence"],
+        requirement_args: %("~> 0.9", ">= 0.9.3"),
+        lock_version: "0.9.3",
+        requirement_surfaces: [
+          "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
+        ]
+      }
+    }
+  end
+
+  def file_content(relative_path)
+    root.join(relative_path).read
+  end
+
+  it "keeps non-StructuredMerge floors aligned across fast-checkable surfaces" do
+    lockfile = file_content("Gemfile.lock")
+
+    non_structuredmerge_floors.each do |gem_name, config|
+      config.fetch(:requirement_surfaces).each do |relative_path|
+        content = file_content(relative_path)
+        floor_declarations = config.fetch(:declaration_names).map do |declaration_name|
+          %(#{declaration_name}", #{config.fetch(:requirement_args)})
+        end
+
+        expect(floor_declarations.any? { |declaration| content.include?(declaration) }).to be(true)
+      end
+
+      expect(lockfile).to include(%(#{gem_name} (#{config.fetch(:lock_version)})))
+    end
+  end
+end
