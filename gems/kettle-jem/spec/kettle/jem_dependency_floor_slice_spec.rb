@@ -6,6 +6,16 @@ RSpec.describe Kettle::Jem do
   let(:root) { Pathname(__dir__).join("../..").expand_path }
   let(:non_structuredmerge_floors) do
     {
+      "appraisal2" => {
+        declaration_names: ["appraisal2"],
+        requirement_args: %("~> 3.1", ">= 3.1.1"),
+        lock_version: "3.1.1",
+        requirement_surfaces: [
+          "kettle-jem.gemspec",
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gem.gemspec.example"
+        ]
+      },
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
         requirement_args: %("~> 2.2", ">= 2.2.3"),

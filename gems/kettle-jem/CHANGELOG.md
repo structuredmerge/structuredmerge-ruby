@@ -31,6 +31,7 @@ Please file a bug if you notice a violation of semantic versioning.
   Ruby 2.4, for generated CI workflow and Appraisal floors.
 - Added `rake spec:dependency_floors` as a fast validation slice for recurring
   non-StructuredMerge dependency floor bumps.
+- The fast dependency floor slice now covers `appraisal2`.
 
 ### Changed
 
