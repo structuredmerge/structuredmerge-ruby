@@ -30,7 +30,6 @@ RSpec.describe Kettle::Jem do
         declaration_names: ["kettle-drift"],
         requirement_args: %("~> 1.0", ">= 1.0.3"),
         lock_version: "1.0.3",
-        lockfile_path: "../../Gemfile.lock",
         requirement_surfaces: [
           "gemfiles/modular/templating.gemfile",
           "lib/kettle/jem.rb",

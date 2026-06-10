@@ -32,6 +32,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added `rake spec:dependency_floors` as a fast validation slice for recurring
   non-StructuredMerge dependency floor bumps.
 - The fast dependency floor slice now covers `appraisal2`.
+- kettle-jem's own `mise` environment now enables templating dependencies so
+  templating-only floors are validated in the normal gem bundle.
 
 ### Changed
 

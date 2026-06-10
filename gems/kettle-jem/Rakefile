@@ -67,8 +67,13 @@ begin
   require "rspec/core/rake_task"
 
   namespace :spec do
+    desc "Disable coverage for the dependency floor slice"
+    task :disable_dependency_floor_coverage do
+      ENV["K_SOUP_COV_DO"] = "false"
+    end
+
     desc "Run the fast dependency floor slice for template/runtime floor bumps"
-    RSpec::Core::RakeTask.new(:dependency_floors) do |task|
+    RSpec::Core::RakeTask.new(dependency_floors: :disable_dependency_floor_coverage) do |task|
       task.pattern = "spec/kettle/jem_dependency_floor_slice_spec.rb"
     end
   end
