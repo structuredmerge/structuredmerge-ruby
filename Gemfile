@@ -59,17 +59,17 @@ gemspec path: "gems/smorg-rb"
 
 gem "rake"
 gem "rspec"
-gem "token-resolver", "~> 2.0", ">= 2.0.1"
+gem "token-resolver", "~> 2.0", ">= 2.0.2"
 
-gem "appraisal2", "~> 3.0", ">= 3.0.7"
+gem "appraisal2", "~> 3.1", ">= 3.1.1"
 
 gem "bundler-audit", "~> 0.9.3"
 
-gem "kettle-dev", "~> 2.0", ">= 2.0.5"
+gem "kettle-dev", "~> 2.2", ">= 2.2.3"
 
-gem "kettle-drift", "~> 1.0", ">= 1.0.1"
+gem "kettle-drift", "~> 1.0", ">= 1.0.3"
 
-gem "kettle-test", "~> 2.0", ">= 2.0.3"
+gem "kettle-test", "~> 2.0", ">= 2.0.5"
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"
 

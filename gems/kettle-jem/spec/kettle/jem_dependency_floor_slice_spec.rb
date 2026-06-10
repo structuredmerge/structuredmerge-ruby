@@ -26,6 +26,17 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gem.gemspec.example"
         ]
       },
+      "kettle-drift" => {
+        declaration_names: ["kettle-drift"],
+        requirement_args: %("~> 1.0", ">= 1.0.3"),
+        lock_version: "1.0.3",
+        lockfile_path: "../../Gemfile.lock",
+        requirement_surfaces: [
+          "gemfiles/modular/templating.gemfile",
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gemfiles/modular/templating.gemfile.example"
+        ]
+      },
       "kettle-test" => {
         declaration_names: ["kettle-test"],
         requirement_args: %("~> 2.0", ">= 2.0.5"),
@@ -86,8 +97,6 @@ RSpec.describe Kettle::Jem do
   end
 
   it "keeps non-StructuredMerge floors aligned across fast-checkable surfaces" do
-    lockfile = file_content("Gemfile.lock")
-
     non_structuredmerge_floors.each do |gem_name, config|
       config.fetch(:requirement_surfaces).each do |relative_path|
         content = file_content(relative_path)
@@ -98,6 +107,7 @@ RSpec.describe Kettle::Jem do
         expect(floor_declarations.any? { |declaration| content.include?(declaration) }).to be(true)
       end
 
+      lockfile = file_content(config.fetch(:lockfile_path, "Gemfile.lock"))
       expect(lockfile).to include(%(#{gem_name} (#{config.fetch(:lock_version)})))
     end
   end
