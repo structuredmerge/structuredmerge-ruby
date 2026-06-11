@@ -4767,6 +4767,9 @@ module Kettle
         return template_content
       end
       if destination_content == template_content
+        if file_type == :gemfile
+          return finalize_gemfile_template_source(recipe, destination_content, destination_content, facts: facts, template_content: template_content)
+        end
         return merge_appraisals_template_policy(destination_content, facts: facts) if file_type == :appraisals
 
         return destination_content
@@ -5155,7 +5158,8 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s if facts
       removable_gems = ["appraisal"]
       removable_gems << package_name unless package_name.to_s.empty?
-      pruned = remove_gemfile_dependency_lines(content, removable_gems)
+      removable_gems << "version_gem" unless version_gem_runtime_compatible?(facts)
+      pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
       pruned = merge_template_gemfile_dependency_blocks(
         template_content,
@@ -5167,7 +5171,7 @@ module Kettle
     end
 
     def merge_template_gemfile_dependency_blocks(template_content, content, removable_gems, preserve_self_word_entries: false)
-      template = remove_gemfile_dependency_lines(template_content, removable_gems)
+      template = remove_gemfile_dependency_blocks(template_content, removable_gems)
       template = remove_gemfile_percent_w_entries(template, removable_gems) unless preserve_self_word_entries
       existing = gemfile_dependency_names(content) + gemfile_percent_w_names(content)
       additions = gemfile_paragraphs(template).filter_map do |paragraph|
@@ -5299,6 +5303,24 @@ module Kettle
       end
       lines = content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first)
       ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def remove_gemfile_dependency_blocks(content, gem_names)
+      names = gem_names.map(&:to_s).reject(&:empty?).uniq
+      return content if names.empty?
+
+      lines = content.to_s.lines
+      remove_indexes = Set.new
+      gemfile_gem_call_records(content).each do |record|
+        next unless names.include?(record.fetch(:name))
+
+        start_index = record.fetch(:start_line) - 1
+        start_index -= 1 while start_index.positive? && gemfile_comment_line?(lines[start_index - 1])
+        (start_index..(record.fetch(:end_line) - 1)).each { |index| remove_indexes << index }
+      end
+      return content if remove_indexes.empty?
+
+      ensure_trailing_newline(lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
     end
 
     def gemfile_gem_call_records(content)
@@ -6098,7 +6120,8 @@ module Kettle
     def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)
       return content if version_gem_runtime_compatible?(facts)
 
-      remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
+      cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
+      remove_ruby_comment_lines_containing(cleaned, "version_gem")
     end
 
     def remove_gemspec_assignment(content, receiver:, field:)
@@ -6119,6 +6142,20 @@ module Kettle
       return content if records_by_line.empty?
 
       ensure_trailing_newline(replace_record_ranges(content, records_by_line).gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def remove_ruby_comment_lines_containing(content, text)
+      result = prism_parse_success(content)
+      return content unless result
+
+      selectors = result.comments.filter_map do |comment|
+        next unless comment.location.slice.include?(text.to_s)
+
+        {start_line: comment.location.start_line, end_line: comment.location.end_line}
+      end
+      return content if selectors.empty?
+
+      ensure_trailing_newline(delete_line_ranges(content.to_s, selectors))
     end
 
     def version_gem_runtime_compatible?(facts)

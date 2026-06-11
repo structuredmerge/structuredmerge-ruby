@@ -7507,6 +7507,16 @@ RSpec.describe Kettle::Jem do
             VERSION = Version::VERSION # Traditional Constant Location
           end
         RUBY
+        "gemfiles/modular/runtime_heads.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          # Test against HEAD of runtime dependencies so we can proactively file bugs
+
+          # Ruby >= 2.2
+          gem "version_gem", github: "ruby-oauth/version_gem", branch: "main"
+
+          eval_gemfile("x_std_libs/vHEAD.gemfile")
+        RUBY
         ".kettle-jem.yml" => <<~YAML,
           rubygems:
             min_ruby: "1.8.7"
@@ -7517,15 +7527,27 @@ RSpec.describe Kettle::Jem do
             apply: true
             entries:
               - legacy.gemspec
+              - gemfiles/modular/runtime_heads.gemfile
         YAML
-        "template/legacy.gemspec.example" => <<~RUBY
+        "template/legacy.gemspec.example" => <<~RUBY,
           Gem::Specification.new do |spec|
             spec.name = "{KJ|GEM_NAME}"
             spec.version = "0.0.0"
             spec.summary = "Template summary"
             spec.required_ruby_version = ">= 2.3.0"
+            # Ref: https://gitlab.com/ruby-oauth/version_gem/-/issues/3
             spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.11")
           end
+        RUBY
+        "template/gemfiles/modular/runtime_heads.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Test against HEAD of runtime dependencies so we can proactively file bugs
+
+          # Ruby >= 2.2
+          gem "version_gem", github: "ruby-oauth/version_gem", branch: "main"
+
+          eval_gemfile("x_std_libs/vHEAD.gemfile")
         RUBY
       })
 
@@ -7534,6 +7556,7 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
       entrypoint_content = File.read(File.join(root, "lib", "legacy.rb"))
       version_content = File.read(File.join(root, "lib", "legacy", "version.rb"))
+      runtime_heads_content = File.read(File.join(root, "gemfiles", "modular", "runtime_heads.gemfile"))
 
       expect(gemspec_content).not_to include("version_gem")
       expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7"')
@@ -7548,6 +7571,8 @@ RSpec.describe Kettle::Jem do
       expect(version_content).to include("module Version")
       expect(version_content).to include('VERSION = "0.1.0"')
       expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
+      expect(runtime_heads_content).not_to include("version_gem")
+      expect(runtime_heads_content).to include('eval_gemfile("x_std_libs/vHEAD.gemfile")')
       expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)
     end
   end
