@@ -588,6 +588,9 @@ module Kettle
           "33.0" => Gem::Version.new("3.3")
         }.freeze
       }.freeze
+      MRI_COMPATIBILITY_BADGE_MIN_VERSION = {
+        "1.8" => Gem::Version.new("1.8.7")
+      }.freeze
       COMPATIBILITY_REFERENCE_LABEL_RE = /\A(?:💎(?:ruby|jruby|truby)-|🚎)/
       ENGINE_ROW_PATTERNS = {
         "jruby" => {
@@ -679,7 +682,7 @@ module Kettle
 
       def compatibility_badge_min_mri(label)
         if (match = label.match(/\A💎ruby-(?<version>\d+\.\d+)i\z/))
-          Gem::Version.new(match[:version])
+          MRI_COMPATIBILITY_BADGE_MIN_VERSION.fetch(match[:version]) { Gem::Version.new(match[:version]) }
         elsif (match = label.match(/\A💎(?<engine>jruby|truby)-(?<version>\d+\.\d+)i\z/))
           ENGINE_COMPATIBILITY_MRI_VERSION.dig(match[:engine], match[:version])
         end

@@ -177,6 +177,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- README compatibility badge pruning now keeps the Ruby 1.8 badge for gems with
+  a `>= 1.8.7` runtime floor.
 - Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
   environment overrides replace destination `spec.email` and `spec.authors`
   metadata instead of preserving stale project fields over resolved template

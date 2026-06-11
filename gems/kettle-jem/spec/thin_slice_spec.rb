@@ -1960,6 +1960,54 @@ RSpec.describe Kettle::Jem do
     expect(template).not_to include("[🚎ruby-2.3-wfi]:")
   end
 
+  it "keeps the Ruby 1.8 compatibility badge for a Ruby 1.8.7 runtime floor" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-ruby-18-badge-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 1.8.7"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          engines:
+            - ruby
+          files:
+            README.md:
+              strategy: accept_template
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN
+          # Example
+
+          | Works with MRI Ruby 1 | ![Ruby 1.8 Compat][💎ruby-1.8i] ![Ruby 1.9 Compat][💎ruby-1.9i] |
+
+          [💎ruby-1.8i]: https://example/ruby-18
+          [💎ruby-1.9i]: https://example/ruby-19
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = report.fetch(:final_content)
+      mri_line = final_content.lines.find { |line| line.start_with?("| Works with MRI Ruby 1") }
+
+      expect(mri_line).to include("ruby-1.8i")
+      expect(mri_line).to include("ruby-1.9i")
+      expect(final_content).to match(/^\[💎ruby-1\.8i\]:/)
+      expect(final_content).to match(/^\[💎ruby-1\.9i\]:/)
+    end
+  end
+
   it "filters template recipes with old only/include semantics" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
