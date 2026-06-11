@@ -177,6 +177,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
+  environment overrides replace destination `spec.email` and `spec.authors`
+  metadata instead of preserving stale project fields over resolved template
+  tokens.
 - Explicit `rubygems.min_ruby: "0"` template configuration now renders the
   zero runtime floor consistently while omitting `required_ruby_version` and
   runtime dependencies that cannot support Ruby 1.x.

@@ -75,6 +75,9 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 <h3 id="added">Added</h3>
 
 <ul>
+  <li>Added the repo-local <code>bin/kettle-jem-workflow-pins</code> maintenance script to<br>
+update the GitHub Actions SHA pin index used by generated workflow templates<br>
+via <code>kettle-gha-sha-pins</code>.</li>
   <li>
 <code>kettle-jem install</code> now generates a curated <code>bin/appraisal</code> binstub for the<br>
 <code>appraisal2</code> executable.</li>
@@ -82,11 +85,30 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 README badges.</li>
   <li>Added explicit <code>ruby.test_minimum</code> template configuration, defaulting to<br>
 Ruby 2.4, for generated CI workflow and Appraisal floors.</li>
+  <li>Added <code>rake spec:dependency_floors</code> as a fast validation slice for recurring<br>
+non-StructuredMerge dependency floor bumps.</li>
+  <li>The fast dependency floor slice now covers <code>appraisal2</code>.</li>
+  <li>kettle-jem’s own <code>mise</code> environment now enables templating dependencies so<br>
+templating-only floors are validated in the normal gem bundle.</li>
+  <li>Restored <code>kettle-jem prepare</code> as a pre-flight dependency bootstrap mode for<br>
+applying the minimal templating Gemfile payload before full templating.</li>
+  <li>Version-gem bootstrapping now removes stale top-level RBS <code>VERSION</code><br>
+declarations and generated style workflows load the RBS environment so<br>
+duplicate declarations fail in CI.</li>
 </ul>
 
 <h3 id="changed">Changed</h3>
 
 <ul>
+  <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.3.</li>
+  <li>The packaged gemspec template now uses the same <code>kettle-dev</code> 2.2.3 floor as<br>
+generated Gemfile tooling.</li>
+  <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.3.</li>
+  <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.5.</li>
+  <li>Generated coverage Gemfiles now require <code>kettle-soup-cover</code> &gt;= 2.0.2.</li>
+  <li>Runtime dependency <code>token-resolver</code> now requires 2.0.2 or newer.</li>
+  <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.2 for the default<br>
+<code>kettle-test</code> runner dependency.</li>
   <li>Gemfile and gemspec source checks now prefer Prism-backed call records instead<br>
 of regex/string fallback matching for dependency and project-name decisions.</li>
   <li>Appraisals template merging now delegates same-name DSL call reconciliation to<br>
@@ -94,6 +116,8 @@ of regex/string fallback matching for dependency and project-name decisions.</li
   <li>Generated gemspec version-loader fallbacks now use <code>require_relative</code> for<br>
 gems whose runtime Ruby floor is 2.2 or newer, reserving <code>$LOAD_PATH</code><br>
 mutation for gems that still target older Rubies.</li>
+  <li>Generated gemspec version-loader guards now use <code>Gem.ruby_version</code>, avoiding<br>
+RuboCop <code>Gemspec/RubyVersionGlobalsUsage</code> violations.</li>
   <li>Generated auto-assign workflows now pin <code>pozil/auto-assign-issue</code> to the<br>
 immutable SHA for v4.</li>
   <li>Generated GitHub Actions workflow templates now pin <code>actions/checkout</code> to<br>
@@ -105,8 +129,13 @@ immutable SHA for v2.2.1.</li>
   <li>Generated workflow templates now pin <code>coverallsapp/github-action</code>,<br>
 <code>codecov/codecov-action</code>, and <code>kettle-rb/ts-grammar-action</code> to resolvable<br>
 release SHAs instead of stripped SemVer strings.</li>
+  <li>Generated GitHub Actions workflow templates now refresh <code>ruby/setup-ruby</code> to<br>
+the immutable SHA for v1.312.0 and <code>codecov/codecov-action</code> to the latest<br>
+v7.0.0 release comment.</li>
   <li>Generated coverage workflows now publish QLTY coverage with GitHub OIDC so<br>
 repositories do not require <code>QLTY_COVERAGE_TOKEN</code> to be configured.</li>
+  <li>Generated README and FUNDING OpenCollective links now use the configured<br>
+OpenCollective slug instead of assuming it matches the GitHub organization.</li>
   <li>Generated coverage workflow uploads now share the same template token as<br>
 custom workflow injection, avoiding duplicate coverage upload step templates.</li>
   <li>Generated coverage workflows no longer gain an extra blank line after the<br>
@@ -158,7 +187,7 @@ entries, such as <code>org|12%</code> or <code>ruby|96px</code>.</li>
   <li>Documented <code>rubygems.min_ruby</code> in the generated <code>.kettle-jem.yml</code> so projects<br>
 can make the published runtime Ruby floor explicit.</li>
   <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.2.0.</li>
-  <li>Documentation templates now require <code>yard-fence</code> &gt;= 0.9.2.</li>
+  <li>Documentation templates now require <code>yard-fence</code> &gt;= 0.9.3.</li>
   <li>Documentation templates now require <code>yard-timekeeper</code> &gt;= 0.2.1.</li>
   <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.1.1.</li>
   <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.3.</li>
@@ -180,7 +209,7 @@ of regenerating the active appraisal Gemfile.</li>
   <li>Generated Ruby 3.0 and Ruby 3.2 appraisal Gemfiles now include<br>
 TruffleRuby-only <code>json</code> modules that pin to the default <code>json</code> gem shipped<br>
 with EOL TruffleRuby releases instead of constraining MRI Ruby bundles.</li>
-  <li>Generated main Gemfiles now install <code>nomono</code> &gt;= 1.0.2 so local workspace<br>
+  <li>Generated main Gemfiles now install <code>nomono</code> &gt;= 1.0.3 so local workspace<br>
 override Gemfiles can load <code>nomono/bundler</code> from the released gem.</li>
   <li>Generated coverage workflows now pass <code>K_SOUP_COV_MIN_LINE</code> and<br>
 <code>K_SOUP_COV_MIN_BRANCH</code> through to Code Coverage Summary thresholds instead<br>
@@ -210,6 +239,10 @@ task dependencies, independent from the gemspec runtime Ruby floor.</li>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>Gemspec merging now lets explicit <code>KJ_AUTHOR_EMAIL</code> and <code>KJ_AUTHOR_NAME</code><br>
+environment overrides replace destination <code>spec.email</code> and <code>spec.authors</code><br>
+metadata instead of preserving stale project fields over resolved template<br>
+tokens.</li>
   <li>Explicit <code>rubygems.min_ruby: "0"</code> template configuration now renders the<br>
 zero runtime floor consistently while omitting <code>required_ruby_version</code> and<br>
 runtime dependencies that cannot support Ruby 1.x.</li>
@@ -482,7 +515,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Mon Jun  8 14:20:37 2026 by
+  Generated on Thu Jun 11 02:20:30 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

@@ -8549,6 +8549,70 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "applies author email environment overrides to gemspec and destination config" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-author-email-env-sync-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["old@example.test"]
+          end
+        RUBY
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+          tokens:
+            author:
+              name: Jane Q Public
+              email: old@example.test
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+              - source: gem.gemspec
+                target: example.gemspec
+        YAML
+        "template/.structuredmerge/kettle-jem.yml.example" => <<~YAML,
+          tokens:
+            author:
+              name: Jane Q Public
+              email: old@example.test
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+              - source: gem.gemspec
+                target: example.gemspec
+        YAML
+        "template/gem.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.summary = "Example gem"
+            spec.authors = ["{KJ|AUTHOR:NAME}"]
+            spec.email = ["{KJ|AUTHOR:EMAIL}"]
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(
+        root,
+        env: {"KJ_AUTHOR_EMAIL" => "env@example.test"},
+        run_options: {accept: true}
+      )
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "example.gemspec" }
+      config_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
+
+      expect(gemspec_report.fetch(:final_content)).to include('spec.email = ["env@example.test"]')
+      expect(YAML.safe_load(config_report.fetch(:final_content)).dig("tokens", "author", "email")).to eq("env@example.test")
+      expect(File.read(File.join(root, "example.gemspec"))).to include('spec.email = ["env@example.test"]')
+      expect(YAML.safe_load_file(File.join(root, ".structuredmerge/kettle-jem.yml")).dig("tokens", "author", "email")).to eq("env@example.test")
+    end
+  end
+
   it "honors forge user template token config and environment overrides" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

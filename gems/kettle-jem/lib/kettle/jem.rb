@@ -4203,7 +4203,7 @@ module Kettle
         return append_used_markdown_link_definitions(processed, resolved)
       end
       if strategy.empty? || strategy == "merge"
-        merged = merge_config_template_source(recipe, resolved, original, facts: facts)
+        merged = merge_config_template_source(recipe, resolved, original, facts: facts, env: env)
         merged = preserve_mise_project_settings(recipe, merged, original, project_root: project_root) if template_file_type(recipe) == :toml
         return sync_kettle_config_env_overrides(merged, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
 
@@ -4729,7 +4729,7 @@ module Kettle
       ensure_trailing_newline(lines.join("\n").gsub(/\n{3,}/, "\n\n").strip)
     end
 
-    def merge_config_template_source(recipe, template_content, destination_content, facts: nil)
+    def merge_config_template_source(recipe, template_content, destination_content, facts: nil, env: ENV)
       file_type = template_file_type(recipe)
       if destination_content.to_s.strip.empty?
         if file_type == :gemfile
@@ -4748,7 +4748,7 @@ module Kettle
 
       case file_type
       when :gemspec
-        return merge_gemspec_template_source(template_content, destination_content, facts: facts)
+        return merge_gemspec_template_source(template_content, destination_content, facts: facts, env: env)
       when :ruby, :gemfile, :rakefile, :appraisals
         merge_result = merge_ruby_template_source(file_type, recipe, template_content, destination_content, facts: facts)
       when :yaml
@@ -5882,11 +5882,12 @@ module Kettle
       Gem::Version.new("#{major}.#{minor}")
     end
 
-    def merge_gemspec_template_source(template_content, destination_content, facts: nil)
+    def merge_gemspec_template_source(template_content, destination_content, facts: nil, env: ENV)
       template_receiver = gemspec_block_param(template_content) || "spec"
       destination_receiver = gemspec_block_param(destination_content) || "spec"
       package_name = facts.dig(:package, :name).to_s if facts
       replacements = gemspec_preserved_assignments(destination_content, receiver: destination_receiver)
+        .except(*env_overridden_gemspec_fields(env))
       normalized_replacements = replacements.to_h do |field, source|
         replacement = normalize_gemspec_receiver(source.rstrip, from: destination_receiver, to: template_receiver)
         [field, normalize_gemspec_project_emoji(replacement, facts, field: field)]
@@ -6196,6 +6197,13 @@ module Kettle
 
         assignments[field] = record.fetch(:source)
       end
+    end
+
+    def env_overridden_gemspec_fields(env)
+      fields = []
+      fields << "authors" if present_template_token_value?(env["KJ_AUTHOR_NAME"].to_s)
+      fields << "email" if present_template_token_value?(env["KJ_AUTHOR_EMAIL"].to_s)
+      fields
     end
 
     def replace_gemspec_assignment_sources(content, replacements, receiver:)
