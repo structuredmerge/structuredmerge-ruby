@@ -588,9 +588,6 @@ module Kettle
           "33.0" => Gem::Version.new("3.3")
         }.freeze
       }.freeze
-      MRI_COMPATIBILITY_BADGE_MIN_VERSION = {
-        "1.8" => Gem::Version.new("1.8.7")
-      }.freeze
       COMPATIBILITY_REFERENCE_LABEL_RE = /\A(?:💎(?:ruby|jruby|truby)-|🚎)/
       ENGINE_ROW_PATTERNS = {
         "jruby" => {
@@ -672,7 +669,7 @@ module Kettle
       def remove_incompatible_compatibility_badges(content, min_ruby)
         markdown_inline_reference_owners(content).flat_map(&:labels).uniq.each do |label|
           badge_min_mri = compatibility_badge_min_mri(label)
-          next unless badge_min_mri && badge_min_mri < min_ruby
+          next unless badge_min_mri && ruby_minor_version(badge_min_mri) < ruby_minor_version(min_ruby)
 
           content = remove_badge_occurrences(content, label)
         end
@@ -682,12 +679,17 @@ module Kettle
 
       def compatibility_badge_min_mri(label)
         if (match = label.match(/\A💎ruby-(?<version>\d+\.\d+)i\z/))
-          MRI_COMPATIBILITY_BADGE_MIN_VERSION.fetch(match[:version]) { Gem::Version.new(match[:version]) }
+          Gem::Version.new(match[:version])
         elsif (match = label.match(/\A💎(?<engine>jruby|truby)-(?<version>\d+\.\d+)i\z/))
           ENGINE_COMPATIBILITY_MRI_VERSION.dig(match[:engine], match[:version])
         end
       rescue
         nil
+      end
+
+      def ruby_minor_version(version)
+        segments = version.segments
+        Gem::Version.new("#{segments[0]}.#{segments[1] || 0}")
       end
 
       def remove_badge_occurrences(content, label)
@@ -7085,6 +7087,10 @@ module Kettle
       remaining
     end
 
+    def ruby_double_quoted_string_body(value)
+      value.to_s.gsub("\\", "\\\\\\").gsub('"', '\"')
+    end
+
     def recipe_report_metadata(recipe)
       metadata = {packaging_recipe: recipe.fetch(:name)}
       metadata[:delete_file] = true if delete_file_recipe?(recipe)
@@ -7895,6 +7901,8 @@ module Kettle
         "KJ|GEM_NAME" => package.fetch(:name).to_s,
         "KJ|PACKAGE_SUMMARY" => package.fetch(:summary, package.fetch(:description, "")).to_s,
         "KJ|PACKAGE_DESCRIPTION" => package.fetch(:description, package.fetch(:summary, "")).to_s,
+        "KJ|GEMSPEC_PACKAGE_SUMMARY" => ruby_double_quoted_string_body(strip_leading_decorative_graphemes(package.fetch(:summary, package.fetch(:description, "")).to_s)),
+        "KJ|GEMSPEC_PACKAGE_DESCRIPTION" => ruby_double_quoted_string_body(strip_leading_decorative_graphemes(package.fetch(:description, package.fetch(:summary, "")).to_s)),
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
         "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require, package.fetch(:name).to_s.tr("-", "/")).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),

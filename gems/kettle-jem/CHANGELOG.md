@@ -177,8 +177,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- README compatibility badge pruning now keeps the Ruby 1.8 badge for gems with
-  a `>= 1.8.7` runtime floor.
+- README compatibility badge pruning now compares Ruby minor series so patch
+  floors like `>= 1.8.7` and `>= 2.2.2` keep their matching minor badges.
+- Gemspec template summary and description tokens now strip an already-present
+  project emoji and escape double quotes before rendering inside Ruby strings.
 - Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
   environment overrides replace destination `spec.email` and `spec.authors`
   metadata instead of preserving stale project fields over resolved template

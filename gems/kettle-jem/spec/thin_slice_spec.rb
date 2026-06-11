@@ -1960,6 +1960,61 @@ RSpec.describe Kettle::Jem do
     expect(template).not_to include("[🚎ruby-2.3-wfi]:")
   end
 
+  it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-patch-floor-badge-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.2.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          engines:
+            - ruby
+          files:
+            README.md:
+              strategy: accept_template
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN
+          # Example
+
+          | Works with MRI Ruby 1 | ![Ruby 1.8 Compat][💎ruby-1.8i] ![Ruby 1.9 Compat][💎ruby-1.9i] |
+          | Works with MRI Ruby 2 | ![Ruby 2.1 Compat][💎ruby-2.1i] ![Ruby 2.2 Compat][💎ruby-2.2i] ![Ruby 2.3 Compat][💎ruby-2.3i] |
+
+          [💎ruby-1.8i]: https://example/ruby-18
+          [💎ruby-1.9i]: https://example/ruby-19
+          [💎ruby-2.1i]: https://example/ruby-21
+          [💎ruby-2.2i]: https://example/ruby-22
+          [💎ruby-2.3i]: https://example/ruby-23
+        MARKDOWN
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = report.fetch(:final_content)
+      ruby_2_line = final_content.lines.find { |line| line.start_with?("| Works with MRI Ruby 2") }
+
+      expect(final_content).not_to include("Works with MRI Ruby 1")
+      expect(ruby_2_line).not_to include("ruby-2.1i")
+      expect(ruby_2_line).to include("ruby-2.2i")
+      expect(ruby_2_line).to include("ruby-2.3i")
+      expect(final_content).not_to match(/^\[💎ruby-2\.1i\]:/)
+      expect(final_content).to match(/^\[💎ruby-2\.2i\]:/)
+      expect(final_content).to match(/^\[💎ruby-2\.3i\]:/)
+    end
+  end
+
   it "keeps the Ruby 1.8 compatibility badge for a Ruby 1.8.7 runtime floor" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -9098,6 +9153,52 @@ RSpec.describe Kettle::Jem do
     output = described_class.merge_gemspec_template_source(template, destination, facts: facts)
 
     expect(output).to include('spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]')
+  end
+
+  it "escapes and de-duplicates emoji in gemspec summary and description tokens" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-description-token", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "🔍️ Find out what your Ruby gems are worth"
+            spec.description = '🔍️ Example uses repeatable scenarios called "appraisals."'
+            spec.homepage = "https://github.com/example/example"
+            spec.required_ruby_version = ">= 2.3.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🔍️
+          files:
+            example.gemspec:
+              strategy: accept_template
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "{KJ|PROJECT_EMOJI} {KJ|GEMSPEC_PACKAGE_SUMMARY}"
+            spec.description = "{KJ|PROJECT_EMOJI} {KJ|GEMSPEC_PACKAGE_DESCRIPTION}"
+            spec.homepage = "https://github.com/example/example"
+          end
+        RUBY
+      })
+
+      described_class.apply_project(root, env: {})
+      gemspec_path = File.join(root, "example.gemspec")
+      gemspec = File.read(gemspec_path)
+
+      expect(gemspec).to include('spec.summary = "🔍️ Find out what your Ruby gems are worth"')
+      expect(gemspec).to include('spec.description = "🔍️ Example uses repeatable scenarios called \"appraisals.\""')
+      expect(gemspec).not_to include("🔍️ 🔍️")
+      expect(Gem::Specification.load(gemspec_path)).not_to be_nil
+    end
   end
 
   it "refreshes README metadata during template-source README application" do
