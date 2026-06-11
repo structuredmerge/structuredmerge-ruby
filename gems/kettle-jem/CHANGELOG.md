@@ -184,6 +184,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templates now remove `version_gem` dependencies and entrypoint references for
   gems whose minimum Ruby is below 2.2 while keeping the standard
   `<Namespace>::Version::VERSION` constant shape.
+- Curated Bundler binstub pruning now keeps any executable owned by the curated
+  binstub gems, so newly added executables such as `kettle-bump` are retained
+  without hardcoding every executable name.
 - Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
   environment overrides replace destination `spec.email` and `spec.authors`
   metadata instead of preserving stale project fields over resolved template
