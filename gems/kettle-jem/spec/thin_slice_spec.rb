@@ -7469,6 +7469,89 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "removes version_gem dependency and entrypoint references under an old Ruby floor" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-remove-version-gem-runtime", tmp_root) do |root|
+      write_tree(root, {
+        "legacy.gemspec" => <<~RUBY,
+          Gem::Specification.new do |gem|
+            gem.name = "legacy"
+            gem.version = "0.1.0"
+            gem.summary = "Legacy gem"
+            gem.homepage = "https://github.com/acme/legacy"
+            gem.required_ruby_version = ">= 1.8.7"
+            gem.add_dependency("version_gem", "~> 1.1", ">= 1.1.10")
+          end
+        RUBY
+        "lib/legacy.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require "version_gem"
+          require_relative "legacy/version"
+
+          module Legacy
+          end
+
+          Legacy::Version.class_eval do
+            extend VersionGem::Basic
+          end
+        RUBY
+        "lib/legacy/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module Legacy
+            module Version
+              VERSION = "0.1.0"
+            end
+            VERSION = Version::VERSION # Traditional Constant Location
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "1.8.7"
+            entrypoint_require: "legacy"
+            namespace: "Legacy"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - legacy.gemspec
+        YAML
+        "template/legacy.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.11")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_legacy_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+      entrypoint_content = File.read(File.join(root, "lib", "legacy.rb"))
+      version_content = File.read(File.join(root, "lib", "legacy", "version.rb"))
+
+      expect(gemspec_content).not_to include("version_gem")
+      expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7"')
+      expect(apply.fetch(:post_apply_steps)).to include(hash_including(
+        name: "version_gem_cleanup",
+        status: "applied",
+        changed_files: ["lib/legacy.rb"]
+      ))
+      expect(entrypoint_content).not_to include("version_gem")
+      expect(entrypoint_content).not_to include("VersionGem")
+      expect(entrypoint_content).to include('require_relative "legacy/version"')
+      expect(version_content).to include("module Version")
+      expect(version_content).to include('VERSION = "0.1.0"')
+      expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
+      expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "preserves missing runtime gemspec dependencies above the development dependency separator" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

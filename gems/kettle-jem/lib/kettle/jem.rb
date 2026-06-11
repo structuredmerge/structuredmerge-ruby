@@ -3326,9 +3326,10 @@ module Kettle
     end
 
     def template_version_gem_bootstrap_step(project_root, report)
+      facts = report.fetch(:facts)
+      return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
       return unless project_gemspec_declares_version_gem?(project_root)
 
-      facts = report.fetch(:facts)
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
@@ -3340,6 +3341,26 @@ module Kettle
         manage_version_file: !templated_paths.include?(version_path),
         manage_signature_file: !templated_paths.include?(signature_path)
       )
+    end
+
+    def version_gem_cleanup_step(project_root, facts)
+      package_name = facts.dig(:package, :name).to_s
+      return {name: "version_gem_cleanup", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
+
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
+      entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      current = read_project_file(project_root, entrypoint_path)
+      return {name: "version_gem_cleanup", status: "already_current", changed_files: []} if current.empty?
+
+      cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
+      changed = write_if_changed(project_root, entrypoint_path, cleaned)
+      {
+        name: "version_gem_cleanup",
+        status: changed ? "applied" : "already_current",
+        changed_files: changed ? [changed] : [],
+        entrypoint_path: entrypoint_path
+      }
     end
 
     def project_gemspec_version(project_root)
@@ -8665,6 +8686,43 @@ module Kettle
         updated += "\n#{version_gem_class_eval_block(namespace)}"
       end
       collapse_excess_blank_lines(updated)
+    end
+
+    def version_gem_free_entrypoint_content(content, entrypoint_require:)
+      current = remove_version_gem_entrypoint_references(content)
+      relative_path = File.join(File.basename(entrypoint_require), "version")
+      return collapse_excess_blank_lines(current) if ruby_top_level_require?(current, "require_relative", relative_path)
+
+      lines = current.lines
+      lines.insert(version_gem_require_insertion_index(current), %(require_relative "#{relative_path}"\n), "\n")
+      collapse_excess_blank_lines(lines.join)
+    end
+
+    def remove_version_gem_entrypoint_references(content)
+      selectors = []
+      top_level_ruby_call_records(content, :require).each do |call|
+        next unless ruby_string_argument(call) == "version_gem"
+
+        selectors << {start_line: call.location.start_line, end_line: call.location.end_line}
+      end
+      top_level_ruby_call_records(content, :class_eval).each do |call|
+        next unless version_gem_class_eval_call?(call)
+
+        selectors << {start_line: call.location.start_line, end_line: call.location.end_line}
+      end
+      return content.to_s if selectors.empty?
+
+      collapse_excess_blank_lines(delete_line_ranges(content.to_s, selectors))
+    end
+
+    def version_gem_class_eval_call?(call)
+      call.receiver&.slice.to_s.end_with?("::Version") &&
+        call.block&.body&.body.to_a.any? do |child|
+          child.is_a?(::Prism::CallNode) &&
+            child.receiver.nil? &&
+            child.name == :extend &&
+            child.arguments&.arguments&.first&.slice == "VersionGem::Basic"
+        end
     end
 
     def version_gem_require_insertion_index(content, after_version_gem: false)

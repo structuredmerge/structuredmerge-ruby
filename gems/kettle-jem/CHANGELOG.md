@@ -181,6 +181,9 @@ Please file a bug if you notice a violation of semantic versioning.
   floors like `>= 1.8.7` and `>= 2.2.2` keep their matching minor badges.
 - Gemspec template summary and description tokens now strip an already-present
   project emoji and escape double quotes before rendering inside Ruby strings.
+- Templates now remove `version_gem` dependencies and entrypoint references for
+  gems whose minimum Ruby is below 2.2 while keeping the standard
+  `<Namespace>::Version::VERSION` constant shape.
 - Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
   environment overrides replace destination `spec.email` and `spec.authors`
   metadata instead of preserving stale project fields over resolved template
