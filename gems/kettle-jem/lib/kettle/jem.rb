@@ -8728,11 +8728,11 @@ module Kettle
     def version_gem_free_entrypoint_content(content, entrypoint_require:)
       current = remove_version_gem_entrypoint_references(content)
       relative_path = File.join(File.basename(entrypoint_require), "version")
-      return collapse_excess_blank_lines(current) if ruby_top_level_require?(current, "require_relative", relative_path)
+      return trim_trailing_blank_lines(collapse_excess_blank_lines(current)) if ruby_top_level_require?(current, "require_relative", relative_path)
 
       lines = current.lines
       lines.insert(version_gem_require_insertion_index(current), %(require_relative "#{relative_path}"\n), "\n")
-      collapse_excess_blank_lines(lines.join)
+      trim_trailing_blank_lines(collapse_excess_blank_lines(lines.join))
     end
 
     def remove_version_gem_entrypoint_references(content)
@@ -8803,6 +8803,12 @@ module Kettle
         end
         line
       end.join
+    end
+
+    def trim_trailing_blank_lines(content)
+      lines = content.to_s.lines
+      lines.pop while lines.last&.strip == ""
+      ensure_trailing_newline(lines.join)
     end
 
     def version_gem_class_eval_block(namespace)

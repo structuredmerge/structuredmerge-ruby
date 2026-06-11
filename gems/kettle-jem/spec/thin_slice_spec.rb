@@ -7568,6 +7568,7 @@ RSpec.describe Kettle::Jem do
       expect(entrypoint_content).not_to include("version_gem")
       expect(entrypoint_content).not_to include("VersionGem")
       expect(entrypoint_content).to include('require_relative "legacy/version"')
+      expect(entrypoint_content).not_to end_with("\n\n")
       expect(version_content).to include("module Version")
       expect(version_content).to include('VERSION = "0.1.0"')
       expect(version_content).to include("VERSION = Version::VERSION # Traditional Constant Location")
