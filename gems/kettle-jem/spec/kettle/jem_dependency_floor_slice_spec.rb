@@ -54,6 +54,15 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example"
         ]
       },
+      "rubocop-gradual" => {
+        declaration_names: ["rubocop-gradual"],
+        requirement_args: %("~> 0.4", ">= 0.4.0"),
+        lock_version: "0.4.0",
+        requirement_surfaces: [
+          "gemfiles/modular/style.gemfile",
+          "lib/kettle/jem/templates/gemfiles/modular/style.gemfile.example"
+        ]
+      },
       "nomono" => {
         declaration_names: ["nomono"],
         requirement_args: %("~> 1.0", ">= 1.0.3"),
