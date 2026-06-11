@@ -100,27 +100,11 @@
         </dt>
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>appraisal2</span><span class='words_sep'> </span><span class='tstring_content'>rake</span><span class='words_sep'> </span><span class='tstring_content'>rbs</span><span class='words_sep'> </span><span class='tstring_content'>rspec-core</span><span class='words_sep'> </span><span class='tstring_content'>yard</span><span class='words_sep'> </span><span class='tstring_content'>kettle-dev</span><span class='words_sep'> </span><span class='tstring_content'>kettle-test</span><span class='words_sep'> </span><span class='tstring_content'>kettle-soup-cover</span><span class='words_sep'> </span><span class='tstring_content'>stone_checksums</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
-        <dt id="CURATED_BINSTUB_EXECUTABLES-constant" class="">CURATED_BINSTUB_EXECUTABLES =
+        <dt id="CURATED_BINSTUB_DISCRETE_EXECUTABLES-constant" class="">CURATED_BINSTUB_DISCRETE_EXECUTABLES =
           
         </dt>
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>appraisal</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>gem_checksums</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-changelog</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-check-eof</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-commit-msg</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-dev-setup</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>kettle-drift</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-dvcs</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-gh-release</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-pre-release</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-readme-backers</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-release</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-soup-cover</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>kettle-test</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>rake</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>rbs</span><span class='words_sep'>
-</span><span class='words_sep'>  </span><span class='tstring_content'>rspec</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>yard</span><span class='words_sep'>
 </span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
       
@@ -303,6 +287,29 @@
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#bundler_binstub_gem_name-class_method" title="bundler_binstub_gem_name (class method)">.<strong>bundler_binstub_gem_name</strong>(path)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#bundler_generated_binstub%3F-class_method" title="bundler_generated_binstub? (class method)">.<strong>bundler_generated_binstub?</strong>(path)  &#x21d2; Boolean </a>
     
 
@@ -396,6 +403,29 @@
   <span class="summary_signature">
     
       <a href="#conflicting_git_attribute_diagnostics-class_method" title="conflicting_git_attribute_diagnostics (class method)">.<strong>conflicting_git_attribute_diagnostics</strong>(content, updates, managed_block:)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#curated_binstub%3F-class_method" title="curated_binstub? (class method)">.<strong>curated_binstub?</strong>(path)  &#x21d2; Boolean </a>
     
 
     
@@ -2441,14 +2471,14 @@
       <pre class="lines">
 
 
-1369
-1370
-1371
-1372
-1373</pre>
+1376
+1377
+1378
+1379
+1380</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1369</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1376</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bin_setup_command'>bin_setup_command</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_command'>command</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setup</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rbracket'>]</span>
@@ -2475,22 +2505,22 @@
       <pre class="lines">
 
 
-799
-800
-801
-802
-803
-804
-805
-806
-807
-808
-809
-810
-811</pre>
+782
+783
+784
+785
+786
+787
+788
+789
+790
+791
+792
+793
+794</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 799</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 782</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_binstub_files'>binstub_files</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_directory?'>directory?</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='rparen'>)</span>
@@ -2525,13 +2555,6 @@
       <pre class="lines">
 
 
-1292
-1293
-1294
-1295
-1296
-1297
-1298
 1299
 1300
 1301
@@ -2561,10 +2584,17 @@
 1325
 1326
 1327
-1328</pre>
+1328
+1329
+1330
+1331
+1332
+1333
+1334
+1335</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1292</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1299</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bootstrap_commit_step'>bootstrap_commit_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>run_options:</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_value_to_boolean'><span class='object_link'><a href="../DecisionPolicy.html#value_to_boolean-class_method" title="Kettle::Jem::DecisionPolicy.value_to_boolean (method)">value_to_boolean</a></span></span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:skip_commit</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -2623,12 +2653,12 @@
       <pre class="lines">
 
 
-622
-623
-624</pre>
+606
+607
+608</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 622</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 606</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bundle_binstubs_command'>bundle_binstubs_command</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>bundle</span><span class='words_sep'> </span><span class='tstring_content'>binstubs</span><span class='tstring_end'>]</span></span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_GEMS-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_GEMS (constant)">CURATED_BINSTUB_GEMS</a></span></span>
@@ -2653,13 +2683,6 @@
       <pre class="lines">
 
 
-1265
-1266
-1267
-1268
-1269
-1270
-1271
 1272
 1273
 1274
@@ -2678,10 +2701,17 @@
 1287
 1288
 1289
-1290</pre>
+1290
+1291
+1292
+1293
+1294
+1295
+1296
+1297</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1265</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1272</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bundled_handoff_step'>bundled_handoff_step</span><span class='lparen'>(</span><span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>run_options:</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_value_to_boolean'><span class='object_link'><a href="../DecisionPolicy.html#value_to_boolean-class_method" title="Kettle::Jem::DecisionPolicy.value_to_boolean (method)">value_to_boolean</a></span></span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:bootstrap_mode</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -2708,6 +2738,60 @@
     <span class='label'>status:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>reason:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready_for_orchestration</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="bundler_binstub_gem_name-class_method">
+  
+    .<strong>bundler_binstub_gem_name</strong>(path)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+810
+811
+812
+813
+814
+815
+816
+817
+818
+819
+820
+821
+822
+823
+824</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 810</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_bundler_binstub_gem_name'>bundler_binstub_gem_name</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_content'>content</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This file was generated by Bundler</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+  <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ruby_call_records'><span class='object_link'><a href="../../Jem.html#ruby_call_records-class_method" title="Kettle::Jem.ruby_call_records (method)">ruby_call_records</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='symbol'>:bin_path</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_call'>call</span><span class='op'>|</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_call'>call</span><span class='period'>.</span><span class='id identifier rubyid_receiver'>receiver</span><span class='op'>&amp;.</span><span class='id identifier rubyid_slice'>slice</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Gem</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_argument'>argument</span> <span class='op'>=</span> <span class='id identifier rubyid_call'>call</span><span class='period'>.</span><span class='id identifier rubyid_arguments'>arguments</span><span class='op'>&amp;.</span><span class='id identifier rubyid_arguments'>arguments</span><span class='op'>&amp;.</span><span class='id identifier rubyid_first'>first</span>
+    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_argument'>argument</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>Prism</span><span class='op'>::</span><span class='const'>StringNode</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_argument'>argument</span><span class='period'>.</span><span class='id identifier rubyid_unescaped'>unescaped</span>
+  <span class='kw'>end</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
+<span class='kw'>rescue</span>
+  <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2752,14 +2836,14 @@
       <pre class="lines">
 
 
-813
-814
-815
-816
-817</pre>
+804
+805
+806
+807
+808</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 813</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 804</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_bundler_generated_binstub?'>bundler_generated_binstub?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_read'>read</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='int'>512</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>This file was generated by Bundler</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2786,25 +2870,25 @@
       <pre class="lines">
 
 
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296</pre>
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 281</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 265</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_cleanup_legacy_ruby_version_files'>cleanup_legacy_ruby_version_files</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>mise.toml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -2865,16 +2949,16 @@
       <pre class="lines">
 
 
-89
-90
-91
-92
-93
-94
-95</pre>
+73
+74
+75
+76
+77
+78
+79</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 89</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 73</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_config_bootstrap_changed?'>config_bootstrap_changed?</span><span class='lparen'>(</span><span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:recipe_reports</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_recipe_report'>recipe_report</span><span class='op'>|</span>
@@ -2903,22 +2987,22 @@
       <pre class="lines">
 
 
-376
-377
-378
-379
-380
-381
-382
-383
-384
-385
-386
-387
-388</pre>
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 376</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 360</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_configured_project_grapheme'>configured_project_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_env_value'>env_value</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KJ_PROJECT_EMOJI</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
@@ -2953,13 +3037,6 @@
       <pre class="lines">
 
 
-1236
-1237
-1238
-1239
-1240
-1241
-1242
 1243
 1244
 1245
@@ -2968,10 +3045,17 @@
 1248
 1249
 1250
-1251</pre>
+1251
+1252
+1253
+1254
+1255
+1256
+1257
+1258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1236</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1243</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_conflicting_git_attribute_diagnostics'>conflicting_git_attribute_diagnostics</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_updates'>updates</span><span class='comma'>,</span> <span class='label'>managed_block:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_git_attribute_managed_block'>remove_git_attribute_managed_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>managed_block:</span> <span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:lines</span><span class='rparen'>)</span>
@@ -2988,6 +3072,67 @@
       <span class='label'>line:</span> <span class='id identifier rubyid_conflict'>conflict</span>
     <span class='rbrace'>}</span>
   <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="curated_binstub?-class_method">
+  
+    .<strong>curated_binstub?</strong>(path)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+796
+797
+798
+799
+800
+801
+802</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 796</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_curated_binstub?'>curated_binstub?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_basename'>basename</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_basename'>basename</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='kw'>return</span> <span class='kw'>true</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_DISCRETE_EXECUTABLES-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_DISCRETE_EXECUTABLES (constant)">CURATED_BINSTUB_DISCRETE_EXECUTABLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_basename'>basename</span><span class='rparen'>)</span>
+
+  <span class='id identifier rubyid_gem_name'>gem_name</span> <span class='op'>=</span> <span class='id identifier rubyid_bundler_binstub_gem_name'>bundler_binstub_gem_name</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='op'>!</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>&amp;&amp;</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_GEMS-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_GEMS (constant)">CURATED_BINSTUB_GEMS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_gem_name'>gem_name</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3032,15 +3177,15 @@
       <pre class="lines">
 
 
-457
-458
-459
-460
-461
-462</pre>
+441
+442
+443
+444
+445
+446</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 457</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 441</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_decorative_grapheme?'>decorative_grapheme?</span><span class='lparen'>(</span><span class='id identifier rubyid_grapheme'>grapheme</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_grapheme'>grapheme</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -3068,18 +3213,18 @@
       <pre class="lines">
 
 
-1114
-1115
-1116
-1117
-1118
-1119
-1120
 1121
-1122</pre>
+1122
+1123
+1124
+1125
+1126
+1127
+1128
+1129</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1114</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1121</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_default_git_driver_global_commands'>default_git_driver_global_commands</span>
   <span class='const'><span class='object_link'><a href="#DEFAULT_GIT_DRIVER_DEFINITIONS-constant" title="Kettle::Jem::Tasks::InstallTask::DEFAULT_GIT_DRIVER_DEFINITIONS (constant)">DEFAULT_GIT_DRIVER_DEFINITIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_definition'>definition</span><span class='op'>|</span>
@@ -3110,15 +3255,15 @@
       <pre class="lines">
 
 
-164
-165
-166
-167
-168
-169</pre>
+148
+149
+150
+151
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 164</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 148</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_development_dependency_names'>development_dependency_names</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_gemspec_dependency_records'><span class='object_link'><a href="../../Jem.html#gemspec_dependency_records-class_method" title="Kettle::Jem.gemspec_dependency_records (method)">gemspec_dependency_records</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
@@ -3169,15 +3314,15 @@
       <pre class="lines">
 
 
-1229
-1230
-1231
-1232
-1233
-1234</pre>
+1236
+1237
+1238
+1239
+1240
+1241</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1229</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1236</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_dirty_git_attribute_managed_block?'>dirty_git_attribute_managed_block?</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_git_attribute_block_start'>git_attribute_block_start</span><span class='lparen'>(</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span>
@@ -3205,22 +3350,22 @@
       <pre class="lines">
 
 
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233</pre>
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 221</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 205</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_bin_setup_executable'>ensure_bin_setup_executable</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setup</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -3255,45 +3400,43 @@
       <pre class="lines">
 
 
+744
+745
+746
+747
+748
+749
+750
+751
+752
+753
+754
+755
+756
+757
+758
+759
 760
-761
-762
-763
-764
-765
-766
-767
-768
-769
-770
-771
-772
-773
-774
-775
-776
-777
-778</pre>
+761</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 760</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 744</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_curated_binstubs_executable'>ensure_curated_binstubs_executable</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_bin_dir'>bin_dir</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
-  <span class='id identifier rubyid_updated'>updated</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_EXECUTABLES-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_EXECUTABLES (constant)">CURATED_BINSTUB_EXECUTABLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_basename'>basename</span><span class='op'>|</span>
-    <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_basename'>basename</span><span class='rparen'>)</span>
-    <span class='kw'>next</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_executable_binstubs'>executable_binstubs</span> <span class='op'>=</span> <span class='id identifier rubyid_binstub_files'>binstub_files</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='id identifier rubyid_curated_binstub?'>curated_binstub?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+  <span class='id identifier rubyid_updated'>updated</span> <span class='op'>=</span> <span class='id identifier rubyid_executable_binstubs'>executable_binstubs</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span>
     <span class='kw'>next</span> <span class='kw'>if</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_executable?'>executable?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
 
     <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_chmod'>chmod</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>+x</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_basename'>basename</span>
+    <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_basename'>basename</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
 
   <span class='lbrace'>{</span>
     <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>curated_binstubs_executable</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>status:</span> <span class='id identifier rubyid_updated'>updated</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>already_executable</span><span class='tstring_end'>&quot;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>updated</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
     <span class='label'>path:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-    <span class='label'>executable_binstubs:</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_EXECUTABLES-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_EXECUTABLES (constant)">CURATED_BINSTUB_EXECUTABLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_basename'>basename</span><span class='op'>|</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='comma'>,</span> <span class='id identifier rubyid_basename'>basename</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
+    <span class='label'>executable_binstubs:</span> <span class='id identifier rubyid_executable_binstubs'>executable_binstubs</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_basename'>basename</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='comma'>,</span>
     <span class='label'>updated_binstubs:</span> <span class='id identifier rubyid_updated'>updated</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span>
   <span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
@@ -3317,6 +3460,22 @@
       <pre class="lines">
 
 
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562
+563
+564
 565
 566
 567
@@ -3327,26 +3486,10 @@
 572
 573
 574
-575
-576
-577
-578
-579
-580
-581
-582
-583
-584
-585
-586
-587
-588
-589
-590
-591</pre>
+575</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 565</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 549</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_env_local_gitignore'>ensure_env_local_gitignore</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_file?'>file?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.env.local.example</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -3418,13 +3561,6 @@
       <pre class="lines">
 
 
-1503
-1504
-1505
-1506
-1507
-1508
-1509
 1510
 1511
 1512
@@ -3437,10 +3573,17 @@
 1519
 1520
 1521
-1522</pre>
+1522
+1523
+1524
+1525
+1526
+1527
+1528
+1529</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1503</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1510</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_git_drivers_check_step'>execute_git_drivers_check_step</span><span class='lparen'>(</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_missing'>missing</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -3482,13 +3625,6 @@
       <pre class="lines">
 
 
-1454
-1455
-1456
-1457
-1458
-1459
-1460
 1461
 1462
 1463
@@ -3529,10 +3665,17 @@
 1498
 1499
 1500
-1501</pre>
+1501
+1502
+1503
+1504
+1505
+1506
+1507
+1508</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1454</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1461</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_git_drivers_step'>execute_git_drivers_step</span><span class='lparen'>(</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_step'>step</span> <span class='kw'>unless</span> <span class='id identifier rubyid_step'>step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready</span><span class='tstring_end'>&quot;</span></span>
@@ -3602,13 +3745,6 @@
       <pre class="lines">
 
 
-1436
-1437
-1438
-1439
-1440
-1441
-1442
 1443
 1444
 1445
@@ -3618,10 +3754,17 @@
 1449
 1450
 1451
-1452</pre>
+1452
+1453
+1454
+1455
+1456
+1457
+1458
+1459</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1436</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1443</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_hook_templates_step'>execute_hook_templates_step</span><span class='lparen'>(</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_step'>step</span> <span class='kw'>unless</span> <span class='id identifier rubyid_step'>step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready</span><span class='tstring_end'>&quot;</span></span>
@@ -3660,13 +3803,6 @@
       <pre class="lines">
 
 
-833
-834
-835
-836
-837
-838
-839
 840
 841
 842
@@ -3680,10 +3816,17 @@
 850
 851
 852
-853</pre>
+853
+854
+855
+856
+857
+858
+859
+860</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 833</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 840</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_orchestration_steps'>execute_orchestration_steps</span><span class='lparen'>(</span><span class='id identifier rubyid_install_steps'>install_steps</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>run_options:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_quiet'>quiet</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_value_to_boolean'><span class='object_link'><a href="../DecisionPolicy.html#value_to_boolean-class_method" title="Kettle::Jem::DecisionPolicy.value_to_boolean (method)">value_to_boolean</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span><span class='lbracket'>[</span><span class='symbol'>:quiet</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -3749,13 +3892,6 @@
       <pre class="lines">
 
 
-1399
-1400
-1401
-1402
-1403
-1404
-1405
 1406
 1407
 1408
@@ -3763,10 +3899,17 @@
 1410
 1411
 1412
-1413</pre>
+1413
+1414
+1415
+1416
+1417
+1418
+1419
+1420</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1399</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1406</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_ready_command_step'>execute_ready_command_step</span><span class='lparen'>(</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_step'>step</span> <span class='kw'>unless</span> <span class='id identifier rubyid_step'>step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready</span><span class='tstring_end'>&quot;</span></span>
@@ -3803,13 +3946,6 @@
       <pre class="lines">
 
 
-1415
-1416
-1417
-1418
-1419
-1420
-1421
 1422
 1423
 1424
@@ -3822,10 +3958,17 @@
 1431
 1432
 1433
-1434</pre>
+1434
+1435
+1436
+1437
+1438
+1439
+1440
+1441</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1415</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1422</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_execute_ready_commands_step'>execute_ready_commands_step</span><span class='lparen'>(</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_step'>step</span> <span class='kw'>unless</span> <span class='id identifier rubyid_step'>step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:status</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ready</span><span class='tstring_end'>&quot;</span></span>
@@ -3867,12 +4010,12 @@
       <pre class="lines">
 
 
-453
-454
-455</pre>
+437
+438
+439</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 453</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 437</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_first_grapheme'>first_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='lbracket'>[</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\X</span><span class='regexp_end'>/u</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -3897,20 +4040,20 @@
       <pre class="lines">
 
 
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87</pre>
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 77</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 61</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_followup_apply_after_config_bootstrap'>followup_apply_after_config_bootstrap</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>run_options:</span><span class='comma'>,</span> <span class='label'>report:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_report'>report</span> <span class='kw'>unless</span> <span class='id identifier rubyid_config_bootstrap_changed?'>config_bootstrap_changed?</span><span class='lparen'>(</span><span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
@@ -3943,28 +4086,28 @@
       <pre class="lines">
 
 
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
 144
 145
-146
-147
-148
-149
-150
-151
-152
-153
-154
-155
-156
-157
-158
-159
-160
-161
-162</pre>
+146</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 144</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 128</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gemspec_dependency_sync_step'>gemspec_dependency_sync_step</span><span class='lparen'>(</span><span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_gemspec_report'>gemspec_report</span> <span class='op'>=</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:recipe_reports</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_recipe_report'>recipe_report</span><span class='op'>|</span>
@@ -4005,25 +4148,25 @@
       <pre class="lines">
 
 
-414
-415
-416
-417
-418
-419
-420
-421
-422
-423
-424
-425
-426
-427
-428
-429</pre>
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 414</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 398</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gemspec_grapheme_assignment_replacements'>gemspec_grapheme_assignment_replacements</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_grapheme'>grapheme</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_ruby_call_records'><span class='object_link'><a href="../../Jem.html#ruby_call_records-class_method" title="Kettle::Jem.ruby_call_records (method)">ruby_call_records</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_call'>call</span><span class='op'>|</span>
@@ -4061,15 +4204,15 @@
       <pre class="lines">
 
 
-558
-559
-560
-561
-562
-563</pre>
+542
+543
+544
+545
+546
+547</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 558</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 542</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_gemspec_name'>gemspec_name</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_gemspec_path'>gemspec_path</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_gemspec_assignment_records'><span class='object_link'><a href="../../Jem.html#gemspec_assignment_records-class_method" title="Kettle::Jem.gemspec_assignment_records (method)">gemspec_assignment_records</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>receiver:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>spec</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -4097,12 +4240,12 @@
       <pre class="lines">
 
 
-1574
-1575
-1576</pre>
+1581
+1582
+1583</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1574</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1581</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_attribute_block_end'>git_attribute_block_end</span><span class='lparen'>(</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># &lt;&lt;/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;&gt;</span><span class='tstring_end'>&quot;</span></span>
@@ -4127,12 +4270,12 @@
       <pre class="lines">
 
 
-1570
-1571
-1572</pre>
+1577
+1578
+1579</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1570</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1577</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_attribute_block_start'>git_attribute_block_start</span><span class='lparen'>(</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># &lt;&lt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;&gt; do not edit below this line</span><span class='tstring_end'>&quot;</span></span>
@@ -4180,20 +4323,20 @@
       <pre class="lines">
 
 
-1253
-1254
-1255
-1256
-1257
-1258
-1259
 1260
 1261
 1262
-1263</pre>
+1263
+1264
+1265
+1266
+1267
+1268
+1269
+1270</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1253</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_attribute_line_conflicts?'>git_attribute_line_conflicts?</span><span class='lparen'>(</span><span class='id identifier rubyid_line'>line</span><span class='comma'>,</span> <span class='id identifier rubyid_update'>update</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_parts'>parts</span> <span class='op'>=</span> <span class='id identifier rubyid_line'>line</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span>
@@ -4226,13 +4369,6 @@
       <pre class="lines">
 
 
-1210
-1211
-1212
-1213
-1214
-1215
-1216
 1217
 1218
 1219
@@ -4243,10 +4379,17 @@
 1224
 1225
 1226
-1227</pre>
+1227
+1228
+1229
+1230
+1231
+1232
+1233
+1234</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1210</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1217</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_attribute_diagnostics'>git_driver_attribute_diagnostics</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_updates'>updates</span><span class='comma'>,</span> <span class='label'>managed_block:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -4286,15 +4429,15 @@
       <pre class="lines">
 
 
-1203
-1204
-1205
-1206
-1207
-1208</pre>
+1210
+1211
+1212
+1213
+1214
+1215</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1203</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1210</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_attribute_reason'>git_driver_attribute_reason</span><span class='lparen'>(</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='comma'>,</span> <span class='label'>dry_run:</span><span class='comma'>,</span> <span class='label'>ready:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git_driver_attribute_conflict</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='op'>|</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:key</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>conflicting_attributes</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
@@ -4322,14 +4465,14 @@
       <pre class="lines">
 
 
-1197
-1198
-1199
-1200
-1201</pre>
+1204
+1205
+1206
+1207
+1208</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1197</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1204</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_attribute_status'>git_driver_attribute_status</span><span class='lparen'>(</span><span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='comma'>,</span> <span class='label'>dry_run:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>blocked</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_diagnostics'>diagnostics</span><span class='period'>.</span><span class='id identifier rubyid_any?'>any?</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='op'>|</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:blocking</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -4356,19 +4499,19 @@
       <pre class="lines">
 
 
-1088
-1089
-1090
-1091
-1092
-1093
-1094
 1095
 1096
-1097</pre>
+1097
+1098
+1099
+1100
+1101
+1102
+1103
+1104</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1088</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1095</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_attribute_updates'>git_driver_attribute_updates</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile_hash'>profile_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_git_driver_manifest_profile'>git_driver_manifest_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span>
@@ -4400,17 +4543,17 @@
       <pre class="lines">
 
 
-1079
-1080
-1081
-1082
-1083
-1084
-1085
-1086</pre>
+1086
+1087
+1088
+1089
+1090
+1091
+1092
+1093</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1079</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1086</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_forge_warning_diagnostic'>git_driver_forge_warning_diagnostic</span>
   <span class='lbrace'>{</span>
@@ -4440,17 +4583,17 @@
       <pre class="lines">
 
 
-1099
-1100
-1101
-1102
-1103
-1104
-1105
-1106</pre>
+1106
+1107
+1108
+1109
+1110
+1111
+1112
+1113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1099</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1106</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_global_commands'>git_driver_global_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>semantic-diff</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_profile_hash'>profile_hash</span> <span class='op'>=</span> <span class='id identifier rubyid_git_driver_manifest_profile'>git_driver_manifest_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span>
@@ -4480,14 +4623,14 @@
       <pre class="lines">
 
 
-1134
-1135
-1136
-1137
-1138</pre>
+1141
+1142
+1143
+1144
+1145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1134</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1141</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_global_config_checks'>git_driver_global_config_checks</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>semantic-diff</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_git_driver_global_commands'>git_driver_global_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_command'>command</span><span class='op'>|</span>
@@ -4514,18 +4657,18 @@
       <pre class="lines">
 
 
-1124
-1125
-1126
-1127
-1128
-1129
-1130
 1131
-1132</pre>
+1132
+1133
+1134
+1135
+1136
+1137
+1138
+1139</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1124</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1131</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_global_unset_commands'>git_driver_global_unset_commands</span>
   <span class='const'><span class='object_link'><a href="#DEFAULT_GIT_DRIVER_DEFINITIONS-constant" title="Kettle::Jem::Tasks::InstallTask::DEFAULT_GIT_DRIVER_DEFINITIONS (constant)">DEFAULT_GIT_DRIVER_DEFINITIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_definition'>definition</span><span class='op'>|</span>
@@ -4556,14 +4699,14 @@
       <pre class="lines">
 
 
-1108
-1109
-1110
-1111
-1112</pre>
+1115
+1116
+1117
+1118
+1119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1108</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1115</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_local_commands'>git_driver_local_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>semantic-diff</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_git_driver_global_commands'>git_driver_global_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_command'>command</span><span class='op'>|</span>
@@ -4590,14 +4733,14 @@
       <pre class="lines">
 
 
-1140
-1141
-1142
-1143
-1144</pre>
+1147
+1148
+1149
+1150
+1151</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1140</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1147</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_local_config_checks'>git_driver_local_config_checks</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>semantic-diff</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_git_driver_local_commands'>git_driver_local_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_command'>command</span><span class='op'>|</span>
@@ -4624,19 +4767,19 @@
       <pre class="lines">
 
 
-1146
-1147
-1148
-1149
-1150
-1151
-1152
 1153
 1154
-1155</pre>
+1155
+1156
+1157
+1158
+1159
+1160
+1161
+1162</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1146</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_manifest'>git_driver_manifest</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.structuredmerge</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git-drivers.toml</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -4668,14 +4811,14 @@
       <pre class="lines">
 
 
-1157
-1158
-1159
-1160
-1161</pre>
+1164
+1165
+1166
+1167
+1168</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1157</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1164</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_driver_manifest_profile'>git_driver_manifest_profile</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>unless</span> <span class='id identifier rubyid_manifest'>manifest</span>
@@ -4702,13 +4845,6 @@
       <pre class="lines">
 
 
-959
-960
-961
-962
-963
-964
-965
 966
 967
 968
@@ -4796,10 +4932,17 @@
 1050
 1051
 1052
-1053</pre>
+1053
+1054
+1055
+1056
+1057
+1058
+1059
+1060</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 959</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 966</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_drivers_step'>git_drivers_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_mode'>mode</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_git_drivers_mode'>normalize_git_drivers_mode</span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:git_drivers</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -4916,13 +5059,13 @@
       <pre class="lines">
 
 
-1335
-1336
-1337
-1338</pre>
+1342
+1343
+1344
+1345</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1335</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1342</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_output'>git_output</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid__stderr'>_stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='const'>Open3</span><span class='period'>.</span><span class='id identifier rubyid_capture3'>capture3</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-C</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -4971,13 +5114,13 @@
       <pre class="lines">
 
 
-1330
-1331
-1332
-1333</pre>
+1337
+1338
+1339
+1340</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1330</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1337</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_success?'>git_success?</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
   <span class='id identifier rubyid__stdout'>_stdout</span><span class='comma'>,</span> <span class='id identifier rubyid__stderr'>_stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='const'>Open3</span><span class='period'>.</span><span class='id identifier rubyid_capture3'>capture3</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-C</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='rparen'>)</span>
@@ -5003,13 +5146,13 @@
       <pre class="lines">
 
 
-819
-820
-821
-822</pre>
+826
+827
+828
+829</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 819</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 826</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_git_toplevel'>git_toplevel</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid__stderr'>_stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='const'>Open3</span><span class='period'>.</span><span class='id identifier rubyid_capture3'>capture3</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-C</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rev-parse</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>--show-toplevel</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -5035,16 +5178,16 @@
       <pre class="lines">
 
 
-532
-533
-534
-535
-536
-537
-538</pre>
+516
+517
+518
+519
+520
+521
+522</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 532</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 516</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_github_org_from_env'>github_org_from_env</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>FORGE_ORG</span><span class='words_sep'> </span><span class='tstring_content'>KJ_GH_USER</span><span class='words_sep'> </span><span class='tstring_content'>GITHUB_ORG</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span>
@@ -5073,26 +5216,26 @@
       <pre class="lines">
 
 
-540
-541
-542
-543
-544
-545
-546
-547
-548
-549
-550
-551
-552
-553
-554
-555
-556</pre>
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 540</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 524</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_github_org_from_origin'>github_org_from_origin</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid__stderr'>_stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='const'>Open3</span><span class='period'>.</span><span class='id identifier rubyid_capture3'>capture3</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>git</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-C</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>remote</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>get-url</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>origin</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -5131,17 +5274,17 @@
       <pre class="lines">
 
 
-333
-334
-335
-336
-337
-338
-339
-340</pre>
+317
+318
+319
+320
+321
+322
+323
+324</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 333</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 317</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_github_workflow_paths'>github_workflow_paths</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_workflow_root'>workflow_root</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.github</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>workflows</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -5171,13 +5314,6 @@
       <pre class="lines">
 
 
-1340
-1341
-1342
-1343
-1344
-1345
-1346
 1347
 1348
 1349
@@ -5189,10 +5325,17 @@
 1355
 1356
 1357
-1358</pre>
+1358
+1359
+1360
+1361
+1362
+1363
+1364
+1365</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1340</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1347</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_handoff_argv'>handoff_argv</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -5233,13 +5376,6 @@
       <pre class="lines">
 
 
-876
-877
-878
-879
-880
-881
-882
 883
 884
 885
@@ -5270,10 +5406,17 @@
 910
 911
 912
-913</pre>
+913
+914
+915
+916
+917
+918
+919
+920</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 876</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 883</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hook_templates_step'>hook_templates_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_mode'>mode</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_hook_templates_mode'>normalize_hook_templates_mode</span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:hook_templates</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -5333,6 +5476,22 @@
       <pre class="lines">
 
 
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
 176
 177
 178
@@ -5349,26 +5508,10 @@
 189
 190
 191
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201
-202
-203
-204
-205
-206
-207
-208</pre>
+192</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 176</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 160</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_install_phase_reports'>install_phase_reports</span><span class='lparen'>(</span><span class='id identifier rubyid_install_steps'>install_steps</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_phases'>phases</span> <span class='op'>=</span> <span class='lbrace'>{</span>
@@ -5423,12 +5566,12 @@
       <pre class="lines">
 
 
-73
-74
-75</pre>
+57
+58
+59</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 57</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_install_run_options'>install_run_options</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
   <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="TemplateTask.html" title="Kettle::Jem::Tasks::TemplateTask (module)">TemplateTask</a></span></span><span class='period'>.</span><span class='id identifier rubyid_env_run_options'><span class='object_link'><a href="TemplateTask.html#env_run_options-class_method" title="Kettle::Jem::Tasks::TemplateTask.env_run_options (method)">env_run_options</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
@@ -5453,19 +5596,19 @@
       <pre class="lines">
 
 
-210
-211
-212
-213
-214
-215
-216
-217
-218
-219</pre>
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 210</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 194</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_install_step_summary'>install_step_summary</span><span class='lparen'>(</span><span class='id identifier rubyid_install_steps'>install_steps</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_statuses'>statuses</span> <span class='op'>=</span> <span class='id identifier rubyid_install_steps'>install_steps</span><span class='period'>.</span><span class='id identifier rubyid_each_with_object'>each_with_object</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_step'>step</span><span class='comma'>,</span> <span class='id identifier rubyid_counts'>counts</span><span class='op'>|</span>
@@ -5497,6 +5640,22 @@
       <pre class="lines">
 
 
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
 108
 109
 110
@@ -5515,26 +5674,10 @@
 123
 124
 125
-126
-127
-128
-129
-130
-131
-132
-133
-134
-135
-136
-137
-138
-139
-140
-141
-142</pre>
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 108</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 92</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_kettle_config_migration_step'>kettle_config_migration_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_canonical_relative'>canonical_relative</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html#KETTLE_CONFIG_PATH-constant" title="Kettle::Jem::KETTLE_CONFIG_PATH (constant)">KETTLE_CONFIG_PATH</a></span></span>
@@ -5591,13 +5734,13 @@
       <pre class="lines">
 
 
-1364
-1365
-1366
-1367</pre>
+1371
+1372
+1373
+1374</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1364</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1371</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_list_arg'>list_arg</span><span class='lparen'>(</span><span class='id identifier rubyid_flag'>flag</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_values'>values</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_flat_map'>flat_map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>,</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:strip</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:empty?</span><span class='rparen'>)</span>
@@ -5646,22 +5789,22 @@
       <pre class="lines">
 
 
-518
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530</pre>
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 518</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 502</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_literal_github_homepage?'>literal_github_homepage?</span><span class='lparen'>(</span><span class='id identifier rubyid_assigned'>assigned</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_assigned'>assigned</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
@@ -5696,12 +5839,12 @@
       <pre class="lines">
 
 
-652
-653
-654</pre>
+636
+637
+638</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 652</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 636</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lockfile_normalization_command'>lockfile_normalization_command</span>
   <span class='qwords_beg'>%w[</span><span class='tstring_content'>bundle</span><span class='words_sep'> </span><span class='tstring_content'>update</span><span class='tstring_end'>]</span></span>
@@ -5726,19 +5869,19 @@
       <pre class="lines">
 
 
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106</pre>
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_apply_reports'>merge_apply_reports</span><span class='lparen'>(</span><span class='id identifier rubyid_initial'>initial</span><span class='comma'>,</span> <span class='id identifier rubyid_followup'>followup</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_merged'>merged</span> <span class='op'>=</span> <span class='id identifier rubyid_followup'>followup</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
@@ -5793,17 +5936,17 @@
       <pre class="lines">
 
 
-262
-263
-264
-265
-266
-267
-268
-269</pre>
+246
+247
+248
+249
+250
+251
+252
+253</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 262</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 246</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mise_installed?'>mise_installed?</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>PATH</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -5833,6 +5976,22 @@
       <pre class="lines">
 
 
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
 235
 236
 237
@@ -5842,26 +6001,10 @@
 241
 242
 243
-244
-245
-246
-247
-248
-249
-250
-251
-252
-253
-254
-255
-256
-257
-258
-259
-260</pre>
+244</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 235</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mise_trust_step'>mise_trust_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='comma'>,</span> <span class='label'>env:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_mise_report'>mise_report</span> <span class='op'>=</span> <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:recipe_reports</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_recipe_report'>recipe_report</span><span class='op'>|</span>
@@ -5909,30 +6052,30 @@
       <pre class="lines">
 
 
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649
+650
+651
+652
+653
+654
+655
 656
 657
 658
 659
-660
-661
-662
-663
-664
-665
-666
-667
-668
-669
-670
-671
-672
-673
-674
-675
-676</pre>
+660</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 656</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 640</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normal_lockfile_env'>normal_lockfile_env</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_command_env'>command_env</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
@@ -5975,13 +6118,13 @@
       <pre class="lines">
 
 
-409
-410
-411
-412</pre>
+393
+394
+395
+396</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 409</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 393</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_gemspec_grapheme'>normalize_gemspec_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_grapheme'>grapheme</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_replacements'>replacements</span> <span class='op'>=</span> <span class='id identifier rubyid_gemspec_grapheme_assignment_replacements'>gemspec_grapheme_assignment_replacements</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_grapheme'>grapheme</span><span class='rparen'>)</span>
@@ -6007,22 +6150,22 @@
       <pre class="lines">
 
 
-1055
-1056
-1057
-1058
-1059
-1060
-1061
 1062
 1063
 1064
 1065
 1066
-1067</pre>
+1067
+1068
+1069
+1070
+1071
+1072
+1073
+1074</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1055</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1062</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_git_drivers_mode'>normalize_git_drivers_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_tr'>tr</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>_</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -6057,18 +6200,18 @@
       <pre class="lines">
 
 
-915
-916
-917
-918
-919
-920
-921
 922
-923</pre>
+923
+924
+925
+926
+927
+928
+929
+930</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 915</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 922</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_hook_templates_mode'>normalize_hook_templates_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized'>normalized</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
@@ -6099,6 +6242,22 @@
       <pre class="lines">
 
 
+610
+611
+612
+613
+614
+615
+616
+617
+618
+619
+620
+621
+622
+623
+624
+625
 626
 627
 628
@@ -6107,26 +6266,10 @@
 631
 632
 633
-634
-635
-636
-637
-638
-639
-640
-641
-642
-643
-644
-645
-646
-647
-648
-649
-650</pre>
+634</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 626</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 610</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_lockfile_step'>normalize_lockfile_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_value_to_boolean'><span class='object_link'><a href="../DecisionPolicy.html#value_to_boolean-class_method" title="Kettle::Jem::DecisionPolicy.value_to_boolean (method)">value_to_boolean</a></span></span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='symbol'>:skip_lock_normalization</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -6173,19 +6316,19 @@
       <pre class="lines">
 
 
-398
-399
-400
-401
-402
-403
-404
-405
-406
-407</pre>
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 398</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 382</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_normalize_readme_h1_grapheme'>normalize_readme_h1_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_grapheme'>grapheme</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
@@ -6217,18 +6360,18 @@
       <pre class="lines">
 
 
-271
-272
-273
-274
-275
-276
-277
-278
-279</pre>
+255
+256
+257
+258
+259
+260
+261
+262
+263</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 271</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 255</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_post_template_project_fix_steps'>post_template_project_fix_steps</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='comma'>,</span> <span class='label'>env:</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span>
@@ -6259,33 +6402,33 @@
       <pre class="lines">
 
 
-780
-781
-782
-783
-784
-785
-786
-787
-788
-789
-790
-791
-792
-793
-794
-795
-796
-797</pre>
+763
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775
+776
+777
+778
+779
+780</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 780</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 763</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_prune_unwanted_bundler_binstubs'>prune_unwanted_bundler_binstubs</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_bin_dir'>bin_dir</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_removed'>removed</span> <span class='op'>=</span> <span class='id identifier rubyid_binstub_files'>binstub_files</span><span class='lparen'>(</span><span class='id identifier rubyid_bin_dir'>bin_dir</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_filter_map'>filter_map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_path'>path</span><span class='op'>|</span>
     <span class='id identifier rubyid_basename'>basename</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_basename'>basename</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
-    <span class='kw'>next</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#CURATED_BINSTUB_EXECUTABLES-constant" title="Kettle::Jem::Tasks::InstallTask::CURATED_BINSTUB_EXECUTABLES (constant)">CURATED_BINSTUB_EXECUTABLES</a></span></span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_basename'>basename</span><span class='rparen'>)</span>
+    <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_curated_binstub?'>curated_binstub?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
     <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_bundler_generated_binstub?'>bundler_generated_binstub?</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
 
     <span class='const'>FileUtils</span><span class='period'>.</span><span class='id identifier rubyid_rm_f'>rm_f</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='rparen'>)</span>
@@ -6319,16 +6462,16 @@
       <pre class="lines">
 
 
-390
-391
-392
-393
-394
-395
-396</pre>
+374
+375
+376
+377
+378
+379
+380</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 390</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 374</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_readme_h1_grapheme'>readme_h1_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_h1'>h1</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='period'>.</span><span class='id identifier rubyid_markdown_heading_owners'><span class='object_link'><a href="../../Jem.html#markdown_heading_owners-class_method" title="Kettle::Jem.markdown_heading_owners (method)">markdown_heading_owners</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>source_label:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_owner'>owner</span><span class='op'>|</span> <span class='id identifier rubyid_owner'>owner</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span> <span class='op'>==</span> <span class='int'>1</span> <span class='rbrace'>}</span>
@@ -6357,17 +6500,17 @@
       <pre class="lines">
 
 
-824
-825
-826
-827
-828
-829
-830
-831</pre>
+831
+832
+833
+834
+835
+836
+837
+838</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 824</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 831</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_relative_or_absolute_path'>relative_or_absolute_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='comma'>,</span> <span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_expanded_path'>expanded_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_path'>path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -6397,13 +6540,6 @@
       <pre class="lines">
 
 
-1544
-1545
-1546
-1547
-1548
-1549
-1550
 1551
 1552
 1553
@@ -6416,10 +6552,17 @@
 1560
 1561
 1562
-1563</pre>
+1563
+1564
+1565
+1566
+1567
+1568
+1569
+1570</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1544</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1551</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_remove_git_attribute_managed_block'>remove_git_attribute_managed_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>managed_block:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_start_line'>start_line</span> <span class='op'>=</span> <span class='id identifier rubyid_git_attribute_block_start'>git_attribute_block_start</span><span class='lparen'>(</span><span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span>
@@ -6461,13 +6604,13 @@
       <pre class="lines">
 
 
-1565
-1566
-1567
-1568</pre>
+1572
+1573
+1574
+1575</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1565</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1572</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_render_git_attribute_line'>render_git_attribute_line</span><span class='lparen'>(</span><span class='id identifier rubyid_update'>update</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_attributes'>attributes</span> <span class='op'>=</span> <span class='id identifier rubyid_update'>update</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:attributes</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> </span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -6493,17 +6636,17 @@
       <pre class="lines">
 
 
-1535
-1536
-1537
-1538
-1539
-1540
-1541
-1542</pre>
+1542
+1543
+1544
+1545
+1546
+1547
+1548
+1549</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1535</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1542</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_render_git_attributes'>render_git_attributes</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_updates'>updates</span><span class='comma'>,</span> <span class='label'>managed_block:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_unmanaged_lines'>unmanaged_lines</span> <span class='op'>=</span> <span class='id identifier rubyid_remove_git_attribute_managed_block'>remove_git_attribute_managed_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='label'>managed_block:</span> <span class='id identifier rubyid_managed_block'>managed_block</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:lines</span><span class='rparen'>)</span>
@@ -6533,19 +6676,19 @@
       <pre class="lines">
 
 
-1524
-1525
-1526
-1527
-1528
-1529
-1530
 1531
 1532
-1533</pre>
+1533
+1534
+1535
+1536
+1537
+1538
+1539
+1540</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1524</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1531</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_render_git_driver_include_config'>render_git_driver_include_config</span><span class='lparen'>(</span><span class='id identifier rubyid_config_entries'>config_entries</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'># Generated by kettle-jem; do not commit this file.</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
@@ -6577,6 +6720,22 @@
       <pre class="lines">
 
 
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
 464
 465
 466
@@ -6613,26 +6772,10 @@
 497
 498
 499
-500
-501
-502
-503
-504
-505
-506
-507
-508
-509
-510
-511
-512
-513
-514
-515
-516</pre>
+500</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 464</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_repair_gemspec_homepage'>repair_gemspec_homepage</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_gemspec_path'>gemspec_path</span> <span class='op'>=</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_glob'>glob</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*.gemspec</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_min'>min</span>
@@ -6707,14 +6850,14 @@
       <pre class="lines">
 
 
-436
-437
-438
-439
-440</pre>
+420
+421
+422
+423
+424</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 436</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 420</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_replace_character_ranges'>replace_character_ranges</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_replacements'>replacements</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_replacements'>replacements</span><span class='period'>.</span><span class='id identifier rubyid_sort_by'>sort_by</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:first</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reverse'>reverse</span><span class='period'>.</span><span class='id identifier rubyid_reduce'>reduce</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_updated'>updated</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='id identifier rubyid_start_offset'>start_offset</span><span class='comma'>,</span> <span class='id identifier rubyid_end_offset'>end_offset</span><span class='comma'>,</span> <span class='id identifier rubyid_replacement'>replacement</span><span class='rparen'>)</span><span class='op'>|</span>
@@ -6741,6 +6884,22 @@
       <pre class="lines">
 
 
+692
+693
+694
+695
+696
+697
+698
+699
+700
+701
+702
+703
+704
+705
+706
+707
 708
 709
 710
@@ -6755,26 +6914,10 @@
 719
 720
 721
-722
-723
-724
-725
-726
-727
-728
-729
-730
-731
-732
-733
-734
-735
-736
-737
-738</pre>
+722</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 708</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 692</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_rewrite_yard_binstub'>rewrite_yard_binstub</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_yard_binstub'>yard_binstub</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>yard</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -6827,13 +6970,13 @@
       <pre class="lines">
 
 
-431
-432
-433
-434</pre>
+415
+416
+417
+418</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 431</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 415</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ruby_string_literal_content'>ruby_string_literal_content</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_quote'>quote</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_escaped'>escaped</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>\\\\\\\\</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -6859,6 +7002,22 @@
       <pre class="lines">
 
 
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
 37
 38
 39
@@ -6877,26 +7036,10 @@
 52
 53
 54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71</pre>
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 21</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='label'>project_root:</span> <span class='const'>Dir</span><span class='period'>.</span><span class='id identifier rubyid_pwd'>pwd</span><span class='comma'>,</span> <span class='label'>env:</span> <span class='const'>ENV</span><span class='comma'>,</span> <span class='label'>run_options:</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>command_runner:</span> <span class='id identifier rubyid_method'>method</span><span class='lparen'>(</span><span class='symbol'>:run_system_command</span><span class='rparen'>)</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_effective_run_options'>effective_run_options</span> <span class='op'>=</span> <span class='id identifier rubyid_install_run_options'>install_run_options</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='comma'>,</span> <span class='id identifier rubyid_run_options'>run_options</span><span class='rparen'>)</span>
@@ -6953,6 +7096,22 @@
       <pre class="lines">
 
 
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
 593
 594
 595
@@ -6964,26 +7123,10 @@
 601
 602
 603
-604
-605
-606
-607
-608
-609
-610
-611
-612
-613
-614
-615
-616
-617
-618
-619
-620</pre>
+604</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 593</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 577</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_bundle_setup_commands'>run_bundle_setup_commands</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>run_options:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_quiet'>quiet</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../DecisionPolicy.html" title="Kettle::Jem::DecisionPolicy (class)">DecisionPolicy</a></span></span><span class='period'>.</span><span class='id identifier rubyid_value_to_boolean'><span class='object_link'><a href="../DecisionPolicy.html#value_to_boolean-class_method" title="Kettle::Jem::DecisionPolicy.value_to_boolean (method)">value_to_boolean</a></span></span><span class='lparen'>(</span><span class='id identifier rubyid_run_options'>run_options</span><span class='lbracket'>[</span><span class='symbol'>:quiet</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -7056,13 +7199,6 @@
       <pre class="lines">
 
 
-1375
-1376
-1377
-1378
-1379
-1380
-1381
 1382
 1383
 1384
@@ -7078,10 +7214,17 @@
 1394
 1395
 1396
-1397</pre>
+1397
+1398
+1399
+1400
+1401
+1402
+1403
+1404</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1375</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1382</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_command_step'>run_command_step</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='label'>project_root:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='comma'>,</span> <span class='label'>command_runner:</span><span class='rparen'>)</span>
   <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span> <span class='op'>==</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setup</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setup</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='rparen'>)</span>
@@ -7126,20 +7269,20 @@
       <pre class="lines">
 
 
-1578
-1579
-1580
-1581
-1582
-1583
-1584
 1585
 1586
 1587
-1588</pre>
+1588
+1589
+1590
+1591
+1592
+1593
+1594
+1595</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1578</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1585</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run_system_command'>run_system_command</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='label'>chdir:</span><span class='comma'>,</span> <span class='label'>env:</span><span class='comma'>,</span> <span class='label'>quiet:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_stdout'>stdout</span><span class='comma'>,</span> <span class='id identifier rubyid_stderr'>stderr</span><span class='comma'>,</span> <span class='id identifier rubyid_status'>status</span> <span class='op'>=</span> <span class='const'>Open3</span><span class='period'>.</span><span class='id identifier rubyid_capture3'>capture3</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='label'>chdir:</span> <span class='id identifier rubyid_chdir'>chdir</span><span class='rparen'>)</span>
@@ -7172,18 +7315,18 @@
       <pre class="lines">
 
 
-1069
-1070
-1071
-1072
-1073
-1074
-1075
 1076
-1077</pre>
+1077
+1078
+1079
+1080
+1081
+1082
+1083
+1084</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1069</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1076</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_semantic_git_driver_attribute_updates'>semantic_git_driver_attribute_updates</span>
   <span class='const'><span class='object_link'><a href="#GIT_DRIVER_LANGUAGE_REGISTRY-constant" title="Kettle::Jem::Tasks::InstallTask::GIT_DRIVER_LANGUAGE_REGISTRY (constant)">GIT_DRIVER_LANGUAGE_REGISTRY</a></span></span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_definition'>definition</span><span class='op'>|</span>
@@ -7214,16 +7357,16 @@
       <pre class="lines">
 
 
-855
-856
-857
-858
-859
-860
-861</pre>
+862
+863
+864
+865
+866
+867
+868</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 855</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 862</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_setup_command_env'>setup_command_env</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_command_env'>command_env</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
@@ -7252,21 +7395,21 @@
       <pre class="lines">
 
 
-863
-864
-865
-866
-867
-868
-869
 870
 871
 872
 873
-874</pre>
+874
+875
+876
+877
+878
+879
+880
+881</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 863</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 870</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_strip_inherited_bundler_activation!'>strip_inherited_bundler_activation!</span><span class='lparen'>(</span><span class='id identifier rubyid_command_env'>command_env</span><span class='rparen'>)</span>
   <span class='qwords_beg'>%w[</span><span class='words_sep'>
@@ -7300,19 +7443,19 @@
       <pre class="lines">
 
 
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451</pre>
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 442</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 426</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_strip_leading_decorative_graphemes'>strip_leading_decorative_graphemes</span><span class='lparen'>(</span><span class='id identifier rubyid_text'>text</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_remaining'>remaining</span> <span class='op'>=</span> <span class='id identifier rubyid_text'>text</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_sub'>sub</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\A\s+</span><span class='regexp_end'>/</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -7344,6 +7487,22 @@
       <pre class="lines">
 
 
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
 342
 343
 344
@@ -7360,26 +7519,10 @@
 355
 356
 357
-358
-359
-360
-361
-362
-363
-364
-365
-366
-367
-368
-369
-370
-371
-372
-373
-374</pre>
+358</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 342</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 326</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_sync_readme_gemspec_grapheme'>sync_readme_gemspec_grapheme</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_readme_path'>readme_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -7434,6 +7577,22 @@
       <pre class="lines">
 
 
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
 298
 299
 300
@@ -7451,26 +7610,10 @@
 312
 313
 314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
-331</pre>
+315</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 298</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 282</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_trim_readme_compatibility_badges'>trim_readme_compatibility_badges</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_readme_path'>readme_path</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>README.md</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -7549,12 +7692,12 @@
       <pre class="lines">
 
 
-1193
-1194
-1195</pre>
+1200
+1201
+1202</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1193</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1200</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unsafe_git_driver_command_value?'>unsafe_git_driver_command_value?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>$(</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>${</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>`</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -7579,6 +7722,22 @@
       <pre class="lines">
 
 
+662
+663
+664
+665
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
 678
 679
 680
@@ -7591,26 +7750,10 @@
 687
 688
 689
-690
-691
-692
-693
-694
-695
-696
-697
-698
-699
-700
-701
-702
-703
-704
-705
-706</pre>
+690</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 678</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 662</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate_bundle_binstub_location'>validate_bundle_binstub_location</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_destination_bin'>destination_bin</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>bin</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -7684,20 +7827,20 @@
       <pre class="lines">
 
 
-1163
-1164
-1165
-1166
-1167
-1168
-1169
 1170
 1171
 1172
-1173</pre>
+1173
+1174
+1175
+1176
+1177
+1178
+1179
+1180</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1163</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate_git_driver_manifest!'>validate_git_driver_manifest!</span><span class='lparen'>(</span><span class='id identifier rubyid_manifest'>manifest</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Invalid .structuredmerge/git-drivers.toml: root must be a mapping</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_manifest'>manifest</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Hash</span><span class='rparen'>)</span>
@@ -7753,13 +7896,6 @@
       <pre class="lines">
 
 
-1175
-1176
-1177
-1178
-1179
-1180
-1181
 1182
 1183
 1184
@@ -7769,10 +7905,17 @@
 1188
 1189
 1190
-1191</pre>
+1191
+1192
+1193
+1194
+1195
+1196
+1197
+1198</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1175</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1182</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_validate_git_driver_profile!'>validate_git_driver_profile!</span><span class='lparen'>(</span><span class='id identifier rubyid_profile_name'>profile_name</span><span class='comma'>,</span> <span class='id identifier rubyid_profile'>profile</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Error</a></span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Invalid .structuredmerge/git-drivers.toml: profile name is required</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_profile_name'>profile_name</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -7811,12 +7954,12 @@
       <pre class="lines">
 
 
-1360
-1361
-1362</pre>
+1367
+1368
+1369</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1360</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 1367</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_value_arg'>value_arg</span><span class='lparen'>(</span><span class='id identifier rubyid_flag'>flag</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_flag'>flag</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rbracket'>]</span>
@@ -7841,13 +7984,13 @@
       <pre class="lines">
 
 
-171
-172
-173
-174</pre>
+155
+156
+157
+158</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 171</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 155</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_version_gem_bootstrap_step'>version_gem_bootstrap_step</span><span class='lparen'>(</span><span class='id identifier rubyid_project_root'>project_root</span><span class='comma'>,</span> <span class='id identifier rubyid_report'>report</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_report'>report</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:post_apply_steps</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_find'>find</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_step'>step</span><span class='op'>|</span> <span class='id identifier rubyid_step'>step</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:name</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>version_gem_bootstrap</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span> <span class='op'>||</span>
@@ -7873,28 +8016,28 @@
       <pre class="lines">
 
 
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735
+736
+737
+738
+739
 740
 741
-742
-743
-744
-745
-746
-747
-748
-749
-750
-751
-752
-753
-754
-755
-756
-757
-758</pre>
+742</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 740</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem/tasks/install_task.rb', line 724</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_yard_binstub_rake_handoff_content'>yard_binstub_rake_handoff_content</span>
   <span class='heredoc_beg'>&lt;&lt;~RUBY</span>
@@ -7925,7 +8068,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jun 11 02:20:32 2026 by
+  Generated on Thu Jun 11 14:06:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

@@ -359,19 +359,19 @@
       <pre class="lines">
 
 
-1475
-1476
-1477
 1478
 1479
 1480
 1481
 1482
 1483
-1484</pre>
+1484
+1485
+1486
+1487</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1475</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1478</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_build_yaml_block'>build_yaml_block</span><span class='lparen'>(</span><span class='label'>checksums:</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='const'><span class='object_link'><a href="#YAML_KEY-constant" title="Kettle::Jem::TemplateChecksums::YAML_KEY (constant)">YAML_KEY</a></span></span><span class='rbracket'>]</span>
@@ -403,9 +403,6 @@
       <pre class="lines">
 
 
-1418
-1419
-1420
 1421
 1422
 1423
@@ -413,10 +410,13 @@
 1425
 1426
 1427
-1428</pre>
+1428
+1429
+1430
+1431</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1418</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1421</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_compute'>compute</span><span class='lparen'>(</span><span class='label'>template_root:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span> <span class='op'>=</span> <span class='id identifier rubyid_template_root'>template_root</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_chomp'>chomp</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -449,16 +449,16 @@
       <pre class="lines">
 
 
-1467
-1468
-1469
 1470
 1471
 1472
-1473</pre>
+1473
+1474
+1475
+1476</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1467</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1470</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_detail_lines'>detail_lines</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
   <span class='lbracket'>[</span>
@@ -487,19 +487,19 @@
       <pre class="lines">
 
 
-1441
-1442
-1443
 1444
 1445
 1446
 1447
 1448
 1449
-1450</pre>
+1450
+1451
+1452
+1453</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1441</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1444</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_diff'>diff</span><span class='lparen'>(</span><span class='label'>current:</span><span class='comma'>,</span> <span class='label'>stored:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_current_keys'>current_keys</span> <span class='op'>=</span> <span class='id identifier rubyid_current'>current</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span><span class='period'>.</span><span class='id identifier rubyid_to_set'>to_set</span>
@@ -531,12 +531,12 @@
       <pre class="lines">
 
 
-1452
-1453
-1454</pre>
+1455
+1456
+1457</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1452</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1455</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_diff_count'>diff_count</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:added</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>+</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:changed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span> <span class='op'>+</span> <span class='id identifier rubyid_diff'>diff</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:removed</span><span class='comma'>,</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_size'>size</span>
@@ -561,19 +561,19 @@
       <pre class="lines">
 
 
-1430
-1431
-1432
 1433
 1434
 1435
 1436
 1437
 1438
-1439</pre>
+1439
+1440
+1441
+1442</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1430</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1433</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_stored'>load_stored</span><span class='lparen'>(</span><span class='label'>config_path:</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -605,9 +605,6 @@
       <pre class="lines">
 
 
-1496
-1497
-1498
 1499
 1500
 1501
@@ -624,10 +621,13 @@
 1512
 1513
 1514
-1515</pre>
+1515
+1516
+1517
+1518</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1496</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1499</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_replace_top_level_yaml_block'>replace_top_level_yaml_block</span><span class='lparen'>(</span><span class='id identifier rubyid_content'>content</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_replacement'>replacement</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lines'>lines</span> <span class='op'>=</span> <span class='id identifier rubyid_content'>content</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_lines'>lines</span>
@@ -669,19 +669,19 @@
       <pre class="lines">
 
 
-1456
-1457
-1458
 1459
 1460
 1461
 1462
 1463
 1464
-1465</pre>
+1465
+1466
+1467
+1468</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1456</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1459</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_summary'>summary</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_count'>count</span> <span class='op'>=</span> <span class='id identifier rubyid_diff_count'>diff_count</span><span class='lparen'>(</span><span class='id identifier rubyid_diff'>diff</span><span class='rparen'>)</span>
@@ -713,18 +713,18 @@
       <pre class="lines">
 
 
-1486
-1487
-1488
 1489
 1490
 1491
 1492
 1493
-1494</pre>
+1494
+1495
+1496
+1497</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1486</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1489</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_write_to_config'>write_to_config</span><span class='lparen'>(</span><span class='label'>config_path:</span><span class='comma'>,</span> <span class='label'>checksums:</span><span class='comma'>,</span> <span class='label'>version:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_config_path'>config_path</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -745,7 +745,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jun 11 02:20:32 2026 by
+  Generated on Thu Jun 11 14:06:36 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

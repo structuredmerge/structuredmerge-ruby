@@ -4,7 +4,6 @@ smorg_remote = ENV.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
 kettle_remote = ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
 
 if smorg_remote
-  # Merge recipes and parser dependencies for released installs.
 end
 
 if kettle_remote

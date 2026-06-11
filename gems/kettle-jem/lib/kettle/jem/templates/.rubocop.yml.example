@@ -16,6 +16,7 @@ inherit_mode:
     - Exclude
 
 AllCops:
+  TargetRubyVersion: {KJ|RUBOCOP_TARGET_RUBY}
   Exclude:
     - certs/**/*
     - checksums/**/*

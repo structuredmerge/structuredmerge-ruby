@@ -187,6 +187,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Curated Bundler binstub pruning now keeps any executable owned by the curated
   binstub gems, so newly added executables such as `kettle-bump` are retained
   without hardcoding every executable name.
+- Gem templates now require `appraisal2` >= 3.1.2.
 - Gemspec merging now lets explicit `KJ_AUTHOR_EMAIL` and `KJ_AUTHOR_NAME`
   environment overrides replace destination `spec.email` and `spec.authors`
   metadata instead of preserving stale project fields over resolved template

@@ -226,7 +226,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(gemspec).to include('spec.description = "💎 Dummy gem for kettle-jem system testing."')
     expect(gemspec).to include('spec.homepage = "https://github.com/acme/dummy-gem"')
     expect(gemspec).to include('spec.required_ruby_version = ">= 3.2.0"')
-    expect(gemspec).to include('spec.metadata["source_code_uri"] = "#{spec.homepage}/tree/v#{spec.version}"')
+    expect(gemspec).to include("spec.metadata[\"source_code_uri\"] = \"\#{spec.homepage}/tree/v\#{spec.version}\"")
     expect(gemspec).to include('spec.add_dependency("json", "~> 2.7") # preserve custom runtime dependency')
     expect(gemspec).to include('spec.add_development_dependency("rake", "~> 13.1") # preserve destination rake policy')
     expect(gemspec.scan('spec.add_development_dependency("rake"').size).to eq(1)

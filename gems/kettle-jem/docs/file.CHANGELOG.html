@@ -239,6 +239,17 @@ task dependencies, independent from the gemspec runtime Ruby floor.</li>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>README compatibility badge pruning now compares Ruby minor series so patch<br>
+floors like <code>&gt;= 1.8.7</code> and <code>&gt;= 2.2.2</code> keep their matching minor badges.</li>
+  <li>Gemspec template summary and description tokens now strip an already-present<br>
+project emoji and escape double quotes before rendering inside Ruby strings.</li>
+  <li>Templates now remove <code>version_gem</code> dependencies and entrypoint references for<br>
+gems whose minimum Ruby is below 2.2 while keeping the standard<br>
+<code>&lt;Namespace&gt;::Version::VERSION</code> constant shape.</li>
+  <li>Curated Bundler binstub pruning now keeps any executable owned by the curated<br>
+binstub gems, so newly added executables such as <code>kettle-bump</code> are retained<br>
+without hardcoding every executable name.</li>
+  <li>Gem templates now require <code>appraisal2</code> &gt;= 3.1.2.</li>
   <li>Gemspec merging now lets explicit <code>KJ_AUTHOR_EMAIL</code> and <code>KJ_AUTHOR_NAME</code><br>
 environment overrides replace destination <code>spec.email</code> and <code>spec.authors</code><br>
 metadata instead of preserving stale project fields over resolved template<br>
@@ -515,7 +526,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jun 11 02:20:30 2026 by
+  Generated on Thu Jun 11 14:06:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>

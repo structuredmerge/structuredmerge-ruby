@@ -1650,12 +1650,18 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-opencollective-missing-org-slice", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY
+        "example.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
           end
         RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            entries:
+              - .opencollective.yml
+        YAML
       })
 
       plan = described_class.plan_project(root, env: {})
@@ -1663,6 +1669,8 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :funding, :open_collective_disabled_source)).to eq("missing.open_collective_org")
       expect(plan.dig(:facts, :funding, :open_collective_org)).to be_nil
       expect(plan.dig(:facts, :funding, :urls)).not_to include("https://opencollective.com/")
+      expect(plan.dig(:facts, :templates, :tokens).to_h).not_to include("KJ|OPENCOLLECTIVE_ORG")
+      expect(plan.dig(:facts, :templates, :source_preferences).to_a).to be_empty
     end
   end
 
@@ -10383,6 +10391,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.0", require: false')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2"')
       expect(template_report.dig(:metadata, :template_tokens)).to include(
+        "KJ|RUBOCOP_TARGET_RUBY" => "3.1",
         "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.0\"",
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.2\"",
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"

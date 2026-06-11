@@ -67,8 +67,7 @@ module Kettle
       :rubocop_lts,
       :rails,
       :rails_appraisals,
-      :notes,
-      keyword_init: true
+      :notes
     )
     RRRRB_MATRIX = {
       "ruby-1.8" => RRRRBMatrixEntry.new(ruby: "1.8.7-p374", engine: "ruby", rails: "4.0.x", rubocop_lts: "0.3.0"),
@@ -380,8 +379,7 @@ module Kettle
       :blocking,
       :diagnostics,
       :prompt_required,
-      :prompt,
-      keyword_init: true
+      :prompt
     ) do
       def to_h
         {
@@ -1205,7 +1203,7 @@ module Kettle
     }.freeze
 
     class PluginRegistry
-      Hook = Struct.new(:plugin_name, :phase, :timing, :callback, keyword_init: true)
+      Hook = Struct.new(:plugin_name, :phase, :timing, :callback)
       VALID_TIMINGS = %i[before after].freeze
 
       attr_reader :hooks, :configured_plugins, :loaded_plugins, :load_errors
@@ -3279,7 +3277,7 @@ module Kettle
 
     def monorepo_root_gemfile_dependency_lines
       [
-        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.1", ">= 3.1.1"\n)},
+        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.1", ">= 3.1.2"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.2", ">= 2.2.3"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.3"\n)},
@@ -5735,7 +5733,7 @@ module Kettle
         add_template_only_nodes: true,
         freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
       }
-      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+      if !recipe.dig(:template_preference, :add_template_only_nodes).nil?
         configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
         options[:add_template_only_nodes] = configured unless configured.nil?
       end
@@ -5752,7 +5750,7 @@ module Kettle
         add_template_only_nodes: true,
         freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
       }
-      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+      if !recipe.dig(:template_preference, :add_template_only_nodes).nil?
         configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
         options[:add_template_only_nodes] = configured unless configured.nil?
       end
@@ -5776,7 +5774,7 @@ module Kettle
         add_template_only_nodes: true,
         freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
       }
-      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+      if !recipe.dig(:template_preference, :add_template_only_nodes).nil?
         configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
         options[:add_template_only_nodes] = configured unless configured.nil?
       end
@@ -5800,7 +5798,7 @@ module Kettle
         add_template_only_nodes: true,
         freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
       }
-      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+      if !recipe.dig(:template_preference, :add_template_only_nodes).nil?
         configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
         options[:add_template_only_nodes] = configured unless configured.nil?
       end
@@ -5824,7 +5822,7 @@ module Kettle
         add_template_only_nodes: true,
         freeze_token: recipe.dig(:template_preference, :freeze_token) || "kettle-jem"
       }
-      if recipe.dig(:template_preference, :add_template_only_nodes) != nil
+      if !recipe.dig(:template_preference, :add_template_only_nodes).nil?
         configured = DecisionPolicy.value_to_boolean(recipe.dig(:template_preference, :add_template_only_nodes))
         options[:add_template_only_nodes] = configured unless configured.nil?
       end
@@ -9427,10 +9425,21 @@ module Kettle
     def rubocop_template_tokens(min_ruby)
       constraint, gem_name, gem_constraint = rubocop_tokens_for(min_ruby_version(min_ruby))
       {
+        "KJ|RUBOCOP_TARGET_RUBY" => rubocop_target_ruby_token(min_ruby),
         "KJ|RUBOCOP_LTS_CONSTRAINT" => constraint,
         "KJ|RUBOCOP_RUBY_GEM" => gem_name,
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => gem_constraint
       }
+    end
+
+    def rubocop_target_ruby_token(min_ruby)
+      token = minimum_ruby_token(min_ruby)
+      return "0" if token == "0"
+
+      segments = Gem::Version.new(token).segments
+      segments.first(2).join(".")
+    rescue ArgumentError
+      ""
     end
 
     def rubocop_tokens_for(min_ruby)
@@ -10313,6 +10322,7 @@ module Kettle
       return if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
       return if skip_packaged_gemfile_template?(target_path, config)
       return if skip_packaged_license_template?(target_path, config)
+      return if template_root.fetch(:kind) == "packaged" && opencollective_disabled && opencollective_disabled_file?(target_path)
 
       selected_source = preferred_template_source(template_root.fetch(:path), source_path, opencollective_disabled: opencollective_disabled)
       return unless selected_source
