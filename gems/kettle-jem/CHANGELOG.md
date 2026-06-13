@@ -75,6 +75,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated GitHub Actions workflow templates now refresh `ruby/setup-ruby` to
   the immutable SHA for v1.312.0 and `codecov/codecov-action` to the latest
   v7.0.0 release comment.
+- Generated GitHub Actions workflow templates now refresh `ruby/setup-ruby`,
+  `coverallsapp/github-action`, `pozil/auto-assign-issue`, and
+  `kettle-rb/ts-grammar-action` pins.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated README and FUNDING OpenCollective links now use the configured

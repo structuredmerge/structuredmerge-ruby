@@ -11112,7 +11112,7 @@ module Kettle
                 uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0
+                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -11184,7 +11184,7 @@ module Kettle
                 uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0
+                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -11285,7 +11285,7 @@ module Kettle
                 uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0
+                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -11373,7 +11373,7 @@ module Kettle
       <<~YAML.lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join.chomp
         - name: Upload coverage to Coveralls
           if: ${{ !env.ACT }}
-          uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
+          uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
           with:
             github-token: ${{ secrets.GITHUB_TOKEN }}
             file: coverage/lcov.info
@@ -11526,8 +11526,8 @@ module Kettle
     def github_actions_step_pins
       {
         "actions/checkout" => "actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3",
-        "ruby/setup-ruby" => "ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0",
-        "coverallsapp/github-action" => "coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6",
+        "ruby/setup-ruby" => "ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0",
+        "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1",
         "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0",
         "irongut/CodeCoverageSummary" => "irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0",
@@ -11538,9 +11538,9 @@ module Kettle
         "github/codeql-action/init" => "github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
         "github/codeql-action/autobuild" => "github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
         "github/codeql-action/analyze" => "github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0",
-        "pozil/auto-assign-issue" => "pozil/auto-assign-issue@07fe6dc0e9771842b428f5739098d6140734e226 # v4",
+        "pozil/auto-assign-issue" => "pozil/auto-assign-issue@af6beea6bdf1e8eb373f061c5bc168681fc6d011 # v4.0.1",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0",
-        "kettle-rb/ts-grammar-action" => "kettle-rb/ts-grammar-action@4adf5a6f4960c7e8d0fcc1d05165e3647eb5cc8c # v1.0.0",
+        "kettle-rb/ts-grammar-action" => "kettle-rb/ts-grammar-action@4b0c04d11ed5b85c67c0c60c6ecb590e81748ccb # v1.0.1",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"
       }
     end
