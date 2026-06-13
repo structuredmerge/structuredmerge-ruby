@@ -133,7 +133,6 @@ class KettleJemWorkflowPins
       "--root", workflow_dir,
       "--upgrade", upgrade,
       "--json",
-      "--cache-path", "",
       "--no-progress"
     ]
     stdout, stderr, status = Open3.capture3(@env.to_hash, *command, chdir: @project_root)

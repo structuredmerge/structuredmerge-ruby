@@ -25,7 +25,7 @@ RSpec.describe KettleJemWorkflowPins do
       synthetic_workflow = File.read(File.join(root_arg, "action-pin-index.yml"))
 
       expect(chdir).to eq(project_root)
-      expect(command).to include("--cache-path", "")
+      expect(command).not_to include("--cache-path")
       expect { Psych.parse_stream(synthetic_workflow) }.not_to raise_error
       expect(synthetic_workflow).to include("      - name: actions/checkout\n")
 
