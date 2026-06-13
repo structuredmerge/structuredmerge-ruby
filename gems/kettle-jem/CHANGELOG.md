@@ -178,6 +178,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Fixed `bin/kettle-jem-workflow-pins` so its synthetic workflow is valid YAML
+  and child command failures include stdout diagnostics.
 - README compatibility badge pruning now compares Ruby minor series so patch
   floors like `>= 1.8.7` and `>= 2.2.2` keep their matching minor badges.
 - Gemspec template summary and description tokens now strip an already-present
