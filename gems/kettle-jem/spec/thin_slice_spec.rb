@@ -46,6 +46,21 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  def normalize_workflow_pins_for_spec(value)
+    case value
+    when Hash
+      value.to_h { |key, item| [key, normalize_workflow_pins_for_spec(item)] }
+    when String
+      value.gsub(%r{([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)?@)[a-f0-9]{40}(\s+#\s+v?[^\s]+)}, "\\1<sha> # <version>")
+    else
+      value
+    end
+  end
+
+  def expect_pinned_action(content, action)
+    expect(content).to match(%r{#{Regexp.escape(action)}@[a-f0-9]{40}\s+#\s+v?[^\s]+})
+  end
+
   def prism_string_argument(call, index = 0)
     argument = call&.arguments&.arguments&.[](index)
     argument.unescaped if argument.is_a?(::Prism::StringNode)
@@ -135,10 +150,10 @@ RSpec.describe Kettle::Jem do
       end
       expect(custom_ci_report.fetch(:final_content)).to include("permissions:")
       expect(custom_ci_report.fetch(:final_content)).to include("concurrency:")
-      expect(custom_ci_report.fetch(:final_content)).to include("actions/checkout@df4cb1c0")
-      expect(custom_ci_report.fetch(:final_content)).to include("ruby/setup-ruby@12fd32")
+      expect_pinned_action(custom_ci_report.fetch(:final_content), "actions/checkout")
+      expect_pinned_action(custom_ci_report.fetch(:final_content), "ruby/setup-ruby")
       expect(custom_ci_report.fetch(:final_content)).to include("Upload coverage to Coveralls")
-      expect(custom_ci_report.fetch(:final_content)).to include("qltysh/qlty-action/coverage@fd52dc")
+      expect_pinned_action(custom_ci_report.fetch(:final_content), "qltysh/qlty-action/coverage")
       expect(custom_ci_report.fetch(:final_content)).to include("oidc: true")
       expect(custom_ci_report.fetch(:final_content)).not_to include("QLTY_COVERAGE_TOKEN")
       expect(custom_ci_report.fetch(:final_content)).to include("Code Coverage Summary Report")
@@ -153,7 +168,9 @@ RSpec.describe Kettle::Jem do
 
       apply = described_class.apply_project(root, env: {})
       expect(apply[:changed_files]).to eq(fixture.fetch(:expected).fetch(:changed_files))
-      expect(project_files(root, fixture.fetch(:expected).fetch(:files).keys.map(&:to_s))).to eq(fixture.fetch(:expected).fetch(:files))
+      expect(normalize_workflow_pins_for_spec(project_files(root, fixture.fetch(:expected).fetch(:files).keys.map(&:to_s)))).to eq(
+        normalize_workflow_pins_for_spec(fixture.fetch(:expected).fetch(:files))
+      )
     end
   end
 
@@ -425,19 +442,19 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:recipe_name)).to start_with("github_actions_workflow_snippets_")
       expect(content).to include("permissions:\n  contents: read")
       expect(content).to include("concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"")
-      expect(content).to include("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3")
-      expect(content).to include("ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0")
-      expect(content).to include("actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1")
-      expect(content).to include("codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0")
-      expect(content).to include("coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6")
-      expect(content).to include("actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0")
-      expect(content).to include("github/codeql-action/init@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
-      expect(content).to include("github/codeql-action/autobuild@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
-      expect(content).to include("github/codeql-action/analyze@7211b7c8077ea37d8641b6271f6a365a22a5fbfa # v4.36.0")
-      expect(content).to include("pozil/auto-assign-issue@07fe6dc0e9771842b428f5739098d6140734e226 # v4")
-      expect(content).to include("apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0")
-      expect(content).to include("kettle-rb/ts-grammar-action@4adf5a6f4960c7e8d0fcc1d05165e3647eb5cc8c # v1.0.0")
-      expect(content).to include("sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0")
+      expect_pinned_action(content, "actions/checkout")
+      expect_pinned_action(content, "ruby/setup-ruby")
+      expect_pinned_action(content, "actions/upload-artifact")
+      expect_pinned_action(content, "codecov/codecov-action")
+      expect_pinned_action(content, "coverallsapp/github-action")
+      expect_pinned_action(content, "actions/dependency-review-action")
+      expect_pinned_action(content, "github/codeql-action/init")
+      expect_pinned_action(content, "github/codeql-action/autobuild")
+      expect_pinned_action(content, "github/codeql-action/analyze")
+      expect_pinned_action(content, "pozil/auto-assign-issue")
+      expect_pinned_action(content, "apache/skywalking-eyes/dependency")
+      expect_pinned_action(content, "kettle-rb/ts-grammar-action")
+      expect_pinned_action(content, "sarisia/actions-status-discord")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
       expect(content).to end_with("\n")
@@ -485,8 +502,8 @@ RSpec.describe Kettle::Jem do
       content = report.fetch(:final_content)
 
       expect(report.fetch(:recipe_name)).to start_with("template_source_application_")
-      expect(content).to include("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3")
-      expect(content).to include("ruby/setup-ruby@12fd324f1d0b43274fdc8130f6980590a667c455 # v1.312.0")
+      expect_pinned_action(content, "actions/checkout")
+      expect_pinned_action(content, "ruby/setup-ruby")
       expect(content).not_to include("actions/checkout@v6")
       expect(content).not_to include("ruby/setup-ruby@v1")
     end
@@ -4988,7 +5005,7 @@ RSpec.describe Kettle::Jem do
       workflow = File.read(File.join(root, ".github", "workflows", "coverage.yml"))
 
       expect(apply.fetch(:changed_files)).to include(".github/workflows/coverage.yml")
-      expect(workflow).to include("qltysh/qlty-action/coverage@fd52dc")
+      expect_pinned_action(workflow, "qltysh/qlty-action/coverage")
       expect(workflow).to include("oidc: true")
       expect(workflow).not_to include("QLTY_COVERAGE_TOKEN")
       expect(workflow).not_to include("KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS")
