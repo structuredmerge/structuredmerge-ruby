@@ -8860,6 +8860,61 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves existing multi-author gemspec metadata in packaged gemspec templates" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-multi-authors-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.description = "Example gem"
+            spec.authors = ["First Author", "Second Author"]
+            spec.email = ["authors@example.test"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - source: gem.gemspec
+                target: example.gemspec
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "example.gemspec" }
+
+      expect(gemspec_report.fetch(:final_content)).to include('spec.authors = ["First Author", "Second Author"]')
+      expect(gemspec_report.dig(:metadata, :template_tokens)).to include(
+        "KJ|AUTHOR:NAME" => "First Author",
+        "KJ|AUTHOR:NAMES" => '["First Author", "Second Author"]'
+      )
+      expect(File.read(File.join(root, "example.gemspec"))).to include('spec.authors = ["First Author", "Second Author"]')
+    end
+  end
+
+  it "derives author names from copyright holders when gemspec authors are absent" do
+    author = described_class.send(
+      :author_facts,
+      {},
+      {},
+      copyright: {
+        lines: [
+          "Copyright (c) 2020 Ada Lovelace",
+          "Copyright (c) 2021, 2023-2024 Grace Hopper"
+        ]
+      }
+    )
+
+    expect(described_class.send(:author_template_tokens, author)).to include(
+      "KJ|AUTHOR:NAMES" => '["Ada Lovelace", "Grace Hopper"]'
+    )
+  end
+
   it "honors forge user template token config and environment overrides" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

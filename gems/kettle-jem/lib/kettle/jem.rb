@@ -2519,8 +2519,8 @@ module Kettle
       package_name = File.basename(project_root.to_s) if package_name.empty?
       configured_or_detected_licenses = detected_license_ids(project_root)
       configured_or_detected_licenses = Array(kettle_config["licenses"]) if configured_or_detected_licenses.empty?
-      author = author_facts(kettle_config, env)
       copyright = copyright_facts(project_root, kettle_config)
+      author = author_facts(kettle_config, env, copyright: copyright)
       license = license_facts(kettle_config.merge("licenses" => configured_or_detected_licenses), configured_or_detected_licenses, author: author, author_email: author[:email], copyright: copyright)
       test_min_ruby = config_test_min_ruby(kettle_config, nil)
       project_runtime = project_runtime_facts(
@@ -2653,8 +2653,8 @@ module Kettle
         metadata_value(gemspec_metadata, :min_ruby)
       gemspec_licenses = Array(gemspec_metadata[:licenses])
 
-      author = author_facts(kettle_config, env, gemspec_metadata: gemspec_metadata)
       copyright = copyright_facts(project_root, kettle_config)
+      author = author_facts(kettle_config, env, gemspec_metadata: gemspec_metadata, copyright: copyright)
       license = license_facts(
         kettle_config,
         gemspec_licenses,
@@ -8163,7 +8163,7 @@ module Kettle
       false
     end
 
-    def author_facts(config, env, gemspec_metadata: {})
+    def author_facts(config, env, gemspec_metadata: {}, copyright: {})
       token_config = token_config_values(config)
       author_config = token_config["author"].is_a?(Hash) ? token_config["author"] : {}
       derived_name = Array(gemspec_metadata[:authors]).map(&:to_s).find { |value| present_template_token_value?(value) }
@@ -8176,6 +8176,7 @@ module Kettle
       orcid = preferred_template_token_value(nil, author_config["orcid"], env, "KJ_AUTHOR_ORCID")
       compact_hash(
         name: name,
+        names: author_names(gemspec_metadata, copyright, name),
         given_names: given_names.to_s,
         family_names: family_names.to_s,
         email: email,
@@ -8210,14 +8211,48 @@ module Kettle
     end
 
     def author_template_tokens(author)
+      names = Array(author[:names]).map(&:to_s).reject(&:empty?)
+      names = [author[:name].to_s] if names.empty?
       {
         "KJ|AUTHOR:NAME" => author[:name].to_s,
+        "KJ|AUTHOR:NAMES" => ruby_array_literal(names),
         "KJ|AUTHOR:GIVEN_NAMES" => author[:given_names].to_s,
         "KJ|AUTHOR:FAMILY_NAMES" => author[:family_names].to_s,
         "KJ|AUTHOR:EMAIL" => author[:email].to_s,
         "KJ|AUTHOR:DOMAIN" => author[:domain].to_s,
         "KJ|AUTHOR:ORCID" => author[:orcid].to_s
       }
+    end
+
+    def author_names(gemspec_metadata, copyright, primary_name)
+      names = Array(gemspec_metadata[:authors]).map(&:to_s)
+      names = names.select { |name| present_template_token_value?(name) }
+      names = copyright_author_names(copyright) if names.empty?
+      names = [primary_name.to_s] if names.empty?
+      names.map(&:strip).reject(&:empty?).uniq
+    end
+
+    def copyright_author_names(copyright)
+      Array(copyright[:lines]).filter_map do |line|
+        copyright_name_from_line(line.to_s)
+      end
+    end
+
+    def copyright_name_from_line(line)
+      prefix = "Copyright (c) "
+      return unless line.start_with?(prefix)
+
+      tokens = line[prefix.length..].to_s.split
+      tokens.shift while tokens.first && copyright_year_token?(tokens.first)
+      tokens.join(" ").strip.then { |name| name unless name.empty? }
+    end
+
+    def copyright_year_token?(token)
+      token.delete(",-").chars.all? { |char| char.between?("0", "9") }
+    end
+
+    def ruby_array_literal(values)
+      "[#{Array(values).map { |value| %("#{ruby_double_quoted_string_body(value.to_s)}") }.join(", ")}]"
     end
 
     def copyright_facts(project_root, config)

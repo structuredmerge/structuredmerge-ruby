@@ -63,6 +63,7 @@
 #
 # Safe automatic derivations currently implemented:
 #   AUTHOR:NAME         <- first author from the gemspec
+#   AUTHOR:NAMES        <- all authors from the gemspec, or copyright holders if no gemspec authors exist
 #   AUTHOR:EMAIL        <- first email from the gemspec
 #   AUTHOR:DOMAIN       <- domain part of AUTHOR:EMAIL
 #   AUTHOR:GIVEN_NAMES  <- AUTHOR:NAME minus the last word
@@ -377,7 +378,7 @@ tokens:
     sh_user: "galtzo"        # SourceHut username only, no leading ~, no URL. Used as https://sr.ht/~<value>/. ENV: KJ_SH_USER
 
   author:
-    name: "Peter H. Boling"                 # Full display name. Example: Ada Lovelace. ENV: KJ_AUTHOR_NAME. Auto-seeded from gemspec authors.first
+    name: "Peter H. Boling"                 # Full display name. Example: Ada Lovelace. ENV: KJ_AUTHOR_NAME. Auto-seeded from gemspec authors.first; generated gemspec authors preserve the full existing authors array via AUTHOR:NAMES.
     given_names: "Peter H."   # Given/personal names only. Example: Ada. ENV: KJ_AUTHOR_GIVEN_NAMES. Auto-seeded when AUTHOR:NAME can be split
     family_names: "Boling" # Family/surname only. Example: Lovelace. ENV: KJ_AUTHOR_FAMILY_NAMES. Auto-seeded when AUTHOR:NAME can be split
     email: "floss@galtzo.com"               # Primary public email address. Example: floss@galtzo.com. ENV: KJ_AUTHOR_EMAIL. Auto-seeded from gemspec email.first
