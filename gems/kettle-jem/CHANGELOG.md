@@ -42,8 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.6.
-- The packaged gemspec template now uses the same `kettle-dev` 2.2.6 floor as
+- Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.7.
+- The packaged gemspec template now uses the same `kettle-dev` 2.2.7 floor as
   generated Gemfile tooling.
 - Generated templating Gemfiles now require `kettle-drift` >= 1.0.3.
 - Gem templates now require `kettle-test` >= 2.0.5.
