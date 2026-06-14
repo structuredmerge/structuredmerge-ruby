@@ -112,7 +112,7 @@ PATH
       commonmarker-merge (= 7.0.0)
       dotenv-merge (= 7.0.0)
       json-merge (= 7.0.0)
-      kettle-dev (~> 2.2, >= 2.2.5)
+      kettle-dev (~> 2.2, >= 2.2.7)
       kramdown-merge (= 7.0.0)
       markdown-merge (= 7.0.0)
       markly-merge (= 7.0.0)
@@ -285,10 +285,13 @@ GEM
     diff-lcs (1.6.2)
     gitmoji-regex (2.0.1)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-dev (2.2.5)
+    kettle-dev (2.2.7)
       kettle-test (~> 2.0, >= 2.0.4)
       version_gem (~> 1.1, >= 1.1.11)
     kettle-drift (1.0.3)
+      version_gem (~> 1.1, >= 1.1.11)
+    kettle-family (0.1.2)
+      tsort (~> 0.2)
       version_gem (~> 1.1, >= 1.1.11)
     kettle-test (2.0.5)
       appraisal2 (~> 3.0, >= 3.0.6)
@@ -405,6 +408,7 @@ DEPENDENCIES
   json-merge!
   kettle-dev (~> 2.2, ~> 2.0, >= 2.2.3, >= 2.0.5)
   kettle-drift (~> 1.0, >= 1.0.3)
+  kettle-family (~> 0.1)
   kettle-jem!
   kettle-test (~> 2.0, >= 2.0.5, >= 2.0.1)
   kramdown-merge!
@@ -460,8 +464,9 @@ CHECKSUMS
   gitmoji-regex (2.0.1) sha256=a0afe78c4a2cb4590068c3007a1172ac3f12a73fb289bbc8c7a73c759cf8a2f5
   go-merge (7.0.0)
   json-merge (7.0.0)
-  kettle-dev (2.2.5)
+  kettle-dev (2.2.7) sha256=41b35c5eee77ed4a0e1a7fff7751dc195d3729a1f6ad95e30b6c6113e6a76c30
   kettle-drift (1.0.3) sha256=6e15bec89763bab5a2a8d39d234e0219cceb96ea286949bfacdcfae2f306924e
+  kettle-family (0.1.2) sha256=bbf1fcccbce0347a2579ed31332eba5a7a26fdc248aa21a264434a3e7da7fe55
   kettle-jem (7.0.0)
   kettle-test (2.0.5) sha256=98fd96f03c4470cd2cb0b1cef339455064d8a68bc180f70864d85fd74f41d978
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
