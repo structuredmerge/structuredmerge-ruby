@@ -51,6 +51,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates now require `kettle-test` >= 2.0.5.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 2.0.2.
 - Generated style Gemfiles now require `rubocop-gradual` >= 0.4.0.
+- Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.1.
 - Generated main Gemfiles now require `nomono` >= 1.0.4.
 - Runtime dependency `token-resolver` now requires 2.0.2 or newer.
 - Gem templates now require `turbo_tests2` >= 3.1.2 for the default
