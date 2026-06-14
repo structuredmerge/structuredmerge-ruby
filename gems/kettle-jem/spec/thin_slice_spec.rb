@@ -6909,7 +6909,7 @@ RSpec.describe Kettle::Jem do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.3", require: false')
+      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.4", require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end

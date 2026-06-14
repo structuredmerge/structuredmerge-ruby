@@ -65,8 +65,8 @@ RSpec.describe Kettle::Jem do
       },
       "nomono" => {
         declaration_names: ["nomono"],
-        requirement_args: %("~> 1.0", ">= 1.0.3"),
-        lock_version: "1.0.3",
+        requirement_args: %("~> 1.0", ">= 1.0.4"),
+        lock_version: "1.0.4",
         requirement_surfaces: [
           "Gemfile",
           "lib/kettle/jem/templates/Gemfile.example"
