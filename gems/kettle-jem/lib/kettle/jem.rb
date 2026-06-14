@@ -47,6 +47,7 @@ module Kettle
       main.yml
       hoary.yml
       codeql-analysis.yml
+      tests.yml
     ].freeze
     OPENCOLLECTIVE_DISABLED_FILES = %w[.opencollective.yml .github/workflows/opencollective.yml].freeze
     OPT_IN_GITHUB_WORKFLOWS = %w[.github/workflows/discord-notifier.yml].freeze

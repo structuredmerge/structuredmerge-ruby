@@ -55,6 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated main Gemfiles now require `nomono` >= 1.0.4.
 - Generated gemspec templates now preserve the full existing gemspec author list
   instead of replacing it with the primary author token.
+- Retemplating now removes legacy `.github/workflows/tests.yml` files as
+  obsolete workflows.
 - Runtime dependency `token-resolver` now requires 2.0.2 or newer.
 - Gem templates now require `turbo_tests2` >= 3.1.2 for the default
   `kettle-test` runner dependency.

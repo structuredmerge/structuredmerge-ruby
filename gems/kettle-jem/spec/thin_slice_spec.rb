@@ -202,6 +202,41 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "removes legacy tests workflow files as obsolete GitHub Actions workflows" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-obsolete-tests-workflow-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries: []
+        YAML
+        ".github/workflows/tests.yml" => <<~YAML
+          name: Tests
+          on:
+            pull_request:
+              branches:
+                - '!*'
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".github/workflows/tests.yml" }
+
+      expect(report.fetch(:recipe_name)).to eq("github_actions_obsolete_workflow_cleanup_github_workflows_tests_yml")
+      expect(report.fetch(:metadata).fetch(:delete_file)).to be(true)
+      expect(File).not_to exist(File.join(root, ".github/workflows/tests.yml"))
+    end
+  end
+
   it "projects configured workflow exec_cmd into GitHub workflow templates" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
