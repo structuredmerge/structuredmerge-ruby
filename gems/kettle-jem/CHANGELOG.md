@@ -175,7 +175,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Runtime dependency `token-resolver` now requires 2.0.1 or newer.
 - Generated gemspecs now require `version_gem` >= 1.1.11 while allowing the
   released 1.1 line.
-- Gem templates now require `gitmoji-regex` >= 2.0.1.
+- Gem templates now require `gitmoji-regex` >= 2.0.2.
 - Gem templates now require `turbo_tests2` >= 3.1.1 for the default
   `kettle-test` runner.
 - Generated style Gemfiles now use the latest released `rubocop-ruby*`

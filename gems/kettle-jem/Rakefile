@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-# kettle-jem Rakefile v7.0.0 - 2026-06-11
+# kettle-jem Rakefile v7.0.0 - 2026-06-14
 # Ruby 2.3 (Safe Navigation) or higher required
 #
 # See LICENSE.md for license information.
@@ -61,29 +61,6 @@ desc "Default tasks aggregator"
 task :default do
   puts "Default task complete."
 end
-
-# kettle-jem:freeze
-begin
-  require "rspec/core/rake_task"
-
-  namespace :spec do
-    desc "Disable coverage for the dependency floor slice"
-    task :disable_dependency_floor_coverage do
-      ENV["K_SOUP_COV_DO"] = "false"
-    end
-
-    desc "Run the fast dependency floor slice for template/runtime floor bumps"
-    RSpec::Core::RakeTask.new(dependency_floors: :disable_dependency_floor_coverage) do |task|
-      task.pattern = "spec/kettle/jem_dependency_floor_slice_spec.rb"
-    end
-  end
-rescue LoadError
-  desc("(stub) spec:dependency_floors is unavailable")
-  task("spec:dependency_floors") do
-    warn("NOTE: rspec-core isn't installed, or is disabled for #{RUBY_VERSION} in the current environment")
-  end
-end
-# kettle-jem:unfreeze
 
 # :nocov:
 ### MONOREPO FAMILY TASKS
