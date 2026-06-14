@@ -69,7 +69,7 @@ gem "kettle-dev", "~> 2.2", ">= 2.2.3"
 
 gem "kettle-drift", "~> 1.0", ">= 1.0.3"
 
-gem "kettle-family", "~> 0.1"
+gem "kettle-family", ">= 0.1.3"
 
 gem "kettle-test", "~> 2.0", ">= 2.0.5"
 
