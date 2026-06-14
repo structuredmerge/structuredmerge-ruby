@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated GitHub Actions workflow templates now refresh pins for
   `coverallsapp/github-action`, `codecov/codecov-action`, and
   `kettle-rb/ts-grammar-action`.
+- Generated GitHub Actions workflow templates now refresh pins for
+  `github/codeql-action` sub-actions to v4.36.2.
 - Generated workflow templates now pin `coverallsapp/github-action`,
   `codecov/codecov-action`, and `kettle-rb/ts-grammar-action` to resolvable
   release SHAs instead of stripped SemVer strings.
@@ -192,6 +194,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Fixed `bin/kettle-jem-workflow-pins` so its synthetic workflow is valid YAML
   and child command failures include stdout diagnostics.
+- Fixed `bin/kettle-jem-workflow-pins` so sub-action updates reported under the
+  parent action repository, such as `github/codeql-action`, update the full
+  pinned action path instead of being silently counted as zero updates.
 - README compatibility badge pruning now compares Ruby minor series so patch
   floors like `>= 1.8.7` and `>= 2.2.2` keep their matching minor badges.
 - Gemspec template summary and description tokens now strip an already-present

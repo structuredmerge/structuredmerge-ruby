@@ -58,6 +58,37 @@ RSpec.describe KettleJemWorkflowPins do
     expect(File.read(workflow_path)).to include("uses: #{new_pin}")
   end
 
+  it "updates sub-action pins when kettle-gha-sha-pins reports the parent action repository" do
+    sub_action = "github/codeql-action/init"
+    old_sub_pin = "#{sub_action}@#{old_sha} # v4.36.0"
+    new_sub_pin = "#{sub_action}@#{new_sha} # v4.36.2"
+
+    allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({sub_action => old_sub_pin})
+    File.write(pin_index_path, %(def github_actions_step_pins\n  {"#{sub_action}" => "#{old_sub_pin}"}\nend\n))
+    File.write(workflow_path, "steps:\n  - uses: #{old_sub_pin}\n")
+    allow(Open3).to receive(:capture3).and_return([
+      JSON.generate(
+        "planned_changes" => [
+          {
+            "action" => "github/codeql-action",
+            "old_value" => "#{sub_action}@#{old_sha}",
+            "new_ref" => new_sha,
+            "new_version" => "4.36.2"
+          }
+        ],
+        "outdated_pins" => []
+      ),
+      "",
+      instance_double(Process::Status, success?: true, exitstatus: 0)
+    ])
+
+    result = described_class.new(project_root: project_root, options: {write: true}).run
+
+    expect(result[:updated_actions]).to eq([sub_action])
+    expect(File.read(pin_index_path)).to include(new_sub_pin)
+    expect(File.read(workflow_path)).to include("uses: #{new_sub_pin}")
+  end
+
   it "includes stdout diagnostics when kettle-gha-sha-pins fails without stderr" do
     allow(Open3).to receive(:capture3).and_return([
       JSON.generate("errors" => [{"error" => "yaml_parse_error"}]),

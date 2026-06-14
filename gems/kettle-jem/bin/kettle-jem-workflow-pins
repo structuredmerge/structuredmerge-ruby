@@ -169,7 +169,7 @@ class KettleJemWorkflowPins
 
   def replacement_map(planned_changes, pins)
     planned_changes.each_with_object({}) do |change, replacements|
-      action = change.fetch("action")
+      action = pin_action_key(change, pins)
       next unless pins.key?(action)
 
       new_ref = change.fetch("new_ref").to_s
@@ -180,6 +180,17 @@ class KettleJemWorkflowPins
       desired += " # v#{new_version}" unless new_version.empty?
       replacements[action] = [pins.fetch(action), desired]
     end
+  end
+
+  def pin_action_key(change, pins)
+    action = change.fetch("action")
+    return action if pins.key?(action)
+
+    old_value = change["old_value"].to_s
+    old_action, separator, = old_value.partition("@")
+    return old_action if separator == "@" && pins.key?(old_action)
+
+    action
   end
 
   def apply_replacements(replacements)

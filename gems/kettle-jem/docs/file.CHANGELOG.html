@@ -100,15 +100,25 @@ duplicate declarations fail in CI.</li>
 <h3 id="changed">Changed</h3>
 
 <ul>
-  <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.3.</li>
-  <li>The packaged gemspec template now uses the same <code>kettle-dev</code> 2.2.3 floor as<br>
+  <li>Refreshed the generated <code>codecov/codecov-action</code> workflow pin and made<br>
+workflow-pin specs validate immutable pin shape instead of exact live SHAs.</li>
+  <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.8.</li>
+  <li>The packaged gemspec template now uses the same <code>kettle-dev</code> 2.2.8 floor as<br>
 generated Gemfile tooling.</li>
   <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.3.</li>
   <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.5.</li>
   <li>Generated coverage Gemfiles now require <code>kettle-soup-cover</code> &gt;= 2.0.2.</li>
+  <li>Generated style Gemfiles now require <code>rubocop-gradual</code> &gt;= 0.4.0.</li>
+  <li>Generated style Gemfiles now require <code>appraisal2-rubocop</code> &gt;= 0.2.1.</li>
+  <li>Generated main Gemfiles now require <code>nomono</code> &gt;= 1.0.4.</li>
+  <li>Generated gemspec templates now preserve the full existing gemspec author list<br>
+instead of replacing it with the primary author token.</li>
+  <li>Retemplating now removes legacy <code>.github/workflows/tests.yml</code> files as<br>
+obsolete workflows.</li>
   <li>Runtime dependency <code>token-resolver</code> now requires 2.0.2 or newer.</li>
-  <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.2 for the default<br>
+  <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.3 for the default<br>
 <code>kettle-test</code> runner dependency.</li>
+  <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.2.1.</li>
   <li>Gemfile and gemspec source checks now prefer Prism-backed call records instead<br>
 of regex/string fallback matching for dependency and project-name decisions.</li>
   <li>Appraisals template merging now delegates same-name DSL call reconciliation to<br>
@@ -126,12 +136,17 @@ immutable SHA for v2.2.1.</li>
   <li>Generated GitHub Actions workflow templates now refresh pins for<br>
 <code>coverallsapp/github-action</code>, <code>codecov/codecov-action</code>, and<br>
 <code>kettle-rb/ts-grammar-action</code>.</li>
+  <li>Generated GitHub Actions workflow templates now refresh pins for<br>
+<code>github/codeql-action</code> sub-actions to v4.36.2.</li>
   <li>Generated workflow templates now pin <code>coverallsapp/github-action</code>,<br>
 <code>codecov/codecov-action</code>, and <code>kettle-rb/ts-grammar-action</code> to resolvable<br>
 release SHAs instead of stripped SemVer strings.</li>
   <li>Generated GitHub Actions workflow templates now refresh <code>ruby/setup-ruby</code> to<br>
 the immutable SHA for v1.312.0 and <code>codecov/codecov-action</code> to the latest<br>
 v7.0.0 release comment.</li>
+  <li>Generated GitHub Actions workflow templates now refresh <code>ruby/setup-ruby</code>,<br>
+<code>coverallsapp/github-action</code>, <code>pozil/auto-assign-issue</code>, and<br>
+<code>kettle-rb/ts-grammar-action</code> pins.</li>
   <li>Generated coverage workflows now publish QLTY coverage with GitHub OIDC so<br>
 repositories do not require <code>QLTY_COVERAGE_TOKEN</code> to be configured.</li>
   <li>Generated README and FUNDING OpenCollective links now use the configured<br>
@@ -239,6 +254,11 @@ task dependencies, independent from the gemspec runtime Ruby floor.</li>
 <h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>Fixed <code>bin/kettle-jem-workflow-pins</code> so its synthetic workflow is valid YAML<br>
+and child command failures include stdout diagnostics.</li>
+  <li>Fixed <code>bin/kettle-jem-workflow-pins</code> so sub-action updates reported under the<br>
+parent action repository, such as <code>github/codeql-action</code>, update the full<br>
+pinned action path instead of being silently counted as zero updates.</li>
   <li>README compatibility badge pruning now compares Ruby minor series so patch<br>
 floors like <code>&gt;= 1.8.7</code> and <code>&gt;= 2.2.2</code> keep their matching minor badges.</li>
   <li>Gemspec template summary and description tokens now strip an already-present<br>
@@ -526,7 +546,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jun 11 14:06:34 2026 by
+  Generated on Sun Jun 14 04:56:05 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.44 (ruby-4.0.5).
 </div>
