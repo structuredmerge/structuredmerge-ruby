@@ -105,6 +105,15 @@ RSpec.describe Kettle::Jem do
         requirement_surfaces: [
           "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
         ]
+      },
+      "yard-yaml" => {
+        declaration_names: ["yard-yaml"],
+        requirement_args: %("~> 0.2", ">= 0.2.1"),
+        lock_version: "0.2.1",
+        requirement_surfaces: [
+          "gemfiles/modular/documentation.gemfile",
+          "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
+        ]
       }
     }
   end
