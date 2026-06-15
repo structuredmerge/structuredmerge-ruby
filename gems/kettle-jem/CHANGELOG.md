@@ -47,6 +47,8 @@ Please file a bug if you notice a violation of semantic versioning.
   from target runtime sibling path dependencies.
 - Generated kettle-jem usage instructions now use the `kettle-jem` executable as
   the bootstrap entrypoint instead of starting from `bundle exec kettle-jem`.
+- Generated Appraisals now use modern keyword hash syntax for the
+  `appraisal2-rubocop` plugin declaration.
 - Refreshed the generated `codecov/codecov-action` workflow pin and made
   workflow-pin specs validate immutable pin shape instead of exact live SHAs.
 - Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.9.

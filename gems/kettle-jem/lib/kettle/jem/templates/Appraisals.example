@@ -9,7 +9,7 @@
 # HOW TO UPDATE APPRAISALS (Appraisal2 RuboCop plugin normalizes generated gemfiles on modern Ruby):
 #   bin/rake appraisal:update
 
-plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true
+plugin "appraisal2-rubocop", require: "appraisal2/rubocop", optional: true
 
 # Lock/Unlock Deps Pattern
 #

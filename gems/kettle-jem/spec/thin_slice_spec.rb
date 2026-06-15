@@ -10690,7 +10690,7 @@ RSpec.describe Kettle::Jem do
       end
 
       expect(appraisals_report.fetch(:final_content)).to include(
-        'plugin "appraisal2-rubocop", :require => "appraisal2/rubocop", :optional => true'
+        'plugin "appraisal2-rubocop", require: "appraisal2/rubocop", optional: true'
       )
       expect(appraisals_report.fetch(:final_content)).not_to include("respond_to?(:plugin)")
       expect(appraisals_report.fetch(:final_content)).not_to include('require "appraisal2/rubocop"')
