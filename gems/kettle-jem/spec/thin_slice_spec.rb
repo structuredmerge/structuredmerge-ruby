@@ -5396,6 +5396,57 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "discovers nested public entrypoint namespace before stale generated version namespace" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-nested-entrypoint-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "warden_oauth.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "warden_oauth"
+            spec.version = Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/warden_oauth/version.rb", mod) }::WardenOauth::Version::VERSION
+            spec.summary = "Warden OAuth"
+            spec.required_ruby_version = ">= 1.8"
+          end
+        RUBY
+        "lib/warden_oauth.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require_relative "warden_oauth/version"
+
+          module Warden
+            module OAuth
+              autoload :Strategy, "warden_oauth/strategy"
+            end
+          end
+        RUBY
+        "lib/warden_oauth/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module WardenOauth
+            module Version
+              VERSION = "0.1.1"
+            end
+            VERSION = Version::VERSION
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "🛡️"
+          rubygems:
+            min_ruby: "1.8"
+        YAML
+      })
+
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+      tokens = described_class.send(:template_tokens, facts, {})
+
+      expect(facts.dig(:rubygems, :namespace)).to eq("Warden::OAuth")
+      expect(facts.dig(:rubygems, :namespace)).not_to eq("WardenOauth")
+      expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden%3A%3AOAuth")
+    end
+  end
+
   it "places version_gem entrypoint requires from top-level Ruby structure" do
     content = <<~RUBY
       # frozen_string_literal: true
@@ -9904,6 +9955,7 @@ RSpec.describe Kettle::Jem do
           Major: {KJ|GEM_MAJOR}
           GitHub org: {KJ|GH_ORG}
           Namespace shield: {KJ|NAMESPACE_SHIELD}
+          Namespace badge: https://img.shields.io/badge/namespace-{KJ|NAMESPACE_SHIELD}-3C2D2D.svg
           Min dev Ruby: {KJ|MIN_DEV_RUBY}
           Freeze: {KJ|FREEZE_TOKEN}
           Version: {KJ|KETTLE_JEM_VERSION}
@@ -9933,6 +9985,7 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("Major: 2")
       expect(final_content).to include("GitHub org: acme")
       expect(final_content).to include("Namespace shield: Example%3A%3AGem")
+      expect(final_content).to include("Namespace badge: https://img.shields.io/badge/namespace-Example%3A%3AGem-3C2D2D.svg")
       expect(final_content).to include("Min dev Ruby: 3.2")
       expect(final_content).to include("Freeze: custom-freeze")
       expect(final_content).to include("Version: #{Kettle::Jem::VERSION}")

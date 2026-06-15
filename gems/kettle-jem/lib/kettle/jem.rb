@@ -9098,7 +9098,8 @@ module Kettle
     end
 
     def existing_entrypoint_version_namespace(project_root, relative_path)
-      ruby_version_class_eval_namespaces(read_project_file(project_root, relative_path)).first
+      content = read_project_file(project_root, relative_path)
+      ruby_version_class_eval_namespaces(content).first || ruby_entrypoint_module_namespace(content)
     end
 
     def ruby_version_class_eval_namespaces(content)
@@ -9109,6 +9110,26 @@ module Kettle
 
         receiver.delete_suffix("::Version")
       end
+    end
+
+    def ruby_entrypoint_module_namespace(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      body.each do |node|
+        namespace = ruby_entrypoint_module_namespace_for(node, [])
+        return namespace if namespace
+      end
+      nil
+    end
+
+    def ruby_entrypoint_module_namespace_for(node, namespace)
+      return unless node.is_a?(::Prism::ModuleNode)
+
+      current = namespace + ruby_constant_path_segments(node.constant_path)
+      node.body&.body&.each do |child|
+        child_namespace = ruby_entrypoint_module_namespace_for(child, current)
+        return child_namespace if child_namespace
+      end
+      current.join("::") unless current.empty?
     end
 
     def read_project_file(project_root, relative_path)

@@ -203,6 +203,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Namespace discovery now detects nested module declarations in the public
+  entrypoint before falling back to a stale generated version namespace, and the
+  README namespace badge now uses the shield-safe namespace token.
 - OpenCollective template tokens now use `.github/FUNDING.yml` as a valid org
   source, preventing empty `https://opencollective.com//...` README and
   FUNDING links when destination env variables are not loaded.
