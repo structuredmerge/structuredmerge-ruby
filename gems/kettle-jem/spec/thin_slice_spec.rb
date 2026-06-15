@@ -2867,17 +2867,17 @@ RSpec.describe Kettle::Jem do
           gemspec
 
           unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
-          unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
-            unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
-              require "nomono/bundler"
+            unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+              unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
+                require "nomono/bundler"
 
-              eval_nomono_gems(
-                gems: %w[version_gem],
-                prefix: "RUBY_OAUTH",
-                path_env: "RUBY_OAUTH_DEV"
-              )
+                eval_nomono_gems(
+                  gems: %w[version_gem],
+                  prefix: "RUBY_OAUTH",
+                  path_env: "RUBY_OAUTH_DEV"
+                )
+              end
             end
-          end
           end
         RUBY
       })
@@ -2886,6 +2886,11 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
       guard_line = %(unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?\n)
       expect(gemfile.lines.count(guard_line)).to eq(1)
+      expect(gemfile).to include(<<~RUBY.rstrip)
+        unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
+            require "nomono/bundler"
+      RUBY
     end
   end
 

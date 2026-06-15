@@ -4861,6 +4861,7 @@ module Kettle
       output = content.to_s
       records.sort_by { |record| -record.fetch(:outer_start_line) }.each do |record|
         inner_source = output.lines[(record.fetch(:inner_start_line) - 1)..(record.fetch(:inner_end_line) - 1)].join
+        inner_source = outdent_source(inner_source, 2)
         output = replace_source_range_lines(output, record.fetch(:outer_start_line), record.fetch(:outer_end_line), inner_source)
       end
       output
@@ -4949,6 +4950,11 @@ module Kettle
     def indent_source(source, spaces)
       prefix = " " * spaces
       source.to_s.lines.map { |line| line.strip.empty? ? line : "#{prefix}#{line}" }.join
+    end
+
+    def outdent_source(source, spaces)
+      prefix = " " * spaces
+      source.to_s.lines.map { |line| line.start_with?(prefix) ? line.delete_prefix(prefix) : line }.join
     end
 
     def local_gemfile_template_recipe?(recipe)
