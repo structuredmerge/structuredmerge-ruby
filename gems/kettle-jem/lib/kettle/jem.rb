@@ -4837,6 +4837,7 @@ module Kettle
 
     def guard_main_gemfile_runtime_workspace_overrides(content)
       content = collapse_nested_templating_guards(content)
+      content = normalize_templating_guard_indentation(content)
       records = runtime_workspace_override_records(content)
       return content if records.empty?
 
@@ -4865,6 +4866,56 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:outer_start_line), record.fetch(:outer_end_line), inner_source)
       end
       output
+    end
+
+    def normalize_templating_guard_indentation(content)
+      records = templating_guard_records(content)
+      return content if records.empty?
+
+      output = content.to_s
+      records.sort_by { |record| -record.fetch(:start_line) }.each do |record|
+        source = output.lines[(record.fetch(:start_line) - 1)..(record.fetch(:end_line) - 1)].join
+        normalized = normalize_conditional_body_indentation(source)
+        next if normalized == source
+
+        output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), normalized)
+      end
+      output
+    end
+
+    def templating_guard_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        gemfile_conditional_node?(node) && prism_subtree_contains_string?(node.predicate, "K_JEM_TEMPLATING")
+      end.map do |node|
+        {start_line: node.location.start_line, end_line: node.location.end_line}
+      end
+    end
+
+    def normalize_conditional_body_indentation(source)
+      lines = source.to_s.lines
+      return source if lines.length < 3
+
+      outer_indent = leading_space_count(lines.first)
+      desired_body_indent = outer_indent + 2
+      body = lines[1...-1]
+      min_body_indent = body.reject { |line| line.strip.empty? }.map { |line| leading_space_count(line) }.min
+      return source unless min_body_indent && min_body_indent > desired_body_indent
+
+      remove_spaces = min_body_indent - desired_body_indent
+      ([lines.first] + body.map { |line| outdent_line(line, remove_spaces) } + [lines.last]).join
+    end
+
+    def leading_space_count(line)
+      line.to_s.each_char.take_while { |char| char == " " }.count
+    end
+
+    def outdent_line(line, spaces)
+      return line if line.strip.empty?
+
+      line.delete_prefix(" " * spaces)
     end
 
     def nested_templating_guard_records(content)
