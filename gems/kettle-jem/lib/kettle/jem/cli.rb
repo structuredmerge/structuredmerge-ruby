@@ -30,6 +30,7 @@ module Kettle
 
         options = parse_options(args)
         project_root = File.expand_path(options.fetch(:project_root) || Dir.pwd)
+        ensure_not_running_from_own_context!(command, project_root)
         print_debug_snapshot(command, project_root: project_root, env: env, err: err) if debug_enabled?(env)
         result = execute(command, project_root: project_root, env: env, options: options)
         write_report(options[:report_path], result) if options[:report_path]
@@ -196,6 +197,25 @@ module Kettle
       def scoped_template_run?(run_options)
         run_options = run_options.to_h
         run_options.key?(:only) || run_options.key?(:include)
+      end
+
+      def ensure_not_running_from_own_context!(command, project_root)
+        return if %w[help version].include?(command)
+
+        current_root = canonical_path(Dir.pwd)
+        own_root = canonical_path(File.expand_path("../../..", __dir__))
+        target_root = canonical_path(project_root)
+        return unless current_root == own_root && target_root != own_root
+
+        raise ArgumentError,
+          "Refusing to run kettle-jem from its own project root against #{project_root}; " \
+          "run from the destination repository so its environment is loaded, or target kettle-jem itself."
+      end
+
+      def canonical_path(path)
+        File.realpath(path)
+      rescue Errno::ENOENT
+        File.expand_path(path)
       end
 
       def print_result(command, result, options:, out:)

@@ -40,12 +40,19 @@
         "min_ruby": ">= 3.2"
       },
       "funding": {
+        "open_collective_org": "example",
+        "open_collective_org_source": ".github/FUNDING.yml",
         "urls": [
           "https://example.test/fund",
           "https://github.com/sponsors/example",
           "https://opencollective.com/example",
           "https://tidelift.com/funding/github/rubygems/example"
         ]
+      },
+      "templates": {
+        "tokens": {
+          "KJ|OPENCOLLECTIVE_ORG": "example"
+        }
       },
       "ci": {
         "provider": "github_actions",

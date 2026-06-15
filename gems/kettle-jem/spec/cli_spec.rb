@@ -16,6 +16,7 @@ RSpec.describe Kettle::Jem::CLI do
   def run_cli(argv, env: {})
     out = StringIO.new
     err = StringIO.new
+    allow(Dir).to receive(:pwd).and_return(tmp_root)
     status = described_class.run(argv, env: env, out: out, err: err)
     [status, out.string, err.string]
   end
@@ -38,6 +39,19 @@ RSpec.describe Kettle::Jem::CLI do
     expect(version_status).to eq(0)
     expect(version_out).to eq("#{Kettle::Jem::Version::VERSION}\n")
     expect(version_err).to eq("")
+  end
+
+  it "refuses to target another project from kettle-jem's own project root" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      out = StringIO.new
+      err = StringIO.new
+      allow(Dir).to receive(:pwd).and_return(File.expand_path("..", __dir__))
+      status = described_class.run(["plan", root], env: {}, out: out, err: err)
+
+      expect(status).to eq(2)
+      expect(out.string).to eq("")
+      expect(err.string).to include("Refusing to run kettle-jem from its own project root")
+    end
   end
 
   it "uses no-subcommand invocation as first-run setup bootstrap" do

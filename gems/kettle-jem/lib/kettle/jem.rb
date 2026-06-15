@@ -2747,10 +2747,8 @@ module Kettle
       funding[:open_collective_disabled] = true if opencollective_disabled
       funding[:open_collective_disabled_source] = opencollective_policy[:source] if opencollective_disabled
       if open_collective_org
-        unless open_collective_org.fetch(:source) == ".github/FUNDING.yml"
-          funding[:open_collective_org] = open_collective_org.fetch(:org)
-          funding[:open_collective_org_source] = open_collective_org.fetch(:source)
-        end
+        funding[:open_collective_org] = open_collective_org.fetch(:org)
+        funding[:open_collective_org_source] = open_collective_org.fetch(:source)
       end
       open_collective_files = opencollective_disabled ? opencollective_disabled_files(project_root) : []
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?

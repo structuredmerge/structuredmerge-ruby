@@ -1048,8 +1048,8 @@ RSpec.describe Kettle::Jem do
     workflow = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/templating.yml.example"))
 
     expect(workflow).to include("- name: Update templating bootstrap dependencies")
-    expect(workflow).to include('BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile')
-    expect(workflow).to include('K_JEM_TEMPLATING: "true"')
+    expect(workflow).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile")
+    expect(workflow).to include("K_JEM_TEMPLATING: \"true\"")
     expect(workflow).to include("run: bundle update nomono")
     expect(workflow.index("Update templating bootstrap dependencies")).to be < workflow.index("[Attempt 1] Appraisal")
   end
@@ -1704,6 +1704,36 @@ RSpec.describe Kettle::Jem do
       expect(plan.dig(:facts, :funding, :open_collective_org_source)).to eq("config.funding.open_collective")
       expect(plan.dig(:facts, :funding, :urls)).to include("https://opencollective.com/config-org")
       expect(plan.dig(:facts, :templates, :tokens)).to include("KJ|OPENCOLLECTIVE_ORG" => "config-org")
+    end
+  end
+
+  it "uses GitHub funding Open Collective config as the template token source" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-opencollective-github-funding-org-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".github/FUNDING.yml" => <<~YAML,
+          open_collective: "github-funding-org"
+        YAML
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      expect(plan.dig(:facts, :funding, :open_collective_org)).to eq("github-funding-org")
+      expect(plan.dig(:facts, :funding, :open_collective_org_source)).to eq(".github/FUNDING.yml")
+      expect(plan.dig(:facts, :funding, :urls)).to include("https://opencollective.com/github-funding-org")
+      expect(plan.dig(:facts, :templates, :tokens)).to include(
+        "KJ|OPENCOLLECTIVE_ORG" => "github-funding-org"
+      )
     end
   end
 

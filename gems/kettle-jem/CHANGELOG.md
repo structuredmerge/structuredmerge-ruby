@@ -195,6 +195,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- OpenCollective template tokens now use `.github/FUNDING.yml` as a valid org
+  source, preventing empty `https://opencollective.com//...` README and
+  FUNDING links when destination env variables are not loaded.
+- The `kettle-jem` CLI now refuses to run from the `kettle-jem` project root
+  against a different destination, so templating cannot silently use
+  `kettle-jem`'s own environment instead of the target repo's environment.
 - Fixed `bin/kettle-jem-workflow-pins` so its synthetic workflow is valid YAML
   and child command failures include stdout diagnostics.
 - Fixed `bin/kettle-jem-workflow-pins` so sub-action updates reported under the
