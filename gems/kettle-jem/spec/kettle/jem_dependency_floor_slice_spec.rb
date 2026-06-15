@@ -100,8 +100,8 @@ RSpec.describe Kettle::Jem do
       },
       "yard-fence" => {
         declaration_names: ["yard-fence"],
-        requirement_args: %("~> 0.9", ">= 0.9.3"),
-        lock_version: "0.9.3",
+        requirement_args: %("~> 0.9", ">= 0.9.4"),
+        lock_version: "0.9.4",
         requirement_surfaces: [
           "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
         ]
