@@ -19,7 +19,7 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
           spec.version = "7.0.0"
           spec.summary = "Plain merge"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.11")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.12")
         end
       RUBY
       write_file(root, "lib/plain/merge.rb", <<~RUBY)
