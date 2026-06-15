@@ -204,6 +204,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - OpenCollective template tokens now use `.github/FUNDING.yml` as a valid org
   source, preventing empty `https://opencollective.com//...` README and
   FUNDING links when destination env variables are not loaded.
+- Monorepo-root templating now uses the no-OpenCollective funding templates
+  when no OpenCollective slug is configured, preventing empty generated
+  OpenCollective badge URLs in root `FUNDING.md` files.
 - The `kettle-jem` CLI now refuses to run from the `kettle-jem` project root
   against a different destination, so templating cannot silently use
   `kettle-jem`'s own environment instead of the target repo's environment.

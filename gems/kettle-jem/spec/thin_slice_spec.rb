@@ -1596,6 +1596,7 @@ RSpec.describe Kettle::Jem do
             profile: monorepo-subgem
             entries:
               - README.md
+              - FUNDING.md
           files:
             README.md:
               strategy: accept_template
@@ -1607,12 +1608,18 @@ RSpec.describe Kettle::Jem do
       readme = apply.fetch(:recipe_reports).find do |candidate|
         candidate.fetch(:recipe_name) == "template_source_application_README_md"
       end.fetch(:final_content)
+      funding = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_FUNDING_md"
+      end.fetch(:final_content)
 
       expect(readme).not_to include("Open Source Helpers")
       expect(readme).not_to include("codetriage")
       expect(readme).not_to include("OpenCollective Backers")
       expect(readme).not_to include("OpenCollective Sponsors")
       expect(readme).not_to include("opencollective")
+      expect(funding).not_to include("OpenCollective Backers")
+      expect(funding).not_to include("OpenCollective Sponsors")
+      expect(funding).not_to include("opencollective")
       expect(readme).not_to include("Apache SkyWalking Eyes License Compatibility Check")
       expect(readme).to include("https://github.com/structuredmerge/structuredmerge-ruby#package-family")
       expect(readme).to include("root package-family guide")
@@ -3858,6 +3865,19 @@ RSpec.describe Kettle::Jem do
   it "generates only curated documented binstubs" do
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
       %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
+    )
+  end
+
+  it "omits curated binstubs for gems missing from the destination bundle" do
+    status = instance_double(Process::Status, success?: true)
+    allow(Open3).to receive(:capture3).and_return([
+      "appraisal2\nrake\nrbs\nrspec-core\nkettle-dev\nkettle-test\nkettle-soup-cover\nstone_checksums\n",
+      "",
+      status
+    ])
+
+    expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command("/example", env: {})).to eq(
+      %w[bundle binstubs appraisal2 rake rbs rspec-core kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
 

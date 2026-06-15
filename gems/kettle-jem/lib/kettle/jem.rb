@@ -2562,11 +2562,24 @@ module Kettle
       facts[:social] = social unless social.empty?
       facts[:license] = license unless license.empty?
       facts[:project_runtime] = project_runtime unless project_runtime.empty?
+      opencollective_policy = opencollective_policy(kettle_config, env)
+      opencollective_disabled = opencollective_policy.fetch(:disabled)
+      detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
+      if !opencollective_disabled && detected_open_collective_org.nil?
+        opencollective_disabled = true
+        opencollective_policy = {disabled: true, source: "missing.open_collective_org", value: ""}
+      end
       funding = compact_hash(
-        urls: funding_urls(project_root, package_name, opencollective_disabled: false),
+        urls: funding_urls(
+          project_root,
+          package_name,
+          opencollective_disabled: opencollective_disabled,
+          open_collective_org: detected_open_collective_org && detected_open_collective_org.fetch(:org)
+        ),
         platform_tokens: funding_platform_token_facts(kettle_config, env)
       )
-      detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: false)
+      funding[:open_collective_disabled] = true if opencollective_disabled
+      funding[:open_collective_disabled_source] = opencollective_policy[:source] if opencollective_disabled
       if detected_open_collective_org
         funding[:open_collective_org] = detected_open_collective_org.fetch(:org)
         funding[:open_collective_org_source] = detected_open_collective_org.fetch(:source)
@@ -2591,7 +2604,7 @@ module Kettle
       template_preferences = template_source_preferences(
         project_root,
         template_config,
-        opencollective_disabled: false,
+        opencollective_disabled: opencollective_disabled,
         include_patterns: template_selection[:include]
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?

@@ -587,7 +587,7 @@ module Kettle
             ),
             run_command_step(
               "bundle_binstubs",
-              bundle_binstubs_command,
+              bundle_binstubs_command(project_root, env: env),
               project_root: project_root,
               env: env,
               quiet: quiet,
@@ -603,8 +603,16 @@ module Kettle
           steps
         end
 
-        def bundle_binstubs_command
-          %w[bundle binstubs] + CURATED_BINSTUB_GEMS
+        def bundle_binstubs_command(project_root = Dir.pwd, env: ENV)
+          %w[bundle binstubs] + curated_binstub_gems_in_bundle(project_root, env: env)
+        end
+
+        def curated_binstub_gems_in_bundle(project_root = Dir.pwd, env: ENV)
+          stdout, _stderr, status = Open3.capture3(env.to_h, "bundle", "list", "--name-only", chdir: project_root.to_s)
+          return CURATED_BINSTUB_GEMS unless status.success?
+
+          bundled = stdout.lines.map(&:strip).reject(&:empty?)
+          CURATED_BINSTUB_GEMS & bundled
         end
 
         def normalize_lockfile_step(project_root, env:, run_options: {})

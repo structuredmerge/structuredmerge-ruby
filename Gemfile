@@ -76,3 +76,5 @@ gem "kettle-test", "~> 2.0", ">= 2.0.5"
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"
 
 gem "gitmoji-regex", "~> 2.0", ">= 2.0.1"
+
+gem "turbo_tests2", "~> 3.1", ">= 3.1.3"
