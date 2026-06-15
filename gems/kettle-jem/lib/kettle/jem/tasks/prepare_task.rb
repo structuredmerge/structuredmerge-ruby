@@ -11,6 +11,7 @@ module Kettle
           "gemfiles/modular/templating_local.gemfile",
           "mise.toml"
         ].freeze
+        CRITICAL_TEMPLATING_GEMS = %w[nomono kettle-jem kettle-drift].freeze
 
         module_function
 
@@ -22,6 +23,14 @@ module Kettle
           )
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          update_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
+            "bundle_update_templating_bootstrap",
+            bundle_update_templating_bootstrap_command(setup_env),
+            project_root: project_root,
+            env: setup_env,
+            quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
+            command_runner: command_runner
+          )
           bundle_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_install",
             %w[bundle install],
@@ -33,15 +42,39 @@ module Kettle
 
           report.merge(
             mode: "prepare",
-            prepared: bundle_step.fetch(:status) == "succeeded",
+            prepared: update_step.fetch(:status) == "succeeded" &&
+              bundle_step.fetch(:status) == "succeeded",
             prepare_only: PREPARE_ONLY_PATHS,
-            prepare_steps: [bundle_step],
-            changed_files: (report.fetch(:changed_files, []) + bundle_step.fetch(:changed_files, [])).uniq.sort,
+            prepare_steps: [update_step, bundle_step],
+            changed_files: (
+              report.fetch(:changed_files, []) +
+                update_step.fetch(:changed_files, []) +
+                bundle_step.fetch(:changed_files, [])
+            ).uniq.sort,
             diagnostics: report.fetch(:diagnostics, []) + [{
               severity: "advisory",
-              message: "kettle:jem:prepare applied the templating dependency bootstrap payload and ran bundle install."
+              message: "kettle:jem:prepare applied the templating dependency bootstrap payload, " \
+                "updated critical templating gems, and ran bundle install."
             }]
           )
+        end
+
+        def bundle_update_templating_bootstrap_command(env)
+          %w[bundle update] + critical_templating_gems_for_env(env)
+        end
+
+        def critical_templating_gems_for_env(env)
+          command_env = (env || {}).to_h
+          CRITICAL_TEMPLATING_GEMS.select do |gem_name|
+            case gem_name
+            when "kettle-jem"
+              command_env.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
+            when "kettle-drift"
+              command_env.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+            else
+              true
+            end
+          end
         end
       end
     end

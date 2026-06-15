@@ -7,11 +7,16 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     File.expand_path("../../../../tmp", __dir__).tap { |path| FileUtils.mkdir_p(path) }
   end
 
-  it "applies only the dependency bootstrap payload and runs bundle install" do
+  it "updates critical templating gems after applying the dependency bootstrap payload" do
     Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
       File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
       command_runner = double("command_runner")
       setup_env = {"BUNDLE_GEMFILE" => File.join(root, "Gemfile")}
+      update_step = {
+        name: "bundle_update_templating_bootstrap",
+        status: "succeeded",
+        changed_files: ["Gemfile.lock"]
+      }
       bundle_step = {
         name: "bundle_install",
         status: "succeeded",
@@ -24,9 +29,28 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         diagnostics: []
       )
       allow(Kettle::Jem::Tasks::InstallTask).to receive_messages(
-        setup_command_env: setup_env,
-        run_command_step: bundle_step
+        setup_command_env: setup_env
       )
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
+        .with(
+          "bundle_update_templating_bootstrap",
+          %w[bundle update nomono kettle-jem kettle-drift],
+          project_root: root,
+          env: setup_env,
+          quiet: false,
+          command_runner: command_runner
+        )
+        .and_return(update_step)
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
+        .with(
+          "bundle_install",
+          %w[bundle install],
+          project_root: root,
+          env: setup_env,
+          quiet: false,
+          command_runner: command_runner
+        )
+        .and_return(bundle_step)
 
       result = described_class.run(
         project_root: root,
@@ -40,6 +64,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
         prepared: true,
         prepare_only: described_class::PREPARE_ONLY_PATHS
       )
+      expect(result.fetch(:prepare_steps)).to eq([update_step, bundle_step])
       expect(result.fetch(:changed_files)).to eq(["Gemfile", "Gemfile.lock"])
       expect(Kettle::Jem).to have_received(:apply_project).with(
         root,
@@ -50,14 +75,15 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
           skip_lock_normalization: true
         )
       )
-      expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run_command_step).with(
-        "bundle_install",
-        %w[bundle install],
-        project_root: root,
-        env: setup_env,
-        quiet: false,
-        command_runner: command_runner
-      )
     end
+  end
+
+  it "does not target remote-only templating gems when local path overrides are active" do
+    env = {
+      "SMORG_RB_DEV" => "/workspace/structuredmerge/ruby/gems",
+      "KETTLE_RB_DEV" => "/workspace/kettle-dev"
+    }
+
+    expect(described_class.bundle_update_templating_bootstrap_command(env)).to eq(%w[bundle update nomono])
   end
 end

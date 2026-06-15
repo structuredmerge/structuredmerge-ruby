@@ -1044,6 +1044,16 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "updates root templating bootstrap dependencies before generated templating workflow commands run" do
+    workflow = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/templating.yml.example"))
+
+    expect(workflow).to include("- name: Update templating bootstrap dependencies")
+    expect(workflow).to include('BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile')
+    expect(workflow).to include('K_JEM_TEMPLATING: "true"')
+    expect(workflow).to include("run: bundle update nomono kettle-jem kettle-drift")
+    expect(workflow.index("Update templating bootstrap dependencies")).to be < workflow.index("[Attempt 1] Appraisal")
+  end
+
   it "applies README style conditionals and reports missing integrations" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
