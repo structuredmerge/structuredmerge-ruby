@@ -4836,6 +4836,7 @@ module Kettle
     end
 
     def guard_main_gemfile_runtime_workspace_overrides(content)
+      content = collapse_nested_templating_guards(content)
       records = runtime_workspace_override_records(content)
       return content if records.empty?
 
@@ -4851,6 +4852,47 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
       end
       output
+    end
+
+    def collapse_nested_templating_guards(content)
+      records = nested_templating_guard_records(content)
+      return content if records.empty?
+
+      output = content.to_s
+      records.sort_by { |record| -record.fetch(:outer_start_line) }.each do |record|
+        inner_source = output.lines[(record.fetch(:inner_start_line) - 1)..(record.fetch(:inner_end_line) - 1)].join
+        output = replace_source_range_lines(output, record.fetch(:outer_start_line), record.fetch(:outer_end_line), inner_source)
+      end
+      output
+    end
+
+    def nested_templating_guard_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        redundant_templating_guard_wrapper_node?(node)
+      end.map do |node|
+        inner = node.statements.body.first
+        {
+          outer_start_line: node.location.start_line,
+          outer_end_line: node.location.end_line,
+          inner_start_line: inner.location.start_line,
+          inner_end_line: inner.location.end_line
+        }
+      end
+    end
+
+    def redundant_templating_guard_wrapper_node?(node)
+      return false unless gemfile_conditional_node?(node)
+      return false unless prism_subtree_contains_string?(node.predicate, "K_JEM_TEMPLATING")
+
+      body = node.statements&.body.to_a
+      return false unless body.length == 1
+
+      inner = body.first
+      gemfile_conditional_node?(inner) &&
+        prism_subtree_contains_string?(inner.predicate, "K_JEM_TEMPLATING")
     end
 
     def runtime_workspace_override_records(content)

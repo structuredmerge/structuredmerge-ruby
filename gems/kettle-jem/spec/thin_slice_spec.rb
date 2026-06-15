@@ -2840,6 +2840,55 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "collapses duplicate templating guards around main Gemfile local workspace overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-templating-local-guard-collapse", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "Demo"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY
+          source "https://gem.coop"
+
+          gemspec
+
+          unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+            unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
+              require "nomono/bundler"
+
+              eval_nomono_gems(
+                gems: %w[version_gem],
+                prefix: "RUBY_OAUTH",
+                path_env: "RUBY_OAUTH_DEV"
+              )
+            end
+          end
+          end
+        RUBY
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, force: true, skip_commit: true})
+      gemfile = File.read(File.join(root, "Gemfile"))
+      guard_line = %(unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?\n)
+      expect(gemfile.lines.count(guard_line)).to eq(1)
+    end
+  end
+
   it "preserves monorepo root Rakefile tasks during scaffold cleanup" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
