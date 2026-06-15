@@ -34,7 +34,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
         .with(
           "bundle_update_templating_bootstrap",
-          %w[bundle update nomono kettle-jem kettle-drift],
+          %w[bundle update nomono],
           project_root: root,
           env: setup_env,
           quiet: false,
@@ -78,12 +78,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
-  it "does not target remote-only templating gems when local path overrides are active" do
-    env = {
-      "SMORG_RB_DEV" => "/workspace/structuredmerge/ruby/gems",
-      "KETTLE_RB_DEV" => "/workspace/kettle-dev"
-    }
-
-    expect(described_class.bundle_update_templating_bootstrap_command(env)).to eq(%w[bundle update nomono])
+  it "updates only the lockfile-safe templating bootstrap gem" do
+    expect(described_class.bundle_update_templating_bootstrap_command).to eq(%w[bundle update nomono])
   end
 end

@@ -78,9 +78,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated GitHub Actions workflow templates now refresh pins for
   `coverallsapp/github-action`, `codecov/codecov-action`, and
   `kettle-rb/ts-grammar-action`.
-- Generated templating workflows and `kettle-jem prepare` now update critical
-  templating bootstrap dependencies before install/selftest commands run, so
-  stale locks do not activate old `nomono` or templating gems.
+- Generated templating workflows and `kettle-jem prepare` now update `nomono`
+  before install/selftest commands run, so stale locks do not activate old
+  local-workspace wiring code.
 - Generated GitHub Actions workflow templates now refresh pins for
   `github/codeql-action` sub-actions to v4.36.2.
 - Generated workflow templates now pin `coverallsapp/github-action`,

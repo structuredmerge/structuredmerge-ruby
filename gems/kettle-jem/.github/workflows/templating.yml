@@ -65,7 +65,7 @@ jobs:
         env:
           BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile
           K_JEM_TEMPLATING: "true"
-        run: bundle update nomono kettle-jem kettle-drift
+        run: bundle update nomono
 
       - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
         id: bundleAppraisalAttempt1

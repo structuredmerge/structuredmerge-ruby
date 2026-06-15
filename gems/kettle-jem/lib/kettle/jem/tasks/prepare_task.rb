@@ -11,7 +11,7 @@ module Kettle
           "gemfiles/modular/templating_local.gemfile",
           "mise.toml"
         ].freeze
-        CRITICAL_TEMPLATING_GEMS = %w[nomono kettle-jem kettle-drift].freeze
+        CRITICAL_TEMPLATING_GEMS = %w[nomono].freeze
 
         module_function
 
@@ -25,7 +25,7 @@ module Kettle
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           update_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_update_templating_bootstrap",
-            bundle_update_templating_bootstrap_command(setup_env),
+            bundle_update_templating_bootstrap_command,
             project_root: project_root,
             env: setup_env,
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
@@ -59,22 +59,8 @@ module Kettle
           )
         end
 
-        def bundle_update_templating_bootstrap_command(env)
-          %w[bundle update] + critical_templating_gems_for_env(env)
-        end
-
-        def critical_templating_gems_for_env(env)
-          command_env = (env || {}).to_h
-          CRITICAL_TEMPLATING_GEMS.select do |gem_name|
-            case gem_name
-            when "kettle-jem"
-              command_env.fetch("SMORG_RB_DEV", "false").casecmp("false").zero?
-            when "kettle-drift"
-              command_env.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
-            else
-              true
-            end
-          end
+        def bundle_update_templating_bootstrap_command
+          %w[bundle update] + CRITICAL_TEMPLATING_GEMS
         end
       end
     end
