@@ -4857,18 +4857,39 @@ module Kettle
       result = prism_parse_success(content)
       return [] unless result
 
-      result.value.breadth_first_search_all do |node|
-        gemfile_workspace_override_node?(node)
+      conditional_nodes = result.value.breadth_first_search_all do |node|
+        gemfile_conditional_node?(node)
+      end
+      templating_guard_ranges = conditional_nodes.filter_map do |node|
+        next unless prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
+
+        {start_line: node.location.start_line, end_line: node.location.end_line}
+      end
+      conditional_nodes.select do |node|
+        gemfile_workspace_override_node?(node) &&
+          !node_enclosed_by_ranges?(node, templating_guard_ranges)
       end.map do |node|
         {start_line: node.location.start_line, end_line: node.location.end_line}
       end
     end
 
     def gemfile_workspace_override_node?(node)
-      return false unless node.is_a?(::Prism::IfNode) || node.is_a?(::Prism::UnlessNode)
+      return false unless gemfile_conditional_node?(node)
       return false if prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
 
       prism_subtree_contains_call?(node, :eval_nomono_gems)
+    end
+
+    def gemfile_conditional_node?(node)
+      node.is_a?(::Prism::IfNode) || node.is_a?(::Prism::UnlessNode)
+    end
+
+    def node_enclosed_by_ranges?(node, ranges)
+      start_line = node.location.start_line
+      end_line = node.location.end_line
+      ranges.any? do |range|
+        range.fetch(:start_line) < start_line && range.fetch(:end_line) > end_line
+      end
     end
 
     def prism_subtree_contains_call?(node, call_name)

@@ -2833,6 +2833,10 @@ RSpec.describe Kettle::Jem do
 
             eval_nomono_gems(
       RUBY
+      described_class.apply_project(root, env: {}, run_options: {accept: true, force: true, skip_commit: true})
+      reapplied_gemfile = File.read(File.join(root, "Gemfile"))
+      guard_line = %(unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?\n)
+      expect(reapplied_gemfile.lines.count(guard_line)).to eq(1)
     end
   end
 
