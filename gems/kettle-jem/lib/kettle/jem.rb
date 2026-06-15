@@ -4828,10 +4828,64 @@ module Kettle
         template_content: template_content,
         preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
       )
+      output = guard_main_gemfile_runtime_workspace_overrides(output) if recipe.fetch(:target_path).to_s == "Gemfile"
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
+    end
+
+    def guard_main_gemfile_runtime_workspace_overrides(content)
+      records = runtime_workspace_override_records(content)
+      return content if records.empty?
+
+      output = content.to_s
+      records.sort_by { |record| -record.fetch(:start_line) }.each do |record|
+        source = output.lines[(record.fetch(:start_line) - 1)..(record.fetch(:end_line) - 1)].join
+        guarded = [
+          %(unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?),
+          indent_source(source, 2).rstrip,
+          "end",
+          ""
+        ].join("\n")
+        output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
+      end
+      output
+    end
+
+    def runtime_workspace_override_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        gemfile_workspace_override_node?(node)
+      end.map do |node|
+        {start_line: node.location.start_line, end_line: node.location.end_line}
+      end
+    end
+
+    def gemfile_workspace_override_node?(node)
+      return false unless node.is_a?(::Prism::IfNode) || node.is_a?(::Prism::UnlessNode)
+      return false if prism_subtree_contains_string?(node, "K_JEM_TEMPLATING")
+
+      prism_subtree_contains_call?(node, :eval_nomono_gems)
+    end
+
+    def prism_subtree_contains_call?(node, call_name)
+      node.breadth_first_search_all do |child|
+        child.is_a?(::Prism::CallNode) && child.name == call_name
+      end.any?
+    end
+
+    def prism_subtree_contains_string?(node, string)
+      node.breadth_first_search_all do |child|
+        child.is_a?(::Prism::StringNode) && child.unescaped == string
+      end.any?
+    end
+
+    def indent_source(source, spaces)
+      prefix = " " * spaces
+      source.to_s.lines.map { |line| line.strip.empty? ? line : "#{prefix}#{line}" }.join
     end
 
     def local_gemfile_template_recipe?(recipe)

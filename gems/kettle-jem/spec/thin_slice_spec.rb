@@ -1357,7 +1357,7 @@ RSpec.describe Kettle::Jem do
       plan = described_class.plan_readme_style(root, env: {})
       expect(plan.fetch(:final_content)).to include("Kettle template tool")
       expect(plan.fetch(:final_content)).to include("Configuration shape")
-      expect(plan.fetch(:final_content)).to include("bundle exec kettle-jem install")
+      expect(plan.fetch(:final_content)).to include("K_JEM_TEMPLATING=true kettle-jem install")
       expect(plan.dig(:readme_style, :section_partials, "configuration", :source_root)).to eq("packaged")
     end
   end
@@ -2778,6 +2778,61 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.9"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.5"')
       expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.3"')
+    end
+  end
+
+  it "guards preserved main Gemfile local workspace overrides during templating" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-templating-local-guard", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "Demo"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY
+          source "https://gem.coop"
+
+          gemspec
+
+          unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
+            require "nomono/bundler"
+
+            eval_nomono_gems(
+              gems: %w[auth-sanitizer oauth-tty snaky_hash version_gem],
+              prefix: "RUBY_OAUTH",
+              path_env: "RUBY_OAUTH_DEV",
+              root: %w[code src ruby-oauth],
+              debug_env: "RUBY_OAUTH_DEBUG"
+            )
+          end
+        RUBY
+      })
+
+      report = described_class.apply_project(root, env: {}, run_options: {accept: true, force: true, skip_commit: true})
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(report.fetch(:changed_files)).to include("Gemfile")
+      expect(gemfile).to include('eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?')
+      expect(gemfile).to include(<<~RUBY.rstrip)
+        unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+          unless %w[false 0 no off].include?(ENV.fetch("RUBY_OAUTH_DEV", "false").downcase)
+            require "nomono/bundler"
+
+            eval_nomono_gems(
+      RUBY
     end
   end
 

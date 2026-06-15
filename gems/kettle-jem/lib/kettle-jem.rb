@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 
-require "kettle/jem"
-require "kettle/jem/cli"
+require_relative "kettle/jem"
+require_relative "kettle/jem/cli"

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "kettle-jem"
+require_relative "../lib/kettle-jem"
 
 exit(Kettle::Jem::CLI.run(ARGV, env: ENV, out: $stdout, err: $stderr))
