@@ -1,10 +1,12 @@
+kettle_rb_dev = ENV.fetch("KETTLE_RB_DEV", "false")
+
 source "https://rubygems.org"
 
-unless ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+unless kettle_rb_dev.casecmp("false").zero?
   require "nomono/bundler"
 
   eval_nomono_gems(
-    gems: %w[kettle-dev kettle-test],
+    gems: %w[kettle-dev kettle-family kettle-test],
     prefix: "KETTLE_RB",
     path_env: "KETTLE_RB_DEV",
     vendored_gems_env: "VENDORED_GEMS",
@@ -65,13 +67,16 @@ gem "appraisal2", "~> 3.1", ">= 3.1.1"
 
 gem "bundler-audit", "~> 0.9.3"
 
-gem "kettle-dev", "~> 2.2", ">= 2.2.3"
+if kettle_rb_dev.casecmp("false").zero?
+  gem "kettle-dev", "~> 2.2", ">= 2.2.3"
+
+  gem "kettle-family", ">= 0.1.3"
+
+  gem "kettle-test", "~> 2.0", ">= 2.0.5"
+end
 
 gem "kettle-drift", "~> 1.0", ">= 1.0.3"
 
-gem "kettle-family", ">= 0.1.3"
-
-gem "kettle-test", "~> 2.0", ">= 2.0.5"
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"
 

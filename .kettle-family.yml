@@ -42,6 +42,59 @@ commands:
   lint: bundle exec rake rubocop_gradual:autocorrect rubocop_gradual:force_update
   docs: bin/rake yard
 
+check:
+  required_files:
+    - Gemfile
+    - Gemfile.lock
+    - Rakefile
+    - README.md
+    - LICENSE.md
+    - .rspec
+    - .simplecov
+    - .yardignore
+    - .yardopts
+    - bin/setup
+    - spec/spec_helper.rb
+    - gemfiles/modular/documentation.gemfile
+    - gemfiles/modular/x_std_libs.gemfile
+  required_bins:
+    - bin/gem_checksums
+    - bin/kettle-changelog
+    - bin/kettle-pre-release
+    - bin/kettle-release
+    - bin/kettle-test
+    - bin/rake
+    - bin/rspec
+    - bin/yard
+  root_required_files:
+    - CHANGELOG.md
+    - CODE_OF_CONDUCT.md
+    - CONTRIBUTING.md
+    - FUNDING.md
+    - LICENSE.md
+    - SECURITY.md
+    - .structuredmerge/git-drivers.toml
+  member_required_dirs:
+    - docs
+  forbidden_tracked_member_dirs:
+    - .devcontainer
+    - .git-hooks
+    - .github
+    - .idea
+    - .qlty
+  forbidden_tracked_member_dirs_except:
+    - kettle-jem
+  readme_links:
+    CHANGELOG.md: CHANGELOG.md
+    CODE_OF_CONDUCT.md: CODE_OF_CONDUCT.md
+    CONTRIBUTING.md: CONTRIBUTING.md
+    SECURITY.md: SECURITY.md
+
+changelog:
+  mode: root
+  path: CHANGELOG.md
+  version_file: gems/tree_haver/lib/tree_haver/version.rb
+
 template:
   normalize_lockfiles: true
   normalize_lockfiles_command: bundle update --bundler
@@ -49,3 +102,11 @@ template:
 release:
   build_command: bundle exec rake build
   publish_command: bundle exec kettle-release
+  env:
+    GALTZO_FLOSS_DEV: false
+    KETTLE_RB_DEV: false
+    SMORG_RB_DEV: false
+    TREE_SITTER_LANGUAGE_PACK_DEV: ""
+  family_changelog:
+    enabled: true
+    command: bundle exec kettle-changelog

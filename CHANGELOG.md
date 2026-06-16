@@ -22,6 +22,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- StructuredMerge Ruby now configures `kettle-family` for its root changelog,
+  release readiness, release env, and family changelog phase instead of relying
+  on bespoke workspace scripts.
 - `kettle-jem` gem templates now require `kettle-dev` 2.0.8 or newer.
 - `ast-merge` now requires `token-resolver` 2.0.1 or newer.
 

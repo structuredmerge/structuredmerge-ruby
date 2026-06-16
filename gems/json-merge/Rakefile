@@ -82,6 +82,11 @@ if Dir.exist?(File.join(__dir__, "gems"))
       family_gem_dirs.each { |path| puts File.basename(path) }
     end
 
+    desc "Run release readiness checks for the Ruby gem family"
+    task :readiness do
+      run_kettle_family("check")
+    end
+
     desc "Run tests for the Ruby gem family"
     task :test do
       run_kettle_family("test", "--execute")
@@ -97,6 +102,20 @@ if Dir.exist?(File.join(__dir__, "gems"))
       run_kettle_family("docs", "--execute")
     end
 
+    desc "Report release state for the Ruby gem family"
+    task :release_state do
+      run_kettle_family("release-state")
+    end
+
+    desc "Run the Ruby gem family release planner"
+    task :release do
+      run_kettle_family("release")
+    end
+
+    desc "Execute the Ruby gem family release"
+    task :release_execute do
+      run_kettle_family("release", "--execute")
+    end
   end
 end
 # :nocov:
