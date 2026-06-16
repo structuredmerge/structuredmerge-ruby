@@ -170,6 +170,20 @@ workflows:
   #       requirement: ">= 8.0"
   #   gemfile_pattern: "ar-{version}.x"
 
+# Project-level third-party integrations.
+# Disabling a coverage integration removes its upload action, suppresses its
+# README badges, skips templating its packaged config, and cleans up matching
+# config files if they already exist.
+#
+# Supported coverage integrations: codecov, coveralls, qlty
+#
+# Examples:
+# integrations:
+#   qlty: false
+#   disabled:
+#     - codecov
+#     - coveralls
+
 # README top logos.
 # Comma-separated list of optional logo entries for the generated README header.
 # top_logos render above the title; h2_synopsis_logos render inline with the Synopsis H2.

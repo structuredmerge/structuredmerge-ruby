@@ -9588,6 +9588,122 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "disables coverage integrations across README badges, upload steps, templates, and config cleanup" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-disabled-coverage-integrations", tmp_root) do |root|
+      FileUtils.mkdir_p(File.join(root, ".github"))
+      FileUtils.mkdir_p(File.join(root, ".qlty"))
+      File.write(File.join(root, ".github/.codecov.yml"), "codecov:\n")
+      File.write(File.join(root, ".coveralls.yml"), "service_name: github\n")
+      File.write(File.join(root, ".qlty/qlty.toml"), "# qlty\n")
+
+      config = {
+        "integrations" => {
+          "qlty" => false,
+          "disabled" => %w[codecov coveralls]
+        },
+        "templates" => {
+          "root" => "packaged",
+          "apply" => true
+        }
+      }
+
+      readme_style = described_class.readme_style_facts(
+        root,
+        config,
+        {spdx: ["MIT"]},
+        repository: {slug: "omniauth/omniauth-jwt2"}
+      )
+      expect(readme_style.fetch(:disabled_integrations)).to contain_exactly("codecov", "coveralls", "qlty")
+
+      upload_steps = described_class.github_actions_coverage_steps(disabled_integrations: readme_style.fetch(:disabled_integrations))
+      expect(upload_steps).not_to include("Upload coverage to Coveralls")
+      expect(upload_steps).not_to include("Upload coverage to QLTY")
+      expect(upload_steps).not_to include("Upload coverage to CodeCov")
+      expect(upload_steps).to include("Code Coverage Summary Report")
+
+      template_paths = described_class.template_source_preferences(root, config).map { |preference| preference.fetch(:target_path) }
+      expect(template_paths).not_to include(".github/.codecov.yml", ".qlty/qlty.toml")
+
+      cleanup_paths = described_class.inactive_packaged_template_cleanup_files(root, config).map { |cleanup| cleanup.fetch(:target_path) }
+      expect(cleanup_paths).to include(".github/.codecov.yml", ".coveralls.yml", ".qlty/qlty.toml")
+    end
+  end
+
+  it "keeps coverage integrations active when only README badges are disabled" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-only-coverage-badge-disable", tmp_root) do |root|
+      config = {
+        "readme" => {
+          "badges" => {
+            "disabled" => %w[qlty]
+          }
+        },
+        "templates" => {
+          "root" => "packaged",
+          "apply" => true
+        }
+      }
+
+      expect(described_class.disabled_coverage_integrations(config)).to be_empty
+
+      readme_style = described_class.readme_style_facts(
+        root,
+        config,
+        {spdx: ["MIT"]},
+        repository: {slug: "omniauth/omniauth-jwt2"}
+      )
+      expect(readme_style.fetch(:disabled_integrations)).to contain_exactly("qlty")
+
+      upload_steps = described_class.github_actions_coverage_steps(disabled_integrations: described_class.disabled_coverage_integrations(config))
+      expect(upload_steps).to include("Upload coverage to Coveralls")
+      expect(upload_steps).to include("Upload coverage to QLTY")
+      expect(upload_steps).to include("Upload coverage to CodeCov")
+
+      template_paths = described_class.template_source_preferences(root, config).map { |preference| preference.fetch(:target_path) }
+      expect(template_paths).to include(".github/.codecov.yml", ".qlty/qlty.toml")
+      expect(described_class.inactive_packaged_template_cleanup_files(root, config)).to be_empty
+    end
+  end
+
+  it "supports partial coverage integration disablement" do
+    config = {
+      "integrations" => {
+        "code_cov" => false,
+        "qlty" => true,
+        "coveralls" => "false"
+      }
+    }
+
+    expect(described_class.disabled_coverage_integrations(config)).to contain_exactly("codecov", "coveralls")
+
+    upload_steps = described_class.github_actions_coverage_steps(disabled_integrations: described_class.disabled_coverage_integrations(config))
+    expect(upload_steps).not_to include("Upload coverage to Coveralls")
+    expect(upload_steps).not_to include("Upload coverage to CodeCov")
+    expect(upload_steps).to include("Upload coverage to QLTY")
+
+    workflow = <<~YAML
+      jobs:
+        coverage:
+          steps:
+            - name: Existing
+              run: true
+    YAML
+    updated = described_class.append_github_actions_coverage_steps(workflow, disabled_integrations: described_class.disabled_coverage_integrations(config))
+    expect(updated).to include("Upload coverage to QLTY")
+    expect(updated).not_to include("Upload coverage to Coveralls")
+    expect(described_class.append_github_actions_coverage_steps(updated, disabled_integrations: [])).to eq(updated)
+
+    workflow_without_steps = <<~YAML
+      jobs:
+        coverage:
+          runs-on: ubuntu-latest
+    YAML
+    expect(described_class.append_github_actions_coverage_steps(workflow_without_steps, disabled_integrations: [])).to eq(workflow_without_steps)
+  end
+
   it "applies configured licenses to merged gemspec output" do
     template = <<~RUBY
       Gem::Specification.new do |spec|

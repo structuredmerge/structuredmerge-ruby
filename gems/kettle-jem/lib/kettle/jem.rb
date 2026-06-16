@@ -1098,6 +1098,12 @@ module Kettle
       "🖇osc-sponsors-bottom-img"
     ].freeze
     README_INTEGRATIONS = %w[codecov coveralls qlty codeql].freeze
+    COVERAGE_INTEGRATIONS = %w[codecov coveralls qlty].freeze
+    COVERAGE_INTEGRATION_CONFIG_PATHS = {
+      "codecov" => %w[.github/.codecov.yml codecov.yml .codecov.yml],
+      "coveralls" => %w[.coveralls.yml],
+      "qlty" => %w[.qlty/qlty.toml .qlty.yml]
+    }.freeze
     README_INTEGRATION_BADGE_PATTERNS = {
       "codecov" => [
         /\s*\[!\[CodeCov Test Coverage\]\[[^\]]+\]\]\[[^\]]+\]/,
@@ -2599,6 +2605,8 @@ module Kettle
         repository: facts[:repository]
       )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
+      disabled_integrations = disabled_coverage_integrations(kettle_config)
+      facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       template_facts = {}
       template_config = template_runtime_config(kettle_config, facts, license: license)
       template_preferences = template_source_preferences(
@@ -2766,6 +2774,8 @@ module Kettle
       open_collective_files = opencollective_disabled ? opencollective_disabled_files(project_root) : []
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?
       facts[:funding] = funding unless funding.empty?
+      disabled_integrations = disabled_coverage_integrations(kettle_config)
+      facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
       template_config = template_runtime_config(kettle_config, facts, license: license)
       inactive_workflows = inactive_packaged_workflow_cleanup_files(
@@ -3883,7 +3893,7 @@ module Kettle
       when /\Atemplate_obsolete_license_cleanup_/
         ""
       when /\Agithub_actions_workflow_snippets_/
-        synchronize_github_actions_workflow_snippets(original)
+        synchronize_github_actions_workflow_snippets(original, facts: facts)
       when "kettle_config_bootstrap"
         apply_kettle_config_bootstrap(project_root, recipe, env: env)
       when /\Atemplate_source_preference_/
@@ -8157,7 +8167,7 @@ module Kettle
         "KJ|MIN_DEV_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|MIN_TEST_RUBY" => facts.dig(:project_runtime, :test_min_ruby).to_s,
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
-        "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps
+        "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
       }.merge(
         rubocop_template_tokens(rubygems[:min_ruby])
       ).merge(
@@ -10017,7 +10027,7 @@ module Kettle
     def readme_style_facts(project_root, config, license, template_profile: nil, repository: nil)
       readme = config["readme"].is_a?(Hash) ? config["readme"] : {}
       conditional = readme["conditional_sections"].is_a?(Hash) ? readme["conditional_sections"] : {}
-      disabled_integrations = readme_disabled_integrations(readme)
+      disabled_integrations = readme_disabled_integrations(readme, integration_disabled: disabled_coverage_integrations(config))
       integration_root = readme_integration_project_root(project_root, template_profile, repository)
       missing_integrations = README_INTEGRATIONS.reject do |integration|
         disabled_integrations.include?(integration) || readme_integration_configured?(integration_root, integration)
@@ -10124,15 +10134,40 @@ module Kettle
       Array(license[:spdx]).map(&:to_s).include?("MIT")
     end
 
-    def readme_disabled_integrations(readme)
+    def readme_disabled_integrations(readme, integration_disabled: [])
       disabled = []
+      disabled.concat(Array(integration_disabled).map(&:to_s))
       integrations = readme["integrations"].is_a?(Hash) ? readme["integrations"] : {}
       badges = readme["badges"].is_a?(Hash) ? readme["badges"] : {}
       integrations.each do |name, value|
         disabled << name.to_s if falsey_config?(value)
       end
       disabled.concat(Array(badges["disabled"]).map(&:to_s))
-      disabled.map { |name| name.tr("_", "-").downcase }.map { |name| (name == "code-ql") ? "codeql" : name }.uniq & README_INTEGRATIONS
+      disabled.map { |name| normalize_integration_name(name) }.uniq & README_INTEGRATIONS
+    end
+
+    def disabled_coverage_integrations(config)
+      integrations = if config.is_a?(Hash) && config["integrations"].is_a?(Hash)
+        config["integrations"]
+      else
+        {}
+      end
+      disabled = Array(integrations["disabled"]).map(&:to_s)
+      integrations.each do |name, value|
+        normalized = normalize_integration_name(name)
+        next if normalized.empty? || normalized == "disabled"
+
+        disabled << normalized if falsey_config?(value)
+      end
+      disabled.map { |name| normalize_integration_name(name) }.uniq & COVERAGE_INTEGRATIONS
+    end
+
+    def normalize_integration_name(name)
+      normalized = name.to_s.tr("_", "-").downcase
+      return "codecov" if normalized == "code-cov"
+      return "codeql" if normalized == "code-ql"
+
+      normalized
     end
 
     def readme_integration_configured?(project_root, integration)
@@ -10502,12 +10537,13 @@ module Kettle
     end
 
     def inactive_packaged_template_cleanup_files(project_root, config = {})
-      Dir.glob(File.join(project_root, "gemfiles/**/*.gemfile")).filter_map do |path|
+      gemfile_cleanups = Dir.glob(File.join(project_root, "gemfiles/**/*.gemfile")).filter_map do |path|
         relative_path = path.delete_prefix("#{project_root}/")
         next unless preferred_template_source(PACKAGED_TEMPLATE_ROOT, relative_path)
 
         {target_path: relative_path} if skip_packaged_gemfile_template?(relative_path, config)
-      end.sort_by { |cleanup| cleanup.fetch(:target_path) }
+      end
+      (gemfile_cleanups + disabled_integration_config_cleanups(project_root, config)).sort_by { |cleanup| cleanup.fetch(:target_path) }
     end
 
     def kettle_config_bootstrap_facts(project_root, env, template_selection: {})
@@ -10562,6 +10598,7 @@ module Kettle
       end
       return if source_path.to_s.empty? || target_path.to_s.empty?
       return if skip_packaged_workflow_template?(target_path, config, include_patterns: include_patterns)
+      return if skip_disabled_integration_template?(target_path, config)
       return if skip_packaged_gemfile_template?(target_path, config)
       return if skip_packaged_license_template?(target_path, config)
       return if template_root.fetch(:kind) == "packaged" && opencollective_disabled && opencollective_disabled_file?(target_path)
@@ -10792,6 +10829,24 @@ module Kettle
       return false unless min_ruby
 
       Gem::Version.new(version) < min_ruby
+    end
+
+    def skip_disabled_integration_template?(target_path, config)
+      disabled = disabled_coverage_integrations(config)
+      return false if disabled.empty?
+
+      path = target_path.to_s
+      disabled.any? { |integration| COVERAGE_INTEGRATION_CONFIG_PATHS.fetch(integration).include?(path) }
+    end
+
+    def disabled_integration_config_cleanups(project_root, config)
+      disabled_coverage_integrations(config).flat_map do |integration|
+        COVERAGE_INTEGRATION_CONFIG_PATHS.fetch(integration).filter_map do |relative_path|
+          next unless File.exist?(File.join(project_root, relative_path))
+
+          {target_path: relative_path}
+        end
+      end
     end
 
     def packaged_gemfile_template_ruby_floor(target_path)
@@ -11551,11 +11606,11 @@ module Kettle
                 run: |
                   test -s coverage/lcov.info
                   test -s coverage/coverage.xml
-        #{github_actions_coverage_steps}
+        #{github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))}
       YAML
     end
 
-    def synchronize_github_actions_workflow_snippets(content)
+    def synchronize_github_actions_workflow_snippets(content, facts: {})
       updated = ensure_workflow_top_level_section(
         content.to_s,
         "permissions",
@@ -11568,7 +11623,7 @@ module Kettle
         "concurrency:\n  group: \"${{ github.workflow }}-${{ github.ref }}\"\n  cancel-in-progress: true\n\n",
         before: "jobs"
       )
-      updated = append_github_actions_coverage_steps(updated) if github_actions_coverage_enabled?(updated)
+      updated = append_github_actions_coverage_steps(updated, disabled_integrations: facts.dig(:integrations, :disabled)) if github_actions_coverage_enabled?(updated)
       update_github_actions_pins(updated)
     end
 
@@ -11599,49 +11654,66 @@ module Kettle
       false
     end
 
-    def append_github_actions_coverage_steps(content)
-      return content if content.include?("Upload coverage to Coveralls") || content.include?("Upload coverage to CodeCov")
+    def append_github_actions_coverage_steps(content, disabled_integrations: [])
+      return content if content.include?("Upload coverage to Coveralls") ||
+        content.include?("Upload coverage to QLTY") ||
+        content.include?("Upload coverage to CodeCov") ||
+        content.include?("Code Coverage Summary Report")
 
       lines = content.lines
       steps_sequence = yaml_mapping_value_node(content, "steps", Psych::Nodes::Sequence)
       return content unless steps_sequence
 
       insert_index = steps_sequence.end_line
-      lines.insert(insert_index, "#{github_actions_coverage_steps}\n")
+      lines.insert(insert_index, "#{github_actions_coverage_steps(disabled_integrations: disabled_integrations)}\n")
       lines.join
     end
 
-    def github_actions_coverage_steps
-      <<~YAML.lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join.chomp
-        - name: Upload coverage to Coveralls
-          if: ${{ !env.ACT }}
-          uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            file: coverage/lcov.info
-            format: lcov
-          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+    def github_actions_coverage_steps(disabled_integrations: [])
+      disabled = Array(disabled_integrations).map { |name| normalize_integration_name(name) }.to_set
+      steps = []
+      unless disabled.include?("coveralls")
+        steps << <<~YAML
+          - name: Upload coverage to Coveralls
+            if: ${{ !env.ACT }}
+            uses: coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7
+            with:
+              github-token: ${{ secrets.GITHUB_TOKEN }}
+              file: coverage/lcov.info
+              format: lcov
+            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+        YAML
+      end
 
-        - name: Upload coverage to QLTY
-          if: ${{ !env.ACT }}
-          uses: qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1
-          with:
-            oidc: true
-            files: coverage/lcov.info
-            format: lcov
-            skip-errors: false
-          continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+      unless disabled.include?("qlty")
+        steps << <<~YAML
+          - name: Upload coverage to QLTY
+            if: ${{ !env.ACT }}
+            uses: qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1
+            with:
+              oidc: true
+              files: coverage/lcov.info
+              format: lcov
+              skip-errors: false
+            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+        YAML
+      end
 
-        - name: Upload coverage to CodeCov
-          if: ${{ !env.ACT }}
-          uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
-          with:
-            use_oidc: true
-            disable_search: true
-            fail_ci_if_error: false
-            files: coverage/lcov.info,coverage/coverage.xml
-            verbose: true
+      unless disabled.include?("codecov")
+        steps << <<~YAML
+          - name: Upload coverage to CodeCov
+            if: ${{ !env.ACT }}
+            uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7
+            with:
+              use_oidc: true
+              disable_search: true
+              fail_ci_if_error: false
+              files: coverage/lcov.info,coverage/coverage.xml
+              verbose: true
+        YAML
+      end
 
+      steps << <<~YAML
         - name: Code Coverage Summary Report
           if: ${{ !env.ACT && github.event_name == 'pull_request' }}
           uses: irongut/CodeCoverageSummary@51cc3a756ddcd398d447c044c02cb6aa83fdae95 # v1.3.0
@@ -11665,6 +11737,7 @@ module Kettle
             path: code-coverage-results.md
           continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
       YAML
+      steps.join("\n").lines.map { |line| line.strip.empty? ? line : "      #{line}" }.join.chomp
     end
 
     def ensure_workflow_top_level_section(content, key, section, before:)
