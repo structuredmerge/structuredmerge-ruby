@@ -30,9 +30,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added explicit `ruby.test_minimum` template configuration, defaulting to
   Ruby 2.4, for generated CI workflow and Appraisal floors.
 - Added top-level `integrations` configuration for disabling coverage
-  integrations (`codecov`, `coveralls`, `qlty`) across README badges, upload
-  workflow steps, packaged config templates, and cleanup of existing config
-  files.
+  integrations (`codecov`, `coveralls`, `qlty`) and the SkyWalking Eyes license
+  check integration across README badges, upload/check workflow steps, packaged
+  config/workflow templates, and cleanup of existing config files or workflows.
 - Added `rake spec:dependency_floors` as a fast validation slice for recurring
   non-StructuredMerge dependency floor bumps.
 - The fast dependency floor slice now covers `appraisal2`.

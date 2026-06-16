@@ -1084,6 +1084,7 @@ module Kettle
     README_FOSSA_BADGE = "[![FOSSA Status][🧪fossa-img]][🧪fossa]"
     README_FOSSA_LINK_LABELS = ["🧪fossa", "🧪fossa-img"].freeze
     LICENSE_EYE_COMPATIBILITY_LICENSES = %w[MIT].freeze
+    SKYWALKING_EYES_INTEGRATION = "skywalking-eyes"
     README_OPEN_COLLECTIVE_FUNDING_BADGES = "[![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors]"
     README_OPEN_COLLECTIVE_LINK_LABELS = [
       "🖇osc",
@@ -1097,13 +1098,18 @@ module Kettle
       "🖇osc-sponsors-img",
       "🖇osc-sponsors-bottom-img"
     ].freeze
-    README_INTEGRATIONS = %w[codecov coveralls qlty codeql].freeze
+    README_INTEGRATIONS = %w[codecov coveralls qlty codeql skywalking-eyes].freeze
+    README_DISCOVERED_INTEGRATIONS = (README_INTEGRATIONS - [SKYWALKING_EYES_INTEGRATION]).freeze
     COVERAGE_INTEGRATIONS = %w[codecov coveralls qlty].freeze
+    MANAGED_INTEGRATIONS = (COVERAGE_INTEGRATIONS + [SKYWALKING_EYES_INTEGRATION]).freeze
     COVERAGE_INTEGRATION_CONFIG_PATHS = {
       "codecov" => %w[.github/.codecov.yml codecov.yml .codecov.yml],
       "coveralls" => %w[.coveralls.yml],
       "qlty" => %w[.qlty/qlty.toml .qlty.yml]
     }.freeze
+    INTEGRATION_TEMPLATE_PATHS = COVERAGE_INTEGRATION_CONFIG_PATHS.merge(
+      SKYWALKING_EYES_INTEGRATION => %w[.licenserc.yaml .github/workflows/license-eye.yml .github/workflows/license-eye.yaml]
+    ).freeze
     README_INTEGRATION_BADGE_PATTERNS = {
       "codecov" => [
         /\s*\[!\[CodeCov Test Coverage\]\[[^\]]+\]\]\[[^\]]+\]/,
@@ -1118,13 +1124,17 @@ module Kettle
       ],
       "codeql" => [
         /\s*\[!\[CodeQL\]\[[^\]]+\]\]\[[^\]]+\]/
+      ],
+      "skywalking-eyes" => [
+        /\s*\[!\[Apache SkyWalking Eyes License Compatibility Check\]\[[^\]]+\]\]\[[^\]]+\]/
       ]
     }.freeze
     README_INTEGRATION_LINK_LABELS = {
       "codecov" => %w[🏀codecov 🏀codecovi 🏀codecov-g],
       "coveralls" => %w[🏀coveralls 🏀coveralls-img],
       "qlty" => %w[🏀qlty-mnt 🏀qlty-mnti 🏀qlty-cov 🏀qlty-covi],
-      "codeql" => %w[🖐codeQL 🖐codeQL-img]
+      "codeql" => %w[🖐codeQL 🖐codeQL-img],
+      "skywalking-eyes" => README_LICENSE_EYE_WORKFLOW_LINK_LABELS
     }.freeze
     README_SECTION_ALIASES = {
       "summary" => "synopsis",
@@ -2605,7 +2615,7 @@ module Kettle
         repository: facts[:repository]
       )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
-      disabled_integrations = disabled_coverage_integrations(kettle_config)
+      disabled_integrations = disabled_integrations(kettle_config, license: license)
       facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       template_facts = {}
       template_config = template_runtime_config(kettle_config, facts, license: license)
@@ -2774,7 +2784,7 @@ module Kettle
       open_collective_files = opencollective_disabled ? opencollective_disabled_files(project_root) : []
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?
       facts[:funding] = funding unless funding.empty?
-      disabled_integrations = disabled_coverage_integrations(kettle_config)
+      disabled_integrations = disabled_integrations(kettle_config, license: license)
       facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
       template_config = template_runtime_config(kettle_config, facts, license: license)
@@ -4491,7 +4501,7 @@ module Kettle
       if facts.dig(:readme_style, :fossa_project).to_s.empty?
         processed = remove_readme_badge_and_refs(processed, README_FOSSA_BADGE, README_FOSSA_LINK_LABELS)
       end
-      unless Array(facts.dig(:license, :spdx)).map(&:to_s).include?("MIT")
+      if Array(facts.dig(:readme_style, :disabled_integrations)).map(&:to_s).include?(SKYWALKING_EYES_INTEGRATION)
         processed = remove_readme_badge_and_refs(
           processed,
           README_LICENSE_EYE_WORKFLOW_BADGE,
@@ -9730,7 +9740,7 @@ module Kettle
         readme_license_intro: readme_license_intro(licenses, author_email: author_email),
         readme_license_badge: license_badge(licenses.join(" OR "), ref: :license),
         readme_license_compat_badge: license_compat_badge(compat_category),
-        readme_license_eye_workflow_badge: license_eye_workflow_badge(licenses),
+        readme_license_eye_workflow_badge: license_eye_workflow_badge(licenses, config),
         readme_license_refs: readme_license_refs(licenses.join(" OR "), compat_category),
         license_eye_primary_spdx: license_eye_primary_spdx(licenses, primary),
         license_eye_mode: license_eye_mode(licenses),
@@ -9888,8 +9898,8 @@ module Kettle
       "[![#{data.fetch(:alt)}][#{paperclip_ref(:license_compat_img)}]][#{paperclip_ref(:license_compat)}]"
     end
 
-    def license_eye_workflow_badge(licenses)
-      Array(licenses).map(&:to_s).include?("MIT") ? README_LICENSE_EYE_WORKFLOW_BADGE : ""
+    def license_eye_workflow_badge(licenses, config = {})
+      disabled_integrations(config, license: {spdx: licenses}).include?(SKYWALKING_EYES_INTEGRATION) ? "" : README_LICENSE_EYE_WORKFLOW_BADGE
     end
 
     def license_eye_primary_spdx(licenses, fallback)
@@ -10027,9 +10037,9 @@ module Kettle
     def readme_style_facts(project_root, config, license, template_profile: nil, repository: nil)
       readme = config["readme"].is_a?(Hash) ? config["readme"] : {}
       conditional = readme["conditional_sections"].is_a?(Hash) ? readme["conditional_sections"] : {}
-      disabled_integrations = readme_disabled_integrations(readme, integration_disabled: disabled_coverage_integrations(config))
+      disabled_integrations = readme_disabled_integrations(readme, integration_disabled: disabled_integrations(config, license: license))
       integration_root = readme_integration_project_root(project_root, template_profile, repository)
-      missing_integrations = README_INTEGRATIONS.reject do |integration|
+      missing_integrations = README_DISCOVERED_INTEGRATIONS.reject do |integration|
         disabled_integrations.include?(integration) || readme_integration_configured?(integration_root, integration)
       end
       workflow_paths = readme_workflow_paths(integration_root)
@@ -10146,7 +10156,17 @@ module Kettle
       disabled.map { |name| normalize_integration_name(name) }.uniq & README_INTEGRATIONS
     end
 
+    def disabled_integrations(config, license: nil)
+      disabled = configured_disabled_integrations(config)
+      disabled << SKYWALKING_EYES_INTEGRATION if skywalking_eyes_disabled_by_default?(config, license, disabled)
+      disabled.map { |name| normalize_integration_name(name) }.uniq & MANAGED_INTEGRATIONS
+    end
+
     def disabled_coverage_integrations(config)
+      configured_disabled_integrations(config) & COVERAGE_INTEGRATIONS
+    end
+
+    def configured_disabled_integrations(config)
       integrations = if config.is_a?(Hash) && config["integrations"].is_a?(Hash)
         config["integrations"]
       else
@@ -10159,13 +10179,44 @@ module Kettle
 
         disabled << normalized if falsey_config?(value)
       end
-      disabled.map { |name| normalize_integration_name(name) }.uniq & COVERAGE_INTEGRATIONS
+      disabled.map { |name| normalize_integration_name(name) }.uniq & MANAGED_INTEGRATIONS
+    end
+
+    def skywalking_eyes_disabled_by_default?(config, license, disabled)
+      return false if disabled.include?(SKYWALKING_EYES_INTEGRATION)
+      return false if explicit_integration_enabled?(config, SKYWALKING_EYES_INTEGRATION)
+
+      licenses = integration_license_spdx(config, license)
+      !license_eye_compatible_licenses?(licenses)
+    end
+
+    def integration_license_spdx(config, license)
+      configured = if license.is_a?(Hash)
+        license[:spdx] || license["spdx"]
+      else
+        []
+      end
+      configured = config["resolved_licenses"] if Array(configured).empty? && config.is_a?(Hash)
+      Array(configured).map(&:to_s)
+    end
+
+    def license_eye_compatible_licenses?(licenses)
+      Array(licenses).map(&:to_s).any? { |license_id| LICENSE_EYE_COMPATIBILITY_LICENSES.include?(license_id) }
+    end
+
+    def explicit_integration_enabled?(config, integration)
+      return false unless config.is_a?(Hash) && config["integrations"].is_a?(Hash)
+
+      config["integrations"].any? do |name, value|
+        normalize_integration_name(name) == integration && truthy_config?(value)
+      end
     end
 
     def normalize_integration_name(name)
       normalized = name.to_s.tr("_", "-").downcase
       return "codecov" if normalized == "code-cov"
       return "codeql" if normalized == "code-ql"
+      return SKYWALKING_EYES_INTEGRATION if %w[license-eye license-eyes skywalking-eye skywalking-eyes apache-skywalking-eyes].include?(normalized)
 
       normalized
     end
@@ -10187,6 +10238,10 @@ module Kettle
         File.exist?(File.join(project_root, ".github/workflows/codeql.yml")) ||
           File.exist?(File.join(project_root, ".github/workflows/codeql-analysis.yml")) ||
           github_workflows_include?(project_root, "github/codeql-action")
+      when "skywalking-eyes"
+        File.exist?(File.join(project_root, ".github/workflows/license-eye.yml")) ||
+          File.exist?(File.join(project_root, ".github/workflows/license-eye.yaml")) ||
+          github_workflows_include?(project_root, "apache/skywalking-eyes/dependency")
       else
         false
       end
@@ -10213,6 +10268,10 @@ module Kettle
 
     def falsey_config?(value)
       %w[false no 0].include?(value.to_s.strip.downcase)
+    end
+
+    def truthy_config?(value)
+      %w[true yes 1 on enabled].include?(value.to_s.strip.downcase)
     end
 
     def merge_readme_template(template_content:, destination_content:, preserve_config: {})
@@ -10799,6 +10858,7 @@ module Kettle
     def skip_packaged_workflow_template?(target_path, config, include_patterns: nil)
       path = target_path.to_s
       return false unless path.start_with?(".github/workflows/")
+      return true if disabled_integration_template_path?(path, config)
       return true if OPT_IN_GITHUB_WORKFLOWS.include?(path) && !selected_template_path?(path, Array(include_patterns))
 
       basename = File.basename(path, ".yml")
@@ -10832,21 +10892,26 @@ module Kettle
     end
 
     def skip_disabled_integration_template?(target_path, config)
-      disabled = disabled_coverage_integrations(config)
-      return false if disabled.empty?
-
-      path = target_path.to_s
-      disabled.any? { |integration| COVERAGE_INTEGRATION_CONFIG_PATHS.fetch(integration).include?(path) }
+      disabled_integration_template_path?(target_path, config)
     end
 
     def disabled_integration_config_cleanups(project_root, config)
-      disabled_coverage_integrations(config).flat_map do |integration|
-        COVERAGE_INTEGRATION_CONFIG_PATHS.fetch(integration).filter_map do |relative_path|
+      disabled_integrations(config).flat_map do |integration|
+        INTEGRATION_TEMPLATE_PATHS.fetch(integration, []).filter_map do |relative_path|
+          next if relative_path.start_with?(".github/workflows/")
           next unless File.exist?(File.join(project_root, relative_path))
 
           {target_path: relative_path}
         end
       end
+    end
+
+    def disabled_integration_template_path?(target_path, config)
+      disabled = disabled_integrations(config)
+      return false if disabled.empty?
+
+      path = target_path.to_s
+      disabled.any? { |integration| INTEGRATION_TEMPLATE_PATHS.fetch(integration, []).include?(path) }
     end
 
     def packaged_gemfile_template_ruby_floor(target_path)

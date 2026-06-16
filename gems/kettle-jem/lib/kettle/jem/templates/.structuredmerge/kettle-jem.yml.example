@@ -171,15 +171,19 @@ workflows:
   #   gemfile_pattern: "ar-{version}.x"
 
 # Project-level third-party integrations.
-# Disabling a coverage integration removes its upload action, suppresses its
-# README badges, skips templating its packaged config, and cleans up matching
-# config files if they already exist.
+# Disabling an integration removes its upload/check action, suppresses its
+# README badges, skips templating its packaged config/workflow, and cleans up
+# matching config files or workflows if they already exist.
 #
 # Supported coverage integrations: codecov, coveralls, qlty
+# Supported license-check integration: skywalking-eyes
+# skywalking-eyes defaults to disabled unless the configured licenses include
+# MIT. Set `skywalking-eyes: true` to opt in for other license sets.
 #
 # Examples:
 # integrations:
 #   qlty: false
+#   skywalking-eyes: false
 #   disabled:
 #     - codecov
 #     - coveralls

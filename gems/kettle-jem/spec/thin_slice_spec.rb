@@ -1132,7 +1132,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:final_content)).not_to include("CodeQL")
       expect(report.dig(:metadata, :readme_style, :floss_funding_enabled)).to be(false)
       expect(report.dig(:metadata, :readme_style, :security_enabled)).to be(false)
-      expect(report.dig(:metadata, :readme_style, :disabled_integrations)).to eq(["coveralls"])
+      expect(report.dig(:metadata, :readme_style, :disabled_integrations)).to contain_exactly("coveralls", "skywalking-eyes")
       expect(report.dig(:metadata, :readme_style, :missing_integrations)).to contain_exactly("codecov", "qlty", "codeql")
     end
   end
@@ -9702,6 +9702,89 @@ RSpec.describe Kettle::Jem do
           runs-on: ubuntu-latest
     YAML
     expect(described_class.append_github_actions_coverage_steps(workflow_without_steps, disabled_integrations: [])).to eq(workflow_without_steps)
+  end
+
+  it "disables SkyWalking Eyes from boolean keys and disabled lists" do
+    expect(described_class.disabled_integrations(
+      {
+        "integrations" => {
+          "skywalking_eyes" => false
+        }
+      },
+      license: {spdx: ["MIT"]}
+    )).to include("skywalking-eyes")
+
+    expect(described_class.disabled_integrations(
+      {
+        "integrations" => {
+          "disabled" => %w[license-eye]
+        }
+      },
+      license: {spdx: ["MIT"]}
+    )).to include("skywalking-eyes")
+  end
+
+  it "defaults SkyWalking Eyes off unless a compatible license is configured" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-skywalking-eyes-default-disable", tmp_root) do |root|
+      FileUtils.mkdir_p(File.join(root, ".github/workflows"))
+      File.write(File.join(root, ".licenserc.yaml"), "dependency:\n")
+      File.write(File.join(root, ".github/workflows/license-eye.yml"), "name: Apache SkyWalking Eyes\n")
+      config = {
+        "licenses" => %w[AGPL-3.0-only],
+        "templates" => {
+          "root" => "packaged",
+          "apply" => true
+        }
+      }
+      license = {spdx: ["AGPL-3.0-only"]}
+      template_config = described_class.template_runtime_config(config, {}, license: license)
+
+      expect(described_class.disabled_integrations(config, license: license)).to include("skywalking-eyes")
+
+      readme_style = described_class.readme_style_facts(
+        root,
+        config,
+        license,
+        repository: {slug: "example/example"}
+      )
+      expect(readme_style.fetch(:disabled_integrations)).to include("skywalking-eyes")
+
+      template_paths = described_class.template_source_preferences(root, template_config).map { |preference| preference.fetch(:target_path) }
+      expect(template_paths).not_to include(".licenserc.yaml", ".github/workflows/license-eye.yml")
+
+      cleanup_paths = described_class.inactive_packaged_template_cleanup_files(root, template_config).map { |cleanup| cleanup.fetch(:target_path) }
+      expect(cleanup_paths).to include(".licenserc.yaml")
+
+      workflow_cleanup_paths = described_class.inactive_packaged_workflow_cleanup_files(root, template_config)
+      expect(workflow_cleanup_paths).to include(".github/workflows/license-eye.yml")
+    end
+  end
+
+  it "keeps SkyWalking Eyes enabled for MIT licenses and explicit opt-in" do
+    mit_config = {
+      "templates" => {
+        "root" => "packaged",
+        "apply" => true
+      }
+    }
+    non_mit_opt_in_config = {
+      "licenses" => %w[AGPL-3.0-only],
+      "integrations" => {
+        "skywalking-eyes" => true
+      },
+      "templates" => {
+        "root" => "packaged",
+        "apply" => true
+      }
+    }
+
+    expect(described_class.disabled_integrations(mit_config, license: {spdx: ["MIT"]})).not_to include("skywalking-eyes")
+    expect(described_class.disabled_integrations(non_mit_opt_in_config, license: {spdx: ["AGPL-3.0-only"]})).not_to include("skywalking-eyes")
+    expect(described_class.license_eye_workflow_badge(["AGPL-3.0-only"], non_mit_opt_in_config)).to include(
+      "Apache SkyWalking Eyes License Compatibility Check"
+    )
   end
 
   it "applies configured licenses to merged gemspec output" do
