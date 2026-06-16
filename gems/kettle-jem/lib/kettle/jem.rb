@@ -355,6 +355,7 @@ module Kettle
       KJ|SHIMMED_GEM_NAME
       KJ|SHIMMED_REQUIRE
       KJ|SHIM_COMPAT_REQUIRES
+      KJ|SHIMMED_GEMFILE_OVERRIDE
       KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION
       KJ|SOCIAL:BLUESKY
       KJ|SOCIAL:DEVTO
@@ -3109,6 +3110,8 @@ module Kettle
       replacement_require = env["KETTLE_JEM_SHIMMED_REQUIRE"].to_s.strip if replacement_require.empty?
       replacement_require = shim_config["replacement_require"].to_s.strip if replacement_require.empty?
       replacement_require = replacement_gem if replacement_require.empty?
+      replacement_git = env["KETTLE_JEM_SHIMMED_GIT"].to_s.strip
+      replacement_git = shim_config["replacement_git"].to_s.strip if replacement_git.empty?
 
       legacy_requires = Array(shim_config["legacy_requires"]).flat_map { |entry| entry.to_s.split(",") }
       env_legacy_requires = env["KETTLE_JEM_SHIM_LEGACY_REQUIRES"].to_s
@@ -3125,6 +3128,7 @@ module Kettle
       {
         replacement_gem: replacement_gem,
         replacement_require: replacement_require,
+        replacement_git: replacement_git,
         legacy_requires: legacy_requires,
         primary_require: entrypoint_require.to_s,
         primary_version_relative_require: File.join(File.basename(entrypoint_require.to_s), "version"),
@@ -7254,12 +7258,14 @@ module Kettle
     def add_shim_bootstrap_config(content, shim)
       replacement_gem = shim[:replacement_gem].to_s
       replacement_require = shim[:replacement_require].to_s
+      replacement_git = shim[:replacement_git].to_s
       legacy_requires = Array(shim[:legacy_requires]).map(&:to_s).reject(&:empty?)
       block = [
         "shim:",
         "  replacement_gem: #{replacement_gem}",
         "  replacement_require: #{replacement_require}"
       ]
+      block << "  replacement_git: #{replacement_git}" unless replacement_git.empty?
       unless legacy_requires.empty?
         block << "  legacy_requires:"
         block.concat(legacy_requires.map { |path| "    - #{path}" })
@@ -8435,8 +8441,16 @@ module Kettle
         "KJ|SHIMMED_GEM_NAME" => shim[:replacement_gem].to_s,
         "KJ|SHIMMED_REQUIRE" => shim[:replacement_require].to_s,
         "KJ|SHIM_COMPAT_REQUIRES" => Array(shim[:legacy_requires]).join(", "),
+        "KJ|SHIMMED_GEMFILE_OVERRIDE" => shim_gemfile_override(shim),
         "KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION" => shim[:primary_version_relative_require].to_s
       }
+    end
+
+    def shim_gemfile_override(shim)
+      replacement_git = shim[:replacement_git].to_s
+      return "" if replacement_git.empty?
+
+      %(gem "#{shim[:replacement_gem]}", git: "#{replacement_git}" if shimmed_gem_path.empty?)
     end
 
     def readme_fossa_template_tokens(readme_style)

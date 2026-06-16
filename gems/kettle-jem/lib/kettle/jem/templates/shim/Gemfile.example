@@ -4,5 +4,6 @@ source "https://rubygems.org"
 
 shimmed_gem_path = ENV["KETTLE_JEM_SHIMMED_GEM_PATH"].to_s
 gem "{KJ|SHIMMED_GEM_NAME}", path: shimmed_gem_path unless shimmed_gem_path.empty?
+{KJ|SHIMMED_GEMFILE_OVERRIDE}
 
 gemspec
