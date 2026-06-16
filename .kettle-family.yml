@@ -1,0 +1,51 @@
+---
+family:
+  name: structuredmerge-ruby
+  members_root: gems
+
+members:
+  order:
+    mode: dependency
+    hints:
+      - tree_haver
+      - ast-merge
+      - ast-crispr
+      - ast-crispr-ruby-prism
+      - ast-crispr-markdown-markly
+      - ast-merge-git
+      - plain-merge
+      - bash-merge
+      - dotenv-merge
+      - rbs-merge
+      - json-merge
+      - yaml-merge
+      - toml-merge
+      - markdown-merge
+      - ruby-merge
+      - go-merge
+      - rust-merge
+      - typescript-merge
+      - ast-template
+      - binary-merge
+      - zip-merge
+      - psych-merge
+      - citrus-toml-merge
+      - parslet-toml-merge
+      - commonmarker-merge
+      - kramdown-merge
+      - markly-merge
+      - prism-merge
+      - smorg-rb
+      - kettle-jem
+
+commands:
+  lint: bundle exec rake rubocop_gradual:autocorrect rubocop_gradual:force_update
+  docs: bin/rake yard
+
+template:
+  normalize_lockfiles: true
+  normalize_lockfiles_command: bundle update --bundler
+
+release:
+  build_command: bundle exec rake build
+  publish_command: bundle exec kettle-release

@@ -29,6 +29,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Removed
 
+- Removed the bespoke StructuredMerge Ruby family workflow scripts and migrated
+  generated family Rake tasks to `kettle-family`.
+
 ### Fixed
 
 - Current CI now aligns the root Gemfile dependency floors with local path
