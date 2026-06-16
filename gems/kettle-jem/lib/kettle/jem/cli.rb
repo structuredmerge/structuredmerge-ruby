@@ -140,6 +140,12 @@ module Kettle
           opts.on("--template-profile PROFILE", "Use a packaged template profile.") do |value|
             options[:run_options][:template_profile] = value
           end
+          opts.on("--shimmed-gem GEM", "Runtime gem required by the shim profile.") do |value|
+            options[:run_options][:shimmed_gem] = value
+          end
+          opts.on("--shimmed-require REQUIRE", "Require path loaded by the shim profile.") do |value|
+            options[:run_options][:shimmed_require] = value
+          end
           opts.on("--destination PATH", "Selftest destination root.") do |path|
             options[:destination_root] = path
           end

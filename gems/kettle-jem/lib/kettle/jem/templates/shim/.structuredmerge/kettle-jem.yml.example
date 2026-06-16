@@ -1,0 +1,28 @@
+project_emoji: "{KJ|PROJECT_EMOJI}"
+
+ruby:
+  test_minimum: "{KJ|MIN_TEST_RUBY}"
+
+rubygems:
+  name: "{KJ|GEM_NAME}"
+  entrypoint_require: "{KJ|ENTRYPOINT_REQUIRE}"
+  namespace: "{KJ|NAMESPACE}"
+  min_ruby: "{KJ|MIN_RUBY}"
+
+shim:
+  replacement_gem: "{KJ|SHIMMED_GEM_NAME}"
+  replacement_require: "{KJ|SHIMMED_REQUIRE}"
+  legacy_requires:
+    - "{KJ|ENTRYPOINT_REQUIRE}"
+  version:
+    strategy: shim
+
+templates:
+  root: packaged
+  apply: true
+  profile: shim
+
+defaults:
+  preference: "template"
+  add_template_only_nodes: true
+  freeze_token: "kettle-jem"

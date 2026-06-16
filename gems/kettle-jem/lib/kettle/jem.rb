@@ -123,6 +123,7 @@ module Kettle
       supplied_disabled_opencollective_file_deletion
       supplied_legacy_destination_file_deletion
       supplied_obsolete_license_file_deletion
+      supplied_shim_profile_file_deletion
     ].freeze
     PHASE_ORDER = %i[
       config_sync
@@ -144,6 +145,7 @@ module Kettle
     MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE = "monorepo-subgem-release"
     MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE = "monorepo-subgem-full"
     MONOREPO_SUBGEM_TEMPLATE_PROFILE = MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE
+    SHIM_TEMPLATE_PROFILE = "shim"
     FULL_TEMPLATE_PROFILE = "full"
     REPOSITORY_TOPOLOGY_STANDALONE = "standalone"
     REPOSITORY_TOPOLOGY_MONOREPO_SUBPROJECT = "monorepo-subproject"
@@ -191,6 +193,46 @@ module Kettle
         "spec/spec_helper.rb"
       ] + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES
     ).freeze
+    SHIM_TEMPLATE_STATIC_ENTRIES = [
+      "README.md",
+      "CHANGELOG.md",
+      "Gemfile",
+      "Rakefile",
+      ".rspec",
+      "spec/spec_helper.rb",
+      "spec/shim_spec.rb",
+      ".github/workflows/current.yml",
+      ".structuredmerge/kettle-jem.yml"
+    ].freeze
+    SHIM_TEMPLATE_SOURCE_TARGETS = {
+      "README.md" => "shim/README.md",
+      "CHANGELOG.md" => "shim/CHANGELOG.md",
+      "Gemfile" => "shim/Gemfile",
+      "Rakefile" => "shim/Rakefile",
+      ".rspec" => "shim/.rspec",
+      "spec/spec_helper.rb" => "shim/spec/spec_helper.rb",
+      "spec/shim_spec.rb" => "shim/spec/shim_spec.rb",
+      ".github/workflows/current.yml" => "shim/.github/workflows/current.yml",
+      ".structuredmerge/kettle-jem.yml" => "shim/.structuredmerge/kettle-jem.yml"
+    }.freeze
+    SHIM_PROFILE_CLEANUP_GLOBS = [
+      "Appraisal.root.gemfile",
+      "Appraisals",
+      "Guardfile",
+      ".simplecov",
+      ".yardignore",
+      ".yardopts",
+      ".github/FUNDING.yml",
+      ".gitattributes",
+      "bin/*",
+      "gemfiles/**/*.gemfile",
+      "sig/**/*.rbs",
+      "spec/**/*_spec.rb",
+      "spec/support/**/*",
+      ".github/workflows/*.yml",
+      "lib/**/*.rb",
+      "*.gemspec"
+    ].freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
       "sig/gem/version.rbs"
@@ -202,6 +244,8 @@ module Kettle
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
       %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
+      %w[shim replacement_gem] => "KETTLE_JEM_SHIMMED_GEM",
+      %w[shim replacement_require] => "KETTLE_JEM_SHIMMED_REQUIRE",
       %w[workflows exec_cmd] => "KJ_EXEC_CMD",
       %w[tokens forge gh_user] => "KJ_GH_USER",
       %w[tokens forge gl_user] => "KJ_GL_USER",
@@ -308,6 +352,10 @@ module Kettle
       KJ|README:TOP_LOGO_REFS
       KJ|README:TOP_LOGO_ROW
       KJ|SH:USER
+      KJ|SHIMMED_GEM_NAME
+      KJ|SHIMMED_REQUIRE
+      KJ|SHIM_COMPAT_REQUIRES
+      KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION
       KJ|SOCIAL:BLUESKY
       KJ|SOCIAL:DEVTO
       KJ|SOCIAL:LINKTREE
@@ -2648,7 +2696,10 @@ module Kettle
 
       gemspec_spec = load_project_gemspec(gemspec_path)
       gemspec_metadata = project_gemspec_metadata(project_root, gemspec_path, spec: gemspec_spec)
-      name = metadata_value(gemspec_metadata, :gem_name) ||
+      rubygems_config = kettle_config["rubygems"].is_a?(Hash) ? kettle_config["rubygems"] : {}
+      configured_name = rubygems_config["name"].to_s.strip
+      name = (configured_name.empty? ? nil : configured_name) ||
+        metadata_value(gemspec_metadata, :gem_name) ||
         File.basename(gemspec_path, ".gemspec")
       homepage_url = metadata_value(gemspec_metadata, :homepage)
       metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri)
@@ -2659,14 +2710,17 @@ module Kettle
       homepage_github_url = concrete_github_url(homepage_url)
       git_source_url = git_remote_source_url(project_root)
       git_github_url = concrete_github_url(git_source_url)
-      source_url = metadata_github_url ||
-        homepage_github_url ||
-        git_github_url ||
-        metadata_source_url ||
-        homepage_url ||
-        git_source_url
+      source_url = if template_selection[:template_profile].to_s == SHIM_TEMPLATE_PROFILE
+        git_github_url || git_source_url || metadata_github_url || homepage_github_url || metadata_source_url || homepage_url
+      else
+        metadata_github_url ||
+          homepage_github_url ||
+          git_github_url ||
+          metadata_source_url ||
+          homepage_url ||
+          git_source_url
+      end
       derived_github_user = (git_github_url && source_url == git_github_url) ? github_org_from_url(git_github_url) : nil
-      rubygems_config = kettle_config["rubygems"].is_a?(Hash) ? kettle_config["rubygems"] : {}
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
       entrypoint_require = metadata_value(gemspec_metadata, :entrypoint_require) if entrypoint_require.empty?
       entrypoint_require = name.tr("-", "/") if entrypoint_require.to_s.empty?
@@ -2708,6 +2762,14 @@ module Kettle
         test_min_ruby: config_test_min_ruby(kettle_config, min_ruby),
         version: project_version
       )
+      shim = shim_facts(
+        kettle_config,
+        env,
+        run_options,
+        package_name: name,
+        entrypoint_require: entrypoint_require,
+        template_profile: template_selection[:template_profile]
+      )
       facts = {
         package: compact_hash(
           ecosystem: "rubygems",
@@ -2728,6 +2790,7 @@ module Kettle
           engines: ruby_engines_config(kettle_config)
         )
       }
+      facts[:shim] = shim unless shim.empty?
       repository_topology = repository_topology_for(kettle_config, env, template_selection)
       repository = repository_facts(
         project_root,
@@ -2749,7 +2812,9 @@ module Kettle
         project_emoji ||= readme_project_emoji(project_root)
         project_emoji ||= gemspec_project_emoji(gemspec_metadata)
         project_emoji ||= "💎" if monorepo_subgem_template_profile_value?(template_selection[:template_profile])
+        project_emoji ||= "🪞" if template_selection[:template_profile].to_s == SHIM_TEMPLATE_PROFILE
         bootstrap[:project_emoji] = project_emoji
+        bootstrap[:shim] = shim if shim && !shim.empty?
       end
       facts[:kettle_config_bootstrap] = bootstrap if bootstrap
       facts[:author] = author unless author.empty?
@@ -2788,6 +2853,7 @@ module Kettle
       disabled_integrations = disabled_integrations(kettle_config, license: license)
       facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
+      facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
       template_config = template_runtime_config(kettle_config, facts, license: license)
       inactive_workflows = inactive_packaged_workflow_cleanup_files(
         project_root,
@@ -2795,7 +2861,6 @@ module Kettle
         include_patterns: template_selection[:include]
       )
       inactive_templates = inactive_packaged_template_cleanup_files(project_root, template_config)
-      facts[:template_profile] = template_selection[:template_profile] unless template_selection[:template_profile].to_s.empty?
       facts[:ci] = {
         provider: "github_actions",
         default_branch: "main",
@@ -2823,6 +2888,8 @@ module Kettle
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
       template_facts[:inactive_packaged_template_cleanups] = inactive_templates unless inactive_templates.empty?
+      shim_cleanups = shim_profile_cleanups(project_root, facts, template_preferences, template_selection: template_selection)
+      template_facts[:shim_profile_cleanups] = shim_cleanups unless shim_cleanups.empty?
       legacy_cleanups = template_legacy_destination_cleanups(project_root, template_preferences)
       template_facts[:legacy_destination_cleanups] = legacy_cleanups unless legacy_cleanups.empty?
       license_cleanups = template_obsolete_license_cleanups(project_root, template_config, template_preferences)
@@ -2859,7 +2926,7 @@ module Kettle
     end
 
     def recipe_pack(facts)
-      recipes = if monorepo_template_profile?(facts)
+      recipes = if monorepo_template_profile?(facts) || shim_template_profile?(facts)
         []
       else
         [
@@ -2885,7 +2952,7 @@ module Kettle
       if facts[:kettle_config_bootstrap]
         recipes.unshift(kettle_config_bootstrap_recipe(facts.fetch(:kettle_config_bootstrap)))
       end
-      unless monorepo_template_profile?(facts)
+      unless monorepo_template_profile?(facts) || shim_template_profile?(facts)
         facts.dig(:ci, :framework_matrix, :gemfiles).to_a.each do |gemfile|
           recipes << recipe_entry(
             "github_actions_framework_gemfile_#{workflow_recipe_slug(gemfile.fetch(:path))}",
@@ -2993,15 +3060,26 @@ module Kettle
           facts: %w[templates license]
         )
       end
-      recipes << recipe_entry(
-        "rakefile_scaffold_cleanup",
-        "Rakefile",
-        "generic_ast",
-        "supplied_source_selector_deletion",
-        provider_backend: "generic_structural_owners",
-        facts: %w[rubygems rakefile],
-        selectors: %w[rakefile_scaffold]
-      )
+      facts.dig(:templates, :shim_profile_cleanups).to_a.each do |cleanup|
+        recipes << recipe_entry(
+          "template_shim_profile_cleanup_#{workflow_recipe_slug(cleanup.fetch(:target_path))}",
+          cleanup.fetch(:target_path),
+          "file",
+          "supplied_shim_profile_file_deletion",
+          facts: %w[templates shim]
+        )
+      end
+      unless shim_template_profile?(facts)
+        recipes << recipe_entry(
+          "rakefile_scaffold_cleanup",
+          "Rakefile",
+          "generic_ast",
+          "supplied_source_selector_deletion",
+          provider_backend: "generic_structural_owners",
+          facts: %w[rubygems rakefile],
+          selectors: %w[rakefile_scaffold]
+        )
+      end
 
       {
         name: "kettle-jem-core",
@@ -3012,8 +3090,47 @@ module Kettle
     end
 
     def generated_blocks_facts(gemspec, facts, run_options)
+      return {} if shim_template_profile?(facts)
+
       shunted = shunted_gemfile_block(gemspec, facts, run_options)
       shunted ? {shunted_gemfile: shunted} : {}
+    end
+
+    def shim_facts(config, env, run_options, package_name:, entrypoint_require:, template_profile:)
+      shim_config = config["shim"].is_a?(Hash) ? config["shim"] : {}
+      selection = run_options || {}
+      replacement_gem = selection[:shimmed_gem].to_s.strip
+      replacement_gem = selection["shimmed_gem"].to_s.strip if replacement_gem.empty?
+      replacement_gem = env["KETTLE_JEM_SHIMMED_GEM"].to_s.strip if replacement_gem.empty?
+      replacement_gem = shim_config["replacement_gem"].to_s.strip if replacement_gem.empty?
+
+      replacement_require = selection[:shimmed_require].to_s.strip
+      replacement_require = selection["shimmed_require"].to_s.strip if replacement_require.empty?
+      replacement_require = env["KETTLE_JEM_SHIMMED_REQUIRE"].to_s.strip if replacement_require.empty?
+      replacement_require = shim_config["replacement_require"].to_s.strip if replacement_require.empty?
+      replacement_require = replacement_gem if replacement_require.empty?
+
+      legacy_requires = Array(shim_config["legacy_requires"]).flat_map { |entry| entry.to_s.split(",") }
+      env_legacy_requires = env["KETTLE_JEM_SHIM_LEGACY_REQUIRES"].to_s
+      legacy_requires.concat(env_legacy_requires.split(",")) unless env_legacy_requires.empty?
+      legacy_requires << entrypoint_require
+      legacy_requires = legacy_requires.map(&:strip).reject(&:empty?).uniq
+
+      return {} if replacement_gem.empty? && template_profile.to_s != SHIM_TEMPLATE_PROFILE
+      if replacement_gem.empty?
+        raise ArgumentError,
+          "shim template profile requires shim.replacement_gem, KETTLE_JEM_SHIMMED_GEM, or --shimmed-gem"
+      end
+
+      {
+        replacement_gem: replacement_gem,
+        replacement_require: replacement_require,
+        legacy_requires: legacy_requires,
+        primary_require: entrypoint_require.to_s,
+        primary_version_relative_require: File.join(File.basename(entrypoint_require.to_s), "version"),
+        package_name: package_name.to_s,
+        version_strategy: shim_config.dig("version", "strategy").to_s.empty? ? "shim" : shim_config.dig("version", "strategy").to_s
+      }
     end
 
     def shunted_gemfile_block(gemspec, facts, run_options)
@@ -3902,6 +4019,8 @@ module Kettle
       when /\Atemplate_legacy_destination_cleanup_/
         ""
       when /\Atemplate_obsolete_license_cleanup_/
+        ""
+      when /\Atemplate_shim_profile_cleanup_/
         ""
       when /\Agithub_actions_workflow_snippets_/
         synchronize_github_actions_workflow_snippets(original, facts: facts)
@@ -6860,6 +6979,7 @@ module Kettle
       content = replace_kettle_config_bootstrap_licenses(content, bootstrap_licenses) unless bootstrap_licenses.empty?
       content = replace_kettle_config_bootstrap_project_emoji(content, recipe[:bootstrap_project_emoji]) unless recipe[:bootstrap_project_emoji].to_s.empty?
       content = apply_kettle_config_bootstrap_profile(content, recipe[:bootstrap_template_profile], recipe[:bootstrap_gemspec_path])
+      content = add_shim_bootstrap_config(content, recipe[:bootstrap_shim]) if recipe[:bootstrap_shim].is_a?(Hash)
       sync_kettle_config_env_overrides(content, env)
     end
 
@@ -7098,8 +7218,60 @@ module Kettle
       return replace_yaml_scalar_path(content, %w[templates profile], FULL_TEMPLATE_PROFILE) if profile.to_s == FULL_TEMPLATE_PROFILE
       return apply_monorepo_root_template_profile(content) if profile.to_s == MONOREPO_ROOT_TEMPLATE_PROFILE
       return apply_monorepo_subgem_template_profile(content, gemspec_path, profile) if monorepo_subgem_template_profile_value?(profile)
+      return apply_shim_template_profile(content, gemspec_path) if profile.to_s == SHIM_TEMPLATE_PROFILE
 
       raise Error, "Unknown kettle-jem template profile: #{profile}"
+    end
+
+    def apply_shim_template_profile(content, gemspec_path)
+      entry_lines = shim_template_entries_for_config(gemspec_path, {}).flat_map do |entry|
+        [
+          "    - source: #{entry.fetch("source")}",
+          "      target: #{entry.fetch("target")}"
+        ]
+      end
+      profiled_content = replace_yaml_scalar_path(content, %w[templates profile], SHIM_TEMPLATE_PROFILE)
+      entries_block = ["  entries:", *entry_lines].join("\n")
+      updated = insert_after_line_sequence(
+        profiled_content,
+        ["templates:", "  root: packaged", "  apply: true", "  profile: #{SHIM_TEMPLATE_PROFILE}"],
+        entries_block,
+        nil
+      )
+      if updated == profiled_content
+        updated = insert_after_line_sequence(
+          profiled_content,
+          ["templates:", "  root: packaged", "  apply: true"],
+          entries_block,
+          "Could not apply shim template profile to .kettle-jem.yml bootstrap template"
+        )
+      end
+      raise Error, "Could not apply shim template profile to .kettle-jem.yml bootstrap template" if updated == profiled_content
+
+      add_shim_file_overrides(updated, gemspec_path)
+    end
+
+    def add_shim_bootstrap_config(content, shim)
+      replacement_gem = shim[:replacement_gem].to_s
+      replacement_require = shim[:replacement_require].to_s
+      legacy_requires = Array(shim[:legacy_requires]).map(&:to_s).reject(&:empty?)
+      block = [
+        "shim:",
+        "  replacement_gem: #{replacement_gem}",
+        "  replacement_require: #{replacement_require}"
+      ]
+      unless legacy_requires.empty?
+        block << "  legacy_requires:"
+        block.concat(legacy_requires.map { |path| "    - #{path}" })
+      end
+      block << "  version:"
+      block << "    strategy: shim"
+      insert_after_line_sequence(
+        content,
+        ["homepage_uri: \"{KJ|HOMEPAGE_URI}\""],
+        ["", *block].join("\n"),
+        "Could not add shim config to .kettle-jem.yml bootstrap template"
+      )
     end
 
     def apply_monorepo_root_template_profile(content)
@@ -7273,6 +7445,39 @@ module Kettle
       )
     end
 
+    def shim_template_entries_for_config(gemspec_path, config)
+      package_name = config.dig("rubygems", "name").to_s.strip
+      package_name = File.basename(gemspec_path.to_s, ".gemspec") if package_name.empty?
+      entrypoint_require = config.dig("rubygems", "entrypoint_require").to_s.strip
+      entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
+      legacy_requires = Array(config.dig("shim", "legacy_requires")).map(&:to_s)
+      legacy_requires << entrypoint_require
+      shim = {legacy_requires: legacy_requires.uniq}
+      shim_template_entries(
+        {
+          package: {name: package_name},
+          rubygems: {entrypoint_require: entrypoint_require},
+          shim: shim
+        },
+        config
+      )
+    end
+
+    def add_shim_file_overrides(content, gemspec_path)
+      override_lines = shim_template_entries_for_config(gemspec_path, {}).flat_map do |entry|
+        target = entry.fetch("target")
+        next [] if target == KETTLE_CONFIG_PATH
+
+        kettle_config_file_override_lines(target, "accept_template")
+      end
+      insert_after_line_sequence(
+        content,
+        ["files:"],
+        override_lines.join("\n"),
+        "Could not apply shim file overrides to .kettle-jem.yml bootstrap template"
+      )
+    end
+
     def insert_after_line_sequence(content, sequence, insertion, error_message)
       lines = content.to_s.lines(chomp: true)
       index = (0..(lines.length - sequence.length)).find do |candidate|
@@ -7297,6 +7502,10 @@ module Kettle
 
     def monorepo_template_profile?(facts)
       monorepo_root_template_profile?(facts) || monorepo_subgem_template_profile?(facts)
+    end
+
+    def shim_template_profile?(facts)
+      facts[:template_profile].to_s == SHIM_TEMPLATE_PROFILE
     end
 
     def monorepo_subgem_template_profile_value?(profile)
@@ -7378,6 +7587,8 @@ module Kettle
         only: normalize_list_option(option_hash.fetch(:only, env_hash["only"])),
         include: normalize_list_option(option_hash.fetch(:include, env_hash["include"])),
         template_profile: normalize_template_profile(option_hash.fetch(:template_profile, env_hash["KETTLE_JEM_TEMPLATE_PROFILE"])),
+        shimmed_gem: option_hash.fetch(:shimmed_gem, env_hash["KETTLE_JEM_SHIMMED_GEM"]),
+        shimmed_require: option_hash.fetch(:shimmed_require, env_hash["KETTLE_JEM_SHIMMED_REQUIRE"]),
         skip_commit: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_commit, env_hash["KETTLE_JEM_SKIP_COMMIT"])),
         dry_run: DecisionPolicy.value_to_boolean(option_hash.fetch(:dry_run, env_hash["KETTLE_JEM_DRY_RUN"])),
         accept_config: DecisionPolicy.value_to_boolean(option_hash.fetch(:accept_config, env_hash["KETTLE_JEM_ACCEPT_CONFIG"])),
@@ -7400,6 +7611,7 @@ module Kettle
       return MONOREPO_SUBGEM_RELEASE_TEMPLATE_PROFILE if %w[monorepo-subgem-release monorepo-release release].include?(profile)
       return MONOREPO_SUBGEM_FULL_TEMPLATE_PROFILE if %w[monorepo-subgem-full monorepo-full subgem-full].include?(profile)
       return MONOREPO_ROOT_TEMPLATE_PROFILE if profile == MONOREPO_ROOT_TEMPLATE_PROFILE
+      return SHIM_TEMPLATE_PROFILE if %w[shim shim-gem compatibility-shim compat-shim].include?(profile)
 
       profile
     end
@@ -7575,6 +7787,13 @@ module Kettle
       if recipe.fetch(:primitive) == "supplied_obsolete_license_file_deletion"
         metadata.merge!(
           policy_kind: "delete_obsolete_license_file",
+          operation: "delete",
+          deleted_file: recipe.fetch(:target_path)
+        )
+      end
+      if recipe.fetch(:primitive) == "supplied_shim_profile_file_deletion"
+        metadata.merge!(
+          policy_kind: "delete_shim_profile_file",
           operation: "delete",
           deleted_file: recipe.fetch(:target_path)
         )
@@ -8204,8 +8423,20 @@ module Kettle
         readme_family_intro_and_backend_matrix(facts.fetch(:readme_style, {}))
       tokens.merge!(readme_fossa_template_tokens(facts.fetch(:readme_style, {})))
       tokens.merge!(version_gem_template_tokens(facts))
+      tokens.merge!(shim_template_tokens(facts.fetch(:shim, {})))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
+    end
+
+    def shim_template_tokens(shim)
+      return {} unless shim.is_a?(Hash) && !shim.empty?
+
+      {
+        "KJ|SHIMMED_GEM_NAME" => shim[:replacement_gem].to_s,
+        "KJ|SHIMMED_REQUIRE" => shim[:replacement_require].to_s,
+        "KJ|SHIM_COMPAT_REQUIRES" => Array(shim[:legacy_requires]).join(", "),
+        "KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION" => shim[:primary_version_relative_require].to_s
+      }
     end
 
     def readme_fossa_template_tokens(readme_style)
@@ -9954,7 +10185,7 @@ module Kettle
     def license_compat_img(category)
       data = APACHE_LICENSE_COMPAT_BADGE_DATA.fetch(category)
       normalize_generated_image_url(
-        "https://img.shields.io/badge/#{data.fetch(:label)}-#{data.fetch(:message)}-#{data.fetch(:color)}.svg?style=flat&logo=Apache",
+        "https://img.shields.io/badge/#{data.fetch(:label)}-#{data.fetch(:message)}-#{data.fetch(:color)}.svg?style=flat&logo=Apache"
       )
     end
 
@@ -10517,7 +10748,27 @@ module Kettle
       result["ruby"] = {} unless result["ruby"].is_a?(Hash)
       result["ruby"]["test_minimum"] = config_test_min_ruby(result, facts.dig(:rubygems, :min_ruby)).to_s
       result["resolved_licenses"] = license[:spdx]
+      if facts[:template_profile].to_s == SHIM_TEMPLATE_PROFILE
+        result["templates"] = default_template_config.merge(result["templates"].is_a?(Hash) ? result["templates"] : {})
+        result["templates"]["profile"] = SHIM_TEMPLATE_PROFILE
+        result["templates"]["entries"] = shim_template_entries(facts, result)
+        result["templates"]["entries"].each do |entry|
+          target = entry.fetch("target").to_s
+
+          set_template_file_strategy!(result, target, "accept_template")
+        end
+      end
       result
+    end
+
+    def set_template_file_strategy!(config, target_path, strategy)
+      config["files"] = {} unless config["files"].is_a?(Hash)
+      current = config["files"]
+      target_path.to_s.split("/").each do |part|
+        current[part] = {} unless current[part].is_a?(Hash)
+        current = current[part]
+      end
+      current["strategy"] = strategy
     end
 
     def template_activation_config(config)
@@ -10538,6 +10789,23 @@ module Kettle
       return [] if templates.key?("entries")
 
       template_inventory_entries(project_root, root.fetch(:path))
+    end
+
+    def shim_template_entries(facts, config)
+      package_name = facts.dig(:package, :name).to_s
+      entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
+      shim = facts.fetch(:shim)
+      targets = SHIM_TEMPLATE_STATIC_ENTRIES.map do |target|
+        source = SHIM_TEMPLATE_SOURCE_TARGETS.fetch(target, target)
+        {"source" => source, "target" => target}
+      end
+      targets << {"source" => "shim/gem.gemspec", "target" => "#{package_name}.gemspec"}
+      targets << {"source" => "shim/lib/version.rb", "target" => File.join("lib", entrypoint_require, "version.rb")}
+      targets << {"source" => "shim/lib/entrypoint.rb", "target" => File.join("lib", "#{entrypoint_require}.rb")}
+      Array(shim[:legacy_requires]).map(&:to_s).reject { |path| path == entrypoint_require }.each do |require_path|
+        targets << {"source" => "shim/lib/compat_require.rb", "target" => File.join("lib", "#{require_path}.rb")}
+      end
+      targets.uniq { |entry| entry.fetch("target") }
     end
 
     def template_inventory_entries(project_root, template_root_path)
@@ -10612,6 +10880,25 @@ module Kettle
       (gemfile_cleanups + disabled_integration_config_cleanups(project_root, config)).sort_by { |cleanup| cleanup.fetch(:target_path) }
     end
 
+    def shim_profile_cleanups(project_root, facts, preferences, template_selection: {})
+      return [] unless facts[:template_profile].to_s == SHIM_TEMPLATE_PROFILE
+      return [] unless Array(template_selection[:only]).empty?
+
+      retained_paths = preferences.map { |preference| preference.fetch(:target_path).to_s }.to_set
+      retained_paths << KETTLE_CONFIG_PATH
+      SHIM_PROFILE_CLEANUP_GLOBS.flat_map do |pattern|
+        Dir.glob(File.join(project_root, pattern), File::FNM_DOTMATCH).filter_map do |path|
+          next unless File.file?(path)
+
+          relative_path = path.delete_prefix("#{project_root}/")
+          next if retained_paths.include?(relative_path)
+          next if relative_path.start_with?(".git/")
+
+          {target_path: relative_path}
+        end
+      end.uniq { |cleanup| cleanup.fetch(:target_path) }.sort_by { |cleanup| cleanup.fetch(:target_path) }
+    end
+
     def kettle_config_bootstrap_facts(project_root, env, template_selection: {})
       return if File.exist?(File.join(project_root, KETTLE_CONFIG_PATH))
       return if File.exist?(File.join(project_root, LEGACY_KETTLE_CONFIG_PATH))
@@ -10653,6 +10940,7 @@ module Kettle
       recipe[:bootstrap_template_profile] = bootstrap[:template_profile].to_s unless bootstrap[:template_profile].to_s.empty?
       recipe[:bootstrap_gemspec_path] = bootstrap[:gemspec_path].to_s unless bootstrap[:gemspec_path].to_s.empty?
       recipe[:bootstrap_project_emoji] = bootstrap[:project_emoji].to_s unless bootstrap[:project_emoji].to_s.empty?
+      recipe[:bootstrap_shim] = bootstrap[:shim] if bootstrap[:shim].is_a?(Hash)
       recipe
     end
 

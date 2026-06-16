@@ -43,6 +43,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Version-gem bootstrapping now removes stale top-level RBS `VERSION`
   declarations and generated style workflows load the RBS environment so
   duplicate declarations fail in CI.
+- Added a destructive `shim` template profile for compatibility wrapper gems.
+  Shim templating accepts the replacement gem via `--shimmed-gem` or
+  `KETTLE_JEM_SHIMMED_GEM`, generates only the shim runtime/docs/specs/CI, and
+  deletes obsolete implementation code, behavior specs, workflows, and gemfiles.
 
 ### Changed
 

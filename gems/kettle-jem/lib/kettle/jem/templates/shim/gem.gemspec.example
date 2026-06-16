@@ -1,0 +1,36 @@
+# frozen_string_literal: true
+
+load "lib/{KJ|ENTRYPOINT_REQUIRE}/version.rb"
+gem_version = {KJ|NAMESPACE}::Version::VERSION
+
+Gem::Specification.new do |spec|
+  spec.name = "{KJ|GEM_NAME}"
+  spec.version = gem_version
+  spec.authors = {KJ|AUTHOR:NAMES}
+  spec.email = ["{KJ|AUTHOR:EMAIL}"]
+
+  spec.summary = "{KJ|GEMSPEC_PACKAGE_SUMMARY}"
+  spec.description = "{KJ|GEM_NAME} is a compatibility shim for {KJ|SHIMMED_GEM_NAME}."
+  spec.homepage = "{KJ|README:GH_REPOSITORY_URL}"
+  spec.licenses = ["MIT"]
+  spec.required_ruby_version = ">= {KJ|MIN_RUBY}"
+
+  spec.metadata["homepage_uri"] = "{KJ|HOMEPAGE_URI}"
+  spec.metadata["source_code_uri"] = "#{spec.homepage}/tree/v#{spec.version}"
+  spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/v#{spec.version}/CHANGELOG.md"
+  spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
+  spec.metadata["documentation_uri"] = "https://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
+  spec.metadata["rubygems_mfa_required"] = "true"
+
+  spec.files = Dir.glob("lib/**/*.rb") + %w[
+    CHANGELOG.md
+    LICENSE.txt
+    README.md
+  ].select { |path| File.exist?(path) }
+  spec.require_paths = ["lib"]
+
+  spec.add_dependency "{KJ|SHIMMED_GEM_NAME}"
+
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.12"
+end

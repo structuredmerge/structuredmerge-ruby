@@ -1,0 +1,25 @@
+# {KJ|NAMESPACE}
+
+`{KJ|GEM_NAME}` is a compatibility shim for `{KJ|SHIMMED_GEM_NAME}`.
+
+New applications should depend on `{KJ|SHIMMED_GEM_NAME}` directly. This gem exists so existing applications that still depend on `{KJ|GEM_NAME}` can load the replacement implementation without changing all require paths at once.
+
+## Installation
+
+```ruby
+gem "{KJ|GEM_NAME}"
+```
+
+## Runtime behavior
+
+Loading this gem requires `{KJ|SHIMMED_REQUIRE}` and leaves implementation behavior to `{KJ|SHIMMED_GEM_NAME}`.
+
+The generated compatibility require paths are:
+
+```text
+{KJ|SHIM_COMPAT_REQUIRES}
+```
+
+## Migration
+
+When you are ready to remove the compatibility layer, replace `{KJ|GEM_NAME}` with `{KJ|SHIMMED_GEM_NAME}` in your dependency list and require `{KJ|SHIMMED_REQUIRE}` directly.
