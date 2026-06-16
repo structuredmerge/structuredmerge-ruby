@@ -97,6 +97,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated workflow templates now pin `coverallsapp/github-action`,
   `codecov/codecov-action`, and `kettle-rb/ts-grammar-action` to resolvable
   release SHAs instead of stripped SemVer strings.
+- Generated README badge URLs now use the same URI-normalized form as
+  `kettle-pre-release`, avoiding churn between encoded namespace separators
+  and Unicode badge messages.
 - Generated GitHub Actions workflow templates now refresh `ruby/setup-ruby` to
   the immutable SHA for v1.312.0 and `codecov/codecov-action` to the latest
   v7.0.0 release comment.

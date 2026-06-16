@@ -13,6 +13,7 @@ require "rbconfig"
 require "stringio"
 require "time"
 require "uri"
+require "addressable/uri"
 require "ruby/merge"
 require "prism/merge"
 require "bash/merge"
@@ -1004,7 +1005,7 @@ module Kettle
             forge_org: forge.fetch(:org, nil),
             gh_repo: forge.fetch(:repo, nil),
             namespace: namespace,
-            namespace_shield: namespace.gsub("::", "%3A%3A"),
+            namespace_shield: shield_token(namespace),
             entrypoint_require: entrypoint_require,
             gem_shield: gem_name.gsub("-", "--").gsub("_", "__"),
             authors: Array(spec&.authors).compact.uniq,
@@ -9168,7 +9169,11 @@ module Kettle
     end
 
     def shield_token(value)
-      value.to_s.gsub("-", "--").gsub("_", "__").gsub("::", "%3A%3A").tr(" ", "_")
+      value.to_s.gsub("-", "--").gsub("_", "__").tr(" ", "_")
+    end
+
+    def normalize_generated_image_url(url)
+      Addressable::URI.parse(url.to_s).normalize.to_s
     end
 
     def github_org_from_url(url)
@@ -9948,7 +9953,9 @@ module Kettle
 
     def license_compat_img(category)
       data = APACHE_LICENSE_COMPAT_BADGE_DATA.fetch(category)
-      "https://img.shields.io/badge/#{data.fetch(:label)}-#{data.fetch(:message)}-#{data.fetch(:color)}.svg?style=flat&logo=Apache"
+      normalize_generated_image_url(
+        "https://img.shields.io/badge/#{data.fetch(:label)}-#{data.fetch(:message)}-#{data.fetch(:color)}.svg?style=flat&logo=Apache",
+      )
     end
 
     def polyform_licenses?(licenses)

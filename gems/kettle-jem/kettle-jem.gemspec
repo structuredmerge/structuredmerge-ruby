@@ -98,6 +98,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("ast-crispr-markdown-markly", "= #{spec.version}")  # ruby >= 4.0.0
   spec.add_dependency("ast-crispr-ruby-prism", "= #{spec.version}")        # ruby >= 4.0.0
   spec.add_dependency("ast-merge", "= #{spec.version}")                  # ruby >= 4.0.0
+  spec.add_dependency("addressable", ">= 2.8", "< 3")                     # ruby >= 2.2.0
   spec.add_dependency("bash-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("citrus-toml-merge", "= 7.0.0")                    # ruby >= 4.0.0
   spec.add_dependency("commonmarker-merge", "= #{spec.version}")         # ruby >= 4.0.0

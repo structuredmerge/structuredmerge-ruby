@@ -5443,8 +5443,15 @@ RSpec.describe Kettle::Jem do
 
       expect(facts.dig(:rubygems, :namespace)).to eq("Warden::OAuth")
       expect(facts.dig(:rubygems, :namespace)).not_to eq("WardenOauth")
-      expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden%3A%3AOAuth")
+      expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden::OAuth")
     end
+  end
+
+  it "normalizes generated README badge image URLs consistently with pre-release checks" do
+    expect(described_class.send(:shield_token, "Example::Gem")).to eq("Example::Gem")
+    expect(described_class.send(:license_compat_img, :a)).to include(
+      "Apache_Compatible:_Category_A-%E2%9C%93-259D6C.svg"
+    )
   end
 
   it "places version_gem entrypoint requires from top-level Ruby structure" do
@@ -10183,8 +10190,8 @@ RSpec.describe Kettle::Jem do
       expect(final_content).to include("Gem shield: example--gem")
       expect(final_content).to include("Major: 2")
       expect(final_content).to include("GitHub org: acme")
-      expect(final_content).to include("Namespace shield: Example%3A%3AGem")
-      expect(final_content).to include("Namespace badge: https://img.shields.io/badge/namespace-Example%3A%3AGem-3C2D2D.svg")
+      expect(final_content).to include("Namespace shield: Example::Gem")
+      expect(final_content).to include("Namespace badge: https://img.shields.io/badge/namespace-Example::Gem-3C2D2D.svg")
       expect(final_content).to include("Min dev Ruby: 3.2")
       expect(final_content).to include("Freeze: custom-freeze")
       expect(final_content).to include("Version: #{Kettle::Jem::VERSION}")
@@ -10202,7 +10209,7 @@ RSpec.describe Kettle::Jem do
         "KJ|GH_ORG" => "acme",
         "KJ|MIN_DEV_RUBY" => "3.2",
         "KJ|MIN_DIVERGENCE_THRESHOLD" => "12",
-        "KJ|NAMESPACE_SHIELD" => "Example%3A%3AGem",
+        "KJ|NAMESPACE_SHIELD" => "Example::Gem",
         "KJ|PROJECT_EMOJI" => "🫖",
         "KJ|HOMEPAGE_URI" => "https://homepage.example.test",
         "KJ|YARD_HOST" => "docs.example.test"
