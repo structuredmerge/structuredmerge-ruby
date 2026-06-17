@@ -1666,6 +1666,35 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps shim-only template files out of full profile inventory" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-inventory-profile-slice", tmp_root) do |root|
+      template_root = File.join(root, "template")
+      write_tree(template_root, {
+        "README.md.example" => "readme",
+        "shim/.structuredmerge/kettle-jem.yml.example" => "{KJ|SHIMMED_GEM_NAME}"
+      })
+
+      full_entries = described_class.send(
+        :template_inventory_entries,
+        root,
+        template_root,
+        templates: {"profile" => "full"}
+      )
+      shim_entries = described_class.send(
+        :template_inventory_entries,
+        root,
+        template_root,
+        templates: {"profile" => "shim"}
+      )
+
+      expect(full_entries).to include("README.md")
+      expect(full_entries).not_to include("shim/.structuredmerge/kettle-jem.yml")
+      expect(shim_entries).to include("shim/.structuredmerge/kettle-jem.yml")
+    end
+  end
+
   it "applies packaged monorepo subgem README badge policy" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

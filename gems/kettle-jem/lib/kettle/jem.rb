@@ -10802,7 +10802,7 @@ module Kettle
       return templates["entries"] if templates["entries"].is_a?(Array)
       return [] if templates.key?("entries")
 
-      template_inventory_entries(project_root, root.fetch(:path))
+      template_inventory_entries(project_root, root.fetch(:path), templates: templates)
     end
 
     def shim_template_entries(facts, config)
@@ -10822,8 +10822,9 @@ module Kettle
       targets.uniq { |entry| entry.fetch("target") }
     end
 
-    def template_inventory_entries(project_root, template_root_path)
+    def template_inventory_entries(project_root, template_root_path, templates: {})
       logical_paths = []
+      include_shim_templates = normalize_template_profile(templates["profile"]) == SHIM_TEMPLATE_PROFILE
       Find.find(template_root_path) do |path|
         next if File.directory?(path)
 
@@ -10832,6 +10833,7 @@ module Kettle
           .sub(/\.no-osc\.example\z/, "")
           .sub(/\.example\z/, "")
         next if logical_path.start_with?("readme/partials/")
+        next if logical_path.start_with?("shim/") && !include_shim_templates
         next if logical_path == "gemfiles/modular/shunted.gemfile"
 
         logical_paths << logical_path unless logical_path.empty?
