@@ -76,7 +76,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Retemplating now removes legacy `.github/workflows/tests.yml` files as
   obsolete workflows.
 - Runtime dependency `token-resolver` now requires 2.0.2 or newer.
-- Gem templates now require `turbo_tests2` >= 3.1.3 for the default
+- Gem templates now require `turbo_tests2` >= 3.1.4 for the default
   `kettle-test` runner dependency.
 - Documentation templates now require `yard-yaml` >= 0.2.1.
 - Gemfile and gemspec source checks now prefer Prism-backed call records instead
