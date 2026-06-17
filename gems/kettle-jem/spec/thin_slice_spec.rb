@@ -2848,7 +2848,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:facts).dig(:license, :spdx)).to eq(["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"])
       expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.9"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.10"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.5"')
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
@@ -2856,7 +2856,7 @@ RSpec.describe Kettle::Jem do
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
-      expect(rakefile).to include('run_family_script("10_release_readiness_check.rb")')
+      expect(rakefile).to include('run_kettle_family("check")')
     end
   end
 
@@ -2905,7 +2905,7 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.9"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.10"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.5"')
       expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.3"')
     end
@@ -4103,6 +4103,37 @@ RSpec.describe Kettle::Jem do
         "RUBYLIB" => nil,
         "RUBYOPT" => nil
       ))
+    end
+  end
+
+  it "uses kettle-family local install roots for templating setup" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-family-marker", tmp_root) do |root|
+      marker_path = File.join(root, "local-install.json")
+      marker = {
+        "members_root" => File.join(root, "structuredmerge", "ruby", "gems"),
+        "local_dependencies" => [
+          File.join(root, "kettle-dev", "nomono"),
+          File.join(root, "kettle-dev", "kettle-dev")
+        ],
+        "installed_members" => ["nomono", "kettle-dev", "kettle-jem"]
+      }
+      FileUtils.mkdir_p(File.join(marker.fetch("members_root"), "kettle-jem"))
+      File.write(marker_path, JSON.pretty_generate(marker))
+      File.write(File.join(root, "Gemfile"), "source \"https://gem.coop\"\n")
+
+      env = {
+        "K_JEM_TEMPLATING" => "true",
+        "KETTLE_FAMILY_LOCAL_INSTALL_MARKER" => marker_path
+      }
+
+      expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "K_JEM_TEMPLATING" => "true",
+        "SMORG_RB_DEV" => marker.fetch("members_root"),
+        "KETTLE_RB_DEV" => File.join(root, "kettle-dev")
+      )
     end
   end
 
@@ -8059,7 +8090,7 @@ RSpec.describe Kettle::Jem do
   it "keeps the packaged gemspec template dependency floors current" do
     template = File.read(File.expand_path("../lib/kettle/jem/templates/gem.gemspec.example", __dir__))
 
-    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.2", ">= 2.2.9")))
+    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.2", ">= 2.2.10")))
     expect(template).not_to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.1", ">= 2.1.1")))
   end
 
@@ -8097,7 +8128,7 @@ RSpec.describe Kettle::Jem do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.9")
+            spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -8111,7 +8142,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include(%(spec.add_dependency("json", "~> 2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("custom-dev", ">= 1")))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.9")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.1")))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0")\n))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("rake", "~> 13.0")))

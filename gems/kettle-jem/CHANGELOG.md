@@ -50,6 +50,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `kettle-jem install` now uses the latest `kettle-family install` marker to
+  activate locally installed template-stack source roots during templating
+  setup.
 - Generated Gemfiles now guard preserved runtime `eval_nomono_gems` workspace
   overrides during `K_JEM_TEMPLATING=true`, keeping templating bundles isolated
   from target runtime sibling path dependencies.

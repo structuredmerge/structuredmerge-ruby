@@ -99,6 +99,16 @@ template:
   normalize_lockfiles: true
   normalize_lockfiles_command: bundle update --bundler
 
+install:
+  local_dependencies:
+    - ../../kettle-dev/nomono
+    - ../../kettle-dev/token-resolver
+    - ../../kettle-dev/kettle-dev
+    - ../../kettle-dev/kettle-drift
+    - ../../kettle-dev/kettle-soup-cover
+    - ../../kettle-dev/kettle-test
+    - ../../kettle-dev/kettle-jem-appraisals
+
 release:
   build_command: bundle exec rake build
   publish_command: bundle exec kettle-release

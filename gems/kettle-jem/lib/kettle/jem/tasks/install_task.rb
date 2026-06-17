@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "fileutils"
+require "json"
 require "open3"
 require "toml-rb"
 require "uri"
@@ -871,8 +872,45 @@ module Kettle
           command_env = (env || {}).to_h.dup
           gemfile = File.join(project_root.to_s, "Gemfile")
           command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
+          apply_kettle_family_local_install_env!(command_env)
           strip_inherited_bundler_activation!(command_env)
           command_env
+        end
+
+        def apply_kettle_family_local_install_env!(command_env)
+          return unless command_env.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          marker = kettle_family_local_install_marker(command_env)
+          return unless Array(marker["installed_members"]).include?("kettle-jem")
+
+          members_root = marker["members_root"].to_s
+          if local_env_disabled?(command_env["SMORG_RB_DEV"]) && Dir.exist?(File.join(members_root, "kettle-jem"))
+            command_env["SMORG_RB_DEV"] = members_root
+          end
+
+          kettle_root = kettle_family_dependency_root(marker)
+          command_env["KETTLE_RB_DEV"] = kettle_root if kettle_root && local_env_disabled?(command_env["KETTLE_RB_DEV"])
+        end
+
+        def kettle_family_local_install_marker(command_env)
+          path = command_env["KETTLE_FAMILY_LOCAL_INSTALL_MARKER"].to_s
+          path = File.join(Dir.home, ".kettle-family", "local-install.json") if path.empty?
+          return {} unless File.file?(path)
+
+          JSON.parse(File.read(path))
+        rescue JSON::ParserError
+          {}
+        end
+
+        def kettle_family_dependency_root(marker)
+          Array(marker["local_dependencies"]).map(&:to_s).each do |path|
+            return File.dirname(path) if File.basename(path) == "kettle-dev"
+          end
+          nil
+        end
+
+        def local_env_disabled?(value)
+          value.to_s.empty? || value.to_s.casecmp("false").zero?
         end
 
         def strip_inherited_bundler_activation!(command_env)
