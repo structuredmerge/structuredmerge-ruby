@@ -59,8 +59,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `appraisal2-rubocop` plugin declaration.
 - Refreshed the generated `codecov/codecov-action` workflow pin and made
   workflow-pin specs validate immutable pin shape instead of exact live SHAs.
-- Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.9.
-- The packaged gemspec template now uses the same `kettle-dev` 2.2.9 floor as
+- Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.10.
+- The packaged gemspec template now uses the same `kettle-dev` 2.2.10 floor as
   generated Gemfile tooling.
 - Generated templating Gemfiles now require `kettle-drift` >= 1.0.3.
 - Gem templates now require `kettle-test` >= 2.0.5.
