@@ -4004,6 +4004,21 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "skips bundled handoff when kettle-jem is absent from the destination bundle" do
+    status = instance_double(Process::Status, success?: true)
+    allow(Open3).to receive(:capture3).and_return([
+      "rake\nrspec-core\n",
+      "",
+      status
+    ])
+
+    expect(Kettle::Jem::Tasks::InstallTask.bundled_handoff_step(project_root: "/example", env: {}, run_options: {})).to eq(
+      name: "bundled_handoff",
+      status: "skipped",
+      reason: "kettle_jem_not_in_bundle"
+    )
+  end
+
   it "runs setup commands when the caller passes Ruby ENV" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -616,6 +616,13 @@ module Kettle
           CURATED_BINSTUB_GEMS & bundled
         end
 
+        def bundle_includes_gem?(project_root, gem_name, env: ENV)
+          stdout, _stderr, status = Open3.capture3(env.to_h, "bundle", "list", "--name-only", chdir: project_root.to_s)
+          return true unless status.success?
+
+          stdout.lines.map(&:strip).include?(gem_name.to_s)
+        end
+
         def normalize_lockfile_step(project_root, env:, run_options: {})
           if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_lock_normalization])
             return {
@@ -1331,6 +1338,14 @@ module Kettle
               name: "bundled_handoff",
               status: "already_bundled",
               bundle_gemfile: bundle_gemfile
+            }
+          end
+
+          unless bundle_includes_gem?(project_root, "kettle-jem", env: setup_command_env(project_root, env))
+            return {
+              name: "bundled_handoff",
+              status: "skipped",
+              reason: "kettle_jem_not_in_bundle"
             }
           end
 

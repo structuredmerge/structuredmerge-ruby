@@ -217,6 +217,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem install` now skips its bundled handoff when the destination bundle
+  does not include `kettle-jem`, allowing shim-only gems to finish templating.
 - Namespace discovery now detects nested module declarations in the public
   entrypoint before falling back to a stale generated version namespace, and the
   README namespace badge now uses the shield-safe namespace token.
