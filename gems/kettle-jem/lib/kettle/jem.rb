@@ -9,6 +9,7 @@ require "digest"
 require "json"
 require "net/http"
 require "open3"
+require "pathname"
 require "rbconfig"
 require "stringio"
 require "time"
@@ -3131,10 +3132,17 @@ module Kettle
         replacement_git: replacement_git,
         legacy_requires: legacy_requires,
         primary_require: entrypoint_require.to_s,
-        primary_version_relative_require: File.join(File.basename(entrypoint_require.to_s), "version"),
+        primary_version_relative_require: shim_primary_version_relative_require(entrypoint_require.to_s, replacement_require),
         package_name: package_name.to_s,
         version_strategy: shim_config.dig("version", "strategy").to_s.empty? ? "shim" : shim_config.dig("version", "strategy").to_s
       }
+    end
+
+    def shim_primary_version_relative_require(entrypoint_require, replacement_require)
+      primary_dir = File.dirname(entrypoint_require.to_s)
+      replacement_version = File.join(replacement_require.to_s.tr("-", "/"), "version")
+      relative = Pathname.new(replacement_version).relative_path_from(Pathname.new(primary_dir)).to_s
+      relative.start_with?(".") ? relative : "./#{relative}"
     end
 
     def shunted_gemfile_block(gemspec, facts, run_options)

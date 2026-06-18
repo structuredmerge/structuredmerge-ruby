@@ -7449,11 +7449,14 @@ RSpec.describe Kettle::Jem do
         candidate.fetch(:relative_path) == "gemfiles/modular/debug.gemfile"
       end
       content = report.fetch(:final_content)
+      version_content = File.read(File.join(root, "lib", "legacy", "shim", "version.rb"))
 
       expect(content).to include("debug")
       expect(content).not_to match(/^\s+example-gem$/)
       expect(content).not_to match(/^\s*gem\s+["']example-gem["']/)
       expect(File.read(File.join(root, "gemfiles/modular/debug.gemfile"))).to eq(content)
+      expect(version_content).to include('require_relative "../shim2/version"')
+      expect(version_content).not_to include('require_relative "legacy/shim2/version"')
     end
   end
 

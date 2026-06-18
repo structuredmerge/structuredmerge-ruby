@@ -217,6 +217,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Shim profile version files now compute the replacement version require path
+  relative to the generated shim version file, fixing nested require paths such
+  as `omniauth/jwt` shimming `omniauth/jwt2`.
 - `kettle-jem install` now skips its bundled handoff when the destination bundle
   does not include `kettle-jem`, allowing shim-only gems to finish templating.
 - Namespace discovery now detects nested module declarations in the public
