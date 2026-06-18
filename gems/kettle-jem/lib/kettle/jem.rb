@@ -384,6 +384,7 @@ module Kettle
       KJ|README:LICENSE_REFS
       KJ|README:TOP_LOGO_REFS
       KJ|README:TOP_LOGO_ROW
+      KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA
       KJ|SH:USER
       KJ|SHIMMED_GEM_NAME
       KJ|SHIMMED_REQUIRE
@@ -8512,9 +8513,14 @@ module Kettle
       end
 
       [
+        "<details>",
+        "<summary>How We Manage Complexity In Tests</summary>",
+        "",
         "| Gem | Source | Role | Daily download rank |",
         "|-----|--------|------|---------------------|",
-        *rows
+        *rows,
+        "",
+        "</details>"
       ].join("\n")
     end
 
@@ -10077,6 +10083,32 @@ module Kettle
         "KJ|RUBOCOP_LTS_CONSTRAINT" => constraint,
         "KJ|RUBOCOP_RUBY_GEM" => gem_name,
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => gem_constraint
+      }.merge(
+        ruby_style_template_tokens(min_ruby_version(min_ruby))
+      )
+    end
+
+    def ruby_style_template_tokens(min_ruby)
+      legacy_style = min_ruby && min_ruby < Gem::Version.new("2.3")
+      family_gem_dirs_enumeration = if legacy_style
+        <<~RUBY.chomp
+          Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
+            map { |path| File.dirname(path) }.
+            uniq.
+            sort_by { |path| File.basename(path) }
+        RUBY
+      else
+        <<~RUBY.chomp
+          Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec"))
+            .map { |path| File.dirname(path) }
+            .uniq
+            .sort_by { |path| File.basename(path) }
+        RUBY
+      end
+
+      {
+        "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => family_gem_dirs_enumeration.lines.map { |line| "    #{line}" }.join.chomp,
+        "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => legacy_style ? "," : ""
       }
     end
 

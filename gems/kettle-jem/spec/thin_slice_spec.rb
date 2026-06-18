@@ -11174,6 +11174,8 @@ RSpec.describe Kettle::Jem do
     turbo_table = described_class.send(:readme_dev_test_stack_table, "turbo_tests2")
     coverage_table = described_class.send(:readme_dev_test_stack_table, "kettle-soup-cover")
 
+    expect(example_table).to start_with("<details>\n<summary>How We Manage Complexity In Tests</summary>\n\n")
+    expect(example_table).to end_with("\n</details>")
     expect(example_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
     expect(example_table).to include("[GitHub](https://github.com/appraisal-rb/appraisal2)")
     expect(example_table).to include("https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square")
@@ -11191,18 +11193,27 @@ RSpec.describe Kettle::Jem do
   end
 
   it "keeps packaged Ruby templates aligned with generated RuboCop Gradual baselines" do
-    template_root = described_class::PACKAGED_TEMPLATE_ROOT
-    rakefile = File.read(File.join(template_root, "Rakefile.example"))
-    gemspec = File.read(File.join(template_root, "gem.gemspec.example"))
+    ruby22_tokens = described_class.send(:rubocop_template_tokens, "2.2")
+    ruby23_tokens = described_class.send(:rubocop_template_tokens, "2.3")
 
-    expect(rakefile).to include(<<~RUBY.strip)
-      Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
-        map { |path| File.dirname(path) }.
-        uniq.
-        sort_by { |path| File.basename(path) }
-    RUBY
-    expect(gemspec).to include("    # Signatures\n    *enumerate_package_files.call(\"sig\"),\n  ]")
-    expect(gemspec).to include("    \"--inline-source\",\n    \"--quiet\",\n  ]")
+    expect(ruby22_tokens).to include(
+      "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => ",",
+      "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(<<~RUBY.strip)
+        Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
+          map { |path| File.dirname(path) }.
+          uniq.
+          sort_by { |path| File.basename(path) }
+      RUBY
+    )
+    expect(ruby23_tokens).to include(
+      "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => "",
+      "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(<<~RUBY.strip)
+        Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec"))
+          .map { |path| File.dirname(path) }
+          .uniq
+          .sort_by { |path| File.basename(path) }
+      RUBY
+    )
   end
 
   it "wires Appraisal2 RuboCop as a generator plugin without generated appraisal leakage" do
