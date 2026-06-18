@@ -83,6 +83,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - The README template's test matrix credit now highlights the Kettle dev/test
   stack with BestGems, GitHub, and daily download rank links, excluding the
   current gem from its own stack table.
+- The README dev/test stack table now includes `kettle-soup-cover`.
 - Documentation templates now require `yard-yaml` >= 0.2.1.
 - Gemfile and gemspec source checks now prefer Prism-backed call records instead
   of regex/string fallback matching for dependency and project-name decisions.

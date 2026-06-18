@@ -314,6 +314,11 @@ module Kettle
         role: "standard test runner and coverage harness"
       },
       {
+        name: "kettle-soup-cover",
+        repo: "https://github.com/kettle-dev/kettle-soup-cover",
+        role: "SimpleCov coverage policy and reporting"
+      },
+      {
         name: "rubocop-lts",
         repo: "https://github.com/rubocop-lts/rubocop-lts",
         role: "Ruby-version-aware linting"
