@@ -2613,6 +2613,29 @@ module Kettle
       end
     end
 
+    def ruby_style_facts(project_root)
+      config_path = File.join(project_root.to_s, ".rubocop.yml")
+      config = if File.file?(config_path)
+        YAML.safe_load_file(config_path, permitted_classes: [], aliases: true) || {}
+      else
+        {}
+      end
+      config = {} unless config.is_a?(Hash)
+      dot_position = config.dig("Layout/DotPosition", "EnforcedStyle").to_s
+      dot_position = if dot_position == "trailing"
+        "trailing"
+      else
+        "leading"
+      end
+
+      {
+        dot_position: dot_position,
+        trailing_array_comma: config.dig("Style/TrailingCommaInArrayLiteral", "EnforcedStyleForMultiline").to_s == "comma"
+      }
+    rescue Psych::Exception
+      {dot_position: "leading", trailing_array_comma: false}
+    end
+
     def discover_monorepo_root_facts(project_root, kettle_config, env, template_selection)
       source_url = git_remote_source_url(project_root)
       package_name = repository_name_from_source_url(source_url)
@@ -2661,6 +2684,7 @@ module Kettle
       facts[:social] = social unless social.empty?
       facts[:license] = license unless license.empty?
       facts[:project_runtime] = project_runtime unless project_runtime.empty?
+      facts[:ruby_style] = ruby_style_facts(project_root)
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
       detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
@@ -2950,6 +2974,7 @@ module Kettle
           repository: facts[:repository]
         )
         facts[:readme_style] = readme_style unless readme_style.empty?
+        facts[:ruby_style] = ruby_style_facts(project_root)
         template_tokens = template_tokens(facts, funding)
         template_facts[:tokens] = template_tokens unless template_tokens.empty?
       end
@@ -8469,7 +8494,7 @@ module Kettle
         "KJ|CI:EXEC_CMD" => facts.dig(:ci, :exec_cmd).to_s,
         "KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS" => github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
       }.merge(
-        rubocop_template_tokens(rubygems[:min_ruby])
+        rubocop_template_tokens(rubygems[:min_ruby], ruby_style: facts.fetch(:ruby_style, {}))
       ).merge(
         author_template_tokens(facts.fetch(:author, {}))
       ).merge(
@@ -10076,7 +10101,7 @@ module Kettle
       }
     end
 
-    def rubocop_template_tokens(min_ruby)
+    def rubocop_template_tokens(min_ruby, ruby_style: {})
       constraint, gem_name, gem_constraint = rubocop_tokens_for(min_ruby_version(min_ruby))
       {
         "KJ|RUBOCOP_TARGET_RUBY" => rubocop_target_ruby_token(min_ruby),
@@ -10084,13 +10109,15 @@ module Kettle
         "KJ|RUBOCOP_RUBY_GEM" => gem_name,
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => gem_constraint
       }.merge(
-        ruby_style_template_tokens(min_ruby_version(min_ruby))
+        ruby_style_template_tokens(ruby_style)
       )
     end
 
-    def ruby_style_template_tokens(min_ruby)
-      legacy_style = min_ruby && min_ruby < Gem::Version.new("2.3")
-      family_gem_dirs_enumeration = if legacy_style
+    def ruby_style_template_tokens(ruby_style)
+      style = ruby_style.is_a?(Hash) ? ruby_style : {}
+      trailing_dot = style.fetch(:dot_position, style["dot_position"]).to_s == "trailing"
+      trailing_array_comma = style.fetch(:trailing_array_comma, style["trailing_array_comma"]) == true
+      family_gem_dirs_enumeration = if trailing_dot
         <<~RUBY.chomp
           Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
             map { |path| File.dirname(path) }.
@@ -10108,7 +10135,7 @@ module Kettle
 
       {
         "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => family_gem_dirs_enumeration.lines.map { |line| "    #{line}" }.join.chomp,
-        "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => legacy_style ? "," : ""
+        "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => trailing_array_comma ? "," : ""
       }
     end
 

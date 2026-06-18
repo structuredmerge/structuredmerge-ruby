@@ -11193,27 +11193,42 @@ RSpec.describe Kettle::Jem do
   end
 
   it "keeps packaged Ruby templates aligned with generated RuboCop Gradual baselines" do
-    ruby22_tokens = described_class.send(:rubocop_template_tokens, "2.2")
-    ruby23_tokens = described_class.send(:rubocop_template_tokens, "2.3")
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-ruby-style-slice", tmp_root) do |root|
+      default_style = described_class.send(:ruby_style_facts, root)
+      default_tokens = described_class.send(:rubocop_template_tokens, "2.2", ruby_style: default_style)
 
-    expect(ruby22_tokens).to include(
-      "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => ",",
-      "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(<<~RUBY.strip)
-        Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
-          map { |path| File.dirname(path) }.
-          uniq.
-          sort_by { |path| File.basename(path) }
-      RUBY
-    )
-    expect(ruby23_tokens).to include(
-      "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => "",
-      "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(<<~RUBY.strip)
-        Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec"))
-          .map { |path| File.dirname(path) }
-          .uniq
-          .sort_by { |path| File.basename(path) }
-      RUBY
-    )
+      expect(default_tokens).to include(
+        "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => "",
+        "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(
+          "    Dir.glob(File.join(__dir__, \"gems\", \"*\", \"*.gemspec\"))\n" \
+            "      .map { |path| File.dirname(path) }\n" \
+            "      .uniq\n" \
+            "      .sort_by { |path| File.basename(path) }"
+        )
+      )
+
+      File.write(File.join(root, ".rubocop.yml"), <<~YAML)
+        Layout/DotPosition:
+          EnforcedStyle: trailing
+
+        Style/TrailingCommaInArrayLiteral:
+          EnforcedStyleForMultiline: comma
+      YAML
+      configured_style = described_class.send(:ruby_style_facts, root)
+      configured_tokens = described_class.send(:rubocop_template_tokens, "2.2", ruby_style: configured_style)
+
+      expect(configured_tokens).to include(
+        "KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA" => ",",
+        "KJ|RAKE:FAMILY_GEM_DIRS_ENUMERATION" => include(
+          "    Dir.glob(File.join(__dir__, \"gems\", \"*\", \"*.gemspec\")).\n" \
+            "      map { |path| File.dirname(path) }.\n" \
+            "      uniq.\n" \
+            "      sort_by { |path| File.basename(path) }"
+        )
+      )
+    end
   end
 
   it "wires Appraisal2 RuboCop as a generator plugin without generated appraisal leakage" do
