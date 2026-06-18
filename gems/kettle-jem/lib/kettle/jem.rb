@@ -2800,7 +2800,7 @@ module Kettle
         repository_topology: repository_topology
       )
       facts[:repository] = repository unless repository.empty?
-      generated_blocks = generated_blocks_facts(gemspec_metadata, facts, run_options)
+      generated_blocks = generated_blocks_facts(gemspec_metadata, facts.merge(project_root: File.expand_path(project_root)), run_options)
       facts[:generated_blocks] = generated_blocks unless generated_blocks.empty?
       bootstrap = kettle_config_bootstrap_facts(project_root, env, template_selection: template_selection)
       if bootstrap
@@ -3142,7 +3142,10 @@ module Kettle
       return if dependencies.empty?
 
       floor = shunted_effective_floor(facts.dig(:rubygems, :min_ruby))
+      project_root = facts[:project_root] || facts["project_root"] || run_options[:project_root] || run_options["project_root"]
       shunted = dependencies.filter_map do |dependency|
+        next if shunted_dependency_has_modular_override?(project_root, dependency)
+
         versions = resolver.versions(dependency.fetch(:name), requirements: dependency[:requirement])
         version = versions.max_by { |entry| Gem::Version.new((entry[:number] || entry["number"]).to_s) }
         next unless version
@@ -3151,6 +3154,7 @@ module Kettle
         min_ruby = resolver.min_ruby_version(dependency.fetch(:name), number) ||
           resolver.parse_min_ruby(version[:ruby_version] || version["ruby_version"])
         next unless min_ruby && Gem::Version.new(min_ruby.to_s) > floor
+        next if shunted_dependency_has_floor_compatible_version?(resolver, dependency, versions, floor)
 
         dependency.merge(version: number, min_ruby: min_ruby.to_s)
       rescue
@@ -3161,6 +3165,29 @@ module Kettle
       shunted_gemfile_managed_block(shunted)
     rescue
       nil
+    end
+
+    def shunted_dependency_has_modular_override?(project_root, dependency)
+      root = project_root.to_s
+      return false if root.empty?
+
+      name = dependency.fetch(:name).to_s
+      return false if name.empty? || name.include?("/") || name.include?("\\")
+
+      File.directory?(File.join(root, "gemfiles", "modular", name))
+    end
+
+    def shunted_dependency_has_floor_compatible_version?(resolver, dependency, versions, floor)
+      versions.any? do |entry|
+        number = (entry[:number] || entry["number"]).to_s
+        next false if number.empty?
+
+        min_ruby = resolver.min_ruby_version(dependency.fetch(:name), number) ||
+          resolver.parse_min_ruby(entry[:ruby_version] || entry["ruby_version"])
+        min_ruby.nil? || Gem::Version.new(min_ruby.to_s) <= floor
+      rescue
+        false
+      end
     end
 
     def extract_gemspec_development_dependencies(gemspec)

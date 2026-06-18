@@ -7510,6 +7510,11 @@ RSpec.describe Kettle::Jem do
         case gem_name
         when "debug"
           [{number: "1.9.2", ruby_version: ">= 3.3"}]
+        when "rack-session"
+          [
+            {number: "1.0.1", ruby_version: ">= 2.3"},
+            {number: "2.1.2", ruby_version: ">= 2.5"}
+          ]
         when "rake"
           [{number: "13.2.1", ruby_version: ">= 2.6"}]
         else
@@ -7518,7 +7523,14 @@ RSpec.describe Kettle::Jem do
       end
 
       def min_ruby_version(gem_name, _version)
-        (gem_name == "debug") ? Gem::Version.new("3.3") : Gem::Version.new("2.6")
+        case gem_name
+        when "debug"
+          Gem::Version.new("3.3")
+        when "rack-session"
+          (_version == "1.0.1") ? Gem::Version.new("2.3") : Gem::Version.new("2.5")
+        else
+          Gem::Version.new("2.6")
+        end
       end
 
       def parse_min_ruby(requirement)
@@ -7534,13 +7546,17 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example"
             spec.required_ruby_version = ">= 3.2"
             spec.add_development_dependency "debug", "~> 1.9"
+            spec.add_development_dependency "rack-session", ">= 0"
             spec.add_development_dependency "rake", "~> 13.0"
           end
         RUBY
-        "gemfiles/modular/shunted.gemfile" => <<~RUBY
+        "gemfiles/modular/shunted.gemfile" => <<~RUBY,
           # frozen_string_literal: true
 
           # local notes remain outside the generated block
+        RUBY
+        "gemfiles/modular/rack-session/r2.4/v2.0.gemfile" => <<~RUBY
+          gem "rack-session", "< 2", github: "pboling/rack-session", branch: "fix-missing-rack-session"
         RUBY
       })
 
@@ -7555,6 +7571,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:report_envelope).fetch(:report).fetch(:step_reports).first.fetch(:metadata).fetch(:provider_family)).to eq("ruby")
       expect(content).to include("# local notes remain outside the generated block")
       expect(content).to include('gem "debug", "~> 1.9" # ruby >= 3.3')
+      expect(content).not_to include('gem "rack-session"')
       expect(content).not_to include('gem "rake"')
       expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(content)
 

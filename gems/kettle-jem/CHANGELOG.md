@@ -217,6 +217,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Shunted Gemfile generation no longer duplicates broad gemspec development
+  dependencies that already have explicit modular Gemfile compatibility
+  overrides, such as old-Ruby fork handling.
 - `kettle-jem install` no longer fails a stale outer bootstrap commit step when
   the bundled handoff already committed the generated changes.
 - Shim template discovery now recovers the package version from the git index
