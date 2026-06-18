@@ -11190,6 +11190,21 @@ RSpec.describe Kettle::Jem do
     expect(coverage_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
   end
 
+  it "keeps packaged Ruby templates aligned with generated RuboCop Gradual baselines" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    rakefile = File.read(File.join(template_root, "Rakefile.example"))
+    gemspec = File.read(File.join(template_root, "gem.gemspec.example"))
+
+    expect(rakefile).to include(<<~RUBY.strip)
+      Dir.glob(File.join(__dir__, "gems", "*", "*.gemspec")).
+        map { |path| File.dirname(path) }.
+        uniq.
+        sort_by { |path| File.basename(path) }
+    RUBY
+    expect(gemspec).to include("    # Signatures\n    *enumerate_package_files.call(\"sig\"),\n  ]")
+    expect(gemspec).to include("    \"--inline-source\",\n    \"--quiet\",\n  ]")
+  end
+
   it "wires Appraisal2 RuboCop as a generator plugin without generated appraisal leakage" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
