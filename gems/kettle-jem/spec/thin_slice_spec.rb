@@ -107,6 +107,8 @@ RSpec.describe Kettle::Jem do
   end
 
   it "converts an implementation-shaped gem into a shim profile gem" do
+    expect(described_class.shim_primary_version_relative_require("omniauth/jwt", "omniauth-jwt2")).to eq("../jwt2/version")
+
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-shim-slice", tmp_root) do |root|

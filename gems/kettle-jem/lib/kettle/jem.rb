@@ -3139,7 +3139,7 @@ module Kettle
     end
 
     def shim_primary_version_relative_require(entrypoint_require, replacement_require)
-      primary_dir = File.dirname(entrypoint_require.to_s)
+      primary_dir = entrypoint_require.to_s
       replacement_version = File.join(replacement_require.to_s.tr("-", "/"), "version")
       relative = Pathname.new(replacement_version).relative_path_from(Pathname.new(primary_dir)).to_s
       relative.start_with?(".") ? relative : "./#{relative}"
