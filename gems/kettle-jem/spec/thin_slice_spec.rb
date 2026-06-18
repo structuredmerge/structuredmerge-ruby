@@ -7457,6 +7457,9 @@ RSpec.describe Kettle::Jem do
       expect(File.read(File.join(root, "gemfiles/modular/debug.gemfile"))).to eq(content)
       expect(version_content).to include('require_relative "../shim2/version"')
       expect(version_content).not_to include('require_relative "legacy/shim2/version"')
+      expect(version_content).to include("Version = Legacy::Shim2::Version unless const_defined?(:Version, false)")
+      expect(version_content).to include("VERSION = Legacy::Shim2::VERSION unless const_defined?(:VERSION, false)")
+      expect(version_content).not_to include('VERSION = "0.1.0"')
     end
   end
 

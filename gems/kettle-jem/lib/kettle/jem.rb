@@ -8563,10 +8563,51 @@ module Kettle
       version = "0.0.1.pre" if version.empty?
       return {} if namespace.empty?
 
+      version_rb = if facts.dig(:shim, :version_strategy).to_s == "shim"
+        shim_version_file_content(
+          namespace: namespace,
+          replacement_namespace: shim_replacement_namespace(facts.dig(:shim, :replacement_require)),
+          relative_require: facts.dig(:shim, :primary_version_relative_require)
+        )
+      else
+        version_gem_version_file_content(existing_version: "", namespace: namespace, version: version)
+      end
+
       {
-        "KJ|VERSION_GEM:VERSION_RB" => version_gem_version_file_content(existing_version: "", namespace: namespace, version: version).chomp,
+        "KJ|VERSION_GEM:VERSION_RB" => version_rb.chomp,
         "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace).chomp
       }
+    end
+
+    SHIM_REPLACEMENT_NAMESPACE_ACRONYMS = {
+      "jwt" => "JWT",
+      "jwt2" => "JWT2",
+      "oauth" => "OAuth",
+      "oauth2" => "OAuth2"
+    }.freeze
+    private_constant :SHIM_REPLACEMENT_NAMESPACE_ACRONYMS
+
+    def shim_replacement_namespace(replacement_require)
+      replacement_require.to_s.tr("-", "/").split("/").reject(&:empty?).map do |segment|
+        SHIM_REPLACEMENT_NAMESPACE_ACRONYMS.fetch(segment) do
+          segment.split("_").map { |part| "#{part[0].to_s.upcase}#{part[1..]}" }.join
+        end
+      end.join("::")
+    end
+
+    def shim_version_file_content(namespace:, replacement_namespace:, relative_require:)
+      body = [
+        "Version = #{replacement_namespace}::Version unless const_defined?(:Version, false)",
+        "VERSION = #{replacement_namespace}::VERSION unless const_defined?(:VERSION, false)"
+      ]
+
+      <<~RUBY
+        # frozen_string_literal: true
+
+        require_relative #{relative_require.to_s.dump}
+
+        #{wrap_ruby_namespace(namespace, body).join("\n")}
+      RUBY
     end
 
     def readme_family_intro_and_backend_matrix(readme_style = {})
