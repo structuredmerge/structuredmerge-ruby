@@ -2734,6 +2734,7 @@ module Kettle
         classify_namespace(name)
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
+      project_version = git_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
       configured_min_ruby = rubygems_config["min_ruby"].to_s.strip
       min_ruby = (configured_min_ruby.empty? ? nil : configured_min_ruby) ||
         metadata_value(gemspec_metadata, :required_ruby_version) ||
@@ -9358,6 +9359,18 @@ module Kettle
 
     def existing_version_file_value(project_root, relative_path)
       ruby_version_constant_value(read_project_file(project_root, relative_path)).to_s
+    end
+
+    def git_version_file_value(project_root, relative_path)
+      [
+        git_output(project_root, "show", ":#{relative_path}"),
+        git_output(project_root, "show", "HEAD:#{relative_path}")
+      ].each do |content|
+        version = ruby_version_constant_value(content)
+        return version.to_s if valid_gem_version?(version)
+      end
+
+      ""
     end
 
     def existing_version_namespace(project_root, relative_path)

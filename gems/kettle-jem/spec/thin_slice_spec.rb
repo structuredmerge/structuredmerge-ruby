@@ -164,6 +164,8 @@ RSpec.describe Kettle::Jem do
           ".github/workflows/coverage.yml" => "name: Coverage\n"
         }
       )
+      system("git", "-C", root, "init", "--quiet")
+      system("git", "-C", root, "add", "legacy-shim.gemspec", "lib/legacy/shim/version.rb")
 
       plan = described_class.plan_project(root, env: {})
       expect(plan.dig(:facts, :shim, :replacement_gem)).to eq("legacy-shim2")
@@ -199,6 +201,22 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"gemfiles/legacy.gemfile"]).to be_nil
       expect(generated[:"spec/lib/legacy/strategies/shim_spec.rb"]).to be_nil
       expect(generated[:".github/workflows/coverage.yml"]).to be_nil
+
+      File.write(File.join(root, "legacy-shim.gemspec"), <<~RUBY)
+        Gem::Specification.new do |spec|
+          load "lib/legacy/shim/version.rb"
+          spec.name = "legacy-shim"
+          spec.version = Legacy::Shim::Version::VERSION
+          spec.authors = ["Ada Lovelace"]
+          spec.email = ["ada@example.com"]
+          spec.summary = "Legacy implementation"
+          spec.description = "Legacy implementation"
+          spec.homepage = "https://github.com/example/legacy-shim"
+          spec.licenses = ["MIT"]
+          spec.required_ruby_version = ">= 2.2"
+        end
+      RUBY
+      expect { described_class.plan_project(root, env: {}) }.not_to raise_error
     end
   end
 
