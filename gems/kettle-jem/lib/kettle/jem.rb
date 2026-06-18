@@ -9,7 +9,6 @@ require "digest"
 require "json"
 require "net/http"
 require "open3"
-require "pathname"
 require "rbconfig"
 require "stringio"
 require "time"
@@ -357,7 +356,6 @@ module Kettle
       KJ|SHIMMED_REQUIRE
       KJ|SHIM_COMPAT_REQUIRES
       KJ|SHIMMED_GEMFILE_OVERRIDE
-      KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION
       KJ|SOCIAL:BLUESKY
       KJ|SOCIAL:DEVTO
       KJ|SOCIAL:LINKTREE
@@ -3132,17 +3130,9 @@ module Kettle
         replacement_git: replacement_git,
         legacy_requires: legacy_requires,
         primary_require: entrypoint_require.to_s,
-        primary_version_relative_require: shim_primary_version_relative_require(entrypoint_require.to_s, replacement_require),
         package_name: package_name.to_s,
         version_strategy: shim_config.dig("version", "strategy").to_s.empty? ? "shim" : shim_config.dig("version", "strategy").to_s
       }
-    end
-
-    def shim_primary_version_relative_require(entrypoint_require, replacement_require)
-      primary_dir = entrypoint_require.to_s
-      replacement_version = File.join(replacement_require.to_s.tr("-", "/"), "version")
-      relative = Pathname.new(replacement_version).relative_path_from(Pathname.new(primary_dir)).to_s
-      relative.start_with?(".") ? relative : "./#{relative}"
     end
 
     def shunted_gemfile_block(gemspec, facts, run_options)
@@ -8449,8 +8439,7 @@ module Kettle
         "KJ|SHIMMED_GEM_NAME" => shim[:replacement_gem].to_s,
         "KJ|SHIMMED_REQUIRE" => shim[:replacement_require].to_s,
         "KJ|SHIM_COMPAT_REQUIRES" => Array(shim[:legacy_requires]).join(", "),
-        "KJ|SHIMMED_GEMFILE_OVERRIDE" => shim_gemfile_override(shim),
-        "KJ|SHIM_PRIMARY_REQUIRE_RELATIVE_VERSION" => shim[:primary_version_relative_require].to_s
+        "KJ|SHIMMED_GEMFILE_OVERRIDE" => shim_gemfile_override(shim)
       }
     end
 
@@ -8567,7 +8556,7 @@ module Kettle
         shim_version_file_content(
           namespace: namespace,
           replacement_namespace: shim_replacement_namespace(facts.dig(:shim, :replacement_require)),
-          relative_require: facts.dig(:shim, :primary_version_relative_require)
+          replacement_require: facts.dig(:shim, :replacement_require)
         )
       else
         version_gem_version_file_content(existing_version: "", namespace: namespace, version: version)
@@ -8595,7 +8584,7 @@ module Kettle
       end.join("::")
     end
 
-    def shim_version_file_content(namespace:, replacement_namespace:, relative_require:)
+    def shim_version_file_content(namespace:, replacement_namespace:, replacement_require:)
       body = [
         "Version = #{replacement_namespace}::Version unless const_defined?(:Version, false)",
         "VERSION = #{replacement_namespace}::VERSION unless const_defined?(:VERSION, false)"
@@ -8604,7 +8593,7 @@ module Kettle
       <<~RUBY
         # frozen_string_literal: true
 
-        require_relative #{relative_require.to_s.dump}
+        require #{replacement_require.to_s.dump}
 
         #{wrap_ruby_namespace(namespace, body).join("\n")}
       RUBY

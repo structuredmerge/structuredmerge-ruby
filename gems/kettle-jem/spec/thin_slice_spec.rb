@@ -107,8 +107,6 @@ RSpec.describe Kettle::Jem do
   end
 
   it "converts an implementation-shaped gem into a shim profile gem" do
-    expect(described_class.shim_primary_version_relative_require("omniauth/jwt", "omniauth-jwt2")).to eq("../jwt2/version")
-
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-shim-slice", tmp_root) do |root|
@@ -7457,8 +7455,8 @@ RSpec.describe Kettle::Jem do
       expect(content).not_to match(/^\s+example-gem$/)
       expect(content).not_to match(/^\s*gem\s+["']example-gem["']/)
       expect(File.read(File.join(root, "gemfiles/modular/debug.gemfile"))).to eq(content)
-      expect(version_content).to include('require_relative "../shim2/version"')
-      expect(version_content).not_to include('require_relative "legacy/shim2/version"')
+      expect(version_content).to include('require "legacy-shim2"')
+      expect(version_content).not_to include("require_relative")
       expect(version_content).to include("Version = Legacy::Shim2::Version unless const_defined?(:Version, false)")
       expect(version_content).to include("VERSION = Legacy::Shim2::VERSION unless const_defined?(:VERSION, false)")
       expect(version_content).not_to include('VERSION = "0.1.0"')
