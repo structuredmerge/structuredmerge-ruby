@@ -50,6 +50,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating
   setup.
