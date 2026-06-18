@@ -6285,6 +6285,8 @@ module Kettle
     end
 
     def rewrite_gemspec_version_loader(content, facts:)
+      return content if shim_template_profile?(facts)
+
       min_ruby = gemspec_runtime_floor_token(facts)
       return content if min_ruby.to_s.empty?
 
@@ -8392,6 +8394,7 @@ module Kettle
         "KJ|GEM_NAME_PATH" => package.fetch(:name).to_s.tr("-", "/"),
         "KJ|ENTRYPOINT_REQUIRE" => rubygems.fetch(:entrypoint_require, package.fetch(:name).to_s.tr("-", "/")).to_s,
         "KJ|GEM_SHIELD" => shield_token(package.fetch(:name).to_s),
+        "KJ|GEM_VERSION" => facts.dig(:project_runtime, :version).to_s,
         "KJ|GEM_MAJOR" => gem_major_token(facts.fetch(:project_runtime, {})[:version]),
         "KJ|SECURITY:SUPPORTED_VERSION" => security_supported_version_token(facts.fetch(:project_runtime, {})[:version]),
         "KJ|GH_ORG" => github_org,

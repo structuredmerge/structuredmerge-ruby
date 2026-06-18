@@ -1,11 +1,8 @@
 # frozen_string_literal: true
 
-load "lib/{KJ|ENTRYPOINT_REQUIRE}/version.rb"
-gem_version = {KJ|NAMESPACE}::Version::VERSION
-
 Gem::Specification.new do |spec|
   spec.name = "{KJ|GEM_NAME}"
-  spec.version = gem_version
+  spec.version = "{KJ|GEM_VERSION}"
   spec.authors = {KJ|AUTHOR:NAMES}
   spec.email = ["{KJ|AUTHOR:EMAIL}"]
 
