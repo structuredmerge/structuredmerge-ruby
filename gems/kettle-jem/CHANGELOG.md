@@ -80,6 +80,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-test` runner dependency.
 - The README template now links `kettle-readme-backers` to the generated
   `bin/` binstub instead of a non-existent `exe/` path.
+- The README template's test matrix credit now highlights the Kettle dev/test
+  stack with BestGems, GitHub, and daily download rank links, excluding the
+  current gem from its own stack table.
 - Documentation templates now require `yard-yaml` >= 0.2.1.
 - Gemfile and gemspec source checks now prefer Prism-backed call records instead
   of regex/string fallback matching for dependency and project-name decisions.

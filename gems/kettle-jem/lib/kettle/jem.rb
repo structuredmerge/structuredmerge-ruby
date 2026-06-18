@@ -292,6 +292,33 @@ module Kettle
       RUBOCOP.md
       SECURITY.md
     ].freeze
+    README_DEV_TEST_STACK_GEMS = [
+      {
+        name: "appraisal2",
+        repo: "https://github.com/appraisal-rb/appraisal2",
+        role: "multi-dependency Appraisal matrix generation"
+      },
+      {
+        name: "appraisal2-rubocop",
+        repo: "https://github.com/appraisal-rb/appraisal2-rubocop",
+        role: "RuboCop Appraisal generator integration"
+      },
+      {
+        name: "turbo_tests2",
+        repo: "https://github.com/galtzo-floss/turbo_tests2",
+        role: "parallel test execution"
+      },
+      {
+        name: "kettle-test",
+        repo: "https://github.com/kettle-dev/kettle-test",
+        role: "standard test runner and coverage harness"
+      },
+      {
+        name: "rubocop-lts",
+        repo: "https://github.com/rubocop-lts/rubocop-lts",
+        role: "Ruby-version-aware linting"
+      }
+    ].freeze
     MONOREPO_SUBGEM_THIN_README_KEEP_HEADINGS = [
       "synopsis",
       "info you can shake a stick at",
@@ -344,6 +371,7 @@ module Kettle
       KJ|README:LICENSE_BADGE
       KJ|README:LICENSE_COMPAT_BADGE
       KJ|README:LICENSE_EYE_WORKFLOW_BADGE
+      KJ|README:DEV_TEST_STACK_TABLE
       KJ|README:FOSSA_BADGE
       KJ|README:FOSSA_REFS
       KJ|README:H2_SYNOPSIS_LOGO_ROW
@@ -3749,6 +3777,7 @@ module Kettle
         "KJ|README:COPYRIGHT_NOTICE" => "",
         "KJ|README:LICENSE_BADGE" => "",
         "KJ|README:LICENSE_COMPAT_BADGE" => "",
+        "KJ|README:DEV_TEST_STACK_TABLE" => "",
         "KJ|README:LICENSE_INTRO" => "",
         "KJ|README:LICENSE_REFS" => "",
         "KJ|README:H2_SYNOPSIS_LOGO_ROW" => "",
@@ -8456,11 +8485,32 @@ module Kettle
       tokens["KJ|OPENCOLLECTIVE_ORG"] = org
       tokens["KJ|README:FAMILY_INTRO_BACKEND_MATRIX"] =
         readme_family_intro_and_backend_matrix(facts.fetch(:readme_style, {}))
+      tokens["KJ|README:DEV_TEST_STACK_TABLE"] = readme_dev_test_stack_table(package.fetch(:name).to_s)
       tokens.merge!(readme_fossa_template_tokens(facts.fetch(:readme_style, {})))
       tokens.merge!(version_gem_template_tokens(facts))
       tokens.merge!(shim_template_tokens(facts.fetch(:shim, {})))
 
       tokens.reject { |key, value| value.empty? && !EMPTY_TEMPLATE_TOKENS.include?(key) }
+    end
+
+    def readme_dev_test_stack_table(package_name)
+      rows = README_DEV_TEST_STACK_GEMS.reject { |gem| gem.fetch(:name) == package_name.to_s }.map do |gem|
+        name = gem.fetch(:name)
+        bestgems_url = "https://bestgems.org/gems/#{name}"
+        badge_url = "https://img.shields.io/gem/rd/#{name}.svg?style=flat-square"
+        [
+          "| [#{name}](#{bestgems_url})",
+          "[GitHub](#{gem.fetch(:repo)})",
+          gem.fetch(:role),
+          "[![Daily download rank for #{name}](#{badge_url})](#{bestgems_url}) |"
+        ].join(" | ")
+      end
+
+      [
+        "| Gem | Source | Role | Daily download rank |",
+        "|-----|--------|------|---------------------|",
+        *rows
+      ].join("\n")
     end
 
     def shim_template_tokens(shim)

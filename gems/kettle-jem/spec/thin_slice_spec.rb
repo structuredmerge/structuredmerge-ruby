@@ -7522,12 +7522,12 @@ RSpec.describe Kettle::Jem do
         end
       end
 
-      def min_ruby_version(gem_name, _version)
+      def min_ruby_version(gem_name, version)
         case gem_name
         when "debug"
           Gem::Version.new("3.3")
         when "rack-session"
-          (_version == "1.0.1") ? Gem::Version.new("2.3") : Gem::Version.new("2.5")
+          (version == "1.0.1") ? Gem::Version.new("2.3") : Gem::Version.new("2.5")
         else
           Gem::Version.new("2.6")
         end
@@ -11167,6 +11167,22 @@ RSpec.describe Kettle::Jem do
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"
       )
     end
+  end
+
+  it "renders README dev and test stack table with self-exclusion" do
+    example_table = described_class.send(:readme_dev_test_stack_table, "example")
+    turbo_table = described_class.send(:readme_dev_test_stack_table, "turbo_tests2")
+
+    expect(example_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
+    expect(example_table).to include("[GitHub](https://github.com/appraisal-rb/appraisal2)")
+    expect(example_table).to include("https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square")
+    expect(example_table).to include("[turbo_tests2](https://bestgems.org/gems/turbo_tests2)")
+    expect(example_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
+    expect(example_table).to include("[GitHub](https://github.com/kettle-dev/kettle-test)")
+    expect(example_table).to include("[rubocop-lts](https://bestgems.org/gems/rubocop-lts)")
+    expect(turbo_table).not_to include("[turbo_tests2](https://bestgems.org/gems/turbo_tests2)")
+    expect(turbo_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
+    expect(turbo_table).to include("[kettle-test](https://bestgems.org/gems/kettle-test)")
   end
 
   it "wires Appraisal2 RuboCop as a generator plugin without generated appraisal leakage" do
