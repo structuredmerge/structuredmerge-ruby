@@ -1483,6 +1483,17 @@ module Kettle
         def execute_ready_commands_step(step, project_root:, env:, quiet:, command_runner:)
           return step unless step.fetch(:status) == "ready"
 
+          if step.fetch(:name) == "bootstrap_commit"
+            dirty_entries = git_output(project_root, "status", "--porcelain").lines.map(&:chomp).reject(&:empty?)
+            if dirty_entries.empty?
+              return step.merge(
+                status: "clean_noop",
+                dirty_entries: [],
+                reason: "clean_before_execution"
+              )
+            end
+          end
+
           command_env = step.fetch(:env, env)
           results = step.fetch(:commands).map do |command|
             result = command_runner.call(command, chdir: project_root, env: command_env, quiet: quiet)

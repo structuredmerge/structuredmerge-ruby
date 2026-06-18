@@ -217,6 +217,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem install` no longer fails a stale outer bootstrap commit step when
+  the bundled handoff already committed the generated changes.
 - Shim template discovery now recovers the package version from the git index
   or `HEAD` when a previous failed run already replaced the working-tree
   version file with replacement-gem aliases.

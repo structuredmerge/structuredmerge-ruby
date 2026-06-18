@@ -3830,6 +3830,25 @@ RSpec.describe Kettle::Jem do
       ))
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 
+      Dir.mktmpdir("kettle-jem-clean-bootstrap", tmp_root) do |clean_root|
+        expect(system("git", "init", clean_root, out: File::NULL, err: File::NULL)).to be(true)
+        stale_commit_step = Kettle::Jem::Tasks::InstallTask.send(
+          :execute_ready_commands_step,
+          {
+            name: "bootstrap_commit",
+            status: "ready",
+            dirty_entries: [" M bin/setup"],
+            commands: [%w[git add -A], ["git", "commit", "-m", "stale"]]
+          },
+          project_root: clean_root,
+          env: {},
+          quiet: false,
+          command_runner: command_runner
+        )
+        expect(stale_commit_step.fetch(:status)).to eq("clean_noop")
+        expect(stale_commit_step.fetch(:reason)).to eq("clean_before_execution")
+      end
+
       Dir.mktmpdir("kettle-jem-install-monorepo", tmp_root) do |repo_root|
         expect(system("git", "init", repo_root, out: File::NULL, err: File::NULL)).to be(true)
         gem_root = File.join(repo_root, "gems", "example")
