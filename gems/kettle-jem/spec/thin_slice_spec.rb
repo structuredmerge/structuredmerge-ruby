@@ -1035,8 +1035,10 @@ RSpec.describe Kettle::Jem do
             entries:
               - .github/workflows/jruby-9.1.yml
               - .github/workflows/jruby-9.4.yml
+              - .github/workflows/jruby-10.0.yml
               - .github/workflows/truffleruby-23.0.yml
               - .github/workflows/truffleruby-23.1.yml
+              - .github/workflows/truffleruby-33.0.yml
         YAML
         ".github/workflows/truffleruby-23.2.yml" => <<~YAML
           name: TruffleRuby 23.2
@@ -1057,8 +1059,10 @@ RSpec.describe Kettle::Jem do
 
       expect(paths).not_to include(".github/workflows/jruby-9.1.yml")
       expect(paths).not_to include(".github/workflows/jruby-9.4.yml")
+      expect(paths).to include(".github/workflows/jruby-10.0.yml")
       expect(paths).not_to include(".github/workflows/truffleruby-23.0.yml")
       expect(paths).not_to include(".github/workflows/truffleruby-23.1.yml")
+      expect(paths).to include(".github/workflows/truffleruby-33.0.yml")
       expect(stale_report).to include(
         recipe_name: "github_actions_inactive_packaged_workflow_cleanup_github_workflows_truffleruby_23_2_yml",
         changed: true
@@ -1890,10 +1894,10 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "disables Open Collective template content when no org can be resolved" do
+  it "defaults Open Collective template content to galtzo-floss when no org can be resolved" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
-    Dir.mktmpdir("kettle-jem-opencollective-missing-org-slice", tmp_root) do |root|
+    Dir.mktmpdir("kettle-jem-opencollective-default-org-slice", tmp_root) do |root|
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
@@ -1910,12 +1914,36 @@ RSpec.describe Kettle::Jem do
       })
 
       plan = described_class.plan_project(root, env: {})
-      expect(plan.dig(:facts, :funding, :open_collective_disabled)).to be(true)
-      expect(plan.dig(:facts, :funding, :open_collective_disabled_source)).to eq("missing.open_collective_org")
-      expect(plan.dig(:facts, :funding, :open_collective_org)).to be_nil
-      expect(plan.dig(:facts, :funding, :urls)).not_to include("https://opencollective.com/")
-      expect(plan.dig(:facts, :templates, :tokens).to_h).not_to include("KJ|OPENCOLLECTIVE_ORG")
-      expect(plan.dig(:facts, :templates, :source_preferences).to_a).to be_empty
+      expect(plan.dig(:facts, :funding, :open_collective_disabled)).to be_nil
+      expect(plan.dig(:facts, :funding, :open_collective_org)).to eq("galtzo-floss")
+      expect(plan.dig(:facts, :funding, :open_collective_org_source)).to eq("fallback.default")
+      expect(plan.dig(:facts, :funding, :urls)).to include("https://opencollective.com/galtzo-floss")
+      expect(plan.dig(:facts, :templates, :tokens)).to include("KJ|OPENCOLLECTIVE_ORG" => "galtzo-floss")
+      expect(plan.fetch(:warnings)).to be_empty
+    end
+  end
+
+  it "warns when the default Open Collective org differs from the GitHub org" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-opencollective-default-org-warning-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/example-org/example"
+            spec.metadata["source_code_uri"] = "https://github.com/example-org/example"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      expect(plan.dig(:facts, :funding, :open_collective_org)).to eq("galtzo-floss")
+      expect(plan.dig(:facts, :funding, :open_collective_org_source)).to eq("fallback.default")
+      expect(plan.fetch(:warnings)).to contain_exactly(
+        'OpenCollective funding org defaulted to "galtzo-floss", but the GitHub org is "example-org". Configure funding.open_collective or FUNDING_ORG if this is not intended.'
+      )
     end
   end
 
@@ -2211,6 +2239,21 @@ RSpec.describe Kettle::Jem do
     expect(template).to include("[💎ruby-2.3i]: https://img.shields.io/badge/Ruby-2.3_(%F0%9F%9A%ABCI)-AABBCC")
     expect(template).not_to include("[🚎ruby-2.3-wf]:")
     expect(template).not_to include("[🚎ruby-2.3-wfi]:")
+  end
+
+  it "keeps current runtime badges distinct from prior-current engine badges" do
+    template = File.read(File.join(__dir__, "..", "lib", "kettle", "jem", "templates", "README.md.example"))
+    ruby_4_line = template.lines.find { |line| line.start_with?("| Works with MRI Ruby 4") }
+    jruby_line = template.lines.find { |line| line.start_with?("| Works with JRuby") }
+    truffleruby_line = template.lines.find { |line| line.start_with?("| Works with Truffle Ruby") }
+
+    expect(ruby_4_line).to include("[![Ruby current Compat][💎ruby-c-i]][🚎11-c-wf]")
+    expect(ruby_4_line).not_to include("Ruby 4.0 Compat")
+    expect(jruby_line).to include("[![JRuby 10.0 Compat][💎jruby-10.0i]][🚎jruby-10.0-wf]")
+    expect(jruby_line).to include("[![JRuby current Compat][💎jruby-c-i]][🚎10-j-wf]")
+    expect(truffleruby_line).to include("[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]")
+    expect(truffleruby_line).to include("[![Truffle Ruby current Compat][💎truby-c-i]][🚎9-t-wf]")
+    expect(truffleruby_line).to include("[![Truffle Ruby HEAD Compat][💎truby-headi]][🚎3-hd-wf]")
   end
 
   it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
@@ -7002,6 +7045,10 @@ RSpec.describe Kettle::Jem do
     expect(described_class::RRRRB_MATRIX.fetch("truffleruby-23.1").mri).to eq("3.2")
     expect(described_class::RRRRB_MATRIX.fetch("truffleruby-23.1").workflow_ruby).to eq("3.1")
     expect(described_class::ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS.fetch("truffleruby-23.1")).to eq("3.1")
+    expect(described_class::RRRRB_MATRIX.fetch("jruby-10.0").mri).to eq("3.4")
+    expect(described_class::ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS.fetch("jruby-10.0")).to eq("3.4")
+    expect(described_class::RRRRB_MATRIX.fetch("truffleruby-33.0").mri).to eq("3.3")
+    expect(described_class::ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS.fetch("truffleruby-33.0")).to eq("3.3")
     expect(described_class::RRRRB_MATRIX.fetch("ruby-2.4").rails_appraisals).to include("4.2.11.3", "5.2.8.1")
   end
 

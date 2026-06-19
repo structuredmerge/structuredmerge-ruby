@@ -254,6 +254,9 @@ module Kettle
           changed_files = result.fetch(:changed_files, [])
           out.puts("#{result.fetch(:mode)}: #{changed_files.length} changed file#{"s" unless changed_files.length == 1}")
           changed_files.each { |path| out.puts("  #{path}") }
+          Array(result[:warnings]).map(&:to_s).reject(&:empty?).uniq.each do |warning|
+            out.puts("  warning: #{warning}")
+          end
         end
       end
 

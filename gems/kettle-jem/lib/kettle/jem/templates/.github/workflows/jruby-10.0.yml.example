@@ -1,4 +1,4 @@
-name: Current JRuby
+name: JRuby 10.0
 
 permissions:
   contents: read
@@ -36,9 +36,9 @@ jobs:
     strategy:
       matrix:
         include:
-          # jruby-10.1 (targets Ruby 4.0 compatibility)
-          - ruby: "jruby"
-            appraisal: "current"
+          # jruby-10.0 (targets Ruby 3.4 compatibility)
+          - ruby: "jruby-10.0"
+            appraisal: "ruby-3-4"
             exec_cmd: "{KJ|CI:EXEC_CMD}"
             rubygems: default
             bundler: default

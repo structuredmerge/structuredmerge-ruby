@@ -58,6 +58,7 @@ module Kettle
       "kettle-test -I ../spec --options ../.rspec ../spec"
     ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
+    DEFAULT_OPENCOLLECTIVE_ORG = "galtzo-floss"
     RRRRBMatrixEntry = Struct.new(
       :ruby,
       :engine,
@@ -96,6 +97,8 @@ module Kettle
       "ruby-3.3" => RRRRBMatrixEntry.new(ruby: "3.3.9", engine: "ruby"),
       "truffleruby-24.2" => RRRRBMatrixEntry.new(ruby: "truffleruby-24.2.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
       "truffleruby-25.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-25.0.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
+      "truffleruby-33.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-33.0.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
+      "jruby-10.0" => RRRRBMatrixEntry.new(ruby: "jruby-10.0.x", engine: "jruby", mri: "3.4", workflow_ruby: "3.4"),
       "ruby-3.4" => RRRRBMatrixEntry.new(ruby: "3.4.7", engine: "ruby")
     }.transform_values(&:freeze).freeze
     ENGINE_WORKFLOW_MAP = {
@@ -109,7 +112,9 @@ module Kettle
       "truffleruby-23.0" => "truffleruby",
       "truffleruby-23.1" => "truffleruby",
       "truffleruby-24.2" => "truffleruby",
-      "truffleruby-25.0" => "truffleruby"
+      "truffleruby-25.0" => "truffleruby",
+      "truffleruby-33.0" => "truffleruby",
+      "jruby-10.0" => "jruby"
     }.freeze
     ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = RRRRB_MATRIX.each_with_object({}) do |(name, entry), result|
       result[name] = entry.workflow_ruby if entry.workflow_ruby
@@ -2698,10 +2703,7 @@ module Kettle
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
       detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
-      if !opencollective_disabled && detected_open_collective_org.nil?
-        opencollective_disabled = true
-        opencollective_policy = {disabled: true, source: "missing.open_collective_org", value: ""}
-      end
+      detected_open_collective_org ||= fallback_opencollective_org
       funding = compact_hash(
         urls: funding_urls(
           project_root,
@@ -2725,6 +2727,8 @@ module Kettle
         repository_topology: REPOSITORY_TOPOLOGY_STANDALONE
       )
       facts[:repository] = repository unless repository.empty?
+      warnings = opencollective_fallback_warnings(funding, github_org_from_url(source_url).to_s)
+      facts[:warnings] = warnings unless warnings.empty?
       readme_logo = readme_logo_facts(
         kettle_config,
         package_name: package_name,
@@ -2895,10 +2899,7 @@ module Kettle
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
       open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
-      if !opencollective_disabled && open_collective_org.nil?
-        opencollective_disabled = true
-        opencollective_policy = {disabled: true, source: "missing.open_collective_org", value: ""}
-      end
+      open_collective_org ||= fallback_opencollective_org
       funding = compact_hash(
         urls: funding_urls(
           project_root,
@@ -2919,6 +2920,8 @@ module Kettle
       open_collective_files = opencollective_disabled ? opencollective_disabled_files(project_root) : []
       funding[:open_collective_files] = open_collective_files unless open_collective_files.empty?
       facts[:funding] = funding unless funding.empty?
+      warnings = opencollective_fallback_warnings(funding, project_runtime[:github_org].to_s)
+      facts[:warnings] = warnings unless warnings.empty?
       disabled_integrations = disabled_integrations(kettle_config, license: license)
       facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       opt_in_workflows = opt_in_workflow_cleanup_files(project_root, template_selection)
@@ -3343,6 +3346,7 @@ module Kettle
         decision_evaluations: decision_evaluations,
         prompt_requests: prompt_requests,
         changed_files: changed_files,
+        warnings: Array(facts[:warnings]).map(&:to_s).reject(&:empty?).uniq,
         diagnostics: diagnostics,
         run_stats: run_stats
       }
@@ -8426,6 +8430,21 @@ module Kettle
       return funding_org if funding_org
 
       opencollective_org_file(project_root)
+    end
+
+    def fallback_opencollective_org
+      {org: DEFAULT_OPENCOLLECTIVE_ORG, source: "fallback.default"}
+    end
+
+    def opencollective_fallback_warnings(funding, github_org)
+      return [] unless funding[:open_collective_org_source].to_s == "fallback.default"
+
+      clean_github_org = github_org.to_s.strip
+      return [] if clean_github_org.empty? || clean_github_org == DEFAULT_OPENCOLLECTIVE_ORG
+
+      [
+        "OpenCollective funding org defaulted to #{DEFAULT_OPENCOLLECTIVE_ORG.inspect}, but the GitHub org is #{clean_github_org.inspect}. Configure funding.open_collective or FUNDING_ORG if this is not intended."
+      ]
     end
 
     def opencollective_org_config(config)

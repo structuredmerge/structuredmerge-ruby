@@ -50,6 +50,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated README and workflow templates now treat Ruby 4.0 as MRI current,
+  add discrete JRuby 10.0 and TruffleRuby 33.0 workflows/badges, and include a
+  TruffleRuby HEAD badge pointing at the shared heads workflow.
+- Generated funding templates now default missing OpenCollective orgs to
+  `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness
   dependencies required by `kettle-changelog`, `kettle-test`, and release tasks.
 - Shim gemspec templates now resolve the generated gem version token instead of
