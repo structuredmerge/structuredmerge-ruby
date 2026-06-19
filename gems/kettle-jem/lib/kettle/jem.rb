@@ -8544,7 +8544,7 @@ module Kettle
 
       [
         '<details markdown="1">',
-        "<summary>How We Manage Complexity In Tests</summary>",
+        "<summary>How kettle-dev manages complexity in tests</summary>",
         "",
         "| Gem | Source | Role | Daily download rank |",
         "|-----|--------|------|---------------------|",

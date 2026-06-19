@@ -52,6 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated README compatibility sections now use prose for the test-matrix
   credit and render all generated details blocks with Markdown enabled.
+- Generated README compatibility sections now pair the test-matrix credit with
+  the kettle-dev logo and use a kettle-dev-specific details summary.
 - The generated README dev/test stack table now includes `kettle-dev` and keeps
   stack gems in A-Z order while preserving self-exclusion.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.

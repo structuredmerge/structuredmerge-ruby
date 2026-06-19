@@ -11174,7 +11174,7 @@ RSpec.describe Kettle::Jem do
     turbo_table = described_class.send(:readme_dev_test_stack_table, "turbo_tests2")
     coverage_table = described_class.send(:readme_dev_test_stack_table, "kettle-soup-cover")
 
-    expect(example_table).to start_with("<details markdown=\"1\">\n<summary>How We Manage Complexity In Tests</summary>\n\n")
+    expect(example_table).to start_with("<details markdown=\"1\">\n<summary>How kettle-dev manages complexity in tests</summary>\n\n")
     expect(example_table).to end_with("\n</details>")
     expect(example_table).to include("[appraisal2](https://bestgems.org/gems/appraisal2)")
     expect(example_table).to include("[GitHub](https://github.com/appraisal-rb/appraisal2)")
