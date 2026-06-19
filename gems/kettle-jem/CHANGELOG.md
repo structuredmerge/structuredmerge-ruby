@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Retemplated generated project metadata, support documentation, CI workflows,
+  binstubs, and development dependency floors with `kettle-jem` v7.0.0.
 - Generated README and workflow templates now treat Ruby 4.0 as MRI current,
   add discrete JRuby 10.0 and TruffleRuby 33.0 workflows/badges, and include a
   TruffleRuby HEAD badge pointing at the shared heads workflow.

@@ -22,6 +22,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Retemplated generated project metadata, support documentation, CI workflows,
+  binstubs, and development dependency floors across the StructuredMerge Ruby
+  gem family with `kettle-jem` v7.0.0.
 - StructuredMerge Ruby now configures `kettle-family` for its root changelog,
   release readiness, release env, and family changelog phase instead of relying
   on bespoke workspace scripts.
