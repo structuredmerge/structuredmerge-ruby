@@ -10,4 +10,4 @@ If none of the above licenses fit your use case, please [contact us](mailto:flos
 
 ## Copyright Notice
 
-Required Notice: Copyright (c) 2026 Peter H. Boling
+- Required Notice: Copyright (c) 2026 Peter H. Boling
