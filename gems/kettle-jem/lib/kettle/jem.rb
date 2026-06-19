@@ -304,14 +304,9 @@ module Kettle
         role: "RuboCop Appraisal generator integration"
       },
       {
-        name: "turbo_tests2",
-        repo: "https://github.com/galtzo-floss/turbo_tests2",
-        role: "parallel test execution"
-      },
-      {
-        name: "kettle-test",
-        repo: "https://github.com/kettle-dev/kettle-test",
-        role: "standard test runner and coverage harness"
+        name: "kettle-dev",
+        repo: "https://github.com/kettle-dev/kettle-dev",
+        role: "development, release, and CI workflow tooling"
       },
       {
         name: "kettle-soup-cover",
@@ -319,9 +314,19 @@ module Kettle
         role: "SimpleCov coverage policy and reporting"
       },
       {
+        name: "kettle-test",
+        repo: "https://github.com/kettle-dev/kettle-test",
+        role: "standard test runner and coverage harness"
+      },
+      {
         name: "rubocop-lts",
         repo: "https://github.com/rubocop-lts/rubocop-lts",
         role: "Ruby-version-aware linting"
+      },
+      {
+        name: "turbo_tests2",
+        repo: "https://github.com/galtzo-floss/turbo_tests2",
+        role: "parallel test execution"
       }
     ].freeze
     MONOREPO_SUBGEM_THIN_README_KEEP_HEADINGS = [
@@ -1999,7 +2004,7 @@ module Kettle
           return if skipped.empty?
 
           lines << ""
-          lines << "<details>"
+          lines << '<details markdown="1">'
           lines << "<summary>Not Templated (#{skipped.size} files) - source-only files not produced by the template task</summary>"
           lines << ""
           lines << "These files are part of the gem source and are not expected to appear in the template output."
@@ -8538,7 +8543,7 @@ module Kettle
       end
 
       [
-        "<details>",
+        '<details markdown="1">',
         "<summary>How We Manage Complexity In Tests</summary>",
         "",
         "| Gem | Source | Role | Daily download rank |",

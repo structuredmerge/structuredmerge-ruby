@@ -50,6 +50,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated README compatibility sections now use prose for the test-matrix
+  credit and render all generated details blocks with Markdown enabled.
+- The generated README dev/test stack table now includes `kettle-dev` and keeps
+  stack gems in A-Z order while preserving self-exclusion.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating
