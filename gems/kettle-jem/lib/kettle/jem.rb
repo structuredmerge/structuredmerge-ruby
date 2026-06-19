@@ -309,6 +309,11 @@ module Kettle
         role: "development, release, and CI workflow tooling"
       },
       {
+        name: "kettle-jem",
+        repo: "https://github.com/kettle-dev/kettle-jem",
+        role: "Appraisals & CI workflow templates"
+      },
+      {
         name: "kettle-soup-cover",
         repo: "https://github.com/kettle-dev/kettle-soup-cover",
         role: "SimpleCov coverage policy and reporting"
