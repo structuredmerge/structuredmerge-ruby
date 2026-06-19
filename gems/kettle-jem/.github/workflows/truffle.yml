@@ -37,7 +37,7 @@ jobs:
       matrix:
         include:
           # NOTE: truffleruby does not support upgrading rubygems.
-          # truffleruby-33.0 (targets Ruby 3.3 compatibility)
+          # truffleruby-34.0 (targets Ruby 3.4 compatibility)
           - ruby: "truffleruby"
             appraisal: "current"
             exec_cmd: "kettle-test"
