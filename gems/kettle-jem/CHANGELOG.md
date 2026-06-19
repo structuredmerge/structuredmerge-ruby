@@ -50,6 +50,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Shim gemspec templates now include the kettle-dev release/test harness
+  dependencies required by `kettle-changelog`, `kettle-test`, and release tasks.
+- Shim gemspec templates now resolve the generated gem version token instead of
+  leaving `{KJ|GEM_VERSION}` unresolved.
 - Generated README compatibility sections now use prose for the test-matrix
   credit and render all generated details blocks with Markdown enabled.
 - Generated README compatibility sections now pair the test-matrix credit with

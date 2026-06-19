@@ -8690,6 +8690,7 @@ module Kettle
       end
 
       {
+        "KJ|GEM_VERSION" => version,
         "KJ|VERSION_GEM:VERSION_RB" => version_rb.chomp,
         "KJ|VERSION_GEM:VERSION_RBS" => version_gem_signature_file_content(namespace: namespace).chomp
       }
