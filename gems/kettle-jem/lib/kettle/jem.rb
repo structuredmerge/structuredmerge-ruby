@@ -168,6 +168,7 @@ module Kettle
       "Rakefile",
       "SECURITY.md",
       ".github/FUNDING.yml",
+      ".gitignore",
       ".structuredmerge/git-drivers.toml"
     ].freeze
     MONOREPO_SUBGEM_TEMPLATE_ENTRIES = [
@@ -203,7 +204,10 @@ module Kettle
       "CHANGELOG.md",
       "Gemfile",
       "Rakefile",
+      ".gitignore",
       ".rspec",
+      "gemfiles/modular/templating.gemfile",
+      "gemfiles/modular/templating_local.gemfile",
       "spec/spec_helper.rb",
       "spec/shim_spec.rb",
       ".github/workflows/current.yml",
@@ -7360,14 +7364,12 @@ module Kettle
     def add_shim_bootstrap_config(content, shim)
       replacement_gem = shim[:replacement_gem].to_s
       replacement_require = shim[:replacement_require].to_s
-      replacement_git = shim[:replacement_git].to_s
       legacy_requires = Array(shim[:legacy_requires]).map(&:to_s).reject(&:empty?)
       block = [
         "shim:",
         "  replacement_gem: #{replacement_gem}",
         "  replacement_require: #{replacement_require}"
       ]
-      block << "  replacement_git: #{replacement_git}" unless replacement_git.empty?
       unless legacy_requires.empty?
         block << "  legacy_requires:"
         block.concat(legacy_requires.map { |path| "    - #{path}" })
@@ -8584,16 +8586,8 @@ module Kettle
       {
         "KJ|SHIMMED_GEM_NAME" => shim[:replacement_gem].to_s,
         "KJ|SHIMMED_REQUIRE" => shim[:replacement_require].to_s,
-        "KJ|SHIM_COMPAT_REQUIRES" => Array(shim[:legacy_requires]).join(", "),
-        "KJ|SHIMMED_GEMFILE_OVERRIDE" => shim_gemfile_override(shim)
+        "KJ|SHIM_COMPAT_REQUIRES" => Array(shim[:legacy_requires]).join(", ")
       }
-    end
-
-    def shim_gemfile_override(shim)
-      replacement_git = shim[:replacement_git].to_s
-      return "" if replacement_git.empty?
-
-      %(gem "#{shim[:replacement_gem]}", git: "#{replacement_git}" if shimmed_gem_path.empty?)
     end
 
     def readme_fossa_template_tokens(readme_style)

@@ -61,6 +61,14 @@ Please file a bug if you notice a violation of semantic versioning.
   dependencies required by `kettle-changelog`, `kettle-test`, and release tasks.
 - Shim gemspec templates now resolve the generated gem version token instead of
   leaving `{KJ|GEM_VERSION}` unresolved.
+- Shim and monorepo-root template profiles now include generated `.gitignore`
+  files so local `.env.local` configuration is ignored consistently.
+- Shim Gemfile templates now include `nomono` and the generated templating
+  Gemfiles so `K_JEM_TEMPLATING=true bundle exec kettle-jem install` works.
+- Shim Gemfile templates no longer add a Git-sourced replacement gem fallback;
+  the released replacement gem is already declared by the generated gemspec.
+- Shim Gemfile templates now use `https://gem.coop`, matching the full template
+  and allowing released replacement gems to resolve without Git sources.
 - Generated README compatibility sections now use prose for the test-matrix
   credit and render all generated details blocks with Markdown enabled.
 - Generated README compatibility sections now pair the test-matrix credit with
@@ -79,6 +87,8 @@ Please file a bug if you notice a violation of semantic versioning.
   from target runtime sibling path dependencies.
 - Generated kettle-jem usage instructions now use the `kettle-jem` executable as
   the bootstrap entrypoint instead of starting from `bundle exec kettle-jem`.
+- Generated templating Gemfiles now resolve the local tree-sitter language pack
+  workspace fork from `structuredmerge/vendor`.
 - Generated Appraisals now use modern keyword hash syntax for the
   `appraisal2-rubocop` plugin declaration.
 - Refreshed the generated `codecov/codecov-action` workflow pin and made

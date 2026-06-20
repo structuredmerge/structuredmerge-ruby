@@ -185,6 +185,9 @@ RSpec.describe Kettle::Jem do
           "lib/legacy/strategies/shim.rb",
           "spec/shim_spec.rb",
           "README.md",
+          "Gemfile",
+          "gemfiles/modular/templating.gemfile",
+          "gemfiles/modular/templating_local.gemfile",
           "gemfiles/legacy.gemfile",
           "spec/lib/legacy/strategies/shim_spec.rb",
           ".github/workflows/coverage.yml"
@@ -196,6 +199,12 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.13")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.5")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.3")))
+      expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
+      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.4"))
+      expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
+      expect(generated[:Gemfile]).not_to include("git:")
+      expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
+      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(smorg_rb_local_gems = %w[))
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
       expect(generated[:"lib/legacy/strategies/shim.rb"]).to include(%(require "legacy/shim"))
