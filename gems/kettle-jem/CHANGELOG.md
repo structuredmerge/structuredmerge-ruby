@@ -80,7 +80,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.
 - Generated SimpleCov setup now keeps `.simplecov` configuration-only and
   starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
-- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc1.
+- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc2.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating
   setup.
