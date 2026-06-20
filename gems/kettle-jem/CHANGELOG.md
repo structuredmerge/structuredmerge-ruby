@@ -254,6 +254,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated README post-processing now adds missing compatible JRuby 10.0 and
+  TruffleRuby 33.0 compatibility badges when the matching workflow files exist.
 - Shunted Gemfile generation no longer duplicates broad gemspec development
   dependencies that already have explicit modular Gemfile compatibility
   overrides, such as old-Ruby fork handling.

@@ -702,6 +702,32 @@ module Kettle
           ref_prefixes: [/\A🚎truby-/, /\A🚎\d+-t-/]
         }.freeze
       }.freeze
+      VERSIONED_ENGINE_COMPATIBILITY_BADGES = [
+        {
+          engine: "jruby",
+          version: "10.0",
+          workflow_path: ".github/workflows/jruby-10.0.yml",
+          workflow_file: "jruby-10.0.yml",
+          row_prefix: "| Works with JRuby",
+          badge_label: "💎jruby-10.0i",
+          workflow_label: "🚎jruby-10.0-wf",
+          inline: "[![JRuby 10.0 Compat][💎jruby-10.0i]][🚎jruby-10.0-wf]",
+          insert_before: "💎jruby-c-i",
+          badge_definition: "[💎jruby-10.0i]: https://img.shields.io/badge/JRuby-10.0-FBE742?style=for-the-badge&logo=ruby&logoColor=red"
+        }.freeze,
+        {
+          engine: "truby",
+          version: "33.0",
+          workflow_path: ".github/workflows/truffleruby-33.0.yml",
+          workflow_file: "truffleruby-33.0.yml",
+          row_prefix: "| Works with Truffle Ruby",
+          badge_label: "💎truby-33.0i",
+          workflow_label: "🚎truby-33.0-wf",
+          inline: "[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]",
+          insert_before: "💎truby-c-i",
+          badge_definition: "[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1?style=for-the-badge&logo=ruby&logoColor=pink"
+        }.freeze
+      ].freeze
 
       def process(content:, min_ruby:, engines: nil, workflow_paths: nil)
         processed = content.to_s
@@ -709,7 +735,9 @@ module Kettle
         processed = remove_missing_workflow_badges(processed, workflow_paths) if workflow_paths
         return processed if min_ruby.to_s.empty?
 
-        processed = remove_incompatible_compatibility_badges(processed, Gem::Version.new(min_ruby.to_s))
+        min_ruby_version = Gem::Version.new(min_ruby.to_s)
+        processed = add_supported_versioned_engine_badges(processed, min_ruby_version, workflow_paths) if workflow_paths
+        processed = remove_incompatible_compatibility_badges(processed, min_ruby_version)
         processed = normalize_compatibility_rows(processed)
         prune_unused_compatibility_reference_definitions(processed)
       end
@@ -765,6 +793,70 @@ module Kettle
 
       def remove_workflow_badge_occurrences(content, workflow_label)
         remove_markdown_inline_references(content, workflow_label)
+      end
+
+      def add_supported_versioned_engine_badges(content, min_ruby, workflow_paths)
+        existing_workflows = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
+        VERSIONED_ENGINE_COMPATIBILITY_BADGES.reduce(content.to_s) do |processed, badge|
+          next processed unless existing_workflows.include?(badge.fetch(:workflow_path))
+          next processed if processed.include?("[#{badge.fetch(:badge_label)}]:")
+          next processed unless versioned_engine_badge_compatible?(badge, min_ruby)
+
+          with_inline = add_versioned_engine_badge_to_row(processed, badge)
+          next processed if with_inline == processed
+
+          add_versioned_engine_badge_definitions(with_inline, badge)
+        end
+      end
+
+      def versioned_engine_badge_compatible?(badge, min_ruby)
+        badge_min_mri = ENGINE_COMPATIBILITY_MRI_VERSION.dig(badge.fetch(:engine), badge.fetch(:version))
+        badge_min_mri && ruby_minor_version(badge_min_mri) >= ruby_minor_version(min_ruby)
+      end
+
+      def add_versioned_engine_badge_to_row(content, badge)
+        lines = content.lines
+        row_index = lines.index { |line| line.lstrip.start_with?(badge.fetch(:row_prefix)) }
+        return content unless row_index
+        return content if lines.fetch(row_index).include?(badge.fetch(:badge_label))
+
+        line = lines.fetch(row_index)
+        insert_before = badge.fetch(:insert_before)
+        inline = badge.fetch(:inline)
+        lines[row_index] = if line.include?("[#{insert_before}]")
+          line.sub(/(?=\[!\[[^\]]+\]\[#{Regexp.escape(insert_before)}\])/, "#{inline} ")
+        else
+          line.sub(/\s*\|\s*$/, " #{inline}|")
+        end
+        lines.join
+      end
+
+      def add_versioned_engine_badge_definitions(content, badge)
+        processed = ensure_markdown_link_definition(content, badge.fetch(:badge_definition))
+        return processed if processed.include?("[#{badge.fetch(:workflow_label)}]:")
+
+        workflow_base = workflow_definition_base_url(processed)
+        return processed unless workflow_base
+
+        ensure_markdown_link_definition(
+          processed,
+          "[#{badge.fetch(:workflow_label)}]: #{workflow_base}/actions/workflows/#{badge.fetch(:workflow_file)}"
+        )
+      end
+
+      def ensure_markdown_link_definition(content, definition)
+        label = definition[/\A(\[[^\]]+\]):/, 1]
+        return content if label && content.include?("#{label}:")
+
+        separator = content.end_with?("\n") ? "" : "\n"
+        "#{content}#{separator}#{definition}\n"
+      end
+
+      def workflow_definition_base_url(content)
+        markdown_link_definition_owners(content).filter_map do |owner|
+          url = owner.url.to_s
+          url.split("/actions/workflows/", 2).first if url.include?("/actions/workflows/")
+        end.first
       end
 
       def remove_incompatible_compatibility_badges(content, min_ruby)

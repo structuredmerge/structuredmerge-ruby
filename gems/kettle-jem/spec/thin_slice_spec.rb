@@ -2265,6 +2265,49 @@ RSpec.describe Kettle::Jem do
     expect(truffleruby_line).to include("[![Truffle Ruby HEAD Compat][💎truby-headi]][🚎3-hd-wf]")
   end
 
+  it "adds missing compatible versioned engine README badges when workflows exist" do
+    readme = <<~MARKDOWN
+      # Example
+
+      | Works with JRuby | [![JRuby current Compat][💎jruby-c-i]][🚎10-j-wf] [![JRuby HEAD Compat][💎jruby-headi]][🚎3-hd-wf]|
+      | Works with Truffle Ruby | [![Truffle Ruby 24.2 Compat][💎truby-24.2i]][🚎truby-24.2-wf] [![Truffle Ruby 25.0 Compat][💎truby-25.0i]][🚎truby-25.0-wf] [![Truffle Ruby current Compat][💎truby-c-i]][🚎9-t-wf] [![Truffle Ruby HEAD Compat][💎truby-headi]][🚎3-hd-wf]|
+
+      [🚎10-j-wf]: https://github.com/acme/example/actions/workflows/jruby.yml
+      [🚎3-hd-wf]: https://github.com/acme/example/actions/workflows/heads.yml
+      [🚎9-t-wf]: https://github.com/acme/example/actions/workflows/truffle.yml
+      [🚎truby-24.2-wf]: https://github.com/acme/example/actions/workflows/truffleruby-24.2.yml
+      [🚎truby-25.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-25.0.yml
+      [💎jruby-c-i]: https://img.shields.io/badge/JRuby-current-FBE742
+      [💎jruby-headi]: https://img.shields.io/badge/JRuby-HEAD-FBE742
+      [💎truby-24.2i]: https://img.shields.io/badge/Truffle_Ruby-24.2-34BCB1
+      [💎truby-25.0i]: https://img.shields.io/badge/Truffle_Ruby-25.0-34BCB1
+      [💎truby-c-i]: https://img.shields.io/badge/Truffle_Ruby-current-34BCB1
+      [💎truby-headi]: https://img.shields.io/badge/Truffle_Ruby-HEAD-34BCB1
+    MARKDOWN
+
+    processed = described_class::ReadmePostProcessor.process(
+      content: readme,
+      min_ruby: Gem::Version.new("3.2"),
+      engines: %w[ruby jruby truffleruby],
+      workflow_paths: %w[
+        .github/workflows/jruby.yml
+        .github/workflows/jruby-10.0.yml
+        .github/workflows/truffle.yml
+        .github/workflows/truffleruby-24.2.yml
+        .github/workflows/truffleruby-25.0.yml
+        .github/workflows/truffleruby-33.0.yml
+        .github/workflows/heads.yml
+      ]
+    )
+
+    expect(processed).to include("[![JRuby 10.0 Compat][💎jruby-10.0i]][🚎jruby-10.0-wf]")
+    expect(processed).to include("[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]")
+    expect(processed).to include("[🚎jruby-10.0-wf]: https://github.com/acme/example/actions/workflows/jruby-10.0.yml")
+    expect(processed).to include("[🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml")
+    expect(processed).to include("[💎jruby-10.0i]: https://img.shields.io/badge/JRuby-10.0-FBE742")
+    expect(processed).to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
+  end
+
   it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
