@@ -7347,7 +7347,9 @@ RSpec.describe Kettle::Jem do
       content = report.fetch(:final_content)
 
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
-      expect(content).to include('require "simplecov" if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include('if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include('require "simplecov"')
+      expect(content).to include("SimpleCov.start")
       expect(content).to include('require "kettle/test/rspec"')
       expect(content.scan('require "example/custom"').size).to eq(1)
     end
@@ -7405,7 +7407,9 @@ RSpec.describe Kettle::Jem do
 
       expect(content).to include('require "kettle-soup-cover"')
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
-      expect(content).to include('require "simplecov" if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include('if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include('require "simplecov"')
+      expect(content).to include("SimpleCov.start")
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
       expect(content.scan('require "example-gem"').size).to eq(1)
       expect(content).not_to include('require "example/gem"')

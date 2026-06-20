@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - The generated README dev/test stack table now includes `kettle-dev` and keeps
   stack gems in A-Z order while preserving self-exclusion.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.
+- Generated SimpleCov setup now keeps `.simplecov` configuration-only and
+  starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc1.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating

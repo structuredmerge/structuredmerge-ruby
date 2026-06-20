@@ -8,7 +8,10 @@
 #       The rescue LoadError handles that scenario.
 begin
   require "kettle-soup-cover"
-  require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+  if Kettle::Soup::Cover::DO_COV
+    require "simplecov"
+    SimpleCov.start
+  end
 rescue LoadError => error
   # check the error message and re-raise when unexpected
   raise error unless error.message.include?("kettle")
