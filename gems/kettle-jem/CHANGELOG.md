@@ -85,7 +85,7 @@ Please file a bug if you notice a violation of semantic versioning.
   Appraisals and CI workflow template role.
 - The generated README dev/test stack table now includes `kettle-dev` and keeps
   stack gems in A-Z order while preserving self-exclusion.
-- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.13.
+- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.14.
 - Generated SimpleCov setup now keeps `.simplecov` configuration-only and
   starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
 - Generated spec helpers now document that requiring SimpleCov loads the
