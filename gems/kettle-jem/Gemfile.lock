@@ -1,3 +1,10 @@
+GIT
+  remote: https://github.com/kettle-dev/simplecov.git
+  revision: c353741460adce5c930a47db3894340cef1b047b
+  branch: fix-generic-parallel-opt-out
+  specs:
+    simplecov (1.0.0.rc3)
+
 PATH
   remote: .
   specs:
@@ -456,7 +463,6 @@ GEM
     silent_stream (1.0.12)
       logger (~> 1.2)
       version_gem (>= 1.1.8, < 3)
-    simplecov (1.0.0.rc3)
     simplecov-cobertura (4.0.0.rc1)
       rexml
       simplecov (>= 1.0.0.rc2, < 2.0)
@@ -598,6 +604,7 @@ DEPENDENCIES
   rubocop-ruby3_2 (~> 3.0, >= 3.0.2)
   ruby-merge!
   ruby-progressbar (~> 1.13)
+  simplecov!
   standard (~> 1.54, >= 1.54.0)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
@@ -736,7 +743,7 @@ CHECKSUMS
   ruby_version (1.0.3) sha256=5930f9950746b7e6c973184398ee364ee7440b170fef7922b9f5cdf317f1ccb5
   service_actor (3.9.4) sha256=e63b523630b9a7e62959b2a90113b08d2565b5de9c148557b281ef847c9539ce
   silent_stream (1.0.12) sha256=377c43aa10033fe90c33b39ea8cd97d79f2d1c4856df598efc56f3091f3ae782
-  simplecov (1.0.0.rc3) sha256=932addedd729aa355ca2087d99f088d32660b3203e471f64e11caba418b229ab
+  simplecov (1.0.0.rc3)
   simplecov-cobertura (4.0.0.rc1) sha256=1de000b112889f5c2d4d4627d00fb27fa0c77de5b2a7a46d9c230c2408de2c11
   simplecov-console (0.9.5) sha256=b1108bcfff5f210143e2b8301698c367b01586f20d25a73e95475a5df6fc6ff6
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc

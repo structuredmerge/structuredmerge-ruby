@@ -90,6 +90,9 @@ Please file a bug if you notice a violation of semantic versioning.
   starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
+- Generated coverage Gemfiles now pin SimpleCov to the `kettle-dev/simplecov`
+  `fix-generic-parallel-opt-out` branch until the upstream parallel coordination
+  fixes are released.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc2.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating

@@ -2,6 +2,8 @@
 
 # We run code coverage on the latest version of Ruby only.
 
+gem "simplecov", github: "kettle-dev/simplecov", branch: "fix-generic-parallel-opt-out"
+
 # Set KETTLE_RB_DEV=true for local development with path-based dependencies.
 # When false (default / CI), remote released gems are used.
 if ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?

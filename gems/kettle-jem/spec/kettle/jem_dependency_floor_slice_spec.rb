@@ -137,4 +137,11 @@ RSpec.describe Kettle::Jem do
       expect(lockfile).to include(%(#{gem_name} (#{config.fetch(:lock_version)})))
     end
   end
+
+  it "pins generated coverage bundles to the fixed SimpleCov fork branch" do
+    source_pin = %(gem "simplecov", github: "kettle-dev/simplecov", branch: "fix-generic-parallel-opt-out")
+
+    expect(file_content("gemfiles/modular/coverage.gemfile")).to include(source_pin)
+    expect(file_content("lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example")).to include(source_pin)
+  end
 end
