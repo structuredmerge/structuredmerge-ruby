@@ -50,6 +50,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Removed retired funding links and template tokens from generated kettle-jem
+  funding and README templates.
 - Retemplated generated project metadata, support documentation, CI workflows,
   binstubs, and development dependency floors with `kettle-jem` v7.0.0.
 - Generated README and workflow templates now treat Ruby 4.0 as MRI current,

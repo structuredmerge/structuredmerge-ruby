@@ -84,7 +84,7 @@ I am a full-time FLOSS maintainer. If you find [my work](github.com/pboling) val
 
 | 🥰 Support FLOSS work 🥰                                                                                                   | Get access                                                                                    | "Sponsors" channel                            | on Galtzo FLOSS                            | Discord 👇️ [![Live Chat on Discord][✉️discord-invite-img-ftb]][✉️discord-invite]                            |
 |----------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------|--------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| [![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors] | [![Buy me a coffee][🖇buyme-small-img]][🖇buyme] [![Donate at ko-fi.com][🖇kofi-img]][🖇kofi] | [![Donate on PayPal][🖇paypal-img]][🖇paypal] | [![Donate on Polar][🖇polar-img]][🖇polar] | [![Sponsor Me on Github][🖇sponsor-img]][🖇sponsor] [![Liberapay Goal Progress][⛳liberapay-img]][⛳liberapay] |
+| [![OpenCollective Backers][🖇osc-backers-i]][🖇osc-backers] [![OpenCollective Sponsors][🖇osc-sponsors-i]][🖇osc-sponsors] | [![Buy me a coffee][🖇buyme-small-img]][🖇buyme] [![Donate at ko-fi.com][🖇kofi-img]][🖇kofi] | [![Donate on PayPal][🖇paypal-img]][🖇paypal] | [![Sponsor Me on Github][🖇sponsor-img]][🖇sponsor] [![Liberapay Goal Progress][⛳liberapay-img]][⛳liberapay] |
 
 [⛳liberapay-img]: https://raster.shields.io/liberapay/goal/pboling.png?logo=liberapay&color=a51611&style=flat
 [⛳liberapay]: https://liberapay.com/pboling/donate
@@ -94,12 +94,8 @@ I am a full-time FLOSS maintainer. If you find [my work](github.com/pboling) val
 [🖇osc-sponsors-i]: https://raster.shields.io/opencollective/sponsors/rubocop-lts.png?style=for-the-badge
 [🖇sponsor-img]: https://raster.shields.io/badge/Sponsor_Me!-pboling.png?style=social&logo=github
 [🖇sponsor]: https://github.com/sponsors/pboling
-[🖇polar-img]: https://raster.shields.io/badge/polar-donate-a51611.png?style=flat
-[🖇polar]: https://polar.sh/pboling
 [🖇kofi-img]: https://raster.shields.io/badge/ko--fi-✓-a51611.png?style=flat
 [🖇kofi]: https://ko-fi.com/O5O86SNP4
-[🖇patreon-img]: https://raster.shields.io/badge/patreon-donate-a51611.png?style=flat
-[🖇patreon]: https://patreon.com/galtzo
 [🖇buyme-small-img]: https://raster.shields.io/badge/buy_me_a_coffee-✓-a51611.png?style=flat
 [🖇buyme]: https://www.buymeacoffee.com/pboling
 [🖇paypal-img]: https://raster.shields.io/badge/donate-paypal-a51611.png?style=flat&logo=paypal

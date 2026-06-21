@@ -266,13 +266,10 @@ module Kettle
       %w[tokens author email] => "KJ_AUTHOR_EMAIL",
       %w[tokens author domain] => "KJ_AUTHOR_DOMAIN",
       %w[tokens author orcid] => "KJ_AUTHOR_ORCID",
-      %w[tokens funding patreon] => "KJ_FUNDING_PATREON",
       %w[tokens funding kofi] => "KJ_FUNDING_KOFI",
       %w[tokens funding paypal] => "KJ_FUNDING_PAYPAL",
       %w[tokens funding buymeacoffee] => "KJ_FUNDING_BUYMEACOFFEE",
-      %w[tokens funding polar] => "KJ_FUNDING_POLAR",
       %w[tokens funding liberapay] => "KJ_FUNDING_LIBERAPAY",
-      %w[tokens funding issuehunt] => "KJ_FUNDING_ISSUEHUNT",
       %w[tokens social mastodon] => "KJ_SOCIAL_MASTODON",
       %w[tokens social bluesky] => "KJ_SOCIAL_BLUESKY",
       %w[tokens social linktree] => "KJ_SOCIAL_LINKTREE",
@@ -374,12 +371,9 @@ module Kettle
       KJ|AUTHOR:DOMAIN
       KJ|AUTHOR:NAME
       KJ|FUNDING:BUYMEACOFFEE
-      KJ|FUNDING:ISSUEHUNT
       KJ|FUNDING:KOFI
       KJ|FUNDING:LIBERAPAY
-      KJ|FUNDING:PATREON
       KJ|FUNDING:PAYPAL
-      KJ|FUNDING:POLAR
       KJ|GH:USER
       KJ|GH_ORG
       KJ|GL:USER
@@ -1360,13 +1354,10 @@ module Kettle
       sh_user: "KJ_SH_USER"
     }.freeze
     FUNDING_TOKEN_ENV_KEYS = {
-      patreon: "KJ_FUNDING_PATREON",
       kofi: "KJ_FUNDING_KOFI",
       paypal: "KJ_FUNDING_PAYPAL",
       buymeacoffee: "KJ_FUNDING_BUYMEACOFFEE",
-      polar: "KJ_FUNDING_POLAR",
-      liberapay: "KJ_FUNDING_LIBERAPAY",
-      issuehunt: "KJ_FUNDING_ISSUEHUNT"
+      liberapay: "KJ_FUNDING_LIBERAPAY"
     }.freeze
     SOCIAL_TOKEN_ENV_KEYS = {
       mastodon: "KJ_SOCIAL_MASTODON",
@@ -3908,9 +3899,7 @@ module Kettle
         "KJ|FUNDING:BUYMEACOFFEE" => "",
         "KJ|FUNDING:KOFI" => "",
         "KJ|FUNDING:LIBERAPAY" => "",
-        "KJ|FUNDING:PATREON" => "",
         "KJ|FUNDING:PAYPAL" => "",
-        "KJ|FUNDING:POLAR" => "",
         "KJ|GH:USER" => "",
         "KJ|GH_ORG" => github_org_from_url(facts.dig(:package, :source_url)).to_s,
         "KJ|GL:USER" => "",
@@ -8076,18 +8065,12 @@ module Kettle
           handle if http_url?(handle)
         when "github"
           "https://github.com/sponsors/#{handle}"
-        when "issuehunt"
-          "https://issuehunt.io/u/#{handle}"
         when "ko_fi"
           "https://ko-fi.com/#{handle}"
         when "liberapay"
           "https://liberapay.com/#{handle}/donate"
         when "open_collective"
           "https://opencollective.com/#{handle}"
-        when "patreon"
-          "https://patreon.com/#{handle}"
-        when "polar"
-          "https://polar.sh/#{handle}"
         when "thanks_dev"
           "https://thanks.dev/#{handle}"
         when "tidelift"
@@ -9121,13 +9104,10 @@ module Kettle
       token_config = token_config_values(config)
       funding_config = token_config["funding"].is_a?(Hash) ? token_config["funding"] : {}
       compact_hash(
-        patreon: funding_platform_token_value(funding_config, env, :patreon).to_s,
         kofi: funding_platform_token_value(funding_config, env, :kofi).to_s,
         paypal: funding_platform_token_value(funding_config, env, :paypal).to_s,
         buymeacoffee: funding_platform_token_value(funding_config, env, :buymeacoffee).to_s,
-        polar: funding_platform_token_value(funding_config, env, :polar).to_s,
-        liberapay: funding_platform_token_value(funding_config, env, :liberapay).to_s,
-        issuehunt: funding_platform_token_value(funding_config, env, :issuehunt).to_s
+        liberapay: funding_platform_token_value(funding_config, env, :liberapay).to_s
       )
     end
 
@@ -9138,13 +9118,10 @@ module Kettle
     def funding_template_tokens(funding)
       platform_tokens = funding.fetch(:platform_tokens, {})
       {
-        "KJ|FUNDING:PATREON" => platform_tokens[:patreon].to_s,
         "KJ|FUNDING:KOFI" => platform_tokens[:kofi].to_s,
         "KJ|FUNDING:PAYPAL" => platform_tokens[:paypal].to_s,
         "KJ|FUNDING:BUYMEACOFFEE" => platform_tokens[:buymeacoffee].to_s,
-        "KJ|FUNDING:POLAR" => platform_tokens[:polar].to_s,
-        "KJ|FUNDING:LIBERAPAY" => platform_tokens[:liberapay].to_s,
-        "KJ|FUNDING:ISSUEHUNT" => platform_tokens[:issuehunt].to_s
+        "KJ|FUNDING:LIBERAPAY" => platform_tokens[:liberapay].to_s
       }
     end
 
