@@ -644,7 +644,7 @@ module Kettle
             name: "bundle_lock_normalization",
             command: lockfile_normalization_command,
             status: "ready",
-            env: normal_lockfile_env(env),
+            env: normal_lockfile_env(project_root, env),
             reason: "bundle_update_without_templating_overrides"
           }
         end
@@ -653,12 +653,13 @@ module Kettle
           %w[bundle update]
         end
 
-        def normal_lockfile_env(env)
+        def normal_lockfile_env(project_root, env)
           command_env = (env || {}).to_h.dup
           command_env["K_JEM_TEMPLATING"] = "false"
           %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV SMORG_RB_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
+          apply_direct_sibling_lockfile_env!(project_root, command_env)
           %w[
             BUNDLE_BIN_PATH
             BUNDLE_LOCKFILE
@@ -673,6 +674,29 @@ module Kettle
             command_env[key] = nil
           end
           command_env
+        end
+
+        def apply_direct_sibling_lockfile_env!(project_root, command_env)
+          gemspec_path = Dir.glob(File.join(project_root.to_s, "*.gemspec")).min
+          return unless gemspec_path
+
+          metadata = Kettle::Jem.send(:project_gemspec_metadata, project_root, gemspec_path)
+          package_name = metadata[:gem_name] || metadata["gem_name"] || File.basename(gemspec_path, ".gemspec")
+          direct_sibling_gems = Kettle::Jem.send(
+            :direct_sibling_runtime_gems,
+            project_root,
+            metadata,
+            package_name: package_name
+          )
+          return if direct_sibling_gems.empty?
+
+          source_url = metadata[:source_code_uri] || metadata["source_code_uri"] ||
+            metadata[:homepage] || metadata["homepage"]
+          workspace_slug = Kettle::Jem.send(:direct_sibling_workspace_slug, source_url, project_root)
+          prefix = workspace_slug.to_s.upcase.tr("-", "_")
+          prefix = "LOCAL" if prefix.empty?
+          dev_env = "#{prefix}_DEV"
+          command_env[dev_env] = File.expand_path("..", project_root.to_s) if local_env_disabled?(command_env[dev_env])
         end
 
         def validate_bundle_binstub_location(project_root)

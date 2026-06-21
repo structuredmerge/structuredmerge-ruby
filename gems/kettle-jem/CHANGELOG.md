@@ -98,6 +98,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated main Gemfiles now add templating-aware `nomono` wiring for direct
   runtime dependencies that exist as sibling gems in the same local family
   workspace.
+- Install lockfile normalization now keeps direct sibling runtime dependencies
+  available through the generated family `*_DEV` environment while still
+  disabling templating-only path overrides.
 - Generated kettle-jem usage instructions now use the `kettle-jem` executable as
   the bootstrap entrypoint instead of starting from `bundle exec kettle-jem`.
 - Generated templating Gemfiles now resolve the local tree-sitter language pack

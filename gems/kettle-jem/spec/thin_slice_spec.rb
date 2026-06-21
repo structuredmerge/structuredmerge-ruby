@@ -11992,6 +11992,78 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps direct sibling runtime dependencies available during lockfile normalization" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-direct-sibling-lock-env", tmp_root) do |workspace|
+      root = File.join(workspace, "adapter")
+      sibling = File.join(workspace, "shared-core")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "shared-core.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "shared-core"
+            spec.version = "0.1.0"
+            spec.summary = "Shared core"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "Gemfile" => "source \"https://gem.coop\"\n",
+        "Gemfile.lock" => <<~LOCK,
+          GEM
+            remote: https://gem.coop/
+            specs:
+
+          PLATFORMS
+            ruby
+
+          DEPENDENCIES
+
+          BUNDLED WITH
+             4.0.10
+        LOCK
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+            spec.homepage = "https://github.com/rubythems/adapter"
+            spec.metadata["source_code_uri"] = "https://github.com/rubythems/adapter"
+            spec.add_dependency "shared-core", "= 0.1.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - bin/setup
+        YAML
+      })
+
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"K_JEM_TEMPLATING" => "true"},
+        run_options: {only: "bin/setup", skip_commit: true},
+        command_runner: command_runner
+      )
+
+      lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
+      expect(lock_command).not_to be_nil
+      expect(lock_command.fetch(:env)).to include(
+        "K_JEM_TEMPLATING" => "false",
+        "RUBYTHEMS_DEV" => workspace
+      )
+    end
+  end
+
   it "generates templating-aware main Gemfile nomono wiring for direct sibling runtime dependencies" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
