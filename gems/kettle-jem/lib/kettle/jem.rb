@@ -12278,7 +12278,7 @@ module Kettle
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
+                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -12350,7 +12350,7 @@ module Kettle
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
+                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -12451,7 +12451,7 @@ module Kettle
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0
+                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -12710,7 +12710,7 @@ module Kettle
     def github_actions_step_pins
       {
         "actions/checkout" => "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
-        "ruby/setup-ruby" => "ruby/setup-ruby@89f90524b88a01fe6e0b732220432cc6142926af # v1.313.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1",
         "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7",
