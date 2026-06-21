@@ -101,7 +101,7 @@ Please file a bug if you notice a violation of semantic versioning.
   instead of the old `kettle-rb` checkout path.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc4.
 - Generated Rakefiles now use `# simplecov:disable` / `# simplecov:enable`
-  blocks instead of deprecated `# :nocov:` markers.
+  blocks instead of deprecated legacy coverage markers.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating
   setup.

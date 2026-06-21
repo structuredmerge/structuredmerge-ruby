@@ -573,9 +573,10 @@ module Prism
           # 1. Lines claimed by promoted BlockDirective nodes (FreezeNode /
           #    NocovNode): those comments live inside synthetic nodes and must
           #    not appear as orphan preamble/postlude regions in the augmenter.
-          # 2. Comments nested inside a top-level statement's body (e.g. # :nocov:
-          #    inside a `task :default do...end` block): those are handled during
-          #    recursive body merging and must not appear at the file level either.
+          # 2. Comments nested inside a top-level statement's body (e.g. coverage
+          #    directives inside a `task :default do...end` block): those are
+          #    handled during recursive body merging and must not appear at the
+          #    file level either.
           @tree.comments
             .reject { |th_comment| claimed_lines.include?(th_comment.location.start_line) }
             .reject { |th_comment| nested_in_top_level_statement?(th_comment.location.start_line) }

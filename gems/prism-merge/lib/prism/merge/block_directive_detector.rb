@@ -2,12 +2,13 @@
 
 module Prism
   module Merge
-    # Detects block directive pairs (freeze and nocov) in source lines and
+    # Detects block directive pairs (freeze and coverage) in source lines and
     # promotes them to synthetic BlockDirective tree nodes in the statements array.
     #
     # A block directive is an open/close comment pair that wraps content:
     # - Freeze: `# token:freeze` ... `# token:unfreeze`
-    # - Nocov:  `# :nocov:` ... `# :nocov:` (same marker toggles)
+    # - Coverage: `# simplecov:disable` ... `# simplecov:enable`
+    # - Legacy coverage: `# :nocov:` ... `# :nocov:` (same marker toggles)
     #
     # The detector runs AFTER Prism's `attach_comments!` to avoid being fooled by
     # Prism's leading-comment attachment, which hoists all preceding comment lines
@@ -21,8 +22,10 @@ module Prism
       # Represents a detected span before tree promotion
       Span = Struct.new(:kind, :start_line, :end_line, :open_marker, :close_marker, keyword_init: true)
 
-      # Default nocov token (SimpleCov convention)
+      # Default legacy nocov token (older SimpleCov convention)
       NOCOV_TOKEN = ":nocov:"
+      SIMPLECOV_DISABLE_RE = /\A\s*#\s*simplecov\s*:\s*disable\b/i
+      SIMPLECOV_ENABLE_RE = /\A\s*#\s*simplecov\s*:\s*enable\b/i
 
       # @param lines [Array<String>] Raw source lines (1-indexed via [line_num - 1])
       # @param freeze_token [String, nil] Freeze token (e.g. "kettle-jem"). nil disables freeze detection.
@@ -183,7 +186,21 @@ module Prism
         @lines.each_with_index do |line, idx|
           line_num = idx + 1
           stripped = line.to_s.chomp
-          if stripped.match?(nocov_pat)
+          if stripped.match?(SIMPLECOV_DISABLE_RE)
+            stack.push({start_line: line_num, open_marker: stripped})
+          elsif stripped.match?(SIMPLECOV_ENABLE_RE)
+            if (open = stack.pop)
+              spans << Span.new(
+                kind: :nocov,
+                start_line: open[:start_line],
+                end_line: line_num,
+                open_marker: open[:open_marker],
+                close_marker: stripped,
+              )
+            else
+              report_unbalanced("unmatched simplecov:enable at line #{line_num}")
+            end
+          elsif stripped.match?(nocov_pat)
             if stack.empty?
               stack.push({start_line: line_num, open_marker: stripped})
             else
@@ -200,7 +217,7 @@ module Prism
         end
 
         stack.each do |open|
-          report_unbalanced("unclosed :nocov: at line #{open[:start_line]}")
+          report_unbalanced("unclosed coverage directive at line #{open[:start_line]}")
         end
 
         spans

@@ -1185,7 +1185,7 @@ module Prism
           magic_key: magic_comment.key,
           magic_value: magic_comment.value
         }
-      elsif comment_text.strip == "# :nocov:"
+      elsif coverage_directive_comment?(comment_text)
         {
           kind: "coverage_directive",
           directive_kind: "coverage",
@@ -1198,6 +1198,11 @@ module Prism
           semantic_roles: ["comment"]
         }
       end
+    end
+
+    def coverage_directive_comment?(comment_text)
+      stripped = comment_text.strip
+      stripped == "# :nocov:" || stripped.match?(/\A#\s*simplecov\s*:\s*(?:disable|enable)\b/i)
     end
 
     def magic_comment_for(comment, magic_comments)

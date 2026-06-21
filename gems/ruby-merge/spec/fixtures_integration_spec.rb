@@ -1244,7 +1244,8 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(relocated_rakefile_merge[:ok]).to be(true)
     expect(relocated_rakefile_merge[:output].scan(/task\s+:default/).size).to eq(1)
-    expect(relocated_rakefile_merge[:output].scan("# :nocov:").size).to eq(2)
+    expect(relocated_rakefile_merge[:output].scan("# simplecov:disable").size).to eq(1)
+    expect(relocated_rakefile_merge[:output].scan("# simplecov:enable").size).to eq(1)
     expect(relocated_rakefile_merge[:output]).to include('desc "Default tasks aggregator"')
     expect(relocated_rakefile_merge[:output]).to include(<<~RUBY)
       task :default do
@@ -1283,7 +1284,8 @@ RSpec.describe "Ruby::Merge" do
     )
     expect(rescue_task_merge[:ok]).to be(true)
     expect(rescue_task_merge[:output].scan('task("kettle:jem:selftest")').size).to eq(1)
-    expect(rescue_task_merge[:output].scan("# :nocov:").size).to eq(2)
+    expect(rescue_task_merge[:output].scan("# simplecov:disable").size).to eq(1)
+    expect(rescue_task_merge[:output].scan("# simplecov:enable").size).to eq(1)
 
     rakefile_require_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1317,7 +1319,8 @@ RSpec.describe "Ruby::Merge" do
       require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
       # simplecov:enable
     RUBY
-    expect(nocov_require_merge[:output].scan("# :nocov:").size).to eq(2)
+    expect(nocov_require_merge[:output].scan("# simplecov:disable").size).to eq(1)
+    expect(nocov_require_merge[:output].scan("# simplecov:enable").size).to eq(1)
 
     nested_require_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1344,7 +1347,8 @@ RSpec.describe "Ruby::Merge" do
       merge_template_requires: true
     )
     expect(nested_require_merge[:ok]).to be(true)
-    expect(nested_require_merge[:output].scan("# :nocov:").size).to eq(2)
+    expect(nested_require_merge[:output].scan("# simplecov:disable").size).to eq(1)
+    expect(nested_require_merge[:output].scan("# simplecov:enable").size).to eq(1)
 
     surfaces_analysis = RUBY_MERGE.parse_ruby(surfaces_fixture[:source], "ruby")
     expect(surfaces_analysis[:ok]).to be(true)
