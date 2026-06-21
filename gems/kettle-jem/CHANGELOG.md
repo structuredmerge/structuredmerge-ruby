@@ -93,6 +93,11 @@ Please file a bug if you notice a violation of semantic versioning.
 - `.simplecov` templating now removes the obsolete kettle-soup-cover config
   require with the same Prism AST cleanup pass so SimpleCov finishes loading
   before formatter configuration is required.
+- `.simplecov` templating now migrates old generated `keep_destination`
+  overrides and converts preserved `track_files` calls to `cover` calls.
+- Generated spec helper templating now normalizes stale SimpleCov bootstrap
+  blocks by deduplicating SimpleCov requires and restoring the formatter config
+  require before `SimpleCov.start`.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
 - Generated coverage Gemfiles now pin SimpleCov to upstream

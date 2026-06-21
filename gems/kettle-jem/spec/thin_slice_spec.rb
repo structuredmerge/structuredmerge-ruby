@@ -114,7 +114,7 @@ RSpec.describe Kettle::Jem do
       require "kettle/soup/cover/config"
 
       SimpleCov.configure do
-        cover "lib/**/*.rb"
+        track_files "lib/**/*.rb"
         custom_setting "kept"
       end
 
@@ -130,11 +130,129 @@ RSpec.describe Kettle::Jem do
 
     expect(output).to include("# local coverage note")
     expect(output).to include("SimpleCov.configure do")
+    expect(output).to include('cover "lib/**/*.rb"')
     expect(output).to include('custom_setting "kept"')
     expect(output).to include("custom_after_config")
     expect(output).not_to include('require "kettle/soup/cover/config"')
     expect(output).not_to include("SimpleCov.start")
     expect(output).not_to include("track_files")
+  end
+
+  it "removes obsolete .simplecov keep_destination config during config sync" do
+    content = <<~YAML
+      defaults:
+        preference: "template"
+      files:
+        AGENTS.md:
+          strategy: accept_template
+        .simplecov:
+          strategy: keep_destination
+        Rakefile:
+          strategy: accept_template
+    YAML
+
+    output = described_class.send(:sync_kettle_config_env_overrides, content, {})
+
+    expect(output).to include("AGENTS.md:")
+    expect(output).to include("Rakefile:")
+    expect(output).not_to include(".simplecov:")
+  end
+
+  it "normalizes stale spec helper SimpleCov bootstrap without dropping local wiring" do
+    content = <<~RUBY
+      # frozen_string_literal: true
+
+      require_relative "support/local"
+
+      begin
+        require "kettle-soup-cover"
+        if Kettle::Soup::Cover::DO_COV
+          require "simplecov"
+          SimpleCov.start
+        end
+        require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+      rescue LoadError => error
+        raise error unless error.message.include?("kettle")
+      end
+
+      require "kettle/test/rspec"
+      require "example"
+    RUBY
+
+    output = described_class.send(:normalize_spec_helper_simplecov_template_source, content)
+
+    expect(output).to include('require_relative "support/local"')
+    expect(output.scan('require "simplecov"').size).to eq(1)
+    expect(output.index('require "simplecov"')).to be < output.index('require "kettle/soup/cover/config"')
+    expect(output.index('require "kettle/soup/cover/config"')).to be < output.index("SimpleCov.start")
+    expect(output).not_to include("`.simplecov` is run here")
+  end
+
+  it "updates old generated SimpleCov files in the same templating pass that removes keep_destination" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-simplecov-migration", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".structuredmerge/kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+              - .simplecov
+              - spec/spec_helper.rb
+          rubygems:
+            entrypoint_require: "example"
+            namespace: "Example"
+          files:
+            .simplecov:
+              strategy: keep_destination
+        YAML
+        ".simplecov" => <<~RUBY,
+          require "kettle/soup/cover/config"
+
+          SimpleCov.start do
+            track_files "lib/**/*.rb"
+          end
+        RUBY
+        "spec/spec_helper.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          begin
+            require "kettle-soup-cover"
+            if Kettle::Soup::Cover::DO_COV
+              require "simplecov"
+              SimpleCov.start
+            end
+            require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+          rescue LoadError => error
+            raise error unless error.message.include?("kettle")
+          end
+
+          require "example"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      simplecov = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".simplecov" }
+      spec_helper = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "spec/spec_helper.rb" }
+      kettle_config = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
+
+      expect(simplecov.fetch(:final_content)).to include('cover "lib/**/*.rb"')
+      expect(simplecov.fetch(:final_content)).not_to include("SimpleCov.start")
+      expect(simplecov.fetch(:final_content)).not_to include('require "kettle/soup/cover/config"')
+      expect(spec_helper.fetch(:final_content).scan('require "simplecov"').size).to eq(1)
+      expect(spec_helper.fetch(:final_content)).to include('require "kettle/soup/cover/config"')
+      expect(kettle_config.fetch(:final_content)).not_to include(".simplecov:")
+    end
   end
 
   it "converts an implementation-shaped gem into a shim profile gem" do
@@ -1966,7 +2084,7 @@ RSpec.describe Kettle::Jem do
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-opencollective-default-org-warning-slice", tmp_root) do |root|
       write_tree(root, {
-        "example.gemspec" => <<~RUBY,
+        "example.gemspec" => <<~RUBY
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
@@ -7372,7 +7490,7 @@ RSpec.describe Kettle::Jem do
       content = report.fetch(:final_content)
 
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
-      expect(content).to include('if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include("if Kettle::Soup::Cover::DO_COV")
       expect(content).to include('require "simplecov"')
       expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
@@ -7434,7 +7552,7 @@ RSpec.describe Kettle::Jem do
 
       expect(content).to include('require "kettle-soup-cover"')
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
-      expect(content).to include('if Kettle::Soup::Cover::DO_COV')
+      expect(content).to include("if Kettle::Soup::Cover::DO_COV")
       expect(content).to include('require "simplecov"')
       expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")

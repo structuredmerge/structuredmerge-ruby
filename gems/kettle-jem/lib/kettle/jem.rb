@@ -4601,6 +4601,7 @@ module Kettle
 
     def finalize_template_source_content(recipe, content)
       return finalize_rubocop_config(content) if recipe.fetch(:target_path).to_s == ".rubocop.yml"
+      return normalize_spec_helper_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
 
       content
     end
@@ -5257,11 +5258,10 @@ module Kettle
 
     def normalize_simplecov_template_source(content)
       nodes = simplecov_obsolete_call_nodes(content)
-      return content if nodes.empty?
-
-      nodes.sort_by { |node| -node.location.start_line }.reduce(content.to_s) do |output, node|
+      output = nodes.sort_by { |node| -node.location.start_line }.reduce(content.to_s) do |output, node|
         replace_source_range_lines(output, node.location.start_line, expand_line_range_through_following_blanks(output, node.location.end_line), "")
       end
+      normalize_simplecov_track_files_calls(output)
     end
 
     def simplecov_obsolete_call_nodes(content)
@@ -5284,6 +5284,86 @@ module Kettle
         node.name == :require &&
         node.receiver.nil? &&
         ruby_string_argument(node) == "kettle/soup/cover/config"
+    end
+
+    def normalize_simplecov_track_files_calls(content)
+      records = simplecov_track_files_call_records(content)
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        indent = leading_whitespace(record.fetch(:source))
+        replacement = "#{indent}cover #{record.fetch(:arguments_source)}\n"
+        replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), replacement)
+      end
+    end
+
+    def simplecov_track_files_call_records(content)
+      lines = content.to_s.lines
+      ruby_call_records(content, :track_files).filter_map do |call|
+        next unless call.receiver.nil?
+
+        arguments = call.arguments&.location&.slice.to_s
+        next if arguments.empty?
+
+        end_line = ruby_node_source_end_line(call)
+        {
+          start_line: call.location.start_line,
+          end_line: end_line,
+          source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join,
+          arguments_source: arguments
+        }
+      end
+    end
+
+    def normalize_spec_helper_simplecov_template_source(content)
+      output = remove_duplicate_simplecov_requires(content)
+      ensure_spec_helper_simplecov_config_require(output)
+    end
+
+    def remove_duplicate_simplecov_requires(content)
+      records = simplecov_require_call_records(content)
+      return content if records.length <= 1
+
+      records.drop(1).sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(output, record.fetch(:start_line), expand_line_range_through_following_blanks(output, record.fetch(:end_line)), "")
+      end
+    end
+
+    def ensure_spec_helper_simplecov_config_require(content)
+      return content if simplecov_config_require_call_nodes(content).any?
+
+      simplecov_require = simplecov_require_call_records(content).first
+      return content unless simplecov_require
+
+      insert_lines_after(
+        content,
+        simplecov_require.fetch(:end_line),
+        "#{leading_whitespace(simplecov_require.fetch(:source))}require \"kettle/soup/cover/config\"\n"
+      )
+    end
+
+    def simplecov_require_call_records(content)
+      lines = content.to_s.lines
+      ruby_call_records(content, :require).filter_map do |call|
+        next unless call.receiver.nil?
+        next unless ruby_string_argument(call) == "simplecov"
+
+        end_line = ruby_node_source_end_line(call)
+        {
+          start_line: call.location.start_line,
+          end_line: end_line,
+          source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join
+        }
+      end.sort_by { |record| record.fetch(:start_line) }
+    end
+
+    def simplecov_config_require_call_nodes(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        simplecov_config_require_call_node?(node)
+      end
     end
 
     def leading_space_count(line)
@@ -7388,9 +7468,19 @@ module Kettle
     end
 
     def prune_legacy_kettle_config_keys(content)
-      KETTLE_CONFIG_LEGACY_KEY_PATHS.reduce(content.to_s) do |updated, legacy_key|
+      pruned = KETTLE_CONFIG_LEGACY_KEY_PATHS.reduce(content.to_s) do |updated, legacy_key|
         remove_yaml_scalar_path(updated, legacy_key.fetch(:path))
       end
+      remove_obsolete_simplecov_keep_destination_config(pruned)
+    end
+
+    def remove_obsolete_simplecov_keep_destination_config(content)
+      config = YAML.safe_load(content.to_s, permitted_classes: [], aliases: true) || {}
+      simplecov_config = config.dig("files", ".simplecov")
+      return content unless simplecov_config.is_a?(Hash)
+      return content unless simplecov_config.keys == ["strategy"] && simplecov_config["strategy"].to_s == "keep_destination"
+
+      remove_yaml_mapping_path(content, %w[files .simplecov])
     end
 
     def migrate_readme_logo_config(content)
@@ -7490,6 +7580,18 @@ module Kettle
 
         line_index = entry.fetch(:line)
         return ensure_trailing_newline(lines.each_with_index.reject { |_line, index| index == line_index }.map(&:first).join)
+      end
+      content
+    end
+
+    def remove_yaml_mapping_path(content, path)
+      lines = content.to_s.lines
+      yaml_mapping_path_entries(content).each do |entry|
+        next unless entry.fetch(:path) == path
+
+        start_line = entry.fetch(:start_line)
+        end_line = entry.fetch(:end_line)
+        return ensure_trailing_newline([*lines[0...start_line], *lines[end_line..].to_a].join)
       end
       content
     end
@@ -8377,10 +8479,27 @@ module Kettle
       return {} unless File.exist?(path)
 
       config = YAML.safe_load_file(path, permitted_classes: [], aliases: false) || {}
+      config = normalize_kettle_jem_config(config)
       validate_kettle_jem_config!(config)
       config
     rescue Psych::SyntaxError => error
       raise Error, "Invalid #{kettle_jem_config_relative_path(project_root)}: #{error.message}"
+    end
+
+    def normalize_kettle_jem_config(config)
+      return config unless config.is_a?(Hash)
+
+      files = config["files"]
+      return config unless files.is_a?(Hash)
+
+      simplecov_config = files[".simplecov"]
+      return config unless simplecov_config.is_a?(Hash)
+      return config unless simplecov_config.keys == ["strategy"] && simplecov_config["strategy"].to_s == "keep_destination"
+
+      normalized = config.dup
+      normalized["files"] = files.dup
+      normalized["files"].delete(".simplecov")
+      normalized
     end
 
     def kettle_jem_config_path(project_root)
@@ -12710,6 +12829,15 @@ module Kettle
       []
     end
 
+    def yaml_mapping_path_entries(content)
+      document = Psych.parse_stream(content.to_s)
+      entries = []
+      document.children.each { |node| collect_yaml_mapping_path_entries(node, [], entries) }
+      entries
+    rescue Psych::Exception
+      []
+    end
+
     def collect_yaml_scalar_path_entries(node, path, entries)
       unless node.is_a?(Psych::Nodes::Mapping)
         node.children.each { |child| collect_yaml_scalar_path_entries(child, path, entries) } if node.respond_to?(:children)
@@ -12724,6 +12852,33 @@ module Kettle
           entries << {path: child_path, line: key_node.start_line}
         elsif value_node.is_a?(Psych::Nodes::Mapping)
           collect_yaml_scalar_path_entries(value_node, child_path, entries)
+        end
+      end
+    end
+
+    def collect_yaml_mapping_path_entries(node, path, entries)
+      unless node.is_a?(Psych::Nodes::Mapping)
+        Array(node.respond_to?(:children) ? node.children : nil).each do |child|
+          collect_yaml_mapping_path_entries(child, path, entries)
+        end
+        return
+      end
+
+      node.children.each_slice(2) do |key_node, value_node|
+        next unless key_node.is_a?(Psych::Nodes::Scalar)
+
+        child_path = path + [key_node.value.to_s]
+        if value_node.is_a?(Psych::Nodes::Mapping)
+          entries << {
+            path: child_path,
+            start_line: key_node.start_line,
+            end_line: value_node.end_line
+          }
+          collect_yaml_mapping_path_entries(value_node, child_path, entries)
+        else
+          Array(value_node.respond_to?(:children) ? value_node.children : nil).each do |child|
+            collect_yaml_mapping_path_entries(child, child_path, entries)
+          end
         end
       end
     end
