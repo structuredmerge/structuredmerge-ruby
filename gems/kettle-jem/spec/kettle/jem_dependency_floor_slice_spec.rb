@@ -138,8 +138,8 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "pins generated coverage bundles to the fixed SimpleCov fork branch" do
-    source_pin = %(gem "simplecov", github: "kettle-dev/simplecov", branch: "fix-generic-parallel-opt-out")
+  it "pins generated coverage bundles to upstream SimpleCov main" do
+    source_pin = %(gem "simplecov", github: "simplecov-ruby/simplecov", branch: "main")
 
     expect(file_content("gemfiles/modular/coverage.gemfile")).to include(source_pin)
     expect(file_content("lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example")).to include(source_pin)

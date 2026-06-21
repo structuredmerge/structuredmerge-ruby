@@ -95,9 +95,8 @@ Please file a bug if you notice a violation of semantic versioning.
   before formatter configuration is required.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
-- Generated coverage Gemfiles now pin SimpleCov to the `kettle-dev/simplecov`
-  `fix-generic-parallel-opt-out` branch until the upstream parallel coordination
-  fixes are released.
+- Generated coverage Gemfiles now pin SimpleCov to upstream
+  `simplecov-ruby/simplecov` on the `main` branch.
 - Generated workspace path examples now use the renamed `my` local workspace
   instead of the old `kettle-rb` checkout path.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc3.
