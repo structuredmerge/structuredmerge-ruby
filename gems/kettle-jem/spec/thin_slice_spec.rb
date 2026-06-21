@@ -106,7 +106,7 @@ RSpec.describe Kettle::Jem do
     )
   end
 
-  it "removes obsolete SimpleCov.start blocks from .simplecov while preserving local config" do
+  it "removes obsolete SimpleCov setup calls from .simplecov while preserving local config" do
     content = <<~RUBY
       # kettle-jem:freeze
       # local coverage note
@@ -126,12 +126,13 @@ RSpec.describe Kettle::Jem do
       custom_after_config
     RUBY
 
-    output = described_class.send(:remove_simplecov_start_blocks, content)
+    output = described_class.send(:normalize_simplecov_template_source, content)
 
     expect(output).to include("# local coverage note")
     expect(output).to include("SimpleCov.configure do")
     expect(output).to include('custom_setting "kept"')
     expect(output).to include("custom_after_config")
+    expect(output).not_to include('require "kettle/soup/cover/config"')
     expect(output).not_to include("SimpleCov.start")
     expect(output).not_to include("track_files")
   end
@@ -7373,6 +7374,8 @@ RSpec.describe Kettle::Jem do
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
       expect(content).to include('if Kettle::Soup::Cover::DO_COV')
       expect(content).to include('require "simplecov"')
+      expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
+      expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content).to include('require "kettle/test/rspec"')
       expect(content.scan('require "example/custom"').size).to eq(1)
@@ -7433,6 +7436,8 @@ RSpec.describe Kettle::Jem do
       expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
       expect(content).to include('if Kettle::Soup::Cover::DO_COV')
       expect(content).to include('require "simplecov"')
+      expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
+      expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
       expect(content.scan('require "example-gem"').size).to eq(1)

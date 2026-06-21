@@ -10,6 +10,7 @@ begin
   require "kettle-soup-cover"
   if Kettle::Soup::Cover::DO_COV
     require "simplecov"
+    require "kettle/soup/cover/config"
     SimpleCov.start
   end
 rescue LoadError => error

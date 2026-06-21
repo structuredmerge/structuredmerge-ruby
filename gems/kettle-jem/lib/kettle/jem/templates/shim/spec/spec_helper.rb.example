@@ -3,8 +3,9 @@
 begin
   require "kettle-soup-cover"
   if Kettle::Soup::Cover::DO_COV
-    # Requiring simplecov loads `.simplecov`; keep that file configuration-only.
+    # Requiring simplecov loads the project-local `.simplecov`.
     require "simplecov"
+    require "kettle/soup/cover/config"
     SimpleCov.start
   end
 rescue LoadError => error

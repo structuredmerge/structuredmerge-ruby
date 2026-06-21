@@ -90,6 +90,9 @@ Please file a bug if you notice a violation of semantic versioning.
   starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
 - `.simplecov` templating now removes obsolete `SimpleCov.start` blocks with a
   Prism AST cleanup pass while preserving destination-local configuration.
+- `.simplecov` templating now removes the obsolete kettle-soup-cover config
+  require with the same Prism AST cleanup pass so SimpleCov finishes loading
+  before formatter configuration is required.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
 - Generated coverage Gemfiles now pin SimpleCov to the `kettle-dev/simplecov`
