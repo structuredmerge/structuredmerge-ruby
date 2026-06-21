@@ -26,8 +26,8 @@ This gem is part of the gem family.
 | [tree_haver][tree_haver] | Multi | OLD: Cross-Ruby adapter |
 | [ast-merge][ast-merge] | Text | OLD: Shared base classes |
 
-[tree_haver]: https://github.com/kettle-rb/tree_haver
-[ast-merge]: https://github.com/kettle-rb/ast-merge
+[tree_haver]: https://github.com/kettle-dev/tree_haver
+[ast-merge]: https://github.com/kettle-dev/ast-merge
 
 ## Contributing
 

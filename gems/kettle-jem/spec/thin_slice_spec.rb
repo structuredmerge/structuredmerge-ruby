@@ -11056,7 +11056,7 @@ RSpec.describe Kettle::Jem do
           Gem::Specification.new do |spec|
             spec.name = "nomono"
             spec.summary = "Bundler path helper"
-            spec.metadata["source_code_uri"] = "https://github.com/kettle-rb/nomono"
+            spec.metadata["source_code_uri"] = "https://github.com/kettle-dev/nomono"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML
@@ -11071,12 +11071,12 @@ RSpec.describe Kettle::Jem do
         YAML
       })
       expect(system("git", "-C", root, "init", "-q")).to be(true)
-      expect(system("git", "-C", root, "remote", "add", "origin", "git@github.com:kettle-rb/nomono.git")).to be(true)
+      expect(system("git", "-C", root, "remote", "add", "origin", "git@github.com:kettle-dev/nomono.git")).to be(true)
 
       repository = described_class.send(
         :repository_facts,
         root,
-        "https://github.com/kettle-rb/nomono",
+        "https://github.com/kettle-dev/nomono",
         package_name: "nomono",
         repository_topology: "monorepo-subproject"
       )
@@ -11086,7 +11086,7 @@ RSpec.describe Kettle::Jem do
       expect(repository).not_to have_key(:package_path)
       expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq("https://gitlab.com/kettle-rb/nomono")
       expect(tokens.fetch("KJ|README:CB_PACKAGE_SOURCE_URL")).to eq("https://codeberg.org/kettle-rb/nomono")
-      expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq("https://github.com/kettle-rb/nomono")
+      expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq("https://github.com/kettle-dev/nomono")
       expect(tokens.values_at(
         "KJ|README:GL_PACKAGE_SOURCE_URL",
         "KJ|README:CB_PACKAGE_SOURCE_URL",

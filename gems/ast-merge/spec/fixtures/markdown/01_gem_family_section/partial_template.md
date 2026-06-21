@@ -49,21 +49,21 @@ tree_haver supports multiple parsing backends, but not all backends work on all 
 | [kettle-dev][kettle-dev] | Gem Development | Gem templating tool using `*-merge` gems      |
 | [kettle-jem][kettle-jem] | Gem Templating  | Gem template library with smart merge support |
 
-[tree_haver]: https://github.com/kettle-rb/tree_haver
-[ast-merge]: https://github.com/kettle-rb/ast-merge
-[prism-merge]: https://github.com/kettle-rb/prism-merge
-[psych-merge]: https://github.com/kettle-rb/psych-merge
-[json-merge]: https://github.com/kettle-rb/json-merge
-[jsonc-merge]: https://github.com/kettle-rb/jsonc-merge
-[bash-merge]: https://github.com/kettle-rb/bash-merge
-[rbs-merge]: https://github.com/kettle-rb/rbs-merge
-[dotenv-merge]: https://github.com/kettle-rb/dotenv-merge
-[toml-merge]: https://github.com/kettle-rb/toml-merge
-[markdown-merge]: https://github.com/kettle-rb/markdown-merge
-[markly-merge]: https://github.com/kettle-rb/markly-merge
-[commonmarker-merge]: https://github.com/kettle-rb/commonmarker-merge
-[kettle-dev]: https://github.com/kettle-rb/kettle-dev
-[kettle-jem]: https://github.com/kettle-rb/kettle-jem
+[tree_haver]: https://github.com/kettle-dev/tree_haver
+[ast-merge]: https://github.com/kettle-dev/ast-merge
+[prism-merge]: https://github.com/kettle-dev/prism-merge
+[psych-merge]: https://github.com/kettle-dev/psych-merge
+[json-merge]: https://github.com/kettle-dev/json-merge
+[jsonc-merge]: https://github.com/kettle-dev/jsonc-merge
+[bash-merge]: https://github.com/kettle-dev/bash-merge
+[rbs-merge]: https://github.com/kettle-dev/rbs-merge
+[dotenv-merge]: https://github.com/kettle-dev/dotenv-merge
+[toml-merge]: https://github.com/kettle-dev/toml-merge
+[markdown-merge]: https://github.com/kettle-dev/markdown-merge
+[markly-merge]: https://github.com/kettle-dev/markly-merge
+[commonmarker-merge]: https://github.com/kettle-dev/commonmarker-merge
+[kettle-dev]: https://github.com/kettle-dev/kettle-dev
+[kettle-jem]: https://github.com/kettle-dev/kettle-jem
 [prism]: https://github.com/ruby/prism
 [psych]: https://github.com/ruby/psych
 [ts-json]: https://github.com/tree-sitter/tree-sitter-json

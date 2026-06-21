@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
 
   spec.summary = "🍲 A kettle-rb meta tool to streamline development and testing"
   spec.description = "🍲 Kettle::Dev is a meta tool from kettle-rb to streamline development and testing. Acts as a shim dependency, pulling in many other dependencies, to give you OOTB productivity with a RubyGem, or Ruby app project. Configures a complete set of Rake tasks, for all the libraries is brings in, so they arrive ready to go. Fund overlooked open source projects - bottom of stack, dev/test dependencies: floss-funding.dev"
-  spec.homepage = "https://github.com/kettle-rb/kettle-dev"
+  spec.homepage = "https://github.com/kettle-dev/kettle-dev"
   spec.licenses = ["MIT"]
   spec.required_ruby_version = ">= 2.3.0"
 

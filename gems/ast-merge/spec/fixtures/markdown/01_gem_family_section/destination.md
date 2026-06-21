@@ -38,7 +38,7 @@
 [🖼️ruby-lang-i]: https://logos.galtzo.com/assets/images/ruby-lang/avatar-192px.svg
 [🖼️ruby-lang]: https://www.ruby-lang.org/
 [🖼️kettle-rb-i]: https://logos.galtzo.com/assets/images/kettle-rb/avatar-192px.svg
-[🖼️kettle-rb]: https://github.com/kettle-rb
+[🖼️kettle-rb]: https://github.com/kettle-dev
 
 # ☯️ Commonmarker::Merge
 
@@ -54,7 +54,7 @@
 
 ## 🌻 Synopsis
 
-`commonmarker-merge` is a thin wrapper around [markdown-merge](https://github.com/kettle-rb/markdown-merge) that provides:
+`commonmarker-merge` is a thin wrapper around [markdown-merge](https://github.com/kettle-dev/markdown-merge) that provides:
 
 - **Hard dependency on Commonmarker** - Ensures the Comrak (Rust) parser is installed
 - **Commonmarker-specific defaults** - Freeze token: `"commonmarker-merge"`, `inner_merge_code_blocks: false`
@@ -68,7 +68,7 @@
   header similarity, first column (row labels), content overlap, and position
 - **Freeze blocks** - Mark sections with HTML comments to preserve them during merges
 - **Configurable merge strategies** - Choose whether template or destination wins for conflicts,
-  or use a Hash for per-node-type preferences with `node_splitter` (see [ast-merge](https://github.com/kettle-rb/ast-merge) docs)
+  or use a Hash for per-node-type preferences with `node_splitter` (see [ast-merge](https://github.com/kettle-dev/ast-merge) docs)
 - **Type normalization** - Canonical node types work across all markdown backends
 - **Full CommonMarker support** - Works with all CommonMark and GitHub Flavored Markdown extensions
 
@@ -99,21 +99,21 @@ This gem is part of a family of gems that provide intelligent merging for variou
 | [kettle-dev][kettle-dev] | Gem Development | Gem templating tool using `*-merge` gems |
 | [kettle-jem][kettle-jem] | Gem Templating | Gem template library with smart merge support |
 
-[tree_haver]: https://github.com/kettle-rb/tree_haver
-[ast-merge]: https://github.com/kettle-rb/ast-merge
-[prism-merge]: https://github.com/kettle-rb/prism-merge
-[psych-merge]: https://github.com/kettle-rb/psych-merge
-[json-merge]: https://github.com/kettle-rb/json-merge
-[jsonc-merge]: https://github.com/kettle-rb/jsonc-merge
-[bash-merge]: https://github.com/kettle-rb/bash-merge
-[rbs-merge]: https://github.com/kettle-rb/rbs-merge
-[dotenv-merge]: https://github.com/kettle-rb/dotenv-merge
-[toml-merge]: https://github.com/kettle-rb/toml-merge
-[markdown-merge]: https://github.com/kettle-rb/markdown-merge
-[markly-merge]: https://github.com/kettle-rb/markly-merge
-[commonmarker-merge]: https://github.com/kettle-rb/commonmarker-merge
-[kettle-dev]: https://github.com/kettle-rb/kettle-dev
-[kettle-jem]: https://github.com/kettle-rb/kettle-jem
+[tree_haver]: https://github.com/kettle-dev/tree_haver
+[ast-merge]: https://github.com/kettle-dev/ast-merge
+[prism-merge]: https://github.com/kettle-dev/prism-merge
+[psych-merge]: https://github.com/kettle-dev/psych-merge
+[json-merge]: https://github.com/kettle-dev/json-merge
+[jsonc-merge]: https://github.com/kettle-dev/jsonc-merge
+[bash-merge]: https://github.com/kettle-dev/bash-merge
+[rbs-merge]: https://github.com/kettle-dev/rbs-merge
+[dotenv-merge]: https://github.com/kettle-dev/dotenv-merge
+[toml-merge]: https://github.com/kettle-dev/toml-merge
+[markdown-merge]: https://github.com/kettle-dev/markdown-merge
+[markly-merge]: https://github.com/kettle-dev/markly-merge
+[commonmarker-merge]: https://github.com/kettle-dev/commonmarker-merge
+[kettle-dev]: https://github.com/kettle-dev/kettle-dev
+[kettle-jem]: https://github.com/kettle-dev/kettle-jem
 [prism]: https://github.com/ruby/prism
 [psych]: https://github.com/ruby/psych
 [ts-json]: https://github.com/tree-sitter/tree-sitter-json
@@ -202,7 +202,7 @@ Compatible with MRI Ruby 3.2.0+, and concordant releases of JRuby, and TruffleRu
 
 </details>
 
-[gh-discussions]: https://github.com/kettle-rb/commonmarker-merge/discussions
+[gh-discussions]: https://github.com/kettle-dev/commonmarker-merge/discussions
 
 ### Enterprise Support [![Tidelift](https://tidelift.com/badges/package/rubygems/commonmarker-merge)](https://tidelift.com/subscription/pkg/rubygems-commonmarker-merge?utm_source=rubygems-commonmarker-merge&utm_medium=referral&utm_campaign=readme)
 
@@ -557,7 +557,7 @@ NOTE: [kettle-readme-backers][kettle-readme-backers] updates this list every day
 No sponsors yet. Be the first!
 <!-- OPENCOLLECTIVE-ORGANIZATIONS:END -->
 
-[kettle-readme-backers]: https://github.com/kettle-rb/commonmarker-merge/blob/main/exe/kettle-readme-backers
+[kettle-readme-backers]: https://github.com/kettle-dev/commonmarker-merge/blob/main/exe/kettle-readme-backers
 
 ### Another way to support open-source
 
@@ -738,12 +738,12 @@ Thanks for RTFM. ☺️
 [✉️ruby-friends]: https://app.daily.dev/squads/rubyfriends
 
 [✇bundle-group-pattern]: https://gist.github.com/pboling/4564780
-[⛳️gem-namespace]: https://github.com/kettle-rb/commonmarker-merge
+[⛳️gem-namespace]: https://github.com/kettle-dev/commonmarker-merge
 [⛳️namespace-img]: https://img.shields.io/badge/namespace-Commonmarker::Merge-3C2D2D.svg?style=square&logo=ruby&logoColor=white
 [⛳️gem-name]: https://bestgems.org/gems/commonmarker-merge
 [⛳️name-img]: https://img.shields.io/badge/name-commonmarker--merge-3C2D2D.svg?style=square&logo=rubygems&logoColor=red
 [⛳️tag-img]: https://img.shields.io/github/tag/kettle-rb/commonmarker-merge.svg
-[⛳️tag]: http://github.com/kettle-rb/commonmarker-merge/releases
+[⛳️tag]: http://github.com/kettle-dev/commonmarker-merge/releases
 [🚂maint-blog]: http://www.railsbling.com/tags/commonmarker-merge
 [🚂maint-blog-img]: https://img.shields.io/badge/blog-railsbling-0093D0.svg?style=for-the-badge&logo=rubyonrails&logoColor=orange
 [🚂maint-contact]: http://www.railsbling.com/contact
@@ -782,11 +782,11 @@ Thanks for RTFM. ☺️
 [📜src-cb-img]: https://img.shields.io/badge/CodeBerg-4893CC?style=for-the-badge&logo=CodeBerg&logoColor=blue
 [📜src-cb]: https://codeberg.org/kettle-rb/commonmarker-merge
 [📜src-gh-img]: https://img.shields.io/badge/GitHub-238636?style=for-the-badge&logo=Github&logoColor=green
-[📜src-gh]: https://github.com/kettle-rb/commonmarker-merge
+[📜src-gh]: https://github.com/kettle-dev/commonmarker-merge
 [📜docs-cr-rd-img]: https://img.shields.io/badge/RubyDoc-Current_Release-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white
 [📜docs-head-rd-img]: https://img.shields.io/badge/YARD_on_Galtzo.com-HEAD-943CD2?style=for-the-badge&logo=readthedocs&logoColor=white
 [📜gl-wiki]: https://gitlab.com/kettle-rb/commonmarker-merge/-/wikis/home
-[📜gh-wiki]: https://github.com/kettle-rb/commonmarker-merge/wiki
+[📜gh-wiki]: https://github.com/kettle-dev/commonmarker-merge/wiki
 [📜gl-wiki-img]: https://img.shields.io/badge/wiki-examples-943CD2.svg?style=for-the-badge&logo=gitlab&logoColor=white
 [📜gh-wiki-img]: https://img.shields.io/badge/wiki-examples-943CD2.svg?style=for-the-badge&logo=github&logoColor=white
 [👽dl-rank]: https://bestgems.org/gems/commonmarker-merge
@@ -803,28 +803,28 @@ Thanks for RTFM. ☺️
 [🏀codecovi]: https://codecov.io/gh/kettle-rb/commonmarker-merge/graph/badge.svg
 [🏀coveralls]: https://coveralls.io/github/kettle-rb/commonmarker-merge?branch=main
 [🏀coveralls-img]: https://coveralls.io/repos/github/kettle-rb/commonmarker-merge/badge.svg?branch=main
-[🖐codeQL]: https://github.com/kettle-rb/commonmarker-merge/security/code-scanning
-[🖐codeQL-img]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/codeql-analysis.yml/badge.svg
-[🚎2-cov-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/coverage.yml
-[🚎2-cov-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/coverage.yml/badge.svg
-[🚎3-hd-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/heads.yml
-[🚎3-hd-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/heads.yml/badge.svg
-[🚎5-st-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/style.yml
-[🚎5-st-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/style.yml/badge.svg
-[🚎6-s-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/supported.yml
-[🚎6-s-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/supported.yml/badge.svg
-[🚎9-t-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/truffle.yml
-[🚎9-t-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/truffle.yml/badge.svg
-[🚎11-c-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/current.yml
-[🚎11-c-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/current.yml/badge.svg
-[🚎12-crh-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/dep-heads.yml
-[🚎12-crh-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/dep-heads.yml/badge.svg
-[🚎13-🔒️-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/locked_deps.yml
-[🚎13-🔒️-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/locked_deps.yml/badge.svg
-[🚎14-🔓️-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/unlocked_deps.yml
-[🚎14-🔓️-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/unlocked_deps.yml/badge.svg
-[🚎15-🪪-wf]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/license-eye.yml
-[🚎15-🪪-wfi]: https://github.com/kettle-rb/commonmarker-merge/actions/workflows/license-eye.yml/badge.svg
+[🖐codeQL]: https://github.com/kettle-dev/commonmarker-merge/security/code-scanning
+[🖐codeQL-img]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/codeql-analysis.yml/badge.svg
+[🚎2-cov-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/coverage.yml
+[🚎2-cov-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/coverage.yml/badge.svg
+[🚎3-hd-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/heads.yml
+[🚎3-hd-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/heads.yml/badge.svg
+[🚎5-st-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/style.yml
+[🚎5-st-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/style.yml/badge.svg
+[🚎6-s-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/supported.yml
+[🚎6-s-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/supported.yml/badge.svg
+[🚎9-t-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/truffle.yml
+[🚎9-t-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/truffle.yml/badge.svg
+[🚎11-c-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/current.yml
+[🚎11-c-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/current.yml/badge.svg
+[🚎12-crh-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/dep-heads.yml
+[🚎12-crh-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/dep-heads.yml/badge.svg
+[🚎13-🔒️-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/locked_deps.yml
+[🚎13-🔒️-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/locked_deps.yml/badge.svg
+[🚎14-🔓️-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/unlocked_deps.yml
+[🚎14-🔓️-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/unlocked_deps.yml/badge.svg
+[🚎15-🪪-wf]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/license-eye.yml
+[🚎15-🪪-wfi]: https://github.com/kettle-dev/commonmarker-merge/actions/workflows/license-eye.yml/badge.svg
 [💎ruby-3.2i]: https://img.shields.io/badge/Ruby-3.2-CC342D?style=for-the-badge&logo=ruby&logoColor=white
 [💎ruby-3.3i]: https://img.shields.io/badge/Ruby-3.3-CC342D?style=for-the-badge&logo=ruby&logoColor=white
 [💎ruby-c-i]: https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&logo=ruby&logoColor=green
@@ -834,8 +834,8 @@ Thanks for RTFM. ☺️
 [💎truby-headi]: https://img.shields.io/badge/Truffle_Ruby-HEAD-34BCB1?style=for-the-badge&logo=ruby&logoColor=blue
 [💎jruby-c-i]: https://img.shields.io/badge/JRuby-current-FBE742?style=for-the-badge&logo=ruby&logoColor=green
 [💎jruby-headi]: https://img.shields.io/badge/JRuby-HEAD-FBE742?style=for-the-badge&logo=ruby&logoColor=blue
-[🤝gh-issues]: https://github.com/kettle-rb/commonmarker-merge/issues
-[🤝gh-pulls]: https://github.com/kettle-rb/commonmarker-merge/pulls
+[🤝gh-issues]: https://github.com/kettle-dev/commonmarker-merge/issues
+[🤝gh-pulls]: https://github.com/kettle-dev/commonmarker-merge/pulls
 [🤝gl-issues]: https://gitlab.com/kettle-rb/commonmarker-merge/-/issues
 [🤝gl-pulls]: https://gitlab.com/kettle-rb/commonmarker-merge/-/merge_requests
 [🤝cb-issues]: https://codeberg.org/kettle-rb/commonmarker-merge/issues
@@ -844,7 +844,7 @@ Thanks for RTFM. ☺️
 [🤝contributing]: CONTRIBUTING.md
 [🏀codecov-g]: https://codecov.io/gh/kettle-rb/commonmarker-merge/graphs/tree.svg
 [🖐contrib-rocks]: https://contrib.rocks
-[🖐contributors]: https://github.com/kettle-rb/commonmarker-merge/graphs/contributors
+[🖐contributors]: https://github.com/kettle-dev/commonmarker-merge/graphs/contributors
 [🖐contributors-img]: https://contrib.rocks/image?repo=kettle-rb/commonmarker-merge
 [🚎contributors-gl]: https://gitlab.com/kettle-rb/commonmarker-merge/-/graphs/main
 [🪇conduct]: CODE_OF_CONDUCT.md
