@@ -3,6 +3,7 @@
 begin
   require "kettle-soup-cover"
   if Kettle::Soup::Cover::DO_COV
+    # Requiring simplecov loads `.simplecov`; keep that file configuration-only.
     require "simplecov"
     SimpleCov.start
   end
