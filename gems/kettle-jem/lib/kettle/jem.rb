@@ -5844,7 +5844,7 @@ module Kettle
         {
           name: name,
           start_line: call.location.start_line,
-          end_line: call.location.end_line
+          end_line: ruby_node_source_end_line(call)
         }
       end
     end
@@ -5860,7 +5860,7 @@ module Kettle
         {
           name: name,
           start_line: node.location.start_line,
-          end_line: node.location.end_line
+          end_line: ruby_node_source_end_line(node)
         }
       end
     end
@@ -5872,6 +5872,17 @@ module Kettle
       result.value.breadth_first_search_all do |node|
         node.is_a?(::Prism::CallNode) && (call_name.nil? || node.name == call_name)
       end
+    end
+
+    def ruby_node_source_end_line(node)
+      return 0 unless node
+
+      lines = [node.location&.end_line]
+      lines << node.closing_loc&.start_line if node.respond_to?(:closing_loc)
+      node.compact_child_nodes.each do |child|
+        lines << ruby_node_source_end_line(child)
+      end
+      lines.compact.max.to_i
     end
 
     def commented_gem_dependency_records(content)
@@ -5916,12 +5927,12 @@ module Kettle
 
     def ruby_string_argument_at(call, index)
       argument = call&.arguments&.arguments&.[](index)
-      argument.unescaped if argument.is_a?(::Prism::StringNode)
+      ruby_static_string_value(argument)
     end
 
     def ruby_string_arguments(call)
       Array(call&.arguments&.arguments).filter_map do |argument|
-        argument.unescaped if argument.is_a?(::Prism::StringNode)
+        ruby_static_string_value(argument)
       end
     end
 
@@ -5931,7 +5942,47 @@ module Kettle
         element.respond_to?(:key) && element.key.respond_to?(:unescaped) && element.key.unescaped == key.to_s
       end
       value = assoc&.value
-      value.unescaped if value.is_a?(::Prism::StringNode)
+      ruby_static_string_value(value)
+    end
+
+    def ruby_static_string_value(node)
+      case node
+      when ::Prism::StringNode
+        node.unescaped
+      when ::Prism::InterpolatedStringNode
+        ruby_static_interpolated_string_value(node)
+      when ::Prism::CallNode
+        ruby_static_string_call_value(node)
+      end
+    end
+
+    def ruby_static_interpolated_string_value(node)
+      parts = node.compact_child_nodes.map { |child| ruby_static_string_value(child) }
+      return if parts.any?(&:nil?)
+
+      parts.join
+    end
+
+    def ruby_static_string_call_value(node)
+      return unless node.receiver && node.arguments.nil?
+
+      value = ruby_static_string_value(node.receiver)
+      return if value.nil?
+
+      case node.name
+      when :to_s
+        value.to_s
+      when :strip
+        value.strip
+      when :lstrip
+        value.lstrip
+      when :rstrip
+        value.rstrip
+      when :chomp
+        value.chomp
+      when :chop
+        value.chop
+      end
     end
 
     def prism_parse_success(content)
@@ -6062,9 +6113,9 @@ module Kettle
         {
           path: path,
           key: key,
-          line: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join,
+          line: (lines[(call.location.start_line - 1)..(ruby_node_source_end_line(call) - 1)] || []).join,
           start_line: call.location.start_line,
-          end_line: call.location.end_line
+          end_line: ruby_node_source_end_line(call)
         }
       end
     end
@@ -6180,7 +6231,7 @@ module Kettle
           path = ruby_string_argument(call)
           next unless path.to_s.include?("modular/recording/")
 
-          (call.location.start_line..call.location.end_line).each { |line_number| remove_indexes << (line_number - 1) }
+          (call.location.start_line..ruby_node_source_end_line(call)).each { |line_number| remove_indexes << (line_number - 1) }
         end
       end
       head_appraisal = appraisal_call_records(content).find { |record| record.fetch(:name) == "head" }
@@ -6426,8 +6477,8 @@ module Kettle
         {
           name: name,
           start_line: call.location.start_line,
-          end_line: call.location.end_line,
-          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
+          end_line: ruby_node_source_end_line(call),
+          source: (lines[(call.location.start_line - 1)..(ruby_node_source_end_line(call) - 1)] || []).join
         }
       end
     end
@@ -6744,15 +6795,11 @@ module Kettle
       record = gemspec_assignment_records(line).find { |candidate| candidate.fetch(:field) == field.to_s }
       value = record&.fetch(:value)
       return line unless value.is_a?(String)
-      return line if value.lstrip.start_with?("<<")
+      string_node = ruby_first_simple_quoted_string_node(record[:value_node])
+      return line unless string_node
 
-      if value.start_with?('"', "'")
-        quote = value[0]
-        value_body = value[1..].to_s
-        line.sub(value, "#{quote}#{project_emoji} #{strip_leading_decorative_graphemes(value_body)}")
-      else
-        line.sub(value, "#{project_emoji} #{strip_leading_decorative_graphemes(value)}")
-      end
+      first_value = string_node.unescaped.to_s
+      line.sub(first_value, "#{project_emoji} #{strip_leading_decorative_graphemes(first_value)}")
     end
 
     def gemspec_preserved_assignments(source, receiver:)
@@ -6999,11 +7046,10 @@ module Kettle
 
     def gemspec_dependency_record_version(record)
       versions = record.fetch(:requirements, []).filter_map do |requirement|
-        version_text = requirement.to_s[/\d+(?:[._-]?[A-Za-z0-9]+)*/]
-        Gem::Version.new(version_text.tr("_", ".")) if version_text
+        Gem::Requirement.new(requirement.to_s).requirements.map(&:last)
       rescue ArgumentError
         nil
-      end
+      end.flatten
       versions.max || Gem::Version.new("0")
     end
 
@@ -7013,41 +7059,18 @@ module Kettle
         field = gemspec_assignment_field(call)
         next unless field
         next if receiver && call.receiver&.slice != receiver.to_s
-        end_line = gemspec_assignment_end_line(call, lines)
+        end_line = ruby_node_source_end_line(call)
 
         {
           field: field,
           value: gemspec_assignment_value(call),
+          value_node: call.arguments&.arguments&.first,
           receiver: call.receiver&.slice,
           start_line: call.location.start_line,
           end_line: end_line,
           source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join
         }
       end
-    end
-
-    def gemspec_assignment_end_line(call, lines)
-      argument = call.arguments&.arguments&.first
-      closing_line = argument.respond_to?(:closing_loc) && argument.closing_loc&.end_line
-      closing_line = nil unless closing_line.is_a?(Integer)
-      [call.location.end_line, closing_line, gemspec_assignment_heredoc_end_line(call, lines)].compact.max
-    end
-
-    def gemspec_assignment_heredoc_end_line(call, lines)
-      argument = call.arguments&.arguments&.first
-      source = argument&.slice.to_s
-      source = call.slice.to_s if source.empty?
-      # Prism reports `<<~MARKER.strip` as a chained call ending on the opener,
-      # so use a bounded marker scan only to recover the assignment source range.
-      marker = source[/<<[-~]?["'`]?([A-Za-z_]\w*)["'`]?/, 1]
-      return unless marker
-
-      start_index = call.location.start_line
-      lines[start_index..]&.each_with_index do |line, offset|
-        return start_index + offset + 1 if line.strip == marker
-      end
-
-      nil
     end
 
     def gemspec_assignment_field(call)
@@ -7061,13 +7084,33 @@ module Kettle
     def gemspec_assignment_value(call)
       argument = call.arguments&.arguments&.first
       case argument
-      when ::Prism::StringNode
-        argument.unescaped
+      when ::Prism::StringNode, ::Prism::InterpolatedStringNode, ::Prism::CallNode
+        ruby_static_string_value(argument) || argument&.slice
       when ::Prism::ArrayNode
-        argument.elements.filter_map { |element| element.unescaped if element.is_a?(::Prism::StringNode) }
+        argument.elements.filter_map { |element| ruby_static_string_value(element) }
       else
         argument&.slice
       end
+    end
+
+    def ruby_first_simple_quoted_string_node(node)
+      case node
+      when ::Prism::StringNode
+        node if ruby_simple_quoted_string_node?(node)
+      when ::Prism::InterpolatedStringNode
+        node.compact_child_nodes.each do |child|
+          string_node = ruby_first_simple_quoted_string_node(child)
+          return string_node if string_node
+        end
+        nil
+      when ::Prism::CallNode
+        ruby_first_simple_quoted_string_node(node.receiver)
+      end
+    end
+
+    def ruby_simple_quoted_string_node?(node)
+      opening = node.opening_loc&.slice
+      opening == '"' || opening == "'"
     end
 
     def gemspec_field_receiver_and_name(field)
@@ -7133,8 +7176,8 @@ module Kettle
           requirements: ruby_string_arguments(call).drop(1),
           receiver: call.receiver&.slice,
           start_line: call.location.start_line,
-          end_line: call.location.end_line,
-          source: (lines[(call.location.start_line - 1)..(call.location.end_line - 1)] || []).join
+          end_line: ruby_node_source_end_line(call),
+          source: (lines[(call.location.start_line - 1)..(ruby_node_source_end_line(call) - 1)] || []).join
         }
       end
     end
@@ -9490,12 +9533,12 @@ module Kettle
       top_level_ruby_call_records(content, :require).each do |call|
         next unless ruby_string_argument(call) == "version_gem"
 
-        selectors << {start_line: call.location.start_line, end_line: call.location.end_line}
+        selectors << {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
       end
       top_level_ruby_call_records(content, :class_eval).each do |call|
         next unless version_gem_class_eval_call?(call)
 
-        selectors << {start_line: call.location.start_line, end_line: call.location.end_line}
+        selectors << {start_line: call.location.start_line, end_line: ruby_node_source_end_line(call)}
       end
       return content.to_s if selectors.empty?
 
@@ -11944,7 +11987,7 @@ module Kettle
         {
           name: name,
           start_line: call.location.start_line,
-          end_line: call.location.end_line
+          end_line: ruby_node_source_end_line(call)
         }
       end
     end
@@ -11957,7 +12000,7 @@ module Kettle
         {
           receiver: receiver,
           start_line: call.location.start_line,
-          end_line: call.location.end_line
+          end_line: ruby_node_source_end_line(call)
         }
       end
     end
@@ -11981,7 +12024,7 @@ module Kettle
 
         {
           start_line: call.location.start_line,
-          end_line: call.location.end_line
+          end_line: ruby_node_source_end_line(call)
         }
       end
     end

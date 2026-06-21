@@ -8862,6 +8862,11 @@ RSpec.describe Kettle::Jem do
             DESCRIPTION
             spec.homepage = "https://github.com/pboling/sanitize_email"
             spec.required_ruby_version = ">= 2.3"
+            spec.add_dependency(<<~GEM.strip, <<~REQ.strip)
+              rake
+            GEM
+              ~> 13.0
+            REQ
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -8894,6 +8899,9 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include("spec.description = <<~DESCRIPTION.strip")
       expect(gemspec_content).to include("Email Condom for your Ruby Server.")
       expect(gemspec_content).to include("DESCRIPTION")
+      expect(gemspec_content).to include("spec.add_dependency(<<~GEM.strip, <<~REQ.strip)")
+      expect(gemspec_content).to include("rake")
+      expect(gemspec_content).to include("REQ")
       expect(gemspec_content).not_to include("spec.description = 📧")
     end
   end
