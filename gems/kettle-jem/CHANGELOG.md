@@ -261,6 +261,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec template merging now preserves chained squiggly heredoc assignments
+  such as `spec.description = <<~DESC.strip` instead of replacing only the
+  opener line.
 - Generated README post-processing now adds missing compatible JRuby 10.0 and
   TruffleRuby 33.0 compatibility badges when the matching workflow files exist.
 - Shunted Gemfile generation no longer duplicates broad gemspec development

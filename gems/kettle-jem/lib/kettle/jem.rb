@@ -7013,7 +7013,7 @@ module Kettle
         field = gemspec_assignment_field(call)
         next unless field
         next if receiver && call.receiver&.slice != receiver.to_s
-        end_line = gemspec_assignment_end_line(call)
+        end_line = gemspec_assignment_end_line(call, lines)
 
         {
           field: field,
@@ -7026,11 +7026,28 @@ module Kettle
       end
     end
 
-    def gemspec_assignment_end_line(call)
+    def gemspec_assignment_end_line(call, lines)
       argument = call.arguments&.arguments&.first
       closing_line = argument.respond_to?(:closing_loc) && argument.closing_loc&.end_line
       closing_line = nil unless closing_line.is_a?(Integer)
-      [call.location.end_line, closing_line].compact.max
+      [call.location.end_line, closing_line, gemspec_assignment_heredoc_end_line(call, lines)].compact.max
+    end
+
+    def gemspec_assignment_heredoc_end_line(call, lines)
+      argument = call.arguments&.arguments&.first
+      source = argument&.slice.to_s
+      source = call.slice.to_s if source.empty?
+      # Prism reports `<<~MARKER.strip` as a chained call ending on the opener,
+      # so use a bounded marker scan only to recover the assignment source range.
+      marker = source[/<<[-~]?["'`]?([A-Za-z_]\w*)["'`]?/, 1]
+      return unless marker
+
+      start_index = call.location.start_line
+      lines[start_index..]&.each_with_index do |line, offset|
+        return start_index + offset + 1 if line.strip == marker
+      end
+
+      nil
     end
 
     def gemspec_assignment_field(call)

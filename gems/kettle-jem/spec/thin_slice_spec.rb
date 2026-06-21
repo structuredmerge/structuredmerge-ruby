@@ -8856,7 +8856,7 @@ RSpec.describe Kettle::Jem do
           Gem::Specification.new do |spec|
             spec.name = "#{package_name}"
             spec.summary = "Email Condom for your Ruby Server"
-            spec.description = <<~DESCRIPTION
+            spec.description = <<~DESCRIPTION.strip
                 Email Condom for your Ruby Server.
               In Rails, Sinatra, et al.
             DESCRIPTION
@@ -8891,7 +8891,9 @@ RSpec.describe Kettle::Jem do
       gemspec_content = report.fetch(:final_content)
 
       expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
-      expect(gemspec_content).to include("spec.description = <<~DESCRIPTION")
+      expect(gemspec_content).to include("spec.description = <<~DESCRIPTION.strip")
+      expect(gemspec_content).to include("Email Condom for your Ruby Server.")
+      expect(gemspec_content).to include("DESCRIPTION")
       expect(gemspec_content).not_to include("spec.description = 📧")
     end
   end
