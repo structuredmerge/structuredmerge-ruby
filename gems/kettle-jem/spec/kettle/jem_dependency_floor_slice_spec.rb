@@ -19,7 +19,7 @@ RSpec.describe Kettle::Jem do
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
         requirement_args: %("~> 2.2", ">= 2.2.13"),
-        lock_version: "2.2.13",
+        lock_version: "2.2.14",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
@@ -47,8 +47,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-soup-cover" => {
         declaration_names: ["kettle-soup-cover"],
-        requirement_args: %("~> 3.0.a", ">= 3.0.0.rc2"),
-        lock_version: "3.0.0.rc2",
+        requirement_args: %("~> 3.0.a", ">= 3.0.0.rc3"),
+        lock_version: "3.0.0.rc3",
         requirement_surfaces: [
           "gemfiles/modular/coverage.gemfile",
           "lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example"

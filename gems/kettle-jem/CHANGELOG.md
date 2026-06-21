@@ -95,7 +95,7 @@ Please file a bug if you notice a violation of semantic versioning.
   fixes are released.
 - Generated workspace path examples now use the renamed `my` local workspace
   instead of the old `kettle-rb` checkout path.
-- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc2.
+- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc3.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating
   setup.
