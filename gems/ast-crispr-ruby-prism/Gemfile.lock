@@ -22,10 +22,7 @@ GEM
       service_actor (~> 3.9)
       version_gem (~> 1.1, >= 1.1.9)
     ast-merge (7.0.0)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.1)
       tree_haver (= 7.0.0)
-      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -300,14 +297,10 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
-    token-resolver (2.0.2)
-      parslet (~> 2.0)
-      version_gem (~> 1.1, >= 1.1.12)
     tree_haver (7.0.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
       tree_sitter_language_pack (~> 1.6)
-      version_gem (~> 1.1, >= 1.1.9)
     tree_sitter_language_pack (1.8.1-x86_64-linux)
     tsort (0.2.0)
     turbo_tests2 (3.1.4)
@@ -393,7 +386,7 @@ CHECKSUMS
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   ast-crispr (7.0.0)
   ast-crispr-ruby-prism (7.0.0)
-  ast-merge (7.0.0)
+  ast-merge (7.0.0) sha256=5d4143eb07170baaf54437d42977bdacef3f8c0cc8808145ca7224d61209e4dc
   backports (3.25.3) sha256=94298d32dc3c40ca15633b54e282780b49e2db0c045f602ea1907e4f63a17235
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
@@ -499,8 +492,7 @@ CHECKSUMS
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
-  token-resolver (2.0.2) sha256=0711c26306c4156d48351f3dfed60aef643479ee0bef02c6df9ba04b6ac7d677
-  tree_haver (7.0.0)
+  tree_haver (7.0.0) sha256=424c938036458a7f0645baa4e9d641bd8a31f17eeef52ca0e74bd3beb22510c0
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.4) sha256=c7e207e57d4352202c5496a72d850840b9c02120ed8355765abf105a568e5f1c
