@@ -11991,4 +11991,70 @@ RSpec.describe Kettle::Jem do
       )
     end
   end
+
+  it "generates templating-aware main Gemfile nomono wiring for direct sibling runtime dependencies" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-wiring", tmp_root) do |workspace|
+      root = File.join(workspace, "adapter")
+      sibling = File.join(workspace, "shared-core")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "shared-core.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "shared-core"
+            spec.version = "0.1.0"
+            spec.summary = "Shared core"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+            spec.homepage = "https://github.com/rubythems/adapter"
+            spec.metadata["source_code_uri"] = "https://github.com/rubythems/adapter"
+            spec.add_dependency "shared-core", "= 0.1.0"
+            spec.add_dependency "version_gem", ">= 1"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      report = described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+      direct_block = gemfile
+        .split("# Direct sibling dependencies", 2).last.to_s
+        .split("# Templating", 2).first.to_s
+
+      expect(report.fetch(:changed_files)).to include("Gemfile")
+      expect(direct_block).to include("direct_sibling_gems = %w[")
+      expect(direct_block).to include("shared-core")
+      expect(direct_block).not_to include("version_gem")
+      expect(direct_block).to include(
+        'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
+      )
+      expect(direct_block).not_to include(
+        'unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
+      )
+      expect(direct_block).to include('ENV["RUBYTHEMS_DEV"] = File.expand_path("..", __dir__)')
+      expect(direct_block).to include('prefix: "RUBYTHEMS"')
+      expect(direct_block).to include('path_env: "RUBYTHEMS_DEV"')
+      expect(direct_block).to include('root: ["src", "my", "rubythems"]')
+      expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
+    end
+  end
 end

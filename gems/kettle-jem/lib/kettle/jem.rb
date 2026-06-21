@@ -381,6 +381,7 @@ module Kettle
       KJ|LICENSE_EYE:DEPENDENCY_LICENSES
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
+      KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|MIN_RUBY
       KJ|OPENCOLLECTIVE_ORG
@@ -2756,7 +2757,8 @@ module Kettle
         author_domain: author[:domain],
         min_ruby: nil,
         test_min_ruby: test_min_ruby,
-        version: nil
+        version: nil,
+        project_root: project_root
       )
       facts = {
         package: compact_hash(
@@ -2920,7 +2922,9 @@ module Kettle
         author_domain: author[:domain],
         min_ruby: min_ruby,
         test_min_ruby: config_test_min_ruby(kettle_config, min_ruby),
-        version: project_version
+        version: project_version,
+        project_root: project_root,
+        gemspec_metadata: gemspec_metadata
       )
       shim = shim_facts(
         kettle_config,
@@ -9264,10 +9268,22 @@ module Kettle
       }
     end
 
-    def project_runtime_facts(config, env, package_name:, source_url:, author_domain:, min_ruby:, test_min_ruby:, version:)
+    def project_runtime_facts(
+      config,
+      env,
+      package_name:,
+      source_url:,
+      author_domain:,
+      min_ruby:,
+      test_min_ruby:,
+      version:,
+      project_root: nil,
+      gemspec_metadata: {}
+    )
       run_timestamp = Time.now
       configured_project_emoji = preferred_template_token_value(nil, config["project_emoji"], env, "KJ_PROJECT_EMOJI")
       yard_host = project_yard_host(config, env, package_name: package_name, author_domain: author_domain)
+      direct_sibling_gems = direct_sibling_runtime_gems(project_root, gemspec_metadata, package_name: package_name)
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
@@ -9284,8 +9300,81 @@ module Kettle
         min_dev_ruby: test_min_ruby.to_s,
         test_min_ruby: test_min_ruby.to_s,
         version: version.to_s,
-        github_org: github_org_from_url(source_url).to_s
+        github_org: github_org_from_url(source_url).to_s,
+        main_gemfile_direct_sibling_block: main_gemfile_direct_sibling_block(
+          direct_sibling_gems,
+          source_url: source_url,
+          project_root: project_root
+        )
       )
+    end
+
+    def direct_sibling_runtime_gems(project_root, gemspec_metadata, package_name:)
+      return [] unless project_root && gemspec_metadata.is_a?(Hash)
+
+      sibling_root = File.expand_path("..", project_root.to_s)
+      dependencies = Array(
+        gemspec_metadata[:runtime_dependencies] || gemspec_metadata["runtime_dependencies"]
+      )
+      dependencies.each_with_object([]) do |dependency, names|
+        name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
+        next if name.empty? || name == package_name.to_s
+        next unless File.directory?(File.join(sibling_root, name))
+        next if names.include?(name)
+
+        names << name
+      end
+    end
+
+    def main_gemfile_direct_sibling_block(gems, source_url:, project_root:)
+      names = Array(gems).map(&:to_s).reject(&:empty?).uniq
+      return "" if names.empty?
+
+      workspace_slug = direct_sibling_workspace_slug(source_url, project_root)
+      prefix = workspace_slug.to_s.upcase.tr("-", "_")
+      prefix = "LOCAL" if prefix.empty?
+      dev_env = "#{prefix}_DEV"
+      root_literal = ruby_array_literal(["src", "my", workspace_slug].reject(&:empty?))
+      word_array = names.map { |name| "  #{name}" }.join("\n")
+
+      <<~RUBY.rstrip
+        # Direct sibling dependencies (env-switched via #{dev_env})
+        direct_sibling_gems = %w[
+        #{word_array}
+        ]
+        direct_sibling_dev = ENV.fetch("#{dev_env}", "")
+        direct_sibling_local =
+          !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+        direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+        if direct_sibling_gems.any? &&
+            (direct_sibling_local ||
+              ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+          begin
+            require "nomono/bundler"
+            if direct_sibling_templating && !direct_sibling_local
+              ENV["#{dev_env}"] = File.expand_path("..", __dir__)
+            end
+
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "#{prefix}",
+              path_env: "#{dev_env}",
+              root: #{root_literal}
+            )
+          rescue LoadError
+            warn "Install nomono to enable #{dev_env} local sibling-gem dependencies."
+          end
+        end
+      RUBY
+    end
+
+    def direct_sibling_workspace_slug(source_url, project_root)
+      slug = github_org_from_url(source_url).to_s
+      return slug unless slug.empty?
+      return "" unless project_root
+
+      File.basename(File.expand_path("..", project_root.to_s)).to_s
     end
 
     def project_gemspec_metadata(project_root, gemspec_path, spec: nil)
@@ -9417,6 +9506,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_RB_LOCAL_GEMS" => project_runtime[:kettle_rb_local_gems].to_s,
+        "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
         "KJ|HOMEPAGE_URI" => project_runtime[:homepage_uri].to_s,
