@@ -106,6 +106,36 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "removes obsolete SimpleCov.start blocks from .simplecov while preserving local config" do
+    content = <<~RUBY
+      # kettle-jem:freeze
+      # local coverage note
+      # kettle-jem:unfreeze
+      require "kettle/soup/cover/config"
+
+      SimpleCov.configure do
+        cover "lib/**/*.rb"
+        custom_setting "kept"
+      end
+
+      SimpleCov.start do
+        track_files "lib/**/*.rb"
+        track_files "exe/*.rb"
+      end
+
+      custom_after_config
+    RUBY
+
+    output = described_class.send(:remove_simplecov_start_blocks, content)
+
+    expect(output).to include("# local coverage note")
+    expect(output).to include("SimpleCov.configure do")
+    expect(output).to include('custom_setting "kept"')
+    expect(output).to include("custom_after_config")
+    expect(output).not_to include("SimpleCov.start")
+    expect(output).not_to include("track_files")
+  end
+
   it "converts an implementation-shaped gem into a shim profile gem" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

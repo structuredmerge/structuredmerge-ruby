@@ -88,6 +88,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.2.14.
 - Generated SimpleCov setup now keeps `.simplecov` configuration-only and
   starts coverage explicitly from `spec/spec_helper.rb` for SimpleCov v1.
+- `.simplecov` templating now removes obsolete `SimpleCov.start` blocks with a
+  Prism AST cleanup pass while preserving destination-local configuration.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
 - Generated coverage Gemfiles now pin SimpleCov to the `kettle-dev/simplecov`

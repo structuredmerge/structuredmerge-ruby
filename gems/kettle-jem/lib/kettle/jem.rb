@@ -5156,6 +5156,7 @@ module Kettle
         return merge_appraisals_template_policy(output, facts: facts) if file_type == :appraisals
 
         output = finalize_github_workflow_template(prune_github_workflow_matrix_by_min_ruby(output, facts), facts) if github_workflow_template_recipe?(recipe)
+        output = remove_simplecov_start_blocks(output) if recipe.fetch(:target_path).to_s == ".simplecov"
         return output
       end
 
@@ -5252,6 +5253,30 @@ module Kettle
 
       remove_spaces = min_body_indent - desired_body_indent
       ([lines.first] + body.map { |line| outdent_line(line, remove_spaces) } + [lines.last]).join
+    end
+
+    def remove_simplecov_start_blocks(content)
+      nodes = simplecov_start_call_nodes(content)
+      return content if nodes.empty?
+
+      nodes.sort_by { |node| -node.location.start_line }.reduce(content.to_s) do |output, node|
+        replace_source_range_lines(output, node.location.start_line, expand_line_range_through_following_blanks(output, node.location.end_line), "")
+      end
+    end
+
+    def simplecov_start_call_nodes(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        simplecov_start_call_node?(node)
+      end
+    end
+
+    def simplecov_start_call_node?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :start &&
+        node.receiver&.slice == "SimpleCov"
     end
 
     def leading_space_count(line)
