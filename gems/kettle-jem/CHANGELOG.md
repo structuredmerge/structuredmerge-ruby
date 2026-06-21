@@ -135,16 +135,18 @@ Please file a bug if you notice a violation of semantic versioning.
   the peeled commit SHA for v6.0.3 and `qltysh/qlty-action/coverage` to the
   immutable SHA for v2.2.1.
 - Generated GitHub Actions workflow templates now refresh pins for
-  `coverallsapp/github-action`, `codecov/codecov-action`, and
-  `kettle-rb/ts-grammar-action`.
+  `coverallsapp/github-action` and `codecov/codecov-action`.
+- Generated templating and unlocked dependency workflows no longer install the
+  legacy tree-sitter action and rely on the packaged
+  `tree_sitter_language_pack` runtime instead.
 - Generated templating workflows and `kettle-jem prepare` now update `nomono`
   before install/selftest commands run, so stale locks do not activate old
   local-workspace wiring code.
 - Generated GitHub Actions workflow templates now refresh pins for
   `github/codeql-action` sub-actions to v4.36.2.
-- Generated workflow templates now pin `coverallsapp/github-action`,
-  `codecov/codecov-action`, and `kettle-rb/ts-grammar-action` to resolvable
-  release SHAs instead of stripped SemVer strings.
+- Generated workflow templates now pin `coverallsapp/github-action` and
+  `codecov/codecov-action` to resolvable release SHAs instead of stripped
+  SemVer strings.
 - Generated README badge URLs now use the same URI-normalized form as
   `kettle-pre-release`, avoiding churn between encoded namespace separators
   and Unicode badge messages.
@@ -152,8 +154,7 @@ Please file a bug if you notice a violation of semantic versioning.
   the immutable SHA for v1.312.0 and `codecov/codecov-action` to the latest
   v7.0.0 release comment.
 - Generated GitHub Actions workflow templates now refresh `ruby/setup-ruby`,
-  `coverallsapp/github-action`, `pozil/auto-assign-issue`, and
-  `kettle-rb/ts-grammar-action` pins.
+  `coverallsapp/github-action`, and `pozil/auto-assign-issue` pins.
 - Generated coverage workflows now publish QLTY coverage with GitHub OIDC so
   repositories do not require `QLTY_COVERAGE_TOKEN` to be configured.
 - Generated README and FUNDING OpenCollective links now use the configured

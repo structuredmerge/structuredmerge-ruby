@@ -587,7 +587,6 @@ RSpec.describe Kettle::Jem do
                 - uses: github/codeql-action/analyze@v4
                 - uses: pozil/auto-assign-issue@v2
                 - uses: apache/skywalking-eyes/dependency@v0.8.0
-                - uses: kettle-rb/ts-grammar-action@v1
                 - uses: sarisia/actions-status-discord@v1
                 - name: Project-specific check
                   run: bundle exec rake custom
@@ -614,7 +613,6 @@ RSpec.describe Kettle::Jem do
       expect_pinned_action(content, "github/codeql-action/analyze")
       expect_pinned_action(content, "pozil/auto-assign-issue")
       expect_pinned_action(content, "apache/skywalking-eyes/dependency")
-      expect_pinned_action(content, "kettle-rb/ts-grammar-action")
       expect_pinned_action(content, "sarisia/actions-status-discord")
       expect(content).to include("Project-specific check")
       expect(content).to include("bundle exec rake custom")
