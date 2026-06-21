@@ -164,12 +164,12 @@ module TreeHaver
       if ENV[env_var] || ENV.key?(env_var)
         env_path = ENV[env_var]
 
-        # :nocov: defensive - ENV.key? true with nil value is rare edge case
+        # simplecov:disable defensive - ENV.key? true with nil value is rare edge case
         if env_path.nil?
           @env_rejection_reason = "explicitly disabled (set to nil)"
           return
         end
-        # :nocov:
+        # simplecov:enable
 
         # Empty string means "explicitly skip this grammar"
         # This allows users to disable tree-sitter for specific languages

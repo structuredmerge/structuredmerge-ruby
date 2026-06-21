@@ -47,9 +47,9 @@ module Ast
             when :template_only
               template_only_sort_key(entry, dest_size)
             else
-              # :nocov: defensive
+              # simplecov:disable defensive
               [999, 0, 0, 0]
-              # :nocov:
+              # simplecov:enable
             end
           end
         end

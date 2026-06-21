@@ -45,10 +45,10 @@ module TreeHaver
             @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
           rescue LoadError
             @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            # :nocov: defensive code - StandardError during require is extremely rare
+            # simplecov:disable defensive code - StandardError during require is extremely rare
           rescue StandardError
             @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            # :nocov:
+            # simplecov:enable
           end
           @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
         end

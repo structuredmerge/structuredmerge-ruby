@@ -33,7 +33,7 @@ module Markdown
       # Default language-to-merger mapping
       # Each merger is a lambda that takes (template_content, dest_content, preference)
       # and returns { merged: true/false, content: String, stats: Hash }
-      # :nocov: integration - DEFAULT_MERGERS lambdas require external gems
+      # simplecov:disable integration - DEFAULT_MERGERS lambdas require external gems
       DEFAULT_MERGERS = {
         # Ruby code blocks
         "ruby" => ->(template, dest, preference, **opts) {
@@ -77,7 +77,7 @@ module Markdown
           CodeBlockMerger.merge_with_toml(template, dest, preference, **opts)
         },
       }.freeze
-      # :nocov:
+      # simplecov:enable
 
       # @return [Hash<String, Proc>] Language to merger mapping
       attr_reader :mergers

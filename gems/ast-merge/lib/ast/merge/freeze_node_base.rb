@@ -437,10 +437,10 @@ module Ast
       # Extract the token from the start marker
       # @return [String, nil] The token (e.g., "rbs-merge" from "# rbs-merge:freeze")
       def extract_token_from_marker
-        # :nocov:
+        # simplecov:disable
         # Defensive: @start_marker is always set in normal usage, nil check is for safety
         return unless @start_marker
-        # :nocov:
+        # simplecov:enable
 
         # Match the token before :freeze
         match = @start_marker.match(/([\w-]+):freeze/i)

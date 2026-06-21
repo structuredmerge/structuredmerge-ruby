@@ -727,10 +727,10 @@ module Markdown
           end
           nodes
         rescue StandardError => e
-          # :nocov: defensive - parser rarely fails on valid markdown subset
+          # simplecov:disable defensive - parser rarely fails on valid markdown subset
           DebugLogger.debug("Failed to parse freeze block content", {error: e.message})
           []
-          # :nocov:
+          # simplecov:enable
         end
       end
 

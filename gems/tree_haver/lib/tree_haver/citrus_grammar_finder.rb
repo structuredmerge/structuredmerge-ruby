@@ -85,7 +85,7 @@ module TreeHaver
 
         # Verify it responds to parse
         unless @grammar_module.respond_to?(:parse)
-          # :nocov: defensive - requires a gem with malformed grammar module
+          # simplecov:disable defensive - requires a gem with malformed grammar module
           # Show what methods ARE available to help diagnose the issue
           if debug
             available_methods = @grammar_module.methods(false).sort.first(20)
@@ -100,30 +100,30 @@ module TreeHaver
           end
           @available = false
           return false
-          # :nocov:
+          # simplecov:enable
         end
 
         @available = true
       rescue LoadError => e
-        # :nocov: defensive - requires gem to not be installed
+        # simplecov:disable defensive - requires gem to not be installed
         # Only show LoadError details when debugging
         if debug
           warn("CitrusGrammarFinder: Failed to load '#{@require_path}': #{e.class}: #{e.message}")
           warn("CitrusGrammarFinder: LoadError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue NameError => e
-        # :nocov: defensive - requires gem with missing constant
+        # simplecov:disable defensive - requires gem with missing constant
         # Only show NameError details when debugging
         if debug
           warn("CitrusGrammarFinder: Failed to resolve '#{@grammar_const}': #{e.class}: #{e.message}")
           warn("CitrusGrammarFinder: NameError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue TypeError => e
-        # :nocov: defensive - TruffleRuby-specific edge case
+        # simplecov:disable defensive - TruffleRuby-specific edge case
         # TruffleRuby's bundled_gems.rb can raise TypeError when File.path is called on nil
         # This happens in bundled_gems.rb:124 warning? method when caller locations return nil
         # Always warn about TypeError as it indicates a platform-specific issue
@@ -133,16 +133,16 @@ module TreeHaver
           warn("CitrusGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue => e
-        # :nocov: defensive - catch-all for unexpected errors
+        # simplecov:disable defensive - catch-all for unexpected errors
         # Always warn about unexpected errors
         warn("CitrusGrammarFinder: Unexpected error: #{e.class}: #{e.message}")
         if debug
           warn("CitrusGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       end
 
       @available

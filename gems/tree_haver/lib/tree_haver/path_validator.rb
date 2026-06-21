@@ -86,13 +86,13 @@ module TreeHaver
       # Add directories from environment variable
       ENV[TRUSTED_DIRS_ENV_VAR]&.split(",")&.each do |dir|
         expanded = File.expand_path(dir.strip)
-        # :nocov:
+        # simplecov:disable
         # File.expand_path always returns absolute paths on Unix/macOS.
         # This guard exists for defensive programming on exotic platforms
         # where expand_path might behave differently, but cannot be tested
         # in standard CI environments.
         dirs << expanded if expanded.start_with?("/")
-        # :nocov:
+        # simplecov:enable
       end
 
       dirs.uniq
@@ -115,7 +115,7 @@ module TreeHaver
     def add_trusted_directory(directory)
       expanded = File.expand_path(directory)
 
-      # :nocov:
+      # simplecov:disable
       # File.expand_path always returns absolute paths on Unix/macOS.
       # This guard exists for defensive programming on exotic platforms
       # where expand_path might behave differently, but cannot be tested
@@ -123,7 +123,7 @@ module TreeHaver
       unless expanded.start_with?("/")
         raise ArgumentError, "Trusted directory must be an absolute path: #{directory.inspect}"
       end
-      # :nocov:
+      # simplecov:enable
 
       @mutex.synchronize do
         @custom_trusted_directories << expanded unless @custom_trusted_directories.include?(expanded)

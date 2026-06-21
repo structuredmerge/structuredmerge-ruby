@@ -518,7 +518,7 @@ module Prism
         # @return [void]
         def attach_comments_safely!(parse_result)
           parse_result.attach_comments!
-        # :nocov: defensive - JRuby compatibility for Comments class autoloading
+        # simplecov:disable defensive - JRuby compatibility for Comments class autoloading
         rescue NameError => e
           if e.message.include?("Comments")
             # On JRuby, the Comments class needs to be explicitly required
@@ -527,7 +527,7 @@ module Prism
           else
             raise
           end
-          # :nocov:
+          # simplecov:enable
         end
       end
 
@@ -821,15 +821,15 @@ module Prism
 
         body = @parse_result.value.statements
         raw_nodes = if body.nil?
-          # :nocov: defensive
+          # simplecov:disable defensive
           []
-          # :nocov:
+          # simplecov:enable
         elsif body.type.to_s == "statements_node"
           body.body.compact
         else
-          # :nocov: defensive
+          # simplecov:disable defensive
           [body].compact
-          # :nocov:
+          # simplecov:enable
         end
 
         if raw_nodes.empty? && @lines.any?
@@ -1057,9 +1057,9 @@ module Prism
           params = if node.parameters
             # Handle forwarding parameters (def foo(...)) specially
             if node.parameters.is_a?(Prism::ForwardingParameterNode)
-              # :nocov: defensive - current Prism wraps ForwardingParameterNode in ParametersNode
+              # simplecov:disable defensive - current Prism wraps ForwardingParameterNode in ParametersNode
               [:forwarding]
-              # :nocov:
+              # simplecov:enable
             else
               param_names = []
               param_names.concat(node.parameters.requireds.map(&:name)) if node.parameters.requireds
@@ -1195,9 +1195,9 @@ module Prism
               receiver
             end
             if node.block
-              # :nocov: defensive - Ruby syntax doesn't allow blocks with assignment methods
+              # simplecov:disable defensive - Ruby syntax doesn't allow blocks with assignment methods
               [:call_with_block, node.name, effective_receiver]
-              # :nocov:
+              # simplecov:enable
             else
               [:call, node.name, effective_receiver]
             end

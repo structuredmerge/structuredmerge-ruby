@@ -87,20 +87,20 @@ module TreeHaver
           @loaded = begin # rubocop:disable ThreadSafety/ClassInstanceVariable
             # TruffleRuby's FFI doesn't support STRUCT_BY_VALUE return types
             # which tree-sitter uses extensively (ts_tree_root_node, ts_node_child, etc.)
-            # :nocov: TruffleRuby returns false early - subsequent FFI code paths unreachable on TruffleRuby
+            # simplecov:disable TruffleRuby returns false early - subsequent FFI code paths unreachable on TruffleRuby
             if RUBY_ENGINE == "truffleruby"
               false
-            # :nocov:
+            # simplecov:enable
             else
               require "ffi"
               true
             end
           rescue LoadError
             false
-            # :nocov: defensive code - StandardError during require is extremely rare
+            # simplecov:disable defensive code - StandardError during require is extremely rare
           rescue StandardError
             false
-            # :nocov:
+            # simplecov:enable
           end
           @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
         end
@@ -255,7 +255,7 @@ module TreeHaver
             end
 
             unless lib_loaded
-              # :nocov:
+              # simplecov:disable
               tried = candidates.join(", ")
               env_hint = ENV["TREE_SITTER_RUNTIME_LIB"] ? " TREE_SITTER_RUNTIME_LIB=#{ENV["TREE_SITTER_RUNTIME_LIB"]}." : ""
               msg = if last_error
@@ -264,7 +264,7 @@ module TreeHaver
                 "Could not load libtree-sitter (tried: #{tried}).#{env_hint}"
               end
               raise TreeHaver::NotAvailable, msg
-              # :nocov:
+              # simplecov:enable
             end
 
             # Attach functions after lib is selected

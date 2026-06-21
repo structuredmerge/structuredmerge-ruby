@@ -96,38 +96,38 @@ module TreeHaver
 
         @available = true
       rescue LoadError => e
-        # :nocov: defensive - requires gem to not be installed
+        # simplecov:disable defensive - requires gem to not be installed
         if debug
           warn("ParsletGrammarFinder: Failed to load '#{@require_path}': #{e.class}: #{e.message}")
           warn("ParsletGrammarFinder: LoadError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue NameError => e
-        # :nocov: defensive - requires gem with missing constant
+        # simplecov:disable defensive - requires gem with missing constant
         if debug
           warn("ParsletGrammarFinder: Failed to resolve '#{@grammar_const}': #{e.class}: #{e.message}")
           warn("ParsletGrammarFinder: NameError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue TypeError => e
-        # :nocov: defensive - TruffleRuby-specific edge case
+        # simplecov:disable defensive - TruffleRuby-specific edge case
         warn("ParsletGrammarFinder: TypeError during load of '#{@require_path}': #{e.class}: #{e.message}")
         warn("ParsletGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue")
         if debug
           warn("ParsletGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       rescue => e
-        # :nocov: defensive - catch-all for unexpected errors
+        # simplecov:disable defensive - catch-all for unexpected errors
         warn("ParsletGrammarFinder: Unexpected error: #{e.class}: #{e.message}")
         if debug
           warn("ParsletGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
         end
         @available = false
-        # :nocov:
+        # simplecov:enable
       end
 
       @available

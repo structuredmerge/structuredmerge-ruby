@@ -66,18 +66,18 @@ module TreeHaver
               require "tree_sitter"
               @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
             else
-              # :nocov: only runs on non-MRI engines (JRuby, TruffleRuby)
+              # simplecov:disable only runs on non-MRI engines (JRuby, TruffleRuby)
               @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-              # :nocov:
+              # simplecov:enable
             end
           rescue LoadError
-            # :nocov: only runs when ruby_tree_sitter gem is not installed
+            # simplecov:disable only runs when ruby_tree_sitter gem is not installed
             @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            # :nocov:
+            # simplecov:enable
           rescue StandardError
-            # :nocov: defensive code - StandardError during require is extremely rare
+            # simplecov:disable defensive code - StandardError during require is extremely rare
             @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            # :nocov:
+            # simplecov:enable
           end
           @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
         end

@@ -1235,9 +1235,9 @@ RSpec.describe "Ruby::Merge" do
         require "kettle/dev"
 
         task :default do
-          # :nocov:
+          # simplecov:disable
           puts "Default task complete."
-          # :nocov:
+          # simplecov:enable
         end
       RUBY
       "ruby"
@@ -1248,9 +1248,9 @@ RSpec.describe "Ruby::Merge" do
     expect(relocated_rakefile_merge[:output]).to include('desc "Default tasks aggregator"')
     expect(relocated_rakefile_merge[:output]).to include(<<~RUBY)
       task :default do
-        # :nocov:
+        # simplecov:disable
         puts "Default task complete."
-        # :nocov:
+        # simplecov:enable
       end
     RUBY
     expect(relocated_rakefile_merge[:output].index('desc "Default tasks aggregator"')).to be <
@@ -1271,12 +1271,12 @@ RSpec.describe "Ruby::Merge" do
         begin
           require "kettle/jem"
         rescue LoadError
-          # :nocov:
+          # simplecov:disable
           desc("(stub) kettle:jem:selftest is unavailable")
           task("kettle:jem:selftest") do
             warn("NOTE: not installed")
           end
-          # :nocov:
+          # simplecov:enable
         end
       RUBY
       "ruby"
@@ -1304,18 +1304,18 @@ RSpec.describe "Ruby::Merge" do
         require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
       RUBY
       <<~RUBY,
-        # :nocov:
+        # simplecov:disable
         require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
-        # :nocov:
+        # simplecov:enable
       RUBY
       "ruby",
       merge_template_requires: true
     )
     expect(nocov_require_merge[:ok]).to be(true)
     expect(nocov_require_merge[:output]).to include(<<~RUBY)
-      # :nocov:
+      # simplecov:disable
       require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
-      # :nocov:
+      # simplecov:enable
     RUBY
     expect(nocov_require_merge[:output].scan("# :nocov:").size).to eq(2)
 
@@ -1330,9 +1330,9 @@ RSpec.describe "Ruby::Merge" do
         end
       RUBY
       <<~RUBY,
-        # :nocov:
+        # simplecov:disable
         require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
-        # :nocov:
+        # simplecov:enable
 
         begin
           require "kettle/dev"

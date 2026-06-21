@@ -104,7 +104,7 @@ module TreeHaver
       #   ENV["TREE_SITTER_JAVA_JARS_DIR"] = "/path/to/java-tree-sitter/jars"
       #   TreeHaver::Backends::Java.add_jars_from_env!
       def add_jars_from_env!
-        # :nocov:
+        # simplecov:disable
         # This method requires JRuby and cannot be tested on MRI/CRuby.
         # JRuby-specific CI jobs would test this code.
         require "java"
@@ -121,7 +121,7 @@ module TreeHaver
         # Configure native library path for libtree-sitter
         # java-tree-sitter uses JNI and needs to find the native library
         configure_native_library_path!
-        # :nocov:
+        # simplecov:enable
       rescue LoadError
         # ignore; not JRuby or Java bridge not available
       end
@@ -131,7 +131,7 @@ module TreeHaver
       # @return [void]
       # @api private
       def configure_native_library_path!
-        # :nocov:
+        # simplecov:disable
         # This method requires JRuby and cannot be tested on MRI/CRuby.
         lib_path = ENV["TREE_SITTER_RUNTIME_LIB"]
         return unless lib_path && File.exist?(lib_path)
@@ -146,7 +146,7 @@ module TreeHaver
           # Also set jna.library.path in case it uses JNA
           java.lang.System.setProperty("jna.library.path", new_path)
         end
-        # :nocov:
+        # simplecov:enable
       rescue => _error
         # Ignore errors setting library path
       end
@@ -224,7 +224,7 @@ module TreeHaver
       #   TreeHaver::Backends::Java.capabilities
       #   # => { backend: :java, parse: true, query: true, bytes_field: true, incremental: true, comment_support: :nodes_only }
       def capabilities
-        # :nocov:
+        # simplecov:disable
         # This method returns meaningful data only on JRuby when java-tree-sitter is available.
         return {} unless available?
         {
@@ -235,7 +235,7 @@ module TreeHaver
           incremental: true, # java-tree-sitter supports Parser.parse(Tree, String)
           comment_support: :nodes_only,
         }
-        # :nocov:
+        # simplecov:enable
       end
 
       # Java backend language wrapper (raw backend language)
@@ -251,7 +251,7 @@ module TreeHaver
       # @see TreeHaver::Language The factory module users should interact with
       # @see https://tree-sitter.github.io/java-tree-sitter/io/github/treesitter/jtreesitter/Language.html
       #
-      # :nocov:
+      # simplecov:disable
       # All Java backend implementation classes require JRuby and cannot be tested on MRI/CRuby.
       # JRuby-specific CI jobs would test this code.
       class Language
@@ -883,7 +883,7 @@ module TreeHaver
           @impl.text.to_s
         end
       end
-      # :nocov:
+      # simplecov:enable
 
       # Register the availability checker for RSpec dependency tags
       TreeHaver::BackendRegistry.register_availability_checker(:java) do

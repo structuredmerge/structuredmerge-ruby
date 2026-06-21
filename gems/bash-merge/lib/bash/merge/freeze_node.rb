@@ -75,11 +75,11 @@ module Bash
       # String representation for debugging
       # @return [String]
       def inspect
-        # :nocov:
+        # simplecov:disable
         # Defensive: slice is always set via resolve_content in FreezeNodeBase#initialize
         # The || 0 branch is normally unreachable because validate_structure! ensures non-empty content
         content_length = slice&.length || 0
-        # :nocov:
+        # simplecov:enable
         "#<#{self.class.name} lines=#{start_line}..#{end_line} content_length=#{content_length}>"
       end
 

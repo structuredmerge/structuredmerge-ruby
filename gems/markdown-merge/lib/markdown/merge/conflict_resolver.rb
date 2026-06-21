@@ -170,9 +170,9 @@ module Markdown
           if start_line && end_line
             analysis.source_range(start_line, end_line)
           else
-            # :nocov: defensive - Markdown nodes typically have source positions
+            # simplecov:disable defensive - Markdown nodes typically have source positions
             node.to_commonmark
-            # :nocov:
+            # simplecov:enable
           end
         end
       end
