@@ -72,7 +72,7 @@ if kettle_rb_dev.casecmp("false").zero?
 
   gem "kettle-family", ">= 0.1.3"
 
-  gem "kettle-test", "~> 2.0", ">= 2.0.5"
+  gem "kettle-test", "~> 2.0", ">= 2.0.6"
 end
 
 gem "kettle-drift", "~> 1.0", ">= 1.0.3"
