@@ -93,6 +93,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated coverage Gemfiles now pin SimpleCov to the `kettle-dev/simplecov`
   `fix-generic-parallel-opt-out` branch until the upstream parallel coordination
   fixes are released.
+- Generated workspace path examples now use the renamed `my` local workspace
+  instead of the old `kettle-rb` checkout path.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc2.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
   activate locally installed template-stack source roots during templating

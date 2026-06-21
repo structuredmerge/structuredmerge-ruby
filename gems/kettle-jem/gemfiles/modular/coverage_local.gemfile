@@ -9,7 +9,7 @@ local_gems = %w[kettle-dev kettle-test kettle-soup-cover kettle-drift]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
 local_gems_to_eval = local_gems - %w[kettle-jem] - declared_gems
 
-# export KETTLE_RB_DEV=/path/to/kettle-rb
+# export KETTLE_RB_DEV=/path/to/my
 platform :mri do
   eval_nomono_gems(
     gems: local_gems_to_eval,

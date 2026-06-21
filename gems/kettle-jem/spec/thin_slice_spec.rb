@@ -4322,7 +4322,7 @@ RSpec.describe Kettle::Jem do
       env = {
         "KETTLE_JEM_SKIP_COMMIT" => "true",
         "K_JEM_TEMPLATING" => "true",
-        "KETTLE_RB_DEV" => "/workspace/kettle-rb",
+        "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
         "SMORG_RB_DEV" => "/workspace/smorg-rb"
       }
@@ -4430,7 +4430,7 @@ RSpec.describe Kettle::Jem do
 
       env = {
         "K_JEM_TEMPLATING" => "true",
-        "KETTLE_RB_DEV" => "/workspace/kettle-rb",
+        "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
         "SMORG_RB_DEV" => "/workspace/smorg-rb",
         "RUBYOPT" => "-rbundler/setup",
