@@ -53,6 +53,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gemfile, gemspec, Appraisal, and Rakefile template merging now derives Ruby
   call source ranges and static string values from Prism nodes so heredoc
   string arguments are preserved transparently.
+- Gemspec dependency preservation now rewrites project-version constant
+  interpolation in dependency requirements to `spec.version` so preserved
+  dependencies remain loadable after anonymous-module version loading.
 - Removed retired funding links and template tokens from generated kettle-jem
   funding and README templates.
 - Retemplated generated project metadata, support documentation, CI workflows,

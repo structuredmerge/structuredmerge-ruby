@@ -7952,6 +7952,73 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "rewrites preserved dependency requirements that interpolate the project version constant" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-version-dependency-slice", tmp_root) do |root|
+      write_tree(root, {
+        "gemserver-gem_coop.gemspec" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require_relative "lib/gemserver/gem_coop/version"
+
+          Gem::Specification.new do |spec|
+            spec.name = "gemserver-gem_coop"
+            spec.version = Gemserver::GemCoop::VERSION
+            spec.summary = "Gem coop preset"
+            spec.required_ruby_version = ">= 3.2"
+            spec.add_dependency "gemserver-purl", "= \#{Gemserver::GemCoop::VERSION}"
+          end
+        RUBY
+        "lib/gemserver/gem_coop/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module Gemserver
+            module GemCoop
+              module Version
+                VERSION = "0.1.0"
+              end
+              VERSION = Version::VERSION
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "3.2"
+            entrypoint_require: "gemserver/gem_coop"
+            namespace: "Gemserver::GemCoop"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemserver-gem_coop.gemspec
+        YAML
+        "template/gemserver-gem_coop.gemspec.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+            spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.12")
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_gemserver_gem_coop_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).not_to include('require_relative "lib/gemserver/gem_coop/version"')
+      expect(gemspec_content).to include("spec.version = Module.new.tap { |mod| Kernel.load(\"\#{__dir__}/lib/gemserver/gem_coop/version.rb\", mod) }::Gemserver::GemCoop::Version::VERSION")
+      expect(gemspec_content).to include(%(spec.add_dependency "gemserver-purl", "= \#{spec.version}"))
+      expect(gemspec_content).not_to include("Gemserver::GemCoop::VERSION}")
+      expect { load File.join(root, "gemserver-gem_coop.gemspec") }.not_to raise_error
+      expect(File.read(File.join(root, "gemserver-gem_coop.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
   it "keeps gemspec legacy version loading with require_relative when minimum Ruby is below 3.1 and at least 2.2" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

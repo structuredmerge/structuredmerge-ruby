@@ -6509,7 +6509,8 @@ module Kettle
         merged,
         destination_content,
         template_receiver: template_receiver,
-        destination_receiver: destination_receiver
+        destination_receiver: destination_receiver,
+        facts: facts
       )
       merged = preserve_gemspec_freeze_blocks(merged, destination_content, facts: facts, receiver: template_receiver)
       merged = apply_configured_gemspec_licenses(merged, facts, receiver: template_receiver)
@@ -6843,11 +6844,13 @@ module Kettle
       replace_record_ranges(content, records_by_line)
     end
 
-    def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:)
+    def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:, facts: nil)
+      namespace = facts.to_h.dig(:rubygems, :namespace).to_s
       template_dependencies = gemspec_dependency_line_index(template_content, receiver: template_receiver)
       destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver)
         .transform_values do |source|
-          normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
+          normalized = normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
+          normalize_gemspec_dependency_version_requirements(normalized, receiver: template_receiver, namespace: namespace)
         end
       destination_dependencies = destination_dependencies.reject do |key, _source|
         retired_gemspec_development_dependency_key?(key)
@@ -6909,6 +6912,58 @@ module Kettle
         index[record.fetch(:start_line)] = record.merge(replacement: replacement) if replacement
       end
       replace_record_ranges(content, records_by_line)
+    end
+
+    def normalize_gemspec_dependency_version_requirements(source, receiver:, namespace:)
+      return source if namespace.to_s.empty?
+
+      replacements = ruby_call_records(source, nil).flat_map do |call|
+        next [] unless gemspec_dependency_call_kind(call)
+
+        Array(call.arguments&.arguments).drop(1).filter_map do |argument|
+          replacement = ruby_project_version_interpolated_string_source(argument, receiver: receiver, namespace: namespace)
+          next unless replacement
+
+          {start_offset: argument.location.start_offset, end_offset: argument.location.end_offset, replacement: replacement}
+        end
+      end
+      return source if replacements.empty?
+
+      replace_source_offsets(source, replacements)
+    end
+
+    def ruby_project_version_interpolated_string_source(node, receiver:, namespace:)
+      return unless node.is_a?(::Prism::InterpolatedStringNode)
+
+      parts = node.parts.map do |part|
+        case part
+        when ::Prism::StringNode
+          ruby_double_quoted_string_body(part.unescaped.to_s)
+        when ::Prism::EmbeddedStatementsNode
+          next unless ruby_project_version_embedded_statements?(part, namespace: namespace)
+
+          "\#{#{receiver}.version}"
+        end
+      end
+      return if parts.any?(&:nil?)
+
+      %("#{parts.join}")
+    end
+
+    def ruby_project_version_embedded_statements?(node, namespace:)
+      body = node.statements&.body.to_a
+      return false unless body.length == 1
+
+      ruby_project_version_constant_path?(body.first, namespace: namespace)
+    end
+
+    def ruby_project_version_constant_path?(node, namespace:)
+      return false unless node.is_a?(::Prism::ConstantPathNode)
+
+      segments = ruby_constant_path_segments(node)
+      namespace_segments = namespace.to_s.split("::").reject(&:empty?)
+      segments == namespace_segments + ["VERSION"] ||
+        segments == namespace_segments + ["Version", "VERSION"]
     end
 
     def sort_runtime_gemspec_dependency_lines(content, receiver:)
