@@ -28,8 +28,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-drift" => {
         declaration_names: ["kettle-drift"],
-        requirement_args: %("~> 1.0", ">= 1.0.3"),
-        lock_version: "1.0.3",
+        requirement_args: %("~> 1.0", ">= 1.0.4"),
+        lock_version: "1.0.4",
         requirement_surfaces: [
           "gemfiles/modular/templating.gemfile",
           "lib/kettle/jem.rb",

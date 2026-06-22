@@ -135,7 +135,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates and generated templating Gemfiles now require `kettle-dev` >= 2.2.12.
 - The packaged gemspec template now uses the same `kettle-dev` 2.2.12 floor as
   generated Gemfile tooling.
-- Generated templating Gemfiles now require `kettle-drift` >= 1.0.3.
+- Generated templating Gemfiles now require `kettle-drift` >= 1.0.4.
 - Gem templates now require `kettle-test` >= 2.0.6.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 2.0.2.
 - Generated style Gemfiles now require `rubocop-gradual` >= 0.4.0.
