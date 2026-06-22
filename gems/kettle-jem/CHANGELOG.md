@@ -56,6 +56,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated documentation Gemfiles now require `yaml-converter` >= 0.2.2.
 - Generated documentation Gemfiles now require `yard-fence` >= 0.9.5.
 - Generated documentation Gemfiles now require `yard-timekeeper` >= 0.2.2.
+- Generated documentation Gemfiles now require `yard-yaml` >= 0.2.2.
 - Gemfile, gemspec, Appraisal, and Rakefile template merging now derives Ruby
   call source ranges and static string values from Prism nodes so heredoc
   string arguments are preserved transparently.
