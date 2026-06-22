@@ -294,6 +294,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated local Gemfile overrides now load `nomono/bundler` without activating
+  nomono's runtime dependencies during Bundler Gemfile evaluation, and bundled
+  handoff no longer runs through the RubyGems `kettle-jem` wrapper.
 - Gemspec template merging now preserves chained squiggly heredoc assignments
   such as `spec.description = <<~DESC.strip` instead of replacing only the
   opener line.

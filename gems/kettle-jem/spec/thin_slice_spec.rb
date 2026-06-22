@@ -31,6 +31,18 @@ RSpec.describe Kettle::Jem do
     JSON.parse(JSON.generate(value), symbolize_names: true)
   end
 
+  def kettle_jem_handoff_command(*args)
+    [
+      "bundle",
+      "exec",
+      "ruby",
+      "-e",
+      %(load Gem.bin_path("kettle-jem", "kettle-jem")),
+      "--",
+      *args
+    ]
+  end
+
   def write_tree(root, files)
     files.each do |relative_path, content|
       path = File.join(root, relative_path.to_s)
@@ -3971,7 +3983,7 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bundled_handoff",
-        command: ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"],
+        command: kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup"),
         status: "succeeded",
         exitstatus: 0,
         reason: "executed"
@@ -4002,7 +4014,7 @@ RSpec.describe Kettle::Jem do
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--skip-commit", "--quiet", "--only", "bin/setup"]
+        kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup")
       )
       expect(commands).to all(include(chdir: root, env: {}, quiet: true))
       expect(File).to exist(setup_path)
@@ -4023,7 +4035,7 @@ RSpec.describe Kettle::Jem do
       )
       expect(second.fetch(:install_steps)).to include(
         name: "bundled_handoff",
-        command: ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"],
+        command: kettle_jem_handoff_command("--quiet", "--only", "bin/setup"),
         status: "succeeded",
         exitstatus: 0,
         reason: "executed"
@@ -4034,7 +4046,7 @@ RSpec.describe Kettle::Jem do
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--quiet", "--only", "bin/setup"]
+        kettle_jem_handoff_command("--quiet", "--only", "bin/setup")
       )
 
       bootstrap_install = Kettle::Jem::Tasks::InstallTask.run(
@@ -4254,13 +4266,13 @@ RSpec.describe Kettle::Jem do
       expect(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile"))).to include('gem "kettle-jem", ">= 7.0"')
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundled_handoff",
-        command: ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"],
+        command: kettle_jem_handoff_command("--accept-config", "--skip-commit", "--force"),
         status: "succeeded"
       ))
       expect(commands.map { |entry| entry.fetch(:command) }).to include(
         ["bin/setup"],
         curated_binstubs,
-        ["bundle", "exec", "kettle-jem", "--accept-config", "--skip-commit", "--force"]
+        kettle_jem_handoff_command("--accept-config", "--skip-commit", "--force")
       )
     end
   end
@@ -5738,7 +5750,7 @@ RSpec.describe Kettle::Jem do
       expect(signature).to include("VERSION: String")
       expect(commands).to include(
         %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums],
-        ["bundle", "exec", "kettle-jem", "--skip-commit", "--only", "example-gem.gemspec"]
+        kettle_jem_handoff_command("--skip-commit", "--only", "example-gem.gemspec")
       )
     end
   end
@@ -12308,6 +12320,8 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
+      expect(direct_block).to include('require "nomono/bundler"')
+      expect(direct_block).not_to include('Gem::Specification.find_all_by_name("nomono")')
       expect(direct_block).not_to include(
         'unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )

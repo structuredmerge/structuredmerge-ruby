@@ -3,7 +3,7 @@
 # Local path overrides for development.
 # Loaded by the associated non-local gemfile when KETTLE_RB_DEV != "false".
 
-require "nomono/bundler" unless defined?(Nomono)
+require "nomono/bundler"
 
 local_gems = %w[{KJ|KETTLE_RB_LOCAL_GEMS}]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)

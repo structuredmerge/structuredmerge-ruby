@@ -1375,7 +1375,7 @@ module Kettle
 
           {
             name: "bundled_handoff",
-            command: ["bundle", "exec", "kettle-jem"] + handoff_argv(run_options),
+            command: bundled_handoff_command(run_options),
             status: "ready",
             reason: "ready_for_orchestration"
           }
@@ -1447,6 +1447,17 @@ module Kettle
           argv.concat(list_arg("--only", options[:only]))
           argv.concat(list_arg("--include", options[:include]))
           argv
+        end
+
+        def bundled_handoff_command(run_options)
+          [
+            "bundle",
+            "exec",
+            "ruby",
+            "-e",
+            %(load Gem.bin_path("kettle-jem", "kettle-jem")),
+            "--"
+          ] + handoff_argv(run_options)
         end
 
         def value_arg(flag, value)
