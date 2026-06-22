@@ -75,7 +75,7 @@ RSpec.describe Kettle::Jem do
       "nomono" => {
         declaration_names: ["nomono"],
         requirement_args: %("~> 1.0", ">= 1.0.4"),
-        lock_version: "1.0.4",
+        lock_version: "1.0.5",
         requirement_surfaces: [
           "Gemfile",
           "lib/kettle/jem/templates/Gemfile.example"
@@ -83,8 +83,8 @@ RSpec.describe Kettle::Jem do
       },
       "token-resolver" => {
         declaration_names: ["token-resolver"],
-        requirement_args: %("~> 2.0", ">= 2.0.2"),
-        lock_version: "2.0.2",
+        requirement_args: %("~> 2.0", ">= 2.0.3"),
+        lock_version: "2.0.3",
         requirement_surfaces: [
           "kettle-jem.gemspec"
         ]
