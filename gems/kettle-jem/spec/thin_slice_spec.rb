@@ -361,7 +361,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.6")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.3")))
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
-      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.4"))
+      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.6"))
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
@@ -7684,7 +7684,7 @@ RSpec.describe Kettle::Jem do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.4", require: false')
+      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.6", require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
