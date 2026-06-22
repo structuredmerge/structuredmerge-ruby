@@ -7272,6 +7272,15 @@ RSpec.describe Kettle::Jem do
       expect(workflow).to include("          bundle config set --local path vendor/bundle")
       expect(workflow).to include("          bundle install --jobs 1")
     end
+
+    packaged_workflow = File.read(File.join(
+      __dir__,
+      "../lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"
+    ))
+    expect(packaged_workflow).to include("bundler-cache: false")
+    expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
+    expect(packaged_workflow).to include("          bundle config set --local path vendor/bundle")
+    expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
