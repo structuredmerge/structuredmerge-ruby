@@ -115,6 +115,15 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
         ]
       },
+      "yard-timekeeper" => {
+        declaration_names: ["yard-timekeeper"],
+        requirement_args: %("~> 0.2", ">= 0.2.2"),
+        lock_version: "0.2.2",
+        requirement_surfaces: [
+          "gemfiles/modular/documentation.gemfile",
+          "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
+        ]
+      },
       "yard-yaml" => {
         declaration_names: ["yard-yaml"],
         requirement_args: %("~> 0.2", ">= 0.2.1"),
