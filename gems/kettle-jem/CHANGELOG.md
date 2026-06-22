@@ -51,6 +51,7 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - Generated main Gemfiles now require `nomono` >= 1.0.6.
+- Generated gemspecs now require `version_gem` >= 1.1.13.
 - Gemfile, gemspec, Appraisal, and Rakefile template merging now derives Ruby
   call source ranges and static string values from Prism nodes so heredoc
   string arguments are preserved transparently.
