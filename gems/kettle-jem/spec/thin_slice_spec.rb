@@ -7247,6 +7247,33 @@ RSpec.describe Kettle::Jem do
     expect(described_class::RRRRB_MATRIX.fetch("ruby-2.4").rails_appraisals).to include("4.2.11.3", "5.2.8.1")
   end
 
+  it "serializes TruffleRuby 25 setup-ruby workaround in generated CI workflows" do
+    ci = {
+      default_branch: "main",
+      exec_cmd: "kettle-test",
+      ruby_versions: ["truffleruby-25.0"]
+    }
+    workflows = [
+      described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, "", {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      })
+    ]
+
+    workflows.each do |workflow|
+      expect(workflow).to include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' }}")
+      expect(workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
+      expect(workflow).to include("        if: ${{ matrix.ruby == 'truffleruby-25.0' }}")
+      expect(workflow).to include("          bundle config set --local path vendor/bundle")
+      expect(workflow).to include("          bundle install --jobs 1")
+    end
+  end
+
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

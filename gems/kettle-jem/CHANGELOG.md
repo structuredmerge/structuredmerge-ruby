@@ -63,6 +63,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated README and workflow templates now treat Ruby 4.0 as MRI current,
   add discrete JRuby 10.0 and TruffleRuby 33.0 workflows/badges, and include a
   TruffleRuby HEAD badge pointing at the shared heads workflow.
+- Generated CI workflows now disable `ruby/setup-ruby` Bundler caching for
+  TruffleRuby 25.0 and run a serial Bundler install to avoid its EOL parallel
+  installer crash.
 - Generated funding templates now default missing OpenCollective orgs to
   `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness

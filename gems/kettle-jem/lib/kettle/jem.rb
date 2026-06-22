@@ -12385,6 +12385,7 @@ module Kettle
       ci = facts.fetch(:ci)
       ruby_versions = ci.fetch(:ruby_versions)
       ruby_matrix = ruby_versions.map { |version| "          - \"#{version}\"" }.join("\n")
+      setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
 
       <<~YAML
         name: CI
@@ -12428,13 +12429,7 @@ module Kettle
               - name: Checkout #{package.fetch(:name)}
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-              - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
-                with:
-                  ruby-version: "${{ matrix.ruby }}"
-                  rubygems: "${{ matrix.rubygems }}"
-                  bundler: "${{ matrix.bundler }}"
-                  bundler-cache: true
+        #{setup_ruby}
 
               - name: Tests
                 run: bundle exec #{ci.fetch(:exec_cmd)}
@@ -12453,6 +12448,7 @@ module Kettle
       end.join("\n")
       dimension = framework_matrix.fetch(:dimension)
       label = dimension.split(/[-_]/).map { |part| part[0].to_s.upcase + part[1..].to_s }.join(" ")
+      setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
 
       <<~YAML
         name: #{label} CI
@@ -12500,13 +12496,7 @@ module Kettle
               - name: Checkout
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-              - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
-                with:
-                  ruby-version: "${{ matrix.ruby }}"
-                  rubygems: "${{ matrix.rubygems }}"
-                  bundler: "${{ matrix.bundler }}"
-                  bundler-cache: true
+        #{setup_ruby}
 
               - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
                 id: bundleAppraisalAttempt1
@@ -12521,6 +12511,25 @@ module Kettle
               - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
                 run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
       YAML
+    end
+
+    def github_actions_setup_ruby_steps(indent:)
+      yaml = <<~YAML
+        - name: Setup Ruby & RubyGems
+          uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+          with:
+            ruby-version: "${{ matrix.ruby }}"
+            rubygems: "${{ matrix.rubygems }}"
+            bundler: "${{ matrix.bundler }}"
+            bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' }}
+
+        - name: Bundle install for TruffleRuby 25.0
+          if: ${{ matrix.ruby == 'truffleruby-25.0' }}
+          run: |
+            bundle config set --local path vendor/bundle
+            bundle install --jobs 1
+      YAML
+      yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip
     end
 
     def synchronize_github_actions_framework_gemfile(target_path, facts)
