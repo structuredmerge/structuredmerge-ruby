@@ -3988,7 +3988,7 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_steps)).to include(
         name: "rubocop_gradual_autocorrect",
-        command: ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"],
+        command: ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"],
         status: "succeeded",
         exitstatus: 0,
         reason: "executed"
@@ -4024,7 +4024,7 @@ RSpec.describe Kettle::Jem do
           "bootstrap_commit" => "skipped"
         }
       )
-      autocorrect_command = ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+      autocorrect_command = ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
       handoff_command = kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup")
       command_names = commands.map { |entry| entry.fetch(:command) }
       expect(command_names).to include(

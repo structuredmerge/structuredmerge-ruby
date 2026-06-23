@@ -675,7 +675,7 @@ module Kettle
         end
 
         def rubocop_gradual_autocorrect_command
-          ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+          ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
         end
 
         def normal_lockfile_env(project_root, env)
