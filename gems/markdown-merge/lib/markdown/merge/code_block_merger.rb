@@ -36,46 +36,46 @@ module Markdown
       # simplecov:disable integration - DEFAULT_MERGERS lambdas require external gems
       DEFAULT_MERGERS = {
         # Ruby code blocks
-        "ruby" => ->(template, dest, preference, **opts) {
-          require "prism/merge"
+        'ruby' => lambda { |template, dest, preference, **opts|
+          require 'prism/merge'
           CodeBlockMerger.merge_with_prism(template, dest, preference, **opts)
         },
-        "rb" => ->(template, dest, preference, **opts) {
-          require "prism/merge"
+        'rb' => lambda { |template, dest, preference, **opts|
+          require 'prism/merge'
           CodeBlockMerger.merge_with_prism(template, dest, preference, **opts)
         },
 
         # YAML code blocks
-        "yaml" => ->(template, dest, preference, **opts) {
-          require "psych/merge"
+        'yaml' => lambda { |template, dest, preference, **opts|
+          require 'psych/merge'
           CodeBlockMerger.merge_with_psych(template, dest, preference, **opts)
         },
-        "yml" => ->(template, dest, preference, **opts) {
-          require "psych/merge"
+        'yml' => lambda { |template, dest, preference, **opts|
+          require 'psych/merge'
           CodeBlockMerger.merge_with_psych(template, dest, preference, **opts)
         },
 
         # JSON code blocks
-        "json" => ->(template, dest, preference, **opts) {
-          require "json/merge"
+        'json' => lambda { |template, dest, preference, **opts|
+          require 'json/merge'
           CodeBlockMerger.merge_with_json(template, dest, preference, **opts)
         },
 
         # Markdown code blocks
-        "markdown" => ->(template, dest, preference, **opts) {
-          require "markdown/merge"
+        'markdown' => lambda { |template, dest, preference, **opts|
+          require 'markdown/merge'
           CodeBlockMerger.merge_with_markdown(template, dest, preference, **opts)
         },
-        "md" => ->(template, dest, preference, **opts) {
-          require "markdown/merge"
+        'md' => lambda { |template, dest, preference, **opts|
+          require 'markdown/merge'
           CodeBlockMerger.merge_with_markdown(template, dest, preference, **opts)
         },
 
         # TOML code blocks
-        "toml" => ->(template, dest, preference, **opts) {
-          require "toml/merge"
+        'toml' => lambda { |template, dest, preference, **opts|
+          require 'toml/merge'
           CodeBlockMerger.merge_with_toml(template, dest, preference, **opts)
-        },
+        }
       }.freeze
       # simplecov:enable
 
@@ -125,7 +125,7 @@ module Markdown
             preference: preference,
             runtime_session: runtime_session,
             parent_operation: parent_operation,
-            **opts,
+            **opts
           )
         end
 
@@ -133,10 +133,10 @@ module Markdown
       end
 
       def merge_code_blocks_without_runtime(template_node, dest_node, preference:, **opts)
-        return not_merged("inner-merge disabled") unless @enabled
+        return not_merged('inner-merge disabled') unless @enabled
 
         language = extract_language(template_node) || extract_language(dest_node)
-        return not_merged("no language specified") unless language
+        return not_merged('no language specified') unless language
 
         template_content = extract_content(template_node)
         dest_content = extract_content(dest_node)
@@ -147,20 +147,21 @@ module Markdown
           dest_content: dest_content,
           preference: preference,
           reference_node: dest_node,
-          **opts,
+          **opts
         )
       end
 
       private
 
-      def merge_code_blocks_with_runtime(template_node, dest_node, preference:, runtime_session:, parent_operation:, **opts)
+      def merge_code_blocks_with_runtime(template_node, dest_node, preference:, runtime_session:, parent_operation:,
+                                         **opts)
         operation = build_runtime_operation(
           template_node: template_node,
           dest_node: dest_node,
           preference: preference,
           runtime_session: runtime_session,
           parent_operation: parent_operation,
-          **opts,
+          **opts
         )
 
         parent_operation.add_child(operation)
@@ -173,9 +174,10 @@ module Markdown
             operation_id: operation.operation_id,
             depth: parent_frame ? parent_frame.depth + 1 : 1,
             surface_path: operation.surface.address,
-            language_chain: [*(parent_frame&.language_chain || [:markdown]), operation.surface.effective_language].compact,
+            language_chain: [*(parent_frame&.language_chain || [:markdown]),
+                             operation.surface.effective_language].compact
           ),
-          delegate: delegate,
+          delegate: delegate
         )
 
         unless delegate
@@ -189,9 +191,9 @@ module Markdown
               message: reason,
               metadata: {
                 capability: :merge,
-                language: operation.surface.effective_language,
-              },
-            ),
+                language: operation.surface.effective_language
+              }
+            )
           )
           return not_merged(reason).merge(runtime_operation_id: operation.operation_id)
         end
@@ -212,12 +214,12 @@ module Markdown
             runtime_operation_id: operation.operation_id,
             runtime_surface_path: operation.surface.address,
             unresolved_cases: child_result.unresolved_cases,
-            metadata: child_result.metadata,
+            metadata: child_result.metadata
           }
         else
-          not_merged(child_result.metadata[:reason] || "merger declined").merge(
+          not_merged(child_result.metadata[:reason] || 'merger declined').merge(
             stats: child_result.metadata[:stats] || {},
-            runtime_operation_id: operation.operation_id,
+            runtime_operation_id: operation.operation_id
           )
         end
       end
@@ -235,8 +237,8 @@ module Markdown
           reconstruction_strategy: :portable_write,
           metadata: {
             fence_info: reference_node&.respond_to?(:fence_info) ? reference_node.fence_info : nil,
-            language: language,
-          }.compact,
+            language: language
+          }.compact
         )
 
         Ast::Merge::Runtime::Operation.new(
@@ -252,8 +254,8 @@ module Markdown
             unresolved_policy: Ast::Merge::UnresolvedPolicy.coerce(opts[:unresolved_policy]).to_h,
             template_content: extract_content(template_node),
             destination_content: extract_content(dest_node),
-            reference_node: reference_node,
-          },
+            reference_node: reference_node
+          }
         )
       end
 
@@ -288,17 +290,17 @@ module Markdown
       def build_runtime_delegates
         [
           Ast::Merge::Runtime::Delegate.new(
-            name: "markdown-code-block-inner-merge",
+            name: 'markdown-code-block-inner-merge',
             priority: 100,
             surface_kinds: [:markdown_fenced_code_block],
             languages: mergers.keys,
-            capabilities: {merge: [:markdown_fenced_code_block]},
+            capabilities: { merge: [:markdown_fenced_code_block] },
             merge: method(:merge_runtime_surface),
             metadata: {
               source: :markdown_merge,
-              languages: mergers.keys.sort,
-            },
-          ),
+              languages: mergers.keys.sort
+            }
+          )
         ]
       end
 
@@ -311,7 +313,7 @@ module Markdown
           reference_node: operation.options[:reference_node],
           add_template_only_nodes: operation.options.fetch(:add_template_only_nodes, false),
           resolution_mode: operation.options[:resolution_mode],
-          unresolved_policy: operation.options[:unresolved_policy],
+          unresolved_policy: operation.options[:unresolved_policy]
         )
 
         if result[:merged]
@@ -326,8 +328,8 @@ module Markdown
               stats: result[:stats] || {},
               language: operation.surface.effective_language,
               delegate_name: operation.delegate_name,
-              session_policy: session.policy_context,
-            }.merge(result[:metadata] || {}),
+              session_policy: session.policy_context
+            }.merge(result[:metadata] || {})
           )
         else
           operation.add_diagnostic(
@@ -338,13 +340,13 @@ module Markdown
               surface_path: operation.surface.address,
               message: result[:reason].to_s,
               metadata: {
-                language: operation.surface.effective_language,
-              },
-            ),
+                language: operation.surface.effective_language
+              }
+            )
           )
 
           Ast::Merge::Runtime::ChildResult.new(
-            replacement_text: "",
+            replacement_text: '',
             diagnostics: operation.diagnostics,
             capabilities_used: [:delegated_child_merge],
             capabilities_missing: [:language_specific_merge],
@@ -354,14 +356,14 @@ module Markdown
               stats: result[:stats] || {},
               language: operation.surface.effective_language,
               delegate_name: operation.delegate_name,
-              session_policy: session.policy_context,
-            }.merge(result[:metadata] || {}),
+              session_policy: session.policy_context
+            }.merge(result[:metadata] || {})
           )
         end
       end
 
       def perform_code_block_merge(language:, template_content:, dest_content:, preference:, reference_node:, **opts)
-        return not_merged("no language specified") unless language
+        return not_merged('no language specified') unless language
 
         merger = @mergers[language.to_s.downcase]
         return not_merged("no merger for language: #{language}") unless merger
@@ -370,7 +372,7 @@ module Markdown
           return {
             merged: true,
             content: rebuild_code_block(language, dest_content, reference_node),
-            stats: {decision: :identical},
+            stats: { decision: :identical }
           }
         end
 
@@ -386,7 +388,7 @@ module Markdown
               dest_content: dest_content,
               preference: preference,
               reference_node: reference_node,
-              **opts,
+              **opts
             )
             metadata[:delegated_apply_renderer] = delegated_apply_renderer(
               merger: merger,
@@ -395,19 +397,19 @@ module Markdown
               dest_content: dest_content,
               preference: preference,
               reference_node: reference_node,
-              **opts,
+              **opts
             )
             {
               merged: true,
               content: rebuild_code_block(language, result[:content], reference_node),
               stats: result[:stats] || {},
               unresolved_cases: result[:unresolved_cases] || [],
-              metadata: metadata,
+              metadata: metadata
             }
           else
-            not_merged(result[:reason] || "merger declined").merge(
+            not_merged(result[:reason] || 'merger declined').merge(
               stats: result[:stats] || {},
-              metadata: result[:metadata] || {},
+              metadata: result[:metadata] || {}
             )
           end
         rescue LoadError => e
@@ -425,12 +427,13 @@ module Markdown
 
       def unsupported_runtime_reason_for(surface)
         language = surface.effective_language || surface.declared_language
-        return "no language specified" unless language
+        return 'no language specified' unless language
 
         "no merger for language: #{language}"
       end
 
-      def root_apply_candidates_by_case_id(merger:, unresolved_cases:, language:, template_content:, dest_content:, preference:, reference_node:, **opts)
+      def root_apply_candidates_by_case_id(merger:, unresolved_cases:, language:, template_content:, dest_content:,
+                                           preference:, reference_node:, **opts)
         cases = Array(unresolved_cases)
         return {} unless cases.one?
 
@@ -446,9 +449,9 @@ module Markdown
                 preference: preference,
                 case_id: resolution_case.case_id,
                 selection: :template,
-                **opts,
+                **opts
               ),
-              reference_node,
+              reference_node
             ),
             destination: rebuild_code_block(
               language,
@@ -459,15 +462,16 @@ module Markdown
                 preference: preference,
                 case_id: resolution_case.case_id,
                 selection: :destination,
-                **opts,
+                **opts
               ),
-              reference_node,
-            ),
-          },
+              reference_node
+            )
+          }
         }
       end
 
-      def delegated_apply_renderer(merger:, language:, template_content:, dest_content:, preference:, reference_node:, **opts)
+      def delegated_apply_renderer(merger:, language:, template_content:, dest_content:, preference:, reference_node:,
+                                   **opts)
         lambda do |selections|
           delegated_result = delegated_merge_result_for(
             merger: merger,
@@ -475,18 +479,18 @@ module Markdown
             dest_content: dest_content,
             preference: preference,
             apply_unresolved_resolutions: selections,
-            **opts,
+            **opts
           )
           {
             content: rebuild_code_block(language, delegated_result[:content].to_s, reference_node),
             unresolved_cases: delegated_result[:unresolved_cases] || [],
-            metadata: delegated_result[:metadata] || {},
+            metadata: delegated_result[:metadata] || {}
           }
         end
       end
 
       def merged_delegate_content_for(merger:, template_content:, dest_content:, preference:, case_id: nil, selection: nil,
-        apply_unresolved_resolutions: nil, **opts)
+                                      apply_unresolved_resolutions: nil, **opts)
         delegated_merge_result_for(
           merger: merger,
           template_content: template_content,
@@ -495,18 +499,18 @@ module Markdown
           case_id: case_id,
           selection: selection,
           apply_unresolved_resolutions: apply_unresolved_resolutions,
-          **opts,
+          **opts
         )[:content].to_s
       end
 
       def delegated_merge_result_for(merger:, template_content:, dest_content:, preference:, case_id: nil, selection: nil,
-        apply_unresolved_resolutions: nil, **opts)
+                                     apply_unresolved_resolutions: nil, **opts)
         merger.call(
           template_content,
           dest_content,
           preference,
           **opts,
-          apply_unresolved_resolutions: apply_unresolved_resolutions || {case_id => selection},
+          apply_unresolved_resolutions: apply_unresolved_resolutions || { case_id => selection }
         )
       end
 
@@ -538,12 +542,12 @@ module Markdown
       # @param content [String] The merged content
       # @param reference_node [Object] Node to copy fence style from
       # @return [String] The reconstructed code block
-      def rebuild_code_block(language, content, reference_node)
+      def rebuild_code_block(language, content, _reference_node)
         # Ensure content ends with newline for proper fence closing
         content = content.chomp + "\n" unless content.end_with?("\n")
 
         # Use backticks as default fence
-        fence = "```"
+        fence = '```'
 
         "#{fence}#{language}\n#{content}#{fence}\n"
       end
@@ -553,7 +557,7 @@ module Markdown
       # @param reason [String] Why merge was not performed
       # @return [Hash] Not-merged result hash
       def not_merged(reason)
-        {merged: false, reason: reason}
+        { merged: false, reason: reason }
       end
 
       def unwrap_code_block_node(node)
@@ -568,7 +572,7 @@ module Markdown
         rescue NoMethodError
           next
         rescue Exception => e
-          next if e.class.name == "RSpec::Mocks::MockExpectationError"
+          next if e.class.name == 'RSpec::Mocks::MockExpectationError'
 
           raise
         end
@@ -592,16 +596,18 @@ module Markdown
             preference: preference,
             add_template_only_nodes: opts.fetch(:add_template_only_nodes, false),
             resolution_mode: opts.fetch(:resolution_mode, :eager),
-            unresolved_policy: opts[:unresolved_policy],
+            unresolved_policy: opts[:unresolved_policy]
           )
           merge_result = merger.merge_result
-          merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions]) if opts[:apply_unresolved_resolutions]
+          if opts[:apply_unresolved_resolutions]
+            merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions])
+          end
 
           {
             merged: true,
             content: merge_result.to_s,
             stats: merger.stats,
-            unresolved_cases: merge_result.unresolved_cases,
+            unresolved_cases: merge_result.unresolved_cases
           }
         end
 
@@ -620,16 +626,18 @@ module Markdown
             preference: preference,
             add_template_only_nodes: opts.fetch(:add_template_only_nodes, false),
             resolution_mode: opts.fetch(:resolution_mode, :eager),
-            unresolved_policy: opts[:unresolved_policy],
+            unresolved_policy: opts[:unresolved_policy]
           )
           merge_result = merger.merge_result
-          merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions]) if opts[:apply_unresolved_resolutions]
+          if opts[:apply_unresolved_resolutions]
+            merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions])
+          end
 
           {
             merged: true,
             content: merge_result.to_yaml,
             stats: merger.stats,
-            unresolved_cases: merge_result.unresolved_cases,
+            unresolved_cases: merge_result.unresolved_cases
           }
         end
 
@@ -648,16 +656,18 @@ module Markdown
             preference: preference,
             add_template_only_nodes: opts.fetch(:add_template_only_nodes, false),
             resolution_mode: opts.fetch(:resolution_mode, :eager),
-            unresolved_policy: opts[:unresolved_policy],
+            unresolved_policy: opts[:unresolved_policy]
           )
           merge_result = merger.merge_result
-          merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions]) if opts[:apply_unresolved_resolutions]
+          if opts[:apply_unresolved_resolutions]
+            merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions])
+          end
 
           {
             merged: true,
             content: merge_result.to_json,
             stats: merger.stats,
-            unresolved_cases: merge_result.unresolved_cases,
+            unresolved_cases: merge_result.unresolved_cases
           }
         end
 
@@ -670,7 +680,7 @@ module Markdown
         def merge_with_markdown(template, dest, preference, **opts)
           nested_code_block_merger = CodeBlockMerger.new(
             mergers: opts.fetch(:nested_mergers, {}),
-            enabled: opts.fetch(:inner_merge_code_blocks, true),
+            enabled: opts.fetch(:inner_merge_code_blocks, true)
           )
           merger = ::Markdown::Merge::SmartMerger.new(
             template,
@@ -679,10 +689,12 @@ module Markdown
             add_template_only_nodes: opts.fetch(:add_template_only_nodes, false),
             inner_merge_code_blocks: nested_code_block_merger,
             resolution_mode: opts.fetch(:resolution_mode, :eager),
-            unresolved_policy: opts[:unresolved_policy],
+            unresolved_policy: opts[:unresolved_policy]
           )
           merge_result = merger.merge_result
-          merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions]) if opts[:apply_unresolved_resolutions]
+          if opts[:apply_unresolved_resolutions]
+            merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions])
+          end
 
           {
             merged: true,
@@ -690,8 +702,8 @@ module Markdown
             stats: merger.stats,
             unresolved_cases: merge_result.unresolved_cases,
             metadata: {
-              nested_runtime_session: merger.runtime_session&.to_h,
-            },
+              nested_runtime_session: merger.runtime_session&.to_h
+            }
           }
         end
 
@@ -710,16 +722,18 @@ module Markdown
             preference: preference,
             add_template_only_nodes: opts.fetch(:add_template_only_nodes, false),
             resolution_mode: opts.fetch(:resolution_mode, :eager),
-            unresolved_policy: opts[:unresolved_policy],
+            unresolved_policy: opts[:unresolved_policy]
           )
           merge_result = merger.merge_result
-          merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions]) if opts[:apply_unresolved_resolutions]
+          if opts[:apply_unresolved_resolutions]
+            merge_result.apply_unresolved_resolutions!(opts[:apply_unresolved_resolutions])
+          end
 
           {
             merged: true,
             content: merge_result.to_toml,
             stats: merger.stats,
-            unresolved_cases: merge_result.unresolved_cases,
+            unresolved_cases: merge_result.unresolved_cases
           }
         end
       end

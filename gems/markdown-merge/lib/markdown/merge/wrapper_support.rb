@@ -11,17 +11,17 @@ module Markdown
         TableMatchAlgorithm: Markdown::Merge::TableMatchAlgorithm,
         TableMatchRefiner: Markdown::Merge::TableMatchRefiner,
         CodeBlockMerger: Markdown::Merge::CodeBlockMerger,
-        NodeTypeNormalizer: Markdown::Merge::NodeTypeNormalizer,
+        NodeTypeNormalizer: Markdown::Merge::NodeTypeNormalizer
       }.freeze
 
       WRAPPER_AUTOLOADS = {
-        DebugLogger: "debug_logger",
-        CommentTracker: "comment_tracker",
-        FreezeNode: "freeze_node",
-        FileAnalysis: "file_analysis",
-        PartialTemplateMerger: "partial_template_merger",
-        SmartMerger: "smart_merger",
-        Backend: "backend",
+        DebugLogger: 'debug_logger',
+        CommentTracker: 'comment_tracker',
+        FreezeNode: 'freeze_node',
+        FileAnalysis: 'file_analysis',
+        PartialTemplateMerger: 'partial_template_merger',
+        SmartMerger: 'smart_merger',
+        Backend: 'backend'
       }.freeze
 
       module_function
@@ -38,7 +38,8 @@ module Markdown
       )
         define_error_classes!(wrapper_module)
         define_constant_unless_present(wrapper_module, :DEFAULT_FREEZE_TOKEN, default_freeze_token)
-        define_constant_unless_present(wrapper_module, :DEFAULT_INNER_MERGE_CODE_BLOCKS, default_inner_merge_code_blocks)
+        define_constant_unless_present(wrapper_module, :DEFAULT_INNER_MERGE_CODE_BLOCKS,
+                                       default_inner_merge_code_blocks)
 
         SHARED_REEXPORTS.each do |name, value|
           define_constant_unless_present(wrapper_module, name, value)
@@ -56,7 +57,7 @@ module Markdown
           require_path: require_prefix,
           merger_class: merger_class,
           test_source: test_source,
-          category: category,
+          category: category
         )
       end
 
@@ -68,7 +69,10 @@ module Markdown
 
       def configure_file_analysis_subclass!(klass, default_backend:, default_parser_options: nil)
         install_singleton_value_method!(klass, :default_backend, default_backend)
-        install_singleton_value_method!(klass, :default_parser_options, default_parser_options) if default_parser_options
+        return unless default_parser_options
+
+        install_singleton_value_method!(klass, :default_parser_options,
+                                        default_parser_options)
       end
 
       def configure_smart_merger_subclass!(
@@ -83,14 +87,27 @@ module Markdown
       )
         install_singleton_value_method!(klass, :default_backend, default_backend)
         install_singleton_value_method!(klass, :default_freeze_token, default_freeze_token) if default_freeze_token
-        install_singleton_value_method!(klass, :default_inner_merge_code_blocks, default_inner_merge_code_blocks) unless default_inner_merge_code_blocks.nil?
-        install_singleton_value_method!(klass, :default_parser_options, default_parser_options) if default_parser_options
+        unless default_inner_merge_code_blocks.nil?
+          install_singleton_value_method!(klass, :default_inner_merge_code_blocks,
+                                          default_inner_merge_code_blocks)
+        end
+        if default_parser_options
+          install_singleton_value_method!(klass, :default_parser_options,
+                                          default_parser_options)
+        end
         install_singleton_value_method!(klass, :file_analysis_class, file_analysis_class) if file_analysis_class
-        install_singleton_value_method!(klass, :template_parse_error_class, template_parse_error_class) if template_parse_error_class
-        install_singleton_value_method!(klass, :destination_parse_error_class, destination_parse_error_class) if destination_parse_error_class
+        if template_parse_error_class
+          install_singleton_value_method!(klass, :template_parse_error_class,
+                                          template_parse_error_class)
+        end
+        return unless destination_parse_error_class
+
+        install_singleton_value_method!(klass, :destination_parse_error_class,
+                                        destination_parse_error_class)
       end
 
-      def configure_partial_template_merger_subclass!(klass, default_backend:, file_analysis_class:, smart_merger_class:)
+      def configure_partial_template_merger_subclass!(klass, default_backend:, file_analysis_class:,
+                                                      smart_merger_class:)
         install_singleton_value_method!(klass, :default_backend, default_backend)
         install_singleton_value_method!(klass, :file_analysis_class, file_analysis_class)
         install_singleton_value_method!(klass, :smart_merger_class, smart_merger_class)
@@ -113,12 +130,12 @@ module Markdown
         define_constant_unless_present(
           wrapper_module,
           :TemplateParseError,
-          Class.new(wrapper_module.const_get(:ParseError)),
+          Class.new(wrapper_module.const_get(:ParseError))
         )
         define_constant_unless_present(
           wrapper_module,
           :DestinationParseError,
-          Class.new(wrapper_module.const_get(:ParseError)),
+          Class.new(wrapper_module.const_get(:ParseError))
         )
       end
       private_class_method :define_error_classes!
@@ -161,7 +178,7 @@ module Markdown
           require_path: require_path,
           merger_class: merger_class,
           test_source: test_source,
-          category: category,
+          category: category
         )
       end
       private_class_method :register_merge_gem!

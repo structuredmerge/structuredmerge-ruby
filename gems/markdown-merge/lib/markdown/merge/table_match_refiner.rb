@@ -53,7 +53,7 @@ module Markdown
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context (may contain :template_analysis, :dest_analysis)
       # @return [Array<MatchResult>] Array of table matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         template_tables = extract_tables(template_nodes)
         dest_tables = extract_tables(dest_nodes)
 
@@ -89,23 +89,19 @@ module Markdown
       # @return [Boolean]
       def table_node?(node)
         # Check if it's a typed wrapper node first
-        if Ast::Merge::NodeTyping.typed_node?(node)
-          return Ast::Merge::NodeTyping.merge_type_for(node) == :table
-        end
+        return Ast::Merge::NodeTyping.merge_type_for(node) == :table if Ast::Merge::NodeTyping.typed_node?(node)
 
         # Check merge_type directly (wrapped nodes from NodeTypeNormalizer)
-        if node.respond_to?(:merge_type) && node.merge_type
-          return node.merge_type == :table
-        end
+        return node.merge_type == :table if node.respond_to?(:merge_type) && node.merge_type
 
         # Check raw type (string comparison for tree_haver nodes)
         if node.respond_to?(:type)
           node_type = node.type
-          return node_type == :table || node_type == "table" || node_type.to_s == "table"
+          return [:table, 'table'].include?(node_type) || node_type.to_s == 'table'
         end
 
         # Fallback: class name check
-        return true if node.class.name.to_s.include?("Table")
+        return true if node.class.name.to_s.include?('Table')
 
         false
       end
@@ -126,7 +122,7 @@ module Markdown
           total_tables_a: total_t,
           total_tables_b: total_d,
           backend: @backend,
-          **algorithm_options,
+          **algorithm_options
         )
 
         algorithm.call(t_table, d_table)

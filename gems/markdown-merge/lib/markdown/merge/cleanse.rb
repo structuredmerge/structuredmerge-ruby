@@ -34,11 +34,11 @@ module Markdown
     # @see Cleanse::BlockSpacing For fixing missing blank lines between block elements
     # @api public
     module Cleanse
-      autoload :BlockSpacing, "markdown/merge/cleanse/block_spacing"
-      autoload :CodeFenceSpacing, "markdown/merge/cleanse/code_fence_spacing"
-      autoload :CondensedLinkRefs, "markdown/merge/cleanse/condensed_link_refs"
-      autoload :ListMarkerDuplication, "markdown/merge/cleanse/list_marker_duplication"
-      autoload :TemplatingCorruption, "markdown/merge/cleanse/templating_corruption"
+      autoload :BlockSpacing, 'markdown/merge/cleanse/block_spacing'
+      autoload :CodeFenceSpacing, 'markdown/merge/cleanse/code_fence_spacing'
+      autoload :CondensedLinkRefs, 'markdown/merge/cleanse/condensed_link_refs'
+      autoload :ListMarkerDuplication, 'markdown/merge/cleanse/list_marker_duplication'
+      autoload :TemplatingCorruption, 'markdown/merge/cleanse/templating_corruption'
     end
   end
 end

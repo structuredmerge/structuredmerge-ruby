@@ -10,7 +10,7 @@ module Markdown
           ListMarkerDuplication,
           CondensedLinkRefs,
           CodeFenceSpacing,
-          BlockSpacing,
+          BlockSpacing
         ].freeze
 
         attr_reader :source, :passes, :issues
@@ -61,8 +61,8 @@ module Markdown
             issues.concat(Array(pass.issues))
           elsif pass_issues?(pass)
             issues << {
-              type: pass.class.name.split("::").last.gsub(/([a-z])([A-Z])/, '\1_\2').downcase.to_sym,
-              description: "#{pass.class.name} detected malformed content",
+              type: pass.class.name.split('::').last.gsub(/([a-z])([A-Z])/, '\1_\2').downcase.to_sym,
+              description: "#{pass.class.name} detected malformed content"
             }
           end
         end

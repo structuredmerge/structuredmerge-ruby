@@ -63,8 +63,7 @@ module Markdown
 
       # @return [Ast::Merge::Runtime::Session, nil] Runtime session for this merge
       attr_reader :runtime_session
-      attr_reader :corruption_handling
-      attr_reader :resolution_mode, :unresolved_policy
+      attr_reader :corruption_handling, :resolution_mode, :unresolved_policy
 
       # Creates a new SmartMerger for intelligent Markdown file merging.
       #
@@ -171,7 +170,7 @@ module Markdown
         @corruption_handling = ::Ast::Merge::Healer.normalize_mode(corruption_handling)
         @match_refiner = match_refiner || default_match_refiner(
           inner_merge_lists: inner_merge_lists,
-          inner_merge_code_blocks: inner_merge_code_blocks,
+          inner_merge_code_blocks: inner_merge_code_blocks
         )
         @node_typing = node_typing
         @resolution_mode = resolution_mode
@@ -185,27 +184,28 @@ module Markdown
 
         # Set up code block merger
         @code_block_merger = case inner_merge_code_blocks
-        when true
-          CodeBlockMerger.new
-        when false
-          nil
-        when CodeBlockMerger
-          inner_merge_code_blocks
-        else
-          raise ArgumentError, "inner_merge_code_blocks must be true, false, or a CodeBlockMerger instance"
-        end
+                             when true
+                               CodeBlockMerger.new
+                             when false
+                               nil
+                             when CodeBlockMerger
+                               inner_merge_code_blocks
+                             else
+                               raise ArgumentError,
+                                     'inner_merge_code_blocks must be true, false, or a CodeBlockMerger instance'
+                             end
 
         # Set up list merger
         @list_merger = case inner_merge_lists
-        when true
-          ListMerger.new
-        when false
-          nil
-        when ListMerger
-          inner_merge_lists
-        else
-          raise ArgumentError, "inner_merge_lists must be true, false, or a ListMerger instance"
-        end
+                       when true
+                         ListMerger.new
+                       when false
+                         nil
+                       when ListMerger
+                         inner_merge_lists
+                       else
+                         raise ArgumentError, 'inner_merge_lists must be true, false, or a ListMerger instance'
+                       end
 
         # Parse template
         begin
@@ -213,7 +213,7 @@ module Markdown
             template_content,
             freeze_token: freeze_token,
             signature_generator: signature_generator,
-            **parser_options,
+            **parser_options
           )
         rescue StandardError => e
           raise template_parse_error_class.new(errors: [e])
@@ -225,7 +225,7 @@ module Markdown
             dest_content,
             freeze_token: freeze_token,
             signature_generator: signature_generator,
-            **parser_options,
+            **parser_options
           )
         rescue StandardError => e
           raise destination_parse_error_class.new(errors: [e])
@@ -237,7 +237,7 @@ module Markdown
           template_analysis: @template_analysis,
           dest_analysis: @dest_analysis,
           resolution_mode: @resolution_mode,
-          unresolved_policy: @unresolved_policy,
+          unresolved_policy: @unresolved_policy
         )
         @runtime_session = nil
         @runtime_root_operation = nil
@@ -294,21 +294,21 @@ module Markdown
       def merge_result
         return @merge_result if @merge_result
 
-        @merge_result = DebugLogger.time("SmartMergerBase#merge") do
+        @merge_result = DebugLogger.time('SmartMergerBase#merge') do
           prepare_runtime_session!
-          alignment = DebugLogger.time("SmartMergerBase#align") do
+          alignment = DebugLogger.time('SmartMergerBase#align') do
             @aligner.align
           end
 
-          DebugLogger.debug("Alignment complete", {
-            total_entries: alignment.size,
-            matches: alignment.count { |e| e[:type] == :match },
-            template_only: alignment.count { |e| e[:type] == :template_only },
-            dest_only: alignment.count { |e| e[:type] == :dest_only },
-          })
+          DebugLogger.debug('Alignment complete', {
+                              total_entries: alignment.size,
+                              matches: alignment.count { |e| e[:type] == :match },
+                              template_only: alignment.count { |e| e[:type] == :template_only },
+                              dest_only: alignment.count { |e| e[:type] == :dest_only }
+                            })
 
           # Process alignment using OutputBuilder
-          builder, stats, frozen_blocks, conflicts, unresolved_cases = DebugLogger.time("SmartMergerBase#process") do
+          builder, stats, frozen_blocks, conflicts, unresolved_cases = DebugLogger.time('SmartMergerBase#process') do
             process_alignment(alignment)
           end
 
@@ -321,7 +321,8 @@ module Markdown
 
           # Apply post-processing transformations
           content, problems = apply_post_processing(content, problems)
-          complete_runtime_session!(content: content, stats: stats, problems: problems, unresolved_cases: unresolved_cases)
+          complete_runtime_session!(content: content, stats: stats, problems: problems,
+                                    unresolved_cases: unresolved_cases)
 
           # Get final content from OutputBuilder
           MergeResult.new(
@@ -331,7 +332,7 @@ module Markdown
             frozen_blocks: frozen_blocks,
             stats: stats,
             problems: problems,
-            unresolved_cases: unresolved_cases,
+            unresolved_cases: unresolved_cases
           )
         end
       end
@@ -343,11 +344,11 @@ module Markdown
         result = merge_result
         template_analysis_debug = {
           valid: @template_analysis&.valid? || false,
-          statements: @template_analysis&.statements&.size || 0,
+          statements: @template_analysis&.statements&.size || 0
         }
         dest_analysis_debug = {
           valid: @dest_analysis&.valid? || false,
-          statements: @dest_analysis&.statements&.size || 0,
+          statements: @dest_analysis&.statements&.size || 0
         }
 
         {
@@ -360,13 +361,13 @@ module Markdown
             remove_template_missing_nodes: @remove_template_missing_nodes,
             corruption_handling: @corruption_handling,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result.stats,
           decisions: result.stats,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -384,26 +385,26 @@ module Markdown
           surface_kind: :markdown_document,
           declared_language: :markdown,
           effective_language: :markdown,
-          address: "document[0]",
+          address: 'document[0]',
           reconstruction_strategy: :portable_write,
           metadata: {
-            backend: @template_analysis.respond_to?(:backend) ? @template_analysis.backend : nil,
-          }.compact,
+            backend: @template_analysis.respond_to?(:backend) ? @template_analysis.backend : nil
+          }.compact
         )
         registry = Ast::Merge::Runtime::DelegationRegistry.new(
           delegates: runtime_delegates,
           metadata: {
-            source: :markdown_merge,
-          },
+            source: :markdown_merge
+          }
         )
 
         @runtime_session = Ast::Merge::Runtime::Session.new(
           policy_context: runtime_policy_context,
           metadata: runtime_metadata,
-          delegation_registry: registry,
+          delegation_registry: registry
         )
         @runtime_root_operation = Ast::Merge::Runtime::Operation.new(
-          operation_id: "markdown-document-root",
+          operation_id: 'markdown-document-root',
           surface: root_surface,
           template_fragment: @template_analysis.source.to_s,
           destination_fragment: @dest_analysis.source.to_s,
@@ -413,8 +414,8 @@ module Markdown
             inner_merge_lists: !@list_merger.nil?,
             corruption_handling: @corruption_handling,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
-          },
+            unresolved_policy: @unresolved_policy.to_h
+          }
         )
         @runtime_session.register(
           @runtime_root_operation,
@@ -422,9 +423,9 @@ module Markdown
             operation_id: @runtime_root_operation.operation_id,
             depth: 0,
             surface_path: root_surface.address,
-            language_chain: [:markdown],
+            language_chain: [:markdown]
           ),
-          delegate: @runtime_session.resolve_delegate_for(root_surface),
+          delegate: @runtime_session.resolve_delegate_for(root_surface)
         )
       end
 
@@ -444,8 +445,8 @@ module Markdown
           metadata: {
             child_operation_ids: @runtime_root_operation.children.map(&:operation_id),
             stats: stats,
-            problems: problems.all,
-          },
+            problems: problems.all
+          }
         )
 
         if child_result.unresolved?
@@ -462,7 +463,7 @@ module Markdown
           remove_template_missing_nodes: @remove_template_missing_nodes,
           corruption_handling: @corruption_handling,
           resolution_mode: @resolution_mode,
-          unresolved_policy: @unresolved_policy.to_h,
+          unresolved_policy: @unresolved_policy.to_h
         }
       end
 
@@ -470,15 +471,15 @@ module Markdown
         return if Ast::Merge::MergerConfig::VALID_RESOLUTION_MODES.include?(resolution_mode)
 
         raise ArgumentError,
-          "Invalid resolution_mode: #{resolution_mode.inspect}. " \
-            "Must be one of: #{Ast::Merge::MergerConfig::VALID_RESOLUTION_MODES.map(&:inspect).join(", ")}"
+              "Invalid resolution_mode: #{resolution_mode.inspect}. " \
+                "Must be one of: #{Ast::Merge::MergerConfig::VALID_RESOLUTION_MODES.map(&:inspect).join(', ')}"
       end
 
       def runtime_metadata
         {
           merger_class: self.class.name,
           inner_merge_code_blocks: !@code_block_merger.nil?,
-          inner_merge_lists: !@list_merger.nil?,
+          inner_merge_lists: !@list_merger.nil?
         }
       end
 
@@ -488,15 +489,15 @@ module Markdown
 
       def runtime_markdown_delegate
         Ast::Merge::Runtime::Delegate.new(
-          name: "markdown-document",
+          name: 'markdown-document',
           priority: 10,
           surface_kinds: [:markdown_document],
           languages: [:markdown],
           feature_profile: safe_runtime_feature_profile_for(@dest_analysis),
-          capabilities: {merge: [:markdown_document]},
+          capabilities: { merge: [:markdown_document] },
           metadata: {
-            source: :markdown_merge,
-          },
+            source: :markdown_merge
+          }
         )
       end
 
@@ -531,7 +532,7 @@ module Markdown
         # Apply whitespace normalization if enabled
         if @normalize_whitespace
           # Support both boolean and symbol modes
-          mode = (@normalize_whitespace == true) ? :basic : @normalize_whitespace
+          mode = @normalize_whitespace == true ? :basic : @normalize_whitespace
           normalizer = WhitespaceNormalizer.new(content, mode: mode)
           content = normalizer.normalize
           problems.merge!(normalizer.problems)
@@ -562,20 +563,20 @@ module Markdown
         should_heal = ::Ast::Merge::Healer.handle(
           mode: @corruption_handling,
           kind: :duplicate_template_preamble_prefix,
-          message: "merged Markdown preamble begins with duplicated template-owned standalone comment lines",
-          prefix: "[markdown-merge]",
+          message: 'merged Markdown preamble begins with duplicated template-owned standalone comment lines',
+          prefix: '[markdown-merge]',
           error_class: Markdown::Merge::CorruptionDetectedError,
           warner: lambda { |formatted|
             DebugLogger.debug_warning(formatted, {
-              template_comment_lines: template_comments.length,
-              merged_comment_lines: merged_comments.length,
-              destination_specific_comment_lines: destination_specific_comments.length,
-            })
-          },
+                                        template_comment_lines: template_comments.length,
+                                        merged_comment_lines: merged_comments.length,
+                                        destination_specific_comment_lines: destination_specific_comments.length
+                                      })
+          }
         )
         return content unless should_heal
 
-        remainder = remainder.sub(/\A(?:\s*\n)+/, "")
+        remainder = remainder.sub(/\A(?:\s*\n)+/, '')
         rebuilt = destination_specific_comments.join("\n")
         return rebuilt if remainder.empty?
 
@@ -615,7 +616,7 @@ module Markdown
         frozen_blocks = []
         conflicts = []
         unresolved_cases = []
-        stats = {nodes_added: 0, nodes_removed: 0, nodes_modified: 0}
+        stats = { nodes_added: 0, nodes_removed: 0, nodes_modified: 0 }
         preserve_removed_separator_gap = false
         link_ownership_context = removal_mode_link_ownership_context(alignment) if @remove_template_missing_nodes
         removal_comment_ownership = removal_mode_comment_ownership_context(alignment) if @remove_template_missing_nodes
@@ -637,7 +638,7 @@ module Markdown
               preserve_separator_gap: preserve_removed_separator_gap,
               remaining_entries: alignment[(index + 1)..] || [],
               link_ownership_context: link_ownership_context,
-              removal_comment_ownership: removal_comment_ownership&.[](entry[:dest_index]),
+              removal_comment_ownership: removal_comment_ownership&.[](entry[:dest_index])
             )
             frozen_blocks << frozen if frozen
           end
@@ -658,13 +659,15 @@ module Markdown
 
         # Try inner-merge for code blocks first
         if @code_block_merger && code_block_node?(template_node) && code_block_node?(dest_node)
-          inner_result = try_inner_merge_code_block_to_builder(template_node, dest_node, builder, stats, conflicts, unresolved_cases)
+          inner_result = try_inner_merge_code_block_to_builder(template_node, dest_node, builder, stats, conflicts,
+                                                               unresolved_cases)
           return if inner_result
         end
 
         # Try inner-merge for lists
         if @list_merger && list_node?(template_node) && list_node?(dest_node)
-          inner_result = try_inner_merge_list_to_builder(template_node, dest_node, builder, stats, conflicts, unresolved_cases)
+          inner_result = try_inner_merge_list_to_builder(template_node, dest_node, builder, stats, conflicts,
+                                                         unresolved_cases)
           return if inner_result
         end
 
@@ -672,7 +675,7 @@ module Markdown
           template_node,
           dest_node,
           template_index: entry[:template_index],
-          dest_index: entry[:dest_index],
+          dest_index: entry[:dest_index]
         )
         conflicts << resolution[:conflict] if resolution[:conflict]
 
@@ -684,7 +687,8 @@ module Markdown
 
         case resolution[:source]
         when :template
-          preserved_link_definitions = preserved_destination_link_definitions_for_match(raw_template_node, raw_dest_node)
+          preserved_link_definitions = preserved_destination_link_definitions_for_match(raw_template_node,
+                                                                                        raw_dest_node)
           preserved_link_definitions.each do |link_definition|
             builder.add_node_source(link_definition, @dest_analysis)
           end
@@ -699,13 +703,16 @@ module Markdown
             frozen_info = {
               start_line: raw_dest_node.start_line,
               end_line: raw_dest_node.end_line,
-              reason: raw_dest_node.reason,
+              reason: raw_dest_node.reason
             }
           end
           emitted_range = builder.add_node_source(raw_dest_node, @dest_analysis)
         end
 
-        unresolved_cases << unresolved_case_with_output_range(resolution[:unresolved_case], emitted_range) if resolution[:unresolved_case]
+        if resolution[:unresolved_case]
+          unresolved_cases << unresolved_case_with_output_range(resolution[:unresolved_case],
+                                                                emitted_range)
+        end
 
         frozen_info
       end
@@ -729,7 +736,7 @@ module Markdown
           provisional_winner: unresolved_case.provisional_winner,
           surface_path: unresolved_case.surface_path,
           operation_id: unresolved_case.operation_id,
-          metadata: metadata,
+          metadata: metadata
         )
       end
 
@@ -746,10 +753,12 @@ module Markdown
         return [] if destination_link_definitions.empty?
 
         template_signatures = consumed_link_definitions_within(template_node, @template_analysis)
-          .map(&:signature)
-          .to_set
+                              .map(&:signature)
+                              .to_set
 
-        destination_link_definitions.reject { |link_definition| template_signatures.include?(link_definition.signature) }
+        destination_link_definitions.reject do |link_definition|
+          template_signatures.include?(link_definition.signature)
+        end
       end
 
       def consumed_link_definitions_within(node, analysis)
@@ -770,7 +779,7 @@ module Markdown
       end
 
       def missing_source_position_protocol_error?(error)
-        error.is_a?(NoMethodError) || error.class.name == "RSpec::Mocks::MockExpectationError"
+        error.is_a?(NoMethodError) || error.class.name == 'RSpec::Mocks::MockExpectationError'
       end
 
       # Apply node typing to a node if node_typing is configured.
@@ -794,8 +803,8 @@ module Markdown
         if node.respond_to?(:type)
           canonical_type = node.type
           callable = @node_typing[canonical_type] ||
-            @node_typing[canonical_type.to_s] ||
-            @node_typing[canonical_type.to_sym]
+                     @node_typing[canonical_type.to_s] ||
+                     @node_typing[canonical_type.to_sym]
           if callable
             # Call the custom lambda - it may return a refined typed node
             # or the original node unchanged
@@ -817,7 +826,7 @@ module Markdown
       def code_block_node?(node)
         return false if node.respond_to?(:freeze_node?) && node.freeze_node?
 
-        node.respond_to?(:type) && node.type.to_s == "code_block"
+        node.respond_to?(:type) && node.type.to_s == 'code_block'
       end
 
       # Check if a node is an ordered or unordered list.
@@ -827,7 +836,7 @@ module Markdown
       def list_node?(node)
         return false if node.respond_to?(:freeze_node?) && node.freeze_node?
 
-        node.respond_to?(:type) && node.type.to_s == "list"
+        node.respond_to?(:type) && node.type.to_s == 'list'
       end
 
       # Try to inner-merge two list nodes at the item level, adding to OutputBuilder.
@@ -846,7 +855,7 @@ module Markdown
           template_analysis: @template_analysis,
           dest_analysis: @dest_analysis,
           resolution_mode: @resolution_mode,
-          unresolved_policy: @unresolved_policy,
+          unresolved_policy: @unresolved_policy
         )
 
         if result[:merged]
@@ -861,7 +870,7 @@ module Markdown
           conflicts.concat(remapped_cases.map { |resolution_case| conflict_for_resolution_case(resolution_case) })
           true
         else
-          DebugLogger.debug("List inner-merge skipped", {reason: result[:reason]})
+          DebugLogger.debug('List inner-merge skipped', { reason: result[:reason] })
           false
         end
       end
@@ -882,7 +891,7 @@ module Markdown
           parent_operation: @runtime_root_operation,
           add_template_only_nodes: @add_template_only_nodes,
           resolution_mode: @resolution_mode,
-          unresolved_policy: @unresolved_policy,
+          unresolved_policy: @unresolved_policy
         )
 
         if result[:merged]
@@ -895,30 +904,31 @@ module Markdown
             result[:runtime_operation_id],
             result[:runtime_surface_path],
             emitted_range,
-            result[:metadata],
+            result[:metadata]
           )
           unresolved_cases.concat(remapped_cases)
           conflicts.concat(remapped_cases.map { |resolution_case| conflict_for_resolution_case(resolution_case) })
           true
         else
-          DebugLogger.debug("Inner-merge skipped", {reason: result[:reason]})
+          DebugLogger.debug('Inner-merge skipped', { reason: result[:reason] })
           false # Fall back to standard resolution
         end
       end
 
-      def remap_delegated_unresolved_cases(unresolved_cases, runtime_operation_id, runtime_surface_path, output_range = nil, delegated_metadata = nil)
+      def remap_delegated_unresolved_cases(unresolved_cases, runtime_operation_id, runtime_surface_path,
+                                           output_range = nil, delegated_metadata = nil)
         root_apply_candidates = delegated_metadata.to_h[:root_apply_candidates_by_case_id].to_h
         delegated_apply_renderer = delegated_metadata.to_h[:delegated_apply_renderer]
         Array(unresolved_cases).map do |resolution_case|
           suffix = delegated_surface_suffix_for(resolution_case.surface_path)
           metadata = resolution_case.metadata.merge(
-            delegated_case_id: resolution_case.case_id,
+            delegated_case_id: resolution_case.case_id
           )
           apply_candidates = root_apply_candidates[resolution_case.case_id]
           if output_range && apply_candidates
             metadata = metadata.merge(
               output_range: output_range,
-              output_candidate_by_selection: apply_candidates,
+              output_candidate_by_selection: apply_candidates
             )
           end
           if output_range && delegated_apply_renderer
@@ -929,7 +939,7 @@ module Markdown
               delegated_applied_selections: {},
               delegated_root_applied_selections: {},
               delegated_runtime_operation_id: runtime_operation_id,
-              delegated_runtime_surface_path: runtime_surface_path,
+              delegated_runtime_surface_path: runtime_surface_path
             )
           end
 
@@ -938,18 +948,18 @@ module Markdown
             reason: resolution_case.reason,
             candidates: resolution_case.candidates,
             provisional_winner: resolution_case.provisional_winner,
-            surface_path: [runtime_surface_path, suffix].compact.join(" > "),
+            surface_path: [runtime_surface_path, suffix].compact.join(' > '),
             operation_id: runtime_operation_id,
-            metadata: metadata,
+            metadata: metadata
           )
         end
       end
 
       def delegated_surface_suffix_for(surface_path)
         path = surface_path.to_s
-        return if path.empty? || path == "document[0]"
+        return if path.empty? || path == 'document[0]'
 
-        path.sub(/\Adocument\[0\]\s*>\s*/, "")
+        path.sub(/\Adocument\[0\]\s*>\s*/, '')
       end
 
       def conflict_for_resolution_case(resolution_case)
@@ -959,7 +969,7 @@ module Markdown
           template: resolution_case.candidates[:template],
           destination: resolution_case.candidates[:destination],
           provisional_winner: resolution_case.provisional_winner,
-          location: resolution_case.surface_path,
+          location: resolution_case.surface_path
         }.compact
       end
 
@@ -975,7 +985,7 @@ module Markdown
           template_node,
           dest_node,
           preference: @preference,
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         if result[:merged]
@@ -984,7 +994,7 @@ module Markdown
           stats[:inner_merges] += 1
           [result[:content], nil]
         else
-          DebugLogger.debug("Inner-merge skipped", {reason: result[:reason]})
+          DebugLogger.debug('Inner-merge skipped', { reason: result[:reason] })
           nil # Fall back to standard resolution
         end
       end
@@ -1040,7 +1050,8 @@ module Markdown
       # @param builder [OutputBuilder] Output builder to add to
       # @param stats [Hash] Statistics hash to update
       # @return [Hash, nil] Frozen block info if applicable
-      def process_dest_only_to_builder(entry, builder, stats, preserve_separator_gap: false, remaining_entries: [], link_ownership_context: nil, removal_comment_ownership: nil)
+      def process_dest_only_to_builder(entry, builder, stats, preserve_separator_gap: false, remaining_entries: [],
+                                       link_ownership_context: nil, removal_comment_ownership: nil)
         node = entry[:dest_node]
 
         frozen_info = nil
@@ -1049,7 +1060,7 @@ module Markdown
           frozen_info = {
             start_line: node.start_line,
             end_line: node.end_line,
-            reason: node.reason,
+            reason: node.reason
           }
         end
 
@@ -1065,7 +1076,9 @@ module Markdown
             link_ownership_context[:preserved] << node.signature if link_ownership_context
           end
 
-          if standalone_comment_node?(node, @dest_analysis) && preserved_removal_comment_node?(node, removal_comment_ownership)
+          if standalone_comment_node?(node,
+                                      @dest_analysis) && preserved_removal_comment_node?(node,
+                                                                                         removal_comment_ownership)
             stats[:preserved_destination_comment_fragments] ||= 0
             stats[:preserved_destination_comment_fragments] += 1
           end
@@ -1086,7 +1099,8 @@ module Markdown
         end
 
         if removable_destination_only_node?(node)
-          preserved_link_definitions = preserved_destination_link_definitions_for_removed_node(node, link_ownership_context)
+          preserved_link_definitions = preserved_destination_link_definitions_for_removed_node(node,
+                                                                                               link_ownership_context)
 
           if preserved_link_definitions.any?
             builder.add_gap_line(count: 1) unless builder.empty? || builder.blank_line_terminated?
@@ -1142,7 +1156,8 @@ module Markdown
           entry[:type] != :dest_only || !preserve_removed_separator_gap_line?(entry[:dest_node])
         end
 
-        next_entry && next_entry[:type] == :dest_only && standalone_comment_node?(next_entry[:dest_node], @dest_analysis)
+        next_entry && next_entry[:type] == :dest_only && standalone_comment_node?(next_entry[:dest_node],
+                                                                                  @dest_analysis)
       end
 
       def separator_gap_needed_after_removed_node?(remaining_entries)
@@ -1183,7 +1198,7 @@ module Markdown
           link_definition_signatures_within(kept_node, analysis).each { |signature| available << signature }
         end
 
-        {needed: needed, available: available, preserved: Set.new}
+        { needed: needed, available: available, preserved: Set.new }
       end
 
       def removal_mode_comment_ownership_context(alignment)
@@ -1226,7 +1241,7 @@ module Markdown
         {
           remove_plan: remove_plan,
           owned_comment_region_keys: remove_plan_preserved_comment_keys(remove_plan),
-          owned_comment_node_keys: removal_mode_owned_comment_node_keys(remove_plan, entries),
+          owned_comment_node_keys: removal_mode_owned_comment_node_keys(remove_plan, entries)
         }.freeze
       end
 
@@ -1262,7 +1277,7 @@ module Markdown
           statements: statements,
           leading_statement: leading_statement,
           trailing_statement: trailing_statement,
-          source: :smart_merger_base_removal_mode,
+          source: :smart_merger_base_removal_mode
         )
       end
 
@@ -1282,7 +1297,7 @@ module Markdown
         remove_plan_preserved_comment_keys_for_nodes(
           remove_plan,
           nodes: Array(run_entries).map { |entry| entry[:dest_node] },
-          analysis: @dest_analysis,
+          analysis: @dest_analysis
         )
       end
 
@@ -1294,8 +1309,9 @@ module Markdown
           node,
           @dest_analysis,
           removal_comment_ownership.fetch(:remove_plan),
-          preserved_comment_keys: removal_comment_ownership.fetch(:owned_comment_region_keys),
-        ) || removal_comment_ownership.fetch(:owned_comment_node_keys).include?(preserved_comment_node_key(node, @dest_analysis))
+          preserved_comment_keys: removal_comment_ownership.fetch(:owned_comment_region_keys)
+        ) || removal_comment_ownership.fetch(:owned_comment_node_keys).include?(preserved_comment_node_key(node,
+                                                                                                           @dest_analysis))
       end
 
       def kept_node_for_link_ownership(entry)
@@ -1308,7 +1324,7 @@ module Markdown
             template_node,
             dest_node,
             template_index: entry[:template_index],
-            dest_index: entry[:dest_index],
+            dest_index: entry[:dest_index]
           )
 
           if resolution[:source] == :template
@@ -1443,11 +1459,11 @@ module Markdown
         statements = analysis.statements
         gap_index = statements.index(gap_line)
 
-        DebugLogger.debug("Checking if gap line is document-trailing", {
-          gap_line_number: gap_line.line_number,
-          gap_index: gap_index,
-          total_statements: statements.length,
-        })
+        DebugLogger.debug('Checking if gap line is document-trailing', {
+                            gap_line_number: gap_line.line_number,
+                            gap_index: gap_index,
+                            total_statements: statements.length
+                          })
 
         return true if gap_index.nil? # Shouldn't happen, but treat as trailing if missing
 
@@ -1456,17 +1472,17 @@ module Markdown
         (gap_index + 1...statements.length).each do |i|
           node = statements[i]
           # If we find a non-gap-line node, this gap line is NOT document-trailing
-          unless gap_line_node?(node)
-            DebugLogger.debug("Found content after gap line", {
-              next_node_index: i,
-              next_node_type: node.class.name,
-            })
-            return false
-          end
+          next if gap_line_node?(node)
+
+          DebugLogger.debug('Found content after gap line', {
+                              next_node_index: i,
+                              next_node_type: node.class.name
+                            })
+          return false
         end
 
         # All remaining nodes are gap lines (or no nodes after), so this is document-trailing
-        DebugLogger.debug("Gap line IS document-trailing - no content after it")
+        DebugLogger.debug('Gap line IS document-trailing - no content after it')
         true
       end
     end

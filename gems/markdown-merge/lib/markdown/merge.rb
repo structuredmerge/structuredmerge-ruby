@@ -1,18 +1,17 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require "set"
+require 'version_gem'
 
-require "ast/merge"
-require "tree_haver"
+require 'ast/merge'
+require 'tree_haver'
 
-require_relative "merge/version"
+require_relative 'merge/version'
 
 module Markdown
   module Merge
-    PACKAGE_NAME = "markdown-merge"
+    PACKAGE_NAME = 'markdown-merge'
     BACKEND_REFERENCES = {
-      "kreuzberg-language-pack" => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
+      'kreuzberg-language-pack' => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     }.freeze
 
     class Error < Ast::Merge::Error; end
@@ -29,42 +28,42 @@ module Markdown
 
     class CorruptionDetectedError < Error; end
 
-    autoload :BackendSupport, "markdown/merge/backend_support"
-    autoload :Cleanse, "markdown/merge/cleanse"
-    autoload :CodeBlockMatchRefiner, "markdown/merge/code_block_match_refiner"
-    autoload :CodeBlockMerger, "markdown/merge/code_block_merger"
-    autoload :CommentTracker, "markdown/merge/comment_tracker"
-    autoload :ConflictResolver, "markdown/merge/conflict_resolver"
-    autoload :DebugLogger, "markdown/merge/debug_logger"
-    autoload :DocumentProblems, "markdown/merge/document_problems"
-    autoload :FileAligner, "markdown/merge/file_aligner"
-    autoload :FileAnalysis, "markdown/merge/file_analysis"
-    autoload :FileAnalysisBase, "markdown/merge/file_analysis_base"
-    autoload :FreezeNode, "markdown/merge/freeze_node"
-    autoload :GapLineNode, "markdown/merge/gap_line_node"
-    autoload :LinkDefinitionFormatter, "markdown/merge/link_definition_formatter"
-    autoload :LinkDefinitionNode, "markdown/merge/link_definition_node"
-    autoload :LinkParser, "markdown/merge/link_parser"
-    autoload :LinkReferenceRehydrator, "markdown/merge/link_reference_rehydrator"
-    autoload :ListMatchRefiner, "markdown/merge/list_match_refiner"
-    autoload :ListMerger, "markdown/merge/list_merger"
-    autoload :MarkdownStructure, "markdown/merge/markdown_structure"
-    autoload :MergeResult, "markdown/merge/merge_result"
-    autoload :NodeTypeNormalizer, "markdown/merge/node_type_normalizer"
-    autoload :OutputBuilder, "markdown/merge/output_builder"
-    autoload :PartialTemplateMerger, "markdown/merge/partial_template_merger"
-    autoload :PreservationSupport, "markdown/merge/preservation_support"
-    autoload :SmartMerger, "markdown/merge/smart_merger"
-    autoload :SmartMergerBase, "markdown/merge/smart_merger_base"
-    autoload :TableMatchAlgorithm, "markdown/merge/table_match_algorithm"
-    autoload :TableMatchRefiner, "markdown/merge/table_match_refiner"
-    autoload :WhitespaceNormalizer, "markdown/merge/whitespace_normalizer"
-    autoload :WrapperSupport, "markdown/merge/wrapper_support"
+    autoload :BackendSupport, 'markdown/merge/backend_support'
+    autoload :Cleanse, 'markdown/merge/cleanse'
+    autoload :CodeBlockMatchRefiner, 'markdown/merge/code_block_match_refiner'
+    autoload :CodeBlockMerger, 'markdown/merge/code_block_merger'
+    autoload :CommentTracker, 'markdown/merge/comment_tracker'
+    autoload :ConflictResolver, 'markdown/merge/conflict_resolver'
+    autoload :DebugLogger, 'markdown/merge/debug_logger'
+    autoload :DocumentProblems, 'markdown/merge/document_problems'
+    autoload :FileAligner, 'markdown/merge/file_aligner'
+    autoload :FileAnalysis, 'markdown/merge/file_analysis'
+    autoload :FileAnalysisBase, 'markdown/merge/file_analysis_base'
+    autoload :FreezeNode, 'markdown/merge/freeze_node'
+    autoload :GapLineNode, 'markdown/merge/gap_line_node'
+    autoload :LinkDefinitionFormatter, 'markdown/merge/link_definition_formatter'
+    autoload :LinkDefinitionNode, 'markdown/merge/link_definition_node'
+    autoload :LinkParser, 'markdown/merge/link_parser'
+    autoload :LinkReferenceRehydrator, 'markdown/merge/link_reference_rehydrator'
+    autoload :ListMatchRefiner, 'markdown/merge/list_match_refiner'
+    autoload :ListMerger, 'markdown/merge/list_merger'
+    autoload :MarkdownStructure, 'markdown/merge/markdown_structure'
+    autoload :MergeResult, 'markdown/merge/merge_result'
+    autoload :NodeTypeNormalizer, 'markdown/merge/node_type_normalizer'
+    autoload :OutputBuilder, 'markdown/merge/output_builder'
+    autoload :PartialTemplateMerger, 'markdown/merge/partial_template_merger'
+    autoload :PreservationSupport, 'markdown/merge/preservation_support'
+    autoload :SmartMerger, 'markdown/merge/smart_merger'
+    autoload :SmartMergerBase, 'markdown/merge/smart_merger_base'
+    autoload :TableMatchAlgorithm, 'markdown/merge/table_match_algorithm'
+    autoload :TableMatchRefiner, 'markdown/merge/table_match_refiner'
+    autoload :WhitespaceNormalizer, 'markdown/merge/whitespace_normalizer'
+    autoload :WrapperSupport, 'markdown/merge/wrapper_support'
 
     def markdown_feature_profile
       {
-        family: "markdown",
-        supported_dialects: ["markdown"],
+        family: 'markdown',
+        supported_dialects: ['markdown'],
         supported_policies: []
       }
     end
@@ -75,7 +74,9 @@ module Markdown
 
     def markdown_backend_feature_profile(backend: nil)
       resolved_backend = resolve_backend(backend)
-      return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.") unless BACKEND_REFERENCES.key?(resolved_backend)
+      unless BACKEND_REFERENCES.key?(resolved_backend)
+        return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
+      end
 
       markdown_feature_profile.merge(
         backend: resolved_backend,
@@ -98,15 +99,15 @@ module Markdown
     end
 
     def parse_markdown(source, dialect, backend: nil)
-      return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == "markdown"
+      return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == 'markdown'
 
       resolved_backend = resolve_backend(backend)
-      unless resolved_backend == "kreuzberg-language-pack"
+      unless resolved_backend == 'kreuzberg-language-pack'
         return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
       end
 
       syntax = TreeHaver.parse_with_language_pack(
-        TreeHaver::ParserRequest.new(source: source, language: "markdown", dialect: dialect)
+        TreeHaver::ParserRequest.new(source: source, language: 'markdown', dialect: dialect)
       )
       return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
 
@@ -115,10 +116,10 @@ module Markdown
         ok: true,
         diagnostics: [],
         analysis: {
-          kind: "markdown",
+          kind: 'markdown',
           dialect: dialect,
           normalized_source: normalized_source,
-          root_kind: "document",
+          root_kind: 'document',
           owners: collect_markdown_owners(normalized_source)
         },
         policies: []
@@ -126,7 +127,7 @@ module Markdown
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "parse_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
         policies: []
       }
     end
@@ -137,8 +138,8 @@ module Markdown
 
       {
         matched: template[:owners]
-          .filter { |owner| destination_paths[owner[:path]] }
-          .map { |owner| { template_path: owner[:path], destination_path: owner[:path] } },
+                 .filter { |owner| destination_paths[owner[:path]] }
+                 .map { |owner| { template_path: owner[:path], destination_path: owner[:path] } },
         unmatched_template: template[:owners].map { |owner| owner[:path] }.reject { |path| destination_paths[path] },
         unmatched_destination: destination[:owners].map { |owner| owner[:path] }.reject { |path| template_paths[path] }
       }
@@ -161,9 +162,9 @@ module Markdown
       )
       destination_paths = destination_sections.to_h { |section| [section[:path], true] }
       merged_sections = destination_sections.map { |section| section[:text] }.reject(&:empty?) +
-        template_sections
-          .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
-          .map { |section| section[:text] }
+                        template_sections
+                        .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
+                        .map { |section| section[:text] }
 
       {
         ok: true,
@@ -175,7 +176,7 @@ module Markdown
 
     def markdown_embedded_families(analysis)
       analysis[:owners].filter_map do |owner|
-        next unless owner[:owner_kind] == "code_fence"
+        next unless owner[:owner_kind] == 'code_fence'
         next if owner[:info_string].to_s.empty?
 
         family = code_fence_family(owner[:info_string])
@@ -194,13 +195,13 @@ module Markdown
     def markdown_discovered_surfaces(analysis)
       markdown_embedded_families(analysis).map do |candidate|
         Ast::Merge.discovered_surface(
-          surface_kind: "markdown_fenced_code_block",
+          surface_kind: 'markdown_fenced_code_block',
           declared_language: candidate[:language],
           effective_language: candidate[:dialect],
           address: "document[0] > fenced_code_block[#{candidate[:path]}]",
-          parent_address: "document[0]",
-          owner: Ast::Merge.surface_owner_ref(kind: "structural_owner", address: candidate[:path]),
-          reconstruction_strategy: "portable_write",
+          parent_address: 'document[0]',
+          owner: Ast::Merge.surface_owner_ref(kind: 'structural_owner', address: candidate[:path]),
+          reconstruction_strategy: 'portable_write',
           metadata: {
             family: candidate[:family],
             dialect: candidate[:dialect],
@@ -210,13 +211,13 @@ module Markdown
       end
     end
 
-    def markdown_delegated_child_operations(analysis, parent_operation_id: "markdown-document-0")
+    def markdown_delegated_child_operations(analysis, parent_operation_id: 'markdown-document-0')
       markdown_discovered_surfaces(analysis).each_with_index.map do |surface, index|
         Ast::Merge.delegated_child_operation(
           operation_id: "markdown-fence-#{index}",
           parent_operation_id: parent_operation_id,
-          requested_strategy: "delegate_child_surface",
-          language_chain: ["markdown", surface[:effective_language]],
+          requested_strategy: 'delegate_child_surface',
+          language_chain: ['markdown', surface[:effective_language]],
           surface: surface
         )
       end
@@ -235,24 +236,27 @@ module Markdown
 
         owner_path = operation.dig(:surface, :owner, :address)
         range = ranges[owner_path]
-        return {
-          ok: false,
-          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing fenced-code range for #{owner_path}" }],
-          policies: []
-        } if range.nil?
+        if range.nil?
+          return {
+            ok: false,
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
+                            message: "missing fenced-code range for #{owner_path}" }],
+            policies: []
+          }
+        end
 
         { range: range, output: output }
       end
 
       replacements.sort_by { |entry| -entry[:range][:start] }.each do |entry|
-        body_lines = entry[:output].empty? ? [] : entry[:output].sub(/\n\z/, "").split("\n")
+        body_lines = entry[:output].empty? ? [] : entry[:output].sub(/\n\z/, '').split("\n")
         lines[entry[:range][:start] + 1...entry[:range][:end]] = body_lines
       end
 
       {
         ok: true,
         diagnostics: [],
-        output: "#{lines.join("\n").sub(/\n+\z/, "")}\n",
+        output: "#{lines.join("\n").sub(/\n+\z/, '')}\n",
         policies: []
       }
     end
@@ -260,8 +264,8 @@ module Markdown
     def merge_markdown_with_nested_outputs(template_source, destination_source, dialect, nested_outputs, backend: nil)
       Ast::Merge.execute_nested_merge(
         nested_outputs,
-        default_family: "markdown",
-        request_id_prefix: "nested_markdown_child",
+        default_family: 'markdown',
+        request_id_prefix: 'nested_markdown_child',
         merge_parent: -> { merge_markdown(template_source, destination_source, dialect, backend: backend) },
         discover_operations: lambda { |merged_output|
           analysis = parse_markdown(merged_output, dialect, backend: backend)
@@ -284,10 +288,11 @@ module Markdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
+                                                    applied_children, backend: nil)
       Ast::Merge.execute_reviewed_nested_merge(
         review_state,
-        "markdown",
+        'markdown',
         applied_children,
         merge_parent: -> { merge_markdown(template_source, destination_source, dialect, backend: backend) },
         discover_operations: lambda { |merged_output|
@@ -311,9 +316,13 @@ module Markdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
-      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "markdown" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for markdown." }], policies: [] } unless execution
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
+                                                                       replay_bundle, backend: nil)
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == 'markdown' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review replay bundle does not include a reviewed nested execution for markdown.' }], policies: [] }
+      end
 
       merge_markdown_with_reviewed_nested_outputs(
         template_source,
@@ -325,9 +334,13 @@ module Markdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
-      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "markdown" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for markdown." }], policies: [] } unless execution
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect,
+                                                                      review_state, backend: nil)
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == 'markdown' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review state does not include a reviewed nested execution for markdown.' }], policies: [] }
+      end
 
       merge_markdown_with_reviewed_nested_outputs(
         template_source,
@@ -339,9 +352,13 @@ module Markdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source,
+                                                                                dialect, envelope, backend: nil)
       replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
@@ -352,9 +369,13 @@ module Markdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source,
+                                                                               dialect, envelope, backend: nil)
       review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_markdown_with_reviewed_nested_outputs_from_review_state(
         template_source,
@@ -371,12 +392,12 @@ module Markdown
 
     def slugify(value)
       slug = value
-        .strip
-        .downcase
-        .gsub(/[`*_~\[\]()<>]/, "")
-        .gsub(/[^a-z0-9]+/, "-")
-        .gsub(/\A-+|-+\z/, "")
-      slug.empty? ? "section" : slug
+             .strip
+             .downcase
+             .gsub(/[`*_~\[\]()<>]/, '')
+             .gsub(/[^a-z0-9]+/, '-')
+             .gsub(/\A-+|-+\z/, '')
+      slug.empty? ? 'section' : slug
     end
 
     def collect_markdown_owners(source)
@@ -392,7 +413,7 @@ module Markdown
           level = heading[1].length
           owners << {
             path: "/heading/#{heading_index}",
-            owner_kind: "heading",
+            owner_kind: 'heading',
             match_key: "h#{level}:#{slugify(heading[2])}",
             level: level
           }
@@ -408,8 +429,8 @@ module Markdown
           info_string = fence[2].strip.split(/\s+/).first.to_s
           owners << {
             path: "/code_fence/#{code_fence_index}",
-            owner_kind: "code_fence",
-            match_key: "fence:#{info_string.empty? ? "plain" : info_string}",
+            owner_kind: 'code_fence',
+            match_key: "fence:#{info_string.empty? ? 'plain' : info_string}",
             **(info_string.empty? ? {} : { info_string: info_string })
           }
           code_fence_index += 1
@@ -418,8 +439,8 @@ module Markdown
           while index < lines.length
             trimmed = lines[index].strip
             break if trimmed.length >= marker_length &&
-              trimmed.start_with?(marker_char * marker_length) &&
-              trimmed.delete(marker_char).empty?
+                     trimmed.start_with?(marker_char * marker_length) &&
+                     trimmed.delete(marker_char).empty?
 
             index += 1
           end
@@ -459,8 +480,8 @@ module Markdown
           while index < lines.length
             trimmed = lines[index].strip
             break if trimmed.length >= marker_length &&
-              trimmed.start_with?(marker_char * marker_length) &&
-              trimmed.delete(marker_char).empty?
+                     trimmed.start_with?(marker_char * marker_length) &&
+                     trimmed.delete(marker_char).empty?
 
             index += 1
           end
@@ -510,8 +531,8 @@ module Markdown
           while cursor < lines.length
             trimmed = lines[cursor].strip
             if trimmed.length >= marker_length &&
-                trimmed.start_with?(marker_char * marker_length) &&
-                trimmed.delete(marker_char).empty?
+               trimmed.start_with?(marker_char * marker_length) &&
+               trimmed.delete(marker_char).empty?
               closing_index = cursor
               break
             end
@@ -533,38 +554,38 @@ module Markdown
 
     def code_fence_family(info_string)
       case info_string.to_s.downcase
-      when "ts", "typescript"
-        "typescript"
-      when "rust", "rs"
-        "rust"
-      when "go"
-        "go"
-      when "json", "jsonc"
-        "json"
-      when "yaml", "yml"
-        "yaml"
-      when "toml"
-        "toml"
+      when 'ts', 'typescript'
+        'typescript'
+      when 'rust', 'rs'
+        'rust'
+      when 'go'
+        'go'
+      when 'json', 'jsonc'
+        'json'
+      when 'yaml', 'yml'
+        'yaml'
+      when 'toml'
+        'toml'
       end
     end
 
     def code_fence_dialect(info_string, family)
       case family
-      when "typescript", "rust", "go", "yaml", "toml"
+      when 'typescript', 'rust', 'go', 'yaml', 'toml'
         family
-      when "json"
-        info_string.to_s.downcase == "jsonc" ? "jsonc" : "json"
+      when 'json'
+        info_string.to_s.downcase == 'jsonc' ? 'jsonc' : 'json'
       end
     end
 
     def resolve_backend(backend)
-      backend.to_s.empty? ? "kreuzberg-language-pack" : backend.to_s
+      backend.to_s.empty? ? 'kreuzberg-language-pack' : backend.to_s
     end
 
     def unsupported_feature_result(message)
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }],
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
         policies: []
       }
     end
@@ -613,11 +634,11 @@ end
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
     :markdown_merge,
-    require_path: "markdown/merge",
-    merger_class: "Markdown::Merge::SmartMerger",
+    require_path: 'markdown/merge',
+    merger_class: 'Markdown::Merge::SmartMerger',
     test_source: "# Test\n\nParagraph",
     category: :markdown,
-    skip_instantiation: true,
+    skip_instantiation: true
   )
 end
 

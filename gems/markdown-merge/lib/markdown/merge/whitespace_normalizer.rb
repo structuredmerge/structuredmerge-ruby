@@ -75,9 +75,7 @@ module Markdown
         result = collapse_excessive_blank_lines(result)
 
         # Remove blank lines between link refs if mode requires it
-        if @mode == :link_refs || @mode == :strict
-          result = remove_blank_lines_between_link_refs(result)
-        end
+        result = remove_blank_lines_between_link_refs(result) if @mode == :link_refs || @mode == :strict
 
         result
       end
@@ -107,9 +105,9 @@ module Markdown
         when true
           :basic
         when false
-          :basic  # Still do basic normalization
+          :basic # Still do basic normalization
         when Symbol
-          raise ArgumentError, "Unknown mode: #{mode}. Valid modes: #{MODES.join(", ")}" unless MODES.include?(mode)
+          raise ArgumentError, "Unknown mode: #{mode}. Valid modes: #{MODES.join(', ')}" unless MODES.include?(mode)
 
           mode
         else
@@ -142,9 +140,7 @@ module Markdown
             problem_start_line ||= line_number - 1
 
             # Only add up to 1 blank line (which creates the standard paragraph gap)
-            if consecutive_blank_count <= 1
-              result << line
-            end
+            result << line if consecutive_blank_count <= 1
             # Skip adding lines when consecutive_blank_count >= 2
           else
             # Record problem if we had 2+ blank lines (which means 3+ newlines)
@@ -155,7 +151,7 @@ module Markdown
                 severity: :warning,
                 line: problem_start_line,
                 newline_count: consecutive_blank_count + 1, # +1 because first line ends with \n too
-                collapsed_to: 2,
+                collapsed_to: 2
               )
             end
 
@@ -172,7 +168,7 @@ module Markdown
             severity: :warning,
             line: problem_start_line,
             newline_count: consecutive_blank_count + 1,
-            collapsed_to: 2,
+            collapsed_to: 2
           )
         end
 
@@ -204,29 +200,25 @@ module Markdown
             j = i + 1
             while j < lines.length
               next_line = lines[j]
-              if next_line.chomp.empty?
-                # Check if there's a link ref definition after the blank line(s)
-                k = j + 1
-                while k < lines.length && lines[k].chomp.empty?
-                  k += 1
-                end
-                if k < lines.length && link_definition_line?(lines[k])
-                  # Skip all blank lines between link refs
-                  blanks_skipped = k - j
-                  @problems.add(
-                    :link_ref_spacing,
-                    severity: :info,
-                    line: j + 1,
-                    blank_lines_removed: blanks_skipped,
-                  )
-                  j = k
-                else
-                  # Not followed by a link ref, keep the blank line
-                  break
-                end
-              else
-                break
-              end
+              break unless next_line.chomp.empty?
+
+              # Check if there's a link ref definition after the blank line(s)
+              k = j + 1
+              k += 1 while k < lines.length && lines[k].chomp.empty?
+              break unless k < lines.length && link_definition_line?(lines[k])
+
+              # Skip all blank lines between link refs
+              blanks_skipped = k - j
+              @problems.add(
+                :link_ref_spacing,
+                severity: :info,
+                line: j + 1,
+                blank_lines_removed: blanks_skipped
+              )
+              j = k
+
+              # Not followed by a link ref, keep the blank line
+
             end
             i = j
           else

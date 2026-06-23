@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
-require "set"
+require 'digest'
 
 module Markdown
   module Merge
@@ -40,7 +39,7 @@ module Markdown
 
       # Default freeze token for identifying freeze blocks
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "markdown-merge"
+      DEFAULT_FREEZE_TOKEN = 'markdown-merge'
 
       # @return [Object] The root document node
       attr_reader :document
@@ -51,7 +50,7 @@ module Markdown
       # @return [CommentTracker] Comment tracker for this file
       attr_reader :comment_tracker
 
-      # Note: :source is inherited from Ast::Merge::FileAnalyzable
+      # NOTE: :source is inherited from Ast::Merge::FileAnalyzable
 
       # Initialize file analysis
       #
@@ -64,7 +63,7 @@ module Markdown
         # But remove the final empty string if source ends with newline
         # (that empty string represents the "line after the last newline" which doesn't exist)
         @lines = source.split("\n", -1)
-        @lines.pop if @lines.last == "" && source.end_with?("\n")
+        @lines.pop if @lines.last == '' && source.end_with?("\n")
         @comment_tracker = CommentTracker.new(@lines)
 
         @freeze_token = freeze_token
@@ -73,19 +72,19 @@ module Markdown
         @errors = []
 
         # Parse the Markdown source - subclasses implement this
-        @document = DebugLogger.time("FileAnalysisBase#parse") do
+        @document = DebugLogger.time('FileAnalysisBase#parse') do
           parse_document(source)
         end
 
         # Extract and integrate all nodes including freeze blocks
         @statements = extract_and_integrate_all_nodes
 
-        DebugLogger.debug("FileAnalysisBase initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          document_children: count_children(@document),
-          statements_count: @statements.size,
-          freeze_blocks: freeze_blocks.size,
-        })
+        DebugLogger.debug('FileAnalysisBase initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            document_children: count_children(@document),
+                            statements_count: @statements.size,
+                            freeze_blocks: freeze_blocks.size
+                          })
       end
 
       # Parse the source document.
@@ -131,7 +130,7 @@ module Markdown
         @comment_support_style ||= shared_comment_support_style(
           source: :markdown_source,
           style: :html_comment,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -160,7 +159,7 @@ module Markdown
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
@@ -175,7 +174,7 @@ module Markdown
         shared_comment_attachment_for(
           owner,
           tracker_attachment: augmented_attachment || comment_tracker.comment_attachment_for(owner, **options),
-          **options,
+          **options
         )
       end
 
@@ -186,19 +185,19 @@ module Markdown
 
       def ruleset_logical_owners
         {
-          link_definition: :preserve_if_referenced,
+          link_definition: :preserve_if_referenced
         }
       end
 
       def ruleset_surfaces
         [
-          {name: :fenced_code_block, selector: :language_tag},
+          { name: :fenced_code_block, selector: :language_tag }
         ]
       end
 
       def ruleset_delegation_policies
         [
-          {surface_name: :fenced_code_block, strategy: :by_language},
+          { surface_name: :fenced_code_block, strategy: :by_language }
         ]
       end
 
@@ -210,7 +209,7 @@ module Markdown
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -293,11 +292,11 @@ module Markdown
           items_text = []
           child = node.first_child
           while child
-            items_text << extract_text_content(child).downcase.gsub(/\W+/, " ").strip
+            items_text << extract_text_content(child).downcase.gsub(/\W+/, ' ').strip
             child = next_sibling(child)
             break if items_text.size >= 5
           end
-          fingerprint = Digest::SHA256.hexdigest(items_text.sort.join("|"))[0, 16]
+          fingerprint = Digest::SHA256.hexdigest(items_text.sort.join('|'))[0, 16]
           [:list, list_type, fingerprint]
         when :block_quote, :blockquote
           # Content-based: Match block quotes by content hash
@@ -363,10 +362,10 @@ module Markdown
       # @param end_line [Integer] End line (1-indexed)
       # @return [String] Source text
       def source_range(start_line, end_line)
-        return "" if start_line < 1 || end_line < start_line
+        return '' if start_line < 1 || end_line < start_line
 
         extracted_lines = @lines[(start_line - 1)..(end_line - 1)]
-        return "" if extracted_lines.empty?
+        return '' if extracted_lines.empty?
 
         # Add newlines between and after lines, but not after the last line of the file
         # unless it originally had one
@@ -392,7 +391,7 @@ module Markdown
       def extract_table_header_content(node)
         # First row of a table is typically the header
         first_row = node.first_child
-        return "" unless first_row
+        return '' unless first_row
 
         extract_text_content(first_row)
       end
@@ -508,15 +507,11 @@ module Markdown
       # @return [Array<Object>] Gap nodes
       def create_gap_nodes(line_numbers)
         line_numbers.map do |line_num|
-          content = @lines[line_num - 1] || ""
+          content = @lines[line_num - 1] || ''
 
           # Try to parse as link definition first
           link_node = LinkDefinitionNode.parse(content, line_number: line_num)
-          if link_node
-            link_node
-          else
-            GapLineNode.new(content, line_number: line_num)
-          end
+          link_node || GapLineNode.new(content, line_number: line_num)
         end
       end
 
@@ -538,17 +533,17 @@ module Markdown
         # Set preceding_node for gap lines based on their position in the sorted list
         # This allows gap lines to have context-aware signatures
         sorted_nodes.each_with_index do |node, idx|
-          if node.is_a?(GapLineNode) && idx > 0
-            # Find the previous non-gap-line node (structural node)
-            preceding = sorted_nodes[0...idx].reverse.find { |n| !n.is_a?(GapLineNode) }
-            node.preceding_node = preceding
-            if preceding
-              node.preceding_signature = begin
-                compute_node_signature(preceding)
-              rescue StandardError
-                nil
-              end
-            end
+          next unless node.is_a?(GapLineNode) && idx > 0
+
+          # Find the previous non-gap-line node (structural node)
+          preceding = sorted_nodes[0...idx].reverse.find { |n| !n.is_a?(GapLineNode) }
+          node.preceding_node = preceding
+          next unless preceding
+
+          node.preceding_signature = begin
+            compute_node_signature(preceding)
+          rescue StandardError
+            nil
           end
         end
 
@@ -580,7 +575,7 @@ module Markdown
 
           # Check HTML nodes for freeze markers
           # Handle both raw Markly (:html) and TreeHaver normalized ("html_block", :html_block) types
-          if node_type == :html || node_type == :html_block || node_type == "html_block" || node_type == "html"
+          if [:html, :html_block, 'html_block', 'html'].include?(node_type)
             # Try multiple content extraction methods:
             # 1. string_content (raw Markly/Commonmarker)
             # 2. to_commonmark on wrapper
@@ -596,21 +591,15 @@ module Markdown
               end
             end
 
-            if content.nil? || content.empty?
-              if child.respond_to?(:to_commonmark)
-                content = child.to_commonmark.to_s
-              end
-            end
+            content = child.to_commonmark.to_s if (content.nil? || content.empty?) && child.respond_to?(:to_commonmark)
 
             # TreeHaver Commonmarker wrapper stores content in inner_node
             if (content.nil? || content.empty?) && child.respond_to?(:inner_node)
               inner = child.inner_node
-              if inner.respond_to?(:to_commonmark)
-                content = inner.to_commonmark.to_s
-              end
+              content = inner.to_commonmark.to_s if inner.respond_to?(:to_commonmark)
             end
 
-            content ||= ""
+            content ||= ''
             match = content.match(pattern)
 
             if match
@@ -623,7 +612,7 @@ module Markdown
                 type: marker_type.to_sym,
                 text: content.strip,
                 reason: reason,
-                node: child, # Keep reference to the actual node
+                node: child # Keep reference to the actual node
               }
             end
           end
@@ -631,7 +620,7 @@ module Markdown
           child = next_sibling(child)
         end
 
-        DebugLogger.debug("Found freeze markers", {count: markers.size})
+        DebugLogger.debug('Found freeze markers', { count: markers.size })
         markers
       end
 
@@ -651,14 +640,14 @@ module Markdown
               start_marker = stack.pop
               blocks << create_freeze_block(start_marker, marker)
             else
-              DebugLogger.debug("Unmatched unfreeze marker", {line: marker[:line]})
+              DebugLogger.debug('Unmatched unfreeze marker', { line: marker[:line] })
             end
           end
         end
 
         # Warn about unclosed freeze blocks
         stack.each do |unclosed|
-          DebugLogger.debug("Unclosed freeze marker", {line: unclosed[:line]})
+          DebugLogger.debug('Unclosed freeze marker', { line: unclosed[:line] })
         end
 
         blocks.sort_by(&:start_line)
@@ -680,10 +669,10 @@ module Markdown
         content_end = end_line - 1
 
         content = if content_start <= content_end
-          source_range(content_start, content_end)
-        else
-          ""
-        end
+                    source_range(content_start, content_end)
+                  else
+                    ''
+                  end
 
         # Parse the content to get nodes (for nested analysis)
         parsed_nodes = parse_freeze_block_content(content)
@@ -695,7 +684,7 @@ module Markdown
           start_marker: start_marker[:text],
           end_marker: end_marker[:text],
           nodes: parsed_nodes,
-          reason: start_marker[:reason],
+          reason: start_marker[:reason]
         )
       end
 
@@ -728,7 +717,7 @@ module Markdown
           nodes
         rescue StandardError => e
           # simplecov:disable defensive - parser rarely fails on valid markdown subset
-          DebugLogger.debug("Failed to parse freeze block content", {error: e.message})
+          DebugLogger.debug('Failed to parse freeze block content', { error: e.message })
           []
           # simplecov:enable
         end

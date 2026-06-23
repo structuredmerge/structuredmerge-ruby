@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module Markdown
   module Merge
@@ -93,11 +93,11 @@ module Markdown
         class CodeFenceGrammar < Parslet::Parser
           # Any amount of indentation (handles code blocks in lists)
           # Captured as string, not array
-          rule(:indent) { match("[ ]").repeat }
+          rule(:indent) { match('[ ]').repeat }
 
           # Fence markers - 3+ backticks or tildes
-          rule(:backtick) { str("`") }
-          rule(:tilde) { str("~") }
+          rule(:backtick) { str('`') }
+          rule(:tilde) { str('~') }
           rule(:backtick_fence) { backtick.repeat(3, nil) }
           rule(:tilde_fence) { tilde.repeat(3, nil) }
           rule(:fence) { backtick_fence | tilde_fence }
@@ -117,9 +117,9 @@ module Markdown
 
           # Fence line with optional indentation, optional spacing, optional info
           # Capture: indent (raw), fence (as :fence), spacing (as :spacing), info (as :info)
-          rule(:fence_line) {
+          rule(:fence_line) do
             indent.as(:indent) >> fence.as(:fence) >> spaces?.as(:spacing) >> info_string.maybe.as(:info) >> line_end
-          }
+          end
 
           root(:fence_line)
         end
@@ -175,9 +175,9 @@ module Markdown
 
             fence = parsed[:fence]
             fence_char = fence[0]
-            spacing = parsed[:spacing] || ""
-            info = parsed[:info] || ""
-            indent = parsed[:indent] || ""
+            spacing = parsed[:spacing] || ''
+            info = parsed[:info] || ''
+            indent = parsed[:indent] || ''
 
             # Closing fence: matches current fence type and has no info
             if in_code_block && fence_char == current_fence_char && info.empty?
@@ -202,7 +202,7 @@ module Markdown
               spacing: spacing,
               malformed: !spacing.empty? && !language.nil?,
               line_number: line_number,
-              original: line.chomp,
+              original: line.chomp
             }
           end
 
@@ -259,16 +259,16 @@ module Markdown
 
           info_val = tree[:info]
           info_str = if info_val.is_a?(Array)
-            info_val.join
-          else
-            (info_val ? info_val.to_s : "")
-          end
+                       info_val.join
+                     else
+                       (info_val ? info_val.to_s : '')
+                     end
 
           {
             indent: indent_str,
             fence: tree[:fence].to_s,
             spacing: spacing_str,
-            info: info_str,
+            info: info_str
           }
         rescue Parslet::ParseFailed
           nil

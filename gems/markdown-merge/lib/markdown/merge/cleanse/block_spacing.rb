@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module Markdown
   module Merge
@@ -34,9 +34,9 @@ module Markdown
         THEMATIC_BREAK = /\A\s*(?:---+|\*\*\*+|___+)\s*\z/
         HEADING = /\A\s*\#{1,6}\s+/
         LIST_ITEM = /\A\s*(?:[-*+]|\d+\.)\s+/
-        HTML_CLOSE_TAG = /\A\s*<\/[a-zA-Z][a-zA-Z0-9]*>\s*\z/
+        HTML_CLOSE_TAG = %r{\A\s*</[a-zA-Z][a-zA-Z0-9]*>\s*\z}
         HTML_OPEN_TAG = /\A\s*<[a-zA-Z][a-zA-Z0-9]*(?:\s|>)/
-        HTML_ANY_TAG = /\A\s*<\/?[a-zA-Z]/
+        HTML_ANY_TAG = %r{\A\s*</?[a-zA-Z]}
         LINK_REF_DEF = /\A\s*\[[^\]]+\]:\s*/
 
         # Block-level HTML elements that can span multiple lines
@@ -75,24 +75,25 @@ module Markdown
         ].freeze
 
         # Pattern to match opening block-level HTML tags
-        HTML_BLOCK_OPEN = /\A\s*<(#{HTML_BLOCK_ELEMENTS.join("|")})(?:\s|>)/i
+        HTML_BLOCK_OPEN = /\A\s*<(#{HTML_BLOCK_ELEMENTS.join('|')})(?:\s|>)/i
 
         # Pattern to match closing block-level HTML tags
-        HTML_BLOCK_CLOSE = /\A\s*<\/(#{HTML_BLOCK_ELEMENTS.join("|")})>/i
+        HTML_BLOCK_CLOSE = %r{\A\s*</(#{HTML_BLOCK_ELEMENTS.join('|')})>}i
 
         # HTML elements that contain markdown content (not HTML content)
         # These should have blank lines before their closing tags
         MARKDOWN_CONTAINER_ELEMENTS = %w[details].freeze
 
         # Pattern to match closing tags for markdown containers
-        MARKDOWN_CONTAINER_CLOSE = /\A\s*<\/(#{MARKDOWN_CONTAINER_ELEMENTS.join("|")})>/i
+        MARKDOWN_CONTAINER_CLOSE = %r{\A\s*</(#{MARKDOWN_CONTAINER_ELEMENTS.join('|')})>}i
 
         # Markdown content: anything that's not blank, not HTML, and not a link ref def
-        MARKDOWN_CONTENT = ->(line) {
+        MARKDOWN_CONTENT = lambda { |line|
           stripped = line.strip
           return false if stripped.empty?
-          return false if stripped.start_with?("<")
+          return false if stripped.start_with?('<')
           return false if line.match?(LINK_REF_DEF)
+
           true
         }
 
@@ -138,9 +139,7 @@ module Markdown
           lines.each_with_index do |line, idx|
             result << line
             # If this line needs a blank line after it, add one
-            if insertions.include?(idx + 1) # issues use 1-based line numbers
-              result << "\n" unless line.strip.empty?
-            end
+            result << "\n" if insertions.include?(idx + 1) && !line.strip.empty? # issues use 1-based line numbers
           end
 
           result.join
@@ -158,7 +157,7 @@ module Markdown
 
           lines.each_with_index do |line, idx|
             next_line = lines[idx + 1]
-            prev_line = (idx > 0) ? lines[idx - 1] : nil
+            prev_line = idx > 0 ? lines[idx - 1] : nil
 
             # Special case: closing tags for markdown containers like </details>
             # These contain markdown content, so we need blank lines before them
@@ -175,9 +174,7 @@ module Markdown
               end
 
               # Check for issues that need blank line BEFORE current line
-              if prev_line && !prev_line.strip.empty?
-                check_markdown_before_html(prev_line, line, idx)
-              end
+              check_markdown_before_html(prev_line, line, idx) if prev_line && !prev_line.strip.empty?
             end
 
             # Special case: always check for blank line before </details> etc.
@@ -188,9 +185,7 @@ module Markdown
 
             # Update HTML block depth AFTER checking for issues
             # Count opening block-level tags
-            if line.match?(HTML_BLOCK_OPEN)
-              html_block_depth += 1
-            end
+            html_block_depth += 1 if line.match?(HTML_BLOCK_OPEN)
 
             # Check for closing block-level tags
             line.scan(HTML_BLOCK_CLOSE) do
@@ -206,7 +201,7 @@ module Markdown
           @issues << {
             type: :thematic_break_needs_blank,
             line: idx + 1,
-            description: "Thematic break should be followed by blank line",
+            description: 'Thematic break should be followed by blank line'
           }
         end
 
@@ -217,7 +212,7 @@ module Markdown
           @issues << {
             type: :list_before_heading,
             line: idx + 1,
-            description: "List item should be followed by blank line before heading",
+            description: 'List item should be followed by blank line before heading'
           }
         end
 
@@ -231,7 +226,7 @@ module Markdown
           @issues << {
             type: :html_before_markdown,
             line: idx + 1,
-            description: "HTML close tag should be followed by blank line before markdown",
+            description: 'HTML close tag should be followed by blank line before markdown'
           }
         end
 
@@ -244,7 +239,7 @@ module Markdown
           @issues << {
             type: :markdown_before_html,
             line: idx, # Insert blank line BEFORE this line (so after prev_line)
-            description: "Markdown content should be followed by blank line before HTML",
+            description: 'Markdown content should be followed by blank line before HTML'
           }
         end
       end

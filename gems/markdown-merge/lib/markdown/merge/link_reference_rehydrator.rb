@@ -105,8 +105,8 @@ module Markdown
         result = content.dup
         replacements.sort_by { |r| -r[:start_pos] }.each do |replacement|
           result = result[0...replacement[:start_pos]] +
-            replacement[:replacement] +
-            result[replacement[:end_pos]..]
+                   replacement[:replacement] +
+                   result[replacement[:end_pos]..]
         end
 
         result
@@ -158,10 +158,10 @@ module Markdown
           else
             # Leaf node - process directly
             replacement = if item[:type] == :image
-              process_image(item)
-            else
-              process_link(item)
-            end
+                            process_image(item)
+                          else
+                            process_link(item)
+                          end
             replacements << replacement if replacement
           end
         end
@@ -190,14 +190,14 @@ module Markdown
             severity: :info,
             text: item[:text],
             url: item[:url],
-            title: item[:title],
+            title: item[:title]
           )
           return
         end
 
         # Build the new link text by applying child replacements to the original text
         # Extract the original "text" part of the link (between [ and ])
-        original_text = item[:text] || ""
+        original_text = item[:text] || ''
 
         # Apply child replacements to build the new text content
         # Children positions are relative to the document, so we need to adjust
@@ -223,7 +223,7 @@ module Markdown
         {
           start_pos: item[:start_pos],
           end_pos: item[:end_pos],
-          replacement: "[#{new_text}][#{label}]",
+          replacement: "[#{new_text}][#{label}]"
         }
       end
 
@@ -257,7 +257,7 @@ module Markdown
             severity: :warning,
             url: url,
             labels: labels,
-            selected_label: @url_to_label[url],
+            selected_label: @url_to_label[url]
           )
         end
       end
@@ -273,7 +273,7 @@ module Markdown
             severity: :info,
             text: link_text,
             url: url,
-            title: title,
+            title: title
           )
           return
         end
@@ -285,7 +285,7 @@ module Markdown
         {
           start_pos: link[:start_pos],
           end_pos: link[:end_pos],
-          replacement: "[#{link_text}][#{label}]",
+          replacement: "[#{link_text}][#{label}]"
         }
       end
 
@@ -300,7 +300,7 @@ module Markdown
             severity: :info,
             alt: alt_text,
             url: url,
-            title: title,
+            title: title
           )
           return
         end
@@ -312,7 +312,7 @@ module Markdown
         {
           start_pos: image[:start_pos],
           end_pos: image[:end_pos],
-          replacement: "![#{alt_text}][#{label}]",
+          replacement: "![#{alt_text}][#{label}]"
         }
       end
     end

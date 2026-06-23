@@ -3,7 +3,7 @@
 RSpec.describe Markdown::Merge do
   let(:markdown_merge) { ::Markdown::Merge }
   def fixtures_root
-    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
 
   def read_json(path)
@@ -14,77 +14,77 @@ RSpec.describe Markdown::Merge do
     Ast::Merge.json_ready(value)
   end
 
-  it "conforms to the slice-194 Markdown feature profile fixture" do
+  it 'conforms to the slice-194 Markdown feature profile fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-194-markdown-family-feature-profile",
-        "markdown-feature-profile.json"
+        'diagnostics',
+        'slice-194-markdown-family-feature-profile',
+        'markdown-feature-profile.json'
       )
     )
 
     expect(json_ready(markdown_merge.markdown_feature_profile)).to eq(json_ready(fixture[:feature_profile]))
   end
 
-  it "conforms to the slice-195 Markdown backend feature profile fixture" do
+  it 'conforms to the slice-195 Markdown backend feature profile fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-195-markdown-family-backend-feature-profiles",
-        "ruby-markdown-backend-feature-profiles.json"
+        'diagnostics',
+        'slice-195-markdown-family-backend-feature-profiles',
+        'ruby-markdown-backend-feature-profiles.json'
       )
     )
 
     expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(
       json_ready([
-        { id: "kreuzberg-language-pack", family: "tree-sitter" }
-      ])
+                   { id: 'kreuzberg-language-pack', family: 'tree-sitter' }
+                 ])
     )
-    expect(json_ready(TreeHaver::BackendRegistry.fetch("kreuzberg-language-pack")&.to_h)).to eq(
-      json_ready({ id: "kreuzberg-language-pack", family: "tree-sitter" })
+    expect(json_ready(TreeHaver::BackendRegistry.fetch('kreuzberg-language-pack')&.to_h)).to eq(
+      json_ready({ id: 'kreuzberg-language-pack', family: 'tree-sitter' })
     )
-    expect(json_ready(markdown_merge.markdown_backend_feature_profile(backend: "kreuzberg-language-pack"))).to eq(
-      json_ready(fixture[:tree_sitter].merge(family: "markdown", supported_dialects: ["markdown"]))
+    expect(json_ready(markdown_merge.markdown_backend_feature_profile(backend: 'kreuzberg-language-pack'))).to eq(
+      json_ready(fixture[:tree_sitter].merge(family: 'markdown', supported_dialects: ['markdown']))
     )
   end
 
-  it "conforms to the slice-196 Markdown plan-context fixture" do
+  it 'conforms to the slice-196 Markdown plan-context fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-196-markdown-family-plan-contexts",
-        "ruby-markdown-plan-contexts.json"
+        'diagnostics',
+        'slice-196-markdown-family-plan-contexts',
+        'ruby-markdown-plan-contexts.json'
       )
     )
 
-    expect(json_ready(markdown_merge.markdown_plan_context(backend: "kreuzberg-language-pack"))).to eq(
+    expect(json_ready(markdown_merge.markdown_plan_context(backend: 'kreuzberg-language-pack'))).to eq(
       json_ready(fixture[:tree_sitter])
     )
   end
 
-  it "conforms to the slice-197 Markdown family manifest fixture" do
+  it 'conforms to the slice-197 Markdown family manifest fixture' do
     manifest = read_json(
-      fixtures_root.join("conformance", "slice-197-markdown-family-manifest", "markdown-family-manifest.json")
+      fixtures_root.join('conformance', 'slice-197-markdown-family-manifest', 'markdown-family-manifest.json')
     )
 
-    expect(Ast::Merge.conformance_family_feature_profile_path(manifest, "markdown")).to eq(
+    expect(Ast::Merge.conformance_family_feature_profile_path(manifest, 'markdown')).to eq(
       %w[diagnostics slice-194-markdown-family-feature-profile markdown-feature-profile.json]
     )
-    expect(Ast::Merge.conformance_fixture_path(manifest, "markdown", "analysis")).to eq(
+    expect(Ast::Merge.conformance_fixture_path(manifest, 'markdown', 'analysis')).to eq(
       %w[markdown slice-198-analysis headings-and-code-fences.json]
     )
-    expect(Ast::Merge.conformance_fixture_path(manifest, "markdown", "matching")).to eq(
+    expect(Ast::Merge.conformance_fixture_path(manifest, 'markdown', 'matching')).to eq(
       %w[markdown slice-199-matching path-equality.json]
     )
-    expect(Ast::Merge.conformance_fixture_path(manifest, "markdown", "merge")).to eq(
+    expect(Ast::Merge.conformance_fixture_path(manifest, 'markdown', 'merge')).to eq(
       %w[markdown slice-286-merge section-merge.json]
     )
   end
 
-  it "conforms to the slice-198 Markdown analysis fixture" do
-    fixture = read_json(fixtures_root.join("markdown", "slice-198-analysis", "headings-and-code-fences.json"))
+  it 'conforms to the slice-198 Markdown analysis fixture' do
+    fixture = read_json(fixtures_root.join('markdown', 'slice-198-analysis', 'headings-and-code-fences.json'))
 
-    result = markdown_merge.parse_markdown(fixture[:source], fixture[:dialect], backend: "kreuzberg-language-pack")
+    result = markdown_merge.parse_markdown(fixture[:source], fixture[:dialect], backend: 'kreuzberg-language-pack')
     expect(result[:ok]).to be(true)
     expect(result.dig(:analysis, :root_kind)).to eq(fixture.dig(:expected, :root_kind))
     expect(json_ready(result.dig(:analysis, :owners))).to eq(
@@ -102,11 +102,12 @@ RSpec.describe Markdown::Merge do
     )
   end
 
-  it "conforms to the slice-199 Markdown matching fixture" do
-    fixture = read_json(fixtures_root.join("markdown", "slice-199-matching", "path-equality.json"))
+  it 'conforms to the slice-199 Markdown matching fixture' do
+    fixture = read_json(fixtures_root.join('markdown', 'slice-199-matching', 'path-equality.json'))
 
-    template = markdown_merge.parse_markdown(fixture[:template], fixture[:dialect], backend: "kreuzberg-language-pack")
-    destination = markdown_merge.parse_markdown(fixture[:destination], fixture[:dialect], backend: "kreuzberg-language-pack")
+    template = markdown_merge.parse_markdown(fixture[:template], fixture[:dialect], backend: 'kreuzberg-language-pack')
+    destination = markdown_merge.parse_markdown(fixture[:destination], fixture[:dialect],
+                                                backend: 'kreuzberg-language-pack')
     result = markdown_merge.match_markdown_owners(template[:analysis], destination[:analysis])
 
     expect(json_ready(result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
@@ -118,45 +119,45 @@ RSpec.describe Markdown::Merge do
     )
   end
 
-  it "conforms to the slice-286 Markdown merge fixture" do
-    fixture = read_json(fixtures_root.join("markdown", "slice-286-merge", "section-merge.json"))
+  it 'conforms to the slice-286 Markdown merge fixture' do
+    fixture = read_json(fixtures_root.join('markdown', 'slice-286-merge', 'section-merge.json'))
 
     result = markdown_merge.merge_markdown(
       fixture[:template],
       fixture[:destination],
-      "markdown",
-      backend: "kreuzberg-language-pack"
+      'markdown',
+      backend: 'kreuzberg-language-pack'
     )
     expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-208 embedded-family fixture" do
-    fixture = read_json(fixtures_root.join("markdown", "slice-208-embedded-families", "code-fence-families.json"))
+  it 'conforms to the slice-208 embedded-family fixture' do
+    fixture = read_json(fixtures_root.join('markdown', 'slice-208-embedded-families', 'code-fence-families.json'))
 
-    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
+    analysis = markdown_merge.parse_markdown(fixture[:source], 'markdown', backend: 'kreuzberg-language-pack')
     expect(analysis[:ok]).to be(true)
     expect(json_ready(markdown_merge.markdown_embedded_families(analysis[:analysis]))).to eq(
       json_ready(fixture[:expected])
     )
   end
 
-  it "conforms to the slice-212 discovered-surfaces fixture" do
-    fixture = read_json(fixtures_root.join("markdown", "slice-212-discovered-surfaces", "fenced-code-surfaces.json"))
+  it 'conforms to the slice-212 discovered-surfaces fixture' do
+    fixture = read_json(fixtures_root.join('markdown', 'slice-212-discovered-surfaces', 'fenced-code-surfaces.json'))
 
-    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
+    analysis = markdown_merge.parse_markdown(fixture[:source], 'markdown', backend: 'kreuzberg-language-pack')
     expect(analysis[:ok]).to be(true)
     expect(json_ready(markdown_merge.markdown_discovered_surfaces(analysis[:analysis]))).to eq(
       json_ready(fixture[:expected])
     )
   end
 
-  it "conforms to the slice-213 delegated child-operations fixture" do
+  it 'conforms to the slice-213 delegated child-operations fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-213-delegated-child-operations", "fenced-code-child-operations.json")
+      fixtures_root.join('markdown', 'slice-213-delegated-child-operations', 'fenced-code-child-operations.json')
     )
 
-    analysis = markdown_merge.parse_markdown(fixture[:source], "markdown", backend: "kreuzberg-language-pack")
+    analysis = markdown_merge.parse_markdown(fixture[:source], 'markdown', backend: 'kreuzberg-language-pack')
     expect(analysis[:ok]).to be(true)
     expect(
       json_ready(
@@ -168,9 +169,9 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the slice-228 projected child-review groups fixture" do
+  it 'conforms to the slice-228 projected child-review groups fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-228-projected-child-review-groups", "fenced-code-review-groups.json")
+      fixtures_root.join('markdown', 'slice-228-projected-child-review-groups', 'fenced-code-review-groups.json')
     )
 
     expect(json_ready(Ast::Merge.group_projected_child_review_cases(fixture[:cases]))).to eq(
@@ -178,9 +179,10 @@ RSpec.describe Markdown::Merge do
     )
   end
 
-  it "conforms to the slice-231 projected child-review group progress fixture" do
+  it 'conforms to the slice-231 projected child-review group progress fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-231-projected-child-review-group-progress", "fenced-code-review-progress.json")
+      fixtures_root.join('markdown', 'slice-231-projected-child-review-group-progress',
+                         'fenced-code-review-progress.json')
     )
 
     expect(
@@ -193,12 +195,12 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected_progress]))
   end
 
-  it "conforms to the slice-234 projected child-review groups ready-for-apply fixture" do
+  it 'conforms to the slice-234 projected child-review groups ready-for-apply fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-234-projected-child-review-groups-ready-for-apply",
-        "fenced-code-ready-groups.json"
+        'markdown',
+        'slice-234-projected-child-review-groups-ready-for-apply',
+        'fenced-code-ready-groups.json'
       )
     )
 
@@ -212,12 +214,12 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected_ready_groups]))
   end
 
-  it "conforms to the slice-238 delegated child review transport fixture" do
+  it 'conforms to the slice-238 delegated child review transport fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-238-delegated-child-review-transport",
-        "fenced-code-review-transport.json"
+        'markdown',
+        'slice-238-delegated-child-review-transport',
+        'fenced-code-review-transport.json'
       )
     )
 
@@ -237,12 +239,12 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected_accepted_groups]))
   end
 
-  it "conforms to the slice-241 delegated child review-state fixture" do
+  it 'conforms to the slice-241 delegated child review-state fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-241-delegated-child-review-state",
-        "fenced-code-review-state.json"
+        'markdown',
+        'slice-241-delegated-child-review-state',
+        'fenced-code-review-state.json'
       )
     )
 
@@ -257,9 +259,9 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected_state]))
   end
 
-  it "conforms to the slice-244 delegated child apply-plan fixture" do
+  it 'conforms to the slice-244 delegated child apply-plan fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-244-delegated-child-apply-plan", "fenced-code-apply-plan.json")
+      fixtures_root.join('markdown', 'slice-244-delegated-child-apply-plan', 'fenced-code-apply-plan.json')
     )
 
     expect(
@@ -272,9 +274,9 @@ RSpec.describe Markdown::Merge do
     ).to eq(json_ready(fixture[:expected_plan]))
   end
 
-  it "conforms to the slice-288 delegated child apply-output fixture" do
+  it 'conforms to the slice-288 delegated child apply-output fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-288-delegated-child-apply-output", "fenced-code-applied-output.json")
+      fixtures_root.join('markdown', 'slice-288-delegated-child-apply-output', 'fenced-code-applied-output.json')
     )
 
     result = markdown_merge.apply_markdown_delegated_child_outputs(
@@ -287,54 +289,54 @@ RSpec.describe Markdown::Merge do
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-290 nested merge fixture" do
+  it 'conforms to the slice-290 nested merge fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-290-nested-merge", "fenced-code-nested-merge.json")
+      fixtures_root.join('markdown', 'slice-290-nested-merge', 'fenced-code-nested-merge.json')
     )
 
     result = markdown_merge.merge_markdown_with_nested_outputs(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:nested_outputs],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-298 reviewed nested merge fixture" do
+  it 'conforms to the slice-298 reviewed nested merge fixture' do
     fixture = read_json(
-      fixtures_root.join("markdown", "slice-298-reviewed-nested-merge", "fenced-code-reviewed-nested-merge.json")
+      fixtures_root.join('markdown', 'slice-298-reviewed-nested-merge', 'fenced-code-reviewed-nested-merge.json')
     )
 
     result = markdown_merge.merge_markdown_with_reviewed_nested_outputs(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:review_state],
       fixture[:applied_children],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-309 reviewed nested review artifact application fixture" do
+  it 'conforms to the slice-309 reviewed nested review artifact application fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-309-reviewed-nested-review-artifact-application",
-        "fenced-code-reviewed-nested-review-artifact-application.json"
+        'markdown',
+        'slice-309-reviewed-nested-review-artifact-application',
+        'fenced-code-reviewed-nested-review-artifact-application.json'
       )
     )
 
     replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:replay_bundle],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(replay_result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(replay_result[:output]).to eq(fixture.dig(:expected, :output))
@@ -342,57 +344,57 @@ RSpec.describe Markdown::Merge do
     review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:review_state],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(review_state_result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(review_state_result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-311 reviewed nested review artifact rejection fixture" do
+  it 'conforms to the slice-311 reviewed nested review artifact rejection fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-311-reviewed-nested-review-artifact-rejection",
-        "fenced-code-reviewed-nested-review-artifact-rejection.json"
+        'markdown',
+        'slice-311-reviewed-nested-review-artifact-rejection',
+        'fenced-code-reviewed-nested-review-artifact-rejection.json'
       )
     )
 
     replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:replay_bundle],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(json_ready(replay_result)).to eq(json_ready(fixture[:expected].merge(policies: [])))
 
     review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:review_state],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(json_ready(review_state_result)).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
   end
 
-  it "conforms to the slice-313 reviewed nested review artifact envelope application fixture" do
+  it 'conforms to the slice-313 reviewed nested review artifact envelope application fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-313-reviewed-nested-review-artifact-envelope-application",
-        "fenced-code-reviewed-nested-review-artifact-envelope-application.json"
+        'markdown',
+        'slice-313-reviewed-nested-review-artifact-envelope-application',
+        'fenced-code-reviewed-nested-review-artifact-envelope-application.json'
       )
     )
 
     replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:replay_bundle_envelope],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(replay_result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(replay_result[:output]).to eq(fixture.dig(:expected, :output))
@@ -400,38 +402,38 @@ RSpec.describe Markdown::Merge do
     review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:review_state_envelope],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(review_state_result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(review_state_result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the slice-315 reviewed nested review artifact envelope rejection fixture" do
+  it 'conforms to the slice-315 reviewed nested review artifact envelope rejection fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "markdown",
-        "slice-315-reviewed-nested-review-artifact-envelope-rejection",
-        "fenced-code-reviewed-nested-review-artifact-envelope-rejection.json"
+        'markdown',
+        'slice-315-reviewed-nested-review-artifact-envelope-rejection',
+        'fenced-code-reviewed-nested-review-artifact-envelope-rejection.json'
       )
     )
 
     replay_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:replay_bundle_envelope],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(json_ready(replay_result)).to eq(json_ready(fixture[:expected_replay_bundle].merge(policies: [])))
 
     review_state_result = markdown_merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
       fixture[:template],
       fixture[:destination],
-      "markdown",
+      'markdown',
       fixture[:review_state_envelope],
-      backend: "kreuzberg-language-pack"
+      backend: 'kreuzberg-language-pack'
     )
     expect(json_ready(review_state_result)).to eq(json_ready(fixture[:expected_review_state].merge(policies: [])))
   end

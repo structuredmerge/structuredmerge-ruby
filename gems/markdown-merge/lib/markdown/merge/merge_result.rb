@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
+require 'digest'
 
 module Markdown
   module Merge
@@ -139,7 +139,7 @@ module Markdown
       #
       # @return [String] Debug representation
       def inspect
-        status = success? ? "success" : "failed"
+        status = success? ? 'success' : 'failed'
         "#<#{self.class.name} #{status} conflicts=#{conflicts.size} frozen=#{frozen_blocks.size} " \
           "added=#{nodes_added} removed=#{nodes_removed} modified=#{nodes_modified}>"
       end
@@ -148,7 +148,7 @@ module Markdown
       #
       # @return [String] The merged content or empty string
       def to_s
-        content || ""
+        content || ''
       end
 
       def to_unresolved_review_state(selections: {}, metadata: {})
@@ -156,7 +156,7 @@ module Markdown
         Ast::Merge::UnresolvedReviewState.new(
           cases: serializable_unresolved_cases,
           selections: delegated_applied_selections.merge(normalized_selections),
-          metadata: review_state_metadata(metadata, normalized_selections),
+          metadata: review_state_metadata(metadata, normalized_selections)
         )
       end
 
@@ -175,13 +175,14 @@ module Markdown
         raw_output_range = resolution_case.metadata[:output_range]
         if raw_output_range && @content_raw != @raw_content
           raise ArgumentError,
-            "cannot apply non-provisional resolution for case #{resolution_case.case_id} after post-processing transformed markdown output"
+                "cannot apply non-provisional resolution for case #{resolution_case.case_id} after post-processing transformed markdown output"
         end
 
         output_range = normalize_output_range(raw_output_range)
         return super unless output_range
 
-        selected_candidate = resolution_case.metadata.dig(:output_candidate_by_selection, selection.to_sym) || selected_candidate
+        selected_candidate = resolution_case.metadata.dig(:output_candidate_by_selection,
+                                                          selection.to_sym) || selected_candidate
         start_offset, end_offset = output_range
         prefix = @content_raw.byteslice(0, start_offset).to_s
         suffix = @content_raw.byteslice(end_offset..).to_s
@@ -196,8 +197,8 @@ module Markdown
       def apply_grouped_delegated_resolutions!(normalized_resolutions)
         handled_case_ids = []
         delegated_groups = @unresolved_cases
-          .group_by { |resolution_case| resolution_case.metadata[:delegated_apply_group] }
-          .reject { |group_id, _| group_id.nil? }
+                           .group_by { |resolution_case| resolution_case.metadata[:delegated_apply_group] }
+                           .reject { |group_id, _| group_id.nil? }
 
         delegated_groups.each_value do |cases|
           selected_cases = cases.select { |resolution_case| normalized_resolutions.key?(resolution_case.case_id) }
@@ -214,18 +215,26 @@ module Markdown
         raw_output_range = cases.map { |resolution_case| resolution_case.metadata[:output_range] }.compact.uniq.fetch(0)
         if @content_raw != @raw_content
           raise ArgumentError,
-            "cannot apply non-provisional resolution for delegated block #{cases.first.metadata[:delegated_apply_group]} after post-processing transformed markdown output"
+                "cannot apply non-provisional resolution for delegated block #{cases.first.metadata[:delegated_apply_group]} after post-processing transformed markdown output"
         end
 
         output_range = normalize_output_range(raw_output_range)
-        renderer = cases.map { |resolution_case| resolution_case.metadata[:delegated_apply_renderer] }.compact.uniq.fetch(0)
-        prior_selections = cases.map { |resolution_case| resolution_case.metadata[:delegated_applied_selections] }.compact.reduce({}) do |memo, selections|
+        renderer = cases.map do |resolution_case|
+          resolution_case.metadata[:delegated_apply_renderer]
+        end.compact.uniq.fetch(0)
+        prior_selections = cases.map do |resolution_case|
+          resolution_case.metadata[:delegated_applied_selections]
+        end.compact.reduce({}) do |memo, selections|
           memo.merge(selections.transform_keys(&:to_s))
         end
-        prior_root_selections = cases.map { |resolution_case| resolution_case.metadata[:delegated_root_applied_selections] }.compact.reduce({}) do |memo, selections|
+        prior_root_selections = cases.map do |resolution_case|
+          resolution_case.metadata[:delegated_root_applied_selections]
+        end.compact.reduce({}) do |memo, selections|
           memo.merge(selections.transform_keys(&:to_s))
         end
-        prior_root_identities = cases.map { |resolution_case| resolution_case.metadata[:delegated_root_case_identities] }.compact.reduce({}) do |memo, identities|
+        prior_root_identities = cases.map do |resolution_case|
+          resolution_case.metadata[:delegated_root_case_identities]
+        end.compact.reduce({}) do |memo, identities|
           memo.merge(identities.transform_keys(&:to_s))
         end
         delegated_selections = selected_cases.each_with_object(prior_selections) do |resolution_case, hash|
@@ -249,7 +258,7 @@ module Markdown
           renderer: renderer,
           applied_selections: delegated_selections,
           root_applied_selections: delegated_root_selections,
-          root_case_identities: delegated_root_identities,
+          root_case_identities: delegated_root_identities
         )
         remapped_cases.each { |resolution_case| add_unresolved_case(resolution_case) }
         @conflicts.concat(remapped_cases.map { |resolution_case| conflict_for_resolution_case(resolution_case) })
@@ -292,7 +301,8 @@ module Markdown
         [start_offset, start_offset + replacement.to_s.bytesize]
       end
 
-      def remap_delegated_cases_after_apply(unresolved_cases, template_case:, output_range:, renderer:, applied_selections:, root_applied_selections:, root_case_identities:)
+      def remap_delegated_cases_after_apply(unresolved_cases, template_case:, output_range:, renderer:,
+                                            applied_selections:, root_applied_selections:, root_case_identities:)
         operation_id = template_case.metadata[:delegated_runtime_operation_id]
         surface_prefix = template_case.metadata[:delegated_runtime_surface_path]
         delegated_group = template_case.metadata[:delegated_apply_group]
@@ -304,7 +314,7 @@ module Markdown
             reason: resolution_case.reason,
             candidates: resolution_case.candidates,
             provisional_winner: resolution_case.provisional_winner,
-            surface_path: [surface_prefix, suffix].compact.join(" > "),
+            surface_path: [surface_prefix, suffix].compact.join(' > '),
             operation_id: operation_id,
             metadata: resolution_case.metadata.merge(
               delegated_case_id: resolution_case.case_id,
@@ -315,17 +325,17 @@ module Markdown
               delegated_root_applied_selections: root_applied_selections,
               delegated_root_case_identities: root_case_identities,
               delegated_runtime_operation_id: operation_id,
-              delegated_runtime_surface_path: surface_prefix,
-            ),
+              delegated_runtime_surface_path: surface_prefix
+            )
           )
         end
       end
 
       def delegated_surface_suffix_for(surface_path)
         path = surface_path.to_s
-        return if path.empty? || path == "document[0]"
+        return if path.empty? || path == 'document[0]'
 
-        path.sub(/\Adocument\[0\]\s*>\s*/, "")
+        path.sub(/\Adocument\[0\]\s*>\s*/, '')
       end
 
       def conflict_for_resolution_case(resolution_case)
@@ -335,7 +345,7 @@ module Markdown
           template: resolution_case.candidates[:template],
           destination: resolution_case.candidates[:destination],
           provisional_winner: resolution_case.provisional_winner,
-          surface_path: resolution_case.surface_path,
+          surface_path: resolution_case.surface_path
         }
       end
 
@@ -349,8 +359,8 @@ module Markdown
             surface_path: resolution_case.surface_path,
             operation_id: resolution_case.operation_id,
             metadata: sanitize_review_state_metadata(
-              resolution_case.metadata.merge(review_identity: review_identity_for_case(resolution_case)),
-            ),
+              resolution_case.metadata.merge(review_identity: review_identity_for_case(resolution_case))
+            )
           )
         end
       end
@@ -363,11 +373,12 @@ module Markdown
 
       def review_state_metadata(metadata, normalized_selections)
         metadata_hash = super(metadata, normalized_selections)
-        markdown_review_state = metadata_hash.fetch(:markdown_review_state, metadata_hash.fetch("markdown_review_state", {})).to_h
+        markdown_review_state = metadata_hash.fetch(:markdown_review_state,
+                                                    metadata_hash.fetch('markdown_review_state', {})).to_h
         metadata_hash.merge(
           markdown_review_state: markdown_review_state.merge(
-            selection_identities: selection_review_identities(normalized_selections),
-          ),
+            selection_identities: selection_review_identities(normalized_selections)
+          )
         )
       end
 
@@ -383,9 +394,9 @@ module Markdown
       end
 
       def persisted_selection_identities(metadata)
-        markdown_review_state = metadata.fetch(:markdown_review_state, metadata.fetch("markdown_review_state", {})).to_h
-        markdown_review_state.fetch(:selection_identities, markdown_review_state.fetch("selection_identities", {})).to_h
-          .transform_keys(&:to_s)
+        markdown_review_state = metadata.fetch(:markdown_review_state, metadata.fetch('markdown_review_state', {})).to_h
+        markdown_review_state.fetch(:selection_identities, markdown_review_state.fetch('selection_identities', {})).to_h
+                             .transform_keys(&:to_s)
       end
 
       def review_identity_for_case(resolution_case)
@@ -399,8 +410,8 @@ module Markdown
             resolution_case.provisional_winner,
             case_metadata_value(resolution_case, :match_kind),
             resolution_case.candidates[:template],
-            resolution_case.candidates[:destination],
-          ].map(&:to_s).join("\u001f"),
+            resolution_case.candidates[:destination]
+          ].map(&:to_s).join("\u001f")
         )
       end
 
@@ -436,17 +447,17 @@ module Markdown
           current_case = unresolved_case(case_id)
           persisted_case = persisted_cases[case_id]
           if persisted_case && !case_metadata_value(persisted_case, :review_identity) &&
-              (persisted_case.surface_path != current_case.surface_path ||
-              case_metadata_value(persisted_case, :match_kind) != case_metadata_value(current_case, :match_kind))
+             (persisted_case.surface_path != current_case.surface_path ||
+             case_metadata_value(persisted_case, :match_kind) != case_metadata_value(current_case, :match_kind))
             raise ArgumentError,
-              "cannot apply markdown review state: case #{case_id} no longer matches the current unresolved markdown surface"
+                  "cannot apply markdown review state: case #{case_id} no longer matches the current unresolved markdown surface"
           end
 
           next unless current_case&.metadata&.[](:output_range)
           next if @content_raw == @raw_content
 
           raise ArgumentError,
-            "cannot apply markdown review state for case #{case_id} after post-processing transformed markdown output"
+                "cannot apply markdown review state for case #{case_id} after post-processing transformed markdown output"
         end
       end
 
@@ -464,7 +475,7 @@ module Markdown
           nodes_added: 0,
           nodes_removed: 0,
           nodes_modified: 0,
-          merge_time_ms: 0,
+          merge_time_ms: 0
         }
       end
     end

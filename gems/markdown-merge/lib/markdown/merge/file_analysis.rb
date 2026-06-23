@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
+require 'digest'
 
 module Markdown
   module Merge
@@ -41,7 +41,7 @@ module Markdown
     class FileAnalysis < FileAnalysisBase
       # Default freeze token for identifying freeze blocks
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "markdown-merge"
+      DEFAULT_FREEZE_TOKEN = 'markdown-merge'
 
       class << self
         def default_backend
@@ -168,10 +168,10 @@ module Markdown
       def compute_parser_signature(node)
         # Get canonical type from wrapper or normalize raw type
         canonical_type = if Ast::Merge::NodeTyping.typed_node?(node)
-          Ast::Merge::NodeTyping.merge_type_for(node)
-        else
-          NodeTypeNormalizer.canonical_type(node.type, @backend)
-        end
+                           Ast::Merge::NodeTyping.merge_type_for(node)
+                         else
+                           NodeTypeNormalizer.canonical_type(node.type, @backend)
+                         end
 
         # Unwrap to access underlying node methods
         raw_node = Ast::Merge::NodeTyping.unwrap(node)
@@ -292,14 +292,14 @@ module Markdown
         canonical_type = NodeTypeNormalizer.canonical_type(node.type, @backend)
 
         # Collect text from text and code nodes
-        if canonical_type == :text || canonical_type == :code
+        if %i[text code].include?(canonical_type)
           content = if node.respond_to?(:string_content)
-            node.string_content.to_s
-          elsif node.respond_to?(:text)
-            node.text.to_s
-          else
-            ""
-          end
+                      node.string_content.to_s
+                    elsif node.respond_to?(:text)
+                      node.text.to_s
+                    else
+                      ''
+                    end
           text_parts << content unless content.empty?
         end
 
@@ -350,7 +350,7 @@ module Markdown
       def create_commonmarker_parser
         parser = Commonmarker::Merge::Backend::Parser.new
         # Default options enable table extension for GFM compatibility
-        default_options = {extension: {table: true}}
+        default_options = { extension: { table: true } }
         options = default_options.merge(@parser_options[:options] || {})
         parser.language = Commonmarker::Merge::Backend::Language.markdown(options: options)
         parser
@@ -365,7 +365,7 @@ module Markdown
         extensions = @parser_options[:extensions] || [:table]
         parser.language = Markly::Merge::Backend::Language.markdown(
           flags: flags,
-          extensions: extensions,
+          extensions: extensions
         )
         parser
       end

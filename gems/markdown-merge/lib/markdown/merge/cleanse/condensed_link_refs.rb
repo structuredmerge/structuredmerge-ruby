@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module Markdown
   module Merge
@@ -105,14 +105,14 @@ module Markdown
 
           # Bracket content: handles nested brackets recursively
           # Same as LinkParser::DefinitionGrammar
-          rule(:bracket_content) {
+          rule(:bracket_content) do
             (
-              str("[") >> bracket_content.maybe >> str("]") |
-              str("]").absent? >> any
+              str('[') >> bracket_content.maybe >> str(']') |
+              str(']').absent? >> any
             ).repeat
-          }
+          end
 
-          rule(:label) { str("[") >> bracket_content.as(:label) >> str("]") }
+          rule(:label) { str('[') >> bracket_content.as(:label) >> str(']') }
 
           # URL characters - everything except whitespace, >, and [
           # The [ is excluded because it signals the start of the next definition
@@ -120,36 +120,36 @@ module Markdown
           rule(:bare_url) { url_char.repeat(1) }
 
           # Angled URLs can contain [ since they're delimited by <>
-          rule(:angled_url_char) { match("[^>]") }
-          rule(:angled_url) { str("<") >> angled_url_char.repeat(1) >> str(">") }
+          rule(:angled_url_char) { match('[^>]') }
+          rule(:angled_url) { str('<') >> angled_url_char.repeat(1) >> str('>') }
 
           rule(:url) { (angled_url | bare_url).as(:url) }
 
           # Title handling (same as LinkParser)
           rule(:title_content_double) { (str('"').absent? >> any).repeat }
           rule(:title_content_single) { (str("'").absent? >> any).repeat }
-          rule(:title_content_paren) { (str(")").absent? >> any).repeat }
+          rule(:title_content_paren) { (str(')').absent? >> any).repeat }
 
           rule(:title_double) { str('"') >> title_content_double.as(:title) >> str('"') }
           rule(:title_single) { str("'") >> title_content_single.as(:title) >> str("'") }
-          rule(:title_paren) { str("(") >> title_content_paren.as(:title) >> str(")") }
+          rule(:title_paren) { str('(') >> title_content_paren.as(:title) >> str(')') }
           rule(:title) { title_double | title_single | title_paren }
 
           # A single definition
-          rule(:definition) {
+          rule(:definition) do
             spaces? >>
               label >>
-              str(":") >>
+              str(':') >>
               spaces? >>
               url >>
               (spaces >> title).maybe >>
               spaces?
-          }
+          end
 
           # Multiple definitions, possibly with or without newlines between them
-          rule(:definitions) {
+          rule(:definitions) do
             (definition.as(:definition) >> newlines?).repeat(1)
-          }
+          end
 
           root(:definitions)
         end
@@ -209,7 +209,7 @@ module Markdown
             next unless parsed && !parsed.empty?
 
             # Check if line has content before first definition
-            first_bracket = line.index("[")
+            first_bracket = line.index('[')
             has_prefix = first_bracket && first_bracket > 0 && !line[0...first_bracket].strip.empty?
 
             # Include if: multiple definitions OR single definition with prefix
@@ -272,10 +272,10 @@ module Markdown
         # @return [Boolean] true if there's content before first `[label]:`
         def has_content_before_definition?(line)
           # Skip if no link definition pattern
-          return false unless line.include?("]:")
+          return false unless line.include?(']:')
 
           # Find first occurrence of [label]:
-          first_bracket = line.index("[")
+          first_bracket = line.index('[')
           return false unless first_bracket
           return false if inside_inline_code?(line, first_bracket)
 
@@ -297,11 +297,11 @@ module Markdown
         # @return [Array<Hash>, nil] array of definition parse trees, or nil if parse fails
         def parse_line(line)
           # Skip lines that don't look like link definitions
-          return unless line.include?("]:")
+          return unless line.include?(']:')
 
           # First, try to find where the first link definition starts
           # Look for pattern: [anything]:
-          first_bracket = line.index("[")
+          first_bracket = line.index('[')
           return unless first_bracket
           return if inside_inline_code?(line, first_bracket)
 
@@ -317,7 +317,7 @@ module Markdown
 
             # Filter out non-definition nodes and return only definitions
             defs.select { |node| node.is_a?(Hash) && node.key?(:definition) }
-              .map { |node| node[:definition] }
+                .map { |node| node[:definition] }
           rescue Parslet::ParseFailed
             nil
           end
@@ -337,7 +337,7 @@ module Markdown
 
           {
             label: label,
-            url: clean_url(url),
+            url: clean_url(url)
           }
         end
 
@@ -354,8 +354,8 @@ module Markdown
           return line unless parsed && !parsed.empty?
 
           # Find where the first definition starts
-          first_bracket = line.index("[")
-          prefix = (first_bracket && first_bracket > 0) ? line[0...first_bracket].strip : ""
+          first_bracket = line.index('[')
+          prefix = first_bracket && first_bracket > 0 ? line[0...first_bracket].strip : ''
 
           # Case 1: Multiple definitions - always expand
           if parsed.size > 1
@@ -363,10 +363,10 @@ module Markdown
 
             # First definition gets the prefix if present
             result = if prefix && !prefix.empty?
-              "#{prefix}\n#{definitions.join("\n")}"
-            else
-              definitions.join("\n")
-            end
+                       "#{prefix}\n#{definitions.join("\n")}"
+                     else
+                       definitions.join("\n")
+                     end
 
             result += "\n" if line.end_with?("\n")
             return result
@@ -399,11 +399,11 @@ module Markdown
         # @return [String] cleaned URL
         def clean_url(url)
           url = url.strip
-          (url.start_with?("<") && url.end_with?(">")) ? url[1..-2] : url
+          url.start_with?('<') && url.end_with?('>') ? url[1..-2] : url
         end
 
         def inside_inline_code?(line, index)
-          line[0...index].count("`").odd?
+          line[0...index].count('`').odd?
         end
       end
     end

@@ -35,7 +35,7 @@ module Markdown
         first_column: 0.20,      # (B) First column matching
         row_content: 0.25,       # (C) Content in matching rows
         total_cells: 0.15,       # (D) Overall cell matching
-        position: 0.15,          # (E) Position distance
+        position: 0.15 # (E) Position distance
       }.freeze
 
       # Minimum similarity threshold to consider cells as potentially matching
@@ -68,7 +68,8 @@ module Markdown
       # @param total_tables_b [Integer] Total tables in second document (default: 1)
       # @param weights [Hash] Custom weights for scoring factors
       # @param backend [Symbol] Markdown backend for type normalization (default: :commonmarker)
-      def initialize(position_a: nil, position_b: nil, total_tables_a: 1, total_tables_b: 1, weights: {}, backend: :commonmarker)
+      def initialize(position_a: nil, position_b: nil, total_tables_a: 1, total_tables_b: 1, weights: {},
+                     backend: :commonmarker)
         @position_a = position_a
         @position_b = position_b
         @total_tables_a = [total_tables_a, 1].max
@@ -93,7 +94,7 @@ module Markdown
           first_column: compute_first_column_match(rows_a, rows_b),
           row_content: compute_row_content_match(rows_a, rows_b),
           total_cells: compute_total_cells_match(rows_a, rows_b),
-          position: compute_position_score,
+          position: compute_position_score
         }
 
         weighted_average(scores)
@@ -113,9 +114,7 @@ module Markdown
         return str_a.length if str_b.empty?
 
         # Ensure str_a is the shorter string for space optimization
-        if str_a.length > str_b.length
-          str_a, str_b = str_b, str_a
-        end
+        str_a, str_b = str_b, str_a if str_a.length > str_b.length
 
         m = str_a.length
         n = str_b.length
@@ -128,11 +127,11 @@ module Markdown
           curr_row[0] = j
 
           (1..m).each do |i|
-            cost = (str_a[i - 1] == str_b[j - 1]) ? 0 : 1
+            cost = str_a[i - 1] == str_b[j - 1] ? 0 : 1
             curr_row[i] = [
               curr_row[i - 1] + 1,      # insertion
               prev_row[i] + 1,          # deletion
-              prev_row[i - 1] + cost,   # substitution
+              prev_row[i - 1] + cost # substitution
             ].min
           end
 
@@ -171,9 +170,7 @@ module Markdown
         rows = []
         child = table.first_child
         while child
-          if table_row_type?(child)
-            rows << extract_cells(child)
-          end
+          rows << extract_cells(child) if table_row_type?(child)
           child = next_sibling(child)
         end
         rows
@@ -196,7 +193,7 @@ module Markdown
 
         # Normalize the type using NodeTypeNormalizer for backend portability
         canonical = NodeTypeNormalizer.canonical_type(node.type, @backend || :commonmarker)
-        canonical == :table_row || canonical == :table_header
+        %i[table_row table_header].include?(canonical)
       end
 
       # Get the next sibling of a node.
@@ -231,9 +228,7 @@ module Markdown
         while child
           if child.respond_to?(:type)
             canonical = NodeTypeNormalizer.canonical_type(child.type, @backend || :commonmarker)
-            if canonical == :table_cell
-              cells << extract_text_content(child)
-            end
+            cells << extract_text_content(child) if canonical == :table_cell
           end
           child = next_sibling(child)
         end
@@ -271,14 +266,14 @@ module Markdown
         canonical_type = NodeTypeNormalizer.canonical_type(node.type, @backend || :commonmarker)
 
         # Collect text from text and code nodes
-        if canonical_type == :text || canonical_type == :code
+        if %i[text code].include?(canonical_type)
           content = if node.respond_to?(:string_content)
-            node.string_content.to_s
-          elsif node.respond_to?(:text)
-            node.text.to_s
-          else
-            ""
-          end
+                      node.string_content.to_s
+                    elsif node.respond_to?(:text)
+                      node.text.to_s
+                    else
+                      ''
+                    end
           text_parts << content unless content.empty?
         end
 
@@ -292,10 +287,10 @@ module Markdown
           while child
             collect_text_recursive(child, text_parts)
             child = if child.respond_to?(:next_sibling)
-              child.next_sibling
-            else
-              (child.respond_to?(:next) ? child.next : nil)
-            end
+                      child.next_sibling
+                    else
+                      (child.respond_to?(:next) ? child.next : nil)
+                    end
           end
         end
       end
@@ -354,7 +349,7 @@ module Markdown
 
         # Average over total cells
         total_cells = col_a.size + col_b.size
-        (total_cells > 0) ? total_similarity / total_cells : 0.0
+        total_cells > 0 ? total_similarity / total_cells : 0.0
       end
 
       # (C) Compute average match percentage for rows with matching first column.

@@ -14,7 +14,7 @@ module Markdown
       private
 
       def normalized_preserved_fragment_text(text)
-        text.to_s.sub(/\n+\z/, "")
+        text.to_s.sub(/\n+\z/, '')
       end
 
       def standalone_comment_text?(text)
@@ -51,12 +51,12 @@ module Markdown
         return node.blank? if node.respond_to?(:blank?)
 
         text = if node.respond_to?(:text)
-          node.text
-        elsif node.respond_to?(:content)
-          node.content
-        else
-          ""
-        end
+                 node.text
+               elsif node.respond_to?(:content)
+                 node.content
+               else
+                 ''
+               end
 
         text.to_s.strip.empty?
       end
@@ -89,7 +89,7 @@ module Markdown
         [
           region.respond_to?(:start_line) ? region.start_line : nil,
           region.respond_to?(:end_line) ? region.end_line : nil,
-          normalized_preserved_fragment_text(region.respond_to?(:text) ? region.text : nil),
+          normalized_preserved_fragment_text(region.respond_to?(:text) ? region.text : nil)
         ]
       end
 
@@ -99,7 +99,7 @@ module Markdown
         [
           pos&.dig(:start_line),
           pos&.dig(:end_line),
-          normalized_preserved_fragment_text(text || source_text_for_preserved_node(node, analysis)),
+          normalized_preserved_fragment_text(text || source_text_for_preserved_node(node, analysis))
         ]
       end
 
@@ -144,7 +144,7 @@ module Markdown
           rebased_keys << [
             start_line ? start_line - line_offset : nil,
             end_line ? end_line - line_offset : nil,
-            text,
+            text
           ]
         end
       end
@@ -188,7 +188,7 @@ module Markdown
             insertion_index: insertion_index_by_owner[attachment_owner_key(attachment)],
             gap_count: blank_gap_count(attachment.respond_to?(:leading_gap) ? attachment.leading_gap : nil),
             allowed_region_keys: allowed_region_keys,
-            seen_region_keys: seen_region_keys,
+            seen_region_keys: seen_region_keys
           )
         end.tap do |specs|
           append_remove_plan_comment_insertion_spec(
@@ -197,7 +197,7 @@ module Markdown
             insertion_index: final_insertion_index,
             gap_count: blank_gap_count(remove_plan.trailing_boundary&.comment_attachment&.leading_gap),
             allowed_region_keys: allowed_region_keys,
-            seen_region_keys: seen_region_keys,
+            seen_region_keys: seen_region_keys
           )
         end
       end
@@ -225,14 +225,14 @@ module Markdown
 
           {
             kind: :standalone_comment,
-            text: normalized_preserved_fragment_text(source_text_for_preserved_node(node, analysis)),
+            text: normalized_preserved_fragment_text(source_text_for_preserved_node(node, analysis))
           }
         elsif link_definition_node?(node)
           return if template_link_definition_signatures.include?(node.signature)
 
           {
             kind: :link_definition,
-            text: normalized_preserved_fragment_text(source_text_for_preserved_node(node, analysis)),
+            text: normalized_preserved_fragment_text(source_text_for_preserved_node(node, analysis))
           }
         end
       end
@@ -252,10 +252,10 @@ module Markdown
 
       def attachment_owner_key(owner_or_attachment)
         owner = if owner_or_attachment.respond_to?(:owner)
-          owner_or_attachment.owner
-        else
-          owner_or_attachment
-        end
+                  owner_or_attachment.owner
+                else
+                  owner_or_attachment
+                end
 
         owner&.object_id
       end
@@ -264,11 +264,12 @@ module Markdown
         if respond_to?(:node_to_source, true)
           node_to_source(node, analysis)
         else
-          ""
+          ''
         end
       end
 
-      def append_remove_plan_comment_insertion_spec(specs, region:, insertion_index:, gap_count:, allowed_region_keys:, seen_region_keys:)
+      def append_remove_plan_comment_insertion_spec(specs, region:, insertion_index:, gap_count:, allowed_region_keys:,
+                                                    seen_region_keys:)
         return unless region && insertion_index
 
         region_key = preserved_comment_region_key(region)
@@ -280,9 +281,9 @@ module Markdown
           insertion_index: insertion_index,
           fragment: {
             kind: :standalone_comment,
-            text: normalized_preserved_fragment_text(region.text),
+            text: normalized_preserved_fragment_text(region.text)
           },
-          gap_count: gap_count,
+          gap_count: gap_count
         }
       end
     end

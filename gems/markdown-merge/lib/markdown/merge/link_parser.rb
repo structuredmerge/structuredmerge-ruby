@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module Markdown
   module Merge
@@ -35,33 +35,33 @@ module Markdown
         rule(:spaces?) { space.repeat }
 
         # Bracket content: handles nested brackets recursively
-        rule(:bracket_content) {
+        rule(:bracket_content) do
           (
-            str("[") >> bracket_content.maybe >> str("]") |
-            str("]").absent? >> any
+            str('[') >> bracket_content.maybe >> str(']') |
+            str(']').absent? >> any
           ).repeat
-        }
+        end
 
-        rule(:label) { str("[") >> bracket_content.as(:label) >> str("]") }
+        rule(:label) { str('[') >> bracket_content.as(:label) >> str(']') }
 
         rule(:url_char) { match('[^\s>]') }
         rule(:bare_url) { url_char.repeat(1) }
-        rule(:angled_url_char) { match("[^>]") }
-        rule(:angled_url) { str("<") >> angled_url_char.repeat(1) >> str(">") }
+        rule(:angled_url_char) { match('[^>]') }
+        rule(:angled_url) { str('<') >> angled_url_char.repeat(1) >> str('>') }
         rule(:url) { (angled_url | bare_url).as(:url) }
 
         rule(:title_content_double) { (str('"').absent? >> any).repeat }
         rule(:title_content_single) { (str("'").absent? >> any).repeat }
-        rule(:title_content_paren) { (str(")").absent? >> any).repeat }
+        rule(:title_content_paren) { (str(')').absent? >> any).repeat }
 
         rule(:title_double) { str('"') >> title_content_double.as(:title) >> str('"') }
         rule(:title_single) { str("'") >> title_content_single.as(:title) >> str("'") }
-        rule(:title_paren) { str("(") >> title_content_paren.as(:title) >> str(")") }
+        rule(:title_paren) { str('(') >> title_content_paren.as(:title) >> str(')') }
         rule(:title) { title_double | title_single | title_paren }
 
-        rule(:definition) {
-          spaces? >> label >> str(":") >> spaces? >> url >> (spaces >> title).maybe >> spaces?
-        }
+        rule(:definition) do
+          spaces? >> label >> str(':') >> spaces? >> url >> (spaces >> title).maybe >> spaces?
+        end
 
         root(:definition)
       end
@@ -72,22 +72,22 @@ module Markdown
         rule(:spaces) { space.repeat(1) }
 
         # Bracket content with recursive nesting
-        rule(:bracket_content) {
+        rule(:bracket_content) do
           (
-            str("[") >> bracket_content.maybe >> str("]") |
-            str("]").absent? >> any
+            str('[') >> bracket_content.maybe >> str(']') |
+            str(']').absent? >> any
           ).repeat
-        }
+        end
 
-        rule(:link_text) { str("[") >> bracket_content.as(:text) >> str("]") }
+        rule(:link_text) { str('[') >> bracket_content.as(:text) >> str(']') }
 
         # URL content - handles balanced parens inside URLs
-        rule(:paren_content) {
+        rule(:paren_content) do
           (
-            str("(") >> paren_content.maybe >> str(")") |
+            str('(') >> paren_content.maybe >> str(')') |
             match('[^()\s"\']')
           ).repeat
-        }
+        end
 
         rule(:url) { paren_content.as(:url) }
 
@@ -97,7 +97,7 @@ module Markdown
         rule(:title_single) { str("'") >> title_content_single.as(:title) >> str("'") }
         rule(:title) { title_double | title_single }
 
-        rule(:url_part) { str("(") >> url >> (spaces >> title).maybe >> str(")") }
+        rule(:url_part) { str('(') >> url >> (spaces >> title).maybe >> str(')') }
 
         rule(:inline_link) { link_text >> url_part }
 
@@ -109,21 +109,21 @@ module Markdown
         rule(:space) { match('[ \t]') }
         rule(:spaces) { space.repeat(1) }
 
-        rule(:bracket_content) {
+        rule(:bracket_content) do
           (
-            str("[") >> bracket_content.maybe >> str("]") |
-            str("]").absent? >> any
+            str('[') >> bracket_content.maybe >> str(']') |
+            str(']').absent? >> any
           ).repeat
-        }
+        end
 
-        rule(:alt_text) { str("![") >> bracket_content.as(:alt) >> str("]") }
+        rule(:alt_text) { str('![') >> bracket_content.as(:alt) >> str(']') }
 
-        rule(:paren_content) {
+        rule(:paren_content) do
           (
-            str("(") >> paren_content.maybe >> str(")") |
+            str('(') >> paren_content.maybe >> str(')') |
             match('[^()\s"\']')
           ).repeat
-        }
+        end
 
         rule(:url) { paren_content.as(:url) }
 
@@ -133,7 +133,7 @@ module Markdown
         rule(:title_single) { str("'") >> title_content_single.as(:title) >> str("'") }
         rule(:title) { title_double | title_single }
 
-        rule(:url_part) { str("(") >> url >> (spaces >> title).maybe >> str(")") }
+        rule(:url_part) { str('(') >> url >> (spaces >> title).maybe >> str(')') }
 
         rule(:inline_image) { alt_text >> url_part }
 
@@ -170,11 +170,11 @@ module Markdown
 
         url = result[:url].to_s
         # Strip angle brackets if present
-        url = url[1..-2] if url.start_with?("<") && url.end_with?(">")
+        url = url[1..-2] if url.start_with?('<') && url.end_with?('>')
 
         definition = {
           label: result[:label].to_s,
-          url: url,
+          url: url
         }
         definition[:title] = result[:title].to_s if result[:title]
         definition
@@ -239,7 +239,7 @@ module Markdown
       def build_link_tree(links, images)
         # Combine all items
         all_items = links.map { |l| l.merge(type: :link) } +
-          images.map { |i| i.merge(type: :image) }
+                    images.map { |i| i.merge(type: :image) }
 
         # Sort by start position
         sorted = all_items.sort_by { |item| item[:start_pos] }
@@ -297,15 +297,15 @@ module Markdown
       def find_constructs(content, type)
         results = []
         pos = 0
-        grammar = (type == :image) ? @image_grammar : @link_grammar
-        start_marker = (type == :image) ? "![" : "["
+        grammar = type == :image ? @image_grammar : @link_grammar
+        start_marker = type == :image ? '![' : '['
 
         while pos < content.length
           idx = content.index(start_marker, pos)
           break unless idx
 
           # For links, skip if preceded by ! (that's an image)
-          if type == :link && idx > 0 && content[idx - 1] == "!"
+          if type == :link && idx > 0 && content[idx - 1] == '!'
             pos = idx + 1
             next
           end
@@ -327,12 +327,12 @@ module Markdown
         remaining = content[start_idx..]
 
         # Find the closing ) by tracking balanced brackets/parens
-        bracket_end = find_bracket_end(remaining, (type == :image) ? 1 : 0)
+        bracket_end = find_bracket_end(remaining, type == :image ? 1 : 0)
         return unless bracket_end
 
         # Check for ( after ]
         return if bracket_end + 1 >= remaining.length
-        return unless remaining[bracket_end + 1] == "("
+        return unless remaining[bracket_end + 1] == '('
 
         paren_end = find_paren_end(remaining, bracket_end + 1)
         return unless paren_end
@@ -344,22 +344,22 @@ module Markdown
           result = grammar.parse(substring)
 
           parsed = if type == :image
-            {
-              alt: result[:alt].to_s,
-              url: result[:url].to_s,
-              start_pos: start_idx,
-              end_pos: start_idx + substring.length,
-              original: substring,
-            }
-          else
-            {
-              text: result[:text].to_s,
-              url: result[:url].to_s,
-              start_pos: start_idx,
-              end_pos: start_idx + substring.length,
-              original: substring,
-            }
-          end
+                     {
+                       alt: result[:alt].to_s,
+                       url: result[:url].to_s,
+                       start_pos: start_idx,
+                       end_pos: start_idx + substring.length,
+                       original: substring
+                     }
+                   else
+                     {
+                       text: result[:text].to_s,
+                       url: result[:url].to_s,
+                       start_pos: start_idx,
+                       end_pos: start_idx + substring.length,
+                       original: substring
+                     }
+                   end
 
           parsed[:title] = result[:title].to_s if result[:title]
           parsed
@@ -374,9 +374,9 @@ module Markdown
 
         while pos < text.length
           case text[pos]
-          when "["
+          when '['
             depth += 1
-          when "]"
+          when ']'
             depth -= 1
             return pos if depth == 0
           end
@@ -395,7 +395,7 @@ module Markdown
         while pos < text.length
           char = text[pos]
 
-          if !in_quotes && (char == '"' || char == "'")
+          if !in_quotes && ['"', "'"].include?(char)
             in_quotes = true
             quote_char = char
           elsif in_quotes && char == quote_char
@@ -403,9 +403,9 @@ module Markdown
             quote_char = nil
           elsif !in_quotes
             case char
-            when "("
+            when '('
               depth += 1
-            when ")"
+            when ')'
               depth -= 1
               return pos if depth == 0
             end

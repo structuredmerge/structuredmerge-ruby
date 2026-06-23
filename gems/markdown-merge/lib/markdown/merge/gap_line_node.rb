@@ -40,14 +40,14 @@ module Markdown
       def initialize(content, line_number:)
         @content = content.chomp
         @line_number = line_number
-        @preceding_node = nil  # Set later during integration
+        @preceding_node = nil # Set later during integration
         @preceding_signature = nil
 
         location = Ast::Merge::AstNode::Location.new(
           start_line: line_number,
           end_line: line_number,
           start_column: 0,
-          end_column: @content.length,
+          end_column: @content.length
         )
 
         super(slice: @content, location: location)
@@ -61,7 +61,7 @@ module Markdown
 
       # Alias for compatibility with wrapped nodes that have merge_type
       # @return [Symbol] :gap_line
-      alias_method :merge_type, :type
+      alias merge_type type
 
       # Generate a signature for matching gap lines.
       # Gap lines are matched by their position relative to the preceding structural node.
@@ -105,7 +105,7 @@ module Markdown
           start_line: @line_number,
           end_line: @line_number,
           start_column: 0,
-          end_column: @content.length,
+          end_column: @content.length
         }
       end
 

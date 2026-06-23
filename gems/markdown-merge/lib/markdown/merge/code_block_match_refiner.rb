@@ -14,8 +14,8 @@ module Markdown
       end
 
       def call(template_nodes, dest_nodes, context = {})
-        template_blocks = template_nodes.select { |node| node_type(node).to_s == "code_block" }
-        dest_blocks = dest_nodes.select { |node| node_type(node).to_s == "code_block" }
+        template_blocks = template_nodes.select { |node| node_type(node).to_s == 'code_block' }
+        dest_blocks = dest_nodes.select { |node| node_type(node).to_s == 'code_block' }
         return [] if template_blocks.empty? || dest_blocks.empty?
 
         greedy_match(template_blocks, dest_blocks) do |template_node, dest_node|
@@ -38,12 +38,14 @@ module Markdown
 
       def normalized_fence_info(node)
         raw = Ast::Merge::NodeTyping.unwrap(node)
-        raw.respond_to?(:fence_info) ? raw.fence_info.to_s.strip.downcase : ""
+        raw.respond_to?(:fence_info) ? raw.fence_info.to_s.strip.downcase : ''
       end
 
       def surrounding_context_similarity(template_node, template_analysis, dest_node, dest_analysis)
-        template_context = [preceding_context_text(template_node, template_analysis), following_context_text(template_node, template_analysis)].join(" ")
-        dest_context = [preceding_context_text(dest_node, dest_analysis), following_context_text(dest_node, dest_analysis)].join(" ")
+        template_context = [preceding_context_text(template_node, template_analysis),
+                            following_context_text(template_node, template_analysis)].join(' ')
+        dest_context = [preceding_context_text(dest_node, dest_analysis),
+                        following_context_text(dest_node, dest_analysis)].join(' ')
         return 0.0 if template_context.empty? || dest_context.empty?
 
         jaccard(extract_tokens(template_context), extract_tokens(dest_context))
@@ -62,10 +64,10 @@ module Markdown
       end
 
       def preceding_context_text(node, analysis)
-        return "" unless analysis
+        return '' unless analysis
 
         index = statement_index(analysis, node)
-        return "" unless index
+        return '' unless index
 
         (index - 1).downto(0) do |current_index|
           candidate = analysis.statements[current_index]
@@ -75,14 +77,14 @@ module Markdown
           return candidate.text.to_s
         end
 
-        ""
+        ''
       end
 
       def following_context_text(node, analysis)
-        return "" unless analysis
+        return '' unless analysis
 
         index = statement_index(analysis, node)
-        return "" unless index
+        return '' unless index
 
         ((index + 1)...analysis.statements.length).each do |current_index|
           candidate = analysis.statements[current_index]
@@ -92,7 +94,7 @@ module Markdown
           return candidate.text.to_s
         end
 
-        ""
+        ''
       end
 
       def statement_index(analysis, node)

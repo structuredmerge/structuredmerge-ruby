@@ -28,7 +28,7 @@ module Markdown
       # Problem entry struct
       Problem = Struct.new(:category, :severity, :details, keyword_init: true) do
         def to_h
-          {category: category, severity: severity, **details}
+          { category: category, severity: severity, **details }
         end
 
         def warning?
@@ -177,13 +177,13 @@ module Markdown
       def validate_category!(category)
         return if CATEGORIES.include?(category)
 
-        raise ArgumentError, "Invalid category: #{category}. Valid: #{CATEGORIES.join(", ")}"
+        raise ArgumentError, "Invalid category: #{category}. Valid: #{CATEGORIES.join(', ')}"
       end
 
       def validate_severity!(severity)
         return if SEVERITIES.include?(severity)
 
-        raise ArgumentError, "Invalid severity: #{severity}. Valid: #{SEVERITIES.join(", ")}"
+        raise ArgumentError, "Invalid severity: #{severity}. Valid: #{SEVERITIES.join(', ')}"
       end
     end
   end

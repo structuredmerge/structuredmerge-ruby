@@ -200,7 +200,7 @@ module Markdown
           backend: opts[:backend] || @requested_backend,
           freeze_token: opts[:freeze_token],
           signature_generator: opts[:signature_generator],
-          **@parser_options,
+          **@parser_options
         )
       end
 
@@ -228,14 +228,10 @@ module Markdown
       # @return [String] Source text
       def node_to_source(node, analysis)
         # Check for any FreezeNode type (base class or subclass)
-        if node.is_a?(Ast::Merge::FreezeNodeBase)
-          return node.full_text
-        end
+        return node.full_text if node.is_a?(Ast::Merge::FreezeNodeBase)
 
         # Handle gap line nodes (created for blank lines and link definitions)
-        if node.is_a?(LinkDefinitionNode) || node.is_a?(GapLineNode)
-          return node.content
-        end
+        return node.content if node.is_a?(LinkDefinitionNode) || node.is_a?(GapLineNode)
 
         # Unwrap if needed to access source_position
         raw_node = Ast::Merge::NodeTyping.unwrap(node)

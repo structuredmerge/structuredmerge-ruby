@@ -47,7 +47,7 @@ module Markdown
             issues << {
               type: :duplicated_list_marker,
               line: line_number,
-              description: "Ordered-list marker duplicated an existing unordered-list marker",
+              description: 'Ordered-list marker duplicated an existing unordered-list marker'
             }
           end
         end

@@ -54,32 +54,27 @@ module Markdown
         # - Skip if nodes are adjacent in the same source (original spacing is correct)
         # - Otherwise, check MarkdownStructure.needs_blank_between? which handles
         #   contiguous types (like link_definitions that shouldn't have blanks between them)
-        unless [:gap_line, :freeze_block].include?(current_type) ||
-            @last_node_type == :gap_line
-          if @auto_spacing && @last_node_type && current_type
-            if MarkdownStructure.needs_blank_between?(@last_node_type, current_type)
-              # Skip auto-spacing when nodes are adjacent lines in the same source.
-              # The original source formatting is correct — no blank line was there.
-              unless same_source_adjacent?(node, analysis)
-                # Only add spacing if we don't already have adequate blank lines
-                # Check the last part to see if it already ends with blank line(s)
-                unless @parts.empty? || blank_line_terminated?
-                  add_gap_line(count: 1)
-                end
-              end
-            end
-          end
+        # Skip auto-spacing when nodes are adjacent lines in the same source.
+        # The original source formatting is correct — no blank line was there.
+        if !(%i[gap_line freeze_block].include?(current_type) ||
+                       @last_node_type == :gap_line) && @auto_spacing && @last_node_type && current_type && MarkdownStructure.needs_blank_between?(@last_node_type,
+                                                                                                                                                   current_type) && !same_source_adjacent?(
+                                                                                                                                                     node, analysis
+                                                                                                                                                   ) && !(@parts.empty? || blank_line_terminated?)
+          # Only add spacing if we don't already have adequate blank lines
+          # Check the last part to see if it already ends with blank line(s)
+          add_gap_line(count: 1)
         end
 
         content = extract_source(node, analysis)
-        if content && !content.empty?
-          range = append_part(content)
-          # Update last node type (track all node types for proper spacing)
-          @last_node_type = current_type
-          @last_end_line = node_end_line(node)
-          @last_analysis = analysis
-          range
-        end
+        return unless content && !content.empty?
+
+        range = append_part(content)
+        # Update last node type (track all node types for proper spacing)
+        @last_node_type = current_type
+        @last_end_line = node_end_line(node)
+        @last_analysis = analysis
+        range
       end
 
       # Add a reconstructed link definition

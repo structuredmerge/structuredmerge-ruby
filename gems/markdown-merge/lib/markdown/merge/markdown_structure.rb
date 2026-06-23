@@ -94,9 +94,7 @@ module Markdown
           next_sym = next_type.to_sym
 
           # Same contiguous type - no blank line between them
-          if prev_sym == next_sym && contiguous_type?(prev_sym)
-            return false
-          end
+          return false if prev_sym == next_sym && contiguous_type?(prev_sym)
 
           needs_blank_after?(prev_sym) || needs_blank_before?(next_sym)
         end

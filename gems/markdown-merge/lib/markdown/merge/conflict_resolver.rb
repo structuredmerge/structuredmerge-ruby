@@ -61,7 +61,7 @@ module Markdown
             source: :destination,
             template_node: template_node,
             dest_node: dest_node,
-            reason: dest_node.reason,
+            reason: dest_node.reason
           )
         end
 
@@ -70,7 +70,7 @@ module Markdown
             source: :template,
             template_node: template_node,
             dest_node: dest_node,
-            reason: template_node.reason,
+            reason: template_node.reason
           )
         end
 
@@ -78,21 +78,21 @@ module Markdown
         if content_identical?(template_node, dest_node)
           return identical_resolution(
             template_node: template_node,
-            dest_node: dest_node,
+            dest_node: dest_node
           )
         end
 
         if unresolved_mode? && @unresolved_policy.unresolved_for?(:matched_block)
           return unresolved_resolution(
             template_node: template_node,
-            dest_node: dest_node,
+            dest_node: dest_node
           )
         end
 
         # Use preference to decide
         preference_resolution(
           template_node: template_node,
-          dest_node: dest_node,
+          dest_node: dest_node
         )
       end
 
@@ -113,10 +113,10 @@ module Markdown
         preferred_resolution = preference_resolution(template_node: template_node, dest_node: dest_node)
         provisional_winner = @unresolved_policy.provisional_winner_for(
           :matched_block,
-          fallback: preferred_resolution[:source],
+          fallback: preferred_resolution[:source]
         )
         line = node_line_range(dest_node)&.first || node_line_range(template_node)&.first
-        case_id = ["markdown", "matched_block", line].compact.join("-")
+        case_id = ['markdown', 'matched_block', line].compact.join('-')
         surface_path = unresolved_surface_path("matched_block[line=#{line}]")
 
         unresolved_case = Ast::Merge::Runtime::ResolutionCase.new(
@@ -124,7 +124,7 @@ module Markdown
           reason: :conflict,
           candidates: {
             template: node_to_text(template_node, @template_analysis),
-            destination: node_to_text(dest_node, @dest_analysis),
+            destination: node_to_text(dest_node, @dest_analysis)
           },
           provisional_winner: provisional_winner,
           surface_path: surface_path,
@@ -132,8 +132,8 @@ module Markdown
             match_kind: :matched_block,
             template_lines: node_line_range(template_node),
             destination_lines: node_line_range(dest_node),
-            node_type: markdown_node_type(dest_node || template_node),
-          }.compact,
+            node_type: markdown_node_type(dest_node || template_node)
+          }.compact
         )
 
         {
@@ -148,8 +148,8 @@ module Markdown
             template: unresolved_case.candidates[:template],
             destination: unresolved_case.candidates[:destination],
             provisional_winner: provisional_winner,
-            location: line ? "line #{line}" : nil,
-          }.compact,
+            location: line ? "line #{line}" : nil
+          }.compact
         }
       end
 
@@ -192,7 +192,7 @@ module Markdown
       def markdown_node_type(node)
         return node.type.to_sym if node.respond_to?(:type) && !node.type.nil?
 
-        node.class.name.split("::").last
+        node.class.name.split('::').last
       end
     end
   end

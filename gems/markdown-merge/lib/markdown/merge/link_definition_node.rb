@@ -61,7 +61,7 @@ module Markdown
           start_line: line_number,
           end_line: line_number,
           start_column: 0,
-          end_column: content.length,
+          end_column: content.length
         )
 
         super(slice: content, location: location)
@@ -71,7 +71,7 @@ module Markdown
         # Shared parser instance for parsing link definitions
         # @return [LinkParser]
         def parser
-          @parser ||= LinkParser.new # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @parser ||= LinkParser.new
         end
 
         # Parse a line and create a LinkDefinitionNode if it's a link definition.
@@ -88,7 +88,7 @@ module Markdown
             line_number: line_number,
             label: result[:label],
             url: result[:url],
-            title: result[:title],
+            title: result[:title]
           )
         end
 
@@ -109,7 +109,7 @@ module Markdown
 
       # Alias for compatibility with wrapped nodes that have merge_type
       # @return [Symbol] :link_definition
-      alias_method :merge_type, :type
+      alias merge_type type
 
       # Generate a signature for matching link definitions.
       # Link definitions are matched by their label (case-insensitive in Markdown).
@@ -126,7 +126,7 @@ module Markdown
           start_line: @location.start_line,
           end_line: @location.end_line,
           start_column: @location.start_column,
-          end_column: @location.end_column,
+          end_column: @location.end_column
         }
       end
 

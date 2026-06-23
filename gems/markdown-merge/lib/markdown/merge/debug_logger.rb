@@ -19,8 +19,8 @@ module Markdown
       extend Ast::Merge::DebugLogger
 
       # Configure for markdown-merge
-      self.env_var_name = "MARKDOWN_MERGE_DEBUG"
-      self.log_prefix = "[markdown-merge]"
+      self.env_var_name = 'MARKDOWN_MERGE_DEBUG'
+      self.log_prefix = '[markdown-merge]'
     end
   end
 end

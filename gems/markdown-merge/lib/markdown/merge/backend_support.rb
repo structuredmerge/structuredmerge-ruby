@@ -10,7 +10,7 @@ module Markdown
         incremental: false,
         pure_ruby: false,
         markdown_only: true,
-        error_tolerant: true,
+        error_tolerant: true
       }.freeze
 
       module_function
@@ -20,28 +20,29 @@ module Markdown
           backend_module: backend_module,
           backend_name: backend_name,
           gem_name: gem_name,
-          capabilities: capabilities,
+          capabilities: capabilities
         )
         install_tree_wrapper!(backend_module)
         register_backend!(
           backend_module: backend_module,
           backend_name: backend_name,
           gem_name: gem_name,
-          require_path: require_path,
+          require_path: require_path
         )
       end
 
-      def configure_markdown_only_language_class!(klass, backend_label:, factory_method: :markdown, unsupported_language_message: nil)
+      def configure_markdown_only_language_class!(klass, backend_label:, factory_method: :markdown,
+                                                  unsupported_language_message: nil)
         klass.singleton_class.class_eval do
           define_method(:from_library) do |_path = nil, symbol: nil, name: nil|
-            lang_name = name || symbol&.to_s&.sub(/^tree_sitter_/, "")&.to_sym || :markdown
+            lang_name = name || symbol&.to_s&.sub(/^tree_sitter_/, '')&.to_sym || :markdown
 
             unless lang_name == :markdown
               message = if unsupported_language_message.respond_to?(:call)
-                unsupported_language_message.call(lang_name)
-              else
-                unsupported_language_message || "#{backend_label} backend only supports Markdown, not #{lang_name}."
-              end
+                          unsupported_language_message.call(lang_name)
+                        else
+                          unsupported_language_message || "#{backend_label} backend only supports Markdown, not #{lang_name}."
+                        end
               raise TreeHaver::NotAvailable, message
             end
 
@@ -50,7 +51,8 @@ module Markdown
         end
       end
 
-      def configure_node_link_and_navigation!(klass, next_sibling_selector:, prev_sibling_selector:, parent_selector: :parent)
+      def configure_node_link_and_navigation!(klass, next_sibling_selector:, prev_sibling_selector:,
+                                              parent_selector: :parent)
         klass.class_eval do
           define_method(:url) do
             Markdown::Merge::BackendSupport.send(:safe_inner_node_call, inner_node, :url)
@@ -101,21 +103,21 @@ module Markdown
 
         backend_module.singleton_class.class_eval do
           define_method(:available?) do
-            return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
+            return @loaded if @load_attempted
 
-            @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @load_attempted = true
             begin
               require gem_name
-              @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = true
             rescue LoadError, StandardError
-              @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = false
             end
-            @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded
           end
 
           define_method(:reset!) do
-            @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @load_attempted = false
+            @loaded = false
           end
 
           define_method(:capabilities) do
@@ -150,7 +152,7 @@ module Markdown
           :markdown,
           backend_type: backend_name,
           backend_module: backend_module,
-          gem_name: gem_name,
+          gem_name: gem_name
         )
 
         if ::TreeHaver::BackendRegistry.respond_to?(:register_tag)
@@ -158,7 +160,7 @@ module Markdown
             :"#{backend_name}_backend",
             category: :backend,
             backend_name: backend_name,
-            require_path: require_path,
+            require_path: require_path
           ) { backend_module.available? }
         else
           ::TreeHaver::BackendRegistry.register_availability_checker(backend_name) do

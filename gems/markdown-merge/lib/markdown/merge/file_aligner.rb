@@ -57,7 +57,9 @@ module Markdown
       def apply_match_refiner!(alignment, template_statements:, dest_statements:, matched_template:, matched_dest:)
         return unless match_refiner
 
-        unmatched_template = template_statements.each_with_index.reject { |_, i| matched_template.include?(i) }.map(&:first)
+        unmatched_template = template_statements.each_with_index.reject do |_, i|
+          matched_template.include?(i)
+        end.map(&:first)
         unmatched_dest = dest_statements.each_with_index.reject { |_, i| matched_dest.include?(i) }.map(&:first)
         return if unmatched_template.empty? || unmatched_dest.empty?
 
@@ -66,8 +68,8 @@ module Markdown
           unmatched_dest,
           {
             template_analysis: template_analysis,
-            dest_analysis: dest_analysis,
-          },
+            dest_analysis: dest_analysis
+          }
         )
 
         Array(refined_matches).each do |match|
@@ -85,7 +87,7 @@ module Markdown
             template_index: template_index,
             dest_index: dest_index,
             template_statement: template_statement,
-            dest_statement: dest_statement,
+            dest_statement: dest_statement
           )
           repair_dest_index = adjacent_section_hijack_repair_sort_dest_index(template_index, dest_index)
           entry[:repair_dest_index] = repair_dest_index if repair_dest_index
@@ -138,13 +140,13 @@ module Markdown
         statements = statements_for(analysis)
         stack = []
 
-        statements.each_with_index.each_with_object([]) do |(statement, index), paths|
+        statements.each_with_index.each_with_object([]) do |(_statement, index), paths|
           signature = analysis.signature_at(index)
           if heading_signature?(signature)
             level = signature[1]
             stack.pop while stack.any? && stack.last[:level] >= level
             paths << stack.map { |entry| entry[:signature] }.freeze
-            stack << {level: level, signature: signature}
+            stack << { level: level, signature: signature }
           else
             paths << stack.map { |entry| entry[:signature] }.freeze
           end
@@ -190,25 +192,25 @@ module Markdown
       def template_only_entry_context(template_index:, matched_entries_by_template_position:, **)
         next_match = next_match_for_template_only_entry(
           template_index,
-          matched_entries_by_template_position,
+          matched_entries_by_template_position
         )
 
         {
           anchor_dest_index: anchor_dest_index_for_entry(next_match),
-          anchor_position: next_match ? :before : :append,
+          anchor_position: next_match ? :before : :append
         }
       end
 
       def next_match_for_template_only_entry(template_index, matched_entries_by_template_position)
         same_owner_match = next_same_owner_match_for_template_only_entry(
           template_index,
-          matched_entries_by_template_position,
+          matched_entries_by_template_position
         )
         return same_owner_match if same_owner_match
 
         section_boundary_match = next_section_boundary_match_for_template_only_entry(
           template_index,
-          matched_entries_by_template_position,
+          matched_entries_by_template_position
         )
         return section_boundary_match if section_boundary_match
 
@@ -252,7 +254,8 @@ module Markdown
         return unless statement && signature
 
         if heading_signature?(signature)
-          {heading_index: index, level: signature[1], owner_path: heading_owner_path_for(analysis, index), signature: signature}
+          { heading_index: index, level: signature[1], owner_path: heading_owner_path_for(analysis, index),
+            signature: signature }
         else
           owner_path = heading_owner_path_for(analysis, index)
           return if owner_path.empty?
@@ -261,7 +264,7 @@ module Markdown
           owner_index = nearest_owner_heading_index_for(analysis, index, owner_signature)
           return unless owner_index
 
-          {heading_index: owner_index, level: owner_signature[1], owner_path: owner_path, signature: owner_signature}
+          { heading_index: owner_index, level: owner_signature[1], owner_path: owner_path, signature: owner_signature }
         end
       end
 
@@ -276,12 +279,12 @@ module Markdown
       end
 
       def log_alignment(alignment)
-        DebugLogger.debug("Alignment complete", {
-          total: alignment.size,
-          matches: alignment.count { |e| e[:type] == :match },
-          template_only: alignment.count { |e| e[:type] == :template_only },
-          dest_only: alignment.count { |e| e[:type] == :dest_only },
-        })
+        DebugLogger.debug('Alignment complete', {
+                            total: alignment.size,
+                            matches: alignment.count { |e| e[:type] == :match },
+                            template_only: alignment.count { |e| e[:type] == :template_only },
+                            dest_only: alignment.count { |e| e[:type] == :dest_only }
+                          })
       end
 
       def match_sort_key(entry)
@@ -309,10 +312,10 @@ module Markdown
         preceding_context_index = nearest_list_context_index(analysis, index)
         preceding_context = preceding_context_index ? analysis.signature_at(preceding_context_index) : nil
         owner_path = if preceding_context_index && synthetic_section_label_paragraph?(analysis, preceding_context_index)
-          EMPTY_HEADING_OWNER_PATH
-        else
-          heading_owner_path_for(analysis, index)
-        end
+                       EMPTY_HEADING_OWNER_PATH
+                     else
+                       heading_owner_path_for(analysis, index)
+                     end
         first_anchor = first_list_item_anchor(statement, analysis)
         [:list, owner_path, list_type, preceding_context, first_anchor]
       end
@@ -471,20 +474,20 @@ module Markdown
           break
         end
 
-        return "" unless first_item
+        return '' unless first_item
 
         text = if analysis && first_item.respond_to?(:source_position) && first_item.source_position
-          pos = first_item.source_position
-          analysis.source_range(pos[:start_line], pos[:end_line]).to_s
-        else
-          first_item.respond_to?(:text) ? first_item.text.to_s : ""
-        end
+                 pos = first_item.source_position
+                 analysis.source_range(pos[:start_line], pos[:end_line]).to_s
+               else
+                 first_item.respond_to?(:text) ? first_item.text.to_s : ''
+               end
 
         text
           .strip
-          .sub(/\A(?:[-*+]|\d+\.)\s+/, "")
-          .gsub(/[^\p{L}\p{N}]+/u, " ")
-          .gsub(/\s+/, " ")
+          .sub(/\A(?:[-*+]|\d+\.)\s+/, '')
+          .gsub(/[^\p{L}\p{N}]+/u, ' ')
+          .gsub(/\s+/, ' ')
           .downcase
           .strip
       end

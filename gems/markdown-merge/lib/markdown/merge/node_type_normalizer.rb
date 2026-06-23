@@ -73,21 +73,21 @@ module Markdown
           # Table child types
           table_row: :table_row,
           table_cell: :table_cell,
-          table_header: :table_header,  # Some parsers distinguish header rows
+          table_header: :table_header, # Some parsers distinguish header rows
           # List child types
           list_item: :list_item,
-          item: :list_item,             # Alias
+          item: :list_item, # Alias
           # Inline types (usually not top-level, but map them anyway)
           text: :text,
           softbreak: :softbreak,
           linebreak: :linebreak,
           code: :code,
-          code_inline: :code,           # Alias used by some parsers
+          code_inline: :code, # Alias used by some parsers
           html_inline: :html_inline,
           emph: :emph,
           strong: :strong,
           link: :link,
-          image: :image,
+          image: :image
         }.freeze,
         markly: {
           # Block types - note different names from commonmarker
@@ -118,8 +118,8 @@ module Markdown
           emph: :emph,
           strong: :strong,
           link: :link,
-          image: :image,
-        }.freeze,
+          image: :image
+        }.freeze
       )
     end
   end

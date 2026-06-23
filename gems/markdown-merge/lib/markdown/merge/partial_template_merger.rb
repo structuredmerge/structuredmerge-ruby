@@ -133,7 +133,7 @@ module Markdown
             changed: result.changed,
             stats: result.stats.merge(problems: problems.all),
             injection_point: result.injection_point,
-            message: result.message,
+            message: result.message
           )
         else
           result
@@ -151,16 +151,16 @@ module Markdown
           template_analysis,
           source_remove_plan: section_context&.fetch(:source_remove_plan, nil),
           destination_section_statements: section_context&.fetch(:section_statements, nil),
-          destination_section_analysis: section_context&.fetch(:analysis, nil),
+          destination_section_analysis: section_context&.fetch(:analysis, nil)
         )
 
-        return [template, {mode: :replace}] if preserved_fragment_insertions.empty?
+        return [template, { mode: :replace }] if preserved_fragment_insertions.empty?
 
         preservation_stats = replace_mode_preservation_stats(preserved_fragment_insertions)
 
         [
           render_template_with_preserved_insertions(template_analysis, preserved_fragment_insertions),
-          preservation_stats,
+          preservation_stats
         ]
       end
 
@@ -169,10 +169,10 @@ module Markdown
       # @param backend [Symbol] The backend to validate
       # @raise [ArgumentError] If backend is not supported
       def validate_backend!(backend)
-        valid_backends = [:auto, :markly, :commonmarker]
+        valid_backends = %i[auto markly commonmarker]
         return if valid_backends.include?(backend.to_sym)
 
-        raise ArgumentError, "Unknown backend: #{backend}. Supported: #{valid_backends.join(", ")}"
+        raise ArgumentError, "Unknown backend: #{backend}. Supported: #{valid_backends.join(', ')}"
       end
 
       # Create a FileAnalysis for the given content.
@@ -193,7 +193,7 @@ module Markdown
         options = {
           preference: preference,
           add_template_only_nodes: add_missing,
-          backend: backend,
+          backend: backend
         }
 
         # Use custom signature generator if provided, otherwise use position-based
@@ -237,10 +237,10 @@ module Markdown
         # provide a custom signature_generator.
         lambda do |node|
           type_str = node.type.to_s
-          if type_str == "table"
+          if type_str == 'table'
             # All tables within a section merge get the same signature.
             # This ensures template table replaces destination table.
-            [:table, :section_table]
+            %i[table section_table]
           else
             # Return node for default signature computation
             node
@@ -274,12 +274,12 @@ module Markdown
 
           ((anchor.index + 1)...statements.length).each do |idx|
             stmt = statements[idx]
-            if heading_type?(stmt.type)
-              stmt_level = get_heading_level(stmt)
-              if stmt_level && anchor_level && stmt_level <= anchor_level
-                # Found next heading of same or higher level - section ends before it
-                return idx - 1
-              end
+            next unless heading_type?(stmt.type)
+
+            stmt_level = get_heading_level(stmt)
+            if stmt_level && anchor_level && stmt_level <= anchor_level
+              # Found next heading of same or higher level - section ends before it
+              return idx - 1
             end
           end
 
@@ -288,16 +288,12 @@ module Markdown
         end
 
         # For non-headings, use boundary if specified and found
-        if injection_point.boundary
-          return injection_point.boundary.index - 1
-        end
+        return injection_point.boundary.index - 1 if injection_point.boundary
 
         # Otherwise, find next node of same type
         ((anchor.index + 1)...statements.length).each do |idx|
           stmt = statements[idx]
-          if stmt.type == anchor_type
-            return idx - 1
-          end
+          return idx - 1 if stmt.type == anchor_type
         end
 
         # Section extends to end of document
@@ -315,9 +311,7 @@ module Markdown
       def node_to_source(node, analysis = nil)
         # Unwrap if needed
         inner = node
-        while inner.respond_to?(:inner_node) && inner.inner_node != inner
-          inner = inner.inner_node
-        end
+        inner = inner.inner_node while inner.respond_to?(:inner_node) && inner.inner_node != inner
 
         # Prefer source-based extraction to preserve original formatting
         # (link references, table padding, etc.)
@@ -340,11 +334,11 @@ module Markdown
         elsif inner.respond_to?(:to_s)
           inner.to_s
         else
-          ""
+          ''
         end
       end
 
-      alias_method :node_to_text, :node_to_source
+      alias node_to_text node_to_source
 
       private
 
@@ -366,20 +360,21 @@ module Markdown
         {
           mode: :replace,
           preserved_destination_comment_fragments: comment_count,
-          preserved_destination_link_definitions: link_definition_count,
+          preserved_destination_link_definitions: link_definition_count
         }.reject { |_key, value| value == 0 }
       end
 
-      def preserved_destination_insertions(destination_analysis, template_analysis, source_remove_plan: nil, destination_section_statements: nil, destination_section_analysis: nil)
+      def preserved_destination_insertions(destination_analysis, template_analysis, source_remove_plan: nil,
+                                           destination_section_statements: nil, destination_section_analysis: nil)
         insertions = Hash.new { |hash, key| hash[key] = [] }
         remove_plan_owned_comment_region_keys = if source_remove_plan
-          rebase_preserved_comment_keys(
-            remove_plan_preserved_comment_keys(source_remove_plan),
-            line_offset: source_remove_plan.remove_start_line - 1,
-          )
-        else
-          Set.new
-        end
+                                                  rebase_preserved_comment_keys(
+                                                    remove_plan_preserved_comment_keys(source_remove_plan),
+                                                    line_offset: source_remove_plan.remove_start_line - 1
+                                                  )
+                                                else
+                                                  Set.new
+                                                end
         template_has_standalone_comments = template_analysis.statements.any? do |statement|
           standalone_comment_node?(statement, template_analysis)
         end
@@ -392,7 +387,7 @@ module Markdown
           source_remove_plan,
           destination_section_statements,
           destination_section_analysis || destination_analysis,
-          template_has_standalone_comments: template_has_standalone_comments,
+          template_has_standalone_comments: template_has_standalone_comments
         )
 
         structural_index = 0
@@ -409,14 +404,14 @@ module Markdown
               statement,
               destination_analysis,
               source_remove_plan,
-              preserved_comment_keys: remove_plan_owned_comment_region_keys,
+              preserved_comment_keys: remove_plan_owned_comment_region_keys
             )
 
             fragment = preserved_fragment_for_node(
               statement,
               destination_analysis,
               template_has_standalone_comments: template_has_standalone_comments,
-              template_link_definition_signatures: template_link_definition_signatures,
+              template_link_definition_signatures: template_link_definition_signatures
             )
             next unless fragment
 
@@ -428,21 +423,23 @@ module Markdown
         insertions.reject { |_index, fragments| fragments.empty? }
       end
 
-      def preserve_comment_insertions_from_remove_plan(insertions, source_remove_plan, destination_section_statements, destination_section_analysis, template_has_standalone_comments:)
+      def preserve_comment_insertions_from_remove_plan(insertions, source_remove_plan, destination_section_statements,
+                                                       destination_section_analysis, template_has_standalone_comments:)
         return if template_has_standalone_comments
         return unless source_remove_plan && destination_section_statements && destination_section_analysis
 
-        structural_index_by_owner, final_structural_index = structural_index_lookup(destination_section_statements, destination_section_analysis)
+        structural_index_by_owner, final_structural_index = structural_index_lookup(destination_section_statements,
+                                                                                    destination_section_analysis)
         remove_plan_comment_insertion_specs(
           source_remove_plan,
           insertion_index_by_owner: structural_index_by_owner,
-          final_insertion_index: final_structural_index,
+          final_insertion_index: final_structural_index
         ).each do |spec|
           append_preserved_fragment(
             insertions,
             spec.fetch(:insertion_index),
             spec.fetch(:fragment),
-            gap_count: spec.fetch(:gap_count),
+            gap_count: spec.fetch(:gap_count)
           )
         end
       end
@@ -468,7 +465,7 @@ module Markdown
           fragment[:separator] = preserved_fragment_separator(
             gap_count: gap_count,
             previous_kind: insertions[structural_index].last.fetch(:kind),
-            current_kind: fragment.fetch(:kind),
+            current_kind: fragment.fetch(:kind)
           )
         end
 
@@ -476,7 +473,7 @@ module Markdown
       end
 
       def render_template_with_preserved_insertions(template_analysis, insertions)
-        result = +""
+        result = +''
         structural_index = 0
         statements = template_analysis.statements
         index = 0
@@ -484,7 +481,9 @@ module Markdown
         while index < statements.length
           statement = statements[index]
 
-          if gap_line_node?(statement) && insertions.key?(structural_index) && next_structural_statement_after?(statements, index, template_analysis)
+          if gap_line_node?(statement) && insertions.key?(structural_index) && next_structural_statement_after?(
+            statements, index, template_analysis
+          )
             index += 1 while index < statements.length && gap_line_node?(statements[index])
             result = append_preserved_fragments(result, insertions.delete(structural_index))
             next
@@ -520,7 +519,7 @@ module Markdown
       end
 
       def render_preserved_fragment_block(fragments)
-        fragments.each_with_object(+"").with_index do |(fragment, result), index|
+        fragments.each_with_object(+'').with_index do |(fragment, result), index|
           result << fragment[:separator] if index.positive?
           result << fragment.fetch(:text)
         end
@@ -535,7 +534,7 @@ module Markdown
       # @param type [Symbol, String] The node type
       # @return [Boolean] true if this is a heading type
       def heading_type?(type)
-        type.to_s == "heading" || type == :heading || type == :header
+        type.to_s == 'heading' || type == :heading || type == :header
       end
 
       # Get the heading level from a statement.

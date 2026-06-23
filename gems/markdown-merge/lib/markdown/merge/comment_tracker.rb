@@ -26,7 +26,7 @@ module Markdown
             indent: match[:indent].length,
             text: match[:text].to_s,
             full_line: true,
-            raw: line,
+            raw: line
           }
         end
       end
