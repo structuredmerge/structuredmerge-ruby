@@ -1,19 +1,17 @@
 # frozen_string_literal: true
 
-require "version_gem"
+require 'version_gem'
 
-require "go-merge"
-require "ast/merge"
-require "ast-merge-git"
-require "json"
-require "json-merge"
-require "kettle/jem/tasks/install_task"
-require "markly/merge"
-require "pathname"
-require "plain-merge"
-require "set"
+require 'go-merge'
+require 'ast/merge'
+require 'ast-merge-git'
+require 'json'
+require 'json-merge'
+require 'kettle/jem/tasks/install_task'
+require 'markly/merge'
+require 'plain-merge'
 
-require_relative "rb/version"
+require_relative 'rb/version'
 
 module Smorg
   module RB
@@ -27,17 +25,17 @@ module Smorg
     def run(args, stdout: $stdout, stderr: $stderr)
       command, *rest = args
       case command
-      when "merge-driver"
+      when 'merge-driver'
         run_merge_driver(rest, stdout, stderr)
-      when "diff-driver"
+      when 'diff-driver'
         run_diff_driver(rest, stdout, stderr)
-      when "conflicts"
+      when 'conflicts'
         run_conflicts(rest, stdout, stderr)
-      when "languages"
+      when 'languages'
         run_languages(rest, stdout, stderr)
-      when "git"
+      when 'git'
         run_git(rest, stdout, stderr)
-      when "help", "-h", "--help"
+      when 'help', '-h', '--help'
         print_usage(stdout)
         EXIT_SUCCESS
       else
@@ -48,18 +46,18 @@ module Smorg
     end
 
     def print_usage(out)
-      out.puts("usage: smorg-rb merge-driver [--path-name PATH] [--output PATH] [--report PATH] [--strict] [--fallback=none|line|local|full-file] %O %A %B [%P]")
-      out.puts("       smorg-rb merge-driver --ancestor %O --current %A --other %B --path-name %P")
-      out.puts("       smorg-rb diff-driver [--path-name PATH] OLD NEW")
-      out.puts("       smorg-rb diff-driver PATH OLD-FILE OLD-HEX OLD-MODE NEW-FILE NEW-HEX NEW-MODE [OLD-PREFIX NEW-PREFIX]")
-      out.puts("       smorg-rb conflicts diff [--path-name PATH] [--exit-code] FILE")
-      out.puts("       smorg-rb languages --gitattributes")
-      out.puts("       smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]")
+      out.puts('usage: smorg-rb merge-driver [--path-name PATH] [--output PATH] [--report PATH] [--strict] [--fallback=none|line|local|full-file] %O %A %B [%P]')
+      out.puts('       smorg-rb merge-driver --ancestor %O --current %A --other %B --path-name %P')
+      out.puts('       smorg-rb diff-driver [--path-name PATH] OLD NEW')
+      out.puts('       smorg-rb diff-driver PATH OLD-FILE OLD-HEX OLD-MODE NEW-FILE NEW-HEX NEW-MODE [OLD-PREFIX NEW-PREFIX]')
+      out.puts('       smorg-rb conflicts diff [--path-name PATH] [--exit-code] FILE')
+      out.puts('       smorg-rb languages --gitattributes')
+      out.puts('       smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]')
     end
 
     def run_git(args, stdout, stderr)
       subcommand, *rest = args
-      return git_usage(stderr) unless subcommand == "install"
+      return git_usage(stderr) unless subcommand == 'install'
 
       options = parse_git_install_options(rest, stderr)
       return EXIT_USER_ERROR unless options
@@ -71,49 +69,51 @@ module Smorg
         project_root: Dir.pwd,
         env: ENV.to_h,
         run_options: run_options,
-        command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command),
+        command_runner: Kettle::Jem::Tasks::InstallTask.method(:run_system_command)
       ).first
       report = {
         report_version: 1,
-        ok: step.fetch(:status) != "failed",
-        profile: step.fetch(:profile, "semantic-diff"),
-        scope: step.fetch(:scope, run_options.fetch(:git_drivers, "local")),
+        ok: step.fetch(:status) != 'failed',
+        profile: step.fetch(:profile, 'semantic-diff'),
+        scope: step.fetch(:scope, run_options.fetch(:git_drivers, 'local')),
         install_steps: [step],
-        missing: step.fetch(:missing, []),
+        missing: step.fetch(:missing, [])
       }
       if options[:json]
         stdout.puts(JSON.pretty_generate(report))
       else
         stdout.puts("git install: #{step.fetch(:status)} #{report.fetch(:profile)} #{report.fetch(:scope)}")
-        step.fetch(:diagnostics, []).each { |diagnostic| stdout.puts("  #{diagnostic.fetch(:message)}") if diagnostic[:message] }
+        step.fetch(:diagnostics, []).each do |diagnostic|
+          stdout.puts("  #{diagnostic.fetch(:message)}") if diagnostic[:message]
+        end
       end
       report.fetch(:ok) ? EXIT_SUCCESS : EXIT_USER_ERROR
-    rescue Kettle::Jem::Error => error
-      stderr.puts(error.message)
+    rescue Kettle::Jem::Error => e
+      stderr.puts(e.message)
       EXIT_USER_ERROR
     end
 
     def git_usage(stderr)
-      stderr.puts("usage: smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]")
+      stderr.puts('usage: smorg-rb git install [--scope local|global|include-file] [--profile semantic-diff|builtin-diff] [--check] [--undo] [--dry-run] [--json]')
       EXIT_USER_ERROR
     end
 
     def parse_git_install_options(args, stderr)
-      options = {scope: "local", profile: "semantic-diff", json: false, dry_run: false}
+      options = { scope: 'local', profile: 'semantic-diff', json: false, dry_run: false }
       until args.empty?
         value = args.shift
         case value
-        when "--scope"
+        when '--scope'
           options[:scope] = args.shift.to_s
-        when "--profile"
+        when '--profile'
           options[:profile] = args.shift.to_s
-        when "--check"
+        when '--check'
           options[:check] = true
-        when "--undo"
+        when '--undo'
           options[:undo] = true
-        when "--dry-run"
+        when '--dry-run'
           options[:dry_run] = true
-        when "--json"
+        when '--json'
           options[:json] = true
         else
           stderr.puts("unknown git install option #{value.inspect}")
@@ -125,28 +125,28 @@ module Smorg
 
     def git_install_run_options(options)
       git_drivers = if options[:check]
-        "check"
-      elsif options[:undo]
-        "undo"
-      elsif options.fetch(:scope) == "global"
-        "global"
-      elsif options.fetch(:scope) == "include-file"
-        "include-file"
-      elsif options.fetch(:profile) == "builtin-diff"
-        "builtin-diff"
-      else
-        "semantic-diff"
-      end
-      {git_drivers: git_drivers, dry_run: options[:dry_run]}.compact
+                      'check'
+                    elsif options[:undo]
+                      'undo'
+                    elsif options.fetch(:scope) == 'global'
+                      'global'
+                    elsif options.fetch(:scope) == 'include-file'
+                      'include-file'
+                    elsif options.fetch(:profile) == 'builtin-diff'
+                      'builtin-diff'
+                    else
+                      'semantic-diff'
+                    end
+      { git_drivers: git_drivers, dry_run: options[:dry_run] }.compact
     end
 
     def run_merge_driver(args, stdout, stderr)
       options = parse_merge_driver_options(args, stderr)
       return EXIT_USER_ERROR unless options
+
       ancestor_source = File.read(options[:ancestor])
       current_source = File.read(options[:current])
       other_source = File.read(options[:other])
-      ancestor_source
 
       effective_path = options[:path_name] || options[:current]
       settings = load_path_settings(effective_path)
@@ -155,8 +155,9 @@ module Smorg
       profile_exit = report_and_enforce_profile(options, stdout, stderr)
       return profile_exit unless profile_exit == EXIT_SUCCESS
 
-      fallback_policy = options[:strict] ? "none" : options[:fallback]
-      result = merge_by_path(effective_path, settings[:language], settings[:conflict_marker_size], fallback_policy, ancestor_source, current_source, other_source)
+      fallback_policy = options[:strict] ? 'none' : options[:fallback]
+      result = merge_by_path(effective_path, settings[:language], settings[:conflict_marker_size], fallback_policy,
+                             ancestor_source, current_source, other_source)
       fallbacks = []
       if merge_driver_fallback_eligible?(result, options)
         result, fallbacks = apply_merge_fallbacks(
@@ -165,42 +166,51 @@ module Smorg
           settings[:conflict_marker_size],
           ancestor_source,
           current_source,
-          other_source,
+          other_source
         )
       end
       output = result[:output]
       unless result[:ok]
         print_diagnostics(stderr, result)
-        output ||= full_file_conflict_output(settings[:conflict_marker_size], ancestor_source, current_source, other_source) unless options[:strict] || options[:fallback] == "none"
-        if output && !result[:output] && !options[:strict] && options[:fallback] != "none"
+        unless options[:strict] || options[:fallback] == 'none'
+          output ||= full_file_conflict_output(settings[:conflict_marker_size], ancestor_source, current_source,
+                                               other_source)
+        end
+        if output && !result[:output] && !options[:strict] && options[:fallback] != 'none'
           fallbacks << {
-            mode: "full_file",
+            mode: 'full_file',
             requested_mode: options[:fallback],
             reason: fallback_reason(result.fetch(:diagnostics, [])),
             applied: true
           }
         end
-        report_exit = write_merge_driver_machine_report(options[:report], effective_path, false, EXIT_UNRESOLVED_CONFLICT, fallbacks, result, stderr)
+        report_exit = write_merge_driver_machine_report(options[:report], effective_path, false,
+                                                        EXIT_UNRESOLVED_CONFLICT, fallbacks, result, stderr)
         return report_exit unless report_exit == EXIT_SUCCESS
         return EXIT_UNRESOLVED_CONFLICT if options[:check_only]
+
         File.write(options[:output] || options[:current], output) if output
         return EXIT_UNRESOLVED_CONFLICT
       end
       unless output
-        stderr.puts("merge completed without output")
+        stderr.puts('merge completed without output')
         return EXIT_INTERNAL_ERROR
       end
 
       if options[:check_only]
         exit_code = options[:exit_code] && output != current_source ? EXIT_UNRESOLVED_CONFLICT : EXIT_SUCCESS
-        report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, exit_code, fallbacks, result, stderr)
+        report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, exit_code, fallbacks,
+                                                        result, stderr)
         return report_exit unless report_exit == EXIT_SUCCESS
+
         return exit_code
       end
 
       File.write(options[:output] || options[:current], output)
-      report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, EXIT_SUCCESS, fallbacks, result, stderr)
+      report_exit = write_merge_driver_machine_report(options[:report], effective_path, true, EXIT_SUCCESS, fallbacks,
+                                                      result, stderr)
       return report_exit unless report_exit == EXIT_SUCCESS
+
       EXIT_SUCCESS
     rescue Errno::ENOENT, Errno::EACCES => e
       stderr.puts("file error: #{e.message}")
@@ -218,12 +228,12 @@ module Smorg
           merge_fallback_result(result, git_result),
           [
             {
-              mode: "git_merge_file",
+              mode: 'git_merge_file',
               requested_mode: requested_mode,
               reason: fallback_reason_value,
               applied: true
-            },
-          ],
+            }
+          ]
         ]
       end
 
@@ -233,18 +243,18 @@ module Smorg
           merge_fallback_result(result, plain_result),
           [
             {
-              mode: "git_merge_file",
+              mode: 'git_merge_file',
               requested_mode: requested_mode,
               reason: fallback_reason_value,
               applied: false
             },
             {
-              mode: "plain_text",
+              mode: 'plain_text',
               requested_mode: requested_mode,
               reason: fallback_reason(git_result.fetch(:diagnostics, [])),
               applied: true
-            },
-          ],
+            }
+          ]
         ]
       end
 
@@ -252,10 +262,10 @@ module Smorg
     end
 
     def merge_driver_fallback_eligible?(result, options)
-      return false if result[:ok] || options[:strict] || options[:fallback] == "none"
+      return false if result[:ok] || options[:strict] || options[:fallback] == 'none'
 
       result.fetch(:diagnostics, []).any? do |diagnostic|
-        (diagnostic[:category] || diagnostic["category"]).to_s == "unsupported_language"
+        (diagnostic[:category] || diagnostic['category']).to_s == 'unsupported_language'
       end
     end
 
@@ -264,48 +274,53 @@ module Smorg
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "plain_text_fallback_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'plain_text_fallback_error', message: e.message }],
         policies: []
       }
     end
 
     def merge_git_file_fallback(marker_size, ancestor_source, current_source, other_source)
-      require "tempfile"
+      require 'tempfile'
 
-      files = Array.new(3) { Tempfile.new("smorg-rb-merge-file") }
+      files = Array.new(3) { Tempfile.new('smorg-rb-merge-file') }
       files[0].write(current_source)
       files[1].write(ancestor_source)
       files[2].write(other_source)
       files.each(&:flush)
       output = IO.popen(
         [
-          "git",
-          "merge-file",
-          "-p",
-          "-L",
-          "ours",
-          "-L",
-          "base",
-          "-L",
-          "theirs",
+          'git',
+          'merge-file',
+          '-p',
+          '-L',
+          'ours',
+          '-L',
+          'base',
+          '-L',
+          'theirs',
           "--marker-size=#{marker_size}",
           files[0].path,
           files[1].path,
-          files[2].path,
+          files[2].path
         ],
-        err: [:child, :out],
+        err: %i[child out],
         &:read
       )
       {
         ok: $?.success?,
-        diagnostics: $?.success? ? [] : [{ severity: "error", category: "git_merge_file_conflict", message: "git merge-file reported unresolved conflicts" }],
+        diagnostics: if $?.success?
+                       []
+                     else
+                       [{ severity: 'error', category: 'git_merge_file_conflict',
+                          message: 'git merge-file reported unresolved conflicts' }]
+                     end,
         output: output,
         policies: []
       }
     rescue Errno::ENOENT => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "git_merge_file_unavailable", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'git_merge_file_unavailable', message: e.message }],
         policies: []
       }
     ensure
@@ -331,63 +346,63 @@ module Smorg
       marker_size = marker_size.to_i
       marker_size = 7 unless marker_size.positive?
       [
-        "#{"<" * marker_size} ours",
+        "#{'<' * marker_size} ours",
         current_source,
-        "#{"|" * marker_size} base",
+        "#{'|' * marker_size} base",
         ancestor_source,
-        "=" * marker_size,
+        '=' * marker_size,
         other_source,
-        "#{">" * marker_size} theirs",
-        ""
+        "#{'>' * marker_size} theirs",
+        ''
       ].join("\n")
     end
 
     def parse_merge_driver_options(args, stderr)
-      options = { strict: false, fallback: "full-file", check_only: false, exit_code: false, profile_report: false }
+      options = { strict: false, fallback: 'full-file', check_only: false, exit_code: false, profile_report: false }
       positionals = []
       index = 0
       while index < args.length
         value = args[index]
         case value
-        when "--ancestor"
+        when '--ancestor'
           index += 1
           options[:ancestor] = args[index]
-        when "--current"
+        when '--current'
           index += 1
           options[:current] = args[index]
-        when "--other"
+        when '--other'
           index += 1
           options[:other] = args[index]
-        when "--path-name"
+        when '--path-name'
           index += 1
           options[:path_name] = args[index]
-        when "--output"
+        when '--output'
           index += 1
           options[:output] = args[index]
-        when "--report"
+        when '--report'
           index += 1
           options[:report] = args[index]
-        when "--strict"
+        when '--strict'
           options[:strict] = true
-        when "--check-only"
+        when '--check-only'
           options[:check_only] = true
-        when "--exit-code"
+        when '--exit-code'
           options[:exit_code] = true
-        when "--profile"
+        when '--profile'
           index += 1
           options[:profile_id] = args[index]
-        when "--profile-report"
+        when '--profile-report'
           options[:profile_report] = true
-        when "--require-profile-status"
+        when '--require-profile-status'
           index += 1
           options[:require_profile_status] = args[index]
-        when "--fallback"
+        when '--fallback'
           index += 1
           options[:fallback] = args[index]
         else
-          if value.start_with?("--fallback=")
-            options[:fallback] = value.delete_prefix("--fallback=")
-          elsif value.start_with?("--")
+          if value.start_with?('--fallback=')
+            options[:fallback] = value.delete_prefix('--fallback=')
+          elsif value.start_with?('--')
             stderr.puts("unknown merge-driver option #{value.inspect}")
             return nil
           else
@@ -403,7 +418,7 @@ module Smorg
       options[:path_name] ||= positionals[3]
 
       unless options[:ancestor] && options[:current] && options[:other]
-        stderr.puts("merge-driver requires ancestor, current, and other paths")
+        stderr.puts('merge-driver requires ancestor, current, and other paths')
         return nil
       end
       unless %w[none line local full-file].include?(options[:fallback])
@@ -417,7 +432,7 @@ module Smorg
       return EXIT_SUCCESS unless report_path
 
       report = {
-        command: "merge-driver",
+        command: 'merge-driver',
         path_name: path_name,
         ok: ok,
         exit_code: exit_code,
@@ -441,9 +456,9 @@ module Smorg
 
     def fallback_reason(diagnostics)
       first = diagnostics.first
-      return "structured_merge_failed" unless first
+      return 'structured_merge_failed' unless first
 
-      (first[:category] || first["category"] || "structured_merge_failed").to_s
+      (first[:category] || first['category'] || 'structured_merge_failed').to_s
     end
 
     def report_and_enforce_profile(options, stdout, stderr)
@@ -452,16 +467,16 @@ module Smorg
       profile_id = options[:profile_id] || Ast::Merge::PROMOTION_PROFILE_JSON_KEYED_OBJECT
       evaluation = Ast::Merge::ProfilePromotionEvaluation.new(
         profile_id: profile_id,
-        status: "available",
-        blocking_reasons: ["profile promotion evidence is not loaded by this CLI command"],
+        status: 'available',
+        blocking_reasons: ['profile promotion evidence is not loaded by this CLI command'],
         diagnostics: []
       )
       decision = Ast::Merge.evaluate_profile_selection_requirement(
         Ast::Merge::ProfileSelectionRequirement.new(
           profile_id: profile_id,
           promotion_policy_id: Ast::Merge.initial_profile_promotion_policy.policy_id,
-          minimum_profile_status: options[:require_profile_status] || "available",
-          enforcement_mode: options[:require_profile_status] ? "required" : "advisory"
+          minimum_profile_status: options[:require_profile_status] || 'available',
+          enforcement_mode: options[:require_profile_status] ? 'required' : 'advisory'
         ),
         nil,
         evaluation
@@ -496,10 +511,10 @@ module Smorg
       index = 0
       while index < args.length
         value = args[index]
-        if value == "--path-name"
+        if value == '--path-name'
           index += 1
           options[:path_name] = args[index]
-        elsif value.start_with?("--")
+        elsif value.start_with?('--')
           stderr.puts("unknown diff-driver option #{value.inspect}")
           return nil
         else
@@ -512,9 +527,10 @@ module Smorg
       when 2
         options.merge(old_path: positionals[0], new_path: positionals[1])
       when 7, 9
-        options.merge(path_name: options[:path_name] || positionals[0], old_path: positionals[1], new_path: positionals[4])
+        options.merge(path_name: options[:path_name] || positionals[0], old_path: positionals[1],
+                      new_path: positionals[4])
       else
-        stderr.puts("diff-driver requires either 2, 7, or 9 positional arguments")
+        stderr.puts('diff-driver requires either 2, 7, or 9 positional arguments')
         nil
       end
     end
@@ -522,9 +538,9 @@ module Smorg
     def print_structured_diff(stdout, path_name, old_source, new_source)
       stdout.puts("structured-diff #{path_name}")
       if old_source == new_source
-        stdout.puts("status unchanged")
+        stdout.puts('status unchanged')
       else
-        stdout.puts("status changed")
+        stdout.puts('status changed')
         stdout.puts("old-lines #{line_count(old_source)}")
         stdout.puts("new-lines #{line_count(new_source)}")
       end
@@ -532,9 +548,9 @@ module Smorg
 
     def run_conflicts(args, stdout, stderr)
       subcommand, *rest = args
-      return run_conflicts_diff(rest, stdout, stderr) if subcommand == "diff"
+      return run_conflicts_diff(rest, stdout, stderr) if subcommand == 'diff'
 
-      stderr.puts("conflicts requires the diff subcommand")
+      stderr.puts('conflicts requires the diff subcommand')
       EXIT_USER_ERROR
     end
 
@@ -559,13 +575,13 @@ module Smorg
       while index < args.length
         value = args[index]
         case value
-        when "--path-name"
+        when '--path-name'
           index += 1
           options[:path_name] = args[index]
-        when "--exit-code"
+        when '--exit-code'
           options[:exit_code] = true
         else
-          if value.start_with?("--")
+          if value.start_with?('--')
             stderr.puts("unknown conflicts diff option #{value.inspect}")
             return nil
           end
@@ -574,52 +590,53 @@ module Smorg
         index += 1
       end
       if positionals.length != 1
-        stderr.puts("conflicts diff requires exactly one file path")
+        stderr.puts('conflicts diff requires exactly one file path')
         return nil
       end
       options.merge(file_path: positionals[0])
     end
 
     def run_languages(args, stdout, stderr)
-      unless args == ["--gitattributes"]
-        stderr.puts("languages currently requires --gitattributes")
+      unless args == ['--gitattributes']
+        stderr.puts('languages currently requires --gitattributes')
         return EXIT_USER_ERROR
       end
 
       [
-        "*.go merge=smorg-rb diff=smorg-rb smorg.language=go",
-        "*.json merge=smorg-rb diff=smorg-rb smorg.language=json",
-        "*.jsonc merge=smorg-rb diff=smorg-rb smorg.language=jsonc",
-        "*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown",
-        "*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown"
+        '*.go merge=smorg-rb diff=smorg-rb smorg.language=go',
+        '*.json merge=smorg-rb diff=smorg-rb smorg.language=json',
+        '*.jsonc merge=smorg-rb diff=smorg-rb smorg.language=jsonc',
+        '*.md merge=smorg-rb diff=smorg-rb smorg.language=markdown',
+        '*.markdown merge=smorg-rb diff=smorg-rb smorg.language=markdown'
       ].each { |line| stdout.puts(line) }
       EXIT_SUCCESS
     end
 
-    def merge_by_path(path_name, language, conflict_marker_size, fallback_policy, ancestor_source, current_source, other_source)
+    def merge_by_path(path_name, language, conflict_marker_size, fallback_policy, ancestor_source, current_source,
+                      other_source)
       case normalize_language(language, path_name)
-      when "go"
-        Go::Merge.merge_go(other_source, current_source, "go")
-      when "json"
+      when 'go'
+        Go::Merge.merge_go(other_source, current_source, 'go')
+      when 'json'
         merge3_result(
           Ast::Merge::Git.merge3(
             base_source: ancestor_source,
             ours_source: current_source,
             theirs_source: other_source,
             path_name: path_name,
-            language: "json",
-            dialect: "json",
-            profile_id: "json.keyed-object",
+            language: 'json',
+            dialect: 'json',
+            profile_id: 'json.keyed-object',
             fallback_policy: fallback_policy,
             conflict_marker_size: conflict_marker_size,
-            render_policy: "canonical"
+            render_policy: 'canonical'
           )
         )
-      when "jsonc"
-        Json::Merge.merge_json(other_source, current_source, "jsonc")
-      when "markdown"
+      when 'jsonc'
+        Json::Merge.merge_json(other_source, current_source, 'jsonc')
+      when 'markdown'
         merge_markdown(ancestor_source, current_source, other_source)
-      when "text"
+      when 'text'
         Plain::Merge.merge_text(other_source, current_source)
       else
         unsupported_language_result(normalize_language(language, path_name), path_name)
@@ -639,15 +656,15 @@ module Smorg
         add_template_only_nodes: true,
         inner_merge_code_blocks: true,
         inner_merge_lists: true,
-        normalize_whitespace: :basic,
+        normalize_whitespace: :basic
       ).merge_result
       {
         ok: result.success?,
         diagnostics: result.conflicts.map do |conflict|
           {
-            severity: "error",
-            category: "merge_conflict",
-            message: conflict[:message] || conflict[:reason] || "unresolved Markdown conflict"
+            severity: 'error',
+            category: 'merge_conflict',
+            message: conflict[:message] || conflict[:reason] || 'unresolved Markdown conflict'
           }
         end,
         output: result.content,
@@ -656,13 +673,13 @@ module Smorg
     rescue Markdown::Merge::ParseError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "parse_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
         policies: []
       }
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "merge_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'merge_error', message: e.message }],
         policies: []
       }
     end
@@ -687,7 +704,7 @@ module Smorg
       changed_sections.all? do |section|
         other_text = section[:text]
         heading_key = markdown_heading_key(other_text)
-        ancestor_text = ancestor_by_heading[heading_key] || ancestor_by_path.fetch(section[:path], "")
+        ancestor_text = ancestor_by_heading[heading_key] || ancestor_by_path.fetch(section[:path], '')
         current_text = current_by_heading[heading_key] || current_by_path[section[:path]]
         next false unless current_text
 
@@ -697,12 +714,12 @@ module Smorg
     end
 
     def markdown_sections(source)
-      parsed = Markly::Merge.parse_markdown(source, "markdown")
+      parsed = Markly::Merge.parse_markdown(source, 'markdown')
       return nil unless parsed[:ok]
 
       Markdown::Merge.collect_markdown_sections(
         parsed.dig(:analysis, :normalized_source),
-        parsed.dig(:analysis, :owners),
+        parsed.dig(:analysis, :owners)
       )
     end
 
@@ -718,8 +735,8 @@ module Smorg
     end
 
     def markdown_heading_key(section_text)
-      heading = section_text.each_line.find { |line| line.start_with?("#") }.to_s.strip
-      heading = heading.delete_prefix("#").strip while heading.start_with?("#")
+      heading = section_text.each_line.find { |line| line.start_with?('#') }.to_s.strip
+      heading = heading.delete_prefix('#').strip while heading.start_with?('#')
       heading.downcase
     end
 
@@ -734,9 +751,9 @@ module Smorg
       token = raw_token.downcase
       loop do
         previous = token
-        token = token.delete_prefix("(").delete_prefix("[").delete_prefix("{").delete_prefix("<")
-        token = token.delete_suffix(")").delete_suffix("]").delete_suffix("}").delete_suffix(">")
-        token = token.delete_suffix(".").delete_suffix(",").delete_suffix(";").delete_suffix(":")
+        token = token.delete_prefix('(').delete_prefix('[').delete_prefix('{').delete_prefix('<')
+        token = token.delete_suffix(')').delete_suffix(']').delete_suffix('}').delete_suffix('>')
+        token = token.delete_suffix('.').delete_suffix(',').delete_suffix(';').delete_suffix(':')
         return token if token == previous
       end
     end
@@ -746,8 +763,8 @@ module Smorg
         ok: false,
         diagnostics: [
           {
-            severity: "error",
-            category: "unsupported_language",
+            severity: 'error',
+            category: 'unsupported_language',
             message: "no structured merge driver is configured for #{language.inspect} at #{path_name}"
           }
         ],
@@ -800,16 +817,16 @@ module Smorg
 
     def normalize_language(language, path_name)
       case language.to_s.strip.downcase
-      when "go", "golang"
-        "go"
-      when "json"
-        "json"
-      when "jsonc", "json with comments"
-        "jsonc"
-      when "markdown", "md", "gfm", "text/markdown"
-        "markdown"
-      when "plain", "text", "plaintext", "text/plain"
-        "text"
+      when 'go', 'golang'
+        'go'
+      when 'json'
+        'json'
+      when 'jsonc', 'json with comments'
+        'jsonc'
+      when 'markdown', 'md', 'gfm', 'text/markdown'
+        'markdown'
+      when 'plain', 'text', 'plaintext', 'text/plain'
+        'text'
       else
         Ast::Merge.classify_template_target_path(path_name)[:family]
       end
@@ -826,14 +843,19 @@ module Smorg
     end
 
     def attribute_files_for_path(path_name)
-      clean_path = File.expand_path(path_name, Dir.pwd).start_with?(Dir.pwd) ? Pathname.new(path_name).cleanpath.to_s : path_name
+      clean_path = if File.expand_path(path_name,
+                                       Dir.pwd).start_with?(Dir.pwd)
+                     Pathname.new(path_name).cleanpath.to_s
+                   else
+                     path_name
+                   end
       dir = File.dirname(clean_path)
-      return [".gitattributes"] if dir == "." || clean_path.start_with?("..") || Pathname.new(clean_path).absolute?
+      return ['.gitattributes'] if dir == '.' || clean_path.start_with?('..') || Pathname.new(clean_path).absolute?
 
-      files = [".gitattributes"]
+      files = ['.gitattributes']
       parts = dir.split(File::SEPARATOR).reject(&:empty?)
       parts.each_index do |index|
-        files << File.join(*parts[0..index], ".gitattributes")
+        files << File.join(*parts[0..index], '.gitattributes')
       end
       files
     end
@@ -841,23 +863,23 @@ module Smorg
     def apply_attributes(settings, path_name, source)
       source.each_line do |raw_line|
         line = raw_line.strip
-        next if line.empty? || line.start_with?("#")
+        next if line.empty? || line.start_with?('#')
 
         pattern, *fields = line.split(/\s+/)
         next if fields.empty? || !attribute_pattern_matches?(pattern, path_name)
 
         fields.each do |field|
-          key, value = field.split("=", 2)
+          key, value = field.split('=', 2)
           next unless value
 
           case key
-          when "smorg.language", "linguist-language"
+          when 'smorg.language', 'linguist-language'
             settings[:language] = value
-          when "smorg.profile"
+          when 'smorg.profile'
             settings[:profile_id] = value
-          when "smorg.requireProfileStatus"
+          when 'smorg.requireProfileStatus'
             settings[:require_profile_status] = value
-          when "conflict-marker-size"
+          when 'conflict-marker-size'
             marker_size = value.to_i
             settings[:conflict_marker_size] = marker_size if marker_size.positive?
           end
@@ -868,7 +890,7 @@ module Smorg
     def attribute_pattern_matches?(pattern, path_name)
       return true if pattern == path_name
 
-      if !pattern.include?("/")
+      if !pattern.include?('/')
         File.fnmatch?(pattern, File.basename(path_name))
       else
         File.fnmatch?(pattern, path_name)
@@ -877,9 +899,9 @@ module Smorg
 
     def find_conflict_regions(source, marker_size)
       marker_size = [marker_size.to_i, 1].max
-      start_prefix = "<" * marker_size
-      separator_prefix = "=" * marker_size
-      end_prefix = ">" * marker_size
+      start_prefix = '<' * marker_size
+      separator_prefix = '=' * marker_size
+      end_prefix = '>' * marker_size
       regions = []
       current = nil
       source.split("\n").each_with_index do |line, index|
