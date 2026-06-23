@@ -36,7 +36,8 @@ module Rbs
       # @param start_marker [String, nil] The freeze start marker text
       # @param end_marker [String, nil] The freeze end marker text
       # @param pattern_type [Symbol] Pattern type for marker matching (defaults to :hash_comment)
-      def initialize(start_line:, end_line:, analysis:, nodes: [], overlapping_nodes: nil, start_marker: nil, end_marker: nil, pattern_type: Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN)
+      def initialize(start_line:, end_line:, analysis:, nodes: [], overlapping_nodes: nil, start_marker: nil,
+                     end_marker: nil, pattern_type: Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN)
         super(
           start_line: start_line,
           end_line: end_line,
@@ -106,14 +107,14 @@ module Rbs
           start_ln = get_node_start_line(n)
           end_ln = get_node_end_line(n)
           "#{name} (lines #{start_ln}-#{end_ln})"
-        end.join(", ")
+        end.join(', ')
 
         raise InvalidStructureError.new(
           "Freeze block at lines #{@start_line}-#{@end_line} has partial overlap with: #{node_names}. " \
-            "Freeze blocks must fully contain declarations or be fully contained within them.",
+            'Freeze blocks must fully contain declarations or be fully contained within them.',
           start_line: @start_line,
           end_line: @end_line,
-          unclosed_nodes: unclosed,
+          unclosed_nodes: unclosed
         )
       end
 
@@ -156,22 +157,21 @@ module Rbs
         # For TreeHaver::Node, try to find name in children
         if node.respond_to?(:each)
           node.each do |child|
-            child_type = child.respond_to?(:type) ? child.type.to_s : ""
-            if child_type.end_with?("_name") || %w[constant identifier].include?(child_type)
-              if child.respond_to?(:text)
-                text = begin
-                  child.text
-                rescue ArgumentError
-                  nil
-                end
-                return text if text && !text.empty?
-              end
+            child_type = child.respond_to?(:type) ? child.type.to_s : ''
+            next unless (child_type.end_with?('_name') || %w[constant
+                                                             identifier].include?(child_type)) && child.respond_to?(:text)
+
+            text = begin
+              child.text
+            rescue ArgumentError
+              nil
             end
+            return text if text && !text.empty?
           end
         end
 
         # Fallback to class name
-        node.class.name.split("::").last
+        node.class.name.split('::').last
       end
     end
   end

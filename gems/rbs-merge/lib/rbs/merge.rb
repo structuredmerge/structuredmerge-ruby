@@ -2,17 +2,16 @@
 
 # External gems
 # NOTE: rbs gem is loaded by the RBS backend when needed.
-require "version_gem"
-require "set"
+require 'version_gem'
 
 # tree_haver provides unified parsing via multiple backends
-require "tree_haver"
+require 'tree_haver'
 
 # Shared merge infrastructure
-require "ast/merge"
+require 'ast/merge'
 
 # This gem
-require_relative "merge/version"
+require_relative 'merge/version'
 
 module Rbs
   module Merge
@@ -73,20 +72,20 @@ module Rbs
     # Raised when merge-time corruption detection is configured to error.
     class CorruptionDetectedError < Error; end
 
-    autoload :DebugLogger, "rbs/merge/debug_logger"
-    autoload :CommentTracker, "rbs/merge/comment_tracker"
-    autoload :FreezeNode, "rbs/merge/freeze_node"
-    autoload :MergeResult, "rbs/merge/merge_result"
-    autoload :NodeTypeNormalizer, "rbs/merge/node_type_normalizer"
-    autoload :NodeWrapper, "rbs/merge/node_wrapper"
-    autoload :FileAnalysis, "rbs/merge/file_analysis"
-    autoload :ConflictResolver, "rbs/merge/conflict_resolver"
-    autoload :FileAligner, "rbs/merge/file_aligner"
-    autoload :SmartMerger, "rbs/merge/smart_merger"
+    autoload :DebugLogger, 'rbs/merge/debug_logger'
+    autoload :CommentTracker, 'rbs/merge/comment_tracker'
+    autoload :FreezeNode, 'rbs/merge/freeze_node'
+    autoload :MergeResult, 'rbs/merge/merge_result'
+    autoload :NodeTypeNormalizer, 'rbs/merge/node_type_normalizer'
+    autoload :NodeWrapper, 'rbs/merge/node_wrapper'
+    autoload :FileAnalysis, 'rbs/merge/file_analysis'
+    autoload :ConflictResolver, 'rbs/merge/conflict_resolver'
+    autoload :FileAligner, 'rbs/merge/file_aligner'
+    autoload :SmartMerger, 'rbs/merge/smart_merger'
 
     # Backends module containing RBS gem backend for TreeHaver integration
     module Backends
-      autoload :RbsBackend, "rbs/merge/backends/rbs_backend"
+      autoload :RbsBackend, 'rbs/merge/backends/rbs_backend'
     end
 
     # Tracks whether backends were registered, without class instance variables.
@@ -109,7 +108,7 @@ module Rbs
             :rbs,
             backend_module: Backends::RbsBackend,
             backend_type: :rbs,
-            gem_name: "rbs",
+            gem_name: 'rbs'
           )
 
           # Also register the tree-sitter-rbs grammar when present.
@@ -118,7 +117,7 @@ module Rbs
             TreeHaver.register_language(
               :rbs,
               path: grammar_finder.find_library_path,
-              symbol: grammar_finder.symbol_name,
+              symbol: grammar_finder.symbol_name
             )
           end
 
@@ -137,10 +136,10 @@ Rbs::Merge.register_backend!
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
     :rbs_merge,
-    require_path: "rbs/merge",
-    merger_class: "Rbs::Merge::SmartMerger",
+    require_path: 'rbs/merge',
+    merger_class: 'Rbs::Merge::SmartMerger',
     test_source: "class Foo\nend",
-    category: :code,
+    category: :code
   )
 end
 

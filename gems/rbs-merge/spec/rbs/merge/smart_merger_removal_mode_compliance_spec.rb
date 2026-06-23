@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "spec_helper"
-require "rbs/merge"
-require "ast/merge/rspec/shared_examples"
+require 'spec_helper'
+require 'rbs/merge'
+require 'ast/merge/rspec/shared_examples'
 
 RSpec.describe Rbs::Merge::SmartMerger, :rbs_parsing do
-  it_behaves_like "Ast::Merge::RemovalModeCompliance" do
+  it_behaves_like 'Ast::Merge::RemovalModeCompliance' do
     let(:merger_class) { described_class }
 
     let(:removal_mode_leading_comments_case) do
@@ -22,7 +22,7 @@ RSpec.describe Rbs::Merge::SmartMerger, :rbs_parsing do
           class Legacy
           end
         RBS
-        expected: <<~RBS,
+        expected: <<~RBS
           class Keep
           end
 
@@ -52,7 +52,7 @@ RSpec.describe Rbs::Merge::SmartMerger, :rbs_parsing do
           class Tail
           end
         RBS
-        expected: <<~RBS,
+        expected: <<~RBS
           class Keep
           end
 
@@ -81,13 +81,13 @@ RSpec.describe Rbs::Merge::SmartMerger, :rbs_parsing do
           end
         RBS
         expected: "class Example\n  # keep helper docs\n  def shared: () -> String\nend\n",
-        options: {preference: :template},
+        options: { preference: :template }
       }
     end
 
     let(:unsupported_removal_mode_case_reasons) do
       {
-        removal_mode_inline_comments_case: "RBS declarations do not expose general inline-comment promotion semantics",
+        removal_mode_inline_comments_case: 'RBS declarations do not expose general inline-comment promotion semantics'
       }
     end
   end

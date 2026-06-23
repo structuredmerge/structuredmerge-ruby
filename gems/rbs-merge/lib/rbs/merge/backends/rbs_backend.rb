@@ -46,20 +46,21 @@ module Rbs
           #     puts "RBS backend is ready"
           #   end
           def available?
-            return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-            @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            return @loaded if @load_attempted
+
+            @load_attempted = true
             begin
-              require "rbs"
+              require 'rbs'
               # Verify it can actually parse - just requiring isn't enough
-              buffer = ::RBS::Buffer.new(name: "test.rbs", content: "class Foo end")
+              buffer = ::RBS::Buffer.new(name: 'test.rbs', content: 'class Foo end')
               ::RBS::Parser.parse_signature(buffer)
-              @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = true
             rescue LoadError
-              @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = false
             rescue StandardError
-              @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = false
             end
-            @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded
           end
 
           # Reset the load state (primarily for testing)
@@ -67,8 +68,8 @@ module Rbs
           # @return [void]
           # @api private
           def reset!
-            @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @load_attempted = false
+            @loaded = false
           end
 
           # Get capabilities supported by this backend
@@ -79,6 +80,7 @@ module Rbs
           #   # => { backend: :rbs, query: false, rbs_only: true, ... }
           def capabilities
             return {} unless available?
+
             {
               backend: :rbs,
               query: false,           # RBS doesn't have tree-sitter-style queries
@@ -87,7 +89,7 @@ module Rbs
               pure_ruby: false,       # RBS gem has native C extension
               rbs_only: true,         # RBS gem only parses RBS type signatures
               error_tolerant: false,  # RBS parser raises on errors
-              mri_only: true,         # RBS gem C extension only works on MRI
+              mri_only: true # RBS gem C extension only works on MRI
             }
           end
         end
@@ -106,11 +108,11 @@ module Rbs
           def initialize(name = :rbs, options: {})
             super(name, backend: :rbs, options: options)
 
-            unless @name == :rbs
-              raise TreeHaver::NotAvailable,
-                "RBS backend only supports RBS parsing. " \
-                  "Got language: #{name.inspect}"
-            end
+            return if @name == :rbs
+
+            raise TreeHaver::NotAvailable,
+                  'RBS backend only supports RBS parsing. ' \
+                    "Got language: #{name.inspect}"
           end
 
           class << self
@@ -136,18 +138,18 @@ module Rbs
             # @raise [TreeHaver::NotAvailable] if requested language is not RBS
             def from_library(_path = nil, symbol: nil, name: nil)
               # Derive language name from symbol if provided
-              lang_name = name || symbol&.to_s&.sub(/^tree_sitter_/, "")&.to_sym || :rbs
+              lang_name = name || symbol&.to_s&.sub(/^tree_sitter_/, '')&.to_sym || :rbs
 
               unless lang_name == :rbs
                 raise TreeHaver::NotAvailable,
-                  "RBS backend only supports RBS, not #{lang_name}. " \
-                    "Use a tree-sitter backend for #{lang_name} support."
+                      "RBS backend only supports RBS, not #{lang_name}. " \
+                        "Use a tree-sitter backend for #{lang_name} support."
               end
 
               rbs
             end
 
-            alias_method :from_path, :from_library
+            alias from_path from_library
           end
         end
 
@@ -160,7 +162,7 @@ module Rbs
           # @raise [TreeHaver::NotAvailable] if rbs gem is not available
           def initialize
             super()
-            raise TreeHaver::NotAvailable, "rbs gem not available" unless RbsBackend.available?
+            raise TreeHaver::NotAvailable, 'rbs gem not available' unless RbsBackend.available?
           end
 
           # Set the language for this parser
@@ -176,11 +178,11 @@ module Rbs
                 @language = Language.rbs
               else
                 raise ArgumentError,
-                  "RBS backend only supports RBS parsing. Got: #{lang.inspect}"
+                      "RBS backend only supports RBS parsing. Got: #{lang.inspect}"
               end
             else
               raise ArgumentError,
-                "Expected RbsBackend::Language or :rbs, got #{lang.class}"
+                    "Expected RbsBackend::Language or :rbs, got #{lang.class}"
             end
           end
 
@@ -190,9 +192,9 @@ module Rbs
           # @return [Tree] parse result tree
           # @raise [TreeHaver::NotAvailable] if no language is set
           def parse(source)
-            raise TreeHaver::NotAvailable, "No language loaded (use parser.language = :rbs)" unless @language
+            raise TreeHaver::NotAvailable, 'No language loaded (use parser.language = :rbs)' unless @language
 
-            buffer = ::RBS::Buffer.new(name: "merge.rbs", content: source)
+            buffer = ::RBS::Buffer.new(name: 'merge.rbs', content: source)
             _buffer, directives, declarations = ::RBS::Parser.parse_signature(buffer)
             Tree.new(declarations, source: source, directives: directives)
           rescue ::RBS::ParsingError => e
@@ -286,42 +288,42 @@ module Rbs
           #
           # @return [String] node type
           def type
-            return "program" if root_node?
+            return 'program' if root_node?
 
-            return "unknown" if @inner_node.nil?
+            return 'unknown' if @inner_node.nil?
 
             # Map RBS class to canonical type
             case @inner_node
-            when ::RBS::AST::Declarations::Class then "class_decl"
-            when ::RBS::AST::Declarations::Module then "module_decl"
-            when ::RBS::AST::Declarations::Interface then "interface_decl"
-            when ::RBS::AST::Declarations::TypeAlias then "type_alias_decl"
-            when ::RBS::AST::Declarations::Constant then "const_decl"
-            when ::RBS::AST::Declarations::Global then "global_decl"
-            when ::RBS::AST::Declarations::ClassAlias then "class_alias_decl"
-            when ::RBS::AST::Declarations::ModuleAlias then "module_alias_decl"
-            when ::RBS::AST::Members::MethodDefinition then "method_member"
-            when ::RBS::AST::Members::Alias then "alias_member"
-            when ::RBS::AST::Members::AttrReader then "attr_reader_member"
-            when ::RBS::AST::Members::AttrWriter then "attr_writer_member"
-            when ::RBS::AST::Members::AttrAccessor then "attr_accessor_member"
-            when ::RBS::AST::Members::Include then "include_member"
-            when ::RBS::AST::Members::Extend then "extend_member"
-            when ::RBS::AST::Members::Prepend then "prepend_member"
-            when ::RBS::AST::Members::InstanceVariable then "ivar_member"
-            when ::RBS::AST::Members::ClassInstanceVariable then "civar_member"
-            when ::RBS::AST::Members::ClassVariable then "cvar_member"
-            when ::RBS::AST::Members::Public then "public_member"
-            when ::RBS::AST::Members::Private then "private_member"
+            when ::RBS::AST::Declarations::Class then 'class_decl'
+            when ::RBS::AST::Declarations::Module then 'module_decl'
+            when ::RBS::AST::Declarations::Interface then 'interface_decl'
+            when ::RBS::AST::Declarations::TypeAlias then 'type_alias_decl'
+            when ::RBS::AST::Declarations::Constant then 'const_decl'
+            when ::RBS::AST::Declarations::Global then 'global_decl'
+            when ::RBS::AST::Declarations::ClassAlias then 'class_alias_decl'
+            when ::RBS::AST::Declarations::ModuleAlias then 'module_alias_decl'
+            when ::RBS::AST::Members::MethodDefinition then 'method_member'
+            when ::RBS::AST::Members::Alias then 'alias_member'
+            when ::RBS::AST::Members::AttrReader then 'attr_reader_member'
+            when ::RBS::AST::Members::AttrWriter then 'attr_writer_member'
+            when ::RBS::AST::Members::AttrAccessor then 'attr_accessor_member'
+            when ::RBS::AST::Members::Include then 'include_member'
+            when ::RBS::AST::Members::Extend then 'extend_member'
+            when ::RBS::AST::Members::Prepend then 'prepend_member'
+            when ::RBS::AST::Members::InstanceVariable then 'ivar_member'
+            when ::RBS::AST::Members::ClassInstanceVariable then 'civar_member'
+            when ::RBS::AST::Members::ClassVariable then 'cvar_member'
+            when ::RBS::AST::Members::Public then 'public_member'
+            when ::RBS::AST::Members::Private then 'private_member'
             else
               # Fallback to class name conversion
-              @inner_node.class.name.split("::").last
-                .gsub(/([A-Z])/, '_\1').downcase.sub(/^_/, "")
+              @inner_node.class.name.split('::').last
+                         .gsub(/([A-Z])/, '_\1').downcase.sub(/^_/, '')
             end
           end
 
           # Alias for the TreeHaver node contract
-          alias_method :kind, :type
+          alias kind type
 
           # Get byte offset where the node starts
           #
@@ -348,11 +350,11 @@ module Rbs
           #
           # @return [Hash{Symbol => Integer}] with :row and :column keys
           def start_point
-            return {row: 0, column: 0} if root_node?
-            return {row: 0, column: 0} unless @inner_node.respond_to?(:location) && @inner_node.location
+            return { row: 0, column: 0 } if root_node?
+            return { row: 0, column: 0 } unless @inner_node.respond_to?(:location) && @inner_node.location
 
             loc = @inner_node.location
-            {row: loc.start_line - 1, column: loc.start_column}
+            { row: loc.start_line - 1, column: loc.start_column }
           end
 
           # Get the end position as row/column (0-based)
@@ -362,13 +364,13 @@ module Rbs
             if root_node? && source
               last_line = lines.size - 1
               last_col = lines.last&.size || 0
-              return {row: last_line, column: last_col}
+              return { row: last_line, column: last_col }
             end
-            return {row: 0, column: 0} if root_node?
-            return {row: 0, column: 0} unless @inner_node.respond_to?(:location) && @inner_node.location
+            return { row: 0, column: 0 } if root_node?
+            return { row: 0, column: 0 } unless @inner_node.respond_to?(:location) && @inner_node.location
 
             loc = @inner_node.location
-            {row: loc.end_line - 1, column: loc.end_column}
+            { row: loc.end_line - 1, column: loc.end_column }
           end
 
           # Get the 1-based line number where this node starts
@@ -400,7 +402,7 @@ module Rbs
               start_line: start_line,
               end_line: end_line,
               start_column: start_point[:column],
-              end_column: end_point[:column],
+              end_column: end_point[:column]
             }
           end
 
@@ -416,19 +418,17 @@ module Rbs
           # @return [String]
           def text
             return source.to_s if root_node?
-            return "" unless @inner_node.respond_to?(:location) && @inner_node.location
+            return '' unless @inner_node.respond_to?(:location) && @inner_node.location
 
             loc = @inner_node.location
-            source.byteslice(loc.start_pos, loc.end_pos - loc.start_pos) || ""
+            source.byteslice(loc.start_pos, loc.end_pos - loc.start_pos) || ''
           end
 
           # Get all child nodes
           #
           # @return [Array<Node>] array of wrapped child nodes
           def children
-            if root_node?
-              return @children_array.map { |n| Node.new(n, source: source, lines: lines) }
-            end
+            return @children_array.map { |n| Node.new(n, source: source, lines: lines) } if root_node?
 
             return [] unless @inner_node.respond_to?(:members)
 
@@ -450,12 +450,12 @@ module Rbs
             return if result.nil?
 
             # Wrap if it's a node, otherwise return nil
-            if result.respond_to?(:location)
-              Node.new(result, source: source, lines: lines)
-            end
+            return unless result.respond_to?(:location)
+
+            Node.new(result, source: source, lines: lines)
           end
 
-          alias_method :field, :child_by_field_name
+          alias field child_by_field_name
 
           # Get the name of this declaration/member
           #
@@ -489,6 +489,7 @@ module Rbs
           # @return [Boolean]
           def respond_to_missing?(method_name, include_private = false)
             return false if @inner_node.nil?
+
             @inner_node.respond_to?(method_name, include_private) || super
           end
 
@@ -513,7 +514,7 @@ module Rbs
           :rbs,
           backend_type: :rbs,
           backend_module: self,
-          gem_name: "rbs",
+          gem_name: 'rbs'
         )
 
         # Register the availability checker for RSpec dependency tags.

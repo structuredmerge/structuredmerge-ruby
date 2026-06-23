@@ -49,7 +49,8 @@ module Rbs
       # @param index [Integer] Statement index in template
       # @param decision [Symbol] Decision type (default: DECISION_TEMPLATE)
       # @return [void]
-      def add_from_template(index, decision: DECISION_TEMPLATE, comment_source_statement: nil, comment_source_analysis: nil)
+      def add_from_template(index, decision: DECISION_TEMPLATE, comment_source_statement: nil,
+                            comment_source_analysis: nil)
         statement = @template_analysis.statements[index]
         return unless statement
 
@@ -57,17 +58,18 @@ module Rbs
           statement,
           @template_analysis,
           comment_source_statement: comment_source_statement,
-          comment_source_analysis: comment_source_analysis,
+          comment_source_analysis: comment_source_analysis
         )
         @lines.concat(deduplicate_leading_comment_overlap(lines))
-        @decisions << {decision: decision, source: :template, index: index, lines: lines.length}
+        @decisions << { decision: decision, source: :template, index: index, lines: lines.length }
       end
 
       # Add content from the destination at the given statement index
       # @param index [Integer] Statement index in destination
       # @param decision [Symbol] Decision type (default: DECISION_DESTINATION)
       # @return [void]
-      def add_from_destination(index, decision: DECISION_DESTINATION, comment_source_statement: nil, comment_source_analysis: nil)
+      def add_from_destination(index, decision: DECISION_DESTINATION, comment_source_statement: nil,
+                               comment_source_analysis: nil)
         statement = @dest_analysis.statements[index]
         return unless statement
 
@@ -75,10 +77,10 @@ module Rbs
           statement,
           @dest_analysis,
           comment_source_statement: comment_source_statement,
-          comment_source_analysis: comment_source_analysis,
+          comment_source_analysis: comment_source_analysis
         )
         @lines.concat(deduplicate_leading_comment_overlap(lines))
-        @decisions << {decision: decision, source: :destination, index: index, lines: lines.length}
+        @decisions << { decision: decision, source: :destination, index: index, lines: lines.length }
       end
 
       # Add content from a freeze block
@@ -96,14 +98,14 @@ module Rbs
         @emitted_freeze_blocks[freeze_key] = true
 
         # Determine source based on which analysis the freeze_node belongs to
-        source = (source_analysis == @template_analysis) ? :template : :destination
+        source = source_analysis == @template_analysis ? :template : :destination
 
         @decisions << {
           decision: DECISION_FREEZE_BLOCK,
           source: source,
           start_line: freeze_node.start_line,
           end_line: freeze_node.end_line,
-          lines: lines.length,
+          lines: lines.length
         }
       end
 
@@ -116,14 +118,14 @@ module Rbs
         # Split without trailing newlines for consistency with other methods
         lines = merged_content.split("\n", -1)
         # Remove trailing empty element if content ended with newline
-        lines.pop if lines.last == ""
+        lines.pop if lines.last == ''
         @lines.concat(deduplicate_leading_comment_overlap(lines))
         @decisions << {
           decision: DECISION_RECURSIVE,
           source: :merged,
           template_index: template_index,
           dest_index: dest_index,
-          lines: lines.length,
+          lines: lines.length
         }
       end
 
@@ -133,13 +135,13 @@ module Rbs
       # @return [void]
       def add_raw(lines, decision:)
         @lines.concat(deduplicate_leading_comment_overlap(lines))
-        @decisions << {decision: decision, source: :raw, lines: lines.length}
+        @decisions << { decision: decision, source: :raw, lines: lines.length }
       end
 
       # Convert the merged result to a string
       # @return [String] The merged RBS content
       def to_s
-        return "" if @lines.empty?
+        return '' if @lines.empty?
 
         # Lines are stored without trailing newlines, so join with newlines
         result = @lines.join("\n")
@@ -161,7 +163,7 @@ module Rbs
         {
           total_decisions: @decisions.length,
           total_lines: @lines.length,
-          by_decision: counts,
+          by_decision: counts
         }
       end
 
@@ -182,7 +184,7 @@ module Rbs
           statement,
           analysis,
           comment_source_statement: comment_source_statement,
-          comment_source_analysis: comment_source_analysis,
+          comment_source_analysis: comment_source_analysis
         )
         if leading_region && leading_statement
           region_start = region_start_line(leading_region)
@@ -194,7 +196,7 @@ module Rbs
               output_analysis: analysis,
               source_region_start: region_start,
               source_region: leading_region,
-              source_analysis: leading_analysis,
+              source_analysis: leading_analysis
             )
             leading_lines = (leading_start...source_start).filter_map { |ln| leading_analysis.line_at(ln) }
             body_lines = (start_line..end_line).map { |ln| analysis.line_at(ln) }
@@ -316,7 +318,7 @@ module Rbs
       end
 
       def standalone_comment_line?(line)
-        line.lstrip.start_with?("#")
+        line.lstrip.start_with?('#')
       end
 
       def previous_statement_trailing_region_matches?(statement, analysis, source_region)
@@ -355,24 +357,27 @@ module Rbs
         line_num
       end
 
-      def leading_segment_start_for_output(output_statement:, output_analysis:, source_region_start:, source_region: nil, source_analysis:)
+      def leading_segment_start_for_output(output_statement:, output_analysis:, source_region_start:, source_analysis:,
+                                           source_region: nil)
         source_region_start - desired_blank_line_count_before_leading_region(
           output_statement: output_statement,
           output_analysis: output_analysis,
           source_region_start: source_region_start,
           source_region: source_region,
-          source_analysis: source_analysis,
+          source_analysis: source_analysis
         )
       end
 
-      def desired_blank_line_count_before_leading_region(output_statement:, output_analysis:, source_region_start:, source_region: nil, source_analysis:)
+      def desired_blank_line_count_before_leading_region(output_statement:, output_analysis:, source_region_start:, source_analysis:,
+                                                         source_region: nil)
         target_region = leading_region_for(output_statement, output_analysis)
         target_region_start = region_start_line(target_region)
         output_start_line = get_start_line(output_statement)
 
         if target_region_start && output_start_line && target_region_start < output_start_line
           blank_line_count_before(target_region_start, output_analysis)
-        elsif source_region && previous_statement_trailing_region_matches?(output_statement, output_analysis, source_region)
+        elsif source_region && previous_statement_trailing_region_matches?(output_statement, output_analysis,
+                                                                           source_region)
           0
         else
           blank_line_count_before(source_region_start, source_analysis)

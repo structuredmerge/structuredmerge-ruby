@@ -45,18 +45,18 @@ module Rbs
         # Freeze blocks always win (they represent protected content)
         # Template freeze blocks take precedence - frozen content from template is preserved
         if freeze_node?(template_decl)
-          return {source: :template, declaration: template_decl, decision: DECISION_FREEZE_BLOCK}
+          return { source: :template, declaration: template_decl, decision: DECISION_FREEZE_BLOCK }
         end
 
         # Destination freeze blocks also win (though less common)
         if freeze_node?(dest_decl)
-          return {source: :destination, declaration: dest_decl, decision: DECISION_FREEZE_BLOCK}
+          return { source: :destination, declaration: dest_decl, decision: DECISION_FREEZE_BLOCK }
         end
 
         # Check if declarations are identical
         if declarations_identical?(template_decl, dest_decl)
           # Prefer destination to minimize diffs
-          return {source: :destination, declaration: dest_decl, decision: DECISION_DESTINATION}
+          return { source: :destination, declaration: dest_decl, decision: DECISION_DESTINATION }
         end
 
         # Check if we should recursively merge (for container types)
@@ -65,16 +65,16 @@ module Rbs
             source: :recursive,
             template_declaration: template_decl,
             dest_declaration: dest_decl,
-            decision: DECISION_RECURSIVE,
+            decision: DECISION_RECURSIVE
           }
         end
 
         # Apply preference (supports per-node-type preferences with node_typing)
         case resolve_preference(template_decl, dest_decl)
         when :template
-          {source: :template, declaration: template_decl, decision: DECISION_TEMPLATE}
+          { source: :template, declaration: template_decl, decision: DECISION_TEMPLATE }
         else # :destination (validated in initialize)
-          {source: :destination, declaration: dest_decl, decision: DECISION_DESTINATION}
+          { source: :destination, declaration: dest_decl, decision: DECISION_DESTINATION }
         end
       end
 
@@ -156,7 +156,7 @@ module Rbs
       def extract_declaration_text(decl, analysis)
         start_line = get_decl_start_line(decl)
         end_line = get_decl_end_line(decl)
-        return "" unless start_line && end_line
+        return '' unless start_line && end_line
 
         lines = []
 
@@ -184,7 +184,7 @@ module Rbs
         attachment.leading_region if attachment.respond_to?(:leading_region)
       end
 
-      def native_comment_fallback_applicable?(decl, analysis)
+      def native_comment_fallback_applicable?(decl, _analysis)
         decl.respond_to?(:comment) && decl.comment
       end
 
@@ -265,7 +265,7 @@ module Rbs
         elsif decl.respond_to?(:type) && decl.type.respond_to?(:to_sym)
           # TreeHaver::Node - get type and normalize
           NodeTypeNormalizer.canonical_type(decl.type, :tree_sitter)
-        elsif decl.respond_to?(:class) && decl.class.name.to_s.include?("RBS::AST")
+        elsif decl.respond_to?(:class) && decl.class.name.to_s.include?('RBS::AST')
           # RBS gem node - map class name to canonical type
           NodeTypeNormalizer.canonical_type(decl.class.name, :rbs)
         else
@@ -285,7 +285,7 @@ module Rbs
         elsif decl.respond_to?(:each)
           # TreeHaver::Node - check for members container child
           decl.each do |child|
-            child_type = child.respond_to?(:type) ? child.type.to_s : ""
+            child_type = child.respond_to?(:type) ? child.type.to_s : ''
             return true if %w[members interface_members].include?(child_type)
           end
           false

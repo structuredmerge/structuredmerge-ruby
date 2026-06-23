@@ -14,7 +14,7 @@ module Rbs
     # limits, not pending merge-engine work. Freeze marker lines are excluded
     # from the tracked set.
     class CommentTracker < Ast::Merge::Comment::HashTrackerBase
-      DEFAULT_FREEZE_TOKEN = "rbs-merge"
+      DEFAULT_FREEZE_TOKEN = 'rbs-merge'
 
       def initialize(lines, freeze_token: DEFAULT_FREEZE_TOKEN)
         @freeze_token = freeze_token
@@ -39,8 +39,8 @@ module Rbs
           metadata: metadata.merge(
             line_num: resolved_line_num,
             end_line: resolved_end_line,
-            source: :comment_tracker,
-          ),
+            source: :comment_tracker
+          )
         )
       end
 
@@ -51,7 +51,7 @@ module Rbs
           owners: owners,
           style: :hash_comment,
           total_comment_count: @comments.size,
-          **options,
+          **options
         )
       end
 
@@ -69,7 +69,7 @@ module Rbs
             indent: match[:indent].length,
             text: match[:text].to_s,
             full_line: true,
-            raw: line,
+            raw: line
           }
         end
       end

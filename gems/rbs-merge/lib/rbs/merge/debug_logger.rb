@@ -17,8 +17,8 @@ module Rbs
       extend Ast::Merge::DebugLogger
 
       # RBS-specific configuration
-      self.env_var_name = "RBS_MERGE_DEBUG"
-      self.log_prefix = "[rbs-merge]"
+      self.env_var_name = 'RBS_MERGE_DEBUG'
+      self.log_prefix = '[rbs-merge]'
     end
   end
 end

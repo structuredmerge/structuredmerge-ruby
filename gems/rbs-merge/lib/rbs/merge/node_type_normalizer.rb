@@ -127,7 +127,7 @@ module Rbs
           private: :visibility,
 
           # Other
-          comment: :comment,
+          comment: :comment
         }.freeze,
 
         # tree-sitter-rbs grammar node types
@@ -136,7 +136,7 @@ module Rbs
         tree_sitter: {
           # Document structure
           program: :document,
-          decl: :declaration_wrapper,  # Wrapper around all top-level declarations
+          decl: :declaration_wrapper, # Wrapper around all top-level declarations
 
           # Declaration types (direct children of decl)
           class_decl: :class,
@@ -157,7 +157,7 @@ module Rbs
           # Member types (inside member wrapper)
           method_member: :method,
           alias_member: :alias,
-          attribute_member: :attribute,  # Generic attribute, check attribyte_type child
+          attribute_member: :attribute, # Generic attribute, check attribyte_type child
           include_member: :include,
           extend_member: :extend,
           prepend_member: :prepend,
@@ -165,7 +165,7 @@ module Rbs
           visibility_member: :visibility,
 
           # Attribute type specifiers (child of attribute_member)
-          attribyte_type: :attribute_type,  # Note: typo in grammar
+          attribyte_type: :attribute_type, # NOTE: typo in grammar
           attr_reader: :attr_reader,
           attr_writer: :attr_writer,
           attr_accessor: :attr_accessor,
@@ -223,8 +223,8 @@ module Rbs
           visibility: :visibility,
 
           # Other
-          comment: :comment,
-        }.freeze,
+          comment: :comment
+        }.freeze
       )
 
       class << self
@@ -251,10 +251,10 @@ module Rbs
           return if node.nil?
 
           backend_type = if backend == :tree_sitter && node.respond_to?(:type)
-            node.type
-          else
-            node.class.name
-          end
+                           node.type
+                         else
+                           node.class.name
+                         end
 
           canonical = canonical_type(backend_type, backend)
           return canonical unless backend == :tree_sitter
@@ -286,7 +286,8 @@ module Rbs
         # @return [Boolean]
         def declaration_type?(type)
           canonical = type.to_sym
-          %i[class module interface type_alias constant global class_alias module_alias declaration_wrapper].include?(canonical)
+          %i[class module interface type_alias constant global class_alias module_alias
+             declaration_wrapper].include?(canonical)
         end
 
         # Check if a type is a member type (method, attr, include, etc.)
@@ -295,7 +296,8 @@ module Rbs
         # @return [Boolean]
         def member_type?(type)
           canonical = type.to_sym
-          %i[method alias attr_reader attr_writer attr_accessor include extend prepend ivar civar cvar visibility].include?(canonical)
+          %i[method alias attr_reader attr_writer attr_accessor include extend prepend ivar civar cvar
+             visibility].include?(canonical)
         end
 
         # Check if a type is a container type (can have children/members)

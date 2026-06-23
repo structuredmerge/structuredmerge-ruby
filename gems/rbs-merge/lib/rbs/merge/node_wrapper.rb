@@ -43,7 +43,7 @@ module Rbs
             source: source,
             leading_comments: leading_comments,
             inline_comment: inline_comment,
-            backend: backend,
+            backend: backend
           )
         end
       end
@@ -372,8 +372,8 @@ module Rbs
         if @backend == :rbs
           @node.respond_to?(:new_name) ? @node.new_name.to_s : nil
         else
-          method_names = extract_child_texts("method_name")
-          method_names.first || extract_child_text("new_name") || extract_child_text("alias_name")
+          method_names = extract_child_texts('method_name')
+          method_names.first || extract_child_text('new_name') || extract_child_text('alias_name')
         end
       end
 
@@ -385,8 +385,8 @@ module Rbs
         if @backend == :rbs
           @node.respond_to?(:old_name) ? @node.old_name.to_s : nil
         else
-          method_names = extract_child_texts("method_name")
-          method_names[1] || extract_child_text("old_name") || extract_child_text("aliased_name")
+          method_names = extract_child_texts('method_name')
+          method_names[1] || extract_child_text('old_name') || extract_child_text('aliased_name')
         end
       end
 
@@ -397,8 +397,8 @@ module Rbs
 
         if @backend == :rbs
           raw_type = @node.class.name.to_s
-          return :public if raw_type.end_with?("::Public")
-          return :private if raw_type.end_with?("::Private")
+          return :public if raw_type.end_with?('::Public')
+          return :private if raw_type.end_with?('::Private')
 
           nil
         else
@@ -437,17 +437,15 @@ module Rbs
 
         @node.each do |child|
           child_type = child.type.to_s
-          if name_node_types.include?(child_type)
-            # Name nodes often have a constant or identifier child
-            child.each do |inner|
-              inner_type = inner.type.to_s
-              if %w[constant identifier].include?(inner_type)
-                return extract_node_text(inner)
-              end
-            end
-            # If no inner constant/identifier, try the name node itself
-            return extract_node_text(child)
+          next unless name_node_types.include?(child_type)
+
+          # Name nodes often have a constant or identifier child
+          child.each do |inner|
+            inner_type = inner.type.to_s
+            return extract_node_text(inner) if %w[constant identifier].include?(inner_type)
           end
+          # If no inner constant/identifier, try the name node itself
+          return extract_node_text(child)
         end
 
         nil
@@ -476,13 +474,11 @@ module Rbs
           next unless desired_types.include?(child.type.to_s)
 
           inner_text = if child.respond_to?(:each)
-            child.each do |inner|
-              inner_type = inner.type.to_s
-              if %w[constant identifier].include?(inner_type)
-                break extract_node_text(inner)
-              end
-            end
-          end
+                         child.each do |inner|
+                           inner_type = inner.type.to_s
+                           break extract_node_text(inner) if %w[constant identifier].include?(inner_type)
+                         end
+                       end
 
           texts << (inner_text || extract_node_text(child))
         end.compact
@@ -520,7 +516,7 @@ module Rbs
             member,
             lines: @lines,
             source: @source,
-            backend: @backend,
+            backend: @backend
           )
         end
       end
@@ -541,7 +537,7 @@ module Rbs
             node,
             lines: @lines,
             source: @source,
-            backend: @backend,
+            backend: @backend
           )
           return
         end

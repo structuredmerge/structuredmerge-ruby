@@ -25,7 +25,7 @@ module Rbs
 
       # Default freeze token for identifying freeze blocks
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "rbs-merge"
+      DEFAULT_FREEZE_TOKEN = 'rbs-merge'
 
       # @return [TreeHaver::Tree, nil] Parsed AST (for tree-sitter backend)
       attr_reader :ast
@@ -56,32 +56,32 @@ module Rbs
       #   - Use TreeHaver.with_backend(:mri) { ... } for tree-sitter via MRI
       #   - Use TreeHaver.with_backend(:rbs) { ... } for RBS gem (MRI only)
       #   - Set TREE_HAVER_BACKEND=rbs or TREE_HAVER_BACKEND=mri env var
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **_options)
         @source = source
         @lines = source.split("\n", -1)
         @freeze_token = freeze_token
         @signature_generator = signature_generator
         @errors = []
-        @backend = nil  # Will be set during parsing
+        @backend = nil # Will be set during parsing
         @directives = []
         @declarations = []
         @ast = nil
         @comment_tracker = CommentTracker.new(@lines, freeze_token: freeze_token)
 
         # Parse the RBS source
-        DebugLogger.time("FileAnalysis#parse") { parse_rbs }
+        DebugLogger.time('FileAnalysis#parse') { parse_rbs }
 
         # Extract and integrate all nodes including freeze blocks
         @statements = integrate_nodes
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          backend: @backend,
-          declarations_count: @declarations.size,
-          statements_count: @statements.size,
-          freeze_blocks: freeze_blocks.size,
-          valid: valid?,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            backend: @backend,
+                            declarations_count: @declarations.size,
+                            statements_count: @statements.size,
+                            freeze_blocks: freeze_blocks.size,
+                            valid: valid?
+                          })
       end
 
       # Check if parse was successful
@@ -109,7 +109,7 @@ module Rbs
         @comment_support_style ||= shared_comment_support_style(
           source: :rbs_source,
           style: :hash_comment,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -138,7 +138,7 @@ module Rbs
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
@@ -153,7 +153,7 @@ module Rbs
         shared_comment_attachment_for(
           owner,
           tracker_attachment: augmented_attachment || comment_tracker.comment_attachment_for(owner, **options),
-          **options,
+          **options
         )
       end
 
@@ -178,7 +178,7 @@ module Rbs
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -200,7 +200,7 @@ module Rbs
             root,
             lines: @lines,
             source: @source,
-            backend: @backend,
+            backend: @backend
           )
         end
       end
@@ -241,23 +241,23 @@ module Rbs
 
         case canonical
         when :class
-          [:class, name || "anonymous"]
+          [:class, name || 'anonymous']
         when :module
-          [:module, name || "anonymous"]
+          [:module, name || 'anonymous']
         when :interface
-          [:interface, name || "anonymous"]
+          [:interface, name || 'anonymous']
         when :type_alias
-          [:type_alias, name || "anonymous"]
+          [:type_alias, name || 'anonymous']
         when :constant
-          [:constant, name || "anonymous"]
+          [:constant, name || 'anonymous']
         when :global
-          [:global, name || "anonymous"]
+          [:global, name || 'anonymous']
         when :class_alias
-          [:class_alias, name || "anonymous"]
+          [:class_alias, name || 'anonymous']
         when :module_alias
-          [:module_alias, name || "anonymous"]
+          [:module_alias, name || 'anonymous']
         when :method
-          [:method, name || "anonymous"]
+          [:method, name || 'anonymous']
         else
           [canonical, name || node_type]
         end
@@ -280,20 +280,20 @@ module Rbs
         ]
 
         node.each do |child|
-          child_type = child.respond_to?(:type) ? child.type.to_s : ""
-          if name_node_types.include?(child_type)
-            # Name nodes often have a constant or identifier child
-            if child.respond_to?(:each)
-              child.each do |inner|
-                inner_type = inner.respond_to?(:type) ? inner.type.to_s : ""
-                if %w[constant identifier].include?(inner_type)
-                  return inner.respond_to?(:text) ? inner.text : nil
-                end
+          child_type = child.respond_to?(:type) ? child.type.to_s : ''
+          next unless name_node_types.include?(child_type)
+
+          # Name nodes often have a constant or identifier child
+          if child.respond_to?(:each)
+            child.each do |inner|
+              inner_type = inner.respond_to?(:type) ? inner.type.to_s : ''
+              if %w[constant identifier].include?(inner_type)
+                return inner.respond_to?(:text) ? inner.text : nil
               end
             end
-            # If no inner constant/identifier, try the name node itself
-            return child.respond_to?(:text) ? child.text : nil
           end
+          # If no inner constant/identifier, try the name node itself
+          return child.respond_to?(:text) ? child.text : nil
         end
 
         nil
@@ -348,9 +348,9 @@ module Rbs
         @declarations = result.declarations
         @directives = result.directives
 
-        if result.has_errors?
-          result.errors.each { |e| @errors << e.message }
-        end
+        return unless result.has_errors?
+
+        result.errors.each { |e| @errors << e.message }
       end
 
       # Process result from tree-sitter backend
@@ -359,20 +359,18 @@ module Rbs
         @ast = result
 
         # Check for parse errors in the tree
-        if @ast&.root_node&.has_error?
-          collect_parse_errors(@ast.root_node)
-        end
+        collect_parse_errors(@ast.root_node) if @ast&.root_node&.has_error?
 
         # Extract declarations from AST
         extract_tree_sitter_declarations
       end
 
       def collect_parse_errors(node)
-        if node.type.to_s == "ERROR" || node.missing?
+        if node.type.to_s == 'ERROR' || node.missing?
           @errors << {
             type: node.type.to_s,
             start_point: node.start_point,
-            end_point: node.end_point,
+            end_point: node.end_point
           }
         end
 
@@ -394,7 +392,7 @@ module Rbs
           # Skip non-declaration nodes
           next if %w[comment].include?(child_type)
 
-          if child_type == "decl"
+          if child_type == 'decl'
             # The `decl` node wraps the actual declaration
             # Extract the inner declaration (class_decl, module_decl, etc.)
             child.each do |inner|
@@ -405,7 +403,7 @@ module Rbs
               canonical = NodeTypeNormalizer.canonical_type(inner.type, :tree_sitter)
               if %i[class module interface type_alias constant global class_alias module_alias].include?(canonical)
                 @declarations << inner
-                break  # Only one actual declaration per `decl` wrapper
+                break # Only one actual declaration per `decl` wrapper
               end
             end
           else
@@ -441,7 +439,7 @@ module Rbs
             decl,
             lines: @lines,
             source: @source,
-            backend: @backend,
+            backend: @backend
           )
         end
       end
@@ -457,10 +455,10 @@ module Rbs
           next unless (match = line.match(pattern))
 
           marker_type = match[1]&.downcase
-          if marker_type == "freeze"
-            markers << {type: :start, line: line_num, text: line}
-          elsif marker_type == "unfreeze"
-            markers << {type: :end, line: line_num, text: line}
+          if marker_type == 'freeze'
+            markers << { type: :start, line: line_num, text: line }
+          elsif marker_type == 'unfreeze'
+            markers << { type: :end, line: line_num, text: line }
           end
         end
 
@@ -491,7 +489,7 @@ module Rbs
                 nodes: contained_nodes,
                 overlapping_nodes: overlapping_nodes,
                 start_marker: start_marker[:text],
-                end_marker: marker[:text],
+                end_marker: marker[:text]
               )
             else
               DebugLogger.warning("Unmatched freeze end marker at line #{marker[:line]}")
