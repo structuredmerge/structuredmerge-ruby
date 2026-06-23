@@ -15,23 +15,23 @@ module Json
       extend Ast::Merge::DebugLogger
 
       # Json-specific configuration
-      self.env_var_name = "JSON_MERGE_DEBUG"
-      self.log_prefix = "[Json::Merge]"
+      self.env_var_name = 'JSON_MERGE_DEBUG'
+      self.log_prefix = '[Json::Merge]'
 
       class << self
         # Override log_node to handle Json-specific node types.
         #
         # @param node [Object] Node to log information about
         # @param label [String] Label for the node
-        def log_node(node, label: "Node")
+        def log_node(node, label: 'Node')
           return unless enabled?
 
           info = case node
-          when Json::Merge::NodeWrapper
-            {type: node.type.to_s, lines: "#{node.start_line}..#{node.end_line}"}
-          else
-            extract_node_info(node)
-          end
+                 when Json::Merge::NodeWrapper
+                   { type: node.type.to_s, lines: "#{node.start_line}..#{node.end_line}" }
+                 else
+                   extract_node_info(node)
+                 end
 
           debug(label, info)
         end

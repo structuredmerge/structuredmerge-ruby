@@ -6,19 +6,19 @@ module Json
     # JSONC merging.
     class NodeWrapper < Ast::Merge::NodeWrapperBase
       def object?
-        @node.type.to_s == "object"
+        @node.type.to_s == 'object'
       end
 
       def array?
-        @node.type.to_s == "array"
+        @node.type.to_s == 'array'
       end
 
       def string?
-        @node.type.to_s == "string"
+        @node.type.to_s == 'string'
       end
 
       def number?
-        @node.type.to_s == "number"
+        @node.type.to_s == 'number'
       end
 
       def boolean?
@@ -26,30 +26,30 @@ module Json
       end
 
       def null?
-        @node.type.to_s == "null"
+        @node.type.to_s == 'null'
       end
 
       def pair?
-        @node.type.to_s == "pair"
+        @node.type.to_s == 'pair'
       end
 
       def comment?
-        @node.type.to_s == "comment"
+        @node.type.to_s == 'comment'
       end
 
       def key_name
         return unless pair?
 
-        key_node = find_child_by_field("key")
+        key_node = find_child_by_field('key')
         return unless key_node
 
-        node_text(key_node)&.gsub(/\A"|"\z/, "")
+        node_text(key_node)&.gsub(/\A"|"\z/, '')
       end
 
       def value_node
         return unless pair?
 
-        value = find_child_by_field("value")
+        value = find_child_by_field('value')
         return unless value
 
         NodeWrapper.new(value, lines: @lines, source: @source)
@@ -60,8 +60,8 @@ module Json
 
         result = []
         @node.each do |child|
-          next if child.type.to_s == "comment"
-          next unless child.type.to_s == "pair"
+          next if child.type.to_s == 'comment'
+          next unless child.type.to_s == 'pair'
 
           result << NodeWrapper.new(child, lines: @lines, source: @source)
         end
@@ -74,10 +74,10 @@ module Json
         result = []
         @node.each do |child|
           child_type = child.type.to_s
-          next if child_type == "comment"
-          next if child_type == ","
-          next if child_type == "["
-          next if child_type == "]"
+          next if child_type == 'comment'
+          next if child_type == ','
+          next if child_type == '['
+          next if child_type == ']'
 
           result << NodeWrapper.new(child, lines: @lines, source: @source)
         end
@@ -105,7 +105,7 @@ module Json
         parent_node = @node.parent if @node.respond_to?(:parent)
         return false unless parent_node
 
-        parent_node.type.to_s == "document"
+        parent_node.type.to_s == 'document'
       end
 
       def opening_line
@@ -125,15 +125,15 @@ module Json
       end
 
       def opening_bracket
-        return "{" if object?
-        return "[" if array?
+        return '{' if object?
+        return '[' if array?
 
         nil
       end
 
       def closing_bracket
-        return "}" if object?
-        return "]" if array?
+        return '}' if object?
+        return ']' if array?
 
         nil
       end
@@ -163,22 +163,22 @@ module Json
         node_type = node.type.to_s
 
         case node_type
-        when "document"
+        when 'document'
           child = nil
           node.each do |candidate|
-            child = candidate unless candidate.type.to_s == "comment"
+            child = candidate unless candidate.type.to_s == 'comment'
             break if child
           end
           child_type = child&.type&.to_s
           [:document, child_type]
-        when "object"
+        when 'object'
           if root_level_container?
             [:root_object]
           else
             keys = extract_object_keys(node)
             [:object, keys.sort]
           end
-        when "array"
+        when 'array'
           if root_level_container?
             [:root_array]
           else
@@ -186,17 +186,17 @@ module Json
             node.each { |candidate| elements_count += 1 unless %w[comment , \[ \]].include?(candidate.type.to_s) }
             [:array, elements_count]
           end
-        when "pair"
+        when 'pair'
           [:pair, key_name]
-        when "string"
+        when 'string'
           [:string, node_text(node)]
-        when "number"
+        when 'number'
           [:number, node_text(node)]
-        when "true", "false"
+        when 'true', 'false'
           [:boolean, node.type.to_s]
-        when "null"
+        when 'null'
           [:null]
-        when "comment"
+        when 'comment'
           [:comment, node_text(node)&.strip]
         else
           content_preview = node_text(node)&.slice(0, 50)&.strip
@@ -209,16 +209,17 @@ module Json
       def extract_object_keys(object_node)
         keys = []
         object_node.each do |child|
-          next unless child.type.to_s == "pair"
+          next unless child.type.to_s == 'pair'
 
-          key_node = child.respond_to?(:child_by_field_name) ? child.child_by_field_name("key") : nil
+          key_node = child.respond_to?(:child_by_field_name) ? child.child_by_field_name('key') : nil
 
           unless key_node
             begin
               child_each = child.method(:each)
               child_each.call do |pair_child|
                 pair_child_type = pair_child.type.to_s
-                next if pair_child_type == ":" || pair_child_type == "comment"
+                next if [':', 'comment'].include?(pair_child_type)
+
                 key_node = pair_child
                 break
               end
@@ -229,7 +230,7 @@ module Json
 
           next unless key_node
 
-          key_text = node_text(key_node)&.gsub(/\A"|"\z/, "")
+          key_text = node_text(key_node)&.gsub(/\A"|"\z/, '')
           keys << key_text if key_text
         end
         keys

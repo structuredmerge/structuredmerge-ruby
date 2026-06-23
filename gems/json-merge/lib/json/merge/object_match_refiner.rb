@@ -44,7 +44,8 @@ module Json
       # @param threshold [Float] Minimum score to accept a match (default: 0.5)
       # @param key_weight [Float] Weight for key similarity (default: 0.7)
       # @param value_weight [Float] Weight for value similarity (default: 0.3)
-      def initialize(threshold: DEFAULT_THRESHOLD, key_weight: DEFAULT_KEY_WEIGHT, value_weight: DEFAULT_VALUE_WEIGHT, **options)
+      def initialize(threshold: DEFAULT_THRESHOLD, key_weight: DEFAULT_KEY_WEIGHT, value_weight: DEFAULT_VALUE_WEIGHT,
+                     **options)
         super(threshold: threshold, **options)
         @key_weight = key_weight
         @value_weight = value_weight
@@ -58,7 +59,7 @@ module Json
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context
       # @return [Array<MatchResult>] Array of node matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         # Match object pairs (key-value entries)
         pair_matches = match_pairs(template_nodes, dest_nodes)
 
@@ -212,9 +213,9 @@ module Json
       # @return [String] Normalized key
       def normalize_key(key)
         # Convert camelCase to snake_case first, then normalize
-        key.gsub(/([A-Z])/) { "_#{$1.downcase}" }
-          .downcase
-          .gsub(/[-_]/, "")
+        key.gsub(/([A-Z])/) { "_#{::Regexp.last_match(1).downcase}" }
+           .downcase
+           .gsub(/[-_]/, '')
       end
 
       # Compute similarity between two values.
@@ -260,8 +261,8 @@ module Json
       # @return [String]
       def extract_string_value(node)
         # String nodes include quotes, remove them
-        text = node.respond_to?(:text) ? node.text : ""
-        text.gsub(/\A"|"\z/, "")
+        text = node.respond_to?(:text) ? node.text : ''
+        text.gsub(/\A"|"\z/, '')
       end
 
       # Compute similarity between two arrays.
@@ -306,9 +307,7 @@ module Json
         return str1.length if str2.empty?
 
         # Ensure str1 is the shorter string for space optimization
-        if str1.length > str2.length
-          str1, str2 = str2, str1
-        end
+        str1, str2 = str2, str1 if str1.length > str2.length
 
         m = str1.length
         n = str2.length
@@ -321,11 +320,11 @@ module Json
           curr_row[0] = j
 
           (1..m).each do |i|
-            cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1
+            cost = str1[i - 1] == str2[j - 1] ? 0 : 1
             curr_row[i] = [
               prev_row[i] + 1,      # deletion
               curr_row[i - 1] + 1,  # insertion
-              prev_row[i - 1] + cost, # substitution
+              prev_row[i - 1] + cost # substitution
             ].min
           end
 

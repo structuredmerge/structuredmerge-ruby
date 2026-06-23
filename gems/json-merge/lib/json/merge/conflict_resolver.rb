@@ -30,7 +30,8 @@ module Json
       # @param options [Hash] Additional options for forward compatibility
       # @param node_typing [Hash{Symbol,String => #call}, nil] Node typing configuration
       #   for per-node-type preferences
-      def initialize(template_analysis, dest_analysis, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, resolution_mode: :eager, corruption_handling: :heal, match_refiner: nil, node_typing: nil, merge_arrays: true, preserve_atomic_formatting: false, **options)
+      def initialize(template_analysis, dest_analysis, preference: :destination, add_template_only_nodes: false,
+                     remove_template_missing_nodes: false, resolution_mode: :eager, corruption_handling: :heal, match_refiner: nil, node_typing: nil, merge_arrays: true, preserve_atomic_formatting: false, **options)
         super(
           strategy: :batch,
           preference: preference,
@@ -55,7 +56,7 @@ module Json
       #
       # @param result [MergeResult] Result object to populate
       def resolve_batch(result)
-        DebugLogger.time("ConflictResolver#resolve") do
+        DebugLogger.time('ConflictResolver#resolve') do
           @result = result
           template_statements = @template_analysis.statements
           dest_statements = @dest_analysis.statements
@@ -71,7 +72,7 @@ module Json
             template_statements,
             dest_statements,
             @template_analysis,
-            @dest_analysis,
+            @dest_analysis
           )
 
           emit_document_postlude(@dest_analysis, fallback_node: dest_statements.last)
@@ -79,11 +80,11 @@ module Json
           # Transfer emitter output to result
           transfer_emitter_output(result)
 
-          DebugLogger.debug("Conflict resolution complete", {
-            template_statements: template_statements.size,
-            dest_statements: dest_statements.size,
-            result_lines: result.line_count,
-          })
+          DebugLogger.debug('Conflict resolution complete', {
+                              template_statements: template_statements.size,
+                              dest_statements: dest_statements.size,
+                              result_lines: result.line_count
+                            })
         end
       end
 
@@ -120,10 +121,10 @@ module Json
 
         # Pre-compute position-aware trailing groups for template-only nodes.
         dest_sigs = ::Set.new
-        dest_nodes.each { |n|
+        dest_nodes.each do |n|
           sig = dest_analysis.generate_signature(n)
           dest_sigs << sig if sig
-        }
+        end
         refined_template_ids = ::Set.new(refined_matches.keys.map(&:object_id))
 
         trailing_groups, all_matched_indices = build_dest_iterate_trailing_groups(
@@ -131,12 +132,13 @@ module Json
           dest_sigs: dest_sigs,
           signature_for: ->(node) { template_analysis.generate_signature(node) },
           refined_template_ids: refined_template_ids,
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         # Emit template-only nodes that precede the first matched template node.
         emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
           next if freeze_node?(info[:node])
+
           emit_atomic_node(info[:node], template_analysis)
         end
 
@@ -205,9 +207,10 @@ module Json
           flush_ready_trailing_groups(
             trailing_groups: trailing_groups,
             matched_indices: all_matched_indices,
-            consumed_indices: consumed_template_indices,
+            consumed_indices: consumed_template_indices
           ) do |info|
             next if freeze_node?(info[:node])
+
             emit_atomic_node(info[:node], template_analysis)
           end
         end
@@ -215,9 +218,10 @@ module Json
         # Emit remaining trailing groups (tail groups after last match + safety net)
         emit_remaining_trailing_groups(
           trailing_groups: trailing_groups,
-          consumed_indices: consumed_template_indices,
+          consumed_indices: consumed_template_indices
         ) do |info|
           next if freeze_node?(info[:node])
+
           emit_atomic_node(info[:node], template_analysis)
         end
       end
@@ -250,36 +254,41 @@ module Json
               dest_node,
               dest_analysis,
               fallback_node: template_node,
-              fallback_analysis: template_analysis,
+              fallback_analysis: template_analysis
             )
             comment_attachment = shared_line_comment_attachment_for(comment_source_node, comment_source_analysis)
             inline_source_node, inline_source_analysis, inline_attachment = preferred_available_inline_attachment(
               template_node,
               template_analysis,
               dest_node,
-              dest_analysis,
+              dest_analysis
             )
 
-            emit_preferred_leading_comments_for(comment_source_node, comment_source_analysis, shared_attachment: comment_attachment)
+            emit_preferred_leading_comments_for(comment_source_node, comment_source_analysis,
+                                                shared_attachment: comment_attachment)
             trailing_source_node, trailing_source_analysis = preferred_container_comment_source(
               dest_value,
               dest_analysis,
               fallback_node: template_value,
-              fallback_analysis: template_analysis,
+              fallback_analysis: template_analysis
             )
             compact_source_node = trailing_source_node || dest_value || template_value
 
             with_resolution_path_segment(dest_node, template_node) do
               if compact_empty_container?(template_value, compact_source_node, trailing_source_analysis)
-                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis, shared_attachment: inline_attachment) do |inline_text|
-                  @emitter.emit_pair(key_name, compact_container_literal_for(template_value), inline_comment: inline_text)
+                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
+                  @emitter.emit_pair(key_name, compact_container_literal_for(template_value),
+                                     inline_comment: inline_text)
                 end
               elsif template_value.object?
-                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis, shared_attachment: inline_attachment) do |inline_text|
+                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
                   @emitter.emit_nested_object_start(key_name, inline_comment: inline_text)
                 end
               elsif template_value.array?
-                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis, shared_attachment: inline_attachment) do |inline_text|
+                emit_with_preferred_inline_comment(inline_source_node, inline_source_analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
                   @emitter.emit_array_start(key_name, inline_comment: inline_text)
                 end
               end
@@ -289,7 +298,7 @@ module Json
                   template_value.mergeable_children,
                   dest_value.mergeable_children,
                   template_analysis,
-                  dest_analysis,
+                  dest_analysis
                 )
 
                 emit_container_trailing_lines(trailing_source_node, trailing_source_analysis)
@@ -307,20 +316,20 @@ module Json
             record_unresolved_choice(
               template_node: template_node,
               dest_node: dest_node,
-              match_kind: :pair_value,
+              match_kind: :pair_value
             )
             emit_atomic_node(dest_node, dest_analysis)
           else
             record_unresolved_choice(
               template_node: template_node,
               dest_node: dest_node,
-              match_kind: :pair_value,
+              match_kind: :pair_value
             )
             emit_atomic_node(
               template_node,
               template_analysis,
               comment_source_node: dest_node,
-              comment_analysis: dest_analysis,
+              comment_analysis: dest_analysis
             )
           end
         elsif preference_for_pair(template_node, dest_node) == :destination
@@ -328,20 +337,20 @@ module Json
           record_unresolved_choice(
             template_node: template_node,
             dest_node: dest_node,
-            match_kind: :node_value,
+            match_kind: :node_value
           )
           emit_atomic_node(dest_node, dest_analysis)
         else
           record_unresolved_choice(
             template_node: template_node,
             dest_node: dest_node,
-            match_kind: :node_value,
+            match_kind: :node_value
           )
           emit_atomic_node(
             template_node,
             template_analysis,
             comment_source_node: dest_node,
-            comment_analysis: dest_analysis,
+            comment_analysis: dest_analysis
           )
         end
       end
@@ -362,14 +371,14 @@ module Json
           template_node.mergeable_children,
           dest_node.mergeable_children,
           template_analysis,
-          dest_analysis,
+          dest_analysis
         )
 
         trailing_source_node, trailing_source_analysis = preferred_container_comment_source(
           dest_node,
           dest_analysis,
           fallback_node: template_node,
-          fallback_analysis: template_analysis,
+          fallback_analysis: template_analysis
         )
         emit_container_trailing_lines(trailing_source_node, trailing_source_analysis)
 
@@ -414,7 +423,7 @@ module Json
         dest_text = node_resolution_text(dest_node)
         return if template_text == dest_text
 
-        provisional_winner = (preference_for_pair(template_node, dest_node) == :template) ? :template : :destination
+        provisional_winner = preference_for_pair(template_node, dest_node) == :template ? :template : :destination
         key_name = resolution_key_name(template_node, dest_node)
         surface_path = resolution_surface_path(template_node, dest_node)
         metadata = {
@@ -427,8 +436,8 @@ module Json
             provisional_winner: provisional_winner,
             surface_path: surface_path,
             match_kind: match_kind,
-            key_name: key_name,
-          ),
+            key_name: key_name
+          )
         }.compact
 
         record_unresolved_node_choice(
@@ -438,14 +447,14 @@ module Json
           template_text: template_text,
           destination_text: dest_text,
           provisional_winner: provisional_winner,
-          case_prefix: "json",
+          case_prefix: 'json',
           case_parts: [match_kind, metadata[:key_name]],
           surface_path: surface_path,
           metadata: metadata,
           conflict_fields: {
             match_kind: match_kind,
-            key_name: metadata[:key_name],
-          },
+            key_name: metadata[:key_name]
+          }
         )
       end
 
@@ -472,8 +481,10 @@ module Json
         nil
       end
 
-      def with_resolution_path_segment(*nodes)
-        with_first_unresolved_path_segment(*nodes, segment_builder: ->(node) { resolution_path_segment_for(node, node) }) { yield }
+      def with_resolution_path_segment(*nodes, &block)
+        with_first_unresolved_path_segment(*nodes, segment_builder: lambda { |node|
+          resolution_path_segment_for(node, node)
+        }, &block)
       end
 
       # Emit a single node to the emitter
@@ -492,7 +503,7 @@ module Json
             comment_source_node,
             source_analysis,
             preferred_node: node,
-            preferred_analysis: analysis,
+            preferred_analysis: analysis
           )
 
         emit_preferred_leading_comments_for(source_node, source_analysis, shared_attachment: source_attachment)
@@ -509,28 +520,33 @@ module Json
               container_comment_source = source_value_node || value_node
 
               if compact_empty_container?(value_node, container_comment_source, source_analysis)
-                emit_with_preferred_inline_comment(node, analysis, shared_attachment: inline_attachment) do |inline_text|
-                  @emitter.emit_pair(
-                    key,
-                    compact_container_literal_for(value_node),
-                    inline_comment: inline_text,
-                    metadata: emitter_line_metadata(analysis, line_number: node.start_line),
-                  ) if key
+                emit_with_preferred_inline_comment(node, analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
+                  if key
+                    @emitter.emit_pair(
+                      key,
+                      compact_container_literal_for(value_node),
+                      inline_comment: inline_text,
+                      metadata: emitter_line_metadata(analysis, line_number: node.start_line)
+                    )
+                  end
                 end
               elsif value_node.object?
-                emit_with_preferred_inline_comment(node, analysis, shared_attachment: inline_attachment) do |inline_text|
+                emit_with_preferred_inline_comment(node, analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
                   @emitter.emit_nested_object_start(
                     key,
                     inline_comment: inline_text,
-                    metadata: emitter_line_metadata(analysis, line_number: node.start_line),
+                    metadata: emitter_line_metadata(analysis, line_number: node.start_line)
                   )
                 end
               elsif value_node.array?
-                emit_with_preferred_inline_comment(node, analysis, shared_attachment: inline_attachment) do |inline_text|
+                emit_with_preferred_inline_comment(node, analysis,
+                                                   shared_attachment: inline_attachment) do |inline_text|
                   @emitter.emit_array_start(
                     key,
                     inline_comment: inline_text,
-                    metadata: emitter_line_metadata(analysis, line_number: node.start_line),
+                    metadata: emitter_line_metadata(analysis, line_number: node.start_line)
                   )
                 end
               end
@@ -550,12 +566,14 @@ module Json
               end
             else
               emit_with_preferred_inline_comment(node, analysis, shared_attachment: inline_attachment) do |inline_text|
-                @emitter.emit_pair(
-                  key,
-                  value_node.text,
-                  inline_comment: inline_text,
-                  metadata: emitter_line_metadata(analysis, line_number: node.start_line),
-                ) if key
+                if key
+                  @emitter.emit_pair(
+                    key,
+                    value_node.text,
+                    inline_comment: inline_text,
+                    metadata: emitter_line_metadata(analysis, line_number: node.start_line)
+                  )
+                end
               end
             end
           end
@@ -583,7 +601,7 @@ module Json
               @emitter.emit_array_element(
                 node.text,
                 inline_comment: inline_text,
-                metadata: emitter_line_metadata(analysis, line_number: node.start_line),
+                metadata: emitter_line_metadata(analysis, line_number: node.start_line)
               )
             end
           else
@@ -599,8 +617,14 @@ module Json
 
       def emit_atomic_node(node, analysis, comment_source_node: nil, comment_analysis: analysis)
         return if freeze_node?(node)
-        return emit_node(node, analysis, comment_source_node: comment_source_node, comment_analysis: comment_analysis) unless @preserve_atomic_formatting
-        return emit_node(node, analysis, comment_source_node: comment_source_node, comment_analysis: comment_analysis) unless node.respond_to?(:text)
+        unless @preserve_atomic_formatting
+          return emit_node(node, analysis, comment_source_node: comment_source_node,
+                                           comment_analysis: comment_analysis)
+        end
+        unless node.respond_to?(:text)
+          return emit_node(node, analysis, comment_source_node: comment_source_node,
+                                           comment_analysis: comment_analysis)
+        end
 
         source_node = comment_source_node || node
         source_analysis = comment_source_node ? comment_analysis : analysis
@@ -613,14 +637,14 @@ module Json
           fragment = "#{fragment} // #{inline_text}" if inline_text && !inline_text.empty?
           @emitter.emit_raw_fragment(
             fragment,
-            metadata: emitter_block_metadata(analysis, node.start_line),
+            metadata: emitter_block_metadata(analysis, node.start_line)
           )
         end
       end
 
       def reindented_source_fragment(node, analysis)
         fragment = node.text.to_s
-        source_line = node.respond_to?(:start_line) && node.start_line ? analysis.line_at(node.start_line).to_s : ""
+        source_line = node.respond_to?(:start_line) && node.start_line ? analysis.line_at(node.start_line).to_s : ''
         source_indent = leading_indent(source_line)
         return fragment if source_indent.empty?
 
@@ -630,9 +654,9 @@ module Json
       end
 
       def leading_indent(line)
-        indent = +""
+        indent = +''
         line.each_char do |char|
-          break unless char == " " || char == "\t"
+          break unless [' ', "\t"].include?(char)
 
           indent << char
         end
@@ -648,16 +672,19 @@ module Json
 
       def preferred_comment_source(node, analysis, fallback_node: nil, fallback_analysis: nil)
         return [node, analysis] if node_has_emittable_leading_comments?(node, analysis)
-        return [fallback_node, fallback_analysis] if fallback_node && node_has_emittable_leading_comments?(fallback_node, fallback_analysis)
+        return [fallback_node, fallback_analysis] if fallback_node && node_has_emittable_leading_comments?(
+          fallback_node, fallback_analysis
+        )
 
         [node, analysis]
       end
 
-      def preferred_available_inline_attachment(template_node, template_analysis, dest_node, dest_analysis, preferred_node: nil, preferred_analysis: nil)
+      def preferred_available_inline_attachment(template_node, template_analysis, dest_node, dest_analysis,
+                                                preferred_node: nil, preferred_analysis: nil)
         if preferred_node && preferred_analysis
           primary_node = preferred_node
           primary_analysis = preferred_analysis
-          fallback_node = (preferred_node.equal?(template_node) && preferred_analysis.equal?(template_analysis)) ? dest_node : template_node
+          fallback_node = preferred_node.equal?(template_node) && preferred_analysis.equal?(template_analysis) ? dest_node : template_node
           fallback_analysis = fallback_node.equal?(dest_node) ? dest_analysis : template_analysis
         elsif preference_for_pair(template_node, dest_node) == :destination
           primary_node = dest_node
@@ -672,17 +699,24 @@ module Json
         end
 
         primary_attachment = shared_inline_comment_attachment_for(primary_node, primary_analysis)
-        return [primary_node, primary_analysis, primary_attachment] if primary_attachment&.inline_region && !primary_attachment.inline_region.empty?
+        if primary_attachment&.inline_region && !primary_attachment.inline_region.empty?
+          return [primary_node, primary_analysis,
+                  primary_attachment]
+        end
 
         fallback_attachment = shared_inline_comment_attachment_for(fallback_node, fallback_analysis)
-        return [fallback_node, fallback_analysis, fallback_attachment] if fallback_attachment&.inline_region && !fallback_attachment.inline_region.empty?
+        if fallback_attachment&.inline_region && !fallback_attachment.inline_region.empty?
+          return [fallback_node, fallback_analysis,
+                  fallback_attachment]
+        end
 
         [primary_node, primary_analysis, nil]
       end
 
       def preferred_container_comment_source(node, analysis, fallback_node: nil, fallback_analysis: nil)
         return [node, analysis] if container_has_trailing_comments?(node, analysis)
-        return [fallback_node, fallback_analysis] if fallback_node && container_has_trailing_comments?(fallback_node, fallback_analysis)
+        return [fallback_node, fallback_analysis] if fallback_node && container_has_trailing_comments?(fallback_node,
+                                                                                                       fallback_analysis)
 
         [node, analysis]
       end
@@ -708,8 +742,8 @@ module Json
         if normalized && !normalized.empty? && @emitted_leading_comment_texts&.include?(normalized)
           should_heal = handle_suspected_corruption(
             kind: :comment_ownership_overlap,
-            message: "leading comment region overlaps previously emitted JSON comment ownership",
-            context: dedup_warning_context(region: region, analysis: analysis, node: node),
+            message: 'leading comment region overlaps previously emitted JSON comment ownership',
+            context: dedup_warning_context(region: region, analysis: analysis, node: node)
           )
           if should_heal
             emit_blank_lines_in_range((region.end_line || node.start_line).to_i + 1, node.start_line.to_i - 1, analysis)
@@ -740,14 +774,14 @@ module Json
         if @emitted_leading_comment_texts&.include?(normalized)
           should_heal = handle_suspected_corruption(
             kind: :comment_ownership_overlap,
-            message: "tracked leading comments overlap previously emitted JSON comment ownership",
+            message: 'tracked leading comments overlap previously emitted JSON comment ownership',
             context: dedup_warning_context(
               region: nil,
               analysis: analysis,
               node: node,
               normalized_content: normalized,
-              region_lines: [leading.first[:line], comment_end_line(leading.last)],
-            ),
+              region_lines: [leading.first[:line], comment_end_line(leading.last)]
+            )
           )
           if should_heal
             emit_blank_lines_in_range(comment_end_line(leading.last) + 1, node.start_line - 1, analysis)
@@ -784,19 +818,19 @@ module Json
 
         should_heal = handle_suspected_corruption(
           kind: :duplicate_template_preamble_prefix,
-          message: "leading JSON comment region begins with duplicated template-owned preamble comments",
+          message: 'leading JSON comment region begins with duplicated template-owned preamble comments',
           context: {
             template_comment_lines: template_nodes.length,
             merged_comment_lines: region_nodes.length,
-            destination_specific_comment_lines: remaining_nodes.length,
-          },
+            destination_specific_comment_lines: remaining_nodes.length
+          }
         )
         return region unless should_heal
 
         ::Ast::Merge::Comment::Region.new(
           kind: region.kind,
           nodes: remaining_nodes,
-          metadata: region.metadata,
+          metadata: region.metadata
         )
       end
 
@@ -817,12 +851,12 @@ module Json
 
         should_heal = handle_suspected_corruption(
           kind: :duplicate_template_preamble_prefix,
-          message: "tracked JSON leading comments begin with duplicated template-owned preamble comments",
+          message: 'tracked JSON leading comments begin with duplicated template-owned preamble comments',
           context: {
             template_comment_lines: template_units.length,
             merged_comment_lines: leading.length,
-            destination_specific_comment_lines: remaining_comments.length,
-          },
+            destination_specific_comment_lines: remaining_comments.length
+          }
         )
         return leading unless should_heal
 
@@ -838,9 +872,10 @@ module Json
       def dedup_warning_context(region:, analysis:, node:, normalized_content: nil, region_lines: nil)
         {
           file: analysis.respond_to?(:path) ? analysis.path : nil,
-          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split("::").last,
-          region_lines: region_lines || [region&.respond_to?(:start_line) ? region.start_line : nil, region&.respond_to?(:end_line) ? region.end_line : nil],
-          normalized_content: normalized_content || region&.normalized_content,
+          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split('::').last,
+          region_lines: region_lines || [region&.respond_to?(:start_line) ? region.start_line : nil,
+                                         region&.respond_to?(:end_line) ? region.end_line : nil],
+          normalized_content: normalized_content || region&.normalized_content
         }.compact
       end
 
@@ -849,9 +884,9 @@ module Json
           mode: corruption_handling,
           kind: kind,
           message: message,
-          prefix: "[json-merge]",
+          prefix: '[json-merge]',
           error_class: Json::Merge::CorruptionDetectedError,
-          warner: ->(formatted) { DebugLogger.debug_warning(formatted, context) },
+          warner: ->(formatted) { DebugLogger.debug_warning(formatted, context) }
         )
       end
 
@@ -871,7 +906,7 @@ module Json
         return unless first_statement
 
         if first_statement.respond_to?(:container?) && first_statement.container? &&
-            first_statement.respond_to?(:mergeable_children)
+           first_statement.respond_to?(:mergeable_children)
           first_child = Array(first_statement.mergeable_children).first
           return first_child if first_child
         end
@@ -883,8 +918,12 @@ module Json
         return false unless left && right
         return true if left.equal?(right)
         return false unless left.respond_to?(:type) && right.respond_to?(:type) && left.type == right.type
-        return false unless left.respond_to?(:start_line) && right.respond_to?(:start_line) && left.start_line == right.start_line
-        return false unless left.respond_to?(:end_line) && right.respond_to?(:end_line) && left.end_line == right.end_line
+        unless left.respond_to?(:start_line) && right.respond_to?(:start_line) && left.start_line == right.start_line
+          return false
+        end
+        unless left.respond_to?(:end_line) && right.respond_to?(:end_line) && left.end_line == right.end_line
+          return false
+        end
 
         if left.respond_to?(:key_name) && right.respond_to?(:key_name)
           left.key_name == right.key_name
@@ -898,9 +937,7 @@ module Json
 
         comparator ||= ->(left, right) { left == right }
         count = 0
-        while prefix_match?(lines.drop(count * prefix.length).first(prefix.length), prefix, comparator)
-          count += 1
-        end
+        count += 1 while prefix_match?(lines.drop(count * prefix.length).first(prefix.length), prefix, comparator)
         count
       end
 
@@ -925,7 +962,7 @@ module Json
         unless inline_region && !inline_region.empty?
           if tracked_inline_comment
             raise MissingSharedInlineRegionError,
-              "Expected shared inline region for tracked inline comment at line #{tracked_inline_comment[:line]}"
+                  "Expected shared inline region for tracked inline comment at line #{tracked_inline_comment[:line]}"
           end
 
           yield nil
@@ -951,7 +988,7 @@ module Json
           node,
           line_num: node.start_line,
           leading_comments: leading_comments,
-          inline_comment: inline_comment,
+          inline_comment: inline_comment
         )
       end
 
@@ -966,7 +1003,7 @@ module Json
           node,
           line_num: node.start_line,
           leading_comments: [],
-          inline_comment: inline_comment,
+          inline_comment: inline_comment
         )
       end
 
@@ -1010,11 +1047,11 @@ module Json
 
         children = container_node.mergeable_children
         start_line = if children.any?
-          last_child = children.last
-          (last_child.end_line || last_child.start_line) + 1
-        else
-          container_node.start_line + 1
-        end
+                       last_child = children.last
+                       (last_child.end_line || last_child.start_line) + 1
+                     else
+                       container_node.start_line + 1
+                     end
         end_line = container_node.end_line - 1
         return if end_line < start_line
 
@@ -1053,7 +1090,7 @@ module Json
         range.each do |line_num|
           stripped = analysis.line_at(line_num).to_s.strip
           next if stripped.empty?
-          return false unless stripped.start_with?("//")
+          return false unless stripped.start_with?('//')
           return false unless analysis.comment_tracker.full_line_comment?(line_num)
         end
 
@@ -1061,7 +1098,7 @@ module Json
       end
 
       def comment_like_line?(stripped_line)
-        stripped_line.start_with?("//", "/*", "*", "*/")
+        stripped_line.start_with?('//', '/*', '*', '*/')
       end
 
       def emit_freeze_block(freeze_node)
@@ -1077,12 +1114,12 @@ module Json
         inline_comment = removed_inline_comment_for(node, analysis)
         if inline_comment
           @emitter.emit_tracked_comment(normalize_comment_indent(
-            inline_comment.merge(
-              indent: current_emitter_indent,
-              full_line: true,
-              block: inline_comment[:block] || false,
-            ),
-          ))
+                                          inline_comment.merge(
+                                            indent: current_emitter_indent,
+                                            full_line: true,
+                                            block: inline_comment[:block] || false
+                                          )
+                                        ))
         end
 
         emit_following_removed_node_blank_lines(node, analysis) if leading_comments.any? || inline_comment
@@ -1119,8 +1156,8 @@ module Json
         line = analysis.line_at(line_num).to_s
         return if line.empty?
 
-        start_idx = line.index("/*")
-        end_idx = start_idx && line.index("*/", start_idx + 2)
+        start_idx = line.index('/*')
+        end_idx = start_idx && line.index('*/', start_idx + 2)
         return unless start_idx && end_idx
 
         before_comment = line[0...start_idx].to_s
@@ -1137,7 +1174,7 @@ module Json
           text: line[(start_idx + 2)...end_idx].to_s.strip,
           full_line: false,
           block: true,
-          raw: line[start_idx..(end_idx + 1)],
+          raw: line[start_idx..(end_idx + 1)]
         }
       end
 
@@ -1207,7 +1244,10 @@ module Json
         last_region_end = regions.last.end_line
         if normalized_nodes.any?
           first_node_start = normalized_nodes.first.start_line
-          emit_blank_lines_in_range(last_region_end + 1, first_node_start - 1, analysis) if last_region_end && first_node_start
+          if last_region_end && first_node_start
+            emit_blank_lines_in_range(last_region_end + 1, first_node_start - 1,
+                                      analysis)
+          end
         elsif last_region_end
           emit_blank_lines_in_range(last_region_end + 1, analysis.lines.length, analysis)
         end
@@ -1233,8 +1273,9 @@ module Json
         return if regions.empty?
 
         first_region = regions.first
-        if fallback_node && first_region.respond_to?(:start_line) && first_region.start_line
-          emit_blank_lines_in_range(fallback_node.end_line + 1, first_region.start_line - 1, analysis) if fallback_node.respond_to?(:end_line) && fallback_node.end_line
+        if fallback_node && first_region.respond_to?(:start_line) && first_region.start_line && fallback_node.respond_to?(:end_line) && fallback_node.end_line && fallback_node.respond_to?(:end_line) && fallback_node.end_line
+          emit_blank_lines_in_range(fallback_node.end_line + 1, first_region.start_line - 1,
+                                    analysis)
         end
 
         regions.each do |region|
@@ -1287,7 +1328,7 @@ module Json
       end
 
       def compact_container_literal_for(container_node)
-        container_node.object? ? "{}" : "[]"
+        container_node.object? ? '{}' : '[]'
       end
 
       def build_refined_matches(template_nodes, dest_nodes, template_by_sig, dest_by_sig)
@@ -1308,9 +1349,9 @@ module Json
         return {} if unmatched_template.empty? || unmatched_dest.empty?
 
         matches = @match_refiner.call(unmatched_template, unmatched_dest, {
-          template_analysis: @template_analysis,
-          dest_analysis: @dest_analysis,
-        })
+                                        template_analysis: @template_analysis,
+                                        dest_analysis: @dest_analysis
+                                      })
 
         matches.each_with_object({}) do |match, hash|
           hash[match.template_node] = match.dest_node

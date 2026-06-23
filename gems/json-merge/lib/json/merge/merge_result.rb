@@ -33,7 +33,7 @@ module Json
           dest_lines: 0,
           merged_lines: 0,
           freeze_preserved_lines: 0,
-          total_decisions: 0,
+          total_decisions: 0
         }
       end
 
@@ -48,7 +48,7 @@ module Json
           content: line,
           decision: decision,
           source: source,
-          original_line: original_line,
+          original_line: original_line
         }
 
         track_statistics(decision, source)
@@ -73,7 +73,7 @@ module Json
       # @param decision [Symbol] Decision for the blank line
       # @param source [Symbol] Source
       def add_blank_line(decision: DECISION_MERGED, source: :merged)
-        add_line("", decision: decision, source: source)
+        add_line('', decision: decision, source: source)
       end
 
       # Add content from a freeze block
@@ -85,7 +85,7 @@ module Json
             line.chomp,
             decision: DECISION_FREEZE_BLOCK,
             source: :destination,
-            original_line: freeze_node.start_line + idx,
+            original_line: freeze_node.start_line + idx
           )
         end
       end
@@ -110,7 +110,7 @@ module Json
       # Get the merged content as a JSON string
       #
       # @return [String]
-      def to_json
+      def to_json(*_args)
         content = @lines.map { |l| l[:content] }.join("\n")
         # Ensure trailing newline
         content += "\n" unless content.end_with?("\n") || content.empty?
@@ -137,7 +137,7 @@ module Json
 
       private
 
-      def track_statistics(decision, source)
+      def track_statistics(decision, _source)
         @statistics[:total_decisions] += 1
 
         case decision

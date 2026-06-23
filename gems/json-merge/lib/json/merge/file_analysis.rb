@@ -7,7 +7,7 @@ module Json
     class FileAnalysis
       include Ast::Merge::FileAnalyzable
 
-      DEFAULT_FREEZE_TOKEN = "json-merge"
+      DEFAULT_FREEZE_TOKEN = 'json-merge'
 
       attr_reader :comment_tracker, :ast, :errors
 
@@ -17,7 +17,7 @@ module Json
         end
       end
 
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
@@ -27,17 +27,17 @@ module Json
 
         @comment_tracker = CommentTracker.new(source)
 
-        DebugLogger.time("FileAnalysis#parse_json") { parse_json }
+        DebugLogger.time('FileAnalysis#parse_json') { parse_json }
 
         @freeze_blocks = extract_freeze_blocks
         @nodes = integrate_nodes_and_freeze_blocks
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          nodes_count: @nodes.size,
-          freeze_blocks: @freeze_blocks.size,
-          valid: valid?,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            nodes_count: @nodes.size,
+                            freeze_blocks: @freeze_blocks.size,
+                            valid: valid?
+                          })
       end
 
       def valid?
@@ -52,7 +52,7 @@ module Json
         @comment_support_style ||= shared_comment_support_style(
           source: :json_source,
           style: :c_style_line,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -68,21 +68,21 @@ module Json
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
       def statements
         @nodes ||= []
       end
-      alias_method :nodes, :statements
+      alias nodes statements
 
       def in_freeze_block?(line_num)
         @freeze_blocks.any? { |fb| fb.location.cover?(line_num) }
@@ -121,9 +121,7 @@ module Json
         return @root_object = nil unless root
 
         root.each do |child|
-          if child.type.to_s == "object"
-            return @root_object = NodeWrapper.new(child, lines: @lines, source: @source)
-          end
+          return @root_object = NodeWrapper.new(child, lines: @lines, source: @source) if child.type.to_s == 'object'
         end
 
         @root_object = nil
@@ -155,7 +153,7 @@ module Json
           owner,
           tracker_attachment: @comment_tracker.comment_attachment_for(owner, line_num: line_num, **options),
           line_num: line_num,
-          **options,
+          **options
         )
       end
 
@@ -192,7 +190,7 @@ module Json
 
         root.each do |child|
           child_type = child.type.to_s
-          next if child_type == "comment"
+          next if child_type == 'comment'
           next unless %w[object array].include?(child_type)
 
           return NodeWrapper.new(child, lines: @lines, source: @source)
@@ -227,12 +225,12 @@ module Json
       end
 
       def collect_parse_errors(node, found_errors = [])
-        if node.type.to_s == "ERROR" || (node.respond_to?(:missing?) && node.missing?)
+        if node.type.to_s == 'ERROR' || (node.respond_to?(:missing?) && node.missing?)
           found_errors << {
             type: node.type.to_s,
             start_point: node.respond_to?(:start_point) ? node.start_point : nil,
             end_point: node.respond_to?(:end_point) ? node.end_point : nil,
-            text: node.to_s,
+            text: node.to_s
           }
         end
 
@@ -260,10 +258,10 @@ module Json
 
           next unless marker_type
 
-          if marker_type == "freeze"
-            freeze_starts << {line: line_num, marker: line}
-          elsif marker_type == "unfreeze"
-            freeze_ends << {line: line_num, marker: line}
+          if marker_type == 'freeze'
+            freeze_starts << { line: line_num, marker: line }
+          elsif marker_type == 'unfreeze'
+            freeze_ends << { line: line_num, marker: line }
           end
         end
 
@@ -278,7 +276,7 @@ module Json
             end_line: matching_end[:line],
             lines: @lines,
             start_marker: start_info[:marker],
-            end_marker: matching_end[:marker],
+            end_marker: matching_end[:marker]
           )
         end
 

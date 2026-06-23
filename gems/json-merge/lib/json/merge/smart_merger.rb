@@ -24,8 +24,7 @@ module Json
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include ::Ast::Merge::Runtime::RootSessionSupport
 
-      attr_reader :runtime_session
-      attr_reader :corruption_handling
+      attr_reader :runtime_session, :corruption_handling
 
       # Creates a new SmartMerger
       #
@@ -93,7 +92,7 @@ module Json
           resolution_mode: @resolution_mode,
           unresolved_policy: @unresolved_policy.to_h,
           corruption_handling: @corruption_handling,
-          match_refiner: @match_refiner,
+          match_refiner: @match_refiner
         }
       end
 
@@ -120,12 +119,12 @@ module Json
         template_analysis_debug = {
           valid: @template_analysis.valid?,
           nodes: @template_analysis.nodes.size,
-          freeze_blocks: @template_analysis.freeze_blocks.size,
+          freeze_blocks: @template_analysis.freeze_blocks.size
         }
         dest_analysis_debug = {
           valid: @dest_analysis.valid?,
           nodes: @dest_analysis.nodes.size,
-          freeze_blocks: @dest_analysis.freeze_blocks.size,
+          freeze_blocks: @dest_analysis.freeze_blocks.size
         }
 
         {
@@ -139,13 +138,13 @@ module Json
             corruption_handling: @corruption_handling,
             freeze_token: @freeze_token,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result_obj.statistics,
           decisions: result_obj.decision_summary,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -158,7 +157,7 @@ module Json
 
       # @return [String] The default freeze token (not used for JSON)
       def default_freeze_token
-        "json-merge"
+        'json-merge'
       end
 
       # @return [Class] The resolver class for JSON files
@@ -177,10 +176,10 @@ module Json
       def perform_merge
         @resolver.resolve(@result)
 
-        DebugLogger.debug("Merge complete", {
-          lines: @result.line_count,
-          decisions: @result.statistics,
-        })
+        DebugLogger.debug('Merge complete', {
+                            lines: @result.line_count,
+                            decisions: @result.statistics
+                          })
 
         @result
       end
@@ -198,7 +197,7 @@ module Json
           match_refiner: @match_refiner,
           node_typing: @node_typing,
           merge_arrays: @merge_arrays,
-          preserve_atomic_formatting: @preserve_atomic_formatting,
+          preserve_atomic_formatting: @preserve_atomic_formatting
         )
       end
 
@@ -224,25 +223,25 @@ module Json
           surface_kind: :json_document,
           declared_language: :json,
           effective_language: :json,
-          operation_id: "json-document-root",
-          delegate_name: "json-runtime",
+          operation_id: 'json-document-root',
+          delegate_name: 'json-runtime',
           policy_context: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
-          metadata: {merger: self.class.name},
+          metadata: { merger: self.class.name },
           options: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
           language_chain: [:json],
-          delegate_metadata: {merger: self.class.name},
+          delegate_metadata: { merger: self.class.name }
         )
       end
 
@@ -253,8 +252,8 @@ module Json
           unresolved_cases: merge_result.unresolved_cases,
           metadata: {
             stats: merge_result.statistics,
-            decisions: merge_result.decision_summary,
-          },
+            decisions: merge_result.decision_summary
+          }
         )
       end
 
@@ -262,7 +261,7 @@ module Json
         fail_runtime_root_session!(
           root_operation: root_operation,
           error: error,
-          kind: :merge_failed,
+          kind: :merge_failed
         )
       end
     end

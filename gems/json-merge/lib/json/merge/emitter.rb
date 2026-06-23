@@ -20,7 +20,7 @@ module Json
       attr_reader :needs_comma
 
       # Initialize subclass-specific state (comma tracking for JSON)
-      def initialize_subclass_state(**options)
+      def initialize_subclass_state(**_options)
         @needs_comma = false
         initialize_line_metadata_state
       end
@@ -32,18 +32,18 @@ module Json
       end
 
       def emit_blank_line
-        append_line("")
+        append_line('')
       end
 
       # Emit a tracked comment from CommentTracker
       # @param comment [Hash] Comment with :text, :indent, :block
       def emit_tracked_comment(comment)
-        indent = " " * (comment[:indent] || 0)
+        indent = ' ' * (comment[:indent] || 0)
         append_line(if comment[:block]
-          "#{indent}/* #{comment[:text]} */"
-        else
-          "#{indent}// #{comment[:text]}"
-        end)
+                      "#{indent}/* #{comment[:text]} */"
+                    else
+                      "#{indent}// #{comment[:text]}"
+                    end)
       end
 
       # Emit a single-line comment
@@ -90,10 +90,10 @@ module Json
       def emit_array_start(key = nil, inline_comment: nil, metadata: nil)
         add_comma_if_needed
         line = if key
-          "#{current_indent}\"#{key}\": ["
-        else
-          "#{current_indent}["
-        end
+                 "#{current_indent}\"#{key}\": ["
+               else
+                 "#{current_indent}["
+               end
         line += " // #{inline_comment}" if inline_comment
         append_line(line, metadata)
         indent
@@ -155,7 +155,7 @@ module Json
         raw_lines.each_with_index do |line, idx|
           append_line(
             line.chomp,
-            expanded_line_metadata(metadata, idx),
+            expanded_line_metadata(metadata, idx)
           )
         end
       end
@@ -165,7 +165,7 @@ module Json
         fragment.to_s.lines(chomp: true).each_with_index do |line, idx|
           append_line(
             "#{current_indent}#{line}",
-            expanded_line_metadata(metadata, idx),
+            expanded_line_metadata(metadata, idx)
           )
         end
         @needs_comma = true
@@ -174,7 +174,7 @@ module Json
       # Get the output as a JSON string
       #
       # @return [String]
-      def to_json
+      def to_json(*_args)
         to_s
       end
 
@@ -203,7 +203,7 @@ module Json
       end
 
       def comment_line?(stripped_line)
-        stripped_line.start_with?("//", "/*", "*", "*/")
+        stripped_line.start_with?('//', '/*', '*', '*/')
       end
 
       def add_comma_to_line(line)
@@ -212,13 +212,13 @@ module Json
         inline_match = line.match(%r{\A(?<content>.*?)(?<spacing>\s+)(?<comment>//.*)\z})
         if inline_match
           content = inline_match[:content].rstrip
-          return line if content.end_with?(",", "{", "[")
+          return line if content.end_with?(',', '{', '[')
 
           return "#{content}, #{inline_match[:comment]}"
         end
 
         stripped = line.rstrip
-        return line if stripped.end_with?(",", "{", "[")
+        return line if stripped.end_with?(',', '{', '[')
 
         "#{line},"
       end

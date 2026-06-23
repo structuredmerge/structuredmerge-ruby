@@ -45,7 +45,7 @@ module Json
         def text
           @source.byteslice(@start_byte...@end_byte).to_s
         end
-        alias_method :to_s, :text
+        alias to_s text
 
         def start_point
           point_for(@start_byte)
@@ -81,7 +81,7 @@ module Json
         skip_ignored
         value = parse_value
         skip_ignored
-        Tree.new(Node.new("document", start_byte: 0, end_byte: @source.bytesize, source: @source, children: [value]))
+        Tree.new(Node.new('document', start_byte: 0, end_byte: @source.bytesize, source: @source, children: [value]))
       end
 
       private
@@ -89,18 +89,18 @@ module Json
       def parse_value
         skip_ignored
         case current_char
-        when "{"
+        when '{'
           parse_object
-        when "["
+        when '['
           parse_array
-        when "\""
+        when '"'
           parse_string
-        when "t"
-          parse_literal("true")
-        when "f"
-          parse_literal("false")
-        when "n"
-          parse_literal("null")
+        when 't'
+          parse_literal('true')
+        when 'f'
+          parse_literal('false')
+        when 'n'
+          parse_literal('null')
         else
           parse_number
         end
@@ -112,28 +112,28 @@ module Json
         pairs = []
         loop do
           skip_ignored
-          break if consume?("}")
+          break if consume?('}')
 
           pairs << parse_pair
           skip_ignored
-          consume?(",")
+          consume?(',')
         end
-        Node.new("object", start_byte: start, end_byte: @index, source: @source, children: pairs)
+        Node.new('object', start_byte: start, end_byte: @index, source: @source, children: pairs)
       end
 
       def parse_pair
         start = @index
         key = parse_string
         skip_ignored
-        consume?(":")
+        consume?(':')
         value = parse_value
         Node.new(
-          "pair",
+          'pair',
           start_byte: start,
           end_byte: value.end_byte,
           source: @source,
           children: [key, value],
-          fields: { "key" => key, "value" => value },
+          fields: { 'key' => key, 'value' => value }
         )
       end
 
@@ -143,13 +143,13 @@ module Json
         elements = []
         loop do
           skip_ignored
-          break if consume?("]")
+          break if consume?(']')
 
           elements << parse_value
           skip_ignored
-          consume?(",")
+          consume?(',')
         end
-        Node.new("array", start_byte: start, end_byte: @index, source: @source, children: elements)
+        Node.new('array', start_byte: start, end_byte: @index, source: @source, children: elements)
       end
 
       def parse_string
@@ -161,19 +161,19 @@ module Json
           @index += 1
           if escaped
             escaped = false
-          elsif char == "\\"
+          elsif char == '\\'
             escaped = true
-          elsif char == "\""
+          elsif char == '"'
             break
           end
         end
-        Node.new("string", start_byte: start, end_byte: @index, source: @source)
+        Node.new('string', start_byte: start, end_byte: @index, source: @source)
       end
 
       def parse_number
         start = @index
         @index += 1 while @index < @source.bytesize && current_char.match?(/[0-9eE+\-.]/)
-        Node.new("number", start_byte: start, end_byte: @index, source: @source)
+        Node.new('number', start_byte: start, end_byte: @index, source: @source)
       end
 
       def parse_literal(literal)
@@ -185,14 +185,14 @@ module Json
       def skip_ignored
         loop do
           skip_whitespace
-          if current_char == "/" && peek_char == "/"
+          if current_char == '/' && peek_char == '/'
             @index += 2
             @index += 1 while @index < @source.bytesize && current_char != "\n"
             next
           end
-          if current_char == "/" && peek_char == "*"
+          if current_char == '/' && peek_char == '*'
             @index += 2
-            @index += 1 while @index < @source.bytesize && !(current_char == "*" && peek_char == "/")
+            @index += 1 while @index < @source.bytesize && !(current_char == '*' && peek_char == '/')
             @index += 2 if @index < @source.bytesize
             next
           end
