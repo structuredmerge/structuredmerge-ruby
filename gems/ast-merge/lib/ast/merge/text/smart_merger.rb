@@ -51,7 +51,7 @@ module Ast
       #   )
       class SmartMerger < SmartMergerBase
         # Default freeze token for text merging
-        DEFAULT_FREEZE_TOKEN = "text-merge"
+        DEFAULT_FREEZE_TOKEN = 'text-merge'
 
         # Initialize a new SmartMerger
         #
@@ -99,7 +99,7 @@ module Ast
             template_lines: @template_analysis.statements.count { |s| s.is_a?(LineNode) },
             dest_lines: @dest_analysis.statements.count { |s| s.is_a?(LineNode) },
             result_lines: @result.lines.size,
-            decisions: @result.decision_summary,
+            decisions: @result.decision_summary
           }
         end
 
@@ -141,7 +141,7 @@ module Ast
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy,
+            unresolved_policy: @unresolved_policy
           )
         end
       end

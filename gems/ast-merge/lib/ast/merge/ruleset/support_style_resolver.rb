@@ -12,19 +12,19 @@ module Ast
               Comment::SupportStyle.source_augmented_portable_write(
                 source: source,
                 capability: capability,
-                style: style,
+                style: style
               )
             when :native_read_portable_write
               Comment::SupportStyle.native_read_portable_write(
                 source: source,
                 capability: capability,
-                style: style,
+                style: style
               )
             when :native_mutation
               Comment::SupportStyle.native_mutation(
                 source: source,
                 capability: capability,
-                style: style,
+                style: style
               )
             else
               raise ArgumentError, "Unknown ruleset read strategy: #{read.inspect}"

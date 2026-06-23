@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 module Ast
   module Merge
     module Comment
@@ -13,14 +11,14 @@ module Ast
       # objects that format gems can adopt incrementally.
       class Augmenter
         attr_reader :lines,
-          :owners,
-          :tracked_comments,
-          :style,
-          :capability,
-          :attachments_by_owner,
-          :preamble_region,
-          :postlude_region,
-          :orphan_regions
+                    :owners,
+                    :tracked_comments,
+                    :style,
+                    :capability,
+                    :attachments_by_owner,
+                    :preamble_region,
+                    :postlude_region,
+                    :orphan_regions
 
         class << self
           # Build an augmenter and run augmentation immediately.
@@ -42,7 +40,7 @@ module Ast
             style: style_name,
             owner_count: @owners.size,
             comment_count: @tracked_comments.size,
-            **options,
+            **options
           )
 
           @attachments_by_owner = {}
@@ -81,7 +79,7 @@ module Ast
               inline_region: build_region(:inline, inline_comments, include_blank_lines: false),
               trailing_region: build_region(:trailing, trailing_comments),
               leading_gap: layout_attachment&.leading_gap,
-              trailing_gap: layout_attachment&.trailing_gap,
+              trailing_gap: layout_attachment&.trailing_gap
             )
 
             leading_comments.each { |comment| claimed << comment.object_id }
@@ -196,10 +194,10 @@ module Ast
             end
 
             kind = if first_owner_start && group.last[:line] < first_owner_start
-              @preamble_region.nil? ? :preamble : :orphan
-            else
-              :orphan
-            end
+                     @preamble_region.nil? ? :preamble : :orphan
+                   else
+                     :orphan
+                   end
 
             region = build_region(kind, group)
             if kind == :preamble && @preamble_region.nil?
@@ -282,7 +280,10 @@ module Ast
           comments.sort_by { |comment| comment[:line] }.each do |comment|
             if include_blank_lines && previous_line
               ((previous_line + 1)...comment[:line]).each do |line_number|
-                nodes << Empty.new(line_number: line_number, text: line_at(line_number).to_s) if blank_line?(line_number)
+                if blank_line?(line_number)
+                  nodes << Empty.new(line_number: line_number,
+                                     text: line_at(line_number).to_s)
+                end
               end
             end
 
@@ -296,8 +297,8 @@ module Ast
             metadata: {
               source: :augmenter,
               tracked_hashes: comments,
-              floating: floating,
-            },
+              floating: floating
+            }
           )
         end
 
@@ -338,7 +339,7 @@ module Ast
         end
 
         def normalize_comment_hash(comment)
-          raise ArgumentError, "comment must be a Hash" unless comment.is_a?(Hash)
+          raise ArgumentError, 'comment must be a Hash' unless comment.is_a?(Hash)
 
           comment.each_with_object({}) do |(key, value), result|
             result[key.to_sym] = value
@@ -352,9 +353,9 @@ module Ast
         end
 
         def validate_owner!(owner)
-          unless owner.respond_to?(:start_line) && owner.respond_to?(:end_line)
-            raise ArgumentError, "owner must respond to #start_line and #end_line"
-          end
+          return if owner.respond_to?(:start_line) && owner.respond_to?(:end_line)
+
+          raise ArgumentError, 'owner must respond to #start_line and #end_line'
         end
 
         def blank_line?(line_number)

@@ -109,12 +109,8 @@ module Ast
 
           # Check each style's pattern
           Style::STYLES.each do |name, config|
-            if config[:line_pattern]&.match?(stripped)
-              return Style.for(name)
-            end
-            if config[:block_start_pattern]&.match?(stripped)
-              return Style.for(name)
-            end
+            return Style.for(name) if config[:line_pattern]&.match?(stripped)
+            return Style.for(name) if config[:block_start_pattern]&.match?(stripped)
           end
 
           # Default to hash_comment
@@ -148,7 +144,7 @@ module Ast
               current_block << Line.new(
                 text: line.to_s,
                 line_number: line_number,
-                style: style,
+                style: style
               )
             else
               # Non-comment, non-empty line
@@ -161,15 +157,13 @@ module Ast
               nodes << Line.new(
                 text: line.to_s,
                 line_number: line_number,
-                style: Style.for(:hash_comment), # Fallback style for non-comment lines
+                style: Style.for(:hash_comment) # Fallback style for non-comment lines
               )
             end
           end
 
           # Flush remaining block
-          if current_block.any?
-            nodes << build_block(current_block)
-          end
+          nodes << build_block(current_block) if current_block.any?
 
           nodes
         end
@@ -205,7 +199,7 @@ module Ast
                 current_block_lines = []
               end
 
-              current_block_lines << {line: line.to_s, line_number: line_number}
+              current_block_lines << { line: line.to_s, line_number: line_number }
               in_block_comment = true
 
               # Check if block ends on same line
@@ -216,7 +210,7 @@ module Ast
               end
             elsif in_block_comment
               # Inside a block comment
-              current_block_lines << {line: line.to_s, line_number: line_number}
+              current_block_lines << { line: line.to_s, line_number: line_number }
 
               # Check if block ends
               if style.match_block_end?(stripped)
@@ -226,7 +220,7 @@ module Ast
               end
             elsif style.supports_line_comments? && style.match_line?(stripped)
               # Line comment (in a style that supports both line and block)
-              current_block_lines << {line: line.to_s, line_number: line_number}
+              current_block_lines << { line: line.to_s, line_number: line_number }
             else
               # Other content - flush and add as-is
               if current_block_lines.any?
@@ -236,15 +230,13 @@ module Ast
               nodes << Line.new(
                 text: line.to_s,
                 line_number: line_number,
-                style: style,
+                style: style
               )
             end
           end
 
           # Flush remaining block
-          if current_block_lines.any?
-            nodes << build_raw_block(current_block_lines)
-          end
+          nodes << build_raw_block(current_block_lines) if current_block_lines.any?
 
           nodes
         end
@@ -270,7 +262,7 @@ module Ast
             raw_content: raw_content,
             start_line: start_line,
             end_line: end_line,
-            style: style,
+            style: style
           )
         end
       end

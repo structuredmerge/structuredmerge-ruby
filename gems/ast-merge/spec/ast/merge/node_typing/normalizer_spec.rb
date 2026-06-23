@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-require "thread"
-
-# rubocop:disable ThreadSafety/NewThread -- This spec tests thread safety and requires creating threads
+# -- This spec tests thread safety and requires creating threads
 RSpec.describe Ast::Merge::NodeTyping::Normalizer do
   # Create a test module that extends Normalizer for testing
   let(:test_normalizer) do
@@ -13,20 +11,20 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
         backend_a: {
           raw_heading: :heading,
           raw_paragraph: :paragraph,
-          raw_code: :code_block,
+          raw_code: :code_block
         }.freeze,
         backend_b: {
           h1: :heading,
           h2: :heading,
           para: :paragraph,
-          code: :code_block,
-        }.freeze,
+          code: :code_block
+        }.freeze
       )
     end
   end
 
-  describe ".extended" do
-    it "sets up instance variables when extending a module" do
+  describe '.extended' do
+    it 'sets up instance variables when extending a module' do
       new_module = Module.new { extend Ast::Merge::NodeTyping::Normalizer }
 
       expect(new_module.instance_variable_get(:@normalizer_mutex)).to be_a(Mutex)
@@ -34,17 +32,17 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "#configure_normalizer" do
-    it "configures initial backend mappings" do
+  describe '#configure_normalizer' do
+    it 'configures initial backend mappings' do
       expect(test_normalizer.registered_backends).to contain_exactly(:backend_a, :backend_b)
     end
 
-    it "freezes mappings that are not already frozen" do
+    it 'freezes mappings that are not already frozen' do
       new_module = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
 
         configure_normalizer(
-          test_backend: {unfrozen: :type},
+          test_backend: { unfrozen: :type }
         )
       end
 
@@ -52,8 +50,8 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       expect(mappings).to be_frozen
     end
 
-    it "preserves already frozen mappings" do
-      frozen_hash = {already: :frozen}.freeze
+    it 'preserves already frozen mappings' do
+      frozen_hash = { already: :frozen }.freeze
       new_module = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
 
@@ -64,32 +62,32 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "#register_backend" do
-    it "registers a new backend at runtime" do
+  describe '#register_backend' do
+    it 'registers a new backend at runtime' do
       test_normalizer.register_backend(:backend_c, {
-        new_type: :heading,
-      })
+                                         new_type: :heading
+                                       })
 
       expect(test_normalizer.backend_registered?(:backend_c)).to be true
       expect(test_normalizer.canonical_type(:new_type, :backend_c)).to eq(:heading)
     end
 
-    it "freezes the mappings" do
-      test_normalizer.register_backend(:frozen_test, {test: :value})
+    it 'freezes the mappings' do
+      test_normalizer.register_backend(:frozen_test, { test: :value })
 
       expect(test_normalizer.mappings_for(:frozen_test)).to be_frozen
     end
 
-    it "converts backend name to symbol" do
-      test_normalizer.register_backend("string_backend", {a: :b})
+    it 'converts backend name to symbol' do
+      test_normalizer.register_backend('string_backend', { a: :b })
 
       expect(test_normalizer.backend_registered?(:string_backend)).to be true
     end
 
-    it "is thread-safe" do
+    it 'is thread-safe' do
       threads = 10.times.map do |i|
         Thread.new do
-          test_normalizer.register_backend(:"thread_backend_#{i}", {type: :value})
+          test_normalizer.register_backend(:"thread_backend_#{i}", { type: :value })
         end
       end
       threads.each(&:join)
@@ -100,29 +98,29 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "#canonical_type" do
-    it "returns the canonical type for a mapped backend type" do
+  describe '#canonical_type' do
+    it 'returns the canonical type for a mapped backend type' do
       expect(test_normalizer.canonical_type(:raw_heading, :backend_a)).to eq(:heading)
       expect(test_normalizer.canonical_type(:h1, :backend_b)).to eq(:heading)
     end
 
-    it "returns the original type when no mapping exists (passthrough)" do
+    it 'returns the original type when no mapping exists (passthrough)' do
       expect(test_normalizer.canonical_type(:unknown_type, :backend_a)).to eq(:unknown_type)
     end
 
-    it "returns nil when backend_type is nil" do
+    it 'returns nil when backend_type is nil' do
       expect(test_normalizer.canonical_type(nil, :backend_a)).to be_nil
     end
 
-    it "converts string backend_type to symbol for lookup" do
-      expect(test_normalizer.canonical_type("raw_heading", :backend_a)).to eq(:heading)
+    it 'converts string backend_type to symbol for lookup' do
+      expect(test_normalizer.canonical_type('raw_heading', :backend_a)).to eq(:heading)
     end
 
-    it "returns original type when backend is not registered" do
+    it 'returns original type when backend is not registered' do
       expect(test_normalizer.canonical_type(:some_type, :nonexistent_backend)).to eq(:some_type)
     end
 
-    it "is thread-safe for concurrent reads" do
+    it 'is thread-safe for concurrent reads' do
       # Use Queue for thread-safe result collection
       results = Queue.new
       threads = 100.times.map do
@@ -140,12 +138,12 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "#wrap" do
+  describe '#wrap' do
     let(:mock_node) do
-      double("MockNode", type: :raw_heading)
+      double('MockNode', type: :raw_heading)
     end
 
-    it "wraps a node with its canonical type as merge_type" do
+    it 'wraps a node with its canonical type as merge_type' do
       wrapped = test_normalizer.wrap(mock_node, :backend_a)
 
       expect(wrapped).to be_a(Ast::Merge::NodeTyping::Wrapper)
@@ -153,16 +151,16 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       expect(wrapped.node).to eq(mock_node)
     end
 
-    it "uses passthrough when no mapping exists" do
-      unmapped_node = double("UnmappedNode", type: :custom_type)
+    it 'uses passthrough when no mapping exists' do
+      unmapped_node = double('UnmappedNode', type: :custom_type)
       wrapped = test_normalizer.wrap(unmapped_node, :backend_a)
 
       expect(wrapped.merge_type).to eq(:custom_type)
     end
   end
 
-  describe "#registered_backends" do
-    it "returns all registered backend identifiers" do
+  describe '#registered_backends' do
+    it 'returns all registered backend identifiers' do
       backends = test_normalizer.registered_backends
 
       expect(backends).to include(:backend_a)
@@ -170,23 +168,23 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "#backend_registered?" do
-    it "returns true for registered backends" do
+  describe '#backend_registered?' do
+    it 'returns true for registered backends' do
       expect(test_normalizer.backend_registered?(:backend_a)).to be true
       expect(test_normalizer.backend_registered?(:backend_b)).to be true
     end
 
-    it "returns false for unregistered backends" do
+    it 'returns false for unregistered backends' do
       expect(test_normalizer.backend_registered?(:nonexistent)).to be false
     end
 
-    it "converts string to symbol for lookup" do
-      expect(test_normalizer.backend_registered?("backend_a")).to be true
+    it 'converts string to symbol for lookup' do
+      expect(test_normalizer.backend_registered?('backend_a')).to be true
     end
   end
 
-  describe "#mappings_for" do
-    it "returns the mappings hash for a registered backend" do
+  describe '#mappings_for' do
+    it 'returns the mappings hash for a registered backend' do
       mappings = test_normalizer.mappings_for(:backend_a)
 
       expect(mappings).to be_a(Hash)
@@ -194,13 +192,13 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       expect(mappings[:raw_paragraph]).to eq(:paragraph)
     end
 
-    it "returns nil for unregistered backends" do
+    it 'returns nil for unregistered backends' do
       expect(test_normalizer.mappings_for(:nonexistent)).to be_nil
     end
   end
 
-  describe "#canonical_types" do
-    it "returns all unique canonical types across all backends" do
+  describe '#canonical_types' do
+    it 'returns all unique canonical types across all backends' do
       types = test_normalizer.canonical_types
 
       expect(types).to include(:heading)
@@ -208,19 +206,19 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       expect(types).to include(:code_block)
     end
 
-    it "returns unique values (no duplicates)" do
+    it 'returns unique values (no duplicates)' do
       types = test_normalizer.canonical_types
 
       expect(types.size).to eq(types.uniq.size)
     end
   end
 
-  describe "thread safety" do
-    it "handles concurrent registration and lookup" do
+  describe 'thread safety' do
+    it 'handles concurrent registration and lookup' do
       concurrent_module = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
 
-        configure_normalizer(initial: {a: :b}.freeze)
+        configure_normalizer(initial: { a: :b }.freeze)
       end
 
       errors = []
@@ -229,8 +227,8 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       # Writers
       5.times do |i|
         threads << Thread.new do
-          concurrent_module.register_backend(:"writer_#{i}", {type: :value})
-        rescue => e
+          concurrent_module.register_backend(:"writer_#{i}", { type: :value })
+        rescue StandardError => e
           errors << e
         end
       end
@@ -241,7 +239,7 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
           concurrent_module.canonical_type(:a, :initial)
           concurrent_module.registered_backends
           concurrent_module.canonical_types
-        rescue => e
+        rescue StandardError => e
           errors << e
         end
       end
@@ -251,18 +249,18 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
     end
   end
 
-  describe "isolation between modules" do
-    it "each module has its own backend mappings" do
+  describe 'isolation between modules' do
+    it 'each module has its own backend mappings' do
       module_a = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
 
-        configure_normalizer(backend: {type_a: :canonical_a}.freeze)
+        configure_normalizer(backend: { type_a: :canonical_a }.freeze)
       end
 
       module_b = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
 
-        configure_normalizer(backend: {type_b: :canonical_b}.freeze)
+        configure_normalizer(backend: { type_b: :canonical_b }.freeze)
       end
 
       expect(module_a.canonical_type(:type_a, :backend)).to eq(:canonical_a)
@@ -272,7 +270,7 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
       expect(module_b.canonical_type(:type_a, :backend)).to eq(:type_a) # passthrough
     end
 
-    it "registering a backend in one module does not affect another" do
+    it 'registering a backend in one module does not affect another' do
       module_a = Module.new do
         extend Ast::Merge::NodeTyping::Normalizer
       end
@@ -281,11 +279,10 @@ RSpec.describe Ast::Merge::NodeTyping::Normalizer do
         extend Ast::Merge::NodeTyping::Normalizer
       end
 
-      module_a.register_backend(:only_in_a, {x: :y})
+      module_a.register_backend(:only_in_a, { x: :y })
 
       expect(module_a.backend_registered?(:only_in_a)).to be true
       expect(module_b.backend_registered?(:only_in_a)).to be false
     end
   end
 end
-# rubocop:enable ThreadSafety/NewThread

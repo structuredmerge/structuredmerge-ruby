@@ -5,11 +5,11 @@ module TreeHaver
     Point = Struct.new(:row, :column)
 
     class TestableNode
-      attr_reader :type, :text, :start_byte, :end_byte, :children
+      attr_reader :type, :text, :start_byte, :end_byte, :children, :start_line, :end_line
 
       def self.create(
         type:,
-        text: "",
+        text: '',
         start_line: 1,
         end_line: nil,
         start_column: 0,
@@ -37,7 +37,8 @@ module TreeHaver
         specs.flatten.map { |spec| create(**spec) }
       end
 
-      def initialize(type:, text:, start_line:, end_line:, start_column:, end_column:, start_byte:, end_byte:, children:, source:)
+      def initialize(type:, text:, start_line:, end_line:, start_column:, end_column:, start_byte:, end_byte:,
+                     children:, source:)
         @type = type.to_s
         @text = text.to_s
         @source = source || @text
@@ -56,14 +57,6 @@ module TreeHaver
 
       def end_point
         Point.new(@end_line - 1, @end_column)
-      end
-
-      def start_line
-        @start_line
-      end
-
-      def end_line
-        @end_line
       end
 
       def child_count

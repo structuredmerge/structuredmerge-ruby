@@ -58,9 +58,9 @@ module Ast
     # @see DestIterate
     # @see AlignmentSort
     module TrailingGroups
-      autoload :AlignmentSort, "ast/merge/trailing_groups/alignment_sort"
-      autoload :Core, "ast/merge/trailing_groups/core"
-      autoload :DestIterate, "ast/merge/trailing_groups/dest_iterate"
+      autoload :AlignmentSort, 'ast/merge/trailing_groups/alignment_sort'
+      autoload :Core, 'ast/merge/trailing_groups/core'
+      autoload :DestIterate, 'ast/merge/trailing_groups/dest_iterate'
     end
   end
 end

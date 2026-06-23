@@ -69,7 +69,6 @@ module Ast
           def unavailable(**details)
             new(style: :unavailable, details: details)
           end
-
         end
 
         # @param style [Symbol] normalized support style name
@@ -127,7 +126,7 @@ module Ast
             portable_write: portable_write?,
             native_read: native_read?,
             native_write: native_write?,
-            available: available?,
+            available: available?
           }
         end
 
@@ -145,7 +144,7 @@ module Ast
           return normalized if STYLES.include?(normalized)
 
           raise ArgumentError,
-            "Unknown comment support style: #{style.inspect}. Expected one of: #{STYLES.join(", ")}"
+                "Unknown comment support style: #{style.inspect}. Expected one of: #{STYLES.join(', ')}"
         end
       end
     end

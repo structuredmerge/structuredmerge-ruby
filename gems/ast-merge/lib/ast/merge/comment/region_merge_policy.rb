@@ -85,7 +85,7 @@ module Ast
             inline: inline?,
             preferred_kind: preferred_region&.kind,
             other_kind: other_region&.kind,
-            details: details,
+            details: details
           }
         end
 

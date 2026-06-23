@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module SpecSupport
   module FictiveLanguageHarness
@@ -12,7 +12,7 @@ module SpecSupport
       :end_line,
       :raw_line,
       :structural_content,
-      keyword_init: true,
+      keyword_init: true
     ) do
       def content
         structural_content
@@ -35,10 +35,10 @@ module SpecSupport
       root :statement
 
       rule(:statement) do
-        key.as(:name) >> spacing >> str("=") >> spacing >> value.as(:value)
+        key.as(:name) >> spacing >> str('=') >> spacing >> value.as(:value)
       end
 
-      rule(:key) { match("[A-Za-z_]") >> match("[A-Za-z0-9_]").repeat }
+      rule(:key) { match('[A-Za-z_]') >> match('[A-Za-z0-9_]').repeat }
       rule(:value) { any.repeat(1) }
       rule(:spacing) { match('\s').repeat }
     end
@@ -47,11 +47,11 @@ module SpecSupport
       root :statement
 
       rule(:statement) do
-        indent.as(:indent) >> key.as(:name) >> spacing >> str("=") >> spacing >> value.as(:value)
+        indent.as(:indent) >> key.as(:name) >> spacing >> str('=') >> spacing >> value.as(:value)
       end
 
-      rule(:indent) { str(" ").repeat }
-      rule(:key) { match("[A-Za-z_]") >> match("[A-Za-z0-9_]").repeat }
+      rule(:indent) { str(' ').repeat }
+      rule(:key) { match('[A-Za-z_]') >> match('[A-Za-z0-9_]').repeat }
       rule(:value) { any.repeat(1) }
       rule(:spacing) { match('\s').repeat }
     end
@@ -61,7 +61,7 @@ module SpecSupport
         {
           name: name.to_s,
           value: value.to_s.strip,
-          indent: 0,
+          indent: 0
         }
       end
 
@@ -69,7 +69,7 @@ module SpecSupport
         {
           name: name.to_s,
           value: value.to_s.strip,
-          indent: Array(indent).join.length,
+          indent: Array(indent).join.length
         }
       end
     end
@@ -91,7 +91,7 @@ module SpecSupport
               indent: match[:indent].length,
               text: match[:text].to_s.rstrip,
               full_line: true,
-              raw: line,
+              raw: line
             }
           else
             comment = @line_comment_parser.parse(line)
@@ -102,7 +102,7 @@ module SpecSupport
               indent: comment.column,
               text: comment.text,
               full_line: false,
-              raw: comment.raw,
+              raw: comment.raw
             }
           end
         end
@@ -114,7 +114,8 @@ module SpecSupport
 
       attr_reader :statements, :language_name
 
-      def initialize(source, parser_class:, language_name:, freeze_token: "fictive-merge", signature_generator: nil, **_options)
+      def initialize(source, parser_class:, language_name:, freeze_token: 'fictive-merge', signature_generator: nil,
+                     **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
@@ -140,14 +141,14 @@ module SpecSupport
           source: :fictive_language_harness,
           language: language_name,
           style: :hash_comment,
-          comment_nodes: true,
+          comment_nodes: true
         )
       end
 
       def comment_support_style
         Ast::Merge::Comment::SupportStyle.source_augmented_portable_write(
           source: :fictive_language_harness,
-          language: language_name,
+          language: language_name
         )
       end
 
@@ -172,7 +173,7 @@ module SpecSupport
         @comment_tracker.augment(owners: owners || statements, **options)
       end
 
-      def standalone_comment_line(text, indent: "")
+      def standalone_comment_line(text, indent: '')
         "#{indent}# #{text}"
       end
 
@@ -205,7 +206,7 @@ module SpecSupport
             start_line: idx + 1,
             end_line: idx + 1,
             raw_line: line,
-            structural_content: structural_line,
+            structural_content: structural_line
           )
         end
       end
@@ -262,7 +263,7 @@ module SpecSupport
           template_nodes: template_statements,
           dest_sigs: dest_sigs,
           signature_for: ->(node) { signature_key_for(node) },
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         matched_template_indices = Set.new
@@ -284,7 +285,7 @@ module SpecSupport
             flush_ready_trailing_groups(
               trailing_groups: trailing_groups,
               matched_indices: matched_indices,
-              consumed_indices: consumed_indices,
+              consumed_indices: consumed_indices
             ) do |info|
               add_template_only_statement(result, info[:node])
             end
@@ -297,7 +298,7 @@ module SpecSupport
 
         emit_remaining_trailing_groups(
           trailing_groups: trailing_groups,
-          consumed_indices: consumed_indices,
+          consumed_indices: consumed_indices
         ) do |info|
           add_template_only_statement(result, info[:node])
         end
@@ -312,7 +313,7 @@ module SpecSupport
       def build_match_index(statements)
         statements.each_with_index.with_object(Hash.new { |h, k| h[k] = [] }) do |(node, idx), index|
           key = signature_key_for(node)
-          index[key] << {node: node, index: idx}
+          index[key] << { node: node, index: idx }
         end
       end
 
@@ -340,10 +341,10 @@ module SpecSupport
 
       def resolve_matched_pair(result, template_node, dest_node)
         preferred_node = if preference_for_node(template_node) == :template
-          template_node
-        else
-          dest_node
-        end
+                           template_node
+                         else
+                           dest_node
+                         end
         preferred_analysis = preferred_node.equal?(template_node) ? @template_analysis : @dest_analysis
 
         emit_statement(result, preferred_node, preferred_analysis)
@@ -356,7 +357,7 @@ module SpecSupport
             DECISION_KEPT_DEST
           end,
           template_node,
-          dest_node,
+          dest_node
         )
       end
 
@@ -369,7 +370,7 @@ module SpecSupport
         else
           Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
             result: result,
-            attachment: attachment,
+            attachment: attachment
           )
         end
 
@@ -377,8 +378,8 @@ module SpecSupport
           result.add_line(
             @dest_analysis.standalone_comment_line(
               attachment.inline_region.normalized_content,
-              indent: (" " * dest_node.indent),
-            ),
+              indent: (' ' * dest_node.indent)
+            )
           )
         end
 
@@ -445,7 +446,9 @@ module SpecSupport
 
         postlude_region = analysis.comment_augmenter.postlude_region
         return unless postlude_region
-        return if attachment.trailing_region && attachment.trailing_region.normalized_content == postlude_region.normalized_content
+        if attachment.trailing_region && attachment.trailing_region.normalized_content == postlude_region.normalized_content
+          return
+        end
 
         emit_region_lines(result, postlude_region)
       end
@@ -482,7 +485,7 @@ module SpecSupport
         Ast::Merge::Comment::Region.new(
           kind: region.kind,
           nodes: remainder_nodes,
-          metadata: region.metadata,
+          metadata: region.metadata
         )
       end
 
@@ -513,7 +516,7 @@ module SpecSupport
     end
 
     class SmartMergerBase < Ast::Merge::SmartMergerBase
-      DEFAULT_FREEZE_TOKEN = "fictive-merge"
+      DEFAULT_FREEZE_TOKEN = 'fictive-merge'
 
       def initialize(
         template_content,
@@ -549,7 +552,7 @@ module SpecSupport
 
       def build_resolver_options
         {
-          remove_template_missing_nodes: @remove_template_missing_nodes,
+          remove_template_missing_nodes: @remove_template_missing_nodes
         }
       end
 

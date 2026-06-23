@@ -6,16 +6,16 @@ module Ast
       # One merge attempt over one owned surface.
       class Operation
         attr_reader :operation_id,
-          :surface,
-          :template_fragment,
-          :destination_fragment,
-          :requested_strategy,
-          :options,
-          :result,
-          :diagnostics,
-          :children,
-          :delegate_name,
-          :status
+                    :surface,
+                    :template_fragment,
+                    :destination_fragment,
+                    :requested_strategy,
+                    :options,
+                    :result,
+                    :diagnostics,
+                    :children,
+                    :delegate_name,
+                    :status
 
         def initialize(
           operation_id:,
@@ -107,7 +107,7 @@ module Ast
             diagnostics: diagnostics.map { |diagnostic| diagnostic.respond_to?(:to_h) ? diagnostic.to_h : diagnostic },
             children: children.map { |child| child.respond_to?(:operation_id) ? child.operation_id : child },
             delegate_name: delegate_name,
-            status: status,
+            status: status
           }.compact
         end
       end

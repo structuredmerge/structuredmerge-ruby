@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "unresolved_support"
+require_relative 'unresolved_support'
 
 module Ast
   module Merge
@@ -305,7 +305,7 @@ module Ast
 
         {
           content: content,
-          statistics: @result.decision_summary,
+          statistics: @result.decision_summary
         }
       end
 
@@ -331,7 +331,7 @@ module Ast
       #
       # @return [String] The default freeze token (e.g., "prism-merge")
       def default_freeze_token
-        "ast-merge"
+        'ast-merge'
       end
 
       # Returns the ConflictResolver class for this format.
@@ -406,8 +406,8 @@ module Ast
         return if MergerConfig::VALID_RESOLUTION_MODES.include?(resolution_mode)
 
         raise ArgumentError,
-          "Invalid resolution_mode: #{resolution_mode.inspect}. " \
-            "Must be one of: #{MergerConfig::VALID_RESOLUTION_MODES.map(&:inspect).join(", ")}"
+              "Invalid resolution_mode: #{resolution_mode.inspect}. " \
+                "Must be one of: #{MergerConfig::VALID_RESOLUTION_MODES.map(&:inspect).join(', ')}"
       end
 
       # Parse and analyze content, raising appropriate errors.
@@ -434,7 +434,7 @@ module Ast
         # Check if the analysis is valid - if not, raise a parse error
         # This catches cases where parsing fails silently (e.g., grammar not available)
         if analysis.respond_to?(:valid?) && !analysis.valid?
-          error_class = (source == :template) ? template_parse_error_class : destination_parse_error_class
+          error_class = source == :template ? template_parse_error_class : destination_parse_error_class
           errors = analysis.respond_to?(:errors) ? analysis.errors : []
           raise error_class.new(errors: errors, content: content)
         end
@@ -445,7 +445,7 @@ module Ast
         raise if e.is_a?(template_parse_error_class) || e.is_a?(destination_parse_error_class)
 
         # Wrap the error in our parse error class
-        error_class = (source == :template) ? template_parse_error_class : destination_parse_error_class
+        error_class = source == :template ? template_parse_error_class : destination_parse_error_class
         raise error_class.new(errors: [e], content: content)
       end
 
@@ -474,7 +474,7 @@ module Ast
       def build_full_analysis_options
         {
           freeze_token: @freeze_token,
-          signature_generator: @signature_generator,
+          signature_generator: @signature_generator
         }.merge(build_analysis_options).merge(@format_options)
       end
 
@@ -500,7 +500,7 @@ module Ast
           template_analysis: @template_analysis,
           dest_analysis: @dest_analysis,
           add_template_only_nodes: @add_template_only_nodes,
-          match_refiner: @match_refiner,
+          match_refiner: @match_refiner
         }.merge(build_resolver_options)
 
         resolver_class.new(**options)
@@ -519,7 +519,7 @@ module Ast
         else
           result_class.new(
             template_analysis: @template_analysis,
-            dest_analysis: @dest_analysis,
+            dest_analysis: @dest_analysis
           )
         end
       end

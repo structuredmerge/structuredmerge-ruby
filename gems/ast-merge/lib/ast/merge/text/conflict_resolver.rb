@@ -61,7 +61,7 @@ module Ast
             template_nodes: template_statements,
             dest_sigs: dest_sigs,
             signature_for: ->(node) { freeze_node?(node) ? nil : signature_key_for(node) },
-            add_template_only_nodes: @add_template_only_nodes,
+            add_template_only_nodes: @add_template_only_nodes
           )
 
           # Track matched template indices
@@ -91,7 +91,7 @@ module Ast
               flush_ready_trailing_groups(
                 trailing_groups: trailing_groups,
                 matched_indices: matched_indices,
-                consumed_indices: consumed_indices,
+                consumed_indices: consumed_indices
               ) do |info|
                 add_template_only_line(result, info[:node])
               end
@@ -104,7 +104,7 @@ module Ast
 
           emit_remaining_trailing_groups(
             trailing_groups: trailing_groups,
-            consumed_indices: consumed_indices,
+            consumed_indices: consumed_indices
           ) do |info|
             add_template_only_line(result, info[:node])
           end
@@ -142,7 +142,7 @@ module Ast
             next if freeze_node?(node)
 
             key = signature_key_for(node)
-            index[key] << {node: node, index: idx}
+            index[key] << { node: node, index: idx }
           end
           index
         end
@@ -201,9 +201,9 @@ module Ast
           elsif unresolved_mode? && @unresolved_policy.unresolved_for?(:matched_line)
             provisional_winner = @unresolved_policy.provisional_winner_for(
               :matched_line,
-              fallback: ((@preference == :template) ? :template : :destination),
+              fallback: (@preference == :template ? :template : :destination)
             )
-            chosen_content = (provisional_winner == :template) ? template_node.content : dest_node.content
+            chosen_content = provisional_winner == :template ? template_node.content : dest_node.content
             result.add_line(chosen_content)
             result.record_decision(Ast::Merge::MergeResultBase::DECISION_UNRESOLVED, template_node, dest_node)
             record_unresolved_node_choice(
@@ -213,7 +213,7 @@ module Ast
               template_text: template_node.content,
               destination_text: dest_node.content,
               provisional_winner: provisional_winner,
-              case_prefix: "text",
+              case_prefix: 'text',
               case_parts: [:matched_line],
               case_id: "text-line-#{result.line_count}",
               surface_path: nil,
@@ -227,12 +227,12 @@ module Ast
                   provisional_winner: provisional_winner,
                   match_kind: :matched_line,
                   line: result.line_count,
-                  match_key: signature_key_for(dest_node),
-                ),
+                  match_key: signature_key_for(dest_node)
+                )
               },
               conflict_fields: {
-                line: result.line_count,
-              },
+                line: result.line_count
+              }
             )
           elsif @preference == :template
             # Template wins - use template content

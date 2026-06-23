@@ -136,7 +136,7 @@ module Ast
             augmented: augmented?,
             available: available?,
             attachment_hints: attachment_hints?,
-            comment_nodes: comment_nodes?,
+            comment_nodes: comment_nodes?
           }
         end
 
@@ -154,7 +154,7 @@ module Ast
           return normalized if LEVELS.include?(normalized)
 
           raise ArgumentError,
-            "Unknown comment capability level: #{level.inspect}. Expected one of: #{LEVELS.join(", ")}"
+                "Unknown comment capability level: #{level.inspect}. Expected one of: #{LEVELS.join(', ')}"
         end
       end
     end

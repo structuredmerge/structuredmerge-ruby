@@ -15,7 +15,7 @@ module Ast
         when Hash then new(**value)
         else
           raise ArgumentError,
-            "unresolved_policy must be an #{name} or Hash, got #{value.class}"
+                "unresolved_policy must be an #{name} or Hash, got #{value.class}"
         end
       end
 
@@ -39,7 +39,7 @@ module Ast
 
       def provisional_winner_for(kind, fallback: nil)
         normalize_provisional_winner(
-          provisional_winner_by_kind.fetch(kind.to_sym, provisional_winner || fallback),
+          provisional_winner_by_kind.fetch(kind.to_sym, provisional_winner || fallback)
         )
       end
 
@@ -48,7 +48,7 @@ module Ast
           enabled_kinds: enabled_kinds,
           provisional_winner: provisional_winner,
           provisional_winner_by_kind: provisional_winner_by_kind,
-          metadata: metadata,
+          metadata: metadata
         }.compact
       end
 
@@ -65,7 +65,7 @@ module Ast
         return winner.to_sym if VALID_PROVISIONAL_WINNERS.include?(winner.to_sym)
 
         raise ArgumentError,
-          "provisional_winner must be one of: #{VALID_PROVISIONAL_WINNERS.map(&:inspect).join(", ")}"
+              "provisional_winner must be one of: #{VALID_PROVISIONAL_WINNERS.map(&:inspect).join(', ')}"
       end
 
       def normalize_provisional_winner_by_kind(policy)

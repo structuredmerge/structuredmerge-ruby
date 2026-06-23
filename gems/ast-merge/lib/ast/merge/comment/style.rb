@@ -54,59 +54,59 @@ module Ast
         # @return [Hash{Symbol => Hash}] Registered comment styles
         STYLES = {
           hash_comment: {
-            line_start: "#",
+            line_start: '#',
             line_end: nil,
             block_start: nil,
             block_end: nil,
             line_pattern: /^\s*#/,
             block_start_pattern: nil,
-            block_end_pattern: nil,
+            block_end_pattern: nil
           },
           html_comment: {
-            line_start: "<!--",
-            line_end: "-->",
-            block_start: "<!--",
-            block_end: "-->",
+            line_start: '<!--',
+            line_end: '-->',
+            block_start: '<!--',
+            block_end: '-->',
             line_pattern: /^\s*<!--.*-->\s*$/,
             block_start_pattern: /^\s*<!--/,
-            block_end_pattern: /-->\s*$/,
+            block_end_pattern: /-->\s*$/
           },
           c_style_line: {
-            line_start: "//",
+            line_start: '//',
             line_end: nil,
             block_start: nil,
             block_end: nil,
             line_pattern: %r{^\s*//},
             block_start_pattern: nil,
-            block_end_pattern: nil,
+            block_end_pattern: nil
           },
           c_style_block: {
             line_start: nil,
             line_end: nil,
-            block_start: "/*",
-            block_end: "*/",
+            block_start: '/*',
+            block_end: '*/',
             line_pattern: nil,
             block_start_pattern: %r{^\s*/\*},
-            block_end_pattern: %r{\*/\s*$},
+            block_end_pattern: %r{\*/\s*$}
           },
           semicolon_comment: {
-            line_start: ";",
+            line_start: ';',
             line_end: nil,
             block_start: nil,
             block_end: nil,
             line_pattern: /^\s*;/,
             block_start_pattern: nil,
-            block_end_pattern: nil,
+            block_end_pattern: nil
           },
           double_dash_comment: {
-            line_start: "--",
+            line_start: '--',
             line_end: nil,
             block_start: nil,
             block_end: nil,
             line_pattern: /^\s*--/,
             block_start_pattern: nil,
-            block_end_pattern: nil,
-          },
+            block_end_pattern: nil
+          }
         }.freeze
 
         # Default style when none specified
@@ -140,11 +140,9 @@ module Ast
           # @return [Hash] The registered style configuration
           # @raise [ArgumentError] if name already exists
           def register(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil,
-            line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)
+                       line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)
             name = name.to_sym
-            if STYLES.key?(name)
-              raise ArgumentError, "Style :#{name} already registered"
-            end
+            raise ArgumentError, "Style :#{name} already registered" if STYLES.key?(name)
 
             config = {
               line_start: line_start,
@@ -153,7 +151,7 @@ module Ast
               block_end: block_end,
               line_pattern: line_pattern,
               block_start_pattern: block_start_pattern,
-              block_end_pattern: block_end_pattern,
+              block_end_pattern: block_end_pattern
             }
 
             # Modify STYLES (it's frozen, so we need to work around)
@@ -203,7 +201,7 @@ module Ast
         # @param block_start_pattern [Regexp, nil] Pattern to match block start
         # @param block_end_pattern [Regexp, nil] Pattern to match block end
         def initialize(name, line_start: nil, line_end: nil, block_start: nil, block_end: nil,
-          line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)
+                       line_pattern: nil, block_start_pattern: nil, block_end_pattern: nil)
           @name = name
           @line_start = line_start
           @line_end = line_end
@@ -251,10 +249,8 @@ module Ast
         def extract_line_content(line)
           return line.to_s unless line_start
 
-          content = line.to_s.sub(/^\s*#{Regexp.escape(line_start)}\s?/, "")
-          if line_end
-            content = content.sub(/\s*#{Regexp.escape(line_end)}\s*$/, "")
-          end
+          content = line.to_s.sub(/^\s*#{Regexp.escape(line_start)}\s?/, '')
+          content = content.sub(/\s*#{Regexp.escape(line_end)}\s*$/, '') if line_end
           # Content extraction normalizes trailing spaces for comparison/parsing.
           # Callers that need source-preserving output should use the raw line.
           content.rstrip

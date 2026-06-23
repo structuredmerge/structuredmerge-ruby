@@ -6,14 +6,14 @@ module Ast
       # Merge-facing view of ruleset declarations after translation.
       class RuntimeDeclaration
         attr_reader :read_strategy,
-          :attachment_strategy,
-          :comment_style,
-          :render_family,
-          :capabilities,
-          :logical_owners,
-          :logical_owner_policies,
-          :support_style,
-          :metadata
+                    :attachment_strategy,
+                    :comment_style,
+                    :render_family,
+                    :capabilities,
+                    :logical_owners,
+                    :logical_owner_policies,
+                    :support_style,
+                    :metadata
 
         def initialize(
           read_strategy:,
@@ -58,7 +58,7 @@ module Ast
             support_style: support_style&.to_h,
             metadata: metadata,
             comment_free: comment_free?,
-            logical_owner: logical_owner?,
+            logical_owner: logical_owner?
           }.compact
         end
       end

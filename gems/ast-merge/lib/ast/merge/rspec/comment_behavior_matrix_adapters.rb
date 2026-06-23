@@ -41,13 +41,13 @@ module Ast
           line_based_comment_matrix_adapter(
             analysis_class: analysis_class,
             merger_class: merger_class,
-            comment_line_builder: ->(text, indent: "") { "#{indent}# #{text}" },
+            comment_line_builder: ->(text, indent: '') { "#{indent}# #{text}" },
             structural_owners_reader: structural_owners_reader,
             owner_value_reader: owner_value_reader,
             line_builder: line_builder,
             capabilities: capabilities,
             expected_literal_hash_value: expected_literal_hash_value,
-            source_builder: source_builder,
+            source_builder: source_builder
           )
         end
 
@@ -55,7 +55,7 @@ module Ast
           line_based_comment_matrix_adapter(
             analysis_class: analysis_class,
             merger_class: merger_class,
-            comment_line_builder: ->(text, indent: "") { "#{indent}<!-- #{text} -->" },
+            comment_line_builder: ->(text, indent: '') { "#{indent}<!-- #{text} -->" },
             structural_owners_reader: lambda do |analysis|
               analysis.statements.select do |statement|
                 statement.respond_to?(:merge_type) && statement.merge_type == :link_definition
@@ -66,11 +66,11 @@ module Ast
               "[#{name}]: #{value}"
             end,
             capabilities: {
-              inline_comments: "Markdown standalone HTML comment tracking does not attach inline comments to structural owners",
-              quoted_hash_inline_literals: "Markdown matrix adapter uses link-reference definitions without inline comment syntax",
-              remove_template_missing_nodes: "Markdown link-reference definitions are preserved even in removal mode",
+              inline_comments: 'Markdown standalone HTML comment tracking does not attach inline comments to structural owners',
+              quoted_hash_inline_literals: 'Markdown matrix adapter uses link-reference definitions without inline comment syntax',
+              remove_template_missing_nodes: 'Markdown link-reference definitions are preserved even in removal mode'
             }.merge(capabilities),
-            expected_literal_hash_value: '"/literal#hash"',
+            expected_literal_hash_value: '"/literal#hash"'
           )
         end
       end

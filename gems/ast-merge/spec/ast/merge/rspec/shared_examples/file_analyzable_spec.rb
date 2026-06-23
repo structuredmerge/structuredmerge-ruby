@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-require "ast/merge/rspec/shared_examples/file_analyzable"
+require 'ast/merge/rspec/shared_examples/file_analyzable'
 
 # Minimal test implementation of FileAnalyzable for testing shared examples
 class TestFileAnalysis
   include Ast::Merge::FileAnalyzable
 
-  # Note: :source, :lines, :freeze_token, :signature_generator are provided by FileAnalyzable
+  # NOTE: :source, :lines, :freeze_token, :signature_generator are provided by FileAnalyzable
   attr_reader :statements
 
-  def initialize(source, freeze_token: "test-merge", signature_generator: nil)
+  def initialize(source, freeze_token: 'test-merge', signature_generator: nil)
     @source = source
     @lines = source.lines.map(&:chomp)
     @freeze_token = freeze_token
@@ -48,9 +48,9 @@ class TestFileAnalysis
     result = []
     @lines.each_with_index do |line, idx|
       next if line.strip.empty?
-      next if line.strip.start_with?("#") && !line.include?(":freeze") && !line.include?(":unfreeze")
+      next if line.strip.start_with?('#') && !line.include?(':freeze') && !line.include?(':unfreeze')
 
-      result << {type: :statement, value: line, line: idx + 1}
+      result << { type: :statement, value: line, line: idx + 1 }
     end
     result
   end
@@ -79,7 +79,7 @@ class TestFileAnalysis
             content: content_lines.join("\n"),
             start_marker: start_marker,
             end_marker: line,
-            pattern_type: :hash_comment,
+            pattern_type: :hash_comment
           )
           in_freeze = false
           start_line = nil
@@ -100,9 +100,9 @@ class TestFreezeNode < Ast::Merge::FreezeNodeBase
   end
 end
 
-# rubocop:disable RSpec/DescribeClass - This file tests shared examples, not a single class
-RSpec.describe "FileAnalyzable shared examples" do
-  it_behaves_like "Ast::Merge::FileAnalyzable" do
+# - This file tests shared examples, not a single class
+RSpec.describe 'FileAnalyzable shared examples' do
+  it_behaves_like 'Ast::Merge::FileAnalyzable' do
     let(:file_analysis_class) { TestFileAnalysis }
     let(:freeze_node_class) { Ast::Merge::FreezeNodeBase }
 
@@ -142,13 +142,12 @@ RSpec.describe "FileAnalyzable shared examples" do
         attachment_strategy: :layout_only,
         comment_style: nil,
         render_family: nil,
-        capabilities: {layout_aware: true, logical_owner: false},
+        capabilities: { layout_aware: true, logical_owner: false },
         logical_owners: {},
         repair_policies: [],
         surfaces: [],
-        delegation_policies: [],
+        delegation_policies: []
       }
     end
   end
 end
-# rubocop:enable RSpec/DescribeClass

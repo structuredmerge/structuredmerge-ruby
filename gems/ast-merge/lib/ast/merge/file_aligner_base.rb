@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 module Ast
   module Merge
     # Shared signature-based alignment pipeline for format-specific file aligners.
@@ -50,7 +48,7 @@ module Ast
               template_index: t_idx,
               dest_index: d_idx,
               template_statement: template_statements[t_idx],
-              dest_statement: dest_statements[d_idx],
+              dest_statement: dest_statements[d_idx]
             )
 
             matched_template << t_idx
@@ -63,12 +61,16 @@ module Ast
           template_statements: template_statements,
           dest_statements: dest_statements,
           matched_template: matched_template,
-          matched_dest: matched_dest,
+          matched_dest: matched_dest
         )
 
         matched_entries_by_template_position = alignment
-          .select { |entry| entry[:type] == :match }
-          .sort_by { |entry| [entry[:template_index], entry[:dest_index]] }
+                                               .select { |entry| entry[:type] == :match }
+                                               .sort_by do |entry|
+          [
+            entry[:template_index], entry[:dest_index]
+          ]
+        end
 
         template_statements.each_with_index do |statement, idx|
           next if matched_template.include?(idx)
@@ -76,7 +78,7 @@ module Ast
           alignment << build_template_only_entry(
             template_index: idx,
             template_statement: statement,
-            matched_entries_by_template_position: matched_entries_by_template_position,
+            matched_entries_by_template_position: matched_entries_by_template_position
           )
         end
 
@@ -85,7 +87,7 @@ module Ast
 
           alignment << build_dest_only_entry(
             dest_index: idx,
-            dest_statement: statement,
+            dest_statement: statement
           )
         end
 
@@ -112,15 +114,13 @@ module Ast
         analysis.signature_at(index)
       end
 
-      def add_signature_aliases(_map, _statement, _index, _analysis)
-      end
+      def add_signature_aliases(_map, _statement, _index, _analysis); end
 
       def sort_alignment(alignment)
         sort_alignment_with_template_position(alignment, alignment.count { |entry| entry[:type] != :template_only })
       end
 
-      def log_alignment(_alignment)
-      end
+      def log_alignment(_alignment); end
 
       def build_signature_map(statements, analysis)
         map = Hash.new { |h, k| h[k] = [] }
@@ -141,7 +141,7 @@ module Ast
           :dest_index => dest_index,
           :signature => signature,
           template_entry_key => template_statement,
-          dest_entry_key => dest_statement,
+          dest_entry_key => dest_statement
         }
       end
 
@@ -152,13 +152,13 @@ module Ast
           :dest_index => nil,
           :signature => signature_for(template_analysis, template_index),
           template_entry_key => template_statement,
-          dest_entry_key => nil,
+          dest_entry_key => nil
         }.merge(
           template_only_entry_context(
             template_index: template_index,
             template_statement: template_statement,
-            matched_entries_by_template_position: matched_entries_by_template_position,
-          ),
+            matched_entries_by_template_position: matched_entries_by_template_position
+          )
         )
       end
 
@@ -169,7 +169,7 @@ module Ast
           :dest_index => dest_index,
           :signature => signature_for(dest_analysis, dest_index),
           template_entry_key => nil,
-          dest_entry_key => dest_statement,
+          dest_entry_key => dest_statement
         }
       end
 
@@ -199,7 +199,9 @@ module Ast
       def apply_match_refiner!(alignment, template_statements:, dest_statements:, matched_template:, matched_dest:)
         return unless match_refiner
 
-        unmatched_template = template_statements.each_with_index.reject { |_, i| matched_template.include?(i) }.map(&:first)
+        unmatched_template = template_statements.each_with_index.reject do |_, i|
+          matched_template.include?(i)
+        end.map(&:first)
         unmatched_dest = dest_statements.each_with_index.reject { |_, i| matched_dest.include?(i) }.map(&:first)
         return if unmatched_template.empty? || unmatched_dest.empty?
 
@@ -208,8 +210,8 @@ module Ast
           unmatched_dest,
           {
             template_analysis: template_analysis,
-            dest_analysis: dest_analysis,
-          },
+            dest_analysis: dest_analysis
+          }
         )
 
         Array(refined_matches).each do |match|
@@ -226,7 +228,7 @@ module Ast
             template_index: template_index,
             dest_index: dest_index,
             template_statement: template_statement,
-            dest_statement: dest_statement,
+            dest_statement: dest_statement
           )
 
           matched_template << template_index

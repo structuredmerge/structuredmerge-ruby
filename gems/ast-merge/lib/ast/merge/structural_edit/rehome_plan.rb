@@ -20,15 +20,16 @@ module Ast
         # @param layout_gaps [Array<Layout::Gap>] promoted layout gaps
         # @param metadata [Hash] base metadata
         # @param options [Hash] extra metadata merged into +metadata+
-        def initialize(source_owner: nil, target_boundary:, comment_regions: [], layout_gaps: [], metadata: {}, **options)
-          raise ArgumentError, "target_boundary is required" unless target_boundary
+        def initialize(target_boundary:, source_owner: nil, comment_regions: [], layout_gaps: [], metadata: {},
+                       **options)
+          raise ArgumentError, 'target_boundary is required' unless target_boundary
 
           @state = {
             source_owner: source_owner,
             target_boundary: target_boundary,
             comment_regions: Array(comment_regions).compact.freeze,
             layout_gaps: Array(layout_gaps).compact.freeze,
-            metadata: metadata.merge(options).freeze,
+            metadata: metadata.merge(options).freeze
           }.freeze
         end
 
@@ -101,7 +102,7 @@ module Ast
           options = {
             owner: target_owner,
             orphan_regions: orphan_regions,
-            metadata: {source: :structural_edit_rehome_plan}.merge(metadata),
+            metadata: { source: :structural_edit_rehome_plan }.merge(metadata)
           }
 
           if leading?
@@ -118,7 +119,7 @@ module Ast
           primary_gap = layout_gaps.first
           options = {
             owner: target_owner,
-            metadata: {source: :structural_edit_rehome_plan}.merge(metadata),
+            metadata: { source: :structural_edit_rehome_plan }.merge(metadata)
           }
 
           if leading?

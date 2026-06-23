@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "parslet"
+require 'parslet'
 
 module Ast
   module Merge
@@ -27,11 +27,11 @@ module Ast
           rule(:line) { full_line_comment.as(:full_line) | inline_candidate.as(:inline) | any.repeat.as(:text) }
 
           rule(:full_line_comment) do
-            whitespace.repeat.as(:indent) >> str("#") >> str(" ").maybe >> any.repeat.as(:comment_text)
+            whitespace.repeat.as(:indent) >> str('#') >> str(' ').maybe >> any.repeat.as(:comment_text)
           end
 
           rule(:inline_candidate) do
-            prefix.as(:prefix) >> str("#") >> str(" ").maybe >> any.repeat.as(:comment_text)
+            prefix.as(:prefix) >> str('#') >> str(' ').maybe >> any.repeat.as(:comment_text)
           end
 
           rule(:prefix) do
@@ -46,8 +46,8 @@ module Ast
             str("'") >> (str("'").absent? >> any).repeat >> str("'")
           end
 
-          rule(:escaped_char) { str("\\") >> any }
-          rule(:non_hash_char) { str("#").absent? >> any }
+          rule(:escaped_char) { str('\\') >> any }
+          rule(:non_hash_char) { str('#').absent? >> any }
           rule(:whitespace) { match('\s') }
         end
 
@@ -84,7 +84,7 @@ module Ast
             indent: indent,
             text: text,
             raw: raw,
-            column: indent,
+            column: indent
           )
         end
 
@@ -97,7 +97,7 @@ module Ast
 
           column = prefix.length
           raw = source[column..]
-          return unless raw&.start_with?("#")
+          return unless raw&.start_with?('#')
 
           Result.new(
             kind: :inline,
@@ -105,7 +105,7 @@ module Ast
             # Parser text is normalized; the raw inline slice is preserved in :raw.
             text: stringify(node[:comment_text]).rstrip,
             raw: raw,
-            column: column,
+            column: column
           )
         end
 
@@ -116,7 +116,7 @@ module Ast
           when Hash
             value.values.map { |entry| stringify(entry) }.join
           when nil
-            +""
+            +''
           else
             value.to_s
           end

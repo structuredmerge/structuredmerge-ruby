@@ -26,5 +26,5 @@
 #   require "ast/merge/rspec"  # Loads setup + RSpec configuration
 
 # Load only the registry - no RSpec configuration
-require_relative "merge_gem_registry"
-require_relative "dependency_tags_helpers"
+require_relative 'merge_gem_registry'
+require_relative 'dependency_tags_helpers'

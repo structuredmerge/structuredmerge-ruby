@@ -31,7 +31,7 @@ module Ast
             operation_id: operation_id,
             surface_path: surface_path,
             message: message,
-            metadata: metadata,
+            metadata: metadata
           }
         end
       end

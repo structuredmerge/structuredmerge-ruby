@@ -49,7 +49,7 @@ module Ast
       DEFAULT_WEIGHTS = {
         content: 0.7,   # Text content similarity (Levenshtein)
         length: 0.15,   # Length similarity
-        position: 0.15, # Position similarity in document
+        position: 0.15 # Position similarity in document
       }.freeze
 
       # @return [Hash] Scoring weights
@@ -84,7 +84,7 @@ module Ast
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context (may contain :template_analysis, :dest_analysis)
       # @return [Array<MatchResult>] Array of content-based matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         template_filtered = filter_nodes(template_nodes)
         dest_filtered = filter_nodes(dest_nodes)
 
@@ -104,7 +104,7 @@ module Ast
             t_idx,
             d_idx,
             total_template,
-            total_dest,
+            total_dest
           )
         end
       end
@@ -216,8 +216,8 @@ module Ast
       # @return [Float] Similarity score (0.0-1.0)
       def position_similarity(idx1, idx2, total1, total2)
         # Normalize positions to 0.0-1.0 range
-        pos1 = (total1 > 1) ? idx1.to_f / (total1 - 1) : 0.5
-        pos2 = (total2 > 1) ? idx2.to_f / (total2 - 1) : 0.5
+        pos1 = total1 > 1 ? idx1.to_f / (total1 - 1) : 0.5
+        pos2 = total2 > 1 ? idx2.to_f / (total2 - 1) : 0.5
 
         1.0 - (pos1 - pos2).abs
       end
@@ -234,9 +234,7 @@ module Ast
         return str1.length if str2.empty?
 
         # Use shorter string as columns for space efficiency
-        if str1.length > str2.length
-          str1, str2 = str2, str1
-        end
+        str1, str2 = str2, str1 if str1.length > str2.length
 
         m = str1.length
         n = str2.length
@@ -249,11 +247,11 @@ module Ast
           curr_row[0] = j
 
           (1..m).each do |i|
-            cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1
+            cost = str1[i - 1] == str2[j - 1] ? 0 : 1
             curr_row[i] = [
               curr_row[i - 1] + 1,      # insertion
               prev_row[i] + 1,          # deletion
-              prev_row[i - 1] + cost,   # substitution
+              prev_row[i - 1] + cost # substitution
             ].min
           end
 

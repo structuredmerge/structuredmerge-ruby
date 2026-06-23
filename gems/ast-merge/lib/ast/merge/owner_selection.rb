@@ -17,10 +17,10 @@ module Ast
             path = owner_path(owner)
             next unless destination_paths.key?(path)
 
-            {template_path: path, destination_path: path}
+            { template_path: path, destination_path: path }
           end,
           unmatched_template: template_paths.keys.reject { |path| destination_paths.key?(path) },
-          unmatched_destination: destination_paths.keys.reject { |path| template_paths.include?(path) },
+          unmatched_destination: destination_paths.keys.reject { |path| template_paths.include?(path) }
         }
       end
 

@@ -19,7 +19,8 @@ module Ast
         IDENTIFIER_RE = /\A[A-Za-z][A-Za-z0-9_.-]*\z/
         TOKEN_RE = /\A[!-~]+\z/
 
-        attr_reader :source, :path, :directives, :capabilities, :logical_owners, :repair_policies, :surfaces, :delegation_policies
+        attr_reader :source, :path, :directives, :capabilities, :logical_owners, :repair_policies, :surfaces,
+                    :delegation_policies
 
         class << self
           def parse(source, path: nil)
@@ -51,7 +52,7 @@ module Ast
             logical_owners: logical_owners.dup,
             repair_policies: repair_policies.dup,
             surfaces: surfaces.map(&:dup),
-            delegation_policies: delegation_policies.map(&:dup),
+            delegation_policies: delegation_policies.map(&:dup)
           }.merge(@parsed_values)
         end
 
@@ -61,7 +62,7 @@ module Ast
           source.each_line.with_index(1) do |raw_line, line_number|
             stripped = raw_line.strip
             next if stripped.empty?
-            next if stripped.start_with?("#")
+            next if stripped.start_with?('#')
 
             parse_directive_line!(stripped, line_number)
           end
@@ -93,7 +94,7 @@ module Ast
           directives << {
             name: directive,
             arguments: tokens.dup,
-            line_number: line_number,
+            line_number: line_number
           }
         end
 
@@ -114,14 +115,17 @@ module Ast
               value,
               ProfileVocabulary::ATTACHMENT_STRATEGIES.keys,
               directive,
-              line_number,
+              line_number
             )
           end
 
           value = validate_owner_selector!(value, line_number) if directive == :owners
           value = validate_match_key!(value, line_number) if directive == :match
 
-          raise ArgumentError, "Duplicate directive #{directive} on line #{line_number}" if @parsed_values.key?(directive)
+          if @parsed_values.key?(directive)
+            raise ArgumentError,
+                  "Duplicate directive #{directive} on line #{line_number}"
+          end
 
           @parsed_values[directive] = value
         end
@@ -143,7 +147,10 @@ module Ast
           end
 
           owner_kind = parse_identifier!(tokens[0], line_number, field: :logical_owner).to_sym
-          raise ArgumentError, "Duplicate logical_owner #{owner_kind} on line #{line_number}" if logical_owners.key?(owner_kind)
+          if logical_owners.key?(owner_kind)
+            raise ArgumentError,
+                  "Duplicate logical_owner #{owner_kind} on line #{line_number}"
+          end
 
           logical_owners[owner_kind] = parse_scalar(tokens[1], line_number).to_sym
         end
@@ -156,7 +163,8 @@ module Ast
           kind = parse_identifier!(tokens[0], line_number, field: :repair).to_sym
           raise ArgumentError, "Duplicate repair #{kind} on line #{line_number}" if repair_policies.key?(kind)
 
-          repair_policies[kind] = Ast::Merge::Healer.normalize_mode(parse_identifier!(tokens[1], line_number, field: :repair_handling))
+          repair_policies[kind] =
+            Ast::Merge::Healer.normalize_mode(parse_identifier!(tokens[1], line_number, field: :repair_handling))
         end
 
         def parse_surface!(tokens, line_number)
@@ -165,11 +173,13 @@ module Ast
           end
 
           name = parse_identifier!(tokens[0], line_number, field: :surface).to_sym
-          raise ArgumentError, "Duplicate surface #{name} on line #{line_number}" if surfaces.any? { |surface| surface[:name] == name }
+          raise ArgumentError, "Duplicate surface #{name} on line #{line_number}" if surfaces.any? do |surface|
+            surface[:name] == name
+          end
 
           surfaces << {
             name: name,
-            selector: parse_identifier!(tokens[1], line_number, field: :surface_selector).to_sym,
+            selector: parse_identifier!(tokens[1], line_number, field: :surface_selector).to_sym
           }
         end
 
@@ -185,7 +195,7 @@ module Ast
 
           delegation_policies << {
             surface_name: surface_name,
-            strategy: parse_identifier!(tokens[1], line_number, field: :delegate_strategy).to_sym,
+            strategy: parse_identifier!(tokens[1], line_number, field: :delegate_strategy).to_sym
           }
         end
 
@@ -193,7 +203,7 @@ module Ast
           missing = REQUIRED_DIRECTIVES.reject { |directive| @parsed_values.key?(directive) }
           return if missing.empty?
 
-          raise ArgumentError, "Ruleset missing required directives: #{missing.join(", ")}"
+          raise ArgumentError, "Ruleset missing required directives: #{missing.join(', ')}"
         end
 
         def validate_known_directive!(directive, line_number)
@@ -204,7 +214,7 @@ module Ast
 
         def validate_token_list!(tokens, line_number)
           tokens.each do |token|
-            next if TOKEN_RE.match?(token) && !token.include?("#") && !token.include?("\"")
+            next if TOKEN_RE.match?(token) && !token.include?('#') && !token.include?('"')
 
             raise ArgumentError, "Invalid token #{token.inspect} on line #{line_number}"
           end
@@ -238,10 +248,10 @@ module Ast
         end
 
         def parse_scalar(token, line_number)
-          return true if token == "true"
-          return false if token == "false"
+          return true if token == 'true'
+          return false if token == 'false'
           return token if IDENTIFIER_RE.match?(token)
-          return token if TOKEN_RE.match?(token) && !token.include?("#") && !token.include?("\"")
+          return token if TOKEN_RE.match?(token) && !token.include?('#') && !token.include?('"')
 
           raise ArgumentError, "Invalid scalar #{token.inspect} on line #{line_number}"
         end

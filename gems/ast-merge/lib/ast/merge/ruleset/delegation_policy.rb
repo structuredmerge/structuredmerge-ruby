@@ -17,7 +17,7 @@ module Ast
           {
             surface_name: surface_name,
             strategy: strategy,
-            metadata: metadata,
+            metadata: metadata
           }.compact
         end
       end

@@ -9,12 +9,10 @@ module Ast
 
         def start_runtime_root_session!(
           surface_kind:,
-          declared_language: nil,
+          operation_id:, delegate_name:, declared_language: nil,
           effective_language: nil,
-          operation_id:,
-          delegate_name:,
           requested_strategy: :merge,
-          surface_address: "document[0]",
+          surface_address: 'document[0]',
           surface_metadata: {},
           policy_context: {},
           metadata: {},
@@ -28,20 +26,20 @@ module Ast
             declared_language: declared_language,
             effective_language: effective_language,
             address: surface_address,
-            metadata: surface_metadata,
+            metadata: surface_metadata
           )
           delegate = Delegate.new(
             name: delegate_name,
             priority: delegate_priority,
             surface_kinds: [root_surface.surface_kind],
             languages: [root_surface.effective_language || root_surface.declared_language].compact,
-            capabilities: {merge: true},
-            metadata: delegate_metadata,
+            capabilities: { merge: true },
+            metadata: delegate_metadata
           )
           session = Session.new(
             policy_context: policy_context,
             metadata: metadata,
-            delegation_registry: DelegationRegistry.new(delegates: [delegate]),
+            delegation_registry: DelegationRegistry.new(delegates: [delegate])
           )
           root_operation = Operation.new(
             operation_id: operation_id,
@@ -50,7 +48,7 @@ module Ast
             destination_fragment: dest_content,
             requested_strategy: requested_strategy,
             options: options,
-            status: :running,
+            status: :running
           )
 
           session.register(
@@ -59,9 +57,9 @@ module Ast
               operation_id: root_operation.operation_id,
               depth: 0,
               surface_path: root_surface.address,
-              language_chain: Array(language_chain || [root_surface.effective_language || root_surface.declared_language]).compact,
+              language_chain: Array(language_chain || [root_surface.effective_language || root_surface.declared_language]).compact
             ),
-            delegate: session.resolve_delegate_for(root_surface, capability: :merge),
+            delegate: session.resolve_delegate_for(root_surface, capability: :merge)
           )
           @runtime_session = session
           root_operation
@@ -82,7 +80,7 @@ module Ast
             capabilities_used: capabilities_used,
             capabilities_missing: capabilities_missing,
             unresolved_cases: unresolved_cases,
-            metadata: metadata,
+            metadata: metadata
           )
           if child_result.unresolved?
             root_operation.unresolved!(result: child_result)
@@ -100,7 +98,7 @@ module Ast
             operation_id: root_operation.operation_id,
             surface_path: root_operation.surface.address,
             message: error.message,
-            metadata: {error_class: error.class.name}.merge(metadata),
+            metadata: { error_class: error.class.name }.merge(metadata)
           )
           root_operation.fail!(diagnostic: diagnostic)
         end

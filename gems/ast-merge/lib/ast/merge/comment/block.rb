@@ -41,7 +41,7 @@ module Ast
         # TreeHaver::Node protocol: type
         # @return [String] "comment_block"
         def type
-          "comment_block"
+          'comment_block'
         end
 
         # Initialize a new Block.
@@ -77,7 +77,7 @@ module Ast
             start_line: @start_line,
             end_line: @end_line,
             start_column: 0,
-            end_column: combined_slice.split("\n").last&.length || 0,
+            end_column: combined_slice.split("\n").last&.length || 0
           )
 
           super(slice: combined_slice, location: location)
@@ -181,11 +181,11 @@ module Ast
         def first_meaningful_content
           if raw_content
             # Extract first line of content from block comment
-            extract_block_content.split("\n").first&.strip&.downcase || ""
+            extract_block_content.split("\n").first&.strip&.downcase || ''
           else
             # Find first comment line with actual content
             first_content = children.find { |c| c.is_a?(Line) && !c.content.strip.empty? }
-            first_content&.content&.strip&.downcase || ""
+            first_content&.content&.strip&.downcase || ''
           end
         end
 
@@ -195,25 +195,21 @@ module Ast
         #
         # @return [String] The content without delimiters
         def extract_block_content
-          return "" unless raw_content
+          return '' unless raw_content
 
           content = raw_content.to_s
 
           # Remove block start delimiter
-          if style.block_start
-            content = content.sub(/^\s*#{Regexp.escape(style.block_start)}\s*/, "")
-          end
+          content = content.sub(/^\s*#{Regexp.escape(style.block_start)}\s*/, '') if style.block_start
 
           # Remove block end delimiter
-          if style.block_end
-            content = content.sub(/\s*#{Regexp.escape(style.block_end)}\s*$/, "")
-          end
+          content = content.sub(/\s*#{Regexp.escape(style.block_end)}\s*$/, '') if style.block_end
 
           # Clean up common patterns in multi-line block comments
           # (leading asterisks on each line, common in /* ... */ style)
           lines = content.split("\n")
           if lines.size > 1 && lines[1..].all? { |l| l.match?(/^\s*\*/) }
-            lines = lines.map { |l| l.sub(/^\s*\*\s?/, "") }
+            lines = lines.map { |l| l.sub(/^\s*\*\s?/, '') }
           end
 
           lines.map(&:strip).join("\n")

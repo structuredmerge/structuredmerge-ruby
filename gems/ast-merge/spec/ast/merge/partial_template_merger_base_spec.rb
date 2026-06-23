@@ -2,8 +2,8 @@
 
 RSpec.describe Ast::Merge::PartialTemplateMergerBase do
   before do
-    stub_const("FakeNode", Struct.new(:text, :source_position, keyword_init: true))
-    stub_const("FakeAnalysis", Class.new do
+    stub_const('FakeNode', Struct.new(:text, :source_position, keyword_init: true))
+    stub_const('FakeAnalysis', Class.new do
       attr_reader :source
 
       def initialize(source:, comment_attachments: {}, layout_attachments: {})
@@ -34,11 +34,12 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
 
       def create_smart_merger(template_content, destination_content)
         Struct.new(:merge_result).new(
-          Struct.new(:content, :stats).new(template_content, {template: template_content, destination: destination_content}),
+          Struct.new(:content, :stats).new(template_content,
+                                           { template: template_content, destination: destination_content })
         )
       end
 
-      def find_section_end(statements, injection_point)
+      def find_section_end(_statements, injection_point)
         injection_point.anchor.index
       end
 
@@ -47,7 +48,7 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
         if analysis&.respond_to?(:source) && pos
           analysis.source.lines[(pos[:start_line] - 1)..(pos[:end_line] - 1)].join
         else
-          [node, analysis].compact.join("|")
+          [node, analysis].compact.join('|')
         end
       end
     end
@@ -57,43 +58,43 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
     merger_class.new(
       template: "template section\n",
       destination: "destination document\n",
-      anchor: {type: :heading, text: /Section/},
+      anchor: { type: :heading, text: /Section/ }
     )
   end
 
-  describe "#build_merged_content" do
-    it "normalizes separators to a single blank line between before, section, and after content" do
+  describe '#build_merged_content' do
+    it 'normalizes separators to a single blank line between before, section, and after content' do
       result = merger.send(
         :build_merged_content,
         "# Before\n\n\n",
         "## Section\nBody\n\n",
-        "# After\n\n",
+        "# After\n\n"
       )
 
       expect(result).to eq("# Before\n\n## Section\nBody\n\n# After\n")
     end
 
-    it "does not prepend a separator when only section content exists" do
-      result = merger.send(:build_merged_content, "", "## Section\n", nil)
+    it 'does not prepend a separator when only section content exists' do
+      result = merger.send(:build_merged_content, '', "## Section\n", nil)
 
       expect(result).to eq("## Section\n")
     end
 
-    it "joins before and after with one blank line when the merged section is empty" do
-      result = merger.send(:build_merged_content, "# Before\n", "", "# After\n")
+    it 'joins before and after with one blank line when the merged section is empty' do
+      result = merger.send(:build_merged_content, "# Before\n", '', "# After\n")
 
       expect(result).to eq("# Before\n\n# After\n")
     end
 
-    it "returns an empty string when all content parts are blank" do
-      result = merger.send(:build_merged_content, "", "\n", nil)
+    it 'returns an empty string when all content parts are blank' do
+      result = merger.send(:build_merged_content, '', "\n", nil)
 
-      expect(result).to eq("")
+      expect(result).to eq('')
     end
   end
 
-  describe "source-backed structural recomposition" do
-    it "preserves exact surrounding destination whitespace when statement line ranges are available" do
+  describe 'source-backed structural recomposition' do
+    it 'preserves exact surrounding destination whitespace when statement line ranges are available' do
       destination = <<~MD
         # Before
 
@@ -108,16 +109,25 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
 
       analysis = FakeAnalysis.new(source: destination)
       statements = Ast::Merge::Navigable::Statement.build_list([
-        FakeNode.new(text: "# Before", source_position: {start_line: 1, end_line: 1}),
-        FakeNode.new(text: "## Section", source_position: {start_line: 4, end_line: 5}),
-        FakeNode.new(text: "# After", source_position: {start_line: 9, end_line: 9}),
-      ])
+                                                                 FakeNode.new(text: '# Before',
+                                                                              source_position: {
+                                                                                start_line: 1, end_line: 1
+                                                                              }),
+                                                                 FakeNode.new(text: '## Section',
+                                                                              source_position: {
+                                                                                start_line: 4, end_line: 5
+                                                                              }),
+                                                                 FakeNode.new(text: '# After',
+                                                                              source_position: {
+                                                                                start_line: 9, end_line: 9
+                                                                              })
+                                                               ])
       injection_point = Struct.new(:anchor).new(statements[1])
       source_preserving_merger = merger_class.new(
         template: "## Section\nNew body\n",
         destination: destination,
-        anchor: {type: :heading, text: /Section/},
-        replace_mode: true,
+        anchor: { type: :heading, text: /Section/ },
+        replace_mode: true
       )
 
       result = source_preserving_merger.send(:perform_section_merge, analysis, statements, injection_point)
@@ -125,7 +135,7 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
       expect(result.content).to eq("# Before\n\n\n## Section\nNew body\n\n\n\n# After\n")
     end
 
-    it "builds a source-backed remove plan for the replaced section with preserved removed attachments" do
+    it 'builds a source-backed remove plan for the replaced section with preserved removed attachments' do
       destination = <<~MD
         # Before
 
@@ -135,32 +145,32 @@ RSpec.describe Ast::Merge::PartialTemplateMergerBase do
         # After
       MD
 
-      removed_node = FakeNode.new(text: "## Section", source_position: {start_line: 3, end_line: 4})
-      before_node = FakeNode.new(text: "# Before", source_position: {start_line: 1, end_line: 1})
-      after_node = FakeNode.new(text: "# After", source_position: {start_line: 6, end_line: 6})
+      removed_node = FakeNode.new(text: '## Section', source_position: { start_line: 3, end_line: 4 })
+      before_node = FakeNode.new(text: '# Before', source_position: { start_line: 1, end_line: 1 })
+      after_node = FakeNode.new(text: '# After', source_position: { start_line: 6, end_line: 6 })
       promoted_region = instance_double(Ast::Merge::Comment::Region)
       promoted_gap = instance_double(Ast::Merge::Layout::Gap)
       removed_attachment = Ast::Merge::Comment::Attachment.new(
         owner: removed_node,
         leading_region: promoted_region,
-        leading_gap: promoted_gap,
+        leading_gap: promoted_gap
       )
       analysis = FakeAnalysis.new(
         source: destination,
-        comment_attachments: {removed_node.object_id => removed_attachment},
+        comment_attachments: { removed_node.object_id => removed_attachment }
       )
       statements = Ast::Merge::Navigable::Statement.build_list([
-        before_node,
-        removed_node,
-        after_node,
-      ])
+                                                                 before_node,
+                                                                 removed_node,
+                                                                 after_node
+                                                               ])
 
       remove_plan = merger.send(
         :source_remove_plan_for,
         analysis: analysis,
         statements: statements,
         section_start_idx: 1,
-        section_end_idx: 1,
+        section_end_idx: 1
       )
 
       expect(remove_plan).to be_a(Ast::Merge::StructuralEdit::RemovePlan)

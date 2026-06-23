@@ -29,14 +29,14 @@ module Ast
         # TreeHaver::Node protocol: type
         # @return [String] "empty_line"
         def type
-          "empty_line"
+          'empty_line'
         end
 
         # Initialize a new Empty line.
         #
         # @param line_number [Integer] The 1-based line number
         # @param text [String] The actual line content (may have whitespace)
-        def initialize(line_number:, text: "")
+        def initialize(line_number:, text: '')
           @line_number = line_number
           @text = text.to_s
 
@@ -44,7 +44,7 @@ module Ast
             start_line: line_number,
             end_line: line_number,
             start_column: 0,
-            end_column: @text.length,
+            end_column: @text.length
           )
 
           super(slice: @text, location: location)
@@ -61,7 +61,7 @@ module Ast
 
         # @return [String] Empty normalized content
         def normalized_content
-          ""
+          ''
         end
 
         # Empty lines never contain freeze markers.

@@ -19,17 +19,17 @@ module Ast
     #   result = merger.merge
     module Text
       # Default freeze token for text files
-      DEFAULT_FREEZE_TOKEN = "text-merge"
+      DEFAULT_FREEZE_TOKEN = 'text-merge'
 
-      autoload :WordNode, "ast/merge/text/word_node"
-      autoload :LineNode, "ast/merge/text/line_node"
-      autoload :FileAnalysis, "ast/merge/text/file_analysis"
-      autoload :MergeResult, "ast/merge/text/merge_result"
-      autoload :ConflictResolver, "ast/merge/text/conflict_resolver"
-      autoload :SmartMerger, "ast/merge/text/smart_merger"
-      autoload :Section, "ast/merge/text/section"
-      autoload :SectionSplitter, "ast/merge/text/section_splitter"
-      autoload :LineSectionSplitter, "ast/merge/text/section_splitter"
+      autoload :WordNode, 'ast/merge/text/word_node'
+      autoload :LineNode, 'ast/merge/text/line_node'
+      autoload :FileAnalysis, 'ast/merge/text/file_analysis'
+      autoload :MergeResult, 'ast/merge/text/merge_result'
+      autoload :ConflictResolver, 'ast/merge/text/conflict_resolver'
+      autoload :SmartMerger, 'ast/merge/text/smart_merger'
+      autoload :Section, 'ast/merge/text/section'
+      autoload :SectionSplitter, 'ast/merge/text/section_splitter'
+      autoload :LineSectionSplitter, 'ast/merge/text/section_splitter'
     end
   end
 end

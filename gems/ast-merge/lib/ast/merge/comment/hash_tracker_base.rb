@@ -60,10 +60,10 @@ module Ast
         def initialize(lines, tree_haver_comments: nil)
           @lines = Array(lines)
           @comments = if tree_haver_comments
-            comments_from_tree_haver(tree_haver_comments)
-          else
-            extract_comments
-          end
+                        comments_from_tree_haver(tree_haver_comments)
+                      else
+                        extract_comments
+                      end
           @comments_by_line = @comments.group_by { |c| c[:line] }
         end
 
@@ -125,8 +125,8 @@ module Ast
             metadata: {
               range: range,
               full_line_only: full_line_only,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -179,8 +179,8 @@ module Ast
             comments: selected,
             metadata: {
               line_num: line_num,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -207,8 +207,8 @@ module Ast
             comments: selected,
             metadata: {
               line_num: line_num,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -257,8 +257,8 @@ module Ast
             metadata: {
               line_num: line_num,
               upper_bound: upper_bound,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -275,18 +275,18 @@ module Ast
         # @param trailing_comments [Array<Hash>, nil] Optional preselected trailing comments
         # @param metadata [Hash] Additional metadata preserved on the attachment
         # @return [Ast::Merge::Comment::Attachment]
-        def comment_attachment_for(owner, line_num: nil, leading_comments: nil, inline_comment: nil, trailing_comments: nil, **metadata)
+        def comment_attachment_for(owner, line_num: nil, leading_comments: nil, inline_comment: nil,
+                                   trailing_comments: nil, **metadata)
           resolved_line_num = line_num || owner_line_num(owner)
           resolved_end_line = owner_end_line(owner) || resolved_line_num
           leading_region = if resolved_line_num
-            leading_comment_region_before(resolved_line_num, comments: leading_comments)
-          end
-          inline_region = if resolved_line_num
-            inline_comment_region_at(resolved_line_num, comment: inline_comment)
-          end
+                             leading_comment_region_before(resolved_line_num, comments: leading_comments)
+                           end
+          inline_region = (inline_comment_region_at(resolved_line_num, comment: inline_comment) if resolved_line_num)
           trailing_region = if resolved_end_line
-            trailing_comment_region_after(resolved_end_line, comments: trailing_comments, owner: owner)
-          end
+                              trailing_comment_region_after(resolved_end_line, comments: trailing_comments,
+                                                                               owner: owner)
+                            end
 
           Attachment.new(
             owner: owner,
@@ -296,8 +296,8 @@ module Ast
             metadata: metadata.merge(
               line_num: resolved_line_num,
               end_line: resolved_end_line,
-              source: :comment_tracker,
-            ),
+              source: :comment_tracker
+            )
           )
         end
 
@@ -392,7 +392,7 @@ module Ast
             comments: @comments,
             owners: owners,
             style: comment_style,
-            **options,
+            **options
           )
         end
 
@@ -409,7 +409,8 @@ module Ast
         #
         # @return [Array<Hash>]
         def extract_comments
-          raise NotImplementedError, "#{self.class}#extract_comments must be implemented by the format-specific subclass"
+          raise NotImplementedError,
+                "#{self.class}#extract_comments must be implemented by the format-specific subclass"
         end
 
         # Convert a flat list of +TreeHaver::Base::Comment+ objects to the
@@ -441,7 +442,7 @@ module Ast
           indent = th_comment.start_point[:column]
           # Strip the leading `# ` or `#` prefix to get the bare content text.
           # tree_haver's #text includes the delimiter, matching Prism's #slice.
-          content = th_comment.text.sub(/\A#\s?/, "")
+          content = th_comment.text.sub(/\A#\s?/, '')
           # :inline means non-whitespace code appears before the # on the same line.
           # :leading and :trailing both represent full-line (standalone) comments.
           full_line = th_comment.attachment_hint != :inline
@@ -451,17 +452,17 @@ module Ast
             indent: indent,
             text: content,
             full_line: full_line,
-            raw: raw_line,
+            raw: raw_line
           }
         end
 
-        def required_tree_haver_line(th_comment, line_num)
+        def required_tree_haver_line(_th_comment, line_num)
           line = line_at(line_num)
           return line if line
 
           raise MissingTrackedLineError,
-            "tree_haver comment at line #{line_num} could not be mapped back to tracker source lines. " \
-              "HashTrackerBase requires source lines and tree_haver comments to describe the same input."
+                "tree_haver comment at line #{line_num} could not be mapped back to tracker source lines. " \
+                  'HashTrackerBase requires source lines and tree_haver comments to describe the same input.'
         end
 
         # Resolve a structural owner to a 1-based line number.
@@ -496,7 +497,7 @@ module Ast
             kind: kind,
             comments: comments,
             style: comment_style,
-            metadata: metadata,
+            metadata: metadata
           )
         end
 

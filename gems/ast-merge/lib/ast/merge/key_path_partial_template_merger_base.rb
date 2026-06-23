@@ -37,7 +37,8 @@ module Ast
         end
       end
 
-      attr_reader :template, :destination, :key_path, :preference, :add_missing, :remove_missing, :when_missing, :recursive
+      attr_reader :template, :destination, :key_path, :preference, :add_missing, :remove_missing, :when_missing,
+                  :recursive
 
       def initialize(
         template:,
@@ -72,7 +73,7 @@ module Ast
             content: destination,
             has_key_path: false,
             changed: false,
-            message: "Failed to parse destination: #{Array(analysis.errors).join(", ")}",
+            message: "Failed to parse destination: #{Array(analysis.errors).join(', ')}"
           )
         end
 
@@ -111,7 +112,7 @@ module Ast
       private
 
       def validate_key_path!
-        raise ArgumentError, "key_path cannot be empty" if key_path.empty?
+        raise ArgumentError, 'key_path cannot be empty' if key_path.empty?
       end
 
       def find_key_path(analysis)
@@ -144,14 +145,14 @@ module Ast
             content: new_content,
             has_key_path: false,
             changed: true,
-            message: "Key path not found, added with template content",
+            message: 'Key path not found, added with template content'
           )
         else
           Result.new(
             content: destination,
             has_key_path: false,
             changed: false,
-            message: "Key path not found, skipping",
+            message: 'Key path not found, skipping'
           )
         end
       end
@@ -170,8 +171,8 @@ module Ast
             content: destination,
             has_key_path: true,
             changed: false,
-            stats: {mode: :keep_destination},
-            message: "No changes needed",
+            stats: { mode: :keep_destination },
+            message: 'No changes needed'
           )
         end
 
@@ -184,7 +185,7 @@ module Ast
           has_key_path: true,
           changed: changed,
           stats: extract_merger_stats(merger),
-          message: changed ? "Merged at key path" : "No changes needed",
+          message: changed ? 'Merged at key path' : 'No changes needed'
         )
       end
 
@@ -198,7 +199,7 @@ module Ast
 
       def wrap_value_at_key_path(value)
         key_path.reverse_each.reduce(value) do |memo, key|
-          {key => memo}
+          { key => memo }
         end
       end
 

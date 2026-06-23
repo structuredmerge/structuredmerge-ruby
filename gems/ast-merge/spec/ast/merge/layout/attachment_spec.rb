@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Ast::Merge::Layout::Attachment do
-  before { stub_const("AttachmentOwner", Struct.new(:start_line, :end_line, :label, keyword_init: true)) }
+  before { stub_const('AttachmentOwner', Struct.new(:start_line, :end_line, :label, keyword_init: true)) }
 
   let(:before_owner) { AttachmentOwner.new(start_line: 2, end_line: 2, label: :before) }
   let(:after_owner) { AttachmentOwner.new(start_line: 4, end_line: 4, label: :after) }
@@ -10,14 +10,14 @@ RSpec.describe Ast::Merge::Layout::Attachment do
       kind: :interstitial,
       start_line: 3,
       end_line: 3,
-      lines: [""],
+      lines: [''],
       before_owner: before_owner,
-      after_owner: after_owner,
+      after_owner: after_owner
     )
   end
 
-  describe "shared awareness without duplicate control" do
-    it "lets adjacent owners reference the same gap while only one controls output" do
+  describe 'shared awareness without duplicate control' do
+    it 'lets adjacent owners reference the same gap while only one controls output' do
       trailing_attachment = described_class.new(owner: before_owner, trailing_gap: shared_gap)
       leading_attachment = described_class.new(owner: after_owner, leading_gap: shared_gap)
 
@@ -27,7 +27,7 @@ RSpec.describe Ast::Merge::Layout::Attachment do
       expect(leading_attachment.leading_controls_output?).to be(true)
     end
 
-    it "lets the surviving owner take control if the primary owner is removed" do
+    it 'lets the surviving owner take control if the primary owner is removed' do
       trailing_attachment = described_class.new(owner: before_owner, trailing_gap: shared_gap)
       leading_attachment = described_class.new(owner: after_owner, leading_gap: shared_gap)
 
@@ -36,8 +36,8 @@ RSpec.describe Ast::Merge::Layout::Attachment do
     end
   end
 
-  describe "#empty?" do
-    it "is true when no gaps are attached" do
+  describe '#empty?' do
+    it 'is true when no gaps are attached' do
       expect(described_class.new(owner: before_owner)).to be_empty
     end
   end

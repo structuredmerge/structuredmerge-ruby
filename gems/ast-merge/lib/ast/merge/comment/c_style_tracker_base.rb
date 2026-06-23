@@ -90,8 +90,8 @@ module Ast
             metadata: {
               range: range,
               full_line_only: full_line_only,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -131,8 +131,8 @@ module Ast
             comments: selected,
             metadata: {
               line_num: line_num,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -159,8 +159,8 @@ module Ast
             comments: selected,
             metadata: {
               line_num: line_num,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -181,7 +181,9 @@ module Ast
 
           while current <= max_line
             comment = comment_at(current)
-            break unless comment && comment[:full_line] && shared_region_comment?(comment) && trailing_comment_owned_by?(comment, owner)
+            break unless comment && comment[:full_line] && shared_region_comment?(comment) && trailing_comment_owned_by?(
+              comment, owner
+            )
 
             trailing << comment
             current = comment_end_line(comment) + 1
@@ -208,8 +210,8 @@ module Ast
             metadata: {
               line_num: line_num,
               upper_bound: upper_bound,
-              source: :comment_tracker,
-            },
+              source: :comment_tracker
+            }
           )
         end
 
@@ -217,18 +219,18 @@ module Ast
         # Attachment building
         # ----------------------------------------------------------------
 
-        def comment_attachment_for(owner, line_num: nil, leading_comments: nil, inline_comment: nil, trailing_comments: nil, **metadata)
+        def comment_attachment_for(owner, line_num: nil, leading_comments: nil, inline_comment: nil,
+                                   trailing_comments: nil, **metadata)
           resolved_line_num = line_num || owner_line_num(owner)
           resolved_end_line = owner_end_line(owner) || resolved_line_num
           leading_region = if resolved_line_num
-            leading_comment_region_before(resolved_line_num, comments: leading_comments)
-          end
-          inline_region = if resolved_line_num
-            inline_comment_region_at(resolved_line_num, comment: inline_comment)
-          end
+                             leading_comment_region_before(resolved_line_num, comments: leading_comments)
+                           end
+          inline_region = (inline_comment_region_at(resolved_line_num, comment: inline_comment) if resolved_line_num)
           trailing_region = if resolved_end_line
-            trailing_comment_region_after(resolved_end_line, comments: trailing_comments, owner: owner)
-          end
+                              trailing_comment_region_after(resolved_end_line, comments: trailing_comments,
+                                                                               owner: owner)
+                            end
 
           Attachment.new(
             owner: owner,
@@ -238,8 +240,8 @@ module Ast
             metadata: metadata.merge(
               line_num: resolved_line_num,
               end_line: resolved_end_line,
-              source: :comment_tracker,
-            ),
+              source: :comment_tracker
+            )
           )
         end
 
@@ -280,7 +282,7 @@ module Ast
             style: :c_style_line,
             total_comment_count: @comments.size,
             block_comment_count: @comments.count { |comment| comment[:block] },
-            **options,
+            **options
           )
         end
 
@@ -339,7 +341,7 @@ module Ast
             kind: kind,
             comments: comments,
             style: :c_style_line,
-            metadata: metadata,
+            metadata: metadata
           )
         end
 
@@ -356,25 +358,25 @@ module Ast
               current_block_comment[:raw_lines] << line if current_block_comment
               current_block_comment[:raw] = current_block_comment[:raw_lines].join("\n") if current_block_comment
 
-              if line.include?("*/")
+              if line.include?('*/')
                 in_block_comment = false
                 current_block_comment = nil
               end
               next
             end
 
-            if line.include?("/*") && !line.include?("*/")
+            if line.include?('/*') && !line.include?('*/')
               in_block_comment = true
               indent_match = line.match(/\A(?<indent>\s*)/)
               current_block_comment = {
                 line: line_num,
                 end_line: line_num,
                 indent: indent_match ? indent_match[:indent].length : 0,
-                text: line.sub(/\A\s*\/\*\s?/, "").strip,
+                text: line.sub(%r{\A\s*/\*\s?}, '').strip,
                 full_line: true,
                 block: true,
                 raw: line,
-                raw_lines: [line],
+                raw_lines: [line]
               }
               comments << current_block_comment
               next
@@ -388,7 +390,7 @@ module Ast
                 text: match[:text],
                 full_line: true,
                 block: true,
-                raw: line,
+                raw: line
               }
               next
             end
@@ -400,7 +402,7 @@ module Ast
                 text: match[:text],
                 full_line: true,
                 block: false,
-                raw: line,
+                raw: line
               }
               next
             end
@@ -414,9 +416,9 @@ module Ast
         end
 
         def extract_inline_comment(line, line_num)
-          return unless line.include?("//")
+          return unless line.include?('//')
 
-          before_comment, after_comment = line.split("//", 2)
+          before_comment, after_comment = line.split('//', 2)
           return unless after_comment
           return if before_comment.to_s.strip.empty?
           return unless inline_comment_candidate?(before_comment, after_comment, line: line, line_num: line_num)
@@ -430,7 +432,7 @@ module Ast
             text: after_comment.strip,
             full_line: false,
             block: false,
-            raw: raw,
+            raw: raw
           }
         end
 

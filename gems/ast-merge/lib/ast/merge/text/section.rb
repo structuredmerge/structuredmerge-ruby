@@ -43,13 +43,14 @@ module Ast
         # @return [Hash, nil] Optional metadata for splitter-specific information
         #   (e.g., { heading_level: 2 }, { marker_type: :comment })
         :metadata,
-        keyword_init: true,
+        keyword_init: true
       ) do
         # Returns the line range covered by this section.
         #
         # @return [Range, nil] The range from start_line to end_line (inclusive)
         def line_range
           return unless start_line && end_line
+
           start_line..end_line
         end
 
@@ -58,6 +59,7 @@ module Ast
         # @return [Integer, nil] The number of lines
         def line_count
           return unless start_line && end_line
+
           end_line - start_line + 1
         end
 
@@ -65,7 +67,7 @@ module Ast
         #
         # @return [String] The complete section with header and body
         def full_text
-          result = +""
+          result = +''
           result << header.to_s if header
           result << body.to_s
           result
@@ -83,9 +85,10 @@ module Ast
         #
         # @return [String] Normalized name for matching
         def normalized_name
-          return "" if name.nil?
+          return '' if name.nil?
           return name.to_s if name.is_a?(Symbol)
-          name.to_s.strip.downcase.gsub(/\s+/, " ")
+
+          name.to_s.strip.downcase.gsub(/\s+/, ' ')
         end
       end
     end

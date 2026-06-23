@@ -38,7 +38,7 @@ module Ast
         # TreeHaver::Node protocol: type
         # @return [String] "comment_line"
         def type
-          "comment_line"
+          'comment_line'
         end
 
         # Initialize a new Line.
@@ -55,7 +55,7 @@ module Ast
             start_line: line_number,
             end_line: line_number,
             start_column: 0,
-            end_column: @text.length,
+            end_column: @text.length
           )
 
           super(slice: @text, location: location)
@@ -94,10 +94,10 @@ module Ast
           return false unless token
 
           pattern = if action
-            /#{Regexp.escape(token)}:#{action}/i
-          else
-            /#{Regexp.escape(token)}/i
-          end
+                      /#{Regexp.escape(token)}:#{action}/i
+                    else
+                      /#{Regexp.escape(token)}/i
+                    end
           text.match?(pattern)
         end
 

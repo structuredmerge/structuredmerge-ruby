@@ -6,19 +6,18 @@ module Ast
       # Value object describing one owned merge surface.
       class Surface
         attr_reader :surface_kind,
-          :declared_language,
-          :effective_language,
-          :address,
-          :parent_address,
-          :span,
-          :reconstruction_strategy,
-          :metadata
+                    :declared_language,
+                    :effective_language,
+                    :address,
+                    :parent_address,
+                    :span,
+                    :reconstruction_strategy,
+                    :metadata
 
         def initialize(
           surface_kind:,
-          declared_language: nil,
+          address:, declared_language: nil,
           effective_language: nil,
-          address:,
           parent_address: nil,
           span: nil,
           reconstruction_strategy: nil,
@@ -52,7 +51,7 @@ module Ast
             span: span,
             reconstruction_strategy: reconstruction_strategy,
             metadata: metadata,
-            embedded: embedded?,
+            embedded: embedded?
           }.compact
         end
 
@@ -61,7 +60,7 @@ module Ast
         def normalize_language(language)
           return if language.nil?
 
-          language.to_s.strip.downcase.tr("-", "_").to_sym
+          language.to_s.strip.downcase.tr('-', '_').to_sym
         end
       end
     end

@@ -42,7 +42,8 @@ module Ast
         # @param boundary_same_or_shallower [Boolean] If true, boundary is next node at same or shallower tree depth
         # @yield [Statement] Optional custom matcher
         # @return [InjectionPoint, nil] Injection point if anchor found
-        def find(type: nil, text: nil, position:, boundary_type: nil, boundary_text: nil, boundary_matcher: nil, boundary_same_or_shallower: false, &block)
+        def find(position:, type: nil, text: nil, boundary_type: nil, boundary_text: nil, boundary_matcher: nil,
+                 boundary_same_or_shallower: false, &block)
           anchor = Statement.find_first(statements, type: type, text: text, &block)
           return unless anchor
 
@@ -59,6 +60,7 @@ module Ast
                 # Must match type if specified
                 next false if boundary_type && stmt.type.to_s != boundary_type.to_s
                 next false if boundary_text && !stmt.text_matches?(boundary_text)
+
                 # Check tree depth
                 stmt.same_or_shallower_than?(anchor_depth)
               end
@@ -69,7 +71,7 @@ module Ast
               boundary = Statement.find_first(
                 remaining,
                 type: boundary_type,
-                text: boundary_text,
+                text: boundary_text
               )
             end
           end
@@ -78,7 +80,7 @@ module Ast
             anchor: anchor,
             position: position,
             boundary: boundary,
-            match: {type: type, text: text},
+            match: { type: type, text: text }
           )
         end
 
@@ -86,7 +88,7 @@ module Ast
         #
         # @param (see #find)
         # @return [Array<InjectionPoint>] All matching injection points
-        def find_all(type: nil, text: nil, position:, &block)
+        def find_all(position:, type: nil, text: nil, &block)
           anchors = Statement.find_matching(statements, type: type, text: text, &block)
           anchors.map do |anchor|
             InjectionPoint.new(anchor: anchor, position: position)

@@ -36,9 +36,9 @@ RSpec.describe Ast::Merge::SmartMergerBase do
     Class.new do
       attr_accessor :content, :lines
 
-      def initialize(**options)
+      def initialize(**_options)
         @lines = []
-        @content = ""
+        @content = ''
       end
 
       def to_s
@@ -46,7 +46,7 @@ RSpec.describe Ast::Merge::SmartMergerBase do
       end
 
       def decision_summary
-        {lines: @lines.size}
+        { lines: @lines.size }
       end
     end
   end
@@ -58,7 +58,7 @@ RSpec.describe Ast::Merge::SmartMergerBase do
     Class.new(described_class) do
       define_method(:analysis_class) { analysis }
       define_method(:result_class) { result }
-      define_method(:default_freeze_token) { "test-merge" }
+      define_method(:default_freeze_token) { 'test-merge' }
 
       private
 
@@ -81,86 +81,86 @@ RSpec.describe Ast::Merge::SmartMergerBase do
   end
 
   before do
-    stub_const("MockNode", mock_node_class)
+    stub_const('MockNode', mock_node_class)
   end
 
-  describe "#initialize" do
+  describe '#initialize' do
     let(:template) { "line one\nline two" }
     let(:dest) { "line one\nline three" }
 
-    it "creates a merger with default options" do
+    it 'creates a merger with default options' do
       merger = concrete_merger_class.new(template, dest)
 
       expect(merger.preference).to eq(:destination)
       expect(merger.add_template_only_nodes).to be false
-      expect(merger.freeze_token).to eq("test-merge")
+      expect(merger.freeze_token).to eq('test-merge')
     end
 
-    it "accepts custom preference" do
+    it 'accepts custom preference' do
       merger = concrete_merger_class.new(template, dest, preference: :template)
       expect(merger.preference).to eq(:template)
     end
 
-    it "accepts custom add_template_only_nodes" do
+    it 'accepts custom add_template_only_nodes' do
       merger = concrete_merger_class.new(template, dest, add_template_only_nodes: true)
       expect(merger.add_template_only_nodes).to be true
     end
 
-    it "accepts custom freeze_token" do
-      merger = concrete_merger_class.new(template, dest, freeze_token: "custom-freeze")
-      expect(merger.freeze_token).to eq("custom-freeze")
+    it 'accepts custom freeze_token' do
+      merger = concrete_merger_class.new(template, dest, freeze_token: 'custom-freeze')
+      expect(merger.freeze_token).to eq('custom-freeze')
     end
 
-    it "accepts signature_generator" do
+    it 'accepts signature_generator' do
       generator = ->(node) { [:custom, node.to_s] }
       merger = concrete_merger_class.new(template, dest, signature_generator: generator)
       expect(merger.signature_generator).to eq(generator)
     end
 
-    it "accepts match_refiner" do
-      refiner = double("refiner")
+    it 'accepts match_refiner' do
+      refiner = double('refiner')
       merger = concrete_merger_class.new(template, dest, match_refiner: refiner)
       expect(merger.match_refiner).to eq(refiner)
     end
 
-    it "creates template_analysis" do
+    it 'creates template_analysis' do
       merger = concrete_merger_class.new(template, dest)
       expect(merger.template_analysis).not_to be_nil
       expect(merger.template_analysis.content).to eq(template)
     end
 
-    it "creates dest_analysis" do
+    it 'creates dest_analysis' do
       merger = concrete_merger_class.new(template, dest)
       expect(merger.dest_analysis).not_to be_nil
       expect(merger.dest_analysis.content).to eq(dest)
     end
   end
 
-  describe "#merge" do
-    let(:template) { "template line" }
-    let(:dest) { "dest line" }
+  describe '#merge' do
+    let(:template) { 'template line' }
+    let(:dest) { 'dest line' }
 
-    it "returns merged content as a string" do
+    it 'returns merged content as a string' do
       merger = concrete_merger_class.new(template, dest)
       result = merger.merge
 
       expect(result).to be_a(String)
-      expect(result).to eq("dest line")
+      expect(result).to eq('dest line')
     end
   end
 
-  describe "#merge_result" do
-    let(:template) { "line one" }
-    let(:dest) { "line two" }
+  describe '#merge_result' do
+    let(:template) { 'line one' }
+    let(:dest) { 'line two' }
 
-    it "returns the result object" do
+    it 'returns the result object' do
       merger = concrete_merger_class.new(template, dest)
       result = merger.merge_result
 
       expect(result).to respond_to(:to_s)
     end
 
-    it "memoizes the result" do
+    it 'memoizes the result' do
       merger = concrete_merger_class.new(template, dest)
       result1 = merger.merge_result
       result2 = merger.merge_result
@@ -169,11 +169,11 @@ RSpec.describe Ast::Merge::SmartMergerBase do
     end
   end
 
-  describe "#merge_with_debug" do
-    let(:template) { "line one" }
-    let(:dest) { "line two" }
+  describe '#merge_with_debug' do
+    let(:template) { 'line one' }
+    let(:dest) { 'line two' }
 
-    it "returns a hash with content and statistics" do
+    it 'returns a hash with content and statistics' do
       merger = concrete_merger_class.new(template, dest)
       result = merger.merge_with_debug
 
@@ -184,11 +184,11 @@ RSpec.describe Ast::Merge::SmartMergerBase do
     end
   end
 
-  describe "#stats" do
-    let(:template) { "line one" }
-    let(:dest) { "line two" }
+  describe '#stats' do
+    let(:template) { 'line one' }
+    let(:dest) { 'line two' }
 
-    it "returns merge statistics" do
+    it 'returns merge statistics' do
       merger = concrete_merger_class.new(template, dest)
       stats = merger.stats
 
@@ -196,18 +196,18 @@ RSpec.describe Ast::Merge::SmartMergerBase do
     end
   end
 
-  describe "unresolved helper surface" do
-    let(:template) { "line one" }
-    let(:dest) { "line two" }
+  describe 'unresolved helper surface' do
+    let(:template) { 'line one' }
+    let(:dest) { 'line two' }
     let(:merger) { concrete_merger_class.new(template, dest) }
     let(:unresolved_helper_host) { merger }
-    let(:unresolved_case_id_parts) { ["bash", "variable_assignment", "MY_VAR"] }
-    let(:expected_unresolved_case_id) { "bash-variable_assignment-MY_VAR-12" }
+    let(:unresolved_case_id_parts) { %w[bash variable_assignment MY_VAR] }
+    let(:expected_unresolved_case_id) { 'bash-variable_assignment-MY_VAR-12' }
 
-    it_behaves_like "Ast::Merge::UnresolvedHelperContract"
+    it_behaves_like 'Ast::Merge::UnresolvedHelperContract'
   end
 
-  describe "with regions" do
+  describe 'with regions' do
     let(:yaml_detector) { Ast::Merge::Detector::YamlFrontmatter.new }
 
     let(:template) do
@@ -229,81 +229,81 @@ RSpec.describe Ast::Merge::SmartMergerBase do
       MD
     end
 
-    it "accepts regions configuration" do
+    it 'accepts regions configuration' do
       merger = concrete_merger_class.new(
         template,
         dest,
-        regions: [{detector: yaml_detector}],
+        regions: [{ detector: yaml_detector }]
       )
 
       expect(merger.regions_configured?).to be true
     end
 
-    it "accepts custom region_placeholder" do
+    it 'accepts custom region_placeholder' do
       merger = concrete_merger_class.new(
         template,
         dest,
-        regions: [{detector: yaml_detector}],
-        region_placeholder: "###CUSTOM_",
+        regions: [{ detector: yaml_detector }],
+        region_placeholder: '###CUSTOM_'
       )
 
-      expect(merger.instance_variable_get(:@region_placeholder_prefix)).to eq("###CUSTOM_")
+      expect(merger.instance_variable_get(:@region_placeholder_prefix)).to eq('###CUSTOM_')
     end
   end
 
-  describe "abstract methods" do
+  describe 'abstract methods' do
     let(:abstract_class) do
       Class.new(described_class)
     end
 
-    it "raises NotImplementedError for analysis_class" do
+    it 'raises NotImplementedError for analysis_class' do
       # Need to bypass initialize to test the abstract method directly
       instance = abstract_class.allocate
 
       expect { instance.send(:analysis_class) }.to raise_error(NotImplementedError)
     end
 
-    it "raises NotImplementedError for perform_merge" do
+    it 'raises NotImplementedError for perform_merge' do
       instance = abstract_class.allocate
 
       expect { instance.send(:perform_merge) }.to raise_error(NotImplementedError)
     end
   end
 
-  describe "default implementations" do
-    let(:instance) { concrete_merger_class.new("t", "d") }
+  describe 'default implementations' do
+    let(:instance) { concrete_merger_class.new('t', 'd') }
 
-    it "default_freeze_token can be overridden" do
-      expect(instance.send(:default_freeze_token)).to eq("test-merge")
+    it 'default_freeze_token can be overridden' do
+      expect(instance.send(:default_freeze_token)).to eq('test-merge')
     end
 
-    it "resolver_class returns nil by default" do
+    it 'resolver_class returns nil by default' do
       # Test on base class
       base_instance = described_class.allocate
       expect(base_instance.send(:resolver_class)).to be_nil
     end
 
-    it "aligner_class returns nil by default" do
+    it 'aligner_class returns nil by default' do
       base_instance = described_class.allocate
       expect(base_instance.send(:aligner_class)).to be_nil
     end
 
-    it "build_analysis_options returns empty hash by default" do
+    it 'build_analysis_options returns empty hash by default' do
       base_instance = described_class.allocate
       expect(base_instance.send(:build_analysis_options)).to eq({})
     end
 
-    it "build_resolver_options returns empty hash by default" do
+    it 'build_resolver_options returns empty hash by default' do
       base_instance = described_class.allocate
       expect(base_instance.send(:build_resolver_options)).to eq({})
     end
   end
 
-  describe "parse error handling" do
+  describe 'parse error handling' do
     let(:failing_analysis_class) do
       Class.new do
-        def initialize(content, **options)
-          raise StandardError, "Parse failed"
+        def initialize(_content, **_options)
+          raise StandardError, 'Parse failed'
         end
       end
     end
@@ -313,35 +313,35 @@ RSpec.describe Ast::Merge::SmartMergerBase do
 
       Class.new(described_class) do
         define_method(:analysis_class) { analysis }
-        define_method(:default_freeze_token) { "test" }
+        define_method(:default_freeze_token) { 'test' }
       end
     end
 
-    it "raises TemplateParseError for template parse failures" do
-      expect {
-        failing_merger_class.new("bad template", "good dest")
-      }.to raise_error(Ast::Merge::TemplateParseError)
+    it 'raises TemplateParseError for template parse failures' do
+      expect do
+        failing_merger_class.new('bad template', 'good dest')
+      end.to raise_error(Ast::Merge::TemplateParseError)
     end
   end
 
-  describe "inheritance" do
-    it "includes RegionMergeable" do
+  describe 'inheritance' do
+    it 'includes RegionMergeable' do
       expect(described_class.ancestors).to include(Ast::Merge::Detector::Mergeable)
     end
   end
 
-  describe "#merge_with_debug return structure" do
-    it "returns hash with content and statistics" do
-      merger = concrete_merger_class.new("template", "dest")
+  describe '#merge_with_debug return structure' do
+    it 'returns hash with content and statistics' do
+      merger = concrete_merger_class.new('template', 'dest')
       result = merger.merge_with_debug
 
       expect(result).to have_key(:content)
       expect(result).to have_key(:statistics)
-      expect(result.keys).to eq([:content, :statistics])
+      expect(result.keys).to eq(%i[content statistics])
     end
   end
 
-  describe "region substitution in merge_result" do
+  describe 'region substitution in merge_result' do
     let(:yaml_detector) { Ast::Merge::Detector::YamlFrontmatter.new }
 
     let(:template_with_yaml) do
@@ -363,34 +363,34 @@ RSpec.describe Ast::Merge::SmartMergerBase do
       MD
     end
 
-    it "substitutes regions when regions_configured?" do
+    it 'substitutes regions when regions_configured?' do
       merger = concrete_merger_class.new(
         template_with_yaml,
         dest_with_yaml,
-        regions: [{detector: yaml_detector}],
+        regions: [{ detector: yaml_detector }]
       )
 
       result = merger.merge
-      expect(result).to include("title: Dest Title")
+      expect(result).to include('title: Dest Title')
     end
   end
 
-  describe "update_result_content" do
-    it "updates content via content=" do
-      merger = concrete_merger_class.new("t", "d")
+  describe 'update_result_content' do
+    it 'updates content via content=' do
+      merger = concrete_merger_class.new('t', 'd')
       result = merger.merge_result
 
-      merger.send(:update_result_content, result, "new content")
-      expect(result.to_s).to eq("new content")
+      merger.send(:update_result_content, result, 'new content')
+      expect(result.to_s).to eq('new content')
     end
   end
 
-  describe "parse error handling with context" do
-    context "when analysis raises an error" do
+  describe 'parse error handling with context' do
+    context 'when analysis raises an error' do
       let(:error_analysis_class) do
         Class.new do
-          def initialize(content, **options)
-            raise "Parse failed"
+          def initialize(_content, **_options)
+            raise 'Parse failed'
           end
         end
       end
@@ -400,26 +400,26 @@ RSpec.describe Ast::Merge::SmartMergerBase do
 
         Class.new(described_class) do
           define_method(:analysis_class) { analysis }
-          define_method(:default_freeze_token) { "test" }
+          define_method(:default_freeze_token) { 'test' }
         end
       end
 
-      it "raises TemplateParseError" do
-        expect {
-          error_merger_class.new("bad template", "good dest")
-        }.to raise_error(Ast::Merge::TemplateParseError)
+      it 'raises TemplateParseError' do
+        expect do
+          error_merger_class.new('bad template', 'good dest')
+        end.to raise_error(Ast::Merge::TemplateParseError)
       end
     end
   end
 
-  describe "build_result edge cases" do
-    context "when result_class has zero-arity initializer" do
+  describe 'build_result edge cases' do
+    context 'when result_class has zero-arity initializer' do
       let(:zero_arity_result) do
         Class.new do
           attr_accessor :content
 
           def initialize
-            @content = "zero arity"
+            @content = 'zero arity'
           end
 
           def to_s
@@ -439,29 +439,29 @@ RSpec.describe Ast::Merge::SmartMergerBase do
         Class.new(described_class) do
           define_method(:analysis_class) { analysis }
           define_method(:result_class) { result }
-          define_method(:default_freeze_token) { "test" }
+          define_method(:default_freeze_token) { 'test' }
 
           private
 
           define_method(:perform_merge) do
-            @result.content = "merged"
+            @result.content = 'merged'
             @result
           end
         end
       end
 
-      it "creates result with no arguments" do
-        merger = zero_arity_merger_class.new("t", "d")
+      it 'creates result with no arguments' do
+        merger = zero_arity_merger_class.new('t', 'd')
         result = merger.merge_result
         expect(result).not_to be_nil
       end
     end
   end
 
-  describe "with aligner_class" do
+  describe 'with aligner_class' do
     let(:mock_aligner_class) do
       Class.new do
-        def initialize(template_analysis, dest_analysis, **options)
+        def initialize(template_analysis, dest_analysis, **_options)
           @template_analysis = template_analysis
           @dest_analysis = dest_analysis
         end
@@ -481,19 +481,19 @@ RSpec.describe Ast::Merge::SmartMergerBase do
         define_method(:analysis_class) { analysis }
         define_method(:result_class) { result }
         define_method(:aligner_class) { aligner }
-        define_method(:default_freeze_token) { "test" }
+        define_method(:default_freeze_token) { 'test' }
 
         private
 
         define_method(:perform_merge) do
-          @result.content = "merged with aligner"
+          @result.content = 'merged with aligner'
           @result
         end
       end
     end
 
-    it "builds aligner when aligner_class is defined" do
-      merger = merger_with_aligner_class.new("t", "d")
+    it 'builds aligner when aligner_class is defined' do
+      merger = merger_with_aligner_class.new('t', 'd')
       expect(merger.aligner).not_to be_nil
     end
   end

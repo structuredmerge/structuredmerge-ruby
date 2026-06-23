@@ -54,7 +54,7 @@ module Ast
 
       # Emit a blank line
       def emit_blank_line
-        @lines << ""
+        @lines << ''
       end
 
       # Emit leading comments from CommentTracker
@@ -71,7 +71,7 @@ module Ast
       #
       # @param comment [Hash] Comment hash with :text, :indent, :block, etc.
       def emit_tracked_comment(comment)
-        raise NotImplementedError, "Subclasses must implement emit_tracked_comment"
+        raise NotImplementedError, 'Subclasses must implement emit_tracked_comment'
       end
 
       # Emit a comment using the emitter's native syntax.
@@ -80,7 +80,7 @@ module Ast
       # @param text [String] Comment text without the delimiter
       # @param inline [Boolean] Whether this is an inline comment
       def emit_comment(text, inline: false)
-        raise NotImplementedError, "Subclasses must implement emit_comment"
+        raise NotImplementedError, 'Subclasses must implement emit_comment'
       end
 
       # Emit a shared normalized comment region.
@@ -117,21 +117,25 @@ module Ast
       # @param trailing [Boolean] Whether to emit the trailing region
       # @param orphan [Boolean] Whether to emit orphan regions in order
       # @param source_lines [Array<String>, nil] Original source lines for gap preservation
-      def emit_comment_attachment(attachment, leading: true, inline: false, trailing: false, orphan: false, source_lines: nil)
+      def emit_comment_attachment(attachment, leading: true, inline: false, trailing: false, orphan: false,
+                                  source_lines: nil)
         return unless attachment
         return unless attachment.respond_to?(:leading_region) && attachment.respond_to?(:inline_region)
 
         regions = []
         regions << attachment.leading_region if leading && attachment.leading_region
         regions << attachment.inline_region if inline && attachment.inline_region
-        regions << attachment.trailing_region if trailing && attachment.respond_to?(:trailing_region) && attachment.trailing_region
+        if trailing && attachment.respond_to?(:trailing_region) && attachment.trailing_region
+          regions << attachment.trailing_region
+        end
         regions.concat(Array(attachment.orphan_regions)) if orphan && attachment.respond_to?(:orphan_regions)
 
         previous_region_end_line = nil
         regions.each do |region|
           current_region_start_line = region.respond_to?(:start_line) ? region.start_line : nil
           emit_region_gap_lines(previous_region_end_line, current_region_start_line, source_lines)
-          emit_comment_region(region, inline: region.respond_to?(:inline?) ? region.inline? : nil, source_lines: source_lines)
+          emit_comment_region(region, inline: region.respond_to?(:inline?) ? region.inline? : nil,
+                                      source_lines: source_lines)
           previous_region_end_line = region.respond_to?(:end_line) ? region.end_line : previous_region_end_line
         end
       end
@@ -145,18 +149,21 @@ module Ast
       # @param removed_owners [Array<Object>, nil] Explicit removed owners for controller fallback
       # @param last_emitted_source_line [Integer, nil] Skip gap lines up to and including this source line
       # @return [Integer, nil] Last emitted source line number
-      def emit_layout_gap(gap, owner: nil, source_lines: nil, retained_owners: nil, removed_owners: nil, last_emitted_source_line: nil)
+      def emit_layout_gap(gap, owner: nil, source_lines: nil, retained_owners: nil, removed_owners: nil,
+                          last_emitted_source_line: nil)
         return unless gap
 
-        emitting_owner = owner || gap.effective_controller(retained_owners: retained_owners, removed_owners: removed_owners) || gap.controller
+        emitting_owner = owner || gap.effective_controller(retained_owners: retained_owners,
+                                                           removed_owners: removed_owners) || gap.controller
         return unless emitting_owner
-        return unless gap.controls_output_for?(emitting_owner, retained_owners: retained_owners, removed_owners: removed_owners)
+        return unless gap.controls_output_for?(emitting_owner, retained_owners: retained_owners,
+                                                               removed_owners: removed_owners)
 
         start_line = if last_emitted_source_line
-          [gap.start_line, last_emitted_source_line + 1].max
-        else
-          gap.start_line
-        end
+                       [gap.start_line, last_emitted_source_line + 1].max
+                     else
+                       gap.start_line
+                     end
         return if start_line > gap.end_line
 
         emit_layout_gap_lines(gap, source_lines: source_lines, line_numbers: start_line..gap.end_line)
@@ -176,9 +183,12 @@ module Ast
       # @param leading_last_emitted_source_line [Integer, nil] Skip leading gap lines up to and including this source line
       # @param trailing_last_emitted_source_line [Integer, nil] Skip trailing gap lines up to and including this source line
       # @return [Hash{Symbol=>Integer}] Last emitted source line by selected gap side
-      def emit_layout_attachment(attachment, leading: true, trailing: false, source_lines: nil, retained_owners: nil, removed_owners: nil, leading_last_emitted_source_line: nil, trailing_last_emitted_source_line: nil)
+      def emit_layout_attachment(attachment, leading: true, trailing: false, source_lines: nil, retained_owners: nil,
+                                 removed_owners: nil, leading_last_emitted_source_line: nil, trailing_last_emitted_source_line: nil)
         return {} unless attachment
-        return {} unless attachment.respond_to?(:owner) && attachment.respond_to?(:leading_gap) && attachment.respond_to?(:trailing_gap)
+        unless attachment.respond_to?(:owner) && attachment.respond_to?(:leading_gap) && attachment.respond_to?(:trailing_gap)
+          return {}
+        end
 
         emitted_lines = {}
 
@@ -189,7 +199,7 @@ module Ast
             source_lines: source_lines,
             retained_owners: retained_owners,
             removed_owners: removed_owners,
-            last_emitted_source_line: leading_last_emitted_source_line,
+            last_emitted_source_line: leading_last_emitted_source_line
           )
         end
 
@@ -200,7 +210,7 @@ module Ast
             source_lines: source_lines,
             retained_owners: retained_owners,
             removed_owners: removed_owners,
-            last_emitted_source_line: trailing_last_emitted_source_line,
+            last_emitted_source_line: trailing_last_emitted_source_line
           )
         end
 
@@ -251,7 +261,7 @@ module Ast
       # Get the current indentation string
       # @return [String]
       def current_indent
-        " " * (@indent_level * @indent_size)
+        ' ' * (@indent_level * @indent_size)
       end
 
       # Add a line with current indentation
@@ -269,7 +279,7 @@ module Ast
         emit_inline_comment_text(
           text,
           region: region,
-          target_column: inline_comment_region_target_column(region, current_line: @lines[-1].to_s),
+          target_column: inline_comment_region_target_column(region, current_line: @lines[-1].to_s)
         )
       end
 
@@ -279,17 +289,17 @@ module Ast
 
       def inline_comment_region_text(region)
         texts = comment_region_nodes(region).filter_map { |node| inline_comment_node_text(node) }
-        return "" if texts.empty?
+        return '' if texts.empty?
 
-        texts.each_with_index.reduce(+"") do |memo, (text, index)|
+        texts.each_with_index.reduce(+'') do |memo, (text, index)|
           next text.dup if index.zero?
 
-          memo << " " unless memo.end_with?(" ") || text.start_with?(" ")
+          memo << ' ' unless memo.end_with?(' ') || text.start_with?(' ')
           memo << text
         end
       end
 
-      def inline_comment_region_target_column(region, current_line:)
+      def inline_comment_region_target_column(_region, current_line:)
         nil
       end
 
@@ -304,31 +314,35 @@ module Ast
           @lines << node.text.to_s.chomp
         else
           raise UnsupportedCommentNodeError,
-            "Cannot emit comment node without raw text: #{node.class}"
+                "Cannot emit comment node without raw text: #{node.class}"
         end
       end
 
       def inline_comment_node_text(node)
         return unless node
 
-        raise UnsupportedCommentNodeError,
-          "Cannot emit inline comment node without raw slice and style: #{node.class}" unless node.respond_to?(:slice) && node.respond_to?(:style)
+        unless node.respond_to?(:slice) && node.respond_to?(:style)
+          raise UnsupportedCommentNodeError,
+                "Cannot emit inline comment node without raw slice and style: #{node.class}"
+        end
 
         slice = node.slice.to_s
-        line_start = node.style.respond_to?(:line_start) ? node.style.line_start.to_s : ""
-        raise UnsupportedCommentNodeError,
-          "Cannot emit inline comment node without a line comment delimiter: #{node.class}" if line_start.empty?
+        line_start = node.style.respond_to?(:line_start) ? node.style.line_start.to_s : ''
+        if line_start.empty?
+          raise UnsupportedCommentNodeError,
+                "Cannot emit inline comment node without a line comment delimiter: #{node.class}"
+        end
 
         stripped = slice.lstrip
         unless stripped.start_with?(line_start)
           raise UnsupportedCommentNodeError,
-            "Cannot emit inline comment node whose raw slice does not start with the comment delimiter: #{node.class}"
+                "Cannot emit inline comment node whose raw slice does not start with the comment delimiter: #{node.class}"
         end
 
         content = stripped.delete_prefix(line_start)
-        content = content.delete_prefix(" ")
+        content = content.delete_prefix(' ')
         if node.style.respond_to?(:line_end) && node.style.line_end
-          content = content.sub(/\s*#{Regexp.escape(node.style.line_end.to_s)}\z/, "")
+          content = content.sub(/\s*#{Regexp.escape(node.style.line_end.to_s)}\z/, '')
         end
         content
       end

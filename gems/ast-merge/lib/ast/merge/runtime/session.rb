@@ -55,7 +55,7 @@ module Ast
 
           operation.to_h.merge(
             frame: frame_for(operation.operation_id)&.to_h,
-            children: operation.children.filter_map { |child| operation_tree(child) },
+            children: operation.children.filter_map { |child| operation_tree(child) }
           )
         end
 
@@ -72,11 +72,17 @@ module Ast
             diagnostic_severity_counts: tally_by(diagnostics, &:severity),
             delegate_names: normalized_values(operations.map(&:delegate_name)),
             surface_kinds: normalized_values(operations.filter_map { |operation| operation.surface&.surface_kind }),
-            effective_languages: normalized_values(operations.filter_map { |operation| operation.surface&.effective_language }),
-            capabilities_used: normalized_values(operations.filter_map { |operation| operation.result&.capabilities_used }.flatten),
-            capabilities_missing: normalized_values(operations.filter_map { |operation| operation.result&.capabilities_missing }.flatten),
+            effective_languages: normalized_values(operations.filter_map do |operation|
+              operation.surface&.effective_language
+            end),
+            capabilities_used: normalized_values(operations.filter_map do |operation|
+              operation.result&.capabilities_used
+            end.flatten),
+            capabilities_missing: normalized_values(operations.filter_map do |operation|
+              operation.result&.capabilities_missing
+            end.flatten),
             unresolved_operation_count: operations.count(&:unresolved?),
-            unresolved_case_count: operations.sum { |operation| operation.result&.unresolved_cases&.length.to_i },
+            unresolved_case_count: operations.sum { |operation| operation.result&.unresolved_cases&.length.to_i }
           }
         end
 
@@ -88,7 +94,7 @@ module Ast
             delegation_registry: delegation_registry.to_h,
             operations: operations.map(&:to_h),
             operation_trees: operation_trees,
-            diagnostics: diagnostics.map(&:to_h),
+            diagnostics: diagnostics.map(&:to_h)
           }
         end
 

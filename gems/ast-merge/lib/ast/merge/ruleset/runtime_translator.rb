@@ -11,7 +11,7 @@ module Ast
               read: config.read,
               source: source,
               capability: capability,
-              style: config.comment_style,
+              style: config.comment_style
             )
             RuntimeDeclaration.new(
               read_strategy: config.read,
@@ -23,8 +23,8 @@ module Ast
               support_style: support_style,
               metadata: {
                 source: source,
-                path: config.path,
-              }.compact,
+                path: config.path
+              }.compact
             )
           end
 
@@ -40,13 +40,13 @@ module Ast
               support_style: runtime.support_style,
               capabilities: runtime.capabilities.merge(
                 layout_aware: true,
-                logical_owner: runtime.logical_owner?,
+                logical_owner: runtime.logical_owner?
               ),
               logical_owners: runtime.logical_owners,
               repair_policies: config.repair_policies,
               surfaces: config.surfaces,
               delegation_policies: config.delegation_policies,
-              metadata: runtime.metadata,
+              metadata: runtime.metadata
             )
           end
 

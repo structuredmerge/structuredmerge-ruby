@@ -20,7 +20,8 @@ module Ast
 
         attr_reader :kind, :start_line, :end_line, :lines, :before_owner, :after_owner, :controller_side, :metadata
 
-        def initialize(kind:, start_line:, end_line:, lines:, before_owner: nil, after_owner: nil, controller_side: nil, metadata: {}, **options)
+        def initialize(kind:, start_line:, end_line:, lines:, before_owner: nil, after_owner: nil,
+                       controller_side: nil, metadata: {}, **options)
           @kind = normalize_kind(kind)
           @start_line = Integer(start_line)
           @end_line = Integer(end_line)
@@ -74,7 +75,7 @@ module Ast
         def fallback_side
           return unless controller_side
 
-          (controller_side == :before) ? :after : :before
+          controller_side == :before ? :after : :before
         end
 
         # Return the owner on the fallback controller side.
@@ -137,8 +138,10 @@ module Ast
         # @param removed_owners [Array<Object>, nil] explicitly removed owners
         # @return [Symbol, nil]
         def effective_controller_side(retained_owners: nil, removed_owners: nil)
-          return controller_side if owner_available?(controller, retained_owners: retained_owners, removed_owners: removed_owners)
-          return fallback_side if owner_available?(fallback_controller, retained_owners: retained_owners, removed_owners: removed_owners)
+          return controller_side if owner_available?(controller, retained_owners: retained_owners,
+                                                                 removed_owners: removed_owners)
+          return fallback_side if owner_available?(fallback_controller, retained_owners: retained_owners,
+                                                                        removed_owners: removed_owners)
 
           nil
         end
@@ -176,7 +179,7 @@ module Ast
           return normalized if KINDS.include?(normalized)
 
           raise ArgumentError,
-            "Unknown layout gap kind: #{kind.inspect}. Expected one of: #{KINDS.join(", ")}"
+                "Unknown layout gap kind: #{kind.inspect}. Expected one of: #{KINDS.join(', ')}"
         end
 
         def normalize_controller_side(side)
@@ -186,27 +189,30 @@ module Ast
           return normalized if SIDES.include?(normalized)
 
           raise ArgumentError,
-            "Unknown controller side: #{side.inspect}. Expected one of: #{SIDES.join(", ")}"
+                "Unknown controller side: #{side.inspect}. Expected one of: #{SIDES.join(', ')}"
         end
 
         def validate_range!
-          raise ArgumentError, "end_line must be >= start_line" if end_line < start_line
+          raise ArgumentError, 'end_line must be >= start_line' if end_line < start_line
           return if lines.empty? || lines.size == line_count
 
           raise ArgumentError,
-            "lines length (#{lines.size}) must match line range size (#{line_count})"
+                "lines length (#{lines.size}) must match line range size (#{line_count})"
         end
 
         def validate_adjacency!
           case kind
           when :preamble
-            raise ArgumentError, "preamble gaps cannot have a before_owner" if before_owner
-            raise ArgumentError, "preamble gaps require an after_owner" unless after_owner
+            raise ArgumentError, 'preamble gaps cannot have a before_owner' if before_owner
+            raise ArgumentError, 'preamble gaps require an after_owner' unless after_owner
           when :postlude
-            raise ArgumentError, "postlude gaps require a before_owner" unless before_owner
-            raise ArgumentError, "postlude gaps cannot have an after_owner" if after_owner
+            raise ArgumentError, 'postlude gaps require a before_owner' unless before_owner
+            raise ArgumentError, 'postlude gaps cannot have an after_owner' if after_owner
           when :interstitial
-            raise ArgumentError, "interstitial gaps require at least one adjacent owner" unless before_owner || after_owner
+            unless before_owner || after_owner
+              raise ArgumentError,
+                    'interstitial gaps require at least one adjacent owner'
+            end
           end
         end
 
@@ -215,7 +221,7 @@ module Ast
           return if owner_for(controller_side)
 
           raise ArgumentError,
-            "controller_side #{controller_side.inspect} must reference an adjacent owner"
+                "controller_side #{controller_side.inspect} must reference an adjacent owner"
         end
 
         def owner_available?(owner, retained_owners:, removed_owners:)

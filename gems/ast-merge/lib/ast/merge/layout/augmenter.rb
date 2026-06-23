@@ -18,7 +18,8 @@ module Ast
           end
         end
 
-        def initialize(lines: nil, source: nil, owners: [], start_line_for: nil, end_line_for: nil, metadata: {}, **options)
+        def initialize(lines: nil, source: nil, owners: [], start_line_for: nil, end_line_for: nil, metadata: {},
+                       **options)
           @lines = normalize_lines(lines, source)
           @start_line_for = start_line_for
           @end_line_for = end_line_for
@@ -51,7 +52,7 @@ module Ast
 
         def build!
           attachment_state = owners.each_with_object({}) do |owner, hash|
-            hash[owner] = {leading_gap: nil, trailing_gap: nil}
+            hash[owner] = { leading_gap: nil, trailing_gap: nil }
           end
 
           blank_runs.each do |run|
@@ -60,12 +61,12 @@ module Ast
             next unless before_owner || after_owner
 
             kind = if before_owner && after_owner
-              :interstitial
-            elsif before_owner
-              :postlude
-            else
-              :preamble
-            end
+                     :interstitial
+                   elsif before_owner
+                     :postlude
+                   else
+                     :preamble
+                   end
 
             gap = Gap.new(
               kind: kind,
@@ -74,7 +75,7 @@ module Ast
               lines: run[:lines],
               before_owner: before_owner,
               after_owner: after_owner,
-              metadata: {source: :layout_augmenter},
+              metadata: { source: :layout_augmenter }
             )
 
             attachment_state[before_owner][:trailing_gap] = gap if before_owner
@@ -96,7 +97,7 @@ module Ast
               owner: owner,
               leading_gap: state[:leading_gap],
               trailing_gap: state[:trailing_gap],
-              metadata: {source: :layout_augmenter},
+              metadata: { source: :layout_augmenter }
             )
           end
         end
@@ -117,7 +118,7 @@ module Ast
             runs << {
               start_line: start_index + 1,
               end_line: index,
-              lines: lines[start_index...index],
+              lines: lines[start_index...index]
             }
           end
 
@@ -140,8 +141,11 @@ module Ast
         end
 
         def validate_owner!(owner)
-          unless owner_line_reader_available?(owner, :start_line, @start_line_for) && owner_line_reader_available?(owner, :end_line, @end_line_for)
-            raise ArgumentError, "owner must respond to #start_line and #end_line or be supported by configured line extractors"
+          unless owner_line_reader_available?(owner, :start_line,
+                                              @start_line_for) && owner_line_reader_available?(owner, :end_line,
+                                                                                               @end_line_for)
+            raise ArgumentError,
+                  'owner must respond to #start_line and #end_line or be supported by configured line extractors'
           end
         end
 

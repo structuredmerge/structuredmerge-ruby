@@ -67,9 +67,9 @@ module Ast
     # @see MergerConfig
     # @see ConflictResolverBase
     module NodeTyping
-      autoload :FrozenWrapper, "ast/merge/node_typing/frozen_wrapper"
-      autoload :Normalizer, "ast/merge/node_typing/normalizer"
-      autoload :Wrapper, "ast/merge/node_typing/wrapper"
+      autoload :FrozenWrapper, 'ast/merge/node_typing/frozen_wrapper'
+      autoload :Normalizer, 'ast/merge/node_typing/normalizer'
+      autoload :Wrapper, 'ast/merge/node_typing/wrapper'
 
       class << self
         # Wrap a node with a custom merge_type.
@@ -175,21 +175,19 @@ module Ast
         def validate!(typing_config)
           return if typing_config.nil?
 
-          unless typing_config.is_a?(Hash)
-            raise ArgumentError, "node_typing must be a Hash, got #{typing_config.class}"
-          end
+          raise ArgumentError, "node_typing must be a Hash, got #{typing_config.class}" unless typing_config.is_a?(Hash)
 
           typing_config.each do |key, value|
             unless key.is_a?(Symbol) || key.is_a?(String)
               raise ArgumentError,
-                "node_typing keys must be Symbol or String, got #{key.class} for #{key.inspect}"
+                    "node_typing keys must be Symbol or String, got #{key.class} for #{key.inspect}"
             end
 
-            unless value.respond_to?(:call)
-              raise ArgumentError,
-                "node_typing values must be callable (respond to #call), " \
-                  "got #{value.class} for key #{key.inspect}"
-            end
+            next if value.respond_to?(:call)
+
+            raise ArgumentError,
+                  'node_typing values must be callable (respond to #call), ' \
+                    "got #{value.class} for key #{key.inspect}"
           end
         end
 
@@ -203,7 +201,7 @@ module Ast
         def node_type_key(node)
           # Handle Wrapper - use the wrapped node's class
           actual_node = typed_node?(node) ? node.unwrap : node
-          actual_node.class.name&.split("::")&.last || actual_node.class.to_s
+          actual_node.class.name&.split('::')&.last || actual_node.class.to_s
         end
 
         # Find a typing callable for the given type key.
@@ -226,7 +224,7 @@ module Ast
           return config[full_name] if full_name && config.key?(full_name)
 
           # Try with underscored naming (e.g., :prism_call_node)
-          underscored = full_name&.gsub("::", "_")&.gsub(/([a-z])([A-Z])/, '\1_\2')&.downcase
+          underscored = full_name&.gsub('::', '_')&.gsub(/([a-z])([A-Z])/, '\1_\2')&.downcase
           return config[underscored&.to_sym] if underscored && config.key?(underscored.to_sym)
 
           nil

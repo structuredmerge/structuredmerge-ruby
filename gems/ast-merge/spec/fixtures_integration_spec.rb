@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "pathname"
-
 RSpec.describe Ast::Merge do
   def fixtures_root
-    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
 
   def read_json(path)
@@ -12,11 +10,11 @@ RSpec.describe Ast::Merge do
   end
 
   def manifest
-    @manifest ||= read_json(fixtures_root.join("conformance", "slice-24-manifest", "family-feature-profiles.json"))
+    @manifest ||= read_json(fixtures_root.join('conformance', 'slice-24-manifest', 'family-feature-profiles.json'))
   end
 
   def diagnostics_fixture(role)
-    path = described_class.conformance_fixture_path(manifest, "diagnostics", role)
+    path = described_class.conformance_fixture_path(manifest, 'diagnostics', role)
     raise "missing diagnostics fixture for #{role}" unless path
 
     read_json(fixtures_root.join(*path))
@@ -78,96 +76,96 @@ RSpec.describe Ast::Merge do
     described_class::ProfileSelectionRequirement.new(**fixture)
   end
 
-  it "conforms to the merge-gem authoring guide contract fixture" do
+  it 'conforms to the merge-gem authoring guide contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-839-merge-gem-authoring-guide-contract",
-        "merge-gem-authoring-guide-contract.json"
+        'diagnostics',
+        'slice-839-merge-gem-authoring-guide-contract',
+        'merge-gem-authoring-guide-contract.json'
       )
     )
 
-    expect(fixture.dig(:source, :old_document)).to eq("reference/ast-merge/BUILD_A_MERGE_GEM.md")
+    expect(fixture.dig(:source, :old_document)).to eq('reference/ast-merge/BUILD_A_MERGE_GEM.md')
     expect(fixture.fetch(:portable_contracts).map { |contract| contract.fetch(:id) }).to include(
-      "normalized-node-tree",
-      "cursor-duplicate-matching",
-      "recursive-scope",
-      "position-aware-template-only",
-      "shared-before-bespoke"
+      'normalized-node-tree',
+      'cursor-duplicate-matching',
+      'recursive-scope',
+      'position-aware-template-only',
+      'shared-before-bespoke'
     )
-    expect(fixture.fetch(:portable_contracts).map { |contract| contract.fetch(:status) }.uniq).to eq(["keep"])
+    expect(fixture.fetch(:portable_contracts).map { |contract| contract.fetch(:status) }.uniq).to eq(['keep'])
     expect(fixture.fetch(:retired_requirements).map { |requirement| requirement.fetch(:id) }).to include(
-      "mandatory-old-base-classes",
-      "merge-gem-registry",
-      "rspec-shared-examples-as-portable-conformance"
+      'mandatory-old-base-classes',
+      'merge-gem-registry',
+      'rspec-shared-examples-as-portable-conformance'
     )
-    expect(fixture.dig(:contributor_guidance, :recommended_order).first).to eq("add or extend conformance fixtures")
+    expect(fixture.dig(:contributor_guidance, :recommended_order).first).to eq('add or extend conformance fixtures')
     expect(fixture.dig(:contributor_guidance, :ownership_routing, :multiple_unrelated_formats)).to eq(
-      "ast-merge or tree_haver"
+      'ast-merge or tree_haver'
     )
   end
 
-  it "conforms to the merge approach overview alignment fixture" do
+  it 'conforms to the merge approach overview alignment fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-840-merge-approach-overview-alignment",
-        "merge-approach-overview-alignment.json"
+        'diagnostics',
+        'slice-840-merge-approach-overview-alignment',
+        'merge-approach-overview-alignment.json'
       )
     )
 
-    expect(fixture.dig(:source, :old_document)).to eq("reference/ast-merge/MERGE_APPROACH.md")
+    expect(fixture.dig(:source, :old_document)).to eq('reference/ast-merge/MERGE_APPROACH.md')
     expect(fixture.fetch(:kept_principles).map { |principle| principle.fetch(:id) }).to eq(
-      [
-        "signature-not-cardinality",
-        "cursor-duplicate-consumption",
-        "recursive-body-scope",
-        "anchor-aware-template-only"
+      %w[
+        signature-not-cardinality
+        cursor-duplicate-consumption
+        recursive-body-scope
+        anchor-aware-template-only
       ]
     )
     expect(fixture.fetch(:replaced_notes).map { |note| note.fetch(:decision) }.uniq).to eq(
-      ["discard_as_portable_architecture"]
+      ['discard_as_portable_architecture']
     )
     expect(fixture.dig(:portable_language, :destination_only_policy)).to eq(
-      "preserve unless explicit removal policy applies"
+      'preserve unless explicit removal policy applies'
     )
-    expect(fixture.dig(:portable_language, :template_only_policy)).to eq("anchor-aware insertion")
+    expect(fixture.dig(:portable_language, :template_only_policy)).to eq('anchor-aware insertion')
   end
 
-  it "conforms to the ast-merge base class inventory fixture" do
+  it 'conforms to the ast-merge base class inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-841-ast-merge-base-class-inventory",
-        "ast-merge-base-class-inventory.json"
+        'diagnostics',
+        'slice-841-ast-merge-base-class-inventory',
+        'ast-merge-base-class-inventory.json'
       )
     )
     classifications = fixture.fetch(:classifications).to_h do |entry|
       [entry.fetch(:old_surface), entry]
     end
 
-    expect(classifications.fetch("SmartMergerBase").fetch(:classification)).to eq("active_ruby_provider_substrate")
-    expect(classifications.fetch("FileAnalyzable").fetch(:classification)).to eq("active_ruby_provider_substrate")
-    expect(classifications.fetch("MergeResultBase").fetch(:classification)).to eq("active_ruby_provider_substrate")
-    expect(classifications.fetch("DebugLogger").fetch(:classification)).to eq("active_ruby_provider_substrate")
-    expect(classifications.fetch("Runtime Ruleset unresolved review-state support").fetch(:action)).to eq(
-      "keep_active_contracts"
+    expect(classifications.fetch('SmartMergerBase').fetch(:classification)).to eq('active_ruby_provider_substrate')
+    expect(classifications.fetch('FileAnalyzable').fetch(:classification)).to eq('active_ruby_provider_substrate')
+    expect(classifications.fetch('MergeResultBase').fetch(:classification)).to eq('active_ruby_provider_substrate')
+    expect(classifications.fetch('DebugLogger').fetch(:classification)).to eq('active_ruby_provider_substrate')
+    expect(classifications.fetch('Runtime Ruleset unresolved review-state support').fetch(:action)).to eq(
+      'keep_active_contracts'
     )
     expect(fixture.fetch(:surviving_ruby_adapter_conveniences)).to include(
-      "SmartMergerBase",
-      "FileAnalyzable",
-      "MergeResultBase",
-      "DebugLogger"
+      'SmartMergerBase',
+      'FileAnalyzable',
+      'MergeResultBase',
+      'DebugLogger'
     )
-    expect(fixture.fetch(:decision)).to include("port format-neutral Ruby substrate")
+    expect(fixture.fetch(:decision)).to include('port format-neutral Ruby substrate')
   end
 
-  it "conforms to the Ruby ast-merge reference contract fixture" do
+  it 'conforms to the Ruby ast-merge reference contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1004-ruby-ast-merge-reference-contract",
-        "ruby-ast-merge-reference-contract.json"
+        'diagnostics',
+        'slice-1004-ruby-ast-merge-reference-contract',
+        'ruby-ast-merge-reference-contract.json'
       )
     )
 
@@ -176,12 +174,12 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it "conforms to the Ruby-only surface disposition fixture" do
+  it 'conforms to the Ruby-only surface disposition fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1005-ruby-only-surface-disposition",
-        "ruby-only-surface-disposition.json"
+        'diagnostics',
+        'slice-1005-ruby-only-surface-disposition',
+        'ruby-only-surface-disposition.json'
       )
     )
 
@@ -190,12 +188,12 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it "conforms to the Ruby downstream merge gem feature matrix fixture" do
+  it 'conforms to the Ruby downstream merge gem feature matrix fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1006-ruby-downstream-merge-gem-feature-matrix",
-        "ruby-downstream-merge-gem-feature-matrix.json"
+        'diagnostics',
+        'slice-1006-ruby-downstream-merge-gem-feature-matrix',
+        'ruby-downstream-merge-gem-feature-matrix.json'
       )
     )
 
@@ -204,260 +202,265 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it "conforms to the spec terminology glossary fixture" do
+  it 'conforms to the spec terminology glossary fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1007-spec-terminology-glossary",
-        "spec-terminology-glossary.json"
+        'diagnostics',
+        'slice-1007-spec-terminology-glossary',
+        'spec-terminology-glossary.json'
       )
     )
 
     expect(json_ready(described_class.spec_terminology_glossary_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the corruption-healing boundary fixture" do
+  it 'conforms to the corruption-healing boundary fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1008-corruption-healing-boundary",
-        "corruption-healing-boundary.json"
+        'diagnostics',
+        'slice-1008-corruption-healing-boundary',
+        'corruption-healing-boundary.json'
       )
     )
 
     expect(json_ready(described_class.corruption_healing_boundary_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the ruleset runtime translation fixture" do
+  it 'conforms to the ruleset runtime translation fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1009-ruleset-runtime-translation",
-        "ruleset-runtime-translation.json"
+        'diagnostics',
+        'slice-1009-ruleset-runtime-translation',
+        'ruleset-runtime-translation.json'
       )
     )
 
     expect(json_ready(described_class.ruleset_runtime_translation_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the owner-selection substrate fixture" do
+  it 'conforms to the owner-selection substrate fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1010-owner-selection-substrate",
-        "owner-selection-substrate.json"
+        'diagnostics',
+        'slice-1010-owner-selection-substrate',
+        'owner-selection-substrate.json'
       )
     )
 
     expect(json_ready(described_class.owner_selection_substrate_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the attachment-strategy substrate fixture" do
+  it 'conforms to the attachment-strategy substrate fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1011-attachment-strategy-substrate",
-        "attachment-strategy-substrate.json"
+        'diagnostics',
+        'slice-1011-attachment-strategy-substrate',
+        'attachment-strategy-substrate.json'
       )
     )
 
     expect(json_ready(described_class.attachment_strategy_substrate_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the layout-policy substrate fixture" do
+  it 'conforms to the layout-policy substrate fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1012-layout-policy-substrate",
-        "layout-policy-substrate.json"
+        'diagnostics',
+        'slice-1012-layout-policy-substrate',
+        'layout-policy-substrate.json'
       )
     )
 
     expect(json_ready(described_class.layout_policy_substrate_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the logical-owner substrate fixture" do
+  it 'conforms to the logical-owner substrate fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1013-logical-owner-substrate",
-        "logical-owner-substrate.json"
+        'diagnostics',
+        'slice-1013-logical-owner-substrate',
+        'logical-owner-substrate.json'
       )
     )
 
     expect(json_ready(described_class.logical_owner_substrate_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the render source-shaper contract fixture" do
+  it 'conforms to the render source-shaper contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1014-render-source-shaper-contract",
-        "render-source-shaper-contract.json"
+        'diagnostics',
+        'slice-1014-render-source-shaper-contract',
+        'render-source-shaper-contract.json'
       )
     )
 
     expect(json_ready(described_class.render_source_shaper_contract_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the comment-model contract fixture" do
+  it 'conforms to the comment-model contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1015-comment-model-contract",
-        "comment-model-contract.json"
+        'diagnostics',
+        'slice-1015-comment-model-contract',
+        'comment-model-contract.json'
       )
     )
 
     expect(json_ready(described_class.comment_model_contract_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the Ruby shared conformance contract fixture" do
+  it 'conforms to the Ruby shared conformance contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1016-ruby-shared-conformance-contract",
-        "ruby-shared-conformance-contract.json"
+        'diagnostics',
+        'slice-1016-ruby-shared-conformance-contract',
+        'ruby-shared-conformance-contract.json'
       )
     )
 
     expect(json_ready(described_class.ruby_shared_conformance_contract_report)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the match refiner utility inventory fixture" do
+  it 'conforms to the match refiner utility inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-842-match-refiner-utility-inventory",
-        "match-refiner-utility-inventory.json"
+        'diagnostics',
+        'slice-842-match-refiner-utility-inventory',
+        'match-refiner-utility-inventory.json'
       )
     )
 
     expect(fixture.fetch(:generic_patterns).map { |pattern| pattern.fetch(:id) }).to include(
-      "greedy-one-to-one",
-      "scored-match-result",
-      "content-weighted-score",
-      "token-jaccard-score",
-      "composite-refiner-pipeline"
+      'greedy-one-to-one',
+      'scored-match-result',
+      'content-weighted-score',
+      'token-jaccard-score',
+      'composite-refiner-pipeline'
     )
-    expect(fixture.dig(:default_policy, :fuzzy_matching_default)).to eq("disabled")
-    ruby_method = fixture.fetch(:format_specific_patterns).find { |pattern| pattern.fetch(:id) == "ruby-method-refiner" }
-    expect(ruby_method.fetch(:decision)).to include("do_not_enable_by_default")
-    json_object = fixture.fetch(:format_specific_patterns).find { |pattern| pattern.fetch(:id) == "json-object-refiner" }
-    expect(json_object.fetch(:decision)).to eq("preserved_by_slice_745_as_future_fuzzy_owner_matching")
-    expect(fixture.fetch(:decision)).to include("do not port old fuzzy refiners")
+    expect(fixture.dig(:default_policy, :fuzzy_matching_default)).to eq('disabled')
+    ruby_method = fixture.fetch(:format_specific_patterns).find do |pattern|
+      pattern.fetch(:id) == 'ruby-method-refiner'
+    end
+    expect(ruby_method.fetch(:decision)).to include('do_not_enable_by_default')
+    json_object = fixture.fetch(:format_specific_patterns).find do |pattern|
+      pattern.fetch(:id) == 'json-object-refiner'
+    end
+    expect(json_object.fetch(:decision)).to eq('preserved_by_slice_745_as_future_fuzzy_owner_matching')
+    expect(fixture.fetch(:decision)).to include('do not port old fuzzy refiners')
   end
 
-  it "conforms to the freeze block directive vocabulary fixture" do
+  it 'conforms to the freeze block directive vocabulary fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-843-freeze-block-directive-vocabulary",
-        "freeze-block-directive-vocabulary.json"
+        'diagnostics',
+        'slice-843-freeze-block-directive-vocabulary',
+        'freeze-block-directive-vocabulary.json'
       )
     )
 
-    freeze = fixture.fetch(:directive_kinds).find { |entry| entry.fetch(:kind) == "freeze" }
-    node_freeze = fixture.fetch(:directive_kinds).find { |entry| entry.fetch(:kind) == "node_freeze" }
-    expect(freeze).to include(open: "freeze", close: "unfreeze", merge_policy: "destination")
-    expect(node_freeze).to include(merge_policy: "destination_for_attached_node")
+    freeze = fixture.fetch(:directive_kinds).find { |entry| entry.fetch(:kind) == 'freeze' }
+    node_freeze = fixture.fetch(:directive_kinds).find { |entry| entry.fetch(:kind) == 'node_freeze' }
+    expect(freeze).to include(open: 'freeze', close: 'unfreeze', merge_policy: 'destination')
+    expect(node_freeze).to include(merge_policy: 'destination_for_attached_node')
     expect(fixture.fetch(:marker_styles).map { |style| style.fetch(:style) }).to eq(
       %w[hash_comment html_comment c_style_line c_style_block]
     )
     expect(fixture.fetch(:validity_rules)).to include(
-      "crossing_or_offset_overlapping_spans_are_invalid",
-      "unmatched_close_marker_reports_diagnostic",
-      "unclosed_open_marker_reports_diagnostic"
+      'crossing_or_offset_overlapping_spans_are_invalid',
+      'unmatched_close_marker_reports_diagnostic',
+      'unclosed_open_marker_reports_diagnostic'
     )
-    expect(fixture.fetch(:decision)).to include("Do not port old FreezeNodeBase")
+    expect(fixture.fetch(:decision)).to include('Do not port old FreezeNodeBase')
   end
 
-  it "conforms to the template-only partial-template helper inventory fixture" do
+  it 'conforms to the template-only partial-template helper inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-844-template-only-partial-template-helper-inventory",
-        "template-only-partial-template-helper-inventory.json"
+        'diagnostics',
+        'slice-844-template-only-partial-template-helper-inventory',
+        'template-only-partial-template-helper-inventory.json'
       )
     )
 
     expect(fixture.fetch(:portable_template_only_contracts).map { |contract| contract.fetch(:id) }).to eq(
-      [
-        "exact-match-before-insertion",
-        "destination-order-preservation",
-        "neighbor-anchored-template-only",
-        "delayed-interior-group-flush",
-        "deterministic-prefix-tail"
+      %w[
+        exact-match-before-insertion
+        destination-order-preservation
+        neighbor-anchored-template-only
+        delayed-interior-group-flush
+        deterministic-prefix-tail
       ]
     )
     expect(fixture.fetch(:portable_partial_template_contracts).map { |contract| contract.fetch(:id) }).to include(
-      "section-selector",
-      "key-path-selector",
-      "missing-target-policy",
-      "diff-node-mapping"
+      'section-selector',
+      'key-path-selector',
+      'missing-target-policy',
+      'diff-node-mapping'
     )
     expect(fixture.fetch(:retired_public_surfaces).map { |surface| surface.fetch(:old_surface) }).to include(
-      "PartialTemplateMergerBase",
-      "KeyPathPartialTemplateMergerBase",
-      "DiffMapperBase",
-      "FileAlignerBase"
+      'PartialTemplateMergerBase',
+      'KeyPathPartialTemplateMergerBase',
+      'DiffMapperBase',
+      'FileAlignerBase'
     )
     expect(fixture.dig(:helper_api_policy, :exposed_now)).to be(false)
-    expect(fixture.dig(:helper_api_policy, :promotion_condition)).to include("at least two active families")
+    expect(fixture.dig(:helper_api_policy, :promotion_condition)).to include('at least two active families')
     expect(fixture.fetch(:current_fixture_evidence)).to include(
-      "slice-941-ruby-template-only-class-method-merge",
-      "slice-920-ast-crispr-destination-profile-helpers"
+      'slice-941-ruby-template-only-class-method-merge',
+      'slice-920-ast-crispr-destination-profile-helpers'
     )
   end
 
-  it "conforms to the comment layout structural edit helper inventory fixture" do
+  it 'conforms to the comment layout structural edit helper inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-845-comment-layout-structural-edit-helper-inventory",
-        "comment-layout-structural-edit-helper-inventory.json"
+        'diagnostics',
+        'slice-845-comment-layout-structural-edit-helper-inventory',
+        'comment-layout-structural-edit-helper-inventory.json'
       )
     )
 
     expect(fixture.fetch(:portable_comment_contracts).map { |contract| contract.fetch(:id) }).to include(
-      "comment-region-kinds",
-      "comment-style-identifiers",
-      "freeze-directive-integration",
-      "region-text-submerge-gate"
+      'comment-region-kinds',
+      'comment-style-identifiers',
+      'freeze-directive-integration',
+      'region-text-submerge-gate'
     )
     expect(fixture.fetch(:portable_layout_contracts).map { |contract| contract.fetch(:id) }).to eq(
-      [
-        "gap-kinds",
-        "single-output-controller",
-        "controller-fallback",
-        "layout-render-reporting"
+      %w[
+        gap-kinds
+        single-output-controller
+        controller-fallback
+        layout-render-reporting
       ]
     )
     expect(fixture.fetch(:portable_structural_edit_contracts).map { |contract| contract.fetch(:id) }).to include(
-      "exact-splice",
-      "remove-with-rehome-report",
-      "passive-rehome-plan",
-      "selector-to-destination-profile"
+      'exact-splice',
+      'remove-with-rehome-report',
+      'passive-rehome-plan',
+      'selector-to-destination-profile'
     )
-    expect(fixture.dig(:renderer_ownership, :shared_contract_owns)).to include("remove/rehome transfer records")
-    expect(fixture.dig(:renderer_ownership, :provider_renderer_owns)).to include("render and reparse verification")
+    expect(fixture.dig(:renderer_ownership, :shared_contract_owns)).to include('remove/rehome transfer records')
+    expect(fixture.dig(:renderer_ownership, :provider_renderer_owns)).to include('render and reparse verification')
     expect(fixture.fetch(:retired_public_surfaces).map { |surface| surface.fetch(:old_surface) }).to include(
-      "Text::* SmartMerger stack"
+      'Text::* SmartMerger stack'
     )
-    expect(fixture.fetch(:decision)).to include("Do not copy the old public helper class hierarchy")
+    expect(fixture.fetch(:decision)).to include('Do not copy the old public helper class hierarchy')
   end
 
-  it "conforms to the slice-955 comment trivia attachment contract fixture" do
+  it 'conforms to the slice-955 comment trivia attachment contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-955-comment-trivia-attachment-contract",
-        "comment-trivia-attachment-contract.json"
+        'diagnostics',
+        'slice-955-comment-trivia-attachment-contract',
+        'comment-trivia-attachment-contract.json'
       )
     )
     owner_class = Struct.new(:id, :kind, :line_range, keyword_init: true)
     owners = fixture.fetch(:owner_nodes).to_h do |node|
-      [node.fetch(:id), owner_class.new(id: node.fetch(:id), kind: node.fetch(:kind), line_range: node.fetch(:line_range))]
+      [node.fetch(:id),
+       owner_class.new(id: node.fetch(:id), kind: node.fetch(:kind), line_range: node.fetch(:line_range))]
     end
 
     regions = fixture.fetch(:comment_regions).to_h do |region_fixture|
@@ -472,7 +475,7 @@ RSpec.describe Ast::Merge do
       region = described_class::Comment::Region.new(
         kind: region_fixture.fetch(:kind),
         nodes: nodes,
-        metadata: {floating: region_fixture.fetch(:floating)}
+        metadata: { floating: region_fixture.fetch(:floating) }
       )
       expected = region_fixture.fetch(:expected)
 
@@ -481,7 +484,7 @@ RSpec.describe Ast::Merge do
       expect(region.text).to eq(expected.fetch(:text))
       expect(region.normalized_content).to eq(expected.fetch(:normalized_content))
       expect(region.signature.map(&:to_s)).to eq(expected.fetch(:signature))
-      expect(region.freeze_actions("smorg").map(&:to_s)).to eq(expected.fetch(:freeze_actions))
+      expect(region.freeze_actions('smorg').map(&:to_s)).to eq(expected.fetch(:freeze_actions))
 
       [region_fixture.fetch(:id), region]
     end
@@ -530,7 +533,7 @@ RSpec.describe Ast::Merge do
       expect(attachment.empty?).to eq(expected.fetch(:empty))
       expect(attachment.leading_region_layout_owned?).to eq(expected.fetch(:leading_region_layout_owned))
       expect(attachment.trailing_region_layout_owned?).to eq(expected.fetch(:trailing_region_layout_owned))
-      expect(attachment.freeze_marker?("smorg")).to eq(expected.fetch(:freeze_marker))
+      expect(attachment.freeze_marker?('smorg')).to eq(expected.fetch(:freeze_marker))
 
       attachment
     end
@@ -539,17 +542,18 @@ RSpec.describe Ast::Merge do
     expect(regions.length).to eq(fixture.dig(:expected, :comment_region_count))
     expect(gaps.length).to eq(fixture.dig(:expected, :layout_gap_count))
     expect(attachments.length).to eq(fixture.dig(:expected, :attachment_count))
-    expect(described_class::Comment::Region::KINDS.map(&:to_s)).to eq(fixture.dig(:expected, :portable_comment_region_kinds))
+    expect(described_class::Comment::Region::KINDS.map(&:to_s)).to eq(fixture.dig(:expected,
+                                                                                  :portable_comment_region_kinds))
     expect(described_class::Layout::Gap::KINDS.map(&:to_s)).to eq(fixture.dig(:expected, :portable_layout_gap_kinds))
-    expect(fixture.fetch(:contract_rules).first).to include("passive data")
+    expect(fixture.fetch(:contract_rules).first).to include('passive data')
   end
 
-  it "conforms to the slice-956 merge result decision contract fixture" do
+  it 'conforms to the slice-956 merge result decision contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-956-merge-result-decision-contract",
-        "merge-result-decision-contract.json"
+        'diagnostics',
+        'slice-956-merge-result-decision-contract',
+        'merge-result-decision-contract.json'
       )
     )
     result_class = Class.new(described_class::MergeResultBase) do
@@ -585,12 +589,12 @@ RSpec.describe Ast::Merge do
     expect(result.line_count).to eq(expected.fetch(:line_count))
   end
 
-  it "conforms to the slice-957 freeze directive execution contract fixture" do
+  it 'conforms to the slice-957 freeze directive execution contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-957-freeze-directive-execution-contract",
-        "freeze-directive-execution-contract.json"
+        'diagnostics',
+        'slice-957-freeze-directive-execution-contract',
+        'freeze-directive-execution-contract.json'
       )
     )
     valid_count = 0
@@ -610,14 +614,14 @@ RSpec.describe Ast::Merge do
         line_number = index + 1
         if described_class::FreezeNodeBase.freeze_start?(line, style)
           if open_line
-            diagnostics << {category: "nested_freeze_open", severity: "error", line: line_number}
+            diagnostics << { category: 'nested_freeze_open', severity: 'error', line: line_number }
           else
             open_line = line_number
             start_marker = line
           end
         elsif described_class::FreezeNodeBase.freeze_end?(line, style)
           if open_line.nil?
-            diagnostics << {category: "unmatched_freeze_close", severity: "error", line: line_number}
+            diagnostics << { category: 'unmatched_freeze_close', severity: 'error', line: line_number }
           else
             node = described_class::FreezeNodeBase.new(
               start_line: open_line,
@@ -637,7 +641,7 @@ RSpec.describe Ast::Merge do
               content_lines: lines[(open_line - 1)...line_number],
               merge_policy: node.merge_policy.to_s,
               decision: node.merge_type.to_s,
-              signature: ["freeze_block", open_line.to_s, line_number.to_s]
+              signature: ['freeze_block', open_line.to_s, line_number.to_s]
             }
             open_line = nil
             start_marker = nil
@@ -646,7 +650,7 @@ RSpec.describe Ast::Merge do
       end
 
       if open_line
-        diagnostics << {category: "unclosed_freeze_open", severity: "error", line: open_line}
+        diagnostics << { category: 'unclosed_freeze_open', severity: 'error', line: open_line }
         blocks = []
       elsif diagnostics.any?
         blocks = []
@@ -663,7 +667,9 @@ RSpec.describe Ast::Merge do
         end
       end
       expected.fetch(:line_queries).each do |query|
-        block = blocks.find { |candidate| query.fetch(:line).between?(candidate.fetch(:start_line), candidate.fetch(:end_line)) }
+        block = blocks.find do |candidate|
+          query.fetch(:line).between?(candidate.fetch(:start_line), candidate.fetch(:end_line))
+        end
         expect(!block.nil?).to eq(query.fetch(:in_freeze))
         expect(block&.fetch(:id)).to eq(query.fetch(:block_id))
       end
@@ -674,40 +680,40 @@ RSpec.describe Ast::Merge do
     expect(invalid_count).to eq(fixture.dig(:expected, :invalid_case_count))
   end
 
-  it "conforms to the RSpec shared examples dependency tag inventory fixture" do
+  it 'conforms to the RSpec shared examples dependency tag inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-846-rspec-shared-examples-dependency-tag-inventory",
-        "rspec-shared-examples-dependency-tag-inventory.json"
+        'diagnostics',
+        'slice-846-rspec-shared-examples-dependency-tag-inventory',
+        'rspec-shared-examples-dependency-tag-inventory.json'
       )
     )
 
     expect(fixture.fetch(:portable_replacements).map { |replacement| replacement.fetch(:id) }).to include(
-      "reproducible-merge-fixtures",
-      "partial-merge-fixtures",
-      "dependency-tags-to-requirements",
-      "skipped-results",
-      "unresolved-contract-fixtures",
-      "comment-layout-fixtures"
+      'reproducible-merge-fixtures',
+      'partial-merge-fixtures',
+      'dependency-tags-to-requirements',
+      'skipped-results',
+      'unresolved-contract-fixtures',
+      'comment-layout-fixtures'
     )
     expect(fixture.fetch(:ruby_local_helpers).map { |helper| helper.fetch(:id) }).to eq(
-      [
-        "testable-node-builder",
-        "fixture-assertion-wrappers"
+      %w[
+        testable-node-builder
+        fixture-assertion-wrappers
       ]
     )
     expect(fixture.fetch(:ruby_local_helpers).map { |helper| helper.fetch(:allowed) }.uniq).to eq([true])
     expect(fixture.fetch(:retired_public_surfaces).map { |surface| surface.fetch(:old_surface) }).to include(
-      "MergeGemRegistry",
-      "positive/negative dependency tags",
-      "base-class shared examples"
+      'MergeGemRegistry',
+      'positive/negative dependency tags',
+      'base-class shared examples'
     )
-    expect(fixture.fetch(:decision)).to include("Do not port old RSpec shared examples or dependency tags")
+    expect(fixture.fetch(:decision)).to include('Do not port old RSpec shared examples or dependency tags')
   end
 
-  it "conforms to the slice-790 generic merge IR fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-790-generic-merge-ir", "generic-merge-ir.json"))
+  it 'conforms to the slice-790 generic merge IR fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-790-generic-merge-ir', 'generic-merge-ir.json'))
     raw = fixture[:merge_ir]
     merge_ir = described_class::MergeIR.new(
       version: raw[:version],
@@ -723,12 +729,13 @@ RSpec.describe Ast::Merge do
     expect(merge_ir.node_classes.length).to eq(fixture.dig(:expected, :node_class_count))
     expect(merge_ir.ordered_nodes.length).to eq(fixture.dig(:expected, :ordered_node_count))
     expect(merge_ir.changes.map(&:kind)).to eq(fixture.dig(:expected, :change_kinds))
-    expect(merge_ir.node_classes.first.node_ids.fetch(:left)).to eq("left-import-fmt")
-    expect(merge_ir.changes.fetch(1).class_id).to eq("class-import-strings")
+    expect(merge_ir.node_classes.first.node_ids.fetch(:left)).to eq('left-import-fmt')
+    expect(merge_ir.changes.fetch(1).class_id).to eq('class-import-strings')
   end
 
-  it "conforms to the slice-906 merge engine suite setting fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-906-merge-engine-suite-setting", "merge-engine-suite-setting.json"))
+  it 'conforms to the slice-906 merge engine suite setting fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-906-merge-engine-suite-setting',
+                                           'merge-engine-suite-setting.json'))
     settings = fixture[:settings]
     expected = fixture[:expected]
 
@@ -738,22 +745,22 @@ RSpec.describe Ast::Merge do
     expect(described_class::MERGE_ENGINE_ENVIRONMENT_VARIABLE).to eq(expected[:environment_variable])
     expect(settings[:experimental_policy]).to eq(expected[:experimental_policy])
     expect(settings[:runs_same_suite]).to eq(expected[:runs_same_suite])
-    expect(described_class.merge_engine_from_environment(described_class::MERGE_ENGINE_ENVIRONMENT_VARIABLE => settings[:experimental_engine])).to eq("merge_ir_experimental")
+    expect(described_class.merge_engine_from_environment(described_class::MERGE_ENGINE_ENVIRONMENT_VARIABLE => settings[:experimental_engine])).to eq('merge_ir_experimental')
 
     manifest = {
       family_feature_profiles: [],
       suite_descriptors: [
         {
-          kind: "family",
-          subject: { grammar: "go" },
-          roles: ["case"]
+          kind: 'family',
+          subject: { grammar: 'go' },
+          roles: ['case']
         }
       ],
       families: {
         go: [
           {
-            role: "case",
-            path: ["go", "case.json"]
+            role: 'case',
+            path: ['go', 'case.json']
           }
         ]
       }
@@ -762,21 +769,21 @@ RSpec.describe Ast::Merge do
       manifest,
       family_profiles: {
         go: {
-          family: "go",
+          family: 'go',
           supported_dialects: [],
           supported_policies: []
         }
       },
-      merge_engine: "merge_ir_experimental"
+      merge_engine: 'merge_ir_experimental'
     )
 
     expect(plan[:entries].length).to eq(1)
-    expect(plan.dig(:entries, 0, :plan, :merge_engine)).to eq("merge_ir_experimental")
-    expect(plan.dig(:entries, 0, :plan, :entries, 0, :run, :merge_engine)).to eq("merge_ir_experimental")
+    expect(plan.dig(:entries, 0, :plan, :merge_engine)).to eq('merge_ir_experimental')
+    expect(plan.dig(:entries, 0, :plan, :entries, 0, :run, :merge_engine)).to eq('merge_ir_experimental')
   end
 
-  it "conforms to the slice-791 pairwise matchings fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-791-pairwise-matchings", "pairwise-matchings.json"))
+  it 'conforms to the slice-791 pairwise matchings fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-791-pairwise-matchings', 'pairwise-matchings.json'))
     matchings = fixture[:pairwise_matchings].map do |raw|
       described_class::PairwiseMatching.new(
         matching_id: raw[:matching_id],
@@ -790,13 +797,13 @@ RSpec.describe Ast::Merge do
 
     expect(matchings.map(&:matching_id)).to eq(fixture.dig(:expected, :matching_ids))
     expect(matchings.sum { |matching| matching.matches.length }).to eq(fixture.dig(:expected, :total_match_count))
-    expect(matchings.fetch(0).unmatched_to.fetch(0)).to eq("left-import-os")
-    expect(matchings.fetch(1).unmatched_from.fetch(0)).to eq("base-decl-greet")
-    expect(matchings.fetch(2).matches.fetch(1).diagnostics.fetch(0)).to eq("sibling position changed")
+    expect(matchings.fetch(0).unmatched_to.fetch(0)).to eq('left-import-os')
+    expect(matchings.fetch(1).unmatched_from.fetch(0)).to eq('base-decl-greet')
+    expect(matchings.fetch(2).matches.fetch(1).diagnostics.fetch(0)).to eq('sibling position changed')
   end
 
-  it "conforms to the slice-792 class mapping fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-792-class-mapping", "class-mapping.json"))
+  it 'conforms to the slice-792 class mapping fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-792-class-mapping', 'class-mapping.json'))
     raw = fixture[:class_mapping]
     report = described_class::ClassMappingReport.new(
       mapping_id: raw[:mapping_id],
@@ -809,11 +816,12 @@ RSpec.describe Ast::Merge do
     expect(report.diagnostics.map(&:category)).to eq(fixture.dig(:expected, :diagnostic_categories))
     expect(report.diagnostics.map(&:class_id)).to eq(fixture.dig(:expected, :conflicted_class_ids))
     expect(report.node_classes.fetch(2).node_ids).not_to have_key(:right)
-    expect(report.diagnostics.fetch(1).category).to eq("delete_edit_disagreement")
+    expect(report.diagnostics.fetch(1).category).to eq('delete_edit_disagreement')
   end
 
-  it "conforms to the slice-793 PCS change-set generation fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-793-pcs-change-set-generation", "pcs-change-set-generation.json"))
+  it 'conforms to the slice-793 PCS change-set generation fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-793-pcs-change-set-generation',
+                                           'pcs-change-set-generation.json'))
     raw_pcs = fixture[:pcs]
     pcs = described_class::PCS.new(
       pcs_id: raw_pcs[:pcs_id],
@@ -832,14 +840,19 @@ RSpec.describe Ast::Merge do
 
     expect(pcs.constraints.length).to eq(fixture.dig(:expected, :pcs_constraint_count))
     expect(change_sets.length).to eq(fixture.dig(:expected, :change_set_count))
-    expect(change_sets.flat_map { |change_set| change_set.changes.map(&:kind) }).to eq(fixture.dig(:expected, :change_kinds))
-    expect(change_sets.sum { |change_set| change_set.diagnostics.length }).to eq(fixture.dig(:expected, :diagnostic_count))
-    expect(pcs.constraints.fetch(2).predecessor_class_id).to eq("class-import-strings")
-    expect(change_sets.fetch(1).changes.fetch(1).kind).to eq("delete")
+    expect(change_sets.flat_map do |change_set|
+      change_set.changes.map(&:kind)
+    end).to eq(fixture.dig(:expected, :change_kinds))
+    expect(change_sets.sum do |change_set|
+      change_set.diagnostics.length
+    end).to eq(fixture.dig(:expected, :diagnostic_count))
+    expect(pcs.constraints.fetch(2).predecessor_class_id).to eq('class-import-strings')
+    expect(change_sets.fetch(1).changes.fetch(1).kind).to eq('delete')
   end
 
-  it "conforms to the slice-794 raw merge change-set union fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-794-raw-merge-change-set-union", "raw-merge-change-set-union.json"))
+  it 'conforms to the slice-794 raw merge change-set union fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-794-raw-merge-change-set-union',
+                                           'raw-merge-change-set-union.json'))
     raw = fixture[:raw_merge]
     raw_merge = described_class::RawMerge.new(
       raw_merge_id: raw[:raw_merge_id],
@@ -854,12 +867,13 @@ RSpec.describe Ast::Merge do
     expect(raw_merge.changes.length).to eq(fixture.dig(:expected, :raw_change_count))
     expect(raw_merge.input_change_set_ids.length).to eq(fixture.dig(:expected, :input_change_set_count))
     expect(sides).to eq(fixture.dig(:expected, :sides))
-    expect(raw_merge.changes.count { |change| change.class_id == "class-decl-greet" }).to eq(2)
-    expect(raw_merge.diagnostics.first).to eq("raw merge intentionally preserves both sides before inconsistency detection")
+    expect(raw_merge.changes.count { |change| change.class_id == 'class-decl-greet' }).to eq(2)
+    expect(raw_merge.diagnostics.first).to eq('raw merge intentionally preserves both sides before inconsistency detection')
   end
 
-  it "conforms to the slice-795 inconsistency detection fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-795-inconsistency-detection", "inconsistency-detection.json"))
+  it 'conforms to the slice-795 inconsistency detection fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-795-inconsistency-detection',
+                                           'inconsistency-detection.json'))
     raw = fixture[:inconsistency_report]
     report = described_class::InconsistencyReport.new(
       report_id: raw[:report_id],
@@ -870,12 +884,15 @@ RSpec.describe Ast::Merge do
 
     expect(report.inconsistencies.length).to eq(fixture.dig(:expected, :inconsistency_count))
     expect(report.inconsistencies.map(&:category)).to eq(fixture.dig(:expected, :categories))
-    expect(report.inconsistencies.count { |item| item.severity == "error" }).to eq(fixture.dig(:expected, :blocking_count))
-    expect(report.inconsistencies.fetch(1).change_ids.fetch(1)).to eq("right-delete-greet")
+    expect(report.inconsistencies.count do |item|
+      item.severity == 'error'
+    end).to eq(fixture.dig(:expected, :blocking_count))
+    expect(report.inconsistencies.fetch(1).change_ids.fetch(1)).to eq('right-delete-greet')
   end
 
-  it "conforms to the slice-907 merge IR experimental evaluation fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-907-merge-ir-experimental-evaluation", "merge-ir-experimental-evaluation.json"))
+  it 'conforms to the slice-907 merge IR experimental evaluation fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-907-merge-ir-experimental-evaluation',
+                                           'merge-ir-experimental-evaluation.json'))
     request = fixture[:request]
     expected = fixture[:expected]
     change_sets = request[:change_sets].map do |raw|
@@ -893,7 +910,9 @@ RSpec.describe Ast::Merge do
       change_sets
     )
     categories = report.inconsistency_report.inconsistencies.map(&:category)
-    blocking_count = report.inconsistency_report.inconsistencies.count { |inconsistency| inconsistency.severity == "error" }
+    blocking_count = report.inconsistency_report.inconsistencies.count do |inconsistency|
+      inconsistency.severity == 'error'
+    end
 
     expect(report.merge_engine).to eq(expected[:merge_engine])
     expect(report.raw_merge.changes.length).to eq(expected[:raw_change_count])
@@ -903,8 +922,8 @@ RSpec.describe Ast::Merge do
     expect(report.outcome).to eq(expected[:outcome])
   end
 
-  it "conforms to the slice-796 merge IR comparison fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-796-merge-ir-comparison", "merge-ir-comparison.json"))
+  it 'conforms to the slice-796 merge IR comparison fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-796-merge-ir-comparison', 'merge-ir-comparison.json'))
     raw = fixture[:comparison]
     report = described_class::MergeIRComparisonReport.new(
       comparison_id: raw[:comparison_id],
@@ -918,11 +937,12 @@ RSpec.describe Ast::Merge do
     expect(report.cases.map(&:family)).to eq(fixture.dig(:expected, :families))
     expect(report.summary.merge_ir_wins).to eq(fixture.dig(:expected, :merge_ir_wins))
     expect(report.summary.recommendation).to eq(fixture.dig(:expected, :recommendation))
-    expect(report.cases.fetch(4).merge_ir_advantage).to eq("defer")
+    expect(report.cases.fetch(4).merge_ir_advantage).to eq('defer')
   end
 
-  it "conforms to the slice-797 structural matching baseline fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-797-structural-matching-baseline", "structural-matching-baseline.json"))
+  it 'conforms to the slice-797 structural matching baseline fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-797-structural-matching-baseline',
+                                           'structural-matching-baseline.json'))
     raw = fixture[:matching]
     report = described_class::StructuralMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -940,11 +960,12 @@ RSpec.describe Ast::Merge do
     expect(report.unmatched_from.length).to eq(fixture.dig(:expected, :unmatched_from_count))
     expect(report.unmatched_to.length).to eq(fixture.dig(:expected, :unmatched_to_count))
     expect(fixture.dig(:expected, :move_detection)).to be(false)
-    expect(report.matches.fetch(1).from_path).to eq("/declarations/Greet")
+    expect(report.matches.fetch(1).from_path).to eq('/declarations/Greet')
   end
 
-  it "conforms to the slice-798 signature matching commutative parent fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-798-signature-matching-commutative-parent", "signature-matching-commutative-parent.json"))
+  it 'conforms to the slice-798 signature matching commutative parent fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-798-signature-matching-commutative-parent',
+                                           'signature-matching-commutative-parent.json'))
     parent = described_class::SignatureMatchingParent.new(**fixture[:parent])
     raw = fixture[:matching]
     report = described_class::SignatureMatchingReport.new(
@@ -972,8 +993,9 @@ RSpec.describe Ast::Merge do
     expect(report.matches.fetch(0).to_path).to eq(fixture.dig(:expected, :first_match_to_path))
   end
 
-  it "conforms to the slice-799 source-text normalized leaf matching fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-799-source-text-normalized-leaf-matching", "source-text-normalized-leaf-matching.json"))
+  it 'conforms to the slice-799 source-text normalized leaf matching fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-799-source-text-normalized-leaf-matching',
+                                           'source-text-normalized-leaf-matching.json'))
     raw = fixture[:matching]
     report = described_class::SourceTextNormalizedMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -998,8 +1020,9 @@ RSpec.describe Ast::Merge do
     expect(report.matches.fetch(0).confidence).to be >= fixture.dig(:expected, :minimum_confidence)
   end
 
-  it "conforms to the slice-800 move detection opt-in fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-800-move-detection-opt-in", "move-detection-opt-in.json"))
+  it 'conforms to the slice-800 move detection opt-in fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-800-move-detection-opt-in',
+                                           'move-detection-opt-in.json'))
     raw = fixture[:matching]
     report = described_class::MoveDetectionMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -1018,7 +1041,8 @@ RSpec.describe Ast::Merge do
     expect(report.capability.name).to eq(fixture.dig(:expected, :capability))
     expect(report.capability.enabled).to eq(fixture.dig(:expected, :enabled))
     expect(report.capability.default_enabled).to eq(fixture.dig(:expected, :default_enabled))
-    expect(report.capability.requires_stable_node_identity).to eq(fixture.dig(:expected, :requires_stable_node_identity))
+    expect(report.capability.requires_stable_node_identity).to eq(fixture.dig(:expected,
+                                                                              :requires_stable_node_identity))
     expect(report.matches.length).to eq(fixture.dig(:expected, :match_count))
     expect(move_count).to eq(fixture.dig(:expected, :move_count))
     expect(report.matches.fetch(0).signature).to eq(fixture.dig(:expected, :first_moved_signature))
@@ -1026,8 +1050,9 @@ RSpec.describe Ast::Merge do
     expect(report.matches.fetch(0).to_index).to eq(fixture.dig(:expected, :first_moved_to_index))
   end
 
-  it "conforms to the slice-801 rename-aware matching gated fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-801-rename-aware-matching-gated", "rename-aware-matching-gated.json"))
+  it 'conforms to the slice-801 rename-aware matching gated fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-801-rename-aware-matching-gated',
+                                           'rename-aware-matching-gated.json'))
     raw = fixture[:matching]
     report = described_class::RenameAwareMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -1054,8 +1079,9 @@ RSpec.describe Ast::Merge do
     expect(report.candidates.fetch(0).stable_body_hash).to eq(fixture.dig(:expected, :first_candidate_body_hash))
   end
 
-  it "conforms to the slice-802 ambiguity diagnostics fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-802-ambiguity-diagnostics", "ambiguity-diagnostics.json"))
+  it 'conforms to the slice-802 ambiguity diagnostics fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-802-ambiguity-diagnostics',
+                                           'ambiguity-diagnostics.json'))
     raw = fixture[:matching]
     report = described_class::AmbiguityMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -1078,8 +1104,9 @@ RSpec.describe Ast::Merge do
     expect(report.ambiguities.fetch(0).selected).to eq(fixture.dig(:expected, :first_ambiguity_selected))
   end
 
-  it "conforms to the slice-803 duplicate signature tie-break fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-803-duplicate-signature-tie-break", "duplicate-signature-tie-break.json"))
+  it 'conforms to the slice-803 duplicate signature tie-break fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-803-duplicate-signature-tie-break',
+                                           'duplicate-signature-tie-break.json'))
     raw = fixture[:matching]
     report = described_class::TieBreakMatchingReport.new(
       matching_id: raw[:matching_id],
@@ -1089,7 +1116,9 @@ RSpec.describe Ast::Merge do
       matches: raw[:matches].map do |entry|
         described_class::TieBreakMatch.new(
           **entry.merge(
-            rejected_candidates: entry[:rejected_candidates].map { |candidate| described_class::RejectedTieBreakCandidate.new(**candidate) }
+            rejected_candidates: entry[:rejected_candidates].map do |candidate|
+              described_class::RejectedTieBreakCandidate.new(**candidate)
+            end
           )
         )
       end,
@@ -1103,11 +1132,13 @@ RSpec.describe Ast::Merge do
     expect(report.matches.fetch(0).signature).to eq(fixture.dig(:expected, :first_match_signature))
     expect(report.matches.fetch(0).selected_by).to eq(fixture.dig(:expected, :first_match_selected_by))
     expect(report.matches.fetch(0).rejected_candidates.length).to eq(fixture.dig(:expected, :rejected_candidate_count))
-    expect(report.matches.fetch(0).rejected_candidates.fetch(0).rejected_by).to eq(fixture.dig(:expected, :first_rejected_by))
+    expect(report.matches.fetch(0).rejected_candidates.fetch(0).rejected_by).to eq(fixture.dig(:expected,
+                                                                                               :first_rejected_by))
   end
 
-  it "conforms to the slice-804 matching debug artifacts fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-804-matching-debug-artifacts", "matching-debug-artifacts.json"))
+  it 'conforms to the slice-804 matching debug artifacts fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-804-matching-debug-artifacts',
+                                           'matching-debug-artifacts.json'))
     raw = fixture[:debug_artifacts]
     artifacts = described_class::MatchingDebugArtifacts.new(
       artifact_id: raw[:artifact_id],
@@ -1128,8 +1159,8 @@ RSpec.describe Ast::Merge do
     expect(artifacts.rejected_matches.fetch(0).reason).to eq(fixture.dig(:expected, :first_rejection_reason))
   end
 
-  it "conforms to the slice-805 fallback scopes fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-805-fallback-scopes", "fallback-scopes.json"))
+  it 'conforms to the slice-805 fallback scopes fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-805-fallback-scopes', 'fallback-scopes.json'))
     raw = fixture[:fallback]
     report = described_class::FallbackScopeReport.new(
       report_id: raw[:report_id],
@@ -1146,8 +1177,8 @@ RSpec.describe Ast::Merge do
     expect(report.scopes.fetch(-1).requires_source_span).to eq(fixture.dig(:expected, :whole_file_requires_source_span))
   end
 
-  it "conforms to the slice-806 conflict categories fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-806-conflict-categories", "conflict-categories.json"))
+  it 'conforms to the slice-806 conflict categories fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-806-conflict-categories', 'conflict-categories.json'))
     raw = fixture[:conflicts]
     report = described_class::ConflictCategoryReport.new(
       report_id: raw[:report_id],
@@ -1156,7 +1187,7 @@ RSpec.describe Ast::Merge do
       conflicts: raw[:conflicts].map { |entry| described_class::MergeConflict.new(**entry) },
       diagnostics: raw[:diagnostics]
     )
-    parse_limited = report.conflicts.find { |conflict| conflict.category == "parse_limited" }
+    parse_limited = report.conflicts.find { |conflict| conflict.category == 'parse_limited' }
 
     expect(report.categories.length).to eq(fixture.dig(:expected, :category_count))
     expect(report.conflicts.length).to eq(fixture.dig(:expected, :conflict_count))
@@ -1165,8 +1196,9 @@ RSpec.describe Ast::Merge do
     expect(parse_limited.fallback_scope).to eq(fixture.dig(:expected, :parse_limited_fallback_scope))
   end
 
-  it "conforms to the slice-807 local line-based fallback fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-807-local-line-based-fallback", "local-line-based-fallback.json"))
+  it 'conforms to the slice-807 local line-based fallback fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-807-local-line-based-fallback',
+                                           'local-line-based-fallback.json'))
     raw = fixture[:fallback]
     report = described_class::LocalLineFallbackReport.new(
       fallback_id: raw[:fallback_id],
@@ -1188,11 +1220,13 @@ RSpec.describe Ast::Merge do
     expect(report.result).to eq(fixture.dig(:expected, :result))
     expect(report.conflict_category).to eq(fixture.dig(:expected, :conflict_category))
     expect(report.left_span.end_line - report.left_span.start_line + 1).to eq(fixture.dig(:expected, :left_line_count))
-    expect(report.right_span.end_line - report.right_span.start_line + 1).to eq(fixture.dig(:expected, :right_line_count))
+    expect(report.right_span.end_line - report.right_span.start_line + 1).to eq(fixture.dig(:expected,
+                                                                                            :right_line_count))
   end
 
-  it "conforms to the slice-808 conflict marker rendering fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-808-conflict-marker-rendering", "conflict-marker-rendering.json"))
+  it 'conforms to the slice-808 conflict marker rendering fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-808-conflict-marker-rendering',
+                                           'conflict-marker-rendering.json'))
     report = described_class::ConflictMarkerRenderingReport.new(**fixture[:rendering])
 
     expect(report.strategy).to eq(fixture.dig(:expected, :strategy))
@@ -1204,8 +1238,9 @@ RSpec.describe Ast::Merge do
     expect(report.output).to end_with(fixture.dig(:expected, :ends_with))
   end
 
-  it "conforms to the slice-809 typed conflict handler extension points fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-809-typed-conflict-handler-extension-points", "typed-conflict-handler-extension-points.json"))
+  it 'conforms to the slice-809 typed conflict handler extension points fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-809-typed-conflict-handler-extension-points',
+                                           'typed-conflict-handler-extension-points.json'))
     raw = fixture[:handlers]
     report = described_class::ConflictHandlerRegistryReport.new(
       registry_id: raw[:registry_id],
@@ -1221,8 +1256,9 @@ RSpec.describe Ast::Merge do
     expect(report.handlers.fetch(1).fallback_scope).to eq(fixture.dig(:expected, :second_handler_scope))
   end
 
-  it "conforms to the slice-810 generic conflict handler execution fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-810-generic-conflict-handler-execution", "generic-conflict-handler-execution.json"))
+  it 'conforms to the slice-810 generic conflict handler execution fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-810-generic-conflict-handler-execution',
+                                           'generic-conflict-handler-execution.json'))
     raw = fixture[:execution]
     execution = described_class::GenericConflictHandlerExecution.new(
       execution_id: raw[:execution_id],
@@ -1236,14 +1272,24 @@ RSpec.describe Ast::Merge do
           parent_policy: entry[:parent_policy],
           base_children: (entry[:base_children] || []).map { |node| described_class::HandlerChildNode.new(**node) },
           left_insertions: (entry[:left_insertions] || []).map { |node| described_class::HandlerChildNode.new(**node) },
-          right_insertions: (entry[:right_insertions] || []).map { |node| described_class::HandlerChildNode.new(**node) },
+          right_insertions: (entry[:right_insertions] || []).map do |node|
+            described_class::HandlerChildNode.new(**node)
+          end,
           base_members: (entry[:base_members] || []).map { |member| described_class::HandlerKeyedMember.new(**member) },
           left_edits: (entry[:left_edits] || []).map { |member| described_class::HandlerKeyedMember.new(**member) },
           right_edits: (entry[:right_edits] || []).map { |member| described_class::HandlerKeyedMember.new(**member) },
           expected_result: described_class::GenericConflictHandlerResult.new(
             resolved: result[:resolved],
-            merged_children: result.key?(:merged_children) ? result[:merged_children].map { |node| described_class::HandlerChildNode.new(**node) } : nil,
-            merged_members: result.key?(:merged_members) ? result[:merged_members].map { |member| described_class::HandlerKeyedMember.new(**member) } : nil,
+            merged_children: if result.key?(:merged_children)
+                               result[:merged_children].map do |node|
+                                 described_class::HandlerChildNode.new(**node)
+                               end
+                             end,
+            merged_members: if result.key?(:merged_members)
+                              result[:merged_members].map do |member|
+                                described_class::HandlerKeyedMember.new(**member)
+                              end
+                            end,
             diagnostics: result[:diagnostics]
           )
         )
@@ -1265,19 +1311,24 @@ RSpec.describe Ast::Merge do
     expect(results.fetch(1).merged_members.length).to eq(fixture.dig(:expected, :second_merged_member_count))
   end
 
-  it "conforms to the slice-811 language profile handler registration fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-811-language-profile-handler-registration", "language-profile-handler-registration.json"))
+  it 'conforms to the slice-811 language profile handler registration fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-811-language-profile-handler-registration',
+                                           'language-profile-handler-registration.json'))
     raw = fixture[:profile_handlers]
     registry = described_class::LanguageProfileHandlerRegistry.new(
       profile_id: raw[:profile_id],
       language: raw[:language],
       version: raw[:version],
-      registrations: raw[:registrations].map { |entry| described_class::LanguageProfileHandlerRegistration.new(**entry) },
+      registrations: raw[:registrations].map do |entry|
+        described_class::LanguageProfileHandlerRegistration.new(**entry)
+      end,
       diagnostics: raw[:diagnostics]
     )
     enabled_count = registry.registrations.count(&:enabled)
     roles = registry.registrations.map(&:role)
-    duplicate_member_handler = registry.registrations.find { |registration| registration.role == "duplicate_members" }.handler_id
+    duplicate_member_handler = registry.registrations.find do |registration|
+      registration.role == 'duplicate_members'
+    end.handler_id
 
     expect(registry.language).to eq(fixture.dig(:expected, :language))
     expect(registry.registrations.length).to eq(fixture.dig(:expected, :registration_count))
@@ -1286,8 +1337,9 @@ RSpec.describe Ast::Merge do
     expect(duplicate_member_handler).to eq(fixture.dig(:expected, :duplicate_member_handler))
   end
 
-  it "conforms to the slice-812 fallback usage machine output fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-812-fallback-usage-machine-output", "fallback-usage-machine-output.json"))
+  it 'conforms to the slice-812 fallback usage machine output fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-812-fallback-usage-machine-output',
+                                           'fallback-usage-machine-output.json'))
     raw = fixture[:fallback_usage]
     machine_output = described_class::FallbackUsageMachineOutput.new(
       fallbacks: raw.dig(:machine_output, :fallbacks).map { |entry| described_class::FallbackUsageEntry.new(**entry) },
@@ -1313,8 +1365,9 @@ RSpec.describe Ast::Merge do
     expect(report.machine_output.fallbacks.fetch(0).scope).to eq(fixture.dig(:expected, :first_fallback_scope))
   end
 
-  it "conforms to the slice-813 render strategy metadata fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-813-render-strategy-metadata", "render-strategy-metadata.json"))
+  it 'conforms to the slice-813 render strategy metadata fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-813-render-strategy-metadata',
+                                           'render-strategy-metadata.json'))
     raw = fixture[:render_plan]
     report = described_class::RenderPlanReport.new(
       plan_id: raw[:plan_id],
@@ -1331,12 +1384,14 @@ RSpec.describe Ast::Merge do
     expect(report.language).to eq(fixture.dig(:expected, :language))
     expect(report.strategies.length).to eq(fixture.dig(:expected, :strategy_count))
     expect(strategies).to eq(fixture.dig(:expected, :strategies))
-    expect(report.strategies.fetch(0).preserves_source_fragment).to eq(fixture.dig(:expected, :source_reuse_preserves_fragment))
+    expect(report.strategies.fetch(0).preserves_source_fragment).to eq(fixture.dig(:expected,
+                                                                                   :source_reuse_preserves_fragment))
     expect(report.strategies.fetch(-1).requires_reparse).to eq(fixture.dig(:expected, :full_file_requires_reparse))
   end
 
-  it "conforms to the slice-814 reparse after render verification fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-814-reparse-after-render-verification", "reparse-after-render-verification.json"))
+  it 'conforms to the slice-814 reparse after render verification fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-814-reparse-after-render-verification',
+                                           'reparse-after-render-verification.json'))
     report = described_class::RenderVerificationReport.new(**fixture[:render_verification])
 
     expect(report.mode).to eq(fixture.dig(:expected, :mode))
@@ -1348,8 +1403,9 @@ RSpec.describe Ast::Merge do
     expect(report.render_strategy).to eq(fixture.dig(:expected, :render_strategy))
   end
 
-  it "conforms to the slice-815 formatting preservation metrics fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-815-formatting-preservation-metrics", "formatting-preservation-metrics.json"))
+  it 'conforms to the slice-815 formatting preservation metrics fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-815-formatting-preservation-metrics',
+                                           'formatting-preservation-metrics.json'))
     raw = fixture[:conformance_report]
     report = described_class::FormattingPreservationConformanceReport.new(
       report_id: raw[:report_id],
@@ -1364,12 +1420,14 @@ RSpec.describe Ast::Merge do
     expect(report.suite).to eq(fixture.dig(:expected, :suite))
     expect(report.language).to eq(fixture.dig(:expected, :language))
     expect(report.formatting_metrics.expected_output_line_diff_size).to eq(fixture.dig(:expected, :line_diff_size))
-    expect(report.formatting_metrics.expected_output_character_diff_size).to eq(fixture.dig(:expected, :character_diff_size))
+    expect(report.formatting_metrics.expected_output_character_diff_size).to eq(fixture.dig(:expected,
+                                                                                            :character_diff_size))
     expect(report.formatting_metrics.formatting_preservation_score).to eq(fixture.dig(:expected, :score))
   end
 
-  it "conforms to the slice-816 formatting recommendation gate fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-816-formatting-recommendation-gate", "formatting-recommendation-gate.json"))
+  it 'conforms to the slice-816 formatting recommendation gate fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-816-formatting-recommendation-gate',
+                                           'formatting-recommendation-gate.json'))
     raw = fixture[:recommendation_gate]
     gate = described_class::FormattingRecommendationGate.new(
       gate_id: raw[:gate_id],
@@ -1388,8 +1446,9 @@ RSpec.describe Ast::Merge do
     expect(gate.metrics.formatting_preservation_score).to eq(fixture.dig(:expected, :score))
   end
 
-  it "conforms to the slice-817 formatting hard gates fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-817-formatting-hard-gates", "formatting-hard-gates.json"))
+  it 'conforms to the slice-817 formatting hard gates fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-817-formatting-hard-gates',
+                                           'formatting-hard-gates.json'))
     raw = fixture[:hard_gate_report]
     report = described_class::FormattingHardGateReport.new(
       report_id: raw[:report_id],
@@ -1407,8 +1466,9 @@ RSpec.describe Ast::Merge do
     expect(report.gates.fetch(1).name).to eq(fixture.dig(:expected, :second_gate))
   end
 
-  it "conforms to the slice-818 secondary formatting metrics fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-818-secondary-formatting-metrics", "secondary-formatting-metrics.json"))
+  it 'conforms to the slice-818 secondary formatting metrics fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-818-secondary-formatting-metrics',
+                                           'secondary-formatting-metrics.json'))
     report = described_class::SecondaryFormattingMetricsReport.new(**fixture[:secondary_metrics])
 
     expect(report.unchanged_line_churn).to eq(fixture.dig(:expected, :unchanged_line_churn))
@@ -1417,8 +1477,9 @@ RSpec.describe Ast::Merge do
     expect(report.weighted).to eq(fixture.dig(:expected, :weighted))
   end
 
-  it "conforms to the slice-819 token span preservation metrics fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-819-token-span-preservation-metrics", "token-span-preservation-metrics.json"))
+  it 'conforms to the slice-819 token span preservation metrics fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-819-token-span-preservation-metrics',
+                                           'token-span-preservation-metrics.json'))
     report = described_class::TokenSpanPreservationMetricsReport.new(**fixture[:token_span_metrics])
 
     expect(report.source_spans_available).to eq(fixture.dig(:expected, :source_spans_available))
@@ -1427,8 +1488,9 @@ RSpec.describe Ast::Merge do
     expect(report.weighted).to eq(fixture.dig(:expected, :weighted))
   end
 
-  it "conforms to the slice-820 formatting edge fixtures fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-820-formatting-edge-fixtures", "formatting-edge-fixtures.json"))
+  it 'conforms to the slice-820 formatting edge fixtures fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-820-formatting-edge-fixtures',
+                                           'formatting-edge-fixtures.json'))
     raw = fixture[:fixture_suite]
     suite = described_class::FormattingEdgeFixtureSuite.new(
       suite_id: raw[:suite_id],
@@ -1444,8 +1506,9 @@ RSpec.describe Ast::Merge do
     expect(conflict_marker_case_count).to eq(fixture.dig(:expected, :conflict_marker_case_count))
   end
 
-  it "conforms to the slice-821 unsafe render fallback or failure fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-821-unsafe-render-fallback-or-failure", "unsafe-render-fallback-or-failure.json"))
+  it 'conforms to the slice-821 unsafe render fallback or failure fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-821-unsafe-render-fallback-or-failure',
+                                           'unsafe-render-fallback-or-failure.json'))
     report = described_class::RenderSafetyReport.new(**fixture[:render_safety])
 
     expect(report.safe_to_render).to eq(fixture.dig(:expected, :safe_to_render))
@@ -1455,8 +1518,9 @@ RSpec.describe Ast::Merge do
     expect(report.diagnostics.length).to eq(fixture.dig(:expected, :diagnostic_count))
   end
 
-  it "conforms to the slice-822 native provider metadata fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-822-native-provider-metadata", "native-provider-metadata.json"))
+  it 'conforms to the slice-822 native provider metadata fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-822-native-provider-metadata',
+                                           'native-provider-metadata.json'))
     report = described_class::NativeProviderMetadataReport.new(**fixture[:provider_metadata])
 
     expect(report.provider_id).to eq(fixture.dig(:expected, :provider_id))
@@ -1472,8 +1536,9 @@ RSpec.describe Ast::Merge do
     expect(report.metadata_policy).to eq(fixture.dig(:expected, :metadata_policy))
   end
 
-  it "conforms to the slice-823 host language native provider contracts fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-823-host-language-native-provider-contracts", "host-language-native-provider-contracts.json"))
+  it 'conforms to the slice-823 host language native provider contracts fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-823-host-language-native-provider-contracts',
+                                           'host-language-native-provider-contracts.json'))
     raw = fixture[:native_provider_contracts]
     contracts = described_class::HostLanguageNativeProviderContracts.new(
       suite_id: raw[:suite_id],
@@ -1482,7 +1547,7 @@ RSpec.describe Ast::Merge do
       diagnostics: raw[:diagnostics]
     )
     provider_ids = contracts.providers.map(&:provider_id)
-    ruby_provider_count = contracts.providers.count { |provider| provider.host_language == "ruby" }
+    ruby_provider_count = contracts.providers.count { |provider| provider.host_language == 'ruby' }
 
     expect(contracts.providers.length).to eq(fixture.dig(:expected, :provider_count))
     expect(provider_ids).to eq(fixture.dig(:expected, :provider_ids))
@@ -1490,8 +1555,9 @@ RSpec.describe Ast::Merge do
     expect(contracts.providers.fetch(0).parser_name).to eq(fixture.dig(:expected, :first_provider_parser))
   end
 
-  it "conforms to the slice-1010 native parser defaults fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-1010-native-parser-defaults", "native-parser-defaults.json"))
+  it 'conforms to the slice-1010 native parser defaults fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-1010-native-parser-defaults',
+                                           'native-parser-defaults.json'))
     raw = fixture[:native_parser_defaults]
     contract = described_class::NativeParserDefaultsContract.new(
       contract_id: raw[:contract_id],
@@ -1499,8 +1565,8 @@ RSpec.describe Ast::Merge do
       defaults: raw[:defaults].map { |entry| described_class::NativeParserDefault.new(**entry) },
       diagnostics: raw[:diagnostics]
     )
-    ruby_defaults = contract.defaults.select { |entry| entry.implementation == "ruby" }
-    markdown_default = ruby_defaults.find { |entry| entry.family == "markdown" }
+    ruby_defaults = contract.defaults.select { |entry| entry.implementation == 'ruby' }
+    markdown_default = ruby_defaults.find { |entry| entry.family == 'markdown' }
 
     expect(contract.contract_id).to eq(fixture.dig(:expected, :contract_id))
     expect(contract.defaults.length).to eq(fixture.dig(:expected, :default_count))
@@ -1509,8 +1575,9 @@ RSpec.describe Ast::Merge do
     expect(contract.defaults.map(&:generic_substrate_backend).uniq).to eq([fixture.dig(:expected, :fallback_backend)])
   end
 
-  it "conforms to the slice-824 Go native proving ground fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-824-go-native-proving-ground", "go-native-proving-ground.json"))
+  it 'conforms to the slice-824 Go native proving ground fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-824-go-native-proving-ground',
+                                           'go-native-proving-ground.json'))
     report = described_class::NativeProviderProvingGroundReport.new(**fixture[:proving_ground])
 
     expect(report.language).to eq(fixture.dig(:expected, :language))
@@ -1519,8 +1586,9 @@ RSpec.describe Ast::Merge do
     expect(report.checks).to eq(fixture.dig(:expected, :checks))
   end
 
-  it "conforms to the slice-825 go-dst provider stack fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-825-go-dst-provider-stack", "go-dst-provider-stack.json"))
+  it 'conforms to the slice-825 go-dst provider stack fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-825-go-dst-provider-stack',
+                                           'go-dst-provider-stack.json'))
     report = described_class::GoDSTProviderStackReport.new(**fixture[:provider_stack])
 
     expect(report.provider_id).to eq(fixture.dig(:expected, :provider_id))
@@ -1530,18 +1598,21 @@ RSpec.describe Ast::Merge do
     expect(report.compares_with.length).to eq(fixture.dig(:expected, :comparison_count))
   end
 
-  it "conforms to the slice-826 Go provider comparison fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-826-go-provider-comparison", "go-provider-comparison.json"))
+  it 'conforms to the slice-826 Go provider comparison fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-826-go-provider-comparison',
+                                           'go-provider-comparison.json'))
     report = described_class::GoProviderComparisonReport.new(**fixture[:comparison])
 
     expect(report.language).to eq(fixture.dig(:expected, :language))
     expect(report.providers.length).to eq(fixture.dig(:expected, :provider_count))
     expect(report.dimensions.length).to eq(fixture.dig(:expected, :dimension_count))
-    expect(report.dimensions.include?("backend_deficiencies")).to eq(fixture.dig(:expected, :includes_backend_deficiencies))
+    expect(report.dimensions.include?('backend_deficiencies')).to eq(fixture.dig(:expected,
+                                                                                 :includes_backend_deficiencies))
   end
 
-  it "conforms to the slice-827 backend parity fixtures fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-827-backend-parity-fixtures", "backend-parity-fixtures.json"))
+  it 'conforms to the slice-827 backend parity fixtures fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-827-backend-parity-fixtures',
+                                           'backend-parity-fixtures.json'))
     raw = fixture[:parity_suite]
     suite = described_class::BackendParitySuite.new(
       suite_id: raw[:suite_id],
@@ -1551,7 +1622,7 @@ RSpec.describe Ast::Merge do
       diagnostics: raw[:diagnostics]
     )
     native_providers = suite.cases.map(&:native_provider)
-    source_span_case_count = suite.cases.count { |parity_case| parity_case.dimensions.include?("source_spans") }
+    source_span_case_count = suite.cases.count { |parity_case| parity_case.dimensions.include?('source_spans') }
 
     expect(suite.language).to eq(fixture.dig(:expected, :language))
     expect(suite.cases.length).to eq(fixture.dig(:expected, :case_count))
@@ -1560,8 +1631,9 @@ RSpec.describe Ast::Merge do
     expect(source_span_case_count).to eq(fixture.dig(:expected, :source_span_case_count))
   end
 
-  it "conforms to the slice-828 provider richness projection fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-828-provider-richness-projection", "provider-richness-projection.json"))
+  it 'conforms to the slice-828 provider richness projection fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-828-provider-richness-projection',
+                                           'provider-richness-projection.json'))
     raw = fixture[:projection]
     projection = described_class::ProviderRichnessProjection.new(
       projection_id: raw[:projection_id],
@@ -1584,8 +1656,9 @@ RSpec.describe Ast::Merge do
     expect(projection.private_metadata.key?(metadata_namespace)).to eq(true)
   end
 
-  it "conforms to the slice-829 backend gap conformance report fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-829-backend-gap-conformance-report", "backend-gap-conformance-report.json"))
+  it 'conforms to the slice-829 backend gap conformance report fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-829-backend-gap-conformance-report',
+                                           'backend-gap-conformance-report.json'))
     raw = fixture[:report]
     report = described_class::BackendGapConformanceReport.new(
       report_id: raw[:report_id],
@@ -1607,8 +1680,9 @@ RSpec.describe Ast::Merge do
     expect(report.gaps.fetch(0).diagnostic_code).to eq(fixture.dig(:expected, :first_diagnostic_code))
   end
 
-  it "conforms to the slice-901 false textual conflicts fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-901-false-textual-conflicts", "false-textual-conflicts.json"))
+  it 'conforms to the slice-901 false textual conflicts fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-901-false-textual-conflicts',
+                                           'false-textual-conflicts.json'))
     raw = fixture[:suite]
     suite = described_class::FalseTextualConflictSuite.new(
       suite_id: raw[:suite_id],
@@ -1627,8 +1701,9 @@ RSpec.describe Ast::Merge do
     expect(unresolved_conflict_count).to eq(fixture.dig(:expected, :expected_unresolved_conflict_count))
   end
 
-  it "conforms to the slice-902 git driver smoke fixtures fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-902-git-driver-smoke-fixtures", "git-driver-smoke-fixtures.json"))
+  it 'conforms to the slice-902 git driver smoke fixtures fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-902-git-driver-smoke-fixtures',
+                                           'git-driver-smoke-fixtures.json'))
     raw = fixture[:suite]
     suite = described_class::GitDriverSmokeSuite.new(
       suite_id: raw[:suite_id],
@@ -1652,8 +1727,9 @@ RSpec.describe Ast::Merge do
     expect(updated_current_file_count).to eq(fixture.dig(:expected, :updated_current_file_count))
   end
 
-  it "conforms to the slice-903 diff driver smoke fixtures fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-903-diff-driver-smoke-fixtures", "diff-driver-smoke-fixtures.json"))
+  it 'conforms to the slice-903 diff driver smoke fixtures fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-903-diff-driver-smoke-fixtures',
+                                           'diff-driver-smoke-fixtures.json'))
     raw = fixture[:suite]
     suite = described_class::DiffDriverSmokeSuite.new(
       suite_id: raw[:suite_id],
@@ -1663,7 +1739,7 @@ RSpec.describe Ast::Merge do
       diagnostics: raw[:diagnostics]
     )
     argument_counts = suite.cases.map(&:argument_count)
-    structured_diff_count = suite.cases.count { |smoke_case| smoke_case.expected_output_kind == "structured_diff" }
+    structured_diff_count = suite.cases.count { |smoke_case| smoke_case.expected_output_kind == 'structured_diff' }
 
     expect(suite.driver_name).to eq(fixture.dig(:expected, :driver_name))
     expect(suite.cases.length).to eq(fixture.dig(:expected, :case_count))
@@ -1671,8 +1747,9 @@ RSpec.describe Ast::Merge do
     expect(structured_diff_count).to eq(fixture.dig(:expected, :structured_diff_count))
   end
 
-  it "conforms to the slice-904 performance guardrails fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-904-performance-guardrails", "performance-guardrails.json"))
+  it 'conforms to the slice-904 performance guardrails fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-904-performance-guardrails',
+                                           'performance-guardrails.json'))
     raw = fixture[:guardrails]
     guardrails = described_class::PerformanceGuardrails.new(
       guardrail_id: raw[:guardrail_id],
@@ -1693,8 +1770,9 @@ RSpec.describe Ast::Merge do
     expect(guardrails.timeout_diagnostic.fallback).to eq(fixture.dig(:expected, :fallback))
   end
 
-  it "conforms to the slice-905 profile conformance reports fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-905-profile-conformance-reports", "profile-conformance-reports.json"))
+  it 'conforms to the slice-905 profile conformance reports fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-905-profile-conformance-reports',
+                                           'profile-conformance-reports.json'))
     raw = fixture[:report]
     report = described_class::ProfileConformanceReport.new(
       report_id: raw[:report_id],
@@ -1716,7 +1794,7 @@ RSpec.describe Ast::Merge do
   end
 
   def content_recipe_execution_request(recipe_name:, recipe_version:, relative_path:, provider_family:,
-    template_content:, destination_content:, steps:, provider_backend: nil, runtime_context: nil, metadata: nil)
+                                       template_content:, destination_content:, steps:, provider_backend: nil, runtime_context: nil, metadata: nil)
     request = {
       recipe_name: recipe_name.to_s,
       recipe_version: recipe_version.to_s,
@@ -1734,7 +1812,7 @@ RSpec.describe Ast::Merge do
 
   def content_recipe_execution_request_envelope(request)
     {
-      kind: "content_recipe_execution_request",
+      kind: 'content_recipe_execution_request',
       version: described_class::STRUCTURED_EDIT_TRANSPORT_VERSION,
       request: fixture_deep_dup(request)
     }
@@ -1754,7 +1832,7 @@ RSpec.describe Ast::Merge do
 
   def content_recipe_execution_report_envelope(report)
     {
-      kind: "content_recipe_execution_report",
+      kind: 'content_recipe_execution_report',
       version: described_class::STRUCTURED_EDIT_TRANSPORT_VERSION,
       report: fixture_deep_dup(report)
     }
@@ -1771,13 +1849,13 @@ RSpec.describe Ast::Merge do
   end
 
   def ruleset_fixture_paths
-    fixtures_root.join("rulesets").find.select { |path| path.file? && path.extname == ".smrules" }
+    fixtures_root.join('rulesets').find.select { |path| path.file? && path.extname == '.smrules' }
   end
 
   def repo_temp_dir
-    root = Pathname(__dir__).join("..", "..", "tmp").expand_path
+    root = Pathname(__dir__).join('..', '..', 'tmp').expand_path
     root.mkpath
-    path = root.join("ast-merge-#{Process.pid}-#{Time.now.to_f.to_s.delete(".")}")
+    path = root.join("ast-merge-#{Process.pid}-#{Time.now.to_f.to_s.delete('.')}")
     path.mkpath
     path
   end
@@ -1789,27 +1867,27 @@ RSpec.describe Ast::Merge do
   def execute_from(executions)
     lambda do |run|
       key = execution_key(run[:ref])
-      executions[key.to_sym] || executions[key] || { outcome: "failed", messages: ["missing execution"] }
+      executions[key.to_sym] || executions[key] || { outcome: 'failed', messages: ['missing execution'] }
     end
   end
 
-  it "conforms to the shared diagnostic vocabulary fixture" do
-    fixture = diagnostics_fixture("diagnostic_vocabulary")
+  it 'conforms to the shared diagnostic vocabulary fixture' do
+    fixture = diagnostics_fixture('diagnostic_vocabulary')
 
     expect(%w[info warning error]).to eq(fixture[:severities])
     expect(%w[
-      parse_error
-      destination_parse_error
-      unsupported_feature
-      fallback_applied
-      ambiguity
-      assumed_default
-      configuration_error
-      replay_rejected
-    ]).to eq(fixture[:categories])
+             parse_error
+             destination_parse_error
+             unsupported_feature
+             fallback_applied
+             ambiguity
+             assumed_default
+             configuration_error
+             replay_rejected
+           ]).to eq(fixture[:categories])
   end
 
-  it "parses shared compact ruleset fixtures" do
+  it 'parses shared compact ruleset fixtures' do
     paths = ruleset_fixture_paths
     expect(paths).not_to be_empty
 
@@ -1820,12 +1898,12 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "rejects malformed compact ruleset edges" do
+  it 'rejects malformed compact ruleset edges' do
     cases = {
-      "missing-required" => "format json\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\n",
-      "repeated-format" => "format json\nformat yaml\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\nattach layout_only\n",
-      "unknown-read" => "format json\nowners line_bound_statements\nmatch stable_path\nread imaginary\nattach layout_only\n",
-      "unknown-directive" => "format json\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\nattach layout_only\nmystery value\n"
+      'missing-required' => "format json\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\n",
+      'repeated-format' => "format json\nformat yaml\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\nattach layout_only\n",
+      'unknown-read' => "format json\nowners line_bound_statements\nmatch stable_path\nread imaginary\nattach layout_only\n",
+      'unknown-directive' => "format json\nowners line_bound_statements\nmatch stable_path\nread native_read_portable_write\nattach layout_only\nmystery value\n"
     }
 
     cases.each do |name, source|
@@ -1835,21 +1913,21 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "derives the shared compact ruleset feature profile fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-781-compact-ruleset-profile", "module-profile.json"))
+  it 'derives the shared compact ruleset feature profile fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-781-compact-ruleset-profile', 'module-profile.json'))
     ruleset = described_class.parse_compact_ruleset(fixtures_root.join(*fixture[:ruleset_path]).read)
 
     expect(ruleset[:ok]).to be(true), ruleset[:diagnostics].inspect
     expect(described_class.compact_ruleset_feature_profile(ruleset.fetch(:analysis))).to eq(fixture.fetch(:profile))
   end
 
-  it "conforms to the shared policy vocabulary and reporting fixtures" do
-    policy_fixture = diagnostics_fixture("policy_vocabulary")
-    reporting_fixture = diagnostics_fixture("policy_reporting")
+  it 'conforms to the shared policy vocabulary and reporting fixtures' do
+    policy_fixture = diagnostics_fixture('policy_vocabulary')
+    reporting_fixture = diagnostics_fixture('policy_reporting')
 
     policies = [
-      { surface: "fallback", name: "trailing_comma_destination_fallback" },
-      { surface: "array", name: "destination_wins_array" }
+      { surface: 'fallback', name: 'trailing_comma_destination_fallback' },
+      { surface: 'array', name: 'destination_wins_array' }
     ]
 
     expect(%w[fallback array]).to eq(policy_fixture[:surfaces])
@@ -1857,20 +1935,21 @@ RSpec.describe Ast::Merge do
     expect(json_ready(policies.reverse)).to eq(json_ready(reporting_fixture[:merge_policies]))
   end
 
-  it "conforms to the slice-22 shared family feature profile fixture" do
-    fixture = diagnostics_fixture("shared_family_feature_profile")
+  it 'conforms to the slice-22 shared family feature profile fixture' do
+    fixture = diagnostics_fixture('shared_family_feature_profile')
 
     feature_profile = {
-      family: "example",
+      family: 'example',
       supported_dialects: %w[alpha beta],
-      supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+      supported_policies: [{ surface: 'array', name: 'destination_wins_array' }]
     }
 
     expect(json_ready(feature_profile)).to eq(json_ready(fixture[:feature_profile]))
   end
 
-  it "conforms to the slice-908 language backend profile schema fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-908-language-backend-profile-schema", "language-backend-profile-schema.json"))
+  it 'conforms to the slice-908 language backend profile schema fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-908-language-backend-profile-schema',
+                                           'language-backend-profile-schema.json'))
     profile = fixture[:profile]
     expected = fixture[:expected]
 
@@ -1888,9 +1967,15 @@ RSpec.describe Ast::Merge do
         node_roles: profile.dig(:rules, :node_roles),
         atomic_nodes: profile.dig(:rules, :atomic_nodes).map { |rule| described_class::AtomicNodeRule.new(**rule) },
         signatures: profile.dig(:rules, :signatures).map { |rule| described_class::SignatureDefinition.new(**rule) },
-        commutative_parents: profile.dig(:rules, :commutative_parents).map { |rule| described_class::CommutativeParentDefinition.new(**rule) },
-        child_groups: profile.dig(:rules, :child_groups).map { |rule| described_class::ChildGroupDefinition.new(**rule) },
-        comment_attachment: profile.dig(:rules, :comment_attachment).map { |rule| described_class::CommentAttachmentRule.new(**rule) }
+        commutative_parents: profile.dig(:rules, :commutative_parents).map do |rule|
+          described_class::CommutativeParentDefinition.new(**rule)
+        end,
+        child_groups: profile.dig(:rules, :child_groups).map do |rule|
+          described_class::ChildGroupDefinition.new(**rule)
+        end,
+        comment_attachment: profile.dig(:rules, :comment_attachment).map do |rule|
+          described_class::CommentAttachmentRule.new(**rule)
+        end
       )
     )
 
@@ -1902,23 +1987,26 @@ RSpec.describe Ast::Merge do
     expect(contract.rules.commutative_parents.first.selector).to eq(expected[:first_commutative_parent])
   end
 
-  it "conforms to the slice-909 profile validation fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-909-profile-validation", "profile-validation.json"))
+  it 'conforms to the slice-909 profile validation fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-909-profile-validation', 'profile-validation.json'))
     expected = fixture[:expected]
 
     structural = described_class.validate_language_backend_profile(fixture[:structural_profile])
     expect(sorted_validation_messages(structural.errors)).to eq(expected[:structural_errors].sort)
 
-    exhaustive = described_class.validate_language_backend_profile(fixture[:unknown_selector_profile], fixture[:backend_metadata])
+    exhaustive = described_class.validate_language_backend_profile(fixture[:unknown_selector_profile],
+                                                                   fixture[:backend_metadata])
     expect(sorted_validation_messages(exhaustive.errors)).to eq(expected[:exhaustive_backend_errors].sort)
 
-    partial = described_class.validate_language_backend_profile(fixture[:unknown_selector_profile], fixture[:partial_backend_metadata])
+    partial = described_class.validate_language_backend_profile(fixture[:unknown_selector_profile],
+                                                                fixture[:partial_backend_metadata])
     expect(partial.errors).to be_empty
     expect(sorted_validation_messages(partial.warnings)).to eq(expected[:partial_backend_warnings].sort)
   end
 
-  it "conforms to the slice-910 active profile reporting fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-910-active-profile-reporting", "active-profile-reporting.json"))
+  it 'conforms to the slice-910 active profile reporting fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-910-active-profile-reporting',
+                                           'active-profile-reporting.json'))
     expected = fixture[:expected]
     active_profile = fixture[:active_profile]
 
@@ -1943,8 +2031,9 @@ RSpec.describe Ast::Merge do
     expect(debug_output.active_profile.profile_id).to eq(expected[:profile_id])
   end
 
-  it "conforms to the slice-911 profile promotion report fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-911-profile-promotion-report", "profile-promotion-report.json"))
+  it 'conforms to the slice-911 profile promotion report fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-911-profile-promotion-report',
+                                           'profile-promotion-report.json'))
     expected = fixture[:expected]
     report_fixture = fixture[:report]
     blocked_fixture = fixture[:blocked_report]
@@ -1962,17 +2051,22 @@ RSpec.describe Ast::Merge do
     expect(blocked.blocking_reasons.length).to eq(expected[:blocking_reason_count])
   end
 
-  it "conforms to the slice-912 profile promotion policy fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-912-profile-promotion-policy", "profile-promotion-policy.json"))
+  it 'conforms to the slice-912 profile promotion policy fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-912-profile-promotion-policy',
+                                           'profile-promotion-policy.json'))
     expected = fixture[:expected]
     policy_fixture = fixture[:policy]
     policy = promotion_policy_contract(policy_fixture)
 
-    recommended_eligible = policy.profiles.count { |entry| entry.eligible_statuses.include?("recommended") }
-    default_eligible = policy.profiles.count { |entry| entry.eligible_statuses.include?("default") }
-    source_subprofiles = policy.profiles.count { |entry| entry.scope == "source_subprofile" }
-    json_policy = policy.profiles.find { |entry| entry.profile_id == described_class::PROMOTION_PROFILE_JSON_KEYED_OBJECT }
-    ruby_policy = policy.profiles.find { |entry| entry.profile_id == described_class::PROMOTION_PROFILE_RUBY_GEMSPEC_DEPENDENCY_DECLARATIONS }
+    recommended_eligible = policy.profiles.count { |entry| entry.eligible_statuses.include?('recommended') }
+    default_eligible = policy.profiles.count { |entry| entry.eligible_statuses.include?('default') }
+    source_subprofiles = policy.profiles.count { |entry| entry.scope == 'source_subprofile' }
+    json_policy = policy.profiles.find do |entry|
+      entry.profile_id == described_class::PROMOTION_PROFILE_JSON_KEYED_OBJECT
+    end
+    ruby_policy = policy.profiles.find do |entry|
+      entry.profile_id == described_class::PROMOTION_PROFILE_RUBY_GEMSPEC_DEPENDENCY_DECLARATIONS
+    end
 
     expect(policy.policy_id).to eq(expected[:policy_id])
     expect(policy.profiles.length).to eq(expected[:profile_count])
@@ -1986,8 +2080,9 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.initial_profile_promotion_policy)).to eq(json_ready(policy))
   end
 
-  it "conforms to the slice-913 profile promotion evaluation fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-913-profile-promotion-evaluation", "profile-promotion-evaluation.json"))
+  it 'conforms to the slice-913 profile promotion evaluation fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-913-profile-promotion-evaluation',
+                                           'profile-promotion-evaluation.json'))
     expected = fixture[:expected]
     policy = promotion_policy_contract(fixture[:policy])
     recommended_report = promotion_report_contract(fixture[:recommended_report])
@@ -2002,13 +2097,14 @@ RSpec.describe Ast::Merge do
     expect(blocked.blocking_reasons.length).to eq(expected[:blocked_blocking_reason_count])
     expect(blocked.blocking_reasons.first).to eq(expected[:first_blocking_reason])
 
-    unknown_report = promotion_report_contract(fixture[:recommended_report].merge(profile_id: "unknown.profile"))
+    unknown_report = promotion_report_contract(fixture[:recommended_report].merge(profile_id: 'unknown.profile'))
     unknown = described_class.evaluate_profile_promotion(policy, unknown_report)
     expect(unknown.status).to eq(expected[:unknown_profile_status])
   end
 
-  it "conforms to the slice-914 profile selection enforcement fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-914-profile-selection-enforcement", "profile-selection-enforcement.json"))
+  it 'conforms to the slice-914 profile selection enforcement fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-914-profile-selection-enforcement',
+                                           'profile-selection-enforcement.json'))
     expected = fixture[:expected]
     active_profile = active_profile_contract(fixture[:active_profile])
     available_evaluation = promotion_evaluation_contract(fixture[:available_evaluation])
@@ -2017,20 +2113,23 @@ RSpec.describe Ast::Merge do
     required_requirement = profile_selection_requirement_contract(fixture[:required_requirement])
     satisfied_requirement = profile_selection_requirement_contract(fixture[:satisfied_requirement])
 
-    advisory = described_class.evaluate_profile_selection_requirement(advisory_requirement, active_profile, available_evaluation)
+    advisory = described_class.evaluate_profile_selection_requirement(advisory_requirement, active_profile,
+                                                                      available_evaluation)
     expect(advisory.allowed).to eq(expected[:advisory_allowed])
     expect(advisory.satisfied).to eq(expected[:advisory_satisfied])
     expect(advisory.enforced).to eq(expected[:advisory_enforced])
     expect(advisory.rejection_code).to eq(expected[:advisory_rejection_code])
 
-    required = described_class.evaluate_profile_selection_requirement(required_requirement, active_profile, available_evaluation)
+    required = described_class.evaluate_profile_selection_requirement(required_requirement, active_profile,
+                                                                      available_evaluation)
     expect(required.allowed).to eq(expected[:required_allowed])
     expect(required.satisfied).to eq(expected[:required_satisfied])
     expect(required.enforced).to eq(expected[:required_enforced])
     expect(required.rejection_code).to eq(expected[:required_rejection_code])
     expect(required.blocking_reasons.first).to eq(expected[:required_first_blocking_reason])
 
-    satisfied = described_class.evaluate_profile_selection_requirement(satisfied_requirement, active_profile, recommended_evaluation)
+    satisfied = described_class.evaluate_profile_selection_requirement(satisfied_requirement, active_profile,
+                                                                       recommended_evaluation)
     expect(satisfied.allowed).to eq(expected[:satisfied_allowed])
     expect(satisfied.satisfied).to eq(expected[:satisfied_satisfied])
     expect(satisfied.enforced).to eq(expected[:satisfied_enforced])
@@ -2038,8 +2137,8 @@ RSpec.describe Ast::Merge do
     expect(satisfied.blocking_reasons).to be_empty
   end
 
-  it "conforms to the template source path mapping fixture" do
-    fixture = diagnostics_fixture("template_source_path_mapping")
+  it 'conforms to the template source path mapping fixture' do
+    fixture = diagnostics_fixture('template_source_path_mapping')
 
     fixture[:cases].each do |test_case|
       expect(described_class.normalize_template_source_path(test_case[:template_source_path])).to eq(
@@ -2048,8 +2147,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template target classification fixture" do
-    fixture = diagnostics_fixture("template_target_classification")
+  it 'conforms to the template target classification fixture' do
+    fixture = diagnostics_fixture('template_target_classification')
 
     fixture[:cases].each do |test_case|
       expect(json_ready(described_class.classify_template_target_path(test_case[:destination_path]))).to eq(
@@ -2058,8 +2157,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template destination mapping fixture" do
-    fixture = diagnostics_fixture("template_destination_mapping")
+  it 'conforms to the template destination mapping fixture' do
+    fixture = diagnostics_fixture('template_destination_mapping')
 
     fixture[:cases].each do |test_case|
       expect(
@@ -2071,8 +2170,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template strategy selection fixture" do
-    fixture = diagnostics_fixture("template_strategy_selection")
+  it 'conforms to the template strategy selection fixture' do
+    fixture = diagnostics_fixture('template_strategy_selection')
 
     fixture[:cases].each do |test_case|
       expect(
@@ -2085,8 +2184,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template token keys fixture" do
-    fixture = diagnostics_fixture("template_token_keys")
+  it 'conforms to the template token keys fixture' do
+    fixture = diagnostics_fixture('template_token_keys')
 
     fixture[:cases].each do |test_case|
       expect(
@@ -2098,8 +2197,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template entry plan fixture" do
-    fixture = diagnostics_fixture("template_entry_plan")
+  it 'conforms to the template entry plan fixture' do
+    fixture = diagnostics_fixture('template_entry_plan')
 
     expect(
       json_ready(
@@ -2113,8 +2212,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "conforms to the template entry token state fixture" do
-    fixture = diagnostics_fixture("template_entry_token_state")
+  it 'conforms to the template entry token state fixture' do
+    fixture = diagnostics_fixture('template_entry_token_state')
 
     expect(
       json_ready(
@@ -2127,8 +2226,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "conforms to the template entry prepared content fixture" do
-    fixture = diagnostics_fixture("template_entry_prepared_content")
+  it 'conforms to the template entry prepared content fixture' do
+    fixture = diagnostics_fixture('template_entry_prepared_content')
 
     expect(
       json_ready(
@@ -2141,8 +2240,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "conforms to the template execution plan fixture" do
-    fixture = diagnostics_fixture("template_execution_plan")
+  it 'conforms to the template execution plan fixture' do
+    fixture = diagnostics_fixture('template_execution_plan')
 
     expect(
       json_ready(
@@ -2154,12 +2253,12 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "conforms to the mini template tree plan fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_plan")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree plan fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_plan')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     expect(
       json_ready(
@@ -2177,13 +2276,13 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "conforms to the mini template tree preview fixture" do
-    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
-    preview_fixture = diagnostics_fixture("mini_template_tree_preview")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree preview fixture' do
+    plan_fixture = diagnostics_fixture('mini_template_tree_plan')
+    preview_fixture = diagnostics_fixture('mini_template_tree_preview')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     execution_plan = described_class.plan_template_tree_execution(
       template_contents.keys.sort,
@@ -2201,13 +2300,13 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it "conforms to the mini template tree apply fixture" do
-    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
-    apply_fixture = diagnostics_fixture("mini_template_tree_apply")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree apply fixture' do
+    plan_fixture = diagnostics_fixture('mini_template_tree_plan')
+    apply_fixture = diagnostics_fixture('mini_template_tree_apply')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     execution_plan = described_class.plan_template_tree_execution(
       template_contents.keys.sort,
@@ -2221,21 +2320,21 @@ RSpec.describe Ast::Merge do
     )
 
     apply_result = described_class.apply_template_execution(execution_plan) do |entry|
-      destination_path = entry[:destination_path] || entry["destination_path"]
+      destination_path = entry[:destination_path] || entry['destination_path']
       apply_fixture[:merge_results][destination_path] || apply_fixture[:merge_results][destination_path.to_sym]
     end
 
     expect(json_ready(apply_result)).to eq(json_ready(apply_fixture[:expected_result]))
   end
 
-  it "conforms to the mini template tree convergence fixture" do
-    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
-    apply_fixture = diagnostics_fixture("mini_template_tree_apply")
-    convergence_fixture = diagnostics_fixture("mini_template_tree_convergence")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree convergence fixture' do
+    plan_fixture = diagnostics_fixture('mini_template_tree_plan')
+    apply_fixture = diagnostics_fixture('mini_template_tree_apply')
+    convergence_fixture = diagnostics_fixture('mini_template_tree_convergence')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     execution_plan = described_class.plan_template_tree_execution(
       template_contents.keys.sort,
@@ -2248,7 +2347,7 @@ RSpec.describe Ast::Merge do
       plan_fixture[:replacements]
     )
     apply_result = described_class.apply_template_execution(execution_plan) do |entry|
-      destination_path = entry[:destination_path] || entry["destination_path"]
+      destination_path = entry[:destination_path] || entry['destination_path']
       apply_fixture[:merge_results][destination_path] || apply_fixture[:merge_results][destination_path.to_sym]
     end
 
@@ -2267,13 +2366,13 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(convergence_fixture[:expected]))
   end
 
-  it "conforms to the mini template tree run fixture" do
-    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
-    run_fixture = diagnostics_fixture("mini_template_tree_run")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree run fixture' do
+    plan_fixture = diagnostics_fixture('mini_template_tree_plan')
+    run_fixture = diagnostics_fixture('mini_template_tree_run')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     run_result = described_class.run_template_tree_execution(
       template_contents.keys.sort,
@@ -2284,21 +2383,21 @@ RSpec.describe Ast::Merge do
       plan_fixture[:overrides],
       plan_fixture[:replacements]
     ) do |entry|
-      destination_path = entry[:destination_path] || entry["destination_path"]
+      destination_path = entry[:destination_path] || entry['destination_path']
       run_fixture[:merge_results][destination_path] || run_fixture[:merge_results][destination_path.to_sym]
     end
 
     expect(json_ready(run_result)).to eq(json_ready(run_fixture[:expected]))
   end
 
-  it "conforms to the mini template tree run report fixture" do
-    plan_fixture = diagnostics_fixture("mini_template_tree_plan")
-    run_fixture = diagnostics_fixture("mini_template_tree_run")
-    report_fixture = diagnostics_fixture("mini_template_tree_run_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_plan")
+  it 'conforms to the mini template tree run report fixture' do
+    plan_fixture = diagnostics_fixture('mini_template_tree_plan')
+    run_fixture = diagnostics_fixture('mini_template_tree_run')
+    report_fixture = diagnostics_fixture('mini_template_tree_run_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics', 'mini_template_tree_plan')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     run_result = described_class.run_template_tree_execution(
       template_contents.keys.sort,
@@ -2309,19 +2408,20 @@ RSpec.describe Ast::Merge do
       plan_fixture[:overrides],
       plan_fixture[:replacements]
     ) do |entry|
-      destination_path = entry[:destination_path] || entry["destination_path"]
+      destination_path = entry[:destination_path] || entry['destination_path']
       run_fixture[:merge_results][destination_path] || run_fixture[:merge_results][destination_path.to_sym]
     end
 
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(report_fixture[:expected]))
   end
 
-  it "conforms to the mini template tree family merge callback fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_family_merge_callback")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_family_merge_callback")
+  it 'conforms to the mini template tree family merge callback fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_family_merge_callback')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_family_merge_callback')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     run_result = described_class.run_template_tree_execution(
       template_contents.keys.sort,
@@ -2332,18 +2432,19 @@ RSpec.describe Ast::Merge do
       fixture[:overrides],
       fixture[:replacements]
     ) do |entry|
-      family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+      family = entry.dig(:classification, :family) || entry.dig('classification', 'family')
       case family
-      when "markdown"
+      when 'markdown'
         Markdown::Merge.merge_markdown(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "markdown"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'markdown'
         )
       else
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing family merge adapter for #{family}" }],
+          diagnostics: [{ severity: 'error', category: 'configuration_error',
+                          message: "missing family merge adapter for #{family}" }],
           policies: []
         }
       end
@@ -2352,12 +2453,13 @@ RSpec.describe Ast::Merge do
     expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the mini template tree multi-family merge callback fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_multi_family_merge_callback")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_multi_family_merge_callback")
+  it 'conforms to the mini template tree multi-family merge callback fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_multi_family_merge_callback')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_multi_family_merge_callback')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     run_result = described_class.run_template_tree_execution(
       template_contents.keys.sort,
@@ -2368,30 +2470,31 @@ RSpec.describe Ast::Merge do
       fixture[:overrides],
       fixture[:replacements]
     ) do |entry|
-      family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+      family = entry.dig(:classification, :family) || entry.dig('classification', 'family')
       case family
-      when "markdown"
+      when 'markdown'
         Markdown::Merge.merge_markdown(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "markdown"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'markdown'
         )
-      when "toml"
+      when 'toml'
         Toml::Merge.merge_toml(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "toml"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'toml'
         )
-      when "ruby"
+      when 'ruby'
         Ruby::Merge.merge_ruby(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "ruby"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'ruby'
         )
       else
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing family merge adapter for #{family}" }],
+          diagnostics: [{ severity: 'error', category: 'configuration_error',
+                          message: "missing family merge adapter for #{family}" }],
           policies: []
         }
       end
@@ -2400,13 +2503,14 @@ RSpec.describe Ast::Merge do
     expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the mini template tree multi-family run report fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_multi_family_merge_callback")
-    report_fixture = diagnostics_fixture("mini_template_tree_multi_family_run_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_multi_family_merge_callback")
+  it 'conforms to the mini template tree multi-family run report fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_multi_family_merge_callback')
+    report_fixture = diagnostics_fixture('mini_template_tree_multi_family_run_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_multi_family_merge_callback')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
-    template_contents = read_relative_file_tree(fixture_dir.join("template"))
-    destination_contents = read_relative_file_tree(fixture_dir.join("destination"))
+    template_contents = read_relative_file_tree(fixture_dir.join('template'))
+    destination_contents = read_relative_file_tree(fixture_dir.join('destination'))
 
     run_result = described_class.run_template_tree_execution(
       template_contents.keys.sort,
@@ -2417,30 +2521,31 @@ RSpec.describe Ast::Merge do
       fixture[:overrides],
       fixture[:replacements]
     ) do |entry|
-      family = entry.dig(:classification, :family) || entry.dig("classification", "family")
+      family = entry.dig(:classification, :family) || entry.dig('classification', 'family')
       case family
-      when "markdown"
+      when 'markdown'
         Markdown::Merge.merge_markdown(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "markdown"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'markdown'
         )
-      when "toml"
+      when 'toml'
         Toml::Merge.merge_toml(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "toml"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'toml'
         )
-      when "ruby"
+      when 'ruby'
         Ruby::Merge.merge_ruby(
-          entry[:prepared_template_content] || entry["prepared_template_content"],
-          entry[:destination_content] || entry["destination_content"],
-          "ruby"
+          entry[:prepared_template_content] || entry['prepared_template_content'],
+          entry[:destination_content] || entry['destination_content'],
+          'ruby'
         )
       else
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "configuration_error", message: "missing family merge adapter for #{family}" }],
+          diagnostics: [{ severity: 'error', category: 'configuration_error',
+                          message: "missing family merge adapter for #{family}" }],
           policies: []
         }
       end
@@ -2449,30 +2554,31 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(report_fixture[:expected]))
   end
 
-  it "conforms to the mini template tree directory run report fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_directory_run_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_run_report")
+  it 'conforms to the mini template tree directory run report fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_directory_run_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_directory_run_report')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
 
     run_result = described_class.run_template_tree_execution_from_directories(
-      fixture_dir.join("template"),
-      fixture_dir.join("destination"),
+      fixture_dir.join('template'),
+      fixture_dir.join('destination'),
       fixture[:context],
       fixture[:default_strategy],
       fixture[:overrides],
       fixture[:replacements]
     ) do |entry|
       case entry[:classification][:family]
-      when "markdown"
-        Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-      when "toml"
-        Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-      when "ruby"
-        Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+      when 'markdown'
+        Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+      when 'toml'
+        Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+      when 'ruby'
+        Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
       else
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "configuration_error",
+          diagnostics: [{ severity: 'error', category: 'configuration_error',
                           message: "missing family merge adapter for #{entry[:classification][:family]}" }]
         }
       end
@@ -2481,18 +2587,20 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the mini template tree directory apply convergence fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_directory_apply_convergence")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_apply_convergence")
+  it 'conforms to the mini template tree directory apply convergence fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_directory_apply_convergence')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_directory_apply_convergence')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
     temp_dir = repo_temp_dir
-    destination_root = temp_dir.join("destination")
+    destination_root = temp_dir.join('destination')
 
     begin
-      described_class.write_relative_file_tree(destination_root, read_relative_file_tree(fixture_dir.join("destination")))
+      described_class.write_relative_file_tree(destination_root,
+                                               read_relative_file_tree(fixture_dir.join('destination')))
 
       first_run = described_class.apply_template_tree_execution_to_directory(
-        fixture_dir.join("template"),
+        fixture_dir.join('template'),
         destination_root,
         fixture[:context],
         fixture[:default_strategy],
@@ -2500,16 +2608,16 @@ RSpec.describe Ast::Merge do
         fixture[:replacements]
       ) do |entry|
         case entry[:classification][:family]
-        when "markdown"
-          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-        when "toml"
-          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-        when "ruby"
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        when 'markdown'
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+        when 'toml'
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+        when 'ruby'
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
         else
           {
             ok: false,
-            diagnostics: [{ severity: "error", category: "configuration_error",
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
                             message: "missing family merge adapter for #{entry[:classification][:family]}" }]
           }
         end
@@ -2523,7 +2631,7 @@ RSpec.describe Ast::Merge do
       )
 
       second_run = described_class.apply_template_tree_execution_to_directory(
-        fixture_dir.join("template"),
+        fixture_dir.join('template'),
         destination_root,
         fixture[:context],
         fixture[:default_strategy],
@@ -2531,16 +2639,16 @@ RSpec.describe Ast::Merge do
         fixture[:replacements]
       ) do |entry|
         case entry[:classification][:family]
-        when "markdown"
-          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-        when "toml"
-          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-        when "ruby"
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        when 'markdown'
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+        when 'toml'
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+        when 'ruby'
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
         else
           {
             ok: false,
-            diagnostics: [{ severity: "error", category: "configuration_error",
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
                             message: "missing family merge adapter for #{entry[:classification][:family]}" }]
           }
         end
@@ -2554,18 +2662,20 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the mini template tree directory apply report fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_directory_apply_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_apply_report")
+  it 'conforms to the mini template tree directory apply report fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_directory_apply_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_directory_apply_report')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
     temp_dir = repo_temp_dir
-    destination_root = temp_dir.join("destination")
+    destination_root = temp_dir.join('destination')
 
     begin
-      described_class.write_relative_file_tree(destination_root, read_relative_file_tree(fixture_dir.join("destination")))
+      described_class.write_relative_file_tree(destination_root,
+                                               read_relative_file_tree(fixture_dir.join('destination')))
 
       first_run = described_class.apply_template_tree_execution_to_directory(
-        fixture_dir.join("template"),
+        fixture_dir.join('template'),
         destination_root,
         fixture[:context],
         fixture[:default_strategy],
@@ -2573,16 +2683,16 @@ RSpec.describe Ast::Merge do
         fixture[:replacements]
       ) do |entry|
         case entry[:classification][:family]
-        when "markdown"
-          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-        when "toml"
-          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-        when "ruby"
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        when 'markdown'
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+        when 'toml'
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+        when 'ruby'
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
         else
           {
             ok: false,
-            diagnostics: [{ severity: "error", category: "configuration_error",
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
                             message: "missing family merge adapter for #{entry[:classification][:family]}" }]
           }
         end
@@ -2593,7 +2703,7 @@ RSpec.describe Ast::Merge do
       )
 
       second_run = described_class.apply_template_tree_execution_to_directory(
-        fixture_dir.join("template"),
+        fixture_dir.join('template'),
         destination_root,
         fixture[:context],
         fixture[:default_strategy],
@@ -2601,16 +2711,16 @@ RSpec.describe Ast::Merge do
         fixture[:replacements]
       ) do |entry|
         case entry[:classification][:family]
-        when "markdown"
-          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-        when "toml"
-          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-        when "ruby"
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        when 'markdown'
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+        when 'toml'
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+        when 'ruby'
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
         else
           {
             ok: false,
-            diagnostics: [{ severity: "error", category: "configuration_error",
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
                             message: "missing family merge adapter for #{entry[:classification][:family]}" }]
           }
         end
@@ -2624,14 +2734,15 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the mini template tree directory plan report fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_directory_plan_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_plan_report")
+  it 'conforms to the mini template tree directory plan report fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_directory_plan_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_directory_plan_report')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
 
     execution_plan = described_class.plan_template_tree_execution_from_directories(
-      fixture_dir.join("template"),
-      fixture_dir.join("destination"),
+      fixture_dir.join('template'),
+      fixture_dir.join('destination'),
       fixture[:context],
       fixture[:default_strategy],
       fixture[:overrides],
@@ -2643,14 +2754,15 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it "conforms to the mini template tree directory runner report fixture" do
-    fixture = diagnostics_fixture("mini_template_tree_directory_runner_report")
-    fixture_path = described_class.conformance_fixture_path(manifest, "diagnostics", "mini_template_tree_directory_runner_report")
+  it 'conforms to the mini template tree directory runner report fixture' do
+    fixture = diagnostics_fixture('mini_template_tree_directory_runner_report')
+    fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
+                                                            'mini_template_tree_directory_runner_report')
     fixture_dir = fixtures_root.join(*fixture_path[0...-1])
 
     dry_run_plan = described_class.plan_template_tree_execution_from_directories(
-      fixture_dir.join("dry-run", "template"),
-      fixture_dir.join("dry-run", "destination"),
+      fixture_dir.join('dry-run', 'template'),
+      fixture_dir.join('dry-run', 'destination'),
       fixture.dig(:dry_run, :context),
       fixture.dig(:dry_run, :default_strategy),
       fixture.dig(:dry_run, :overrides),
@@ -2661,15 +2773,15 @@ RSpec.describe Ast::Merge do
     )
 
     temp_dir = repo_temp_dir
-    destination_root = temp_dir.join("destination")
+    destination_root = temp_dir.join('destination')
     begin
       described_class.write_relative_file_tree(
         destination_root,
-        read_relative_file_tree(fixture_dir.join("apply-run", "destination"))
+        read_relative_file_tree(fixture_dir.join('apply-run', 'destination'))
       )
 
       apply_plan = described_class.plan_template_tree_execution_from_directories(
-        fixture_dir.join("apply-run", "template"),
+        fixture_dir.join('apply-run', 'template'),
         destination_root,
         fixture.dig(:apply_run, :context),
         fixture.dig(:apply_run, :default_strategy),
@@ -2677,7 +2789,7 @@ RSpec.describe Ast::Merge do
         fixture.dig(:apply_run, :replacements)
       )
       apply_run = described_class.apply_template_tree_execution_to_directory(
-        fixture_dir.join("apply-run", "template"),
+        fixture_dir.join('apply-run', 'template'),
         destination_root,
         fixture.dig(:apply_run, :context),
         fixture.dig(:apply_run, :default_strategy),
@@ -2685,16 +2797,16 @@ RSpec.describe Ast::Merge do
         fixture.dig(:apply_run, :replacements)
       ) do |entry|
         case entry[:classification][:family]
-        when "markdown"
-          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], "markdown")
-        when "toml"
-          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], "toml")
-        when "ruby"
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], "ruby")
+        when 'markdown'
+          Markdown::Merge.merge_markdown(entry[:prepared_template_content], entry[:destination_content], 'markdown')
+        when 'toml'
+          Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
+        when 'ruby'
+          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
         else
           {
             ok: false,
-            diagnostics: [{ severity: "error", category: "configuration_error",
+            diagnostics: [{ severity: 'error', category: 'configuration_error',
                             message: "missing family merge adapter for #{entry[:classification][:family]}" }]
           }
         end
@@ -2708,8 +2820,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the template entry plan state fixture" do
-    fixture = diagnostics_fixture("template_entry_plan_state")
+  it 'conforms to the template entry plan state fixture' do
+    fixture = diagnostics_fixture('template_entry_plan_state')
 
     expect(
       json_ready(
@@ -2721,27 +2833,27 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_entries]))
   end
 
-  it "resolves canonical manifest paths, including widened source-family entries" do
-    expect(described_class.conformance_family_feature_profile_path(manifest, "json")).to eq(
+  it 'resolves canonical manifest paths, including widened source-family entries' do
+    expect(described_class.conformance_family_feature_profile_path(manifest, 'json')).to eq(
       %w[diagnostics slice-21-family-feature-profile json-feature-profile.json]
     )
-    expect(described_class.conformance_fixture_path(manifest, "text", "analysis")).to eq(
+    expect(described_class.conformance_fixture_path(manifest, 'text', 'analysis')).to eq(
       %w[text slice-03-analysis whitespace-and-blocks.json]
     )
-    expect(described_class.conformance_family_feature_profile_path(manifest, "typescript")).to eq(
+    expect(described_class.conformance_family_feature_profile_path(manifest, 'typescript')).to eq(
       %w[diagnostics slice-101-typescript-family-feature-profile typescript-feature-profile.json]
     )
-    expect(described_class.conformance_fixture_path(manifest, "go", "analysis")).to eq(
+    expect(described_class.conformance_fixture_path(manifest, 'go', 'analysis')).to eq(
       %w[go slice-110-analysis module-owners.json]
     )
   end
 
-  it "conforms to the runner shape and summary fixtures" do
-    runner_fixture = diagnostics_fixture("runner_shape")
-    summary_fixture = diagnostics_fixture("runner_summary")
+  it 'conforms to the runner shape and summary fixtures' do
+    runner_fixture = diagnostics_fixture('runner_shape')
+    summary_fixture = diagnostics_fixture('runner_summary')
 
-    case_ref = { family: "json", role: "tree_sitter_adapter", case: "valid_strict_json" }
-    result = { ref: case_ref, outcome: "passed", messages: [] }
+    case_ref = { family: 'json', role: 'tree_sitter_adapter', case: 'valid_strict_json' }
+    result = { ref: case_ref, outcome: 'passed', messages: [] }
 
     expect(json_ready(case_ref)).to eq(json_ready(runner_fixture[:case_ref]))
     expect(json_ready(result)).to eq(json_ready(runner_fixture[:result]))
@@ -2750,7 +2862,7 @@ RSpec.describe Ast::Merge do
     expect(json_ready(summary)).to eq(json_ready(summary_fixture[:summary]))
   end
 
-  it "conforms to the selection fixtures" do
+  it 'conforms to the selection fixtures' do
     %w[capability_selection backend_selection].each do |role|
       fixture = diagnostics_fixture(role)
 
@@ -2766,27 +2878,28 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the case and suite runner fixtures" do
-    case_fixture = diagnostics_fixture("case_runner")
-    suite_fixture = diagnostics_fixture("suite_runner")
+  it 'conforms to the case and suite runner fixtures' do
+    case_fixture = diagnostics_fixture('case_runner')
+    suite_fixture = diagnostics_fixture('suite_runner')
 
     case_fixture[:cases].each do |test_case|
       result = described_class.run_conformance_case(test_case[:run], &->(_run) { test_case[:execution] })
       expect(json_ready(result)).to eq(json_ready(test_case[:expected]))
     end
 
-    suite_results = described_class.run_conformance_suite(suite_fixture[:cases], &execute_from(suite_fixture[:executions]))
+    suite_results = described_class.run_conformance_suite(suite_fixture[:cases],
+                                                          &execute_from(suite_fixture[:executions]))
     expect(json_ready(suite_results)).to eq(json_ready(suite_fixture[:expected_results]))
   end
 
-  it "conforms to the suite plan and report fixtures" do
-    suite_plan_fixture = diagnostics_fixture("suite_plan")
-    planned_runner_fixture = diagnostics_fixture("planned_suite_runner")
-    planned_report_fixture = diagnostics_fixture("planned_suite_report")
-    suite_report_fixture = diagnostics_fixture("suite_report")
-    manifest_requirements_fixture = diagnostics_fixture("manifest_requirements")
-    backend_requirements_fixture = diagnostics_fixture("manifest_backend_requirements")
-    backend_report_fixture = diagnostics_fixture("manifest_backend_report")
+  it 'conforms to the suite plan and report fixtures' do
+    suite_plan_fixture = diagnostics_fixture('suite_plan')
+    planned_runner_fixture = diagnostics_fixture('planned_suite_runner')
+    planned_report_fixture = diagnostics_fixture('planned_suite_report')
+    suite_report_fixture = diagnostics_fixture('suite_report')
+    manifest_requirements_fixture = diagnostics_fixture('manifest_requirements')
+    backend_requirements_fixture = diagnostics_fixture('manifest_backend_requirements')
+    backend_report_fixture = diagnostics_fixture('manifest_backend_report')
 
     plan = described_class.plan_conformance_suite(
       manifest,
@@ -2797,10 +2910,12 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(plan)).to eq(json_ready(suite_plan_fixture[:expected]))
 
-    planned_results = described_class.run_planned_conformance_suite(planned_runner_fixture[:plan], &execute_from(planned_runner_fixture[:executions]))
+    planned_results = described_class.run_planned_conformance_suite(planned_runner_fixture[:plan],
+                                                                    &execute_from(planned_runner_fixture[:executions]))
     expect(json_ready(planned_results)).to eq(json_ready(planned_runner_fixture[:expected_results]))
 
-    report = described_class.report_planned_conformance_suite(planned_report_fixture[:plan], &execute_from(planned_report_fixture[:executions]))
+    report = described_class.report_planned_conformance_suite(planned_report_fixture[:plan],
+                                                              &execute_from(planned_report_fixture[:executions]))
     expect(json_ready(report)).to eq(json_ready(planned_report_fixture[:expected_report]))
 
     suite_report = described_class.report_conformance_suite(suite_report_fixture[:results])
@@ -2832,30 +2947,31 @@ RSpec.describe Ast::Merge do
         backend_report_fixture[:family_profile],
         backend_report_fixture[:feature_profile]
       ) : {},
-      &->(_run) { { outcome: "failed", messages: ["unexpected execution"] } }
+      &->(_run) { { outcome: 'failed', messages: ['unexpected execution'] } }
     )
     expect(json_ready(backend_report)).to eq(json_ready(backend_report_fixture[:expected_report]))
   end
 
-  it "conforms to named suite planning and reporting fixtures" do
-    suite_definitions_fixture = diagnostics_fixture("suite_definitions")
-    named_suite_report_fixture = diagnostics_fixture("named_suite_report")
-    named_suite_runner_fixture = diagnostics_fixture("named_suite_runner")
-    suite_names_fixture = diagnostics_fixture("suite_names")
-    named_suite_entry_fixture = diagnostics_fixture("named_suite_entry")
-    named_suite_plan_entry_fixture = diagnostics_fixture("named_suite_plan_entry")
-    family_plan_context_fixture = diagnostics_fixture("family_plan_context")
-    named_suite_plans_fixture = diagnostics_fixture("named_suite_plans")
-    named_suite_results_fixture = diagnostics_fixture("named_suite_results")
-    named_suite_runner_entries_fixture = diagnostics_fixture("named_suite_runner_entries")
-    named_suite_report_entries_fixture = diagnostics_fixture("named_suite_report_entries")
-    named_suite_summary_fixture = diagnostics_fixture("named_suite_summary")
-    named_suite_report_envelope_fixture = diagnostics_fixture("named_suite_report_envelope")
-    named_suite_report_manifest_fixture = diagnostics_fixture("named_suite_report_manifest")
+  it 'conforms to named suite planning and reporting fixtures' do
+    suite_definitions_fixture = diagnostics_fixture('suite_definitions')
+    named_suite_report_fixture = diagnostics_fixture('named_suite_report')
+    named_suite_runner_fixture = diagnostics_fixture('named_suite_runner')
+    suite_names_fixture = diagnostics_fixture('suite_names')
+    named_suite_entry_fixture = diagnostics_fixture('named_suite_entry')
+    named_suite_plan_entry_fixture = diagnostics_fixture('named_suite_plan_entry')
+    family_plan_context_fixture = diagnostics_fixture('family_plan_context')
+    named_suite_plans_fixture = diagnostics_fixture('named_suite_plans')
+    named_suite_results_fixture = diagnostics_fixture('named_suite_results')
+    named_suite_runner_entries_fixture = diagnostics_fixture('named_suite_runner_entries')
+    named_suite_report_entries_fixture = diagnostics_fixture('named_suite_report_entries')
+    named_suite_summary_fixture = diagnostics_fixture('named_suite_summary')
+    named_suite_report_envelope_fixture = diagnostics_fixture('named_suite_report_envelope')
+    named_suite_report_manifest_fixture = diagnostics_fixture('named_suite_report_manifest')
 
-    expect(json_ready(described_class.conformance_suite_definition(manifest, suite_definitions_fixture[:suite_selector]))).to eq(
-      json_ready(suite_definitions_fixture[:expected])
-    )
+    expect(json_ready(described_class.conformance_suite_definition(manifest,
+                                                                   suite_definitions_fixture[:suite_selector]))).to eq(
+                                                                     json_ready(suite_definitions_fixture[:expected])
+                                                                   )
     expect(json_ready(described_class.conformance_suite_selectors(manifest))).to eq(json_ready(suite_names_fixture[:suite_selectors]))
     expect(json_ready(named_suite_plan_entry_fixture[:context])).to eq(json_ready(family_plan_context_fixture[:context]))
 
@@ -2864,9 +2980,9 @@ RSpec.describe Ast::Merge do
       named_suite_entry_fixture[:suite_selector],
       named_suite_entry_fixture[:family_profile],
       {
-        backend: "kreuzberg-language-pack",
+        backend: 'kreuzberg-language-pack',
         supports_dialects: false,
-        supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+        supported_policies: [{ surface: 'array', name: 'destination_wins_array' }]
       },
       &execute_from(named_suite_entry_fixture[:executions])
     )
@@ -2877,9 +2993,9 @@ RSpec.describe Ast::Merge do
       named_suite_runner_fixture[:suite_selector],
       named_suite_runner_fixture[:family_profile],
       {
-        backend: "kreuzberg-language-pack",
+        backend: 'kreuzberg-language-pack',
         supports_dialects: false,
-        supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+        supported_policies: [{ surface: 'array', name: 'destination_wins_array' }]
       },
       &execute_from(named_suite_runner_fixture[:executions])
     )
@@ -2903,9 +3019,9 @@ RSpec.describe Ast::Merge do
       named_suite_results_fixture[:suite_selector],
       named_suite_results_fixture[:family_profile],
       {
-        backend: "kreuzberg-language-pack",
+        backend: 'kreuzberg-language-pack',
         supports_dialects: false,
-        supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+        supported_policies: [{ surface: 'array', name: 'destination_wins_array' }]
       },
       &execute_from(named_suite_results_fixture[:executions])
     )
@@ -2922,9 +3038,9 @@ RSpec.describe Ast::Merge do
       named_suite_report_fixture[:suite_selector],
       named_suite_report_fixture[:family_profile],
       {
-        backend: "kreuzberg-language-pack",
+        backend: 'kreuzberg-language-pack',
         supports_dialects: false,
-        supported_policies: [{ surface: "array", name: "destination_wins_array" }]
+        supported_policies: [{ surface: 'array', name: 'destination_wins_array' }]
       },
       &execute_from(named_suite_report_fixture[:executions])
     )
@@ -2950,14 +3066,14 @@ RSpec.describe Ast::Merge do
     expect(json_ready(manifest_report)).to eq(json_ready(named_suite_report_manifest_fixture[:expected_report]))
   end
 
-  it "conforms to manifest planning, defaulting, and review host fixtures" do
-    default_context_fixture = diagnostics_fixture("default_family_context")
-    explicit_mode_fixture = diagnostics_fixture("explicit_family_context_mode")
-    missing_roles_fixture = diagnostics_fixture("missing_suite_roles")
-    manifest_report_fixture = diagnostics_fixture("conformance_manifest_report")
-    host_hints_fixture = diagnostics_fixture("review_host_hints")
-    request_ids_fixture = diagnostics_fixture("review_request_ids")
-    family_request_fixture = diagnostics_fixture("family_context_review_request")
+  it 'conforms to manifest planning, defaulting, and review host fixtures' do
+    default_context_fixture = diagnostics_fixture('default_family_context')
+    explicit_mode_fixture = diagnostics_fixture('explicit_family_context_mode')
+    missing_roles_fixture = diagnostics_fixture('missing_suite_roles')
+    manifest_report_fixture = diagnostics_fixture('conformance_manifest_report')
+    host_hints_fixture = diagnostics_fixture('review_host_hints')
+    request_ids_fixture = diagnostics_fixture('review_request_ids')
+    family_request_fixture = diagnostics_fixture('family_context_review_request')
 
     context, diagnostics = described_class.resolve_conformance_family_context(
       default_context_fixture[:family],
@@ -2988,7 +3104,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(manifest_report)).to eq(json_ready(manifest_report_fixture[:expected_report]))
 
     expect(json_ready(described_class.conformance_review_host_hints(host_hints_fixture[:options]))).to eq(json_ready(host_hints_fixture[:expected_hints]))
-    expect(described_class.conformance_manifest_review_request_ids(request_ids_fixture[:manifest], request_ids_fixture[:options])).to eq(request_ids_fixture[:expected_request_ids])
+    expect(described_class.conformance_manifest_review_request_ids(request_ids_fixture[:manifest],
+                                                                   request_ids_fixture[:options])).to eq(request_ids_fixture[:expected_request_ids])
 
     _context, _diagnostics, requests, _decisions = described_class.review_conformance_family_context(
       family_request_fixture[:family],
@@ -2997,312 +3114,313 @@ RSpec.describe Ast::Merge do
     expect(json_ready(requests.first)).to eq(json_ready(family_request_fixture[:expected_request]))
   end
 
-  it "conforms to review-state, replay, and explicit-context fixtures" do
-    review_state_fixture = diagnostics_fixture("conformance_manifest_review_state")
-    reviewed_default_fixture = diagnostics_fixture("reviewed_default_context")
-    replay_compatibility_fixture = diagnostics_fixture("review_replay_compatibility")
-    replay_rejection_fixture = diagnostics_fixture("review_replay_rejection")
-    stale_decision_fixture = diagnostics_fixture("stale_review_decision")
-    replay_bundle_fixture = diagnostics_fixture("review_replay_bundle")
-    replay_bundle_reviewed_nested_fixture = diagnostics_fixture("review_replay_bundle_reviewed_nested_executions")
-    replay_bundle_application_fixture = diagnostics_fixture("review_replay_bundle_application")
-    review_state_reviewed_nested_fixture = diagnostics_fixture("review_state_reviewed_nested_executions")
-    review_state_roundtrip_fixture = diagnostics_fixture("review_state_json_roundtrip")
-    replay_bundle_roundtrip_fixture = diagnostics_fixture("review_replay_bundle_json_roundtrip")
-    review_state_envelope_fixture = diagnostics_fixture("review_state_envelope")
-    replay_bundle_envelope_fixture = diagnostics_fixture("review_replay_bundle_envelope")
-    review_state_envelope_rejection_fixture = diagnostics_fixture("review_state_envelope_rejection")
-    replay_bundle_envelope_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_rejection")
-    reviewed_nested_execution_roundtrip_fixture = diagnostics_fixture("reviewed_nested_execution_json_roundtrip")
-    reviewed_nested_execution_envelope_fixture = diagnostics_fixture("reviewed_nested_execution_envelope")
-    reviewed_nested_execution_envelope_rejection_fixture = diagnostics_fixture("reviewed_nested_execution_envelope_rejection")
-    reviewed_nested_execution_replay_application_fixture = diagnostics_fixture("review_replay_bundle_reviewed_nested_execution_application")
-    reviewed_nested_execution_state_application_fixture = diagnostics_fixture("review_state_reviewed_nested_execution_application")
-    review_proposal_fixture = diagnostics_fixture("family_context_review_proposal")
-    explicit_decision_fixture = diagnostics_fixture("family_context_explicit_review_decision")
-    explicit_bundle_fixture = diagnostics_fixture("explicit_review_replay_bundle_application")
-    missing_context_fixture = diagnostics_fixture("explicit_review_decision_missing_context")
-    family_mismatch_fixture = diagnostics_fixture("explicit_review_decision_family_mismatch")
-    surface_fixture = diagnostics_fixture("surface_ownership")
-    delegated_operation_fixture = diagnostics_fixture("delegated_child_operation")
-    structured_edit_structure_profile_fixture = diagnostics_fixture("structured_edit_structure_profile")
-    structured_edit_selection_profile_fixture = diagnostics_fixture("structured_edit_selection_profile")
-    structured_edit_match_profile_fixture = diagnostics_fixture("structured_edit_match_profile")
-    structured_edit_operation_profile_fixture = diagnostics_fixture("structured_edit_operation_profile")
-    structured_edit_destination_profile_fixture = diagnostics_fixture("structured_edit_destination_profile")
-    structured_edit_request_fixture = diagnostics_fixture("structured_edit_request")
-    structured_edit_result_fixture = diagnostics_fixture("structured_edit_result")
-    structured_edit_application_fixture = diagnostics_fixture("structured_edit_application")
-    structured_edit_application_envelope_fixture = diagnostics_fixture("structured_edit_application_envelope")
-    structured_edit_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_application_envelope_rejection")
-    structured_edit_application_envelope_application_fixture = diagnostics_fixture("structured_edit_application_envelope_application")
-    structured_edit_request_envelope_fixture = diagnostics_fixture("structured_edit_request_envelope")
-    structured_edit_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_request_envelope_rejection")
-    structured_edit_request_envelope_application_fixture = diagnostics_fixture("structured_edit_request_envelope_application")
-    structured_edit_profile_promotion_envelope_fixture = read_json(fixtures_root.join("diagnostics", "slice-915-structured-edit-profile-promotion-envelope", "structured-edit-profile-promotion-envelope.json"))
-    structured_edit_execution_report_fixture = diagnostics_fixture("structured_edit_execution_report")
-    structured_edit_crispr_overmatch_fail_closed_fixture = diagnostics_fixture("structured_edit_crispr_overmatch_fail_closed")
-    structured_edit_crispr_acceptance_scenario_fixture = diagnostics_fixture("structured_edit_crispr_acceptance_scenario")
-    structured_edit_crispr_append_fallback_insert_fixture = diagnostics_fixture("structured_edit_crispr_append_fallback_insert")
-    structured_edit_crispr_ruby_comment_owned_rewrite_delete_parity_fixture = diagnostics_fixture("structured_edit_crispr_ruby_comment_owned_rewrite_delete_parity")
-    structured_edit_crispr_ruby_callable_destination_move_parity_fixture = diagnostics_fixture("structured_edit_crispr_ruby_callable_destination_move_parity")
-    structured_edit_crispr_markdown_heading_section_replace_parity_fixture = diagnostics_fixture("structured_edit_crispr_markdown_heading_section_replace_parity")
-    structured_edit_crispr_example_parity_report_fixture = diagnostics_fixture("structured_edit_crispr_example_parity_report")
-    structured_edit_crispr_parity_substrate_report_fixture = diagnostics_fixture("structured_edit_crispr_parity_substrate_report")
-    structured_edit_kettle_jem_primitive_gap_report_fixture = diagnostics_fixture("structured_edit_kettle_jem_primitive_gap_report")
-    content_recipe_execution_envelope_fixture = diagnostics_fixture("content_recipe_execution_envelope")
-    single_file_readme_heading_section_acceptance_fixture = diagnostics_fixture("single_file_readme_heading_section_acceptance")
-    native_structured_edit_recipe_steps_fixture = diagnostics_fixture("native_structured_edit_recipe_steps")
-    ruby_gemfile_signature_merge_acceptance_fixture = diagnostics_fixture("ruby_gemfile_signature_merge_acceptance")
-    ruby_gemspec_native_boundary_report_fixture = diagnostics_fixture("ruby_gemspec_native_boundary_report")
-    ruby_gemspec_signature_merge_acceptance_fixture = diagnostics_fixture("ruby_gemspec_signature_merge_acceptance")
-    ruby_gemspec_field_policy_acceptance_fixture = diagnostics_fixture("ruby_gemspec_field_policy_acceptance")
-    ruby_gemspec_dependency_section_policy_acceptance_fixture = diagnostics_fixture("ruby_gemspec_dependency_section_policy_acceptance")
-    ruby_gemspec_files_policy_acceptance_fixture = diagnostics_fixture("ruby_gemspec_files_policy_acceptance")
-    ruby_gemspec_version_loader_policy_acceptance_fixture = diagnostics_fixture("ruby_gemspec_version_loader_policy_acceptance")
-    runtime_facts_context_fixture = diagnostics_fixture("runtime_facts_context")
-    ruby_gemspec_self_dependency_policy_acceptance_fixture = diagnostics_fixture("ruby_gemspec_self_dependency_policy_acceptance")
-    ruby_gemfile_self_dependency_policy_acceptance_fixture = diagnostics_fixture("ruby_gemfile_self_dependency_policy_acceptance")
-    ruby_appraisals_self_dependency_policy_acceptance_fixture = diagnostics_fixture("ruby_appraisals_self_dependency_policy_acceptance")
-    ruby_appraisals_min_ruby_prune_policy_acceptance_fixture = diagnostics_fixture("ruby_appraisals_min_ruby_prune_policy_acceptance")
-    changelog_unreleased_normalization_acceptance_fixture = diagnostics_fixture("changelog_unreleased_normalization_acceptance")
-    readme_supplied_metadata_synchronization_acceptance_fixture = diagnostics_fixture("readme_supplied_metadata_synchronization_acceptance")
-    supplied_markdown_pruning_acceptance_fixture = diagnostics_fixture("supplied_markdown_pruning_acceptance")
-    supplied_source_selector_deletion_acceptance_fixture = diagnostics_fixture("supplied_source_selector_deletion_acceptance")
-    supplied_yaml_snippet_synchronization_acceptance_fixture = diagnostics_fixture("supplied_yaml_snippet_synchronization_acceptance")
-    supplied_managed_text_block_replacement_acceptance_fixture = diagnostics_fixture("supplied_managed_text_block_replacement_acceptance")
-    supplied_yaml_placeholder_scalar_backfill_acceptance_fixture = diagnostics_fixture("supplied_yaml_placeholder_scalar_backfill_acceptance")
-    structured_edit_callable_destination_request_fixture = diagnostics_fixture("structured_edit_callable_destination_request")
-    structured_edit_parity_selection_semantics_fixture = diagnostics_fixture("structured_edit_parity_selection_semantics")
-    structured_edit_parity_match_semantics_fixture = diagnostics_fixture("structured_edit_parity_match_semantics")
-    structured_edit_operation_triad_parity_fixture = diagnostics_fixture("structured_edit_operation_triad_parity")
-    structured_edit_provider_execution_request_fixture = diagnostics_fixture("structured_edit_provider_execution_request")
-    structured_edit_provider_execution_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope")
-    structured_edit_provider_execution_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_rejection")
-    structured_edit_provider_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_request_envelope_application")
-    structured_edit_provider_execution_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application")
-    structured_edit_provider_execution_dispatch_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch")
-    structured_edit_provider_execution_dispatch_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope")
-    structured_edit_provider_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_rejection")
-    structured_edit_provider_execution_dispatch_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_dispatch_envelope_application")
-    structured_edit_provider_execution_outcome_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome")
-    structured_edit_provider_execution_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope")
-    structured_edit_provider_execution_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope_rejection")
-    structured_edit_provider_execution_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_outcome_envelope_application")
-    structured_edit_provider_batch_execution_outcome_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome")
-    structured_edit_provider_batch_execution_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope")
-    structured_edit_provider_batch_execution_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_rejection")
-    structured_edit_provider_batch_execution_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_outcome_envelope_application")
-    structured_edit_provider_execution_provenance_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance")
-    structured_edit_provider_execution_provenance_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope")
-    structured_edit_provider_execution_provenance_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope_rejection")
-    structured_edit_provider_execution_provenance_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_provenance_envelope_application")
-    structured_edit_provider_batch_execution_provenance_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance")
-    structured_edit_provider_batch_execution_provenance_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope")
-    structured_edit_provider_batch_execution_provenance_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_rejection")
-    structured_edit_provider_batch_execution_provenance_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_provenance_envelope_application")
-    structured_edit_provider_execution_replay_bundle_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle")
-    structured_edit_provider_execution_replay_bundle_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope")
-    structured_edit_provider_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope_rejection")
-    structured_edit_provider_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_replay_bundle_envelope_application")
-    structured_edit_provider_batch_execution_replay_bundle_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle")
-    structured_edit_provider_batch_execution_replay_bundle_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope")
-    structured_edit_provider_batch_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_rejection")
-    structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_replay_bundle_envelope_application")
-    structured_edit_provider_executor_profile_fixture = diagnostics_fixture("structured_edit_provider_executor_profile")
-    structured_edit_provider_executor_operation_triad_profile_fixture = diagnostics_fixture("structured_edit_provider_executor_operation_triad_profile")
-    structured_edit_provider_executor_profile_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope")
-    structured_edit_provider_executor_profile_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_rejection")
-    structured_edit_provider_executor_profile_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_profile_envelope_application")
-    structured_edit_provider_executor_registry_fixture = diagnostics_fixture("structured_edit_provider_executor_registry")
-    structured_edit_provider_executor_registry_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope")
-    structured_edit_provider_executor_registry_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_rejection")
-    structured_edit_provider_executor_registry_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_registry_envelope_application")
-    structured_edit_provider_executor_selection_policy_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy")
-    structured_edit_provider_executor_selection_policy_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy_envelope")
-    structured_edit_provider_executor_selection_policy_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy_envelope_rejection")
-    structured_edit_provider_executor_selection_policy_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_selection_policy_envelope_application")
-    structured_edit_provider_executor_resolution_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution")
-    structured_edit_provider_executor_resolution_envelope_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope")
-    structured_edit_provider_executor_resolution_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope_rejection")
-    structured_edit_provider_executor_resolution_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_executor_resolution_envelope_application")
-    structured_edit_provider_execution_plan_fixture = diagnostics_fixture("structured_edit_provider_execution_plan")
-    structured_edit_provider_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff")
-    structured_edit_provider_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope")
-    structured_edit_provider_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_rejection")
-    structured_edit_provider_execution_handoff_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_handoff_envelope_application")
-    structured_edit_provider_execution_invocation_fixture = diagnostics_fixture("structured_edit_provider_execution_invocation")
-    structured_edit_provider_execution_invocation_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_invocation_envelope")
-    structured_edit_provider_execution_invocation_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_invocation_envelope_rejection")
-    structured_edit_provider_execution_invocation_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_invocation_envelope_application")
-    structured_edit_provider_batch_execution_invocation_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation")
-    structured_edit_provider_batch_execution_invocation_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope")
-    structured_edit_provider_batch_execution_invocation_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope_rejection")
-    structured_edit_provider_batch_execution_invocation_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_invocation_envelope_application")
-    structured_edit_provider_execution_run_result_fixture = diagnostics_fixture("structured_edit_provider_execution_run_result")
-    structured_edit_provider_execution_run_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_run_result_envelope")
-    structured_edit_provider_execution_run_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_run_result_envelope_rejection")
-    structured_edit_provider_execution_run_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_run_result_envelope_application")
-    structured_edit_provider_batch_execution_run_result_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_run_result")
-    structured_edit_provider_batch_execution_run_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_run_result_envelope")
-    structured_edit_provider_batch_execution_run_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_run_result_envelope_rejection")
-    structured_edit_provider_batch_execution_run_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_run_result_envelope_application")
-    structured_edit_provider_execution_receipt_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt")
-    structured_edit_provider_execution_receipt_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope")
-    structured_edit_provider_execution_receipt_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope_rejection")
-    structured_edit_provider_execution_receipt_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_envelope_application")
-    structured_edit_provider_batch_execution_receipt_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt")
-    structured_edit_provider_batch_execution_receipt_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope")
-    structured_edit_provider_batch_execution_receipt_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_envelope_application")
-    structured_edit_provider_execution_receipt_replay_request_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_request")
-    structured_edit_provider_execution_receipt_replay_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_request_envelope")
-    structured_edit_provider_execution_receipt_replay_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_request_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_request_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_request_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request")
-    structured_edit_provider_batch_execution_receipt_replay_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_request_envelope_application")
-    structured_edit_provider_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application")
-    structured_edit_provider_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope")
-    structured_edit_provider_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_application_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application")
-    structured_edit_provider_batch_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_application_envelope_application")
-    structured_edit_provider_execution_receipt_replay_session_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session")
-    structured_edit_provider_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope")
-    structured_edit_provider_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_session_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_session_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session")
-    structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_session_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow")
-    structured_edit_provider_execution_receipt_replay_workflow_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_result_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result")
-    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_review_request_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_request_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_request")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_session_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_session")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_result_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_result")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application")
-    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope")
-    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection")
-    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_review_request")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_application")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_result_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_result")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_rejection")
-    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_application")
-    structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff")
-    structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope")
-    structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_rejection")
-    structured_edit_provider_batch_execution_handoff_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_handoff_envelope_application")
-    structured_edit_provider_execution_plan_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope")
-    structured_edit_provider_execution_plan_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope_rejection")
-    structured_edit_provider_execution_plan_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_plan_envelope_application")
-    structured_edit_provider_batch_execution_plan_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_plan")
-    structured_edit_provider_batch_execution_plan_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_plan_envelope")
-    structured_edit_provider_batch_execution_plan_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_plan_envelope_rejection")
-    structured_edit_provider_batch_execution_plan_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_plan_envelope_application")
-    structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope")
-    structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_rejection")
-    structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_execution_application_envelope_application")
-    structured_edit_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_execution_report_envelope")
-    structured_edit_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_rejection")
-    structured_edit_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_execution_report_envelope_application")
-    structured_edit_batch_request_fixture = diagnostics_fixture("structured_edit_batch_request")
-    structured_edit_provider_batch_execution_request_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request")
-    structured_edit_provider_batch_execution_request_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope")
-    structured_edit_provider_batch_execution_request_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope_rejection")
-    structured_edit_provider_batch_execution_request_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_request_envelope_application")
-    structured_edit_provider_batch_execution_dispatch_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_dispatch")
-    structured_edit_provider_batch_execution_dispatch_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_dispatch_envelope")
-    structured_edit_provider_batch_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_dispatch_envelope_rejection")
-    structured_edit_provider_batch_execution_dispatch_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_dispatch_envelope_application")
-    structured_edit_provider_batch_execution_report_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report")
-    structured_edit_provider_batch_execution_report_envelope_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope")
-    structured_edit_provider_batch_execution_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope_rejection")
-    structured_edit_provider_batch_execution_report_envelope_application_fixture = diagnostics_fixture("structured_edit_provider_batch_execution_report_envelope_application")
-    structured_edit_batch_report_fixture = diagnostics_fixture("structured_edit_batch_report")
-    structured_edit_batch_report_envelope_fixture = diagnostics_fixture("structured_edit_batch_report_envelope")
-    structured_edit_batch_report_envelope_rejection_fixture = diagnostics_fixture("structured_edit_batch_report_envelope_rejection")
-    structured_edit_batch_report_envelope_application_fixture = diagnostics_fixture("structured_edit_batch_report_envelope_application")
-    projected_cases_fixture = diagnostics_fixture("projected_child_review_cases")
+  it 'conforms to review-state, replay, and explicit-context fixtures' do
+    review_state_fixture = diagnostics_fixture('conformance_manifest_review_state')
+    reviewed_default_fixture = diagnostics_fixture('reviewed_default_context')
+    replay_compatibility_fixture = diagnostics_fixture('review_replay_compatibility')
+    replay_rejection_fixture = diagnostics_fixture('review_replay_rejection')
+    stale_decision_fixture = diagnostics_fixture('stale_review_decision')
+    replay_bundle_fixture = diagnostics_fixture('review_replay_bundle')
+    replay_bundle_reviewed_nested_fixture = diagnostics_fixture('review_replay_bundle_reviewed_nested_executions')
+    replay_bundle_application_fixture = diagnostics_fixture('review_replay_bundle_application')
+    review_state_reviewed_nested_fixture = diagnostics_fixture('review_state_reviewed_nested_executions')
+    review_state_roundtrip_fixture = diagnostics_fixture('review_state_json_roundtrip')
+    replay_bundle_roundtrip_fixture = diagnostics_fixture('review_replay_bundle_json_roundtrip')
+    review_state_envelope_fixture = diagnostics_fixture('review_state_envelope')
+    replay_bundle_envelope_fixture = diagnostics_fixture('review_replay_bundle_envelope')
+    review_state_envelope_rejection_fixture = diagnostics_fixture('review_state_envelope_rejection')
+    replay_bundle_envelope_rejection_fixture = diagnostics_fixture('review_replay_bundle_envelope_rejection')
+    reviewed_nested_execution_roundtrip_fixture = diagnostics_fixture('reviewed_nested_execution_json_roundtrip')
+    reviewed_nested_execution_envelope_fixture = diagnostics_fixture('reviewed_nested_execution_envelope')
+    reviewed_nested_execution_envelope_rejection_fixture = diagnostics_fixture('reviewed_nested_execution_envelope_rejection')
+    reviewed_nested_execution_replay_application_fixture = diagnostics_fixture('review_replay_bundle_reviewed_nested_execution_application')
+    reviewed_nested_execution_state_application_fixture = diagnostics_fixture('review_state_reviewed_nested_execution_application')
+    review_proposal_fixture = diagnostics_fixture('family_context_review_proposal')
+    explicit_decision_fixture = diagnostics_fixture('family_context_explicit_review_decision')
+    explicit_bundle_fixture = diagnostics_fixture('explicit_review_replay_bundle_application')
+    missing_context_fixture = diagnostics_fixture('explicit_review_decision_missing_context')
+    family_mismatch_fixture = diagnostics_fixture('explicit_review_decision_family_mismatch')
+    surface_fixture = diagnostics_fixture('surface_ownership')
+    delegated_operation_fixture = diagnostics_fixture('delegated_child_operation')
+    structured_edit_structure_profile_fixture = diagnostics_fixture('structured_edit_structure_profile')
+    structured_edit_selection_profile_fixture = diagnostics_fixture('structured_edit_selection_profile')
+    structured_edit_match_profile_fixture = diagnostics_fixture('structured_edit_match_profile')
+    structured_edit_operation_profile_fixture = diagnostics_fixture('structured_edit_operation_profile')
+    structured_edit_destination_profile_fixture = diagnostics_fixture('structured_edit_destination_profile')
+    structured_edit_request_fixture = diagnostics_fixture('structured_edit_request')
+    structured_edit_result_fixture = diagnostics_fixture('structured_edit_result')
+    structured_edit_application_fixture = diagnostics_fixture('structured_edit_application')
+    structured_edit_application_envelope_fixture = diagnostics_fixture('structured_edit_application_envelope')
+    structured_edit_application_envelope_rejection_fixture = diagnostics_fixture('structured_edit_application_envelope_rejection')
+    structured_edit_application_envelope_application_fixture = diagnostics_fixture('structured_edit_application_envelope_application')
+    structured_edit_request_envelope_fixture = diagnostics_fixture('structured_edit_request_envelope')
+    structured_edit_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_request_envelope_rejection')
+    structured_edit_request_envelope_application_fixture = diagnostics_fixture('structured_edit_request_envelope_application')
+    structured_edit_profile_promotion_envelope_fixture = read_json(fixtures_root.join('diagnostics',
+                                                                                      'slice-915-structured-edit-profile-promotion-envelope', 'structured-edit-profile-promotion-envelope.json'))
+    structured_edit_execution_report_fixture = diagnostics_fixture('structured_edit_execution_report')
+    structured_edit_crispr_overmatch_fail_closed_fixture = diagnostics_fixture('structured_edit_crispr_overmatch_fail_closed')
+    structured_edit_crispr_acceptance_scenario_fixture = diagnostics_fixture('structured_edit_crispr_acceptance_scenario')
+    structured_edit_crispr_append_fallback_insert_fixture = diagnostics_fixture('structured_edit_crispr_append_fallback_insert')
+    structured_edit_crispr_ruby_comment_owned_rewrite_delete_parity_fixture = diagnostics_fixture('structured_edit_crispr_ruby_comment_owned_rewrite_delete_parity')
+    structured_edit_crispr_ruby_callable_destination_move_parity_fixture = diagnostics_fixture('structured_edit_crispr_ruby_callable_destination_move_parity')
+    structured_edit_crispr_markdown_heading_section_replace_parity_fixture = diagnostics_fixture('structured_edit_crispr_markdown_heading_section_replace_parity')
+    structured_edit_crispr_example_parity_report_fixture = diagnostics_fixture('structured_edit_crispr_example_parity_report')
+    structured_edit_crispr_parity_substrate_report_fixture = diagnostics_fixture('structured_edit_crispr_parity_substrate_report')
+    structured_edit_kettle_jem_primitive_gap_report_fixture = diagnostics_fixture('structured_edit_kettle_jem_primitive_gap_report')
+    content_recipe_execution_envelope_fixture = diagnostics_fixture('content_recipe_execution_envelope')
+    single_file_readme_heading_section_acceptance_fixture = diagnostics_fixture('single_file_readme_heading_section_acceptance')
+    native_structured_edit_recipe_steps_fixture = diagnostics_fixture('native_structured_edit_recipe_steps')
+    ruby_gemfile_signature_merge_acceptance_fixture = diagnostics_fixture('ruby_gemfile_signature_merge_acceptance')
+    ruby_gemspec_native_boundary_report_fixture = diagnostics_fixture('ruby_gemspec_native_boundary_report')
+    ruby_gemspec_signature_merge_acceptance_fixture = diagnostics_fixture('ruby_gemspec_signature_merge_acceptance')
+    ruby_gemspec_field_policy_acceptance_fixture = diagnostics_fixture('ruby_gemspec_field_policy_acceptance')
+    ruby_gemspec_dependency_section_policy_acceptance_fixture = diagnostics_fixture('ruby_gemspec_dependency_section_policy_acceptance')
+    ruby_gemspec_files_policy_acceptance_fixture = diagnostics_fixture('ruby_gemspec_files_policy_acceptance')
+    ruby_gemspec_version_loader_policy_acceptance_fixture = diagnostics_fixture('ruby_gemspec_version_loader_policy_acceptance')
+    runtime_facts_context_fixture = diagnostics_fixture('runtime_facts_context')
+    ruby_gemspec_self_dependency_policy_acceptance_fixture = diagnostics_fixture('ruby_gemspec_self_dependency_policy_acceptance')
+    ruby_gemfile_self_dependency_policy_acceptance_fixture = diagnostics_fixture('ruby_gemfile_self_dependency_policy_acceptance')
+    ruby_appraisals_self_dependency_policy_acceptance_fixture = diagnostics_fixture('ruby_appraisals_self_dependency_policy_acceptance')
+    ruby_appraisals_min_ruby_prune_policy_acceptance_fixture = diagnostics_fixture('ruby_appraisals_min_ruby_prune_policy_acceptance')
+    changelog_unreleased_normalization_acceptance_fixture = diagnostics_fixture('changelog_unreleased_normalization_acceptance')
+    readme_supplied_metadata_synchronization_acceptance_fixture = diagnostics_fixture('readme_supplied_metadata_synchronization_acceptance')
+    supplied_markdown_pruning_acceptance_fixture = diagnostics_fixture('supplied_markdown_pruning_acceptance')
+    supplied_source_selector_deletion_acceptance_fixture = diagnostics_fixture('supplied_source_selector_deletion_acceptance')
+    supplied_yaml_snippet_synchronization_acceptance_fixture = diagnostics_fixture('supplied_yaml_snippet_synchronization_acceptance')
+    supplied_managed_text_block_replacement_acceptance_fixture = diagnostics_fixture('supplied_managed_text_block_replacement_acceptance')
+    supplied_yaml_placeholder_scalar_backfill_acceptance_fixture = diagnostics_fixture('supplied_yaml_placeholder_scalar_backfill_acceptance')
+    structured_edit_callable_destination_request_fixture = diagnostics_fixture('structured_edit_callable_destination_request')
+    structured_edit_parity_selection_semantics_fixture = diagnostics_fixture('structured_edit_parity_selection_semantics')
+    structured_edit_parity_match_semantics_fixture = diagnostics_fixture('structured_edit_parity_match_semantics')
+    structured_edit_operation_triad_parity_fixture = diagnostics_fixture('structured_edit_operation_triad_parity')
+    structured_edit_provider_execution_request_fixture = diagnostics_fixture('structured_edit_provider_execution_request')
+    structured_edit_provider_execution_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_request_envelope')
+    structured_edit_provider_execution_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_request_envelope_rejection')
+    structured_edit_provider_execution_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_request_envelope_application')
+    structured_edit_provider_execution_application_fixture = diagnostics_fixture('structured_edit_provider_execution_application')
+    structured_edit_provider_execution_dispatch_fixture = diagnostics_fixture('structured_edit_provider_execution_dispatch')
+    structured_edit_provider_execution_dispatch_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_dispatch_envelope')
+    structured_edit_provider_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_dispatch_envelope_rejection')
+    structured_edit_provider_execution_dispatch_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_dispatch_envelope_application')
+    structured_edit_provider_execution_outcome_fixture = diagnostics_fixture('structured_edit_provider_execution_outcome')
+    structured_edit_provider_execution_outcome_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_outcome_envelope')
+    structured_edit_provider_execution_outcome_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_outcome_envelope_rejection')
+    structured_edit_provider_execution_outcome_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_outcome_envelope_application')
+    structured_edit_provider_batch_execution_outcome_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_outcome')
+    structured_edit_provider_batch_execution_outcome_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_outcome_envelope')
+    structured_edit_provider_batch_execution_outcome_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_outcome_envelope_rejection')
+    structured_edit_provider_batch_execution_outcome_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_outcome_envelope_application')
+    structured_edit_provider_execution_provenance_fixture = diagnostics_fixture('structured_edit_provider_execution_provenance')
+    structured_edit_provider_execution_provenance_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_provenance_envelope')
+    structured_edit_provider_execution_provenance_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_provenance_envelope_rejection')
+    structured_edit_provider_execution_provenance_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_provenance_envelope_application')
+    structured_edit_provider_batch_execution_provenance_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_provenance')
+    structured_edit_provider_batch_execution_provenance_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_provenance_envelope')
+    structured_edit_provider_batch_execution_provenance_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_provenance_envelope_rejection')
+    structured_edit_provider_batch_execution_provenance_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_provenance_envelope_application')
+    structured_edit_provider_execution_replay_bundle_fixture = diagnostics_fixture('structured_edit_provider_execution_replay_bundle')
+    structured_edit_provider_execution_replay_bundle_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_replay_bundle_envelope')
+    structured_edit_provider_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_replay_bundle_envelope_rejection')
+    structured_edit_provider_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_replay_bundle_envelope_application')
+    structured_edit_provider_batch_execution_replay_bundle_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_replay_bundle')
+    structured_edit_provider_batch_execution_replay_bundle_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_replay_bundle_envelope')
+    structured_edit_provider_batch_execution_replay_bundle_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_replay_bundle_envelope_rejection')
+    structured_edit_provider_batch_execution_replay_bundle_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_replay_bundle_envelope_application')
+    structured_edit_provider_executor_profile_fixture = diagnostics_fixture('structured_edit_provider_executor_profile')
+    structured_edit_provider_executor_operation_triad_profile_fixture = diagnostics_fixture('structured_edit_provider_executor_operation_triad_profile')
+    structured_edit_provider_executor_profile_envelope_fixture = diagnostics_fixture('structured_edit_provider_executor_profile_envelope')
+    structured_edit_provider_executor_profile_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_executor_profile_envelope_rejection')
+    structured_edit_provider_executor_profile_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_executor_profile_envelope_application')
+    structured_edit_provider_executor_registry_fixture = diagnostics_fixture('structured_edit_provider_executor_registry')
+    structured_edit_provider_executor_registry_envelope_fixture = diagnostics_fixture('structured_edit_provider_executor_registry_envelope')
+    structured_edit_provider_executor_registry_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_executor_registry_envelope_rejection')
+    structured_edit_provider_executor_registry_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_executor_registry_envelope_application')
+    structured_edit_provider_executor_selection_policy_fixture = diagnostics_fixture('structured_edit_provider_executor_selection_policy')
+    structured_edit_provider_executor_selection_policy_envelope_fixture = diagnostics_fixture('structured_edit_provider_executor_selection_policy_envelope')
+    structured_edit_provider_executor_selection_policy_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_executor_selection_policy_envelope_rejection')
+    structured_edit_provider_executor_selection_policy_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_executor_selection_policy_envelope_application')
+    structured_edit_provider_executor_resolution_fixture = diagnostics_fixture('structured_edit_provider_executor_resolution')
+    structured_edit_provider_executor_resolution_envelope_fixture = diagnostics_fixture('structured_edit_provider_executor_resolution_envelope')
+    structured_edit_provider_executor_resolution_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_executor_resolution_envelope_rejection')
+    structured_edit_provider_executor_resolution_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_executor_resolution_envelope_application')
+    structured_edit_provider_execution_plan_fixture = diagnostics_fixture('structured_edit_provider_execution_plan')
+    structured_edit_provider_execution_handoff_fixture = diagnostics_fixture('structured_edit_provider_execution_handoff')
+    structured_edit_provider_execution_handoff_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_handoff_envelope')
+    structured_edit_provider_execution_handoff_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_handoff_envelope_rejection')
+    structured_edit_provider_execution_handoff_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_handoff_envelope_application')
+    structured_edit_provider_execution_invocation_fixture = diagnostics_fixture('structured_edit_provider_execution_invocation')
+    structured_edit_provider_execution_invocation_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_invocation_envelope')
+    structured_edit_provider_execution_invocation_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_invocation_envelope_rejection')
+    structured_edit_provider_execution_invocation_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_invocation_envelope_application')
+    structured_edit_provider_batch_execution_invocation_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_invocation')
+    structured_edit_provider_batch_execution_invocation_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_invocation_envelope')
+    structured_edit_provider_batch_execution_invocation_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_invocation_envelope_rejection')
+    structured_edit_provider_batch_execution_invocation_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_invocation_envelope_application')
+    structured_edit_provider_execution_run_result_fixture = diagnostics_fixture('structured_edit_provider_execution_run_result')
+    structured_edit_provider_execution_run_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_run_result_envelope')
+    structured_edit_provider_execution_run_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_run_result_envelope_rejection')
+    structured_edit_provider_execution_run_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_run_result_envelope_application')
+    structured_edit_provider_batch_execution_run_result_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_run_result')
+    structured_edit_provider_batch_execution_run_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_run_result_envelope')
+    structured_edit_provider_batch_execution_run_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_run_result_envelope_rejection')
+    structured_edit_provider_batch_execution_run_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_run_result_envelope_application')
+    structured_edit_provider_execution_receipt_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt')
+    structured_edit_provider_execution_receipt_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_envelope')
+    structured_edit_provider_execution_receipt_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_envelope_rejection')
+    structured_edit_provider_execution_receipt_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_envelope_application')
+    structured_edit_provider_batch_execution_receipt_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt')
+    structured_edit_provider_batch_execution_receipt_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_envelope')
+    structured_edit_provider_batch_execution_receipt_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_envelope_application')
+    structured_edit_provider_execution_receipt_replay_request_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_request')
+    structured_edit_provider_execution_receipt_replay_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_request_envelope')
+    structured_edit_provider_execution_receipt_replay_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_request_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_request_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_request_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_request')
+    structured_edit_provider_batch_execution_receipt_replay_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_request_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_request_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_request_envelope_application')
+    structured_edit_provider_execution_receipt_replay_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_application')
+    structured_edit_provider_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_application_envelope')
+    structured_edit_provider_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_application_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_application_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_application')
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_application_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_application_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_application_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_application_envelope_application')
+    structured_edit_provider_execution_receipt_replay_session_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_session')
+    structured_edit_provider_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_session_envelope')
+    structured_edit_provider_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_session_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_session_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_session_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_session')
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_session_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_session_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_session_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_session_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow')
+    structured_edit_provider_execution_receipt_replay_workflow_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_result_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_result')
+    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_result_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_result_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_result_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_review_request_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_review_request')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_request')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_session_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_session')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_result_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_result')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_decision_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_result_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_session_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_apply_request_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_request_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_session_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_result_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_closure_report_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_envelope_application')
+    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope')
+    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_rejection')
+    structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_receipt_replay_workflow_review_request_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_review_request')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_review_request_envelope_application')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_result_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_result')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_rejection')
+    structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_receipt_replay_workflow_result_envelope_application')
+    structured_edit_provider_batch_execution_handoff_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_handoff')
+    structured_edit_provider_batch_execution_handoff_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_handoff_envelope')
+    structured_edit_provider_batch_execution_handoff_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_handoff_envelope_rejection')
+    structured_edit_provider_batch_execution_handoff_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_handoff_envelope_application')
+    structured_edit_provider_execution_plan_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_plan_envelope')
+    structured_edit_provider_execution_plan_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_plan_envelope_rejection')
+    structured_edit_provider_execution_plan_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_plan_envelope_application')
+    structured_edit_provider_batch_execution_plan_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_plan')
+    structured_edit_provider_batch_execution_plan_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_plan_envelope')
+    structured_edit_provider_batch_execution_plan_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_plan_envelope_rejection')
+    structured_edit_provider_batch_execution_plan_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_plan_envelope_application')
+    structured_edit_provider_execution_application_envelope_fixture = diagnostics_fixture('structured_edit_provider_execution_application_envelope')
+    structured_edit_provider_execution_application_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_execution_application_envelope_rejection')
+    structured_edit_provider_execution_application_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_execution_application_envelope_application')
+    structured_edit_execution_report_envelope_fixture = diagnostics_fixture('structured_edit_execution_report_envelope')
+    structured_edit_execution_report_envelope_rejection_fixture = diagnostics_fixture('structured_edit_execution_report_envelope_rejection')
+    structured_edit_execution_report_envelope_application_fixture = diagnostics_fixture('structured_edit_execution_report_envelope_application')
+    structured_edit_batch_request_fixture = diagnostics_fixture('structured_edit_batch_request')
+    structured_edit_provider_batch_execution_request_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_request')
+    structured_edit_provider_batch_execution_request_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_request_envelope')
+    structured_edit_provider_batch_execution_request_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_request_envelope_rejection')
+    structured_edit_provider_batch_execution_request_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_request_envelope_application')
+    structured_edit_provider_batch_execution_dispatch_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_dispatch')
+    structured_edit_provider_batch_execution_dispatch_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_dispatch_envelope')
+    structured_edit_provider_batch_execution_dispatch_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_dispatch_envelope_rejection')
+    structured_edit_provider_batch_execution_dispatch_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_dispatch_envelope_application')
+    structured_edit_provider_batch_execution_report_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_report')
+    structured_edit_provider_batch_execution_report_envelope_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_report_envelope')
+    structured_edit_provider_batch_execution_report_envelope_rejection_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_report_envelope_rejection')
+    structured_edit_provider_batch_execution_report_envelope_application_fixture = diagnostics_fixture('structured_edit_provider_batch_execution_report_envelope_application')
+    structured_edit_batch_report_fixture = diagnostics_fixture('structured_edit_batch_report')
+    structured_edit_batch_report_envelope_fixture = diagnostics_fixture('structured_edit_batch_report_envelope')
+    structured_edit_batch_report_envelope_rejection_fixture = diagnostics_fixture('structured_edit_batch_report_envelope_rejection')
+    structured_edit_batch_report_envelope_application_fixture = diagnostics_fixture('structured_edit_batch_report_envelope_application')
+    projected_cases_fixture = diagnostics_fixture('projected_child_review_cases')
 
     state = described_class.review_conformance_manifest(
       review_state_fixture[:manifest],
@@ -3383,34 +3501,34 @@ RSpec.describe Ast::Merge do
             ok: true,
             diagnostics: [],
             operations: execution[:review_state][:accepted_groups].map do |group|
-              if execution[:family] == "markdown"
+              if execution[:family] == 'markdown'
                 {
                   operation_id: group[:child_operation_id],
                   parent_operation_id: group[:parent_operation_id],
-                  requested_strategy: "delegate_child_surface",
+                  requested_strategy: 'delegate_child_surface',
                   language_chain: %w[markdown typescript],
                   surface: {
-                    surface_kind: "fenced_code_block",
-                    effective_language: "typescript",
+                    surface_kind: 'fenced_code_block',
+                    effective_language: 'typescript',
                     address: group[:delegated_runtime_surface_path],
-                    owner: { kind: "owned_region", address: "/code_fence/0" },
-                    reconstruction_strategy: "portable_write",
-                    metadata: { family: "typescript" }
+                    owner: { kind: 'owned_region', address: '/code_fence/0' },
+                    reconstruction_strategy: 'portable_write',
+                    metadata: { family: 'typescript' }
                   }
                 }
               else
                 {
                   operation_id: group[:child_operation_id],
                   parent_operation_id: group[:parent_operation_id],
-                  requested_strategy: "delegate_child_surface",
+                  requested_strategy: 'delegate_child_surface',
                   language_chain: %w[ruby ruby],
                   surface: {
-                    surface_kind: "yard_example",
-                    effective_language: "ruby",
+                    surface_kind: 'yard_example',
+                    effective_language: 'ruby',
                     address: group[:delegated_runtime_surface_path],
-                    owner: { kind: "owned_region", address: "/yard_example/1" },
-                    reconstruction_strategy: "portable_write",
-                    metadata: { family: "ruby" }
+                    owner: { kind: 'owned_region', address: '/yard_example/1' },
+                    reconstruction_strategy: 'portable_write',
+                    metadata: { family: 'ruby' }
                   }
                 }
               end
@@ -3423,7 +3541,9 @@ RSpec.describe Ast::Merge do
         }
       }
     end
-    expect(json_ready(replay_nested_runs.map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+    expect(json_ready(replay_nested_runs.map do |run|
+      { execution_family: run[:execution][:family], result: run[:result] }
+    end)).to eq(
       json_ready(reviewed_nested_execution_replay_application_fixture[:expected_results])
     )
 
@@ -3440,34 +3560,34 @@ RSpec.describe Ast::Merge do
             ok: true,
             diagnostics: [],
             operations: execution[:review_state][:accepted_groups].map do |group|
-              if execution[:family] == "markdown"
+              if execution[:family] == 'markdown'
                 {
                   operation_id: group[:child_operation_id],
                   parent_operation_id: group[:parent_operation_id],
-                  requested_strategy: "delegate_child_surface",
+                  requested_strategy: 'delegate_child_surface',
                   language_chain: %w[markdown typescript],
                   surface: {
-                    surface_kind: "fenced_code_block",
-                    effective_language: "typescript",
+                    surface_kind: 'fenced_code_block',
+                    effective_language: 'typescript',
                     address: group[:delegated_runtime_surface_path],
-                    owner: { kind: "owned_region", address: "/code_fence/0" },
-                    reconstruction_strategy: "portable_write",
-                    metadata: { family: "typescript" }
+                    owner: { kind: 'owned_region', address: '/code_fence/0' },
+                    reconstruction_strategy: 'portable_write',
+                    metadata: { family: 'typescript' }
                   }
                 }
               else
                 {
                   operation_id: group[:child_operation_id],
                   parent_operation_id: group[:parent_operation_id],
-                  requested_strategy: "delegate_child_surface",
+                  requested_strategy: 'delegate_child_surface',
                   language_chain: %w[ruby ruby],
                   surface: {
-                    surface_kind: "yard_example",
-                    effective_language: "ruby",
+                    surface_kind: 'yard_example',
+                    effective_language: 'ruby',
                     address: group[:delegated_runtime_surface_path],
-                    owner: { kind: "owned_region", address: "/yard_example/1" },
-                    reconstruction_strategy: "portable_write",
-                    metadata: { family: "ruby" }
+                    owner: { kind: 'owned_region', address: '/yard_example/1' },
+                    reconstruction_strategy: 'portable_write',
+                    metadata: { family: 'ruby' }
                   }
                 }
               end
@@ -3480,11 +3600,13 @@ RSpec.describe Ast::Merge do
         }
       }
     end
-    expect(json_ready(review_state_nested_runs.map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+    expect(json_ready(review_state_nested_runs.map do |run|
+      { execution_family: run[:execution][:family], result: run[:result] }
+    end)).to eq(
       json_ready(reviewed_nested_execution_state_application_fixture[:expected_results])
     )
 
-    replay_bundle_envelope_reviewed_nested_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_execution_application")
+    replay_bundle_envelope_reviewed_nested_fixture = diagnostics_fixture('review_replay_bundle_envelope_reviewed_nested_execution_application')
     replay_bundle_envelope_nested_application = described_class.execute_review_replay_bundle_envelope_reviewed_nested_executions(
       replay_bundle_envelope_reviewed_nested_fixture[:replay_bundle_envelope]
     ) do |execution, index|
@@ -3502,11 +3624,13 @@ RSpec.describe Ast::Merge do
       }
     end
     expect(json_ready(replay_bundle_envelope_nested_application[:diagnostics])).to eq([])
-    expect(json_ready(replay_bundle_envelope_nested_application[:results].map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+    expect(json_ready(replay_bundle_envelope_nested_application[:results].map do |run|
+      { execution_family: run[:execution][:family], result: run[:result] }
+    end)).to eq(
       json_ready(replay_bundle_envelope_reviewed_nested_fixture[:expected_application][:results])
     )
 
-    review_state_envelope_reviewed_nested_fixture = diagnostics_fixture("review_state_envelope_reviewed_nested_execution_application")
+    review_state_envelope_reviewed_nested_fixture = diagnostics_fixture('review_state_envelope_reviewed_nested_execution_application')
     review_state_envelope_nested_application = described_class.execute_review_state_envelope_reviewed_nested_executions(
       review_state_envelope_reviewed_nested_fixture[:review_state_envelope]
     ) do |execution, index|
@@ -3524,31 +3648,33 @@ RSpec.describe Ast::Merge do
       }
     end
     expect(json_ready(review_state_envelope_nested_application[:diagnostics])).to eq([])
-    expect(json_ready(review_state_envelope_nested_application[:results].map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+    expect(json_ready(review_state_envelope_nested_application[:results].map do |run|
+      { execution_family: run[:execution][:family], result: run[:result] }
+    end)).to eq(
       json_ready(review_state_envelope_reviewed_nested_fixture[:expected_application][:results])
     )
 
-    replay_bundle_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_execution_rejection")
+    replay_bundle_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture('review_replay_bundle_envelope_reviewed_nested_execution_rejection')
     replay_bundle_envelope_reviewed_nested_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.execute_review_replay_bundle_envelope_reviewed_nested_executions(
         test_case[:replay_bundle_envelope]
       ) do
-        raise "callbacks should not run for rejected replay bundle envelopes"
+        raise 'callbacks should not run for rejected replay bundle envelopes'
       end
       expect(json_ready(rejected_application)).to eq(json_ready(test_case[:expected_application]))
     end
 
-    review_state_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture("review_state_envelope_reviewed_nested_execution_rejection")
+    review_state_envelope_reviewed_nested_rejection_fixture = diagnostics_fixture('review_state_envelope_reviewed_nested_execution_rejection')
     review_state_envelope_reviewed_nested_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.execute_review_state_envelope_reviewed_nested_executions(
         test_case[:review_state_envelope]
       ) do
-        raise "callbacks should not run for rejected review state envelopes"
+        raise 'callbacks should not run for rejected review state envelopes'
       end
       expect(json_ready(rejected_application)).to eq(json_ready(test_case[:expected_application]))
     end
 
-    reviewed_nested_manifest_application_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_manifest_application")
+    reviewed_nested_manifest_application_fixture = diagnostics_fixture('review_replay_bundle_envelope_reviewed_nested_manifest_application')
     reviewed_nested_manifest_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
       reviewed_nested_manifest_application_fixture[:manifest],
       reviewed_nested_manifest_application_fixture[:options],
@@ -3572,11 +3698,13 @@ RSpec.describe Ast::Merge do
     expect(json_ready(reviewed_nested_manifest_application[:state])).to eq(
       json_ready(reviewed_nested_manifest_application_fixture[:expected_state])
     )
-    expect(json_ready(reviewed_nested_manifest_application[:results].map { |run| { execution_family: run[:execution][:family], result: run[:result] } })).to eq(
+    expect(json_ready(reviewed_nested_manifest_application[:results].map do |run|
+      { execution_family: run[:execution][:family], result: run[:result] }
+    end)).to eq(
       json_ready(reviewed_nested_manifest_application_fixture[:expected_application][:results])
     )
 
-    reviewed_nested_manifest_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_reviewed_nested_manifest_rejection")
+    reviewed_nested_manifest_rejection_fixture = diagnostics_fixture('review_replay_bundle_envelope_reviewed_nested_manifest_rejection')
     reviewed_nested_manifest_rejection_fixture[:cases].each do |test_case|
       rejected_application = described_class.review_and_execute_conformance_manifest_with_replay_bundle_envelope(
         reviewed_nested_manifest_rejection_fixture[:manifest],
@@ -3584,7 +3712,7 @@ RSpec.describe Ast::Merge do
         test_case[:review_replay_bundle_envelope],
         execute: execute_from(reviewed_nested_manifest_rejection_fixture[:executions]),
         reviewed_nested_execution: lambda do
-          raise "callbacks should not run for rejected replay bundle envelopes"
+          raise 'callbacks should not run for rejected replay bundle envelopes'
         end
       )
       expect(json_ready(rejected_application)).to eq(
@@ -3661,7 +3789,7 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(explicit_applied)).to eq(json_ready(explicit_bundle_fixture[:expected_state]))
 
-    replay_bundle_envelope_application_fixture = diagnostics_fixture("review_replay_bundle_envelope_application")
+    replay_bundle_envelope_application_fixture = diagnostics_fixture('review_replay_bundle_envelope_application')
     replay_bundle_envelope_applied = described_class.review_conformance_manifest_with_replay_bundle_envelope(
       replay_bundle_envelope_application_fixture[:manifest],
       replay_bundle_envelope_application_fixture[:options],
@@ -3672,7 +3800,7 @@ RSpec.describe Ast::Merge do
       json_ready(replay_bundle_envelope_application_fixture[:expected_state])
     )
 
-    explicit_bundle_envelope_fixture = diagnostics_fixture("explicit_review_replay_bundle_envelope_application")
+    explicit_bundle_envelope_fixture = diagnostics_fixture('explicit_review_replay_bundle_envelope_application')
     explicit_envelope_applied = described_class.review_conformance_manifest_with_replay_bundle_envelope(
       explicit_bundle_envelope_fixture[:manifest],
       explicit_bundle_envelope_fixture[:options],
@@ -3681,7 +3809,7 @@ RSpec.describe Ast::Merge do
     )
     expect(json_ready(explicit_envelope_applied)).to eq(json_ready(explicit_bundle_envelope_fixture[:expected_state]))
 
-    replay_bundle_envelope_rejection_fixture = diagnostics_fixture("review_replay_bundle_envelope_review_rejection")
+    replay_bundle_envelope_rejection_fixture = diagnostics_fixture('review_replay_bundle_envelope_review_rejection')
     replay_bundle_envelope_rejection_fixture[:cases].each do |test_case|
       rejected_state = described_class.review_conformance_manifest_with_replay_bundle_envelope(
         replay_bundle_envelope_rejection_fixture[:manifest],
@@ -4054,7 +4182,8 @@ RSpec.describe Ast::Merge do
     profile_promotion_request_envelope = described_class.structured_edit_request_envelope(
       structured_edit_profile_promotion_envelope_fixture[:structured_edit_request],
       profile_id: structured_edit_profile_promotion_envelope_fixture.dig(:expected, :profile_id),
-      minimum_profile_status: structured_edit_profile_promotion_envelope_fixture.dig(:expected, :minimum_profile_status),
+      minimum_profile_status: structured_edit_profile_promotion_envelope_fixture.dig(:expected,
+                                                                                     :minimum_profile_status),
       promotion_policy_id: structured_edit_profile_promotion_envelope_fixture.dig(:expected, :promotion_policy_id)
     )
     expect(json_ready(profile_promotion_request_envelope)).to eq(
@@ -4169,7 +4298,8 @@ RSpec.describe Ast::Merge do
       product_target: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :product_target),
       current_substrate: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :current_substrate),
       required_primitives: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :required_primitives),
-      script_classifications: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :script_classifications),
+      script_classifications: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report,
+                                                                                          :script_classifications),
       non_goals: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :non_goals),
       next_slices: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :next_slices),
       metadata: structured_edit_kettle_jem_primitive_gap_report_fixture.dig(:report, :metadata)
@@ -4266,23 +4396,31 @@ RSpec.describe Ast::Merge do
       )
     end
 
-    expect(ruby_gemspec_native_boundary_report_fixture[:kind]).to eq("ruby_gemspec_native_boundary_report")
+    expect(ruby_gemspec_native_boundary_report_fixture[:kind]).to eq('ruby_gemspec_native_boundary_report')
     expect(ruby_gemspec_native_boundary_report_fixture.dig(:native_recipe_surface, :signature_profile)).to eq(
-      "gemspec_declarations"
+      'gemspec_declarations'
     )
-    expect(ruby_gemspec_native_boundary_report_fixture[:wrapper_required_behaviors].map { |entry| entry[:name] }).to include(
-      "dependency_ruby_floor_comment_alignment"
+    expect(ruby_gemspec_native_boundary_report_fixture[:wrapper_required_behaviors].map do |entry|
+      entry[:name]
+    end).to include(
+      'dependency_ruby_floor_comment_alignment'
     )
     request = content_recipe_execution_request(
       recipe_name: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :recipe_name),
-      recipe_version: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :recipe_version),
+      recipe_version: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                      :recipe_version),
       relative_path: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :relative_path),
-      provider_family: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :provider_family),
-      provider_backend: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :provider_backend),
-      template_content: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :template_content),
-      destination_content: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :destination_content),
+      provider_family: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                       :provider_family),
+      provider_backend: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                        :provider_backend),
+      template_content: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                        :template_content),
+      destination_content: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                           :destination_content),
       steps: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :steps),
-      runtime_context: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :runtime_context),
+      runtime_context: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request,
+                                                                       :runtime_context),
       metadata: ruby_gemspec_native_boundary_report_fixture.dig(:example_native_recipe, :request, :metadata)
     )
     expect(json_ready(content_recipe_execution_request_envelope(request))).to eq(
@@ -4372,7 +4510,7 @@ RSpec.describe Ast::Merge do
         json_ready(entry[:report_envelope])
       )
       expect(entry.dig(:report_envelope, :report, :request, :runtime_context, :facts, :schema)).to eq(
-        "runtime_facts.v1"
+        'runtime_facts.v1'
       )
     end
 
@@ -4388,10 +4526,11 @@ RSpec.describe Ast::Merge do
       expect(json_ready(content_recipe_execution_report_envelope(report))).to eq(
         json_ready(entry[:report_envelope])
       )
-      if entry[:label] == "delete-active-self-dependencies-preserve-comments"
-        expect(entry.dig(:report_envelope, :report, :final_content)).not_to include('spec.add_dependency "demo", "~> 1.0"')
-        expect(entry.dig(:report_envelope, :report, :final_content)).to include('# spec.add_dependency "demo", "~> 0"')
-      end
+      next unless entry[:label] == 'delete-active-self-dependencies-preserve-comments'
+
+      expect(entry.dig(:report_envelope, :report,
+                       :final_content)).not_to include('spec.add_dependency "demo", "~> 1.0"')
+      expect(entry.dig(:report_envelope, :report, :final_content)).to include('# spec.add_dependency "demo", "~> 0"')
     end
 
     ruby_gemfile_self_dependency_policy_acceptance_fixture[:cases].each do |entry|
@@ -4406,16 +4545,16 @@ RSpec.describe Ast::Merge do
       expect(json_ready(content_recipe_execution_report_envelope(report))).to eq(
         json_ready(entry[:report_envelope])
       )
-      if entry[:label] == "delete-gemfile-self-dependencies-across-nesting"
+      if entry[:label] == 'delete-gemfile-self-dependencies-across-nesting'
         final_content = entry.dig(:report_envelope, :report, :final_content)
         expect(final_content).not_to include('gem "demo", "~> 1.0"')
         expect(final_content).not_to include('path: "../dev/demo"')
         expect(final_content).to include('# gem "demo", "~> 0"')
         expect(final_content).to include('gem "fallback-gem"')
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq("delete")
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq('delete')
       end
-      if entry[:label] == "missing-project-identity-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-project-identity-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
@@ -4431,15 +4570,15 @@ RSpec.describe Ast::Merge do
       expect(json_ready(content_recipe_execution_report_envelope(report))).to eq(
         json_ready(entry[:report_envelope])
       )
-      if entry[:label] == "delete-appraisals-self-dependencies"
+      if entry[:label] == 'delete-appraisals-self-dependencies'
         final_content = entry.dig(:report_envelope, :report, :final_content)
         expect(final_content).not_to include('gem "demo"')
         expect(final_content).to include('appraise("rails-6")')
         expect(final_content).to include('gem "rspec" # Testing')
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq("delete")
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq('delete')
       end
-      if entry[:label] == "missing-project-identity-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-project-identity-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
@@ -4455,132 +4594,136 @@ RSpec.describe Ast::Merge do
       expect(json_ready(content_recipe_execution_report_envelope(report))).to eq(
         json_ready(entry[:report_envelope])
       )
-      if entry[:label] == "delete-ruby-appraisals-below-min-ruby"
+      if entry[:label] == 'delete-ruby-appraisals-below-min-ruby'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content).not_to include("ruby-2-3")
-        expect(final_content).not_to include("ruby-2-7")
-        expect(final_content).not_to include("ruby-3-0")
-        expect(final_content).to include("ruby-3-2")
+        expect(final_content).not_to include('ruby-2-3')
+        expect(final_content).not_to include('ruby-2-7')
+        expect(final_content).not_to include('ruby-3-0')
+        expect(final_content).to include('ruby-3-2')
         expect(final_content).to include('appraise "style"')
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq("delete")
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq('delete')
         expect(final_content).not_to include("\n\n\n")
       end
-      if entry[:label] == "missing-min-ruby-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-min-ruby-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     changelog_unreleased_normalization_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "create-unreleased-section-from-supplied-entries"
+      if entry[:label] == 'create-unreleased-section-from-supplied-entries'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content.index("## Unreleased")).to be < final_content.index("## 1.2.0")
-        expect(final_content).to include("- Added native Markdown recipe boundary.")
-        expect(final_content).to include("- Existing release.")
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :operation)).to eq("insert_or_replace_section")
+        expect(final_content.index('## Unreleased')).to be < final_content.index('## 1.2.0')
+        expect(final_content).to include('- Added native Markdown recipe boundary.')
+        expect(final_content).to include('- Existing release.')
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata,
+                         :operation)).to eq('insert_or_replace_section')
       end
-      if entry[:label] == "missing-entries-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-entries-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     readme_supplied_metadata_synchronization_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "sync-readme-heading-and-summary-from-supplied-metadata"
+      if entry[:label] == 'sync-readme-heading-and-summary-from-supplied-metadata'
         final_content = entry.dig(:report_envelope, :report, :final_content)
         expect(final_content).to start_with("# Demo Toolkit\n")
-        expect(final_content).to include("A deterministic toolkit for structured merges.")
-        expect(final_content).to include("Destination usage.")
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :consumed_context)).to eq("readme_metadata.title")
-        expect(entry.dig(:report_envelope, :report, :step_reports, 1, :metadata, :consumed_context)).to eq("readme_metadata.summary")
+        expect(final_content).to include('A deterministic toolkit for structured merges.')
+        expect(final_content).to include('Destination usage.')
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata,
+                         :consumed_context)).to eq('readme_metadata.title')
+        expect(entry.dig(:report_envelope, :report, :step_reports, 1, :metadata,
+                         :consumed_context)).to eq('readme_metadata.summary')
       end
-      if entry[:label] == "missing-readme-metadata-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-readme-metadata-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     supplied_markdown_pruning_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "prune-supplied-table-rows-and-reference-definitions"
+      if entry[:label] == 'prune-supplied-table-rows-and-reference-definitions'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content).not_to include("Works with JRuby")
-        expect(final_content).not_to include("[jruby-9.4]:")
-        expect(final_content).not_to include("[jruby-head]:")
-        expect(final_content).to include("Works with MRI Ruby")
-        expect(final_content).to include("[ruby-3.2]:")
+        expect(final_content).not_to include('Works with JRuby')
+        expect(final_content).not_to include('[jruby-9.4]:')
+        expect(final_content).not_to include('[jruby-head]:')
+        expect(final_content).to include('Works with MRI Ruby')
+        expect(final_content).to include('[ruby-3.2]:')
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :deleted_rows)).to eq(1)
-        expect(entry.dig(:report_envelope, :report, :step_reports, 1, :metadata, :deleted_reference_definitions)).to eq(2)
+        expect(entry.dig(:report_envelope, :report, :step_reports, 1, :metadata,
+                         :deleted_reference_definitions)).to eq(2)
       end
-      if entry[:label] == "missing-prune-selectors-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-prune-selectors-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     supplied_source_selector_deletion_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "delete-supplied-structural-owner-ranges"
+      if entry[:label] == 'delete-supplied-structural-owner-ranges'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content).not_to include("kettle/scaffold")
-        expect(final_content).not_to include("task :scaffold")
+        expect(final_content).not_to include('kettle/scaffold')
+        expect(final_content).not_to include('task :scaffold')
         expect(final_content).to include('require "bundler/gem_tasks"')
-        expect(final_content).to include("task :spec")
+        expect(final_content).to include('task :spec')
         expect(final_content).not_to include("\n\n\n")
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :deleted_ranges)).to eq(2)
       end
-      if entry[:label] == "missing-delete-selectors-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-delete-selectors-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     supplied_yaml_snippet_synchronization_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "apply-supplied-sections-and-scalar-pins"
+      if entry[:label] == 'apply-supplied-sections-and-scalar-pins'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content).to include("concurrency:")
-        expect(final_content).to include("permissions:")
-        expect(final_content).to include("actions/checkout@1111111111111111111111111111111111111111")
-        expect(final_content).to include("ruby/setup-ruby@2222222222222222222222222222222222222222")
-        expect(final_content).not_to include("actions/checkout@v3")
-        expect(final_content).not_to include("ruby/setup-ruby@v1")
-        expect(final_content).to include("gemfiles/current.gemfile")
+        expect(final_content).to include('concurrency:')
+        expect(final_content).to include('permissions:')
+        expect(final_content).to include('actions/checkout@1111111111111111111111111111111111111111')
+        expect(final_content).to include('ruby/setup-ruby@2222222222222222222222222222222222222222')
+        expect(final_content).not_to include('actions/checkout@v3')
+        expect(final_content).not_to include('ruby/setup-ruby@v1')
+        expect(final_content).to include('gemfiles/current.gemfile')
         expect(final_content).to include('ruby-version: ${{ matrix.ruby }}')
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :updated_sections)).to eq(2)
         expect(entry.dig(:report_envelope, :report, :step_reports, 1, :metadata, :updated_scalars)).to eq(2)
       end
-      if entry[:label] == "missing-yaml-updates-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-yaml-updates-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     supplied_managed_text_block_replacement_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "replace-existing-managed-text-block"
+      if entry[:label] == 'replace-existing-managed-text-block'
         final_content = entry.dig(:report_envelope, :report, :final_content)
         expect(final_content).to include('gem "debug", "~> 1.9"')
         expect(final_content).to include('gem "irb", "~> 1.15"')
-        expect(final_content).not_to include("old-debug")
+        expect(final_content).not_to include('old-debug')
         expect(final_content).to include('gem "rake"')
         expect(final_content).to include('gem "rspec"')
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :replaced_blocks)).to eq(1)
       end
-      if entry[:label] == "append-missing-managed-text-block"
+      if entry[:label] == 'append-missing-managed-text-block'
         final_content = entry.dig(:report_envelope, :report, :final_content)
-        expect(final_content).to include("# <<kettle-jem:generated>>")
-        expect(final_content).to include("# (no shunted dependencies)")
+        expect(final_content).to include('# <<kettle-jem:generated>>')
+        expect(final_content).to include('# (no shunted dependencies)')
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :appended_blocks)).to eq(1)
       end
-      if entry[:label] == "missing-managed-block-updates-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-managed-block-updates-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
     supplied_yaml_placeholder_scalar_backfill_acceptance_fixture[:cases].each do |entry|
-      if entry[:label] == "backfill-placeholder-and-blank-scalars"
+      if entry[:label] == 'backfill-placeholder-and-blank-scalars'
         final_content = entry.dig(:report_envelope, :report, :final_content)
         expect(final_content).to include('name: "demo-toolkit"')
         expect(final_content).to include("namespace: 'Demo::Toolkit'")
         expect(final_content).to include('homepage: "https://example.invalid/existing"')
-        expect(final_content).to include("# ENV: KJ_GEM_NAME")
-        expect(final_content).to include("# keep concrete value")
+        expect(final_content).to include('# ENV: KJ_GEM_NAME')
+        expect(final_content).to include('# keep concrete value')
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :updated_scalars)).to eq(2)
         expect(entry.dig(:report_envelope, :report, :step_reports, 0, :metadata, :preserved_scalars)).to eq(1)
       end
-      if entry[:label] == "missing-yaml-scalar-backfills-fails-closed"
-        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq("failed")
+      if entry[:label] == 'missing-yaml-scalar-backfills-fails-closed'
+        expect(entry.dig(:report_envelope, :report, :step_reports, 0, :status)).to eq('failed')
       end
     end
 
@@ -4985,10 +5128,12 @@ RSpec.describe Ast::Merge do
       expect(json_ready(executor_profile)).to eq(json_ready(entry[:executor_profile]))
     end
 
-    expect(structured_edit_provider_executor_operation_triad_profile_fixture.dig(:metadata, :canonical_operation_kinds)).to eq(
-      %w[insert replace delete]
-    )
-    expect(structured_edit_provider_executor_operation_triad_profile_fixture.dig(:metadata, :remove_alias_encoded)).to be(false)
+    expect(structured_edit_provider_executor_operation_triad_profile_fixture.dig(:metadata,
+                                                                                 :canonical_operation_kinds)).to eq(
+                                                                                   %w[insert replace delete]
+                                                                                 )
+    expect(structured_edit_provider_executor_operation_triad_profile_fixture.dig(:metadata,
+                                                                                 :remove_alias_encoded)).to be(false)
     structured_edit_provider_executor_operation_triad_profile_fixture[:cases].each do |entry|
       executor_profile = described_class.structured_edit_provider_executor_profile(
         provider_family: entry.dig(:executor_profile, :provider_family),
@@ -5943,7 +6088,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_review_request_fixture[:cases].each do |entry|
       receipt_replay_workflow_review_request =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_review_request(
-          receipt_replay_workflow_result: entry.dig(:receipt_replay_workflow_review_request, :receipt_replay_workflow_result),
+          receipt_replay_workflow_result: entry.dig(:receipt_replay_workflow_review_request,
+                                                    :receipt_replay_workflow_result),
           metadata: entry.dig(:receipt_replay_workflow_review_request, :metadata)
         )
       expect(json_ready(receipt_replay_workflow_review_request)).to eq(
@@ -5954,7 +6100,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_request_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_request =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_request(
-          receipt_replay_workflow_review_request: entry.dig(:receipt_replay_workflow_apply_request, :receipt_replay_workflow_review_request),
+          receipt_replay_workflow_review_request: entry.dig(:receipt_replay_workflow_apply_request,
+                                                            :receipt_replay_workflow_review_request),
           metadata: entry.dig(:receipt_replay_workflow_apply_request, :metadata)
         )
       expect(json_ready(receipt_replay_workflow_apply_request)).to eq(
@@ -5965,7 +6112,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_session_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_session =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_session(
-          receipt_replay_workflow_apply_request: entry.dig(:receipt_replay_workflow_apply_session, :receipt_replay_workflow_apply_request),
+          receipt_replay_workflow_apply_request: entry.dig(:receipt_replay_workflow_apply_session,
+                                                           :receipt_replay_workflow_apply_request),
           receipt_replay_session: entry.dig(:receipt_replay_workflow_apply_session, :receipt_replay_session),
           metadata: entry.dig(:receipt_replay_workflow_apply_session, :metadata)
         )
@@ -5977,8 +6125,10 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_result_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_result =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_result(
-          receipt_replay_workflow_apply_session: entry.dig(:receipt_replay_workflow_apply_result, :receipt_replay_workflow_apply_session),
-          receipt_replay_workflow_result: entry.dig(:receipt_replay_workflow_apply_result, :receipt_replay_workflow_result),
+          receipt_replay_workflow_apply_session: entry.dig(:receipt_replay_workflow_apply_result,
+                                                           :receipt_replay_workflow_apply_session),
+          receipt_replay_workflow_result: entry.dig(:receipt_replay_workflow_apply_result,
+                                                    :receipt_replay_workflow_result),
           metadata: entry.dig(:receipt_replay_workflow_apply_result, :metadata)
         )
       expect(json_ready(receipt_replay_workflow_apply_result)).to eq(
@@ -5989,7 +6139,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision(
-          receipt_replay_workflow_apply_result: entry.dig(:receipt_replay_workflow_apply_decision, :receipt_replay_workflow_apply_result),
+          receipt_replay_workflow_apply_result: entry.dig(:receipt_replay_workflow_apply_decision,
+                                                          :receipt_replay_workflow_apply_result),
           decision: entry.dig(:receipt_replay_workflow_apply_decision, :decision),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision, :metadata)
         )
@@ -6001,7 +6152,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision_outcome =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision_outcome(
-          receipt_replay_workflow_apply_decision: entry.dig(:receipt_replay_workflow_apply_decision_outcome, :receipt_replay_workflow_apply_decision),
+          receipt_replay_workflow_apply_decision: entry.dig(:receipt_replay_workflow_apply_decision_outcome,
+                                                            :receipt_replay_workflow_apply_decision),
           outcome: entry.dig(:receipt_replay_workflow_apply_decision_outcome, :outcome),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision_outcome, :metadata)
         )
@@ -6013,7 +6165,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision_settlement =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision_settlement(
-          receipt_replay_workflow_apply_decision_outcome: entry.dig(:receipt_replay_workflow_apply_decision_settlement, :receipt_replay_workflow_apply_decision_outcome),
+          receipt_replay_workflow_apply_decision_outcome: entry.dig(:receipt_replay_workflow_apply_decision_settlement,
+                                                                    :receipt_replay_workflow_apply_decision_outcome),
           settlement: entry.dig(:receipt_replay_workflow_apply_decision_settlement, :settlement),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision_settlement, :metadata)
         )
@@ -6025,7 +6178,9 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision_confirmation =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision_confirmation(
-          receipt_replay_workflow_apply_decision_settlement: entry.dig(:receipt_replay_workflow_apply_decision_confirmation, :receipt_replay_workflow_apply_decision_settlement),
+          receipt_replay_workflow_apply_decision_settlement: entry.dig(
+            :receipt_replay_workflow_apply_decision_confirmation, :receipt_replay_workflow_apply_decision_settlement
+          ),
           confirmation: entry.dig(:receipt_replay_workflow_apply_decision_confirmation, :confirmation),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision_confirmation, :metadata)
         )
@@ -6037,7 +6192,9 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision_closure_report =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision_closure_report(
-          receipt_replay_workflow_apply_decision_confirmation: entry.dig(:receipt_replay_workflow_apply_decision_closure_report, :receipt_replay_workflow_apply_decision_confirmation),
+          receipt_replay_workflow_apply_decision_confirmation: entry.dig(
+            :receipt_replay_workflow_apply_decision_closure_report, :receipt_replay_workflow_apply_decision_confirmation
+          ),
           closure_report: entry.dig(:receipt_replay_workflow_apply_decision_closure_report, :closure_report),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision_closure_report, :metadata)
         )
@@ -6049,7 +6206,9 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record_fixture[:cases].each do |entry|
       receipt_replay_workflow_apply_decision_audit_record =
         described_class.structured_edit_provider_execution_receipt_replay_workflow_apply_decision_audit_record(
-          receipt_replay_workflow_apply_decision_closure_report: entry.dig(:receipt_replay_workflow_apply_decision_audit_record, :receipt_replay_workflow_apply_decision_closure_report),
+          receipt_replay_workflow_apply_decision_closure_report: entry.dig(
+            :receipt_replay_workflow_apply_decision_audit_record, :receipt_replay_workflow_apply_decision_closure_report
+          ),
           audit_record: entry.dig(:receipt_replay_workflow_apply_decision_audit_record, :audit_record),
           metadata: entry.dig(:receipt_replay_workflow_apply_decision_audit_record, :metadata)
         )
@@ -6409,7 +6568,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome_fixture[:cases].each do |entry|
       batch_receipt_replay_workflow_apply_decision_outcome =
         described_class.structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_outcome(
-          apply_decision_outcomes: entry.dig(:batch_receipt_replay_workflow_apply_decision_outcome, :apply_decision_outcomes),
+          apply_decision_outcomes: entry.dig(:batch_receipt_replay_workflow_apply_decision_outcome,
+                                             :apply_decision_outcomes),
           metadata: entry.dig(:batch_receipt_replay_workflow_apply_decision_outcome, :metadata)
         )
       expect(json_ready(batch_receipt_replay_workflow_apply_decision_outcome)).to eq(
@@ -6610,7 +6770,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement_fixture[:cases].each do |entry|
       batch_receipt_replay_workflow_apply_decision_settlement =
         described_class.structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_settlement(
-          apply_decision_settlements: entry.dig(:batch_receipt_replay_workflow_apply_decision_settlement, :apply_decision_settlements),
+          apply_decision_settlements: entry.dig(:batch_receipt_replay_workflow_apply_decision_settlement,
+                                                :apply_decision_settlements),
           metadata: entry.dig(:batch_receipt_replay_workflow_apply_decision_settlement, :metadata)
         )
       expect(json_ready(batch_receipt_replay_workflow_apply_decision_settlement)).to eq(
@@ -6659,7 +6820,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation_fixture[:cases].each do |entry|
       batch_receipt_replay_workflow_apply_decision_confirmation =
         described_class.structured_edit_provider_batch_execution_receipt_replay_workflow_apply_decision_confirmation(
-          apply_decision_confirmations: entry.dig(:batch_receipt_replay_workflow_apply_decision_confirmation, :apply_decision_confirmations),
+          apply_decision_confirmations: entry.dig(:batch_receipt_replay_workflow_apply_decision_confirmation,
+                                                  :apply_decision_confirmations),
           metadata: entry.dig(:batch_receipt_replay_workflow_apply_decision_confirmation, :metadata)
         )
       expect(json_ready(batch_receipt_replay_workflow_apply_decision_confirmation)).to eq(
@@ -6844,7 +7006,8 @@ RSpec.describe Ast::Merge do
     structured_edit_provider_batch_execution_receipt_replay_workflow_result_fixture[:cases].each do |entry|
       batch_receipt_replay_workflow_result =
         described_class.structured_edit_provider_batch_execution_receipt_replay_workflow_result(
-          receipt_replay_workflow_results: entry.dig(:batch_receipt_replay_workflow_result, :receipt_replay_workflow_results),
+          receipt_replay_workflow_results: entry.dig(:batch_receipt_replay_workflow_result,
+                                                     :receipt_replay_workflow_results),
           metadata: entry.dig(:batch_receipt_replay_workflow_result, :metadata)
         )
       expect(json_ready(batch_receipt_replay_workflow_result)).to eq(json_ready(entry[:batch_receipt_replay_workflow_result]))
@@ -7098,12 +7261,18 @@ RSpec.describe Ast::Merge do
     expect(json_ready(profile_promotion_report_envelope)).to eq(
       json_ready(structured_edit_profile_promotion_envelope_fixture[:expected_execution_report_envelope])
     )
-    expect(structured_edit_profile_promotion_envelope_fixture.dig(:structured_edit_execution_report, :profile_selection_decision, :rejection_code)).to eq(
-      structured_edit_profile_promotion_envelope_fixture.dig(:expected, :rejection_code)
-    )
-    expect(structured_edit_profile_promotion_envelope_fixture.dig(:structured_edit_execution_report, :profile_blocking_reasons).length).to eq(
-      structured_edit_profile_promotion_envelope_fixture.dig(:expected, :profile_blocking_reason_count)
-    )
+    expect(structured_edit_profile_promotion_envelope_fixture.dig(:structured_edit_execution_report,
+                                                                  :profile_selection_decision, :rejection_code)).to eq(
+                                                                    structured_edit_profile_promotion_envelope_fixture.dig(
+                                                                      :expected, :rejection_code
+                                                                    )
+                                                                  )
+    expect(structured_edit_profile_promotion_envelope_fixture.dig(:structured_edit_execution_report,
+                                                                  :profile_blocking_reasons).length).to eq(
+                                                                    structured_edit_profile_promotion_envelope_fixture.dig(
+                                                                      :expected, :profile_blocking_reason_count
+                                                                    )
+                                                                  )
 
     structured_edit_batch_request_fixture[:cases].each do |entry|
       batch_request = described_class.structured_edit_batch_request(
@@ -7311,12 +7480,12 @@ RSpec.describe Ast::Merge do
     expect(json_ready(projected_cases)).to eq(json_ready(projected_cases_fixture[:cases]))
   end
 
-  it "conforms to the slice-227 projected child-review groups fixture" do
+  it 'conforms to the slice-227 projected child-review groups fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-227-projected-child-review-groups",
-        "projected-child-review-groups.json"
+        'diagnostics',
+        'slice-227-projected-child-review-groups',
+        'projected-child-review-groups.json'
       )
     )
 
@@ -7324,12 +7493,12 @@ RSpec.describe Ast::Merge do
     expect(json_ready(grouped)).to eq(json_ready(fixture[:expected_groups]))
   end
 
-  it "conforms to the slice-230 projected child-review group progress fixture" do
+  it 'conforms to the slice-230 projected child-review group progress fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-230-projected-child-review-group-progress",
-        "projected-child-review-group-progress.json"
+        'diagnostics',
+        'slice-230-projected-child-review-group-progress',
+        'projected-child-review-group-progress.json'
       )
     )
 
@@ -7340,12 +7509,12 @@ RSpec.describe Ast::Merge do
     expect(json_ready(progress)).to eq(json_ready(fixture[:expected_progress]))
   end
 
-  it "conforms to the slice-233 projected child-review groups ready-for-apply fixture" do
+  it 'conforms to the slice-233 projected child-review groups ready-for-apply fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-233-projected-child-review-groups-ready-for-apply",
-        "projected-child-review-groups-ready-for-apply.json"
+        'diagnostics',
+        'slice-233-projected-child-review-groups-ready-for-apply',
+        'projected-child-review-groups-ready-for-apply.json'
       )
     )
 
@@ -7356,12 +7525,12 @@ RSpec.describe Ast::Merge do
     expect(json_ready(ready_groups)).to eq(json_ready(fixture[:expected_ready_groups]))
   end
 
-  it "conforms to the slice-236 delegated child group review request fixture" do
+  it 'conforms to the slice-236 delegated child group review request fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-236-delegated-child-group-review-request",
-        "delegated-child-group-review-request.json"
+        'diagnostics',
+        'slice-236-delegated-child-group-review-request',
+        'delegated-child-group-review-request.json'
       )
     )
 
@@ -7375,12 +7544,12 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_request]))
   end
 
-  it "conforms to the slice-237 delegated child groups accepted-for-apply fixture" do
+  it 'conforms to the slice-237 delegated child groups accepted-for-apply fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-237-delegated-child-group-accepted-for-apply",
-        "delegated-child-groups-accepted-for-apply.json"
+        'diagnostics',
+        'slice-237-delegated-child-group-accepted-for-apply',
+        'delegated-child-groups-accepted-for-apply.json'
       )
     )
 
@@ -7395,12 +7564,12 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_accepted_groups]))
   end
 
-  it "conforms to the slice-240 delegated child group review-state fixture" do
+  it 'conforms to the slice-240 delegated child group review-state fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-240-delegated-child-group-review-state",
-        "delegated-child-group-review-state.json"
+        'diagnostics',
+        'slice-240-delegated-child-group-review-state',
+        'delegated-child-group-review-state.json'
       )
     )
 
@@ -7415,12 +7584,12 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_state]))
   end
 
-  it "conforms to the slice-243 delegated child apply-plan fixture" do
+  it 'conforms to the slice-243 delegated child apply-plan fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-243-delegated-child-apply-plan",
-        "delegated-child-apply-plan.json"
+        'diagnostics',
+        'slice-243-delegated-child-apply-plan',
+        'delegated-child-apply-plan.json'
       )
     )
 
@@ -7434,8 +7603,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_plan]))
   end
 
-  it "conforms to the slice-292 delegated child nested-output resolution fixture" do
-    fixture = diagnostics_fixture("delegated_child_nested_output_resolution")
+  it 'conforms to the slice-292 delegated child nested-output resolution fixture' do
+    fixture = diagnostics_fixture('delegated_child_nested_output_resolution')
 
     expect(
       json_ready(
@@ -7449,8 +7618,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the slice-293 delegated child nested-output rejection fixture" do
-    fixture = diagnostics_fixture("delegated_child_nested_output_rejection")
+  it 'conforms to the slice-293 delegated child nested-output rejection fixture' do
+    fixture = diagnostics_fixture('delegated_child_nested_output_rejection')
 
     expect(
       json_ready(
@@ -7464,8 +7633,8 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected]))
   end
 
-  it "conforms to the slice-303 reviewed nested execution payload fixture" do
-    fixture = diagnostics_fixture("reviewed_nested_execution_payload")
+  it 'conforms to the slice-303 reviewed nested execution payload fixture' do
+    fixture = diagnostics_fixture('reviewed_nested_execution_payload')
 
     expect(
       json_ready(
@@ -7478,10 +7647,10 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(fixture[:expected_execution]))
   end
 
-  it "executes nested merge through merge, discovery, resolution, and apply" do
+  it 'executes nested merge through merge, discovery, resolution, and apply' do
     nested_outputs = [
       {
-        surface_address: "document[0] > fenced_code_block[/code_fence/0]",
+        surface_address: 'document[0] > fenced_code_block[/code_fence/0]',
         output: "export const feature = true;\n"
       }
     ]
@@ -7489,11 +7658,11 @@ RSpec.describe Ast::Merge do
 
     result = described_class.execute_nested_merge(
       nested_outputs,
-      default_family: "markdown",
-      request_id_prefix: "nested_markdown_child",
+      default_family: 'markdown',
+      request_id_prefix: 'nested_markdown_child',
       merge_parent: lambda {
-        calls << "merge"
-        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+        calls << 'merge'
+        { ok: true, diagnostics: [], output: 'merged-parent', policies: [] }
       },
       discover_operations: lambda { |merged_output|
         calls << "discover:#{merged_output}"
@@ -7503,16 +7672,16 @@ RSpec.describe Ast::Merge do
           operations: [
             {
               operation_id: "operation:#{nested_outputs.first[:surface_address]}",
-              parent_operation_id: "parent:merge",
-              requested_strategy: "delegate_child_surface",
+              parent_operation_id: 'parent:merge',
+              requested_strategy: 'delegate_child_surface',
               language_chain: %w[markdown typescript],
               surface: {
-                surface_kind: "fenced_code_block",
-                effective_language: "typescript",
+                surface_kind: 'fenced_code_block',
+                effective_language: 'typescript',
                 address: nested_outputs.first[:surface_address],
-                owner: { kind: "owned_region", address: "/code_fence/0" },
-                reconstruction_strategy: "portable_write",
-                metadata: { family: "typescript" }
+                owner: { kind: 'owned_region', address: '/code_fence/0' },
+                reconstruction_strategy: 'portable_write',
+                metadata: { family: 'typescript' }
               }
             }
           ]
@@ -7521,27 +7690,27 @@ RSpec.describe Ast::Merge do
       apply_resolved_outputs: lambda { |merged_output, operations, apply_plan, applied_children|
         calls << "apply:#{merged_output}"
         expect(operations.first[:operation_id]).to eq("operation:#{nested_outputs.first[:surface_address]}")
-        expect(apply_plan.dig(:entries, 0, :family)).to eq("typescript")
+        expect(apply_plan.dig(:entries, 0, :family)).to eq('typescript')
         expect(applied_children.first[:operation_id]).to eq("operation:#{nested_outputs.first[:surface_address]}")
-        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'final-parent', policies: [] }
       }
     )
 
-    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
-    expect(calls).to eq(["merge", "discover:merged-parent", "apply:merged-parent"])
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: 'final-parent', policies: []))
+    expect(calls).to eq(['merge', 'discover:merged-parent', 'apply:merged-parent'])
   end
 
-  it "returns nested parent-merge failure unchanged and skips later stages" do
+  it 'returns nested parent-merge failure unchanged and skips later stages' do
     called = false
 
     result = described_class.execute_nested_merge(
       [],
-      default_family: "markdown",
-      request_id_prefix: "nested",
+      default_family: 'markdown',
+      request_id_prefix: 'nested',
       merge_parent: lambda {
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "parse_error", message: "parent failed" }],
+          diagnostics: [{ severity: 'error', category: 'parse_error', message: 'parent failed' }],
           policies: []
         }
       },
@@ -7551,7 +7720,7 @@ RSpec.describe Ast::Merge do
       },
       apply_resolved_outputs: lambda {
         called = true
-        { ok: true, diagnostics: [], output: "unused", policies: [] }
+        { ok: true, diagnostics: [], output: 'unused', policies: [] }
       }
     )
 
@@ -7559,33 +7728,33 @@ RSpec.describe Ast::Merge do
     expect(called).to eq(false)
   end
 
-  it "executes delegated child apply plan through merge, discovery, and apply" do
-    address = "document[0] > fenced_code_block[/code_fence/0]"
+  it 'executes delegated child apply plan through merge, discovery, and apply' do
+    address = 'document[0] > fenced_code_block[/code_fence/0]'
 
     result = described_class.execute_delegated_child_apply_plan(
       {
         entries: [
           {
-            request_id: "projected_child_group:markdown:fence:typescript",
-            family: "markdown",
+            request_id: 'projected_child_group:markdown:fence:typescript',
+            family: 'markdown',
             delegated_group: {
-              delegated_apply_group: "markdown:fence:typescript",
-              parent_operation_id: "parent:merge",
+              delegated_apply_group: 'markdown:fence:typescript',
+              parent_operation_id: 'parent:merge',
               child_operation_id: "operation:#{address}",
               delegated_runtime_surface_path: address,
               case_ids: [],
               delegated_case_ids: []
             },
             decision: {
-              request_id: "projected_child_group:markdown:fence:typescript",
-              action: "apply_delegated_child_group"
+              request_id: 'projected_child_group:markdown:fence:typescript',
+              action: 'apply_delegated_child_group'
             }
           }
         ]
       },
       [{ operation_id: "operation:#{address}", output: "child-output\n" }],
       merge_parent: lambda {
-        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'merged-parent', policies: [] }
       },
       discover_operations: lambda { |_merged_output|
         {
@@ -7594,16 +7763,16 @@ RSpec.describe Ast::Merge do
           operations: [
             {
               operation_id: "operation:#{address}",
-              parent_operation_id: "parent:merge",
-              requested_strategy: "delegate_child_surface",
+              parent_operation_id: 'parent:merge',
+              requested_strategy: 'delegate_child_surface',
               language_chain: %w[markdown typescript],
               surface: {
-                surface_kind: "fenced_code_block",
-                effective_language: "typescript",
+                surface_kind: 'fenced_code_block',
+                effective_language: 'typescript',
                 address: address,
-                owner: { kind: "owned_region", address: "/code_fence/0" },
-                reconstruction_strategy: "portable_write",
-                metadata: { family: "typescript" }
+                owner: { kind: 'owned_region', address: '/code_fence/0' },
+                reconstruction_strategy: 'portable_write',
+                metadata: { family: 'typescript' }
               }
             }
           ]
@@ -7612,23 +7781,23 @@ RSpec.describe Ast::Merge do
       apply_resolved_outputs: lambda { |_merged_output, _operations, apply_plan, applied_children|
         expect(apply_plan[:entries].length).to eq(1)
         expect(applied_children).to eq([{ operation_id: "operation:#{address}", output: "child-output\n" }])
-        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'final-parent', policies: [] }
       }
     )
 
-    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: 'final-parent', policies: []))
   end
 
-  it "executes reviewed nested merge from accepted review state" do
-    address = "document[0] > fenced_code_block[/code_fence/0]"
+  it 'executes reviewed nested merge from accepted review state' do
+    address = 'document[0] > fenced_code_block[/code_fence/0]'
 
     result = described_class.execute_reviewed_nested_merge(
       {
         requests: [],
         accepted_groups: [
           {
-            delegated_apply_group: "markdown:fence:typescript",
-            parent_operation_id: "parent:merge",
+            delegated_apply_group: 'markdown:fence:typescript',
+            parent_operation_id: 'parent:merge',
             child_operation_id: "operation:#{address}",
             delegated_runtime_surface_path: address,
             case_ids: [],
@@ -7637,16 +7806,16 @@ RSpec.describe Ast::Merge do
         ],
         applied_decisions: [
           {
-            request_id: "projected_child_group:markdown:fence:typescript",
-            action: "apply_delegated_child_group"
+            request_id: 'projected_child_group:markdown:fence:typescript',
+            action: 'apply_delegated_child_group'
           }
         ],
         diagnostics: []
       },
-      "markdown",
+      'markdown',
       [{ operation_id: "operation:#{address}", output: "child-output\n" }],
       merge_parent: lambda {
-        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'merged-parent', policies: [] }
       },
       discover_operations: lambda { |_merged_output|
         {
@@ -7655,42 +7824,42 @@ RSpec.describe Ast::Merge do
           operations: [
             {
               operation_id: "operation:#{address}",
-              parent_operation_id: "parent:merge",
-              requested_strategy: "delegate_child_surface",
+              parent_operation_id: 'parent:merge',
+              requested_strategy: 'delegate_child_surface',
               language_chain: %w[markdown typescript],
               surface: {
-                surface_kind: "fenced_code_block",
-                effective_language: "typescript",
+                surface_kind: 'fenced_code_block',
+                effective_language: 'typescript',
                 address: address,
-                owner: { kind: "owned_region", address: "/code_fence/0" },
-                reconstruction_strategy: "portable_write",
-                metadata: { family: "typescript" }
+                owner: { kind: 'owned_region', address: '/code_fence/0' },
+                reconstruction_strategy: 'portable_write',
+                metadata: { family: 'typescript' }
               }
             }
           ]
         }
       },
       apply_resolved_outputs: lambda { |_merged_output, _operations, apply_plan, _applied_children|
-        expect(apply_plan.dig(:entries, 0, :request_id)).to eq("projected_child_group:markdown:fence:typescript")
-        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+        expect(apply_plan.dig(:entries, 0, :request_id)).to eq('projected_child_group:markdown:fence:typescript')
+        { ok: true, diagnostics: [], output: 'final-parent', policies: [] }
       }
     )
 
-    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: 'final-parent', policies: []))
   end
 
-  it "executes reviewed nested execution payload directly" do
-    address = "document[0] > fenced_code_block[/code_fence/0]"
+  it 'executes reviewed nested execution payload directly' do
+    address = 'document[0] > fenced_code_block[/code_fence/0]'
 
     result = described_class.execute_reviewed_nested_execution(
       described_class.reviewed_nested_execution(
-        "markdown",
+        'markdown',
         {
           requests: [],
           accepted_groups: [
             {
-              delegated_apply_group: "markdown:fence:typescript",
-              parent_operation_id: "parent:merge",
+              delegated_apply_group: 'markdown:fence:typescript',
+              parent_operation_id: 'parent:merge',
               child_operation_id: "operation:#{address}",
               delegated_runtime_surface_path: address,
               case_ids: [],
@@ -7699,8 +7868,8 @@ RSpec.describe Ast::Merge do
           ],
           applied_decisions: [
             {
-              request_id: "projected_child_group:markdown:fence:typescript",
-              action: "apply_delegated_child_group"
+              request_id: 'projected_child_group:markdown:fence:typescript',
+              action: 'apply_delegated_child_group'
             }
           ],
           diagnostics: []
@@ -7708,7 +7877,7 @@ RSpec.describe Ast::Merge do
         [{ operation_id: "operation:#{address}", output: "child-output\n" }]
       ),
       merge_parent: lambda {
-        { ok: true, diagnostics: [], output: "merged-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'merged-parent', policies: [] }
       },
       discover_operations: lambda { |_merged_output|
         {
@@ -7717,42 +7886,43 @@ RSpec.describe Ast::Merge do
           operations: [
             {
               operation_id: "operation:#{address}",
-              parent_operation_id: "parent:merge",
-              requested_strategy: "delegate_child_surface",
+              parent_operation_id: 'parent:merge',
+              requested_strategy: 'delegate_child_surface',
               language_chain: %w[markdown typescript],
               surface: {
-                surface_kind: "fenced_code_block",
-                effective_language: "typescript",
+                surface_kind: 'fenced_code_block',
+                effective_language: 'typescript',
                 address: address,
-                owner: { kind: "owned_region", address: "/code_fence/0" },
-                reconstruction_strategy: "portable_write",
-                metadata: { family: "typescript" }
+                owner: { kind: 'owned_region', address: '/code_fence/0' },
+                reconstruction_strategy: 'portable_write',
+                metadata: { family: 'typescript' }
               }
             }
           ]
         }
       },
       apply_resolved_outputs: lambda { |_merged_output, _operations, apply_plan, applied_children|
-        expect(apply_plan.dig(:entries, 0, :request_id)).to eq("projected_child_group:markdown:fence:typescript")
+        expect(apply_plan.dig(:entries, 0, :request_id)).to eq('projected_child_group:markdown:fence:typescript')
         expect(applied_children).to eq([{ operation_id: "operation:#{address}", output: "child-output\n" }])
-        { ok: true, diagnostics: [], output: "final-parent", policies: [] }
+        { ok: true, diagnostics: [], output: 'final-parent', policies: [] }
       }
     )
 
-    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: "final-parent", policies: []))
+    expect(json_ready(result)).to eq(json_ready(ok: true, diagnostics: [], output: 'final-parent', policies: []))
   end
 
-  it "conforms to the widened source-family manifest and report fixtures" do
-    source_manifest = read_json(fixtures_root.join("conformance", "slice-124-source-family-manifest", "source-family-manifest.json"))
-    source_report_fixture = diagnostics_fixture("manifest_backend_report")
+  it 'conforms to the widened source-family manifest and report fixtures' do
+    source_manifest = read_json(fixtures_root.join('conformance', 'slice-124-source-family-manifest',
+                                                   'source-family-manifest.json'))
+    source_report_fixture = diagnostics_fixture('manifest_backend_report')
     mixed_source_report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-128-source-family-manifest-report", "source-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-128-source-family-manifest-report', 'source-manifest-report.json')
     )
 
-    expect(described_class.conformance_family_feature_profile_path(source_manifest, "typescript")).to eq(
+    expect(described_class.conformance_family_feature_profile_path(source_manifest, 'typescript')).to eq(
       %w[diagnostics slice-101-typescript-family-feature-profile typescript-feature-profile.json]
     )
-    expect(described_class.conformance_fixture_path(source_manifest, "rust", "merge")).to eq(
+    expect(described_class.conformance_fixture_path(source_manifest, 'rust', 'merge')).to eq(
       %w[rust slice-108-merge module-merge.json]
     )
 
@@ -7765,9 +7935,9 @@ RSpec.describe Ast::Merge do
     expect(source_report_fixture).not_to be_nil
   end
 
-  it "conforms to the source-family suite-definition and named-suite plan fixtures" do
+  it 'conforms to the source-family suite-definition and named-suite plan fixtures' do
     suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-125-source-family-suite-definitions", "source-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-125-source-family-suite-definitions', 'source-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(
       json_ready(suite_fixture[:suite_selectors])
@@ -7780,14 +7950,15 @@ RSpec.describe Ast::Merge do
     ).to eq(suite_fixture[:suite_definitions].first)
 
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-126-source-family-named-suite-plans", "source-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-126-source-family-named-suite-plans', 'source-named-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     native_plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-127-source-family-native-suite-plans", "source-native-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-127-source-family-native-suite-plans',
+                         'source-native-named-suite-plans.json')
     )
     expect(
       json_ready(
@@ -7799,12 +7970,12 @@ RSpec.describe Ast::Merge do
     ).to eq(json_ready(native_plans_fixture[:expected_entries]))
   end
 
-  it "conforms to the source-family backend-restricted plan and report fixtures" do
+  it 'conforms to the source-family backend-restricted plan and report fixtures' do
     plans_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-129-source-family-backend-restricted-plans",
-        "source-backend-restricted-plans.json"
+        'diagnostics',
+        'slice-129-source-family-backend-restricted-plans',
+        'source-backend-restricted-plans.json'
       )
     )
     expect(
@@ -7813,9 +7984,9 @@ RSpec.describe Ast::Merge do
 
     report_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-130-source-family-backend-restricted-report",
-        "source-backend-restricted-report.json"
+        'diagnostics',
+        'slice-130-source-family-backend-restricted-report',
+        'source-backend-restricted-report.json'
       )
     )
     report = described_class.report_conformance_manifest(
@@ -7826,24 +7997,25 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the TOML family suite-definition, named-suite plan, and manifest report fixtures" do
+  it 'conforms to the TOML family suite-definition, named-suite plan, and manifest report fixtures' do
     suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-138-toml-family-suite-definitions", "toml-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-138-toml-family-suite-definitions', 'toml-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
-      suite_fixture[:suite_definitions].first
-    )
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest],
+                                                        suite_fixture[:suite_selectors].first)).to eq(
+                                                          suite_fixture[:suite_definitions].first
+                                                        )
 
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-139-toml-family-named-suite-plans", "ruby-toml-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-139-toml-family-named-suite-plans', 'ruby-toml-named-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-140-toml-family-manifest-report", "ruby-toml-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-140-toml-family-manifest-report', 'ruby-toml-manifest-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -7853,24 +8025,25 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the YAML family suite-definition, named-suite plan, and manifest report fixtures" do
+  it 'conforms to the YAML family suite-definition, named-suite plan, and manifest report fixtures' do
     suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-144-yaml-family-suite-definitions", "yaml-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-144-yaml-family-suite-definitions', 'yaml-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
-      suite_fixture[:suite_definitions].first
-    )
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest],
+                                                        suite_fixture[:suite_selectors].first)).to eq(
+                                                          suite_fixture[:suite_definitions].first
+                                                        )
 
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-145-yaml-family-named-suite-plans", "ruby-yaml-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-145-yaml-family-named-suite-plans', 'ruby-yaml-named-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-146-yaml-family-manifest-report", "ruby-yaml-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-146-yaml-family-manifest-report', 'ruby-yaml-manifest-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -7880,20 +8053,22 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the Markdown family suite-definition, named-suite plan, and manifest report fixtures" do
+  it 'conforms to the Markdown family suite-definition, named-suite plan, and manifest report fixtures' do
     suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-200-markdown-family-suite-definitions", "markdown-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-200-markdown-family-suite-definitions',
+                         'markdown-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(suite_fixture[:manifest]))).to eq(json_ready(suite_fixture[:suite_selectors]))
-    expect(described_class.conformance_suite_definition(suite_fixture[:manifest], suite_fixture[:suite_selectors].first)).to eq(
-      suite_fixture[:suite_definitions].first
-    )
+    expect(described_class.conformance_suite_definition(suite_fixture[:manifest],
+                                                        suite_fixture[:suite_selectors].first)).to eq(
+                                                          suite_fixture[:suite_definitions].first
+                                                        )
 
     plans_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-201-markdown-family-named-suite-plans",
-        "ruby-markdown-named-suite-plans.json"
+        'diagnostics',
+        'slice-201-markdown-family-named-suite-plans',
+        'ruby-markdown-named-suite-plans.json'
       )
     )
     expect(
@@ -7902,9 +8077,9 @@ RSpec.describe Ast::Merge do
 
     report_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-202-markdown-family-manifest-report",
-        "ruby-markdown-manifest-report.json"
+        'diagnostics',
+        'slice-202-markdown-family-manifest-report',
+        'ruby-markdown-manifest-report.json'
       )
     )
     report = described_class.report_conformance_manifest(
@@ -7915,16 +8090,18 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the backend-aware YAML family named-suite plan and manifest report fixtures" do
+  it 'conforms to the backend-aware YAML family named-suite plan and manifest report fixtures' do
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-173-yaml-family-backend-named-suite-plans", "ruby-yaml-backend-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-173-yaml-family-backend-named-suite-plans',
+                         'ruby-yaml-backend-named-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-174-yaml-family-backend-manifest-report", "ruby-yaml-backend-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-174-yaml-family-backend-manifest-report',
+                         'ruby-yaml-backend-manifest-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -7934,24 +8111,29 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the slice-246 through slice-251 nested Markdown and Ruby suite fixtures" do
+  it 'conforms to the slice-246 through slice-251 nested Markdown and Ruby suite fixtures' do
     markdown_suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-246-markdown-nested-suite-definitions", "markdown-nested-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-246-markdown-nested-suite-definitions',
+                         'markdown-nested-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(markdown_suite_fixture[:manifest]))).to eq(json_ready(markdown_suite_fixture[:suite_selectors]))
-    expect(described_class.conformance_suite_definition(markdown_suite_fixture[:manifest], markdown_suite_fixture[:suite_selectors].first)).to eq(
-      markdown_suite_fixture[:suite_definitions].first
-    )
+    expect(described_class.conformance_suite_definition(markdown_suite_fixture[:manifest],
+                                                        markdown_suite_fixture[:suite_selectors].first)).to eq(
+                                                          markdown_suite_fixture[:suite_definitions].first
+                                                        )
 
     markdown_plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-247-markdown-nested-named-suite-plans", "markdown-nested-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-247-markdown-nested-named-suite-plans',
+                         'markdown-nested-named-suite-plans.json')
     )
     expect(
-      json_ready(described_class.plan_named_conformance_suites(markdown_plans_fixture[:manifest], markdown_plans_fixture[:contexts]))
+      json_ready(described_class.plan_named_conformance_suites(markdown_plans_fixture[:manifest],
+                                                               markdown_plans_fixture[:contexts]))
     ).to eq(json_ready(markdown_plans_fixture[:expected_entries]))
 
     markdown_report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-248-markdown-nested-manifest-report", "markdown-nested-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-248-markdown-nested-manifest-report',
+                         'markdown-nested-manifest-report.json')
     )
     markdown_report = described_class.report_conformance_manifest(
       markdown_report_fixture[:manifest],
@@ -7961,22 +8143,24 @@ RSpec.describe Ast::Merge do
     expect(json_ready(markdown_report)).to eq(json_ready(markdown_report_fixture[:expected_report]))
 
     ruby_suite_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-249-ruby-nested-suite-definitions", "ruby-nested-suite-definitions.json")
+      fixtures_root.join('diagnostics', 'slice-249-ruby-nested-suite-definitions', 'ruby-nested-suite-definitions.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(ruby_suite_fixture[:manifest]))).to eq(json_ready(ruby_suite_fixture[:suite_selectors]))
-    expect(described_class.conformance_suite_definition(ruby_suite_fixture[:manifest], ruby_suite_fixture[:suite_selectors].first)).to eq(
-      ruby_suite_fixture[:suite_definitions].first
-    )
+    expect(described_class.conformance_suite_definition(ruby_suite_fixture[:manifest],
+                                                        ruby_suite_fixture[:suite_selectors].first)).to eq(
+                                                          ruby_suite_fixture[:suite_definitions].first
+                                                        )
 
     ruby_plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-250-ruby-nested-named-suite-plans", "ruby-nested-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-250-ruby-nested-named-suite-plans', 'ruby-nested-named-suite-plans.json')
     )
     expect(
-      json_ready(described_class.plan_named_conformance_suites(ruby_plans_fixture[:manifest], ruby_plans_fixture[:contexts]))
+      json_ready(described_class.plan_named_conformance_suites(ruby_plans_fixture[:manifest],
+                                                               ruby_plans_fixture[:contexts]))
     ).to eq(json_ready(ruby_plans_fixture[:expected_entries]))
 
     ruby_report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-251-ruby-nested-manifest-report", "ruby-nested-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-251-ruby-nested-manifest-report', 'ruby-nested-manifest-report.json')
     )
     ruby_report = described_class.report_conformance_manifest(
       ruby_report_fixture[:manifest],
@@ -7986,16 +8170,18 @@ RSpec.describe Ast::Merge do
     expect(json_ready(ruby_report)).to eq(json_ready(ruby_report_fixture[:expected_report]))
   end
 
-  it "conforms to the polyglot YAML family named-suite plan and manifest report fixtures" do
+  it 'conforms to the polyglot YAML family named-suite plan and manifest report fixtures' do
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-185-yaml-family-polyglot-backend-named-suite-plans", "ruby-yaml-polyglot-named-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-185-yaml-family-polyglot-backend-named-suite-plans',
+                         'ruby-yaml-polyglot-named-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-186-yaml-family-polyglot-backend-manifest-report", "ruby-yaml-polyglot-manifest-report.json")
+      fixtures_root.join('diagnostics', 'slice-186-yaml-family-polyglot-backend-manifest-report',
+                         'ruby-yaml-polyglot-manifest-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -8005,14 +8191,15 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the aggregate config-family manifest, plan, and report fixtures" do
+  it 'conforms to the aggregate config-family manifest, plan, and report fixtures' do
     manifest_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-148-config-family-aggregate-manifest", "config-family-aggregate.json")
+      fixtures_root.join('diagnostics', 'slice-148-config-family-aggregate-manifest', 'config-family-aggregate.json')
     )
     expect(json_ready(described_class.conformance_suite_selectors(manifest_fixture[:manifest]))).to eq(json_ready(manifest_fixture[:suite_selectors]))
 
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-149-config-family-aggregate-suite-plans", "config-family-aggregate-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-149-config-family-aggregate-suite-plans',
+                         'config-family-aggregate-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
@@ -8020,9 +8207,9 @@ RSpec.describe Ast::Merge do
 
     report_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-150-config-family-aggregate-manifest-report",
-        "config-family-aggregate-manifest-report.json"
+        'diagnostics',
+        'slice-150-config-family-aggregate-manifest-report',
+        'config-family-aggregate-manifest-report.json'
       )
     )
     report = described_class.report_conformance_manifest(
@@ -8033,13 +8220,13 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
   end
 
-  it "conforms to the aggregate config-family review-state fixtures" do
+  it 'conforms to the aggregate config-family review-state fixtures' do
     %w[
       slice-151-config-family-aggregate-review-state/config-family-aggregate-review-state.json
       slice-152-config-family-aggregate-reviewed-default/config-family-aggregate-reviewed-default.json
       slice-153-config-family-aggregate-replay-application/config-family-aggregate-replay-application.json
     ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      fixture = read_json(fixtures_root.join('diagnostics', relative_path))
       state = described_class.review_conformance_manifest(
         fixture[:manifest],
         fixture[:options],
@@ -8049,16 +8236,16 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the canonical stable-suite planning and review fixtures" do
+  it 'conforms to the canonical stable-suite planning and review fixtures' do
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-155-canonical-stable-suite-plans", "canonical-stable-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-155-canonical-stable-suite-plans', 'canonical-stable-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-156-canonical-stable-suite-report", "canonical-stable-suite-report.json")
+      fixtures_root.join('diagnostics', 'slice-156-canonical-stable-suite-report', 'canonical-stable-suite-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -8068,7 +8255,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
 
     review_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-157-canonical-stable-suite-review-state", "canonical-stable-suite-review-state.json")
+      fixtures_root.join('diagnostics', 'slice-157-canonical-stable-suite-review-state',
+                         'canonical-stable-suite-review-state.json')
     )
     state = described_class.review_conformance_manifest(
       review_fixture[:manifest],
@@ -8078,16 +8266,18 @@ RSpec.describe Ast::Merge do
     expect(json_ready(state)).to eq(json_ready(review_fixture[:expected_state]))
   end
 
-  it "conforms to the canonical stable-suite backend fixtures" do
+  it 'conforms to the canonical stable-suite backend fixtures' do
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-175-canonical-stable-suite-backend-plans", "ruby-canonical-stable-suite-backend-plans.json")
+      fixtures_root.join('diagnostics', 'slice-175-canonical-stable-suite-backend-plans',
+                         'ruby-canonical-stable-suite-backend-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-176-canonical-stable-suite-backend-report", "ruby-canonical-stable-suite-backend-report.json")
+      fixtures_root.join('diagnostics', 'slice-176-canonical-stable-suite-backend-report',
+                         'ruby-canonical-stable-suite-backend-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -8097,7 +8287,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
 
     review_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-177-canonical-stable-suite-backend-review-state", "ruby-canonical-stable-suite-backend-review-state.json")
+      fixtures_root.join('diagnostics', 'slice-177-canonical-stable-suite-backend-review-state',
+                         'ruby-canonical-stable-suite-backend-review-state.json')
     )
     state = described_class.review_conformance_manifest(
       review_fixture[:manifest],
@@ -8107,13 +8298,13 @@ RSpec.describe Ast::Merge do
     expect(json_ready(state)).to eq(json_ready(review_fixture[:expected_state]))
   end
 
-  it "conforms to the source-family review-state fixtures" do
+  it 'conforms to the source-family review-state fixtures' do
     %w[
       slice-158-source-family-review-state/source-family-review-state.json
       slice-159-source-family-reviewed-default/source-family-reviewed-default.json
       slice-160-source-family-replay-application/source-family-replay-application.json
     ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      fixture = read_json(fixtures_root.join('diagnostics', relative_path))
       state = described_class.review_conformance_manifest(
         fixture[:manifest],
         fixture[:options],
@@ -8123,16 +8314,17 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the canonical widened-suite fixtures" do
+  it 'conforms to the canonical widened-suite fixtures' do
     plans_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-162-canonical-widened-suite-plans", "canonical-widened-suite-plans.json")
+      fixtures_root.join('diagnostics', 'slice-162-canonical-widened-suite-plans', 'canonical-widened-suite-plans.json')
     )
     expect(
       json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
     ).to eq(json_ready(plans_fixture[:expected_entries]))
 
     report_fixture = read_json(
-      fixtures_root.join("diagnostics", "slice-163-canonical-widened-suite-report", "canonical-widened-suite-report.json")
+      fixtures_root.join('diagnostics', 'slice-163-canonical-widened-suite-report',
+                         'canonical-widened-suite-report.json')
     )
     report = described_class.report_conformance_manifest(
       report_fixture[:manifest],
@@ -8146,7 +8338,7 @@ RSpec.describe Ast::Merge do
       slice-165-canonical-widened-suite-reviewed-default/canonical-widened-suite-reviewed-default.json
       slice-166-canonical-widened-suite-replay-application/canonical-widened-suite-replay-application.json
     ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      fixture = read_json(fixtures_root.join('diagnostics', relative_path))
       state = described_class.review_conformance_manifest(
         fixture[:manifest],
         fixture[:options],
@@ -8156,13 +8348,13 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the canonical widened-suite backend fixtures" do
+  it 'conforms to the canonical widened-suite backend fixtures' do
     [
       [
-        "slice-178-canonical-widened-suite-backend-plans",
-        "ruby-canonical-widened-suite-backend-plans.json",
-        "slice-179-canonical-widened-suite-backend-report",
-        "ruby-canonical-widened-suite-backend-report.json",
+        'slice-178-canonical-widened-suite-backend-plans',
+        'ruby-canonical-widened-suite-backend-plans.json',
+        'slice-179-canonical-widened-suite-backend-report',
+        'ruby-canonical-widened-suite-backend-report.json',
         %w[
           slice-180-canonical-widened-suite-backend-review-state/ruby-canonical-widened-suite-backend-review-state.json
           slice-181-canonical-widened-suite-backend-reviewed-default/ruby-canonical-widened-suite-backend-reviewed-default.json
@@ -8170,10 +8362,10 @@ RSpec.describe Ast::Merge do
         ]
       ],
       [
-        "slice-187-canonical-widened-suite-polyglot-backend-plans",
-        "ruby-canonical-widened-suite-polyglot-backend-plans.json",
-        "slice-188-canonical-widened-suite-polyglot-backend-report",
-        "ruby-canonical-widened-suite-polyglot-backend-report.json",
+        'slice-187-canonical-widened-suite-polyglot-backend-plans',
+        'ruby-canonical-widened-suite-polyglot-backend-plans.json',
+        'slice-188-canonical-widened-suite-polyglot-backend-report',
+        'ruby-canonical-widened-suite-polyglot-backend-report.json',
         %w[
           slice-189-canonical-widened-suite-polyglot-backend-review-state/ruby-canonical-widened-suite-polyglot-backend-review-state.json
           slice-190-canonical-widened-suite-polyglot-backend-reviewed-default/ruby-canonical-widened-suite-polyglot-backend-reviewed-default.json
@@ -8181,12 +8373,12 @@ RSpec.describe Ast::Merge do
         ]
       ]
     ].each do |plans_slice, plans_file, report_slice, report_file, review_paths|
-      plans_fixture = read_json(fixtures_root.join("diagnostics", plans_slice, plans_file))
+      plans_fixture = read_json(fixtures_root.join('diagnostics', plans_slice, plans_file))
       expect(
         json_ready(described_class.plan_named_conformance_suites(plans_fixture[:manifest], plans_fixture[:contexts]))
       ).to eq(json_ready(plans_fixture[:expected_entries]))
 
-      report_fixture = read_json(fixtures_root.join("diagnostics", report_slice, report_file))
+      report_fixture = read_json(fixtures_root.join('diagnostics', report_slice, report_file))
       report = described_class.report_conformance_manifest(
         report_fixture[:manifest],
         report_fixture[:options],
@@ -8195,7 +8387,7 @@ RSpec.describe Ast::Merge do
       expect(json_ready(report)).to eq(json_ready(report_fixture[:expected_report]))
 
       review_paths.each do |relative_path|
-        fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+        fixture = read_json(fixtures_root.join('diagnostics', relative_path))
         state = described_class.review_conformance_manifest(
           fixture[:manifest],
           fixture[:options],
@@ -8206,12 +8398,12 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it "conforms to the backend-sensitive aggregate fixtures" do
+  it 'conforms to the backend-sensitive aggregate fixtures' do
     plans_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-167-backend-sensitive-aggregate-suite-plans",
-        "backend-sensitive-aggregate-suite-plans.json"
+        'diagnostics',
+        'slice-167-backend-sensitive-aggregate-suite-plans',
+        'backend-sensitive-aggregate-suite-plans.json'
       )
     )
     expect(
@@ -8222,7 +8414,7 @@ RSpec.describe Ast::Merge do
       slice-168-backend-sensitive-aggregate-tree-sitter-report/backend-sensitive-aggregate-tree-sitter-report.json
       slice-169-backend-sensitive-aggregate-native-report/backend-sensitive-aggregate-native-report.json
     ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      fixture = read_json(fixtures_root.join('diagnostics', relative_path))
       report = described_class.report_conformance_manifest(
         fixture[:manifest],
         fixture[:options],
@@ -8235,7 +8427,7 @@ RSpec.describe Ast::Merge do
       slice-192-backend-sensitive-aggregate-tree-sitter-review-state/backend-sensitive-aggregate-tree-sitter-review-state.json
       slice-193-backend-sensitive-aggregate-native-review-state/backend-sensitive-aggregate-native-review-state.json
     ].each do |relative_path|
-      fixture = read_json(fixtures_root.join("diagnostics", relative_path))
+      fixture = read_json(fixtures_root.join('diagnostics', relative_path))
       state = described_class.review_conformance_manifest(
         fixture[:manifest],
         fixture[:options],

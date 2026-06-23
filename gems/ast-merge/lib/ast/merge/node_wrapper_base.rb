@@ -151,7 +151,7 @@ module Ast
       # @param ts_node [Object] The TreeHaver node
       # @return [String]
       def node_text(ts_node)
-        return "" unless ts_node.respond_to?(:start_byte) && ts_node.respond_to?(:end_byte)
+        return '' unless ts_node.respond_to?(:start_byte) && ts_node.respond_to?(:end_byte)
 
         length = ts_node.end_byte - ts_node.start_byte
         text = @source.byteslice(ts_node.start_byte, length)
@@ -168,7 +168,7 @@ module Ast
       # Get the content for this node from source lines.
       # @return [String]
       def content
-        return "" unless @start_line && @end_line
+        return '' unless @start_line && @end_line
 
         (@start_line..@end_line).map { |ln| @lines[ln - 1] }.compact.join("\n")
       end
@@ -205,8 +205,8 @@ module Ast
           leading_region: leading_comment_region(style: style, **metadata),
           inline_region: inline_comment_region(style: style, **metadata),
           metadata: {
-            source: :node_wrapper_base,
-          }.merge(metadata),
+            source: :node_wrapper_base
+          }.merge(metadata)
         )
       end
 
@@ -313,8 +313,8 @@ module Ast
           comments: comments,
           style: style || :hash_comment,
           metadata: {
-            source: :node_wrapper_base,
-          }.merge(metadata),
+            source: :node_wrapper_base
+          }.merge(metadata)
         )
       end
 
@@ -326,10 +326,10 @@ module Ast
           @start_line = extract_row(point) + 1
         end
 
-        if node.respond_to?(:end_point)
-          point = node.end_point
-          @end_line = extract_row(point) + 1
-        end
+        return unless node.respond_to?(:end_point)
+
+        point = node.end_point
+        @end_line = extract_row(point) + 1
       end
 
       # Extract row from a point, handling different point implementations.

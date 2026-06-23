@@ -140,7 +140,7 @@ engines:
 # Supported values: org, project, org_and_project
 # Default (when key is absent): org_and_project
 readme:
-  top_logo_mode: org
+  top_logo_mode: org, project
   # Sections to preserve from the destination README during template merging.
   # These section headings (case-insensitive) will keep the destination body
   # instead of being overwritten by the template. Default when absent:
@@ -216,7 +216,7 @@ machine_users:
 # Divergence is currently measured as the percent of produced files that would
 # change or be added during templating (100 - unchanged-file score).
 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
-min_divergence_threshold: 
+min_divergence_threshold:
 
 # Template source inventory.
 # The packaged inventory is the canonical kettle-jem project template. It

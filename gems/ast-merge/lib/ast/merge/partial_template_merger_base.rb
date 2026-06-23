@@ -144,12 +144,10 @@ module Ast
           position: :replace,
           boundary_type: boundary&.dig(:type),
           boundary_text: boundary&.dig(:text),
-          boundary_same_or_shallower: boundary&.dig(:same_or_shallower) || false,
+          boundary_same_or_shallower: boundary&.dig(:same_or_shallower) || false
         )
 
-        if injection_point.nil?
-          return handle_missing_section(d_analysis)
-        end
+        return handle_missing_section(d_analysis) if injection_point.nil?
 
         # Found the section - now merge
         perform_section_merge(d_analysis, d_statements, injection_point)
@@ -230,14 +228,14 @@ module Ast
         return text if text.is_a?(Regexp)
 
         # Handle /regex/ syntax in strings
-        if text.is_a?(String) && text.start_with?("/") && text.end_with?("/")
+        if text.is_a?(String) && text.start_with?('/') && text.end_with?('/')
           Regexp.new(text[1..-2])
         else
           text
         end
       end
 
-      def handle_missing_section(d_analysis)
+      def handle_missing_section(_d_analysis)
         case when_missing
         when :append
           # Append template to end of destination
@@ -246,7 +244,7 @@ module Ast
             content: new_content,
             has_section: false,
             changed: true,
-            message: "Section not found, appended template",
+            message: 'Section not found, appended template'
           )
         when :prepend
           # Prepend template to beginning of destination
@@ -255,14 +253,14 @@ module Ast
             content: new_content,
             has_section: false,
             changed: true,
-            message: "Section not found, prepended template",
+            message: 'Section not found, prepended template'
           )
         else
           Result.new(
             content: destination,
             has_section: false,
             changed: false,
-            message: "Section not found, skipping",
+            message: 'Section not found, skipping'
           )
         end
       end
@@ -282,7 +280,7 @@ module Ast
           statements: d_statements,
           section_start_idx: section_start_idx,
           section_end_idx: section_end_idx,
-          injection_point: injection_point,
+          injection_point: injection_point
         )
 
         # Determine the merged section content
@@ -300,7 +298,7 @@ module Ast
           section_end_idx: section_end_idx,
           merged_section: merged_section,
           before_content: before_content,
-          after_content: after_content,
+          after_content: after_content
         )
 
         changed = new_content != destination
@@ -311,7 +309,7 @@ module Ast
           changed: changed,
           stats: stats,
           injection_point: injection_point,
-          message: changed ? "Section merged successfully" : "Section unchanged",
+          message: changed ? 'Section merged successfully' : 'Section unchanged'
         )
       end
 
@@ -324,7 +322,7 @@ module Ast
 
         if replace_mode?
           # Full replacement: just use template content directly
-          [template, {mode: :replace}]
+          [template, { mode: :replace }]
         else
           # Intelligent merge: use SmartMerger
           merger = create_smart_merger(template, section_content)
@@ -333,7 +331,8 @@ module Ast
         end
       end
 
-      def build_section_merge_context(analysis:, statements:, section_start_idx:, section_end_idx:, injection_point: nil)
+      def build_section_merge_context(analysis:, statements:, section_start_idx:, section_end_idx:,
+                                      injection_point: nil)
         {
           analysis: analysis,
           statements: statements,
@@ -345,8 +344,8 @@ module Ast
             analysis: analysis,
             statements: statements,
             section_start_idx: section_start_idx,
-            section_end_idx: section_end_idx,
-          ),
+            section_end_idx: section_end_idx
+          )
         }
       end
 
@@ -357,7 +356,7 @@ module Ast
       end
 
       def statements_to_content(statements, analysis = nil)
-        return "" if statements.nil? || statements.empty?
+        return '' if statements.nil? || statements.empty?
 
         statements.map do |stmt|
           node = stmt.respond_to?(:node) ? stmt.node : stmt
@@ -366,12 +365,10 @@ module Ast
       end
 
       def build_merged_content(before, section, after)
-        result = +""
+        result = +''
 
         # Before content
-        unless before.nil? || before.strip.empty?
-          result << before.chomp("\n")
-        end
+        result << before.chomp("\n") unless before.nil? || before.strip.empty?
 
         # Merged section - ensure exactly one blank line before it if there's content before
         unless section.nil? || section.strip.empty?
@@ -397,13 +394,14 @@ module Ast
         result
       end
 
-      def build_spliced_content(analysis:, statements:, section_start_idx:, section_end_idx:, merged_section:, before_content:, after_content:)
+      def build_spliced_content(analysis:, statements:, section_start_idx:, section_end_idx:, merged_section:,
+                                before_content:, after_content:)
         splice_plan = source_splice_plan_for(
           analysis: analysis,
           statements: statements,
           section_start_idx: section_start_idx,
           section_end_idx: section_end_idx,
-          merged_section: merged_section,
+          merged_section: merged_section
         )
 
         if splice_plan
@@ -421,7 +419,7 @@ module Ast
         return unless first_statement && last_statement
 
         previous_statement = section_start_idx.positive? ? statements[section_start_idx - 1] : nil
-        next_statement = ((section_end_idx + 1) < statements.length) ? statements[section_end_idx + 1] : nil
+        next_statement = (section_end_idx + 1) < statements.length ? statements[section_end_idx + 1] : nil
 
         replace_start_line = StructuralEdit::BoundarySupport.statement_start_line(first_statement)
         replace_end_line = StructuralEdit::BoundarySupport.statement_end_line(last_statement)
@@ -436,15 +434,15 @@ module Ast
             analysis,
             previous_statement,
             edge: :leading,
-            source: :partial_template_merger_base,
+            source: :partial_template_merger_base
           ),
           trailing_boundary: StructuralEdit::BoundarySupport.build_splice_boundary(
             analysis,
             next_statement,
             edge: :trailing,
-            source: :partial_template_merger_base,
+            source: :partial_template_merger_base
           ),
-          metadata: {source: :partial_template_merger_base},
+          metadata: { source: :partial_template_merger_base }
         )
       rescue ArgumentError
         nil
@@ -452,14 +450,14 @@ module Ast
 
       def source_remove_plan_for(analysis:, statements:, section_start_idx:, section_end_idx:)
         previous_statement = section_start_idx.positive? ? statements[section_start_idx - 1] : nil
-        next_statement = ((section_end_idx + 1) < statements.length) ? statements[section_end_idx + 1] : nil
+        next_statement = (section_end_idx + 1) < statements.length ? statements[section_end_idx + 1] : nil
 
         StructuralEdit::RemovePlanSupport.build_remove_plan(
           analysis: analysis,
           statements: statements[section_start_idx..section_end_idx],
           leading_statement: previous_statement,
           trailing_statement: next_statement,
-          source: :partial_template_merger_base,
+          source: :partial_template_merger_base
         )
       end
     end

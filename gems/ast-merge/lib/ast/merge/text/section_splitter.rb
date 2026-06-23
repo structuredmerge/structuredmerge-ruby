@@ -125,7 +125,7 @@ module Ast
             template_sections,
             dest_sections,
             preference: preference,
-            add_template_only: add_template_only,
+            add_template_only: add_template_only
           )
 
           join(merged_sections)
@@ -138,7 +138,8 @@ module Ast
         # @param preference [Symbol, Hash] Merge preference
         # @param add_template_only [Boolean] Whether to add template-only sections
         # @return [Array<Section>] Merged sections
-        def merge_section_lists(template_sections, dest_sections, preference: DEFAULT_PREFERENCE, add_template_only: false)
+        def merge_section_lists(template_sections, dest_sections, preference: DEFAULT_PREFERENCE,
+                                add_template_only: false)
           # Build lookup by normalized name
           dest_by_name = dest_sections.each_with_object({}) do |section, hash|
             key = normalize_name(section.name)
@@ -170,6 +171,7 @@ module Ast
           dest_sections.each do |dest_section|
             key = normalize_name(dest_section.name)
             next if seen_names.include?(key)
+
             merged << dest_section
           end
 
@@ -216,7 +218,7 @@ module Ast
             body: dest_section.body,
             start_line: dest_section.start_line,
             end_line: dest_section.end_line,
-            metadata: dest_section.metadata&.merge(template_section.metadata || {}),
+            metadata: dest_section.metadata&.merge(template_section.metadata || {})
           )
         end
 
@@ -249,9 +251,10 @@ module Ast
         # @param name [String, Symbol, nil] The section name
         # @return [String] Normalized name
         def normalize_name(name)
-          return "" if name.nil?
+          return '' if name.nil?
           return name.to_s if name.is_a?(Symbol)
-          name.to_s.strip.downcase.gsub(/\s+/, " ")
+
+          name.to_s.strip.downcase.gsub(/\s+/, ' ')
         end
 
         # Generate a signature for section matching.
@@ -274,9 +277,9 @@ module Ast
           def validate!(config)
             return if config.nil?
 
-            unless config.is_a?(Hash)
-              raise ArgumentError, "splitter config must be a Hash, got #{config.class}"
-            end
+            return if config.is_a?(Hash)
+
+            raise ArgumentError, "splitter config must be a Hash, got #{config.class}"
           end
         end
       end
@@ -336,7 +339,7 @@ module Ast
                   body: preamble_lines.join,
                   start_line: 1,
                   end_line: line_num - 1,
-                  metadata: {type: :preamble},
+                  metadata: { type: :preamble }
                 )
               end
 
@@ -345,7 +348,7 @@ module Ast
                 name: section_name.strip,
                 header: line,
                 body_lines: [],
-                start_line: line_num,
+                start_line: line_num
               }
             elsif current_section
               current_section[:body_lines] << line
@@ -366,7 +369,7 @@ module Ast
               body: preamble_lines.join,
               start_line: 1,
               end_line: lines.length,
-              metadata: {type: :preamble},
+              metadata: { type: :preamble }
             )
           end
 
@@ -390,7 +393,7 @@ module Ast
             body: section_data[:body_lines].join,
             start_line: section_data[:start_line],
             end_line: section_data[:end_line] || section_data[:start_line] + section_data[:body_lines].length,
-            metadata: nil,
+            metadata: nil
           )
         end
       end

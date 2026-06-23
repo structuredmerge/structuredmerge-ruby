@@ -86,7 +86,7 @@ module Ast
           build_trailing_groups(
             template_nodes: template_nodes,
             matched_predicate: predicate,
-            entry_builder: entry_builder,
+            entry_builder: entry_builder
           )
         end
 

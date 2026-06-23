@@ -55,7 +55,7 @@ module Ast
 
         # @return [Hash, nil] Optional metadata for detector-specific information
         :metadata,
-        keyword_init: true,
+        keyword_init: true
       ) do
         # Returns the line range covered by this region.
         # @return [Range]
@@ -74,8 +74,8 @@ module Ast
         def full_text
           return content if delimiters.nil? || delimiters.empty?
 
-          opening = delimiters[0] || ""
-          closing = delimiters[1] || ""
+          opening = delimiters[0] || ''
+          closing = delimiters[1] || ''
           "#{opening}\n#{content}#{closing}"
         end
 
@@ -103,10 +103,10 @@ module Ast
         # @return [String]
         def inspect
           truncated = if content && content.length > 30
-            "#{content[0, 30]}..."
-          else
-            content.inspect
-          end
+                        "#{content[0, 30]}..."
+                      else
+                        content.inspect
+                      end
           "#{self} #{truncated}"
         end
       end
@@ -160,7 +160,7 @@ module Ast
         # A human-readable name for this detector.
         # @return [String]
         def name
-          self.class.name || "AnonymousDetector"
+          self.class.name || 'AnonymousDetector'
         end
 
         # @return [String]
@@ -179,15 +179,15 @@ module Ast
             start_line: start_line,
             end_line: end_line,
             delimiters: delimiters,
-            metadata: metadata || {},
+            metadata: metadata || {}
           )
         end
       end
 
-      autoload :FencedCodeBlock, "ast/merge/detector/fenced_code_block"
-      autoload :YamlFrontmatter, "ast/merge/detector/yaml_frontmatter"
-      autoload :TomlFrontmatter, "ast/merge/detector/toml_frontmatter"
-      autoload :Mergeable, "ast/merge/detector/mergeable"
+      autoload :FencedCodeBlock, 'ast/merge/detector/fenced_code_block'
+      autoload :YamlFrontmatter, 'ast/merge/detector/yaml_frontmatter'
+      autoload :TomlFrontmatter, 'ast/merge/detector/toml_frontmatter'
+      autoload :Mergeable, 'ast/merge/detector/mergeable'
     end
   end
 end

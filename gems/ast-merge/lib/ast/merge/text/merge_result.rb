@@ -33,7 +33,7 @@ module Ast
             decision: decision,
             template_node: template_node,
             dest_node: dest_node,
-            line: @lines.length,
+            line: @lines.length
           }
         end
       end

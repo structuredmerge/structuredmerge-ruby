@@ -200,7 +200,7 @@ module Ast
           preference: @preference,
           add_template_only_nodes: @add_template_only_nodes,
           resolution_mode: @resolution_mode,
-          unresolved_policy: @unresolved_policy.to_h,
+          unresolved_policy: @unresolved_policy.to_h
         }
         result[:freeze_token] = @freeze_token || default_freeze_token if @freeze_token || default_freeze_token
         result[:signature_generator] = @signature_generator if @signature_generator
@@ -220,7 +220,7 @@ module Ast
           signature_generator: options.fetch(:signature_generator, @signature_generator),
           node_typing: options.fetch(:node_typing, @node_typing),
           resolution_mode: options.fetch(:resolution_mode, @resolution_mode),
-          unresolved_policy: options.fetch(:unresolved_policy, @unresolved_policy),
+          unresolved_policy: options.fetch(:unresolved_policy, @unresolved_policy)
         )
       end
 
@@ -232,7 +232,8 @@ module Ast
         # @param signature_generator [Proc, nil] Optional signature generator
         # @param node_typing [Hash, nil] Optional node typing configuration
         # @return [MergerConfig] Config preset
-        def destination_wins(freeze_token: nil, signature_generator: nil, node_typing: nil, resolution_mode: :eager, unresolved_policy: nil)
+        def destination_wins(freeze_token: nil, signature_generator: nil, node_typing: nil, resolution_mode: :eager,
+                             unresolved_policy: nil)
           new(
             preference: :destination,
             add_template_only_nodes: false,
@@ -240,7 +241,7 @@ module Ast
             signature_generator: signature_generator,
             node_typing: node_typing,
             resolution_mode: resolution_mode,
-            unresolved_policy: unresolved_policy,
+            unresolved_policy: unresolved_policy
           )
         end
 
@@ -251,7 +252,8 @@ module Ast
         # @param signature_generator [Proc, nil] Optional signature generator
         # @param node_typing [Hash, nil] Optional node typing configuration
         # @return [MergerConfig] Config preset
-        def template_wins(freeze_token: nil, signature_generator: nil, node_typing: nil, resolution_mode: :eager, unresolved_policy: nil)
+        def template_wins(freeze_token: nil, signature_generator: nil, node_typing: nil, resolution_mode: :eager,
+                          unresolved_policy: nil)
           new(
             preference: :template,
             add_template_only_nodes: true,
@@ -259,7 +261,7 @@ module Ast
             signature_generator: signature_generator,
             node_typing: node_typing,
             resolution_mode: resolution_mode,
-            unresolved_policy: unresolved_policy,
+            unresolved_policy: unresolved_policy
           )
         end
       end
@@ -271,8 +273,8 @@ module Ast
           validate_hash_preference!(preference)
         elsif !VALID_PREFERENCES.include?(preference)
           raise ArgumentError,
-            "Invalid preference: #{preference.inspect}. " \
-              "Must be one of: #{VALID_PREFERENCES.map(&:inspect).join(", ")} or a Hash"
+                "Invalid preference: #{preference.inspect}. " \
+                  "Must be one of: #{VALID_PREFERENCES.map(&:inspect).join(', ')} or a Hash"
         end
       end
 
@@ -280,14 +282,14 @@ module Ast
         preference.each do |key, value|
           unless key.is_a?(Symbol)
             raise ArgumentError,
-              "preference Hash keys must be Symbols, got #{key.class} for #{key.inspect}"
+                  "preference Hash keys must be Symbols, got #{key.class} for #{key.inspect}"
           end
 
-          unless VALID_PREFERENCES.include?(value)
-            raise ArgumentError,
-              "preference Hash values must be :destination or :template, " \
-                "got #{value.inspect} for key #{key.inspect}"
-          end
+          next if VALID_PREFERENCES.include?(value)
+
+          raise ArgumentError,
+                'preference Hash values must be :destination or :template, ' \
+                  "got #{value.inspect} for key #{key.inspect}"
         end
       end
 
@@ -295,8 +297,8 @@ module Ast
         return if VALID_RESOLUTION_MODES.include?(resolution_mode)
 
         raise ArgumentError,
-          "Invalid resolution_mode: #{resolution_mode.inspect}. " \
-            "Must be one of: #{VALID_RESOLUTION_MODES.map(&:inspect).join(", ")}"
+              "Invalid resolution_mode: #{resolution_mode.inspect}. " \
+                "Must be one of: #{VALID_RESOLUTION_MODES.map(&:inspect).join(', ')}"
       end
 
       def normalize_unresolved_policy(unresolved_policy)

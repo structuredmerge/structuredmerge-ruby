@@ -6,26 +6,26 @@ module Ast
       # Normalized parsed merge-ruleset configuration.
       class Config
         attr_reader :format,
-          :owners,
-          :match,
-          :read,
-          :attach,
-          :comment_style,
-          :render,
-          :capabilities,
-          :logical_owners,
-          :repair_policies,
-          :surfaces,
-          :delegation_policies,
-          :directives,
-          :source,
-          :path
+                    :owners,
+                    :match,
+                    :read,
+                    :attach,
+                    :comment_style,
+                    :render,
+                    :capabilities,
+                    :logical_owners,
+                    :repair_policies,
+                    :surfaces,
+                    :delegation_policies,
+                    :directives,
+                    :source,
+                    :path
 
         class << self
           def load(path)
             raise ArgumentError, "Ruleset file not found: #{path}" unless File.exist?(path)
 
-            parse(File.read(path, encoding: "UTF-8"), path: path)
+            parse(File.read(path, encoding: 'UTF-8'), path: path)
           end
 
           def parse(source, path: nil)
@@ -35,12 +35,7 @@ module Ast
 
         def initialize(
           source:,
-          path: nil,
-          format:,
-          owners:,
-          match:,
-          read:,
-          attach:,
+          format:, owners:, match:, read:, attach:, path: nil,
           comment_style: nil,
           render: nil,
           capabilities: {},
@@ -80,7 +75,7 @@ module Ast
             logical_owners: logical_owners.dup,
             repair_policies: repair_policies.map(&:to_h),
             surfaces: surfaces.map(&:to_h),
-            delegation_policies: delegation_policies.map(&:to_h),
+            delegation_policies: delegation_policies.map(&:to_h)
           }.compact
         end
 

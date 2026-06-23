@@ -72,8 +72,8 @@ module Ast
               start_line: start_line,
               end_line: end_line,
               delimiters: [opening_delimiter.strip, closing_delimiter.strip],
-              metadata: {format: :toml},
-            ),
+              metadata: { format: :toml }
+            )
           ]
         end
       end

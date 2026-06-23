@@ -37,7 +37,7 @@ module Ast
             mode: mode,
             metadata: metadata,
             exact_preservation: preserve_exact?,
-            blank_line_equivalence: blank_line_equivalent?,
+            blank_line_equivalence: blank_line_equivalent?
           }
         end
 

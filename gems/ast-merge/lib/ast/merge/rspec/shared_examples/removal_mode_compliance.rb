@@ -21,14 +21,14 @@
 # - :options      Additional merge options (remove_template_missing_nodes: true is forced)
 #
 # The shared example validates both exact output and idempotency for each case.
-RSpec.shared_examples("Ast::Merge::RemovalModeCompliance") do
+RSpec.shared_examples('Ast::Merge::RemovalModeCompliance') do
   def merge_removal_mode_case(example_case, destination_override: nil)
-    options = {remove_template_missing_nodes: true}.merge(example_case.fetch(:options, {}))
+    options = { remove_template_missing_nodes: true }.merge(example_case.fetch(:options, {}))
 
     merger_class.new(
       example_case.fetch(:template),
       destination_override || example_case.fetch(:destination),
-      **options,
+      **options
     ).merge.to_s
   end
 
@@ -37,16 +37,16 @@ RSpec.shared_examples("Ast::Merge::RemovalModeCompliance") do
   end
 
   def unsupported_removal_mode_case_reason(case_name)
-    return "case not applicable for this merger" unless respond_to?(:unsupported_removal_mode_case_reasons)
+    return 'case not applicable for this merger' unless respond_to?(:unsupported_removal_mode_case_reasons)
 
-    unsupported_removal_mode_case_reasons.fetch(case_name, "case not applicable for this merger")
+    unsupported_removal_mode_case_reasons.fetch(case_name, 'case not applicable for this merger')
   end
 
   {
-    "promotes leading comments for removed destination-only nodes" => :removal_mode_leading_comments_case,
-    "promotes inline comments for removed destination-only nodes" => :removal_mode_inline_comments_case,
-    "preserves separator blank lines around promoted removed-node comments" => :removal_mode_separator_blank_line_case,
-    "applies the same removal-mode comment preservation rules in recursive scopes" => :removal_mode_recursive_case,
+    'promotes leading comments for removed destination-only nodes' => :removal_mode_leading_comments_case,
+    'promotes inline comments for removed destination-only nodes' => :removal_mode_inline_comments_case,
+    'preserves separator blank lines around promoted removed-node comments' => :removal_mode_separator_blank_line_case,
+    'applies the same removal-mode comment preservation rules in recursive scopes' => :removal_mode_recursive_case
   }.each do |description, case_name|
     it description do
       example_case = removal_mode_case_for(case_name)

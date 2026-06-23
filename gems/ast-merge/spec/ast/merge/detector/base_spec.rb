@@ -12,7 +12,7 @@ RSpec.describe Ast::Merge::Detector::Base do
         # Simple implementation that finds lines starting with ">>>"
         regions = []
         source.lines.each_with_index do |line, idx|
-          next unless line.start_with?(">>>")
+          next unless line.start_with?('>>>')
 
           regions << Ast::Merge::Detector::Region.new(
             type: region_type,
@@ -20,7 +20,7 @@ RSpec.describe Ast::Merge::Detector::Base do
             start_line: idx + 1,
             end_line: idx + 1,
             delimiters: nil,
-            metadata: {},
+            metadata: {}
           )
         end
         regions
@@ -30,23 +30,23 @@ RSpec.describe Ast::Merge::Detector::Base do
 
   let(:detector) { test_detector_class.new }
 
-  describe "#region_type" do
-    it "returns the type symbol" do
+  describe '#region_type' do
+    it 'returns the type symbol' do
       expect(detector.region_type).to eq(:test_region)
     end
 
-    context "when not implemented" do
+    context 'when not implemented' do
       let(:abstract_detector) do
         Class.new(described_class).new
       end
 
-      it "raises NotImplementedError" do
+      it 'raises NotImplementedError' do
         expect { abstract_detector.region_type }.to raise_error(NotImplementedError)
       end
     end
   end
 
-  describe "#detect_all" do
+  describe '#detect_all' do
     let(:source) do
       <<~TEXT
         normal line
@@ -56,45 +56,45 @@ RSpec.describe Ast::Merge::Detector::Base do
       TEXT
     end
 
-    it "returns an array of Region objects" do
+    it 'returns an array of Region objects' do
       regions = detector.detect_all(source)
       expect(regions).to all(be_a(Ast::Merge::Detector::Region))
     end
 
-    it "detects all matching regions" do
+    it 'detects all matching regions' do
       regions = detector.detect_all(source)
       expect(regions.size).to eq(2)
     end
 
-    it "returns empty array for source with no matches" do
-      regions = detector.detect_all("no matches here")
+    it 'returns empty array for source with no matches' do
+      regions = detector.detect_all('no matches here')
       expect(regions).to eq([])
     end
 
-    context "when not implemented" do
+    context 'when not implemented' do
       let(:abstract_detector) do
         Class.new(described_class).new
       end
 
-      it "raises NotImplementedError" do
-        expect { abstract_detector.detect_all("source") }.to raise_error(NotImplementedError)
+      it 'raises NotImplementedError' do
+        expect { abstract_detector.detect_all('source') }.to raise_error(NotImplementedError)
       end
     end
   end
 
-  describe "#strip_delimiters?" do
-    it "returns true by default" do
+  describe '#strip_delimiters?' do
+    it 'returns true by default' do
       expect(detector.strip_delimiters?).to be true
     end
   end
 
-  describe "#name" do
-    it "returns the class name" do
+  describe '#name' do
+    it 'returns the class name' do
       expect(detector.name).to be_a(String)
       expect(detector.name).not_to be_empty
     end
 
-    context "with anonymous class" do
+    context 'with anonymous class' do
       let(:anon_detector_class) do
         Class.new(described_class) do
           def region_type
@@ -116,11 +116,11 @@ RSpec.describe Ast::Merge::Detector::Base do
     end
   end
 
-  describe "#inspect" do
-    it "returns a description including region_type" do
+  describe '#inspect' do
+    it 'returns a description including region_type' do
       result = detector.inspect
-      expect(result).to include("test_region")
-      expect(result).to include("region_type=")
+      expect(result).to include('test_region')
+      expect(result).to include('region_type=')
     end
   end
 end

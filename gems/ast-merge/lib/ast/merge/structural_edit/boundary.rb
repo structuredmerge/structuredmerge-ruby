@@ -67,7 +67,7 @@ module Ast
           return normalized if EDGES.include?(normalized)
 
           raise ArgumentError,
-            "Unknown structural edit boundary edge: #{edge.inspect}. Expected one of: #{EDGES.join(", ")}"
+                "Unknown structural edit boundary edge: #{edge.inspect}. Expected one of: #{EDGES.join(', ')}"
         end
       end
     end

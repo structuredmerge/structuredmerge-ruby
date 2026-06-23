@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "dependency_tags_helpers"
+require_relative 'dependency_tags_helpers'
 
 # Ast::Merge RSpec Dependency Tags - RSpec Configuration
 #
@@ -60,10 +60,10 @@ RSpec.configure do |config|
 
   # Print dependency summary if AST_MERGE_DEBUG is set
   config.before(:suite) do
-    unless ENV.fetch("AST_MERGE_DEBUG", "false").casecmp?("false")
+    unless ENV.fetch('AST_MERGE_DEBUG', 'false').casecmp?('false')
       puts "\n=== Ast::Merge Test Dependencies ==="
       deps.summary.each do |dep, available|
-        status = available ? "✓ available" : "✗ not available"
+        status = available ? '✓ available' : '✗ not available'
         puts "  #{dep}: #{status}"
       end
       puts "=====================================\n"

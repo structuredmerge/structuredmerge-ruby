@@ -48,7 +48,7 @@
 #     }
 #   end
 #
-RSpec.shared_examples("a reproducible merge") do |scenario, options = {}|
+RSpec.shared_examples('a reproducible merge') do |scenario, options = {}|
   let(:scenario_name) { scenario }
   let(:merge_options) { options }
   # file_extension should be defined by the including spec
@@ -56,23 +56,23 @@ RSpec.shared_examples("a reproducible merge") do |scenario, options = {}|
   let(:file_extension) do
     super()
   rescue NoMethodError
-    ""
+    ''
   end
   let(:fixture_filename) do
     ->(name) { file_extension.to_s.empty? ? name : "#{name}.#{file_extension}" }
   end
   let(:fixture) do
-    template = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call("template")))
-    destination = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call("destination")))
-    expected_result = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call("result")))
-    {template: template, destination: destination, expected: expected_result}
+    template = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call('template')))
+    destination = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call('destination')))
+    expected_result = File.read(File.join(fixtures_path, scenario_name, fixture_filename.call('result')))
+    { template: template, destination: destination, expected: expected_result }
   end
 
-  it "produces the expected result" do
+  it 'produces the expected result' do
     merger = merger_class.new(
       fixture[:template],
       fixture[:destination],
-      **merge_options,
+      **merge_options
     )
     result = merger.merge
 
@@ -85,16 +85,16 @@ RSpec.shared_examples("a reproducible merge") do |scenario, options = {}|
       eq(expected),
       "Merge result did not match expected.\n" \
         "Expected:\n#{expected.inspect}\n" \
-        "Got:\n#{actual.inspect}",
+        "Got:\n#{actual.inspect}"
     )
   end
 
-  it "is idempotent (merging again produces same result)" do
+  it 'is idempotent (merging again produces same result)' do
     # First merge
     merger1 = merger_class.new(
       fixture[:template],
       fixture[:destination],
-      **merge_options,
+      **merge_options
     )
     result1 = merger1.merge
 
@@ -102,7 +102,7 @@ RSpec.shared_examples("a reproducible merge") do |scenario, options = {}|
     merger2 = merger_class.new(
       fixture[:template],
       result1,
-      **merge_options,
+      **merge_options
     )
     result2 = merger2.merge
 
@@ -110,7 +110,7 @@ RSpec.shared_examples("a reproducible merge") do |scenario, options = {}|
       eq(result1),
       "Merge is not idempotent!\n" \
         "First merge:\n#{result1.inspect}\n" \
-        "Second merge:\n#{result2.inspect}",
+        "Second merge:\n#{result2.inspect}"
     )
   end
 end

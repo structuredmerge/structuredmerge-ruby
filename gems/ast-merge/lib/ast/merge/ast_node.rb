@@ -46,8 +46,8 @@ module Ast
         # Hash-like access for compatibility
         def [](key)
           case key
-          when :row, "row" then row
-          when :column, "column" then column
+          when :row, 'row' then row
+          when :column, 'column' then column
           end
         end
 
@@ -55,7 +55,7 @@ module Ast
         #
         # @return [Hash{Symbol => Integer, nil}] row/column pair
         def to_h
-          {row: row, column: column}
+          { row: row, column: column }
         end
 
         # Return a compact human-readable point representation.
@@ -115,14 +115,14 @@ module Ast
       # @return [String] Node type
       def type
         # Default: derive from class name (MyNode → "my_node")
-        self.class.name.split("::").last
-          .gsub(/([A-Z])/, '_\1')
-          .downcase
-          .sub(/^_/, "")
+        self.class.name.split('::').last
+            .gsub(/([A-Z])/, '_\1')
+            .downcase
+            .sub(/^_/, '')
       end
 
       # Alias for tree-sitter compatibility
-      alias_method :kind, :type
+      alias kind type
 
       # TreeHaver::Node protocol: text
       # @return [String] The source text
@@ -160,8 +160,8 @@ module Ast
       # @return [Point] Starting position
       def start_point
         Point.new(
-          row: (location&.start_line || 1) - 1,  # Convert to 0-based
-          column: location&.start_column || 0,
+          row: (location&.start_line || 1) - 1, # Convert to 0-based
+          column: location&.start_column || 0
         )
       end
 
@@ -171,8 +171,8 @@ module Ast
       # @return [Point] Ending position
       def end_point
         Point.new(
-          row: (location&.end_line || 1) - 1,  # Convert to 0-based
-          column: location&.end_column || 0,
+          row: (location&.end_line || 1) - 1, # Convert to 0-based
+          column: location&.end_column || 0
         )
       end
 
@@ -234,6 +234,7 @@ module Ast
       # @return [Enumerator, nil]
       def each(&block)
         return to_enum(__method__) unless block_given?
+
         children.each(&block)
       end
 

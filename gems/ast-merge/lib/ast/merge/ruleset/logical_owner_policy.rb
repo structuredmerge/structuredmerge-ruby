@@ -35,7 +35,7 @@ module Ast
           {
             kind: kind,
             action: action,
-            metadata: metadata,
+            metadata: metadata
           }
         end
 

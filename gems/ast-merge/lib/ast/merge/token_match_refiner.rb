@@ -53,7 +53,7 @@ module Ast
         node_types: [],
         text_extractor: nil,
         stopwords: JaccardSimilarity::DEFAULT_STOPWORDS,
-        **options
+        **_options
       )
         super(threshold: threshold, node_types: node_types)
         @text_extractor = text_extractor
@@ -66,7 +66,7 @@ module Ast
       # @param dest_nodes [Array] Unmatched destination nodes
       # @param context [Hash] Additional context (unused)
       # @return [Array<MatchResult>] Matched pairs
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         t_filtered = node_types.empty? ? template_nodes : filter_nodes(template_nodes)
         d_filtered = node_types.empty? ? dest_nodes : filter_nodes(dest_nodes)
 
@@ -85,12 +85,12 @@ module Ast
 
       def node_tokens(node)
         text = if text_extractor
-          text_extractor.call(node)
-        elsif node.respond_to?(:text)
-          node.text.to_s
-        else
-          ""
-        end
+                 text_extractor.call(node)
+               elsif node.respond_to?(:text)
+                 node.text.to_s
+               else
+                 ''
+               end
         extract_tokens(text, stopwords: stopwords)
       end
     end

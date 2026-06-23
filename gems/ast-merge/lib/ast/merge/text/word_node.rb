@@ -37,7 +37,7 @@ module Ast
             start_line: line_number,
             end_line: line_number,
             start_column: start_col,
-            end_column: end_col,
+            end_column: end_col
           )
 
           super(slice: content, location: location)
@@ -46,7 +46,7 @@ module Ast
         # TreeHaver::Node protocol: type
         # @return [String] "word_node"
         def type
-          "word_node"
+          'word_node'
         end
 
         # Generate a signature for this word node.
@@ -89,7 +89,7 @@ module Ast
           other.is_a?(WordNode) && @content == other.content
         end
 
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Hash code for use in Hash keys
         #

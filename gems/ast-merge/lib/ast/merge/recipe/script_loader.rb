@@ -57,9 +57,7 @@ module Ast
           return reference if reference.respond_to?(:call)
 
           # Check if it's an inline lambda expression
-          if inline_expression?(reference)
-            return evaluate_inline_expression(reference)
-          end
+          return evaluate_inline_expression(reference) if inline_expression?(reference)
 
           # It's a file path reference
           load_script_file(reference)
@@ -100,8 +98,8 @@ module Ast
         def available_scripts
           return [] unless scripts_available?
 
-          Dir.glob(File.join(base_dir, "**/*.rb")).map do |path|
-            path.sub("#{base_dir}/", "")
+          Dir.glob(File.join(base_dir, '**/*.rb')).map do |path|
+            path.sub("#{base_dir}/", '')
           end
         end
 
@@ -114,7 +112,7 @@ module Ast
 
           # Convention: scripts folder has same name as recipe (without extension)
           recipe_dir = File.dirname(recipe_path)
-          recipe_basename = File.basename(recipe_path, ".*")
+          recipe_basename = File.basename(recipe_path, '.*')
           scripts_dir = File.join(recipe_dir, recipe_basename)
 
           scripts_dir if Dir.exist?(scripts_dir)
@@ -124,13 +122,13 @@ module Ast
           return false unless reference.is_a?(String)
 
           # Check for inline lambda/proc syntax
-          reference.strip.start_with?("->", "lambda", "proc", "->(")
+          reference.strip.start_with?('->', 'lambda', 'proc', '->(')
         end
 
         def evaluate_inline_expression(expression)
           # Evaluate the expression in a clean binding
           # rubocop:disable Security/Eval
-          result = eval(expression, TOPLEVEL_BINDING.dup, "(inline)", 1)
+          result = eval(expression, TOPLEVEL_BINDING.dup, '(inline)', 1)
           # rubocop:enable Security/Eval
 
           unless result.respond_to?(:call)
@@ -140,7 +138,7 @@ module Ast
           result
         rescue SyntaxError => e
           raise ArgumentError, "Invalid inline expression syntax: #{e.message}"
-        rescue => e
+        rescue StandardError => e
           raise ArgumentError, "Failed to evaluate inline expression: #{e.message}"
         end
 
@@ -162,7 +160,8 @@ module Ast
           # rubocop:enable Security/Eval
 
           unless result.respond_to?(:call)
-            raise ArgumentError, "Script #{path} must return a callable (lambda, proc, or object with #call), got: #{result.class}"
+            raise ArgumentError,
+                  "Script #{path} must return a callable (lambda, proc, or object with #call), got: #{result.class}"
           end
 
           # Cache and return
@@ -170,7 +169,7 @@ module Ast
           result
         rescue SyntaxError => e
           raise ArgumentError, "Syntax error in script #{path}: #{e.message}"
-        rescue => e
+        rescue StandardError => e
           raise ArgumentError, "Failed to load script #{path}: #{e.message}"
         end
 

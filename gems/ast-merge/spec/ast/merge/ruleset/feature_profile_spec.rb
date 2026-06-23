@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
-  describe "#to_h" do
-    it "normalizes feature metadata and derived booleans" do
+  describe '#to_h' do
+    it 'normalizes feature metadata and derived booleans' do
       profile = described_class.new(
         owner_selector: :shared_default,
         match_key: :signature,
@@ -11,13 +11,14 @@ RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
         comment_style: :hash_comment,
         render_family: :toml_pairs_and_tables,
         comment_capability: Ast::Merge::Comment::Capability.native_full(source: :fixture, style: :hash_comment),
-        support_style: Ast::Merge::Comment::SupportStyle.native_read_portable_write(source: :fixture, style: :hash_comment),
-        capabilities: {layout_aware: true},
-        logical_owners: {link_definition: :preserve_if_referenced},
-        repair_policies: [{kind: :comment_ownership_overlap, handling: :warn}],
-        surfaces: [{name: :fenced_code_block, selector: :language_tag}],
-        delegation_policies: [{surface_name: :fenced_code_block, strategy: :by_language}],
-        metadata: {source: :fixture},
+        support_style: Ast::Merge::Comment::SupportStyle.native_read_portable_write(source: :fixture,
+                                                                                    style: :hash_comment),
+        capabilities: { layout_aware: true },
+        logical_owners: { link_definition: :preserve_if_referenced },
+        repair_policies: [{ kind: :comment_ownership_overlap, handling: :warn }],
+        surfaces: [{ name: :fenced_code_block, selector: :language_tag }],
+        delegation_policies: [{ surface_name: :fenced_code_block, strategy: :by_language }],
+        metadata: { source: :fixture }
       )
 
       expect(profile.to_h).to include(
@@ -27,16 +28,16 @@ RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
         attachment_strategy: :normalize_tracked_layout_merge,
         comment_style: :hash_comment,
         render_family: :toml_pairs_and_tables,
-        capabilities: {layout_aware: true},
+        capabilities: { layout_aware: true },
         owner_selector_family: :generic,
         owner_selector_kind: :logical_owner,
         match_key_family: :structural_signature,
         attachment_strategy_family: :layout_merge,
-        logical_owners: {link_definition: :preserve_if_referenced},
-        repair_policies: [{kind: :comment_ownership_overlap, handling: :warn, metadata: {}}],
-        surfaces: [{name: :fenced_code_block, selector: :language_tag, metadata: {}}],
-        delegation_policies: [{surface_name: :fenced_code_block, strategy: :by_language, metadata: {}}],
-        metadata: {source: :fixture},
+        logical_owners: { link_definition: :preserve_if_referenced },
+        repair_policies: [{ kind: :comment_ownership_overlap, handling: :warn, metadata: {} }],
+        surfaces: [{ name: :fenced_code_block, selector: :language_tag, metadata: {} }],
+        delegation_policies: [{ surface_name: :fenced_code_block, strategy: :by_language, metadata: {} }],
+        metadata: { source: :fixture },
         layout_aware: true,
         logical_owner: true,
         comment_aware: true,
@@ -46,14 +47,14 @@ RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
         delegated_surface_aware: true,
         tracked_attachment: true,
         normalized_attachment: true,
-        augmenter_preferred_attachment: false,
+        augmenter_preferred_attachment: false
       )
     end
 
-    it "detects structural-only profiles" do
+    it 'detects structural-only profiles' do
       profile = described_class.new(
         owner_selector: :shared_default,
-        match_key: :signature,
+        match_key: :signature
       )
 
       expect(profile.layout_aware?).to be(false)
@@ -72,11 +73,11 @@ RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
       expect(profile.structural_only?).to be(true)
     end
 
-    it "surfaces vocabulary metadata for the profile axes" do
+    it 'surfaces vocabulary metadata for the profile axes' do
       profile = described_class.new(
         owner_selector: :assignment_lines_plus_freeze_blocks,
         match_key: :env_key,
-        attachment_strategy: :augmenter_preferred_tracker_layout,
+        attachment_strategy: :augmenter_preferred_tracker_layout
       )
 
       expect(profile.owner_selector_metadata).to include(family: :line_oriented)
@@ -86,7 +87,7 @@ RSpec.describe Ast::Merge::Ruleset::FeatureProfile do
         family: :layout_merge,
         tracked_comments: true,
         augmenter_preferred: true,
-        normalized: false,
+        normalized: false
       )
       expect(profile.augmenter_preferred_attachment?).to be(true)
     end

@@ -36,19 +36,19 @@ module Ast
               analysis,
               leading_statement,
               edge: :leading,
-              source: source,
+              source: source
             ),
             trailing_boundary: BoundarySupport.build_splice_boundary(
               analysis,
               trailing_statement,
               edge: :trailing,
-              source: source,
+              source: source
             ),
             removed_attachments: BoundarySupport.removed_statement_attachments_for(
               analysis,
-              statement_list,
+              statement_list
             ),
-            metadata: source ? {source: source} : {},
+            metadata: source ? { source: source } : {}
           )
         rescue ArgumentError
           nil

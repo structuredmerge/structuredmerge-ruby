@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
+require 'digest'
 
 module Ast
   module Merge
@@ -24,23 +24,23 @@ module Ast
         unresolved_path_segments.pop if segment
       end
 
-      def unresolved_surface_path(*segments, root: "document[0]")
-        ([root] + unresolved_path_segments + segments.compact).join(" > ")
+      def unresolved_surface_path(*segments, root: 'document[0]')
+        ([root] + unresolved_path_segments + segments.compact).join(' > ')
       end
 
       def unresolved_case_id_for(prefix, *parts, node: nil)
         line = node&.respond_to?(:start_line) ? node.start_line : nil
-        ([prefix] + parts + [line]).compact.join("-")
+        ([prefix] + parts + [line]).compact.join('-')
       end
 
       def unresolved_line_span(node)
         return unless node.respond_to?(:start_line)
 
         end_line = if node.respond_to?(:effective_end_line)
-          node.effective_end_line
-        elsif node.respond_to?(:end_line)
-          node.end_line
-        end
+                     node.effective_end_line
+                   elsif node.respond_to?(:end_line)
+                     node.end_line
+                   end
         return unless node.start_line && end_line
 
         [node.start_line, end_line]
@@ -70,16 +70,16 @@ module Ast
         fallback
       end
 
-      def unresolved_surface_path_for(segment = nil, fallback_segment: nil, root: "document[0]")
+      def unresolved_surface_path_for(segment = nil, fallback_segment: nil, root: 'document[0]')
         return unresolved_surface_path(segment, root: root) if segment
         return unresolved_surface_path(fallback_segment, root: root) if fallback_segment
 
         root
       end
 
-      def with_first_unresolved_path_segment(*nodes, segment_builder:)
+      def with_first_unresolved_path_segment(*nodes, segment_builder:, &block)
         segment = nodes.lazy.filter_map { |node| segment_builder.call(node) if node }.first
-        with_unresolved_path_segment(segment) { yield }
+        with_unresolved_path_segment(segment, &block)
       end
 
       def record_unresolved_node_choice(
@@ -91,8 +91,7 @@ module Ast
         provisional_winner:,
         case_prefix:,
         case_parts:,
-        case_id: nil,
-        surface_path:,
+        surface_path:, case_id: nil,
         metadata: {},
         conflict_fields: {},
         reason: :conflict,
@@ -102,14 +101,15 @@ module Ast
           template_text: template_text,
           destination_text: destination_text,
           provisional_winner: provisional_winner,
-          case_id: case_id || unresolved_case_id_for(case_prefix, *Array(case_parts), node: case_node || destination_node),
+          case_id: case_id || unresolved_case_id_for(case_prefix, *Array(case_parts),
+                                                     node: case_node || destination_node),
           surface_path: surface_path,
           reason: reason,
           metadata: {
             template_lines: unresolved_line_span(template_node),
-            destination_lines: unresolved_line_span(destination_node),
+            destination_lines: unresolved_line_span(destination_node)
           }.merge(metadata),
-          conflict_fields: conflict_fields,
+          conflict_fields: conflict_fields
         )
       end
 
@@ -124,11 +124,11 @@ module Ast
           destination_text: destination_text,
           provisional_winner: provisional_winner,
           surface_path: surface_path,
-          template_text: template_text,
+          template_text: template_text
         }.merge(attributes)
 
         Digest::SHA256.hexdigest(
-          serialize_review_identity_components(components),
+          serialize_review_identity_components(components)
         )
       end
 
@@ -136,8 +136,8 @@ module Ast
         case value
         when Hash
           value.sort_by { |key, _component| key.to_s }
-            .map { |key, component| "#{key}=#{serialize_review_identity_components(component)}" }
-            .join("\u001f")
+               .map { |key, component| "#{key}=#{serialize_review_identity_components(component)}" }
+               .join("\u001f")
         when Array
           value.map { |component| serialize_review_identity_components(component) }.join("\u001e")
         else

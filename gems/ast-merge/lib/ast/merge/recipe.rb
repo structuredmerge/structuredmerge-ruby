@@ -17,10 +17,10 @@ module Ast
     # @see Recipe::ScriptLoader Loading Ruby scripts from recipe folders
     #
     module Recipe
-      autoload :Config, "ast/merge/recipe/config"
-      autoload :Preset, "ast/merge/recipe/preset"
-      autoload :Runner, "ast/merge/recipe/runner"
-      autoload :ScriptLoader, "ast/merge/recipe/script_loader"
+      autoload :Config, 'ast/merge/recipe/config'
+      autoload :Preset, 'ast/merge/recipe/preset'
+      autoload :Runner, 'ast/merge/recipe/runner'
+      autoload :ScriptLoader, 'ast/merge/recipe/script_loader'
     end
   end
 end

@@ -19,13 +19,13 @@ module Ast
         # @return [Layout::Gap, nil] trailing layout gap associated with the owner
         # @return [Hash] producer metadata for downstream consumers
         attr_reader :owner,
-          :leading_region,
-          :inline_region,
-          :trailing_region,
-          :orphan_regions,
-          :leading_gap,
-          :trailing_gap,
-          :metadata
+                    :leading_region,
+                    :inline_region,
+                    :trailing_region,
+                    :orphan_regions,
+                    :leading_gap,
+                    :trailing_gap,
+                    :metadata
 
         # Build a passive comment attachment.
         #
@@ -39,7 +39,8 @@ module Ast
         # @param metadata [Hash] base metadata
         # @param options [Hash] extra metadata merged into +metadata+
         # @return [void]
-        def initialize(owner: nil, leading_region: nil, inline_region: nil, trailing_region: nil, orphan_regions: [], leading_gap: nil, trailing_gap: nil, metadata: {}, **options)
+        def initialize(owner: nil, leading_region: nil, inline_region: nil, trailing_region: nil, orphan_regions: [],
+                       leading_gap: nil, trailing_gap: nil, metadata: {}, **options)
           @owner = owner
           @leading_region = leading_region
           @inline_region = inline_region
@@ -83,7 +84,7 @@ module Ast
         def layout_owned_regions(**options)
           [
             (leading_region if leading_region_layout_owned?(**options)),
-            (trailing_region if trailing_region_layout_owned?(**options)),
+            (trailing_region if trailing_region_layout_owned?(**options))
           ].compact
         end
 
@@ -112,12 +113,12 @@ module Ast
         # @return [String]
         def inspect
           owner_desc = if owner&.respond_to?(:type)
-            owner.method(:type).call
-          elsif owner.nil?
-            nil
-          else
-            owner.class.name
-          end
+                         owner.method(:type).call
+                       elsif owner.nil?
+                         nil
+                       else
+                         owner.class.name
+                       end
 
           "#<#{self.class.name} owner=#{owner_desc.inspect} regions=#{regions.size} layout_gaps=#{layout_gaps.size}>"
         end

@@ -53,9 +53,9 @@ module Ast
       #
       module Mergeable
         # Default placeholder prefix for extracted regions
-        DEFAULT_PLACEHOLDER_PREFIX = "<<<AST_MERGE_REGION_"
+        DEFAULT_PLACEHOLDER_PREFIX = '<<<AST_MERGE_REGION_'
         # Default placeholder suffix for extracted regions.
-        DEFAULT_PLACEHOLDER_SUFFIX = ">>>"
+        DEFAULT_PLACEHOLDER_SUFFIX = '>>>'
 
         ##
         # Configuration for a single region type.
@@ -171,7 +171,7 @@ module Ast
                 detector: config[:detector],
                 merger_class: config[:merger_class],
                 merger_options: config[:merger_options] || {},
-                regions: config[:regions] || [],
+                regions: config[:regions] || []
               )
             else
               raise ArgumentError, "Invalid region config: #{config.inspect}"
@@ -204,7 +204,7 @@ module Ast
                 region: region,
                 config: config,
                 placeholder: placeholder,
-                merged_content: nil,
+                merged_content: nil
               )
               storage.unshift(extracted) # Add to front since we process in reverse
 
@@ -226,9 +226,9 @@ module Ast
         def validate_no_placeholder_collision!(content)
           return if content.nil? || content.empty?
 
-          if content.include?(@region_placeholder_prefix)
-            raise PlaceholderCollisionError, @region_placeholder_prefix
-          end
+          return unless content.include?(@region_placeholder_prefix)
+
+          raise PlaceholderCollisionError, @region_placeholder_prefix
         end
 
         ##
@@ -323,8 +323,8 @@ module Ast
           dest_region = dest_extracted&.region
 
           # Get the full text (including delimiters) for each region
-          template_text = template_region&.full_text || ""
-          dest_text = dest_region&.full_text || ""
+          template_text = template_region&.full_text || ''
+          dest_text = dest_region&.full_text || ''
 
           # If no merger class, prefer destination content (preserve customizations)
           unless config.merger_class
@@ -332,8 +332,8 @@ module Ast
           end
 
           # Extract just the content (without delimiters) for merging
-          template_content = template_region&.content || ""
-          dest_content = dest_region&.content || ""
+          template_content = template_region&.content || ''
+          dest_content = dest_region&.content || ''
 
           # Build merger options, including nested regions if configured
           merger_options = config.merger_options.dup

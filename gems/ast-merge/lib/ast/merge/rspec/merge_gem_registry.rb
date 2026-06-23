@@ -57,9 +57,9 @@ module Ast
       # @api public
       module MergeGemRegistry
         @mutex = Mutex.new
-        @registry = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
-        @known_gems = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
-        @availability_cache = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+        @registry = {}
+        @known_gems = {}
+        @availability_cache = {}
 
         # Valid categories for merge gems
         CATEGORIES = %i[markdown data code config other].freeze
@@ -98,7 +98,7 @@ module Ast
               merger_class: merger_class,
               test_source: test_source,
               category: category,
-              skip_instantiation: skip_instantiation,
+              skip_instantiation: skip_instantiation
             }
             # Clear cache when re-registering
             @availability_cache.delete(tag_sym)
@@ -115,7 +115,8 @@ module Ast
         # This is intended for spec/bootstrap layers that need to declare the tag
         # universe before RSpec filters examples. Runtime provider gems should
         # still call {register} when loaded.
-        def register_known_gem(tag_name, require_path:, merger_class:, test_source:, category: :other, skip_instantiation: false)
+        def register_known_gem(tag_name, require_path:, merger_class:, test_source:, category: :other,
+                               skip_instantiation: false)
           raise ArgumentError, "Invalid category: #{category}" unless CATEGORIES.include?(category)
 
           @mutex.synchronize do
@@ -124,7 +125,7 @@ module Ast
               merger_class: merger_class,
               test_source: test_source,
               category: category,
-              skip_instantiation: skip_instantiation,
+              skip_instantiation: skip_instantiation
             }
           end
 
@@ -158,7 +159,7 @@ module Ast
             info[:require_path],
             info[:merger_class],
             info[:test_source],
-            info[:skip_instantiation],
+            info[:skip_instantiation]
           )
 
           # Cache result
@@ -201,7 +202,7 @@ module Ast
             tag_sym = tag_name.to_sym
 
             unless known_gems.key?(tag_sym)
-              warn("Unknown gem: #{tag_name}. Available: #{known_gems.keys.join(", ")}")
+              warn("Unknown gem: #{tag_name}. Available: #{known_gems.keys.join(', ')}")
               next
             end
 
@@ -215,7 +216,7 @@ module Ast
               merger_class: metadata[:merger_class],
               test_source: metadata[:test_source],
               category: metadata[:category],
-              skip_instantiation: metadata[:skip_instantiation],
+              skip_instantiation: metadata[:skip_instantiation]
             )
           end
         end
@@ -350,7 +351,7 @@ module Ast
 
           if skip_instantiation
             # Just check that the class exists and looks like a SmartMerger
-            klass.is_a?(Class) && klass.ancestors.any? { |a| a.name&.include?("SmartMergerBase") }
+            klass.is_a?(Class) && klass.ancestors.any? { |a| a.name&.include?('SmartMergerBase') }
           else
             klass.new(test_source, test_source)
             true

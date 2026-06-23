@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require "fileutils"
-require "tmpdir"
-require "yaml"
+require 'fileutils'
+require 'tmpdir'
+require 'yaml'
 
-RSpec.shared_examples("Ast::Merge::Recipe::PresetContract") do
-  let(:preset_filename) { "test_recipe.yml" }
+RSpec.shared_examples('Ast::Merge::Recipe::PresetContract') do
+  let(:preset_filename) { 'test_recipe.yml' }
   let(:preset_script_files) { {} }
-  let(:preset_workspace) { Dir.mktmpdir("ast-merge-preset-contract") }
+  let(:preset_workspace) { Dir.mktmpdir('ast-merge-preset-contract') }
   let(:preset_path) { File.join(preset_workspace, preset_filename) }
-  let(:expected_parser) { (preset_config["parser"] || preset_config[:parser] || "prism").to_sym }
-  let(:expected_parser_explicit) { preset_config.key?("parser") || preset_config.key?(:parser) }
+  let(:expected_parser) { (preset_config['parser'] || preset_config[:parser] || 'prism').to_sym }
+  let(:expected_parser_explicit) { preset_config.key?('parser') || preset_config.key?(:parser) }
   let(:expected_preference) do
-    raw_preference = (preset_config["merge"] || preset_config[:merge] || {})["preference"]
+    raw_preference = (preset_config['merge'] || preset_config[:merge] || {})['preference']
     normalize_preference(raw_preference)
   end
   let(:expected_to_h_including) { {} }
@@ -26,13 +26,13 @@ RSpec.shared_examples("Ast::Merge::Recipe::PresetContract") do
     File.write(preset_path, YAML.dump(preset_config))
 
     preset_script_files.each do |relative_path, content|
-      absolute_path = File.join(preset_workspace, File.basename(preset_filename, ".*"), relative_path)
+      absolute_path = File.join(preset_workspace, File.basename(preset_filename, '.*'), relative_path)
       FileUtils.mkdir_p(File.dirname(absolute_path))
       File.write(absolute_path, content)
     end
   end
 
-  it "loads the preset from disk and preserves recipe metadata" do
+  it 'loads the preset from disk and preserves recipe metadata' do
     preset = Ast::Merge::Recipe::Preset.load(preset_path)
 
     expect(preset.parser).to(eq(expected_parser))
@@ -40,7 +40,7 @@ RSpec.shared_examples("Ast::Merge::Recipe::PresetContract") do
     expect(preset.preference).to(eq(expected_preference))
   end
 
-  it "converts the preset into SmartMerger-compatible options" do
+  it 'converts the preset into SmartMerger-compatible options' do
     preset = Ast::Merge::Recipe::Preset.load(preset_path)
     preset_options = preset.to_h
 
@@ -49,7 +49,7 @@ RSpec.shared_examples("Ast::Merge::Recipe::PresetContract") do
     expect(preset_options).to(include(expected_to_h_including)) unless expected_to_h_including.empty?
   end
 
-  it "resolves companion scripts through the shared ScriptLoader" do
+  it 'resolves companion scripts through the shared ScriptLoader' do
     preset = Ast::Merge::Recipe::Preset.load(preset_path)
 
     if preset_script_files.empty?

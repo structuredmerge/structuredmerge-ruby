@@ -17,7 +17,7 @@ module Ast
           {
             name: name,
             selector: selector,
-            metadata: metadata,
+            metadata: metadata
           }.compact
         end
       end

@@ -62,7 +62,7 @@ module Ast
       # @param threshold [Float] Minimum score to consider a match (default: 0.5)
       # @raise [ArgumentError] If algorithm doesn't respond to :call
       def initialize(node_a, node_b, algorithm:, threshold: DEFAULT_THRESHOLD)
-        raise ArgumentError, "algorithm must respond to :call" unless algorithm.respond_to?(:call)
+        raise ArgumentError, 'algorithm must respond to :call' unless algorithm.respond_to?(:call)
 
         @node_a = node_a
         @node_b = node_b

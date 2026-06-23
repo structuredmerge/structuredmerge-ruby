@@ -11,20 +11,20 @@ module Ast
       # styles, but it is not itself a parser adapter or renderer.
       class FeatureProfile
         attr_reader :owner_selector,
-          :match_key,
-          :read_strategy,
-          :attachment_strategy,
-          :comment_style,
-          :render_family,
-          :comment_capability,
-          :support_style,
-          :capabilities,
-          :logical_owners,
-          :logical_owner_policies,
-          :repair_policies,
-          :surfaces,
-          :delegation_policies,
-          :metadata
+                    :match_key,
+                    :read_strategy,
+                    :attachment_strategy,
+                    :comment_style,
+                    :render_family,
+                    :comment_capability,
+                    :support_style,
+                    :capabilities,
+                    :logical_owners,
+                    :logical_owner_policies,
+                    :repair_policies,
+                    :surfaces,
+                    :delegation_policies,
+                    :metadata
 
         def initialize(
           owner_selector:,
@@ -165,7 +165,7 @@ module Ast
             delegated_surface_aware: delegated_surface_aware?,
             tracked_attachment: tracked_attachment?,
             normalized_attachment: normalized_attachment?,
-            augmenter_preferred_attachment: augmenter_preferred_attachment?,
+            augmenter_preferred_attachment: augmenter_preferred_attachment?
           }.compact
         end
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "merge_gem_registry"
+require_relative 'merge_gem_registry'
 
 # Ast::Merge RSpec Dependency Tags - Helper Module Only
 #

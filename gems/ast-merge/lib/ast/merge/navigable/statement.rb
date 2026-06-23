@@ -152,6 +152,7 @@ module Ast
           current = self.next
           while current
             break unless yield(current)
+
             current = current.next
           end
         end
@@ -164,6 +165,7 @@ module Ast
           result = []
           each_following do |stmt|
             break if yield(stmt)
+
             result << stmt
             true
           end
@@ -236,11 +238,10 @@ module Ast
           while current
             depth += 1
             # Navigate up through parents
-            if current.respond_to?(:parent)
-              current = current.parent
-            else
-              break
-            end
+            break unless current.respond_to?(:parent)
+
+            current = current.parent
+
           end
           depth
         end
@@ -265,7 +266,7 @@ module Ast
 
           # Fallback: derive type from class name (handle anonymous classes)
           class_name = node.class.name
-          class_name ? class_name.split("::").last : "Anonymous"
+          class_name ? class_name.split('::').last : 'Anonymous'
         end
 
         # @return [Array, Object, nil] Node signature for matching
@@ -346,9 +347,7 @@ module Ast
         # @return [Object] The innermost node
         def unwrapped_node
           current = node
-          while current.respond_to?(:inner_node) && current.inner_node != current
-            current = current.inner_node
-          end
+          current = current.inner_node while current.respond_to?(:inner_node) && current.inner_node != current
           current
         end
 

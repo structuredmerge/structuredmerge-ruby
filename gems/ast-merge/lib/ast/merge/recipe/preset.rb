@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "yaml"
+require 'yaml'
 
 module Ast
   module Merge
@@ -71,12 +71,12 @@ module Ast
         # @param preset_path [String, nil] Path to preset file (for script resolution)
         def initialize(config, preset_path: nil)
           @preset_path = preset_path
-          @name = config["name"] || "unnamed"
-          @description = config["description"]
-          @parser_explicit = config.key?("parser") || config.key?(:parser)
-          @parser = (config["parser"] || config[:parser] || "prism").to_sym
-          @merge_config = parse_merge_config(config["merge"] || {})
-          @freeze_token = config["freeze_token"]
+          @name = config['name'] || 'unnamed'
+          @description = config['description']
+          @parser_explicit = config.key?('parser') || config.key?(:parser)
+          @parser = (config['parser'] || config[:parser] || 'prism').to_sym
+          @merge_config = parse_merge_config(config['merge'] || {})
+          @freeze_token = config['freeze_token']
         end
 
         # Whether the parser was explicitly configured.
@@ -103,7 +103,7 @@ module Ast
         def add_missing
           value = merge_config[:add_missing]
           return true if value.nil?
-          return value if value == true || value == false
+          return value if [true, false].include?(value)
           return value if value.respond_to?(:call)
 
           # It's a script reference - load it
@@ -179,7 +179,7 @@ module Ast
             match_refiner: match_refiner,
             freeze_token: freeze_token,
             normalize_whitespace: normalize_whitespace,
-            rehydrate_link_references: rehydrate_link_references,
+            rehydrate_link_references: rehydrate_link_references
           }.compact
         end
 
@@ -194,16 +194,16 @@ module Ast
 
         def parse_merge_config(config)
           {
-            preference: parse_preference(config["preference"]),
-            add_missing: config["add_missing"],
-            replace_mode: config["replace_mode"] == true,
-            match_by: Array(config["match_by"]).map(&:to_sym),
-            deep: config["deep"] == true,
-            signature_generator: config["signature_generator"],
-            node_typing: config["node_typing"],
-            match_refiner: config["match_refiner"],
-            normalize_whitespace: config["normalize_whitespace"] == true,
-            rehydrate_link_references: config["rehydrate_link_references"] == true,
+            preference: parse_preference(config['preference']),
+            add_missing: config['add_missing'],
+            replace_mode: config['replace_mode'] == true,
+            match_by: Array(config['match_by']).map(&:to_sym),
+            deep: config['deep'] == true,
+            signature_generator: config['signature_generator'],
+            node_typing: config['node_typing'],
+            match_refiner: config['match_refiner'],
+            normalize_whitespace: config['normalize_whitespace'] == true,
+            rehydrate_link_references: config['rehydrate_link_references'] == true
           }
         end
 

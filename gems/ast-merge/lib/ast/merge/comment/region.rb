@@ -94,7 +94,7 @@ module Ast
             start_line: start_line,
             end_line: end_line,
             start_column: 0,
-            end_column: 0,
+            end_column: 0
           )
         end
 
@@ -165,7 +165,7 @@ module Ast
           return normalized if KINDS.include?(normalized)
 
           raise ArgumentError,
-            "Unknown comment region kind: #{kind.inspect}. Expected one of: #{KINDS.join(", ")}"
+                "Unknown comment region kind: #{kind.inspect}. Expected one of: #{KINDS.join(', ')}"
         end
       end
     end

@@ -79,7 +79,7 @@ module Ast
           current_language = nil
           fence_char = nil
           fence_length = nil
-          indent = ""
+          indent = ''
 
           lines.each_with_index do |line, idx|
             line_num = idx + 1
@@ -88,7 +88,7 @@ module Ast
               # Match opening fence: ```lang or ~~~lang (optionally indented)
               match = line.match(/^(\s*)(`{3,}|~{3,})(\w*)\s*$/)
               if match
-                indent = match[1] || ""
+                indent = match[1] || ''
                 fence = match[2]
                 lang = match[3].downcase
 
@@ -112,7 +112,7 @@ module Ast
                 start_line: start_line,
                 end_line: line_num,
                 delimiters: [opening_fence, closing_fence],
-                metadata: {language: current_language, indent: indent.empty? ? nil : indent},
+                metadata: { language: current_language, indent: indent.empty? ? nil : indent }
               )
               in_block = false
               start_line = nil
@@ -120,25 +120,25 @@ module Ast
               current_language = nil
               fence_char = nil
               fence_length = nil
-              indent = ""
+              indent = ''
             else
               # Accumulate content lines (strip the indent if present)
               content_lines << if indent.empty?
-                line
-              else
-                # Strip the common indent from content lines
-                line.sub(/^#{Regexp.escape(indent)}/, "")
-              end
+                                 line
+                               else
+                                 # Strip the common indent from content lines
+                                 line.sub(/^#{Regexp.escape(indent)}/, '')
+                               end
             end
           end
 
-          # Note: Unclosed blocks are ignored (no region created)
+          # NOTE: Unclosed blocks are ignored (no region created)
           regions
         end
 
         # @return [String] A description of this detector
         def inspect
-          aliases_str = @aliases.empty? ? "" : " aliases=#{@aliases.inspect}"
+          aliases_str = @aliases.empty? ? '' : " aliases=#{@aliases.inspect}"
           "#<#{self.class.name} language=#{@language}#{aliases_str}>"
         end
 
@@ -146,79 +146,79 @@ module Ast
           # Creates a detector for Ruby code blocks.
           # @return [FencedCodeBlock]
           def ruby
-            new("ruby", aliases: ["rb"])
+            new('ruby', aliases: ['rb'])
           end
 
           # Creates a detector for JSON code blocks.
           # @return [FencedCodeBlock]
           def json
-            new("json")
+            new('json')
           end
 
           # Creates a detector for YAML code blocks.
           # @return [FencedCodeBlock]
           def yaml
-            new("yaml", aliases: ["yml"])
+            new('yaml', aliases: ['yml'])
           end
 
           # Creates a detector for TOML code blocks.
           # @return [FencedCodeBlock]
           def toml
-            new("toml")
+            new('toml')
           end
 
           # Creates a detector for Mermaid diagram blocks.
           # @return [FencedCodeBlock]
           def mermaid
-            new("mermaid")
+            new('mermaid')
           end
 
           # Creates a detector for JavaScript code blocks.
           # @return [FencedCodeBlock]
           def javascript
-            new("javascript", aliases: ["js"])
+            new('javascript', aliases: ['js'])
           end
 
           # Creates a detector for TypeScript code blocks.
           # @return [FencedCodeBlock]
           def typescript
-            new("typescript", aliases: ["ts"])
+            new('typescript', aliases: ['ts'])
           end
 
           # Creates a detector for Python code blocks.
           # @return [FencedCodeBlock]
           def python
-            new("python", aliases: ["py"])
+            new('python', aliases: ['py'])
           end
 
           # Creates a detector for Bash/Shell code blocks.
           # @return [FencedCodeBlock]
           def bash
-            new("bash", aliases: ["sh", "shell", "zsh"])
+            new('bash', aliases: %w[sh shell zsh])
           end
 
           # Creates a detector for SQL code blocks.
           # @return [FencedCodeBlock]
           def sql
-            new("sql")
+            new('sql')
           end
 
           # Creates a detector for HTML code blocks.
           # @return [FencedCodeBlock]
           def html
-            new("html")
+            new('html')
           end
 
           # Creates a detector for CSS code blocks.
           # @return [FencedCodeBlock]
           def css
-            new("css")
+            new('css')
           end
 
           # Creates a detector for Markdown code blocks (nested markdown).
           # @return [FencedCodeBlock]
           def markdown
-            new("markdown", aliases: ["md"])
+            new('markdown', aliases: ['md'])
           end
         end
       end

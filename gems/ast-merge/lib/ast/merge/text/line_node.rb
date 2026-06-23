@@ -34,7 +34,7 @@ module Ast
             start_line: line_number,
             end_line: line_number,
             start_column: 0,
-            end_column: content.length,
+            end_column: content.length
           )
 
           super(slice: content, location: location)
@@ -46,7 +46,7 @@ module Ast
         # TreeHaver::Node protocol: type
         # @return [String] "line_node"
         def type
-          "line_node"
+          'line_node'
         end
 
         # TreeHaver::Node protocol: children
@@ -83,7 +83,7 @@ module Ast
         #
         # @return [Boolean] True if line appears to be a comment
         def comment?
-          @content.strip.start_with?("#")
+          @content.strip.start_with?('#')
         end
 
         # Get the 1-based line number
@@ -114,7 +114,7 @@ module Ast
           other.is_a?(LineNode) && @content == other.content
         end
 
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Hash code for use in Hash keys
         #
@@ -160,7 +160,7 @@ module Ast
               line_number: line_number,
               word_index: word_index,
               start_col: start_col,
-              end_col: end_col,
+              end_col: end_col
             )
             word_index += 1
           end

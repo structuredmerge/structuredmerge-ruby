@@ -7,12 +7,12 @@ module Ast
       # and potentially execute merge work for one or more surface families.
       class Delegate
         attr_reader :name,
-          :priority,
-          :surface_kinds,
-          :languages,
-          :feature_profile,
-          :capabilities,
-          :metadata
+                    :priority,
+                    :surface_kinds,
+                    :languages,
+                    :feature_profile,
+                    :capabilities,
+                    :metadata
 
         def initialize(
           name:,
@@ -61,7 +61,7 @@ module Ast
             return false
           end
 
-          return rule if rule == true || rule == false
+          return rule if [true, false].include?(rule)
           return true unless surface
 
           Array(rule).include?(surface.surface_kind)
@@ -76,7 +76,12 @@ module Ast
 
         def merge(operation:, session:)
           raise NotImplementedError, "Delegate #{name.inspect} does not expose merge execution" unless @merge
-          raise NotImplementedError, "Delegate #{name.inspect} does not support merge for #{operation.surface.surface_kind}" unless capability_supported?(:merge, operation.surface)
+          unless capability_supported?(
+            :merge, operation.surface
+          )
+            raise NotImplementedError,
+                  "Delegate #{name.inspect} does not support merge for #{operation.surface.surface_kind}"
+          end
 
           @merge.call(operation: operation, session: session)
         end
@@ -89,7 +94,7 @@ module Ast
             languages: languages,
             feature_profile: feature_profile.respond_to?(:to_h) ? feature_profile.to_h : feature_profile,
             capabilities: capabilities.transform_values { |value| value.is_a?(Array) ? value.dup : value },
-            metadata: metadata,
+            metadata: metadata
           }
         end
 
@@ -99,7 +104,7 @@ module Ast
           Array(values).filter_map do |value|
             next if value.nil?
 
-            value.to_s.strip.downcase.tr("-", "_").to_sym
+            value.to_s.strip.downcase.tr('-', '_').to_sym
           end.freeze
         end
 
@@ -110,7 +115,7 @@ module Ast
               when true, false, nil
                 surface_kinds
               else
-                Array(surface_kinds).map { |surface_kind| surface_kind.to_s.strip.downcase.tr("-", "_").to_sym }.freeze
+                Array(surface_kinds).map { |surface_kind| surface_kind.to_s.strip.downcase.tr('-', '_').to_sym }.freeze
               end
           end.freeze
         end

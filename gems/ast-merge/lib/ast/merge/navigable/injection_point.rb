@@ -109,7 +109,7 @@ module Ast
 
         # @return [String] Human-readable representation
         def inspect
-          boundary_info = boundary ? " to #{boundary.index}" : ""
+          boundary_info = boundary ? " to #{boundary.index}" : ''
           "#<Navigable::InjectionPoint position=#{position} anchor=#{anchor.index}#{boundary_info}>"
         end
 
@@ -118,13 +118,13 @@ module Ast
         def validate_position!(position)
           return if POSITIONS.include?(position)
 
-          raise ArgumentError, "Invalid position: #{position}. Must be one of: #{POSITIONS.join(", ")}"
+          raise ArgumentError, "Invalid position: #{position}. Must be one of: #{POSITIONS.join(', ')}"
         end
 
         def validate_boundary!(position, boundary)
           return unless boundary && position != :replace
 
-          raise ArgumentError, "boundary is only valid with position: :replace"
+          raise ArgumentError, 'boundary is only valid with position: :replace'
         end
       end
     end

@@ -28,7 +28,7 @@ module Ast
         :new_count,    # Number of lines in new file
         :lines,        # Array of DiffLine objects
         :header,       # The @@ header line
-        keyword_init: true,
+        keyword_init: true
       )
 
       # Represents a single line in a diff hunk
@@ -37,7 +37,7 @@ module Ast
         :content,      # Line content (without +/- prefix)
         :old_line_num, # Line number in original file (nil for additions)
         :new_line_num, # Line number in new file (nil for removals)
-        keyword_init: true,
+        keyword_init: true
       )
 
       # Represents a mapping from diff changes to AST paths
@@ -46,7 +46,7 @@ module Ast
         :operation,    # :add, :remove, or :modify
         :lines,        # Array of DiffLine objects for this path
         :hunk,         # The source DiffHunk
-        keyword_init: true,
+        keyword_init: true
       )
 
       # Result of parsing a diff file
@@ -54,7 +54,7 @@ module Ast
         :old_file,     # Original file path from --- line
         :new_file,     # New file path from +++ line
         :hunks,        # Array of DiffHunk objects
-        keyword_init: true,
+        keyword_init: true
       )
 
       # Parse a unified diff and map changes to AST paths.
@@ -91,19 +91,19 @@ module Ast
           case line
           when /^---\s+(.+)$/
             # Original file path
-            old_file = extract_file_path($1)
+            old_file = extract_file_path(::Regexp.last_match(1))
           when /^\+\+\+\s+(.+)$/
             # New file path
-            new_file = extract_file_path($1)
+            new_file = extract_file_path(::Regexp.last_match(1))
           when /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/
             # Hunk header
             # Finalize previous hunk
             hunks << current_hunk if current_hunk
 
-            old_start = $1.to_i
-            old_count = ($2 || "1").to_i
-            new_start = $3.to_i
-            new_count = ($4 || "1").to_i
+            old_start = ::Regexp.last_match(1).to_i
+            old_count = (::Regexp.last_match(2) || '1').to_i
+            new_start = ::Regexp.last_match(3).to_i
+            new_count = (::Regexp.last_match(4) || '1').to_i
 
             current_hunk = DiffHunk.new(
               old_start: old_start,
@@ -111,7 +111,7 @@ module Ast
               new_start: new_start,
               new_count: new_count,
               lines: [],
-              header: line,
+              header: line
             )
             old_line_num = old_start
             new_line_num = new_start
@@ -121,9 +121,9 @@ module Ast
 
             current_hunk.lines << DiffLine.new(
               type: :addition,
-              content: $1,
+              content: ::Regexp.last_match(1),
               old_line_num: nil,
-              new_line_num: new_line_num,
+              new_line_num: new_line_num
             )
             new_line_num += 1
           when /^-(.*)$/
@@ -132,9 +132,9 @@ module Ast
 
             current_hunk.lines << DiffLine.new(
               type: :removal,
-              content: $1,
+              content: ::Regexp.last_match(1),
               old_line_num: old_line_num,
-              new_line_num: nil,
+              new_line_num: nil
             )
             old_line_num += 1
           when /^ (.*)$/
@@ -143,9 +143,9 @@ module Ast
 
             current_hunk.lines << DiffLine.new(
               type: :context,
-              content: $1,
+              content: ::Regexp.last_match(1),
               old_line_num: old_line_num,
-              new_line_num: new_line_num,
+              new_line_num: new_line_num
             )
             old_line_num += 1
             new_line_num += 1
@@ -158,7 +158,7 @@ module Ast
         DiffParseResult.new(
           old_file: old_file,
           new_file: new_file,
-          hunks: hunks,
+          hunks: hunks
         )
       end
 
@@ -188,7 +188,7 @@ module Ast
       # @return [Object] A FileAnalysis object for the format
       # @abstract
       def create_analysis(content)
-        raise NotImplementedError, "Subclasses must implement #create_analysis"
+        raise NotImplementedError, 'Subclasses must implement #create_analysis'
       end
 
       # Map a single hunk to AST paths.
@@ -199,7 +199,7 @@ module Ast
       # @return [Array<DiffMapping>] Mappings for this hunk
       # @abstract
       def map_hunk_to_paths(hunk, original_analysis)
-        raise NotImplementedError, "Subclasses must implement #map_hunk_to_paths"
+        raise NotImplementedError, 'Subclasses must implement #map_hunk_to_paths'
       end
 
       protected
@@ -211,8 +211,8 @@ module Ast
       def extract_file_path(path_string)
         # Remove common prefixes: a/, b/, or timestamp suffixes
         path_string
-          .sub(%r{^[ab]/}, "")
-          .sub(/\t.*$/, "") # Remove timestamp suffix
+          .sub(%r{^[ab]/}, '')
+          .sub(/\t.*$/, '') # Remove timestamp suffix
           .strip
       end
 
@@ -238,7 +238,7 @@ module Ast
       # @param analysis [Object] The file analysis
       # @return [Array<String, Integer>] Path components
       def build_path_for_node(node, analysis)
-        raise NotImplementedError, "Subclasses must implement #build_path_for_node"
+        raise NotImplementedError, 'Subclasses must implement #build_path_for_node'
       end
     end
   end

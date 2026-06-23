@@ -26,21 +26,21 @@ module Ast
     #   nodes = Comment::Parser.parse(lines, style: :auto)
     #
     module Comment
-      autoload :Attachment, "ast/merge/comment/attachment"
-      autoload :Augmenter, "ast/merge/comment/augmenter"
-      autoload :Capability, "ast/merge/comment/capability"
-      autoload :CStyleTrackerBase, "ast/merge/comment/c_style_tracker_base"
-      autoload :HashTrackerBase, "ast/merge/comment/hash_tracker_base"
-      autoload :Region, "ast/merge/comment/region"
-      autoload :RegionMergePolicy, "ast/merge/comment/region_merge_policy"
-      autoload :SupportStyle, "ast/merge/comment/support_style"
-      autoload :TrackedHashAdapter, "ast/merge/comment/tracked_hash_adapter"
-      autoload :QuotedHashLineParser, "ast/merge/comment/quoted_hash_line_parser"
-      autoload :Style, "ast/merge/comment/style"
-      autoload :Line, "ast/merge/comment/line"
-      autoload :Empty, "ast/merge/comment/empty"
-      autoload :Block, "ast/merge/comment/block"
-      autoload :Parser, "ast/merge/comment/parser"
+      autoload :Attachment, 'ast/merge/comment/attachment'
+      autoload :Augmenter, 'ast/merge/comment/augmenter'
+      autoload :Capability, 'ast/merge/comment/capability'
+      autoload :CStyleTrackerBase, 'ast/merge/comment/c_style_tracker_base'
+      autoload :HashTrackerBase, 'ast/merge/comment/hash_tracker_base'
+      autoload :Region, 'ast/merge/comment/region'
+      autoload :RegionMergePolicy, 'ast/merge/comment/region_merge_policy'
+      autoload :SupportStyle, 'ast/merge/comment/support_style'
+      autoload :TrackedHashAdapter, 'ast/merge/comment/tracked_hash_adapter'
+      autoload :QuotedHashLineParser, 'ast/merge/comment/quoted_hash_line_parser'
+      autoload :Style, 'ast/merge/comment/style'
+      autoload :Line, 'ast/merge/comment/line'
+      autoload :Empty, 'ast/merge/comment/empty'
+      autoload :Block, 'ast/merge/comment/block'
+      autoload :Parser, 'ast/merge/comment/parser'
     end
   end
 end

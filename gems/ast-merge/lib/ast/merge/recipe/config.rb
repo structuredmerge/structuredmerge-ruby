@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "yaml"
+require 'yaml'
 
 module Ast
   module Merge
@@ -96,12 +96,12 @@ module Ast
           effective_path = preset_path || recipe_path
           super(config, preset_path: effective_path)
 
-          @template_path = config["template"]
-          @targets = Array(config.fetch("targets", default_targets_for(@template_path)))
-          @when_missing = (config["when_missing"] || "skip").to_sym
+          @template_path = config['template']
+          @targets = Array(config.fetch('targets', default_targets_for(@template_path)))
+          @when_missing = (config['when_missing'] || 'skip').to_sym
           validate_top_level_step_contract!(config)
-          @injection = parse_injection(config["injection"] || {})
-          @steps = parse_steps(config["steps"])
+          @injection = parse_injection(config['injection'] || {})
+          @steps = parse_steps(config['steps'])
         end
 
         # Get the absolute path to the template file.
@@ -150,14 +150,12 @@ module Ast
             text: anchor[:text],
             position: injection[:position] || :replace,
             boundary_type: boundary[:type],
-            boundary_text: boundary[:text],
+            boundary_text: boundary[:text]
           }
 
           # Support tree-depth based boundary detection
           # same_or_shallower: true means "end at next sibling (same tree level or above)"
-          if boundary[:same_or_shallower]
-            query[:boundary_same_or_shallower] = true
-          end
+          query[:boundary_same_or_shallower] = true if boundary[:same_or_shallower]
 
           query.compact
         end
@@ -178,12 +176,12 @@ module Ast
               kind: :navigable,
               anchor: injection[:anchor],
               position: injection[:position] || :replace,
-              boundary: injection[:boundary],
+              boundary: injection[:boundary]
             }.compact
           when :key_path
             {
               kind: :key_path,
-              key_path: injection[:key_path],
+              key_path: injection[:key_path]
             }
           end
         end
@@ -242,28 +240,28 @@ module Ast
         STEP_KINDS = %i[partial_merge smart_merge ruby_script].freeze
 
         def default_targets_for(template_path)
-          template_path ? ["*.md"] : []
+          template_path ? ['*.md'] : []
         end
 
         def parse_injection(config)
           return {} if config.empty?
 
-          anchor = parse_matcher(config["anchor"] || {})
-          boundary = parse_matcher(config["boundary"] || {})
-          key_path = parse_key_path(config["key_path"])
-          position = config["position"]
+          anchor = parse_matcher(config['anchor'] || {})
+          boundary = parse_matcher(config['boundary'] || {})
+          key_path = parse_key_path(config['key_path'])
+          position = config['position']
 
           validate_injection!(anchor: anchor, boundary: boundary, key_path: key_path, position: position)
 
           if key_path
             return {
-              key_path: key_path,
+              key_path: key_path
             }
           end
 
           result = {}
           result[:anchor] = anchor if anchor
-          result[:position] = (position || "replace").to_sym if anchor
+          result[:position] = (position || 'replace').to_sym if anchor
           result[:boundary] = boundary if boundary
           result
         end
@@ -272,26 +270,24 @@ module Ast
           return [].freeze if config.nil?
 
           steps = Array(config)
-          raise ArgumentError, "Recipe steps cannot be empty" if steps.empty?
+          raise ArgumentError, 'Recipe steps cannot be empty' if steps.empty?
 
           steps.map { |step_config| parse_step(step_config) }.freeze
         end
 
         def parse_step(step_config)
-          unless step_config.is_a?(Hash)
-            raise ArgumentError, "Each recipe step must be a Hash"
-          end
+          raise ArgumentError, 'Each recipe step must be a Hash' unless step_config.is_a?(Hash)
 
           kind = config_value(step_config, :kind)&.to_sym
           unless STEP_KINDS.include?(kind)
-            allowed = STEP_KINDS.map(&:inspect).join(", ")
+            allowed = STEP_KINDS.map(&:inspect).join(', ')
             raise ArgumentError, "Recipe step kind must be one of: #{allowed}"
           end
 
           step = {
             kind: kind,
             name: config_value(step_config, :name),
-            parser: normalize_step_parser(step_config),
+            parser: normalize_step_parser(step_config)
           }.compact
 
           case kind
@@ -309,22 +305,25 @@ module Ast
         def parse_partial_merge_step!(step, step_config)
           injection = parse_injection(config_value(step_config, :injection) || {})
           partial_target = build_partial_target(injection)
-          raise ArgumentError, "partial_merge step requires injection.anchor or injection.key_path" unless partial_target
+          unless partial_target
+            raise ArgumentError,
+                  'partial_merge step requires injection.anchor or injection.key_path'
+          end
 
           step[:partial_target] = partial_target
           step[:when_missing] = (config_value(step_config, :when_missing) || when_missing).to_sym
-          step[:merge_config] = merge_config.merge(parse_step_merge_overrides(config_value(step_config, :merge) || {})).freeze
+          step[:merge_config] =
+            merge_config.merge(parse_step_merge_overrides(config_value(step_config, :merge) || {})).freeze
         end
 
         def parse_smart_merge_step!(step, step_config)
-          step[:merge_config] = merge_config.merge(parse_step_merge_overrides(config_value(step_config, :merge) || {})).freeze
+          step[:merge_config] =
+            merge_config.merge(parse_step_merge_overrides(config_value(step_config, :merge) || {})).freeze
         end
 
         def parse_ruby_script_step!(step, step_config)
           script = config_value(step_config, :script)
-          if script.nil? || script.to_s.strip.empty?
-            raise ArgumentError, "ruby_script step requires script"
-          end
+          raise ArgumentError, 'ruby_script step requires script' if script.nil? || script.to_s.strip.empty?
 
           step[:script] = script
         end
@@ -339,34 +338,32 @@ module Ast
         def parse_step_merge_overrides(config)
           result = {}
 
-          if config.key?("preference") || config.key?(:preference)
+          if config.key?('preference') || config.key?(:preference)
             result[:preference] = parse_preference(config_value(config, :preference))
           end
-          if config.key?("add_missing") || config.key?(:add_missing)
+          if config.key?('add_missing') || config.key?(:add_missing)
             result[:add_missing] = config_value(config, :add_missing)
           end
-          if config.key?("replace_mode") || config.key?(:replace_mode)
+          if config.key?('replace_mode') || config.key?(:replace_mode)
             result[:replace_mode] = config_value(config, :replace_mode) == true
           end
-          if config.key?("match_by") || config.key?(:match_by)
+          if config.key?('match_by') || config.key?(:match_by)
             result[:match_by] = Array(config_value(config, :match_by)).map(&:to_sym)
           end
-          if config.key?("deep") || config.key?(:deep)
-            result[:deep] = config_value(config, :deep) == true
-          end
-          if config.key?("signature_generator") || config.key?(:signature_generator)
+          result[:deep] = config_value(config, :deep) == true if config.key?('deep') || config.key?(:deep)
+          if config.key?('signature_generator') || config.key?(:signature_generator)
             result[:signature_generator] = config_value(config, :signature_generator)
           end
-          if config.key?("node_typing") || config.key?(:node_typing)
+          if config.key?('node_typing') || config.key?(:node_typing)
             result[:node_typing] = config_value(config, :node_typing)
           end
-          if config.key?("match_refiner") || config.key?(:match_refiner)
+          if config.key?('match_refiner') || config.key?(:match_refiner)
             result[:match_refiner] = config_value(config, :match_refiner)
           end
-          if config.key?("normalize_whitespace") || config.key?(:normalize_whitespace)
+          if config.key?('normalize_whitespace') || config.key?(:normalize_whitespace)
             result[:normalize_whitespace] = config_value(config, :normalize_whitespace) == true
           end
-          if config.key?("rehydrate_link_references") || config.key?(:rehydrate_link_references)
+          if config.key?('rehydrate_link_references') || config.key?(:rehydrate_link_references)
             result[:rehydrate_link_references] = config_value(config, :rehydrate_link_references) == true
           end
 
@@ -379,14 +376,14 @@ module Ast
           if injection_config[:key_path]
             {
               kind: :key_path,
-              key_path: injection_config[:key_path],
+              key_path: injection_config[:key_path]
             }
           elsif injection_config[:anchor]
             {
               kind: :navigable,
               anchor: injection_config[:anchor],
               position: injection_config[:position] || :replace,
-              boundary: injection_config[:boundary],
+              boundary: injection_config[:boundary]
             }.compact
           end
         end
@@ -400,23 +397,23 @@ module Ast
               parser: step_parser,
               partial_target: build_partial_target(injection),
               when_missing: when_missing,
-              merge_config: merge_config,
+              merge_config: merge_config
             }.freeze
           else
             {
               kind: :smart_merge,
               parser: step_parser,
-              merge_config: merge_config,
+              merge_config: merge_config
             }.freeze
           end
         end
 
         def validate_top_level_step_contract!(config)
-          return unless config.key?("steps") || config.key?(:steps)
-          return unless config["injection"] || config[:injection]
-          return if (config["injection"] || config[:injection]).empty?
+          return unless config.key?('steps') || config.key?(:steps)
+          return unless config['injection'] || config[:injection]
+          return if (config['injection'] || config[:injection]).empty?
 
-          raise ArgumentError, "Recipe must use either top-level injection or explicit steps, not both"
+          raise ArgumentError, 'Recipe must use either top-level injection or explicit steps, not both'
         end
 
         def config_value(config, key)
@@ -438,12 +435,12 @@ module Ast
           return if config.empty?
 
           {
-            type: config["type"]&.to_sym,
-            text: parse_text_pattern(config["text"]),
-            level: config["level"],
-            level_lte: config["level_lte"],
-            level_gte: config["level_gte"],
-            same_or_shallower: config["same_or_shallower"] == true,
+            type: config['type']&.to_sym,
+            text: parse_text_pattern(config['text']),
+            level: config['level'],
+            level_lte: config['level_lte'],
+            level_gte: config['level_gte'],
+            same_or_shallower: config['same_or_shallower'] == true
           }.compact
         end
 
@@ -452,7 +449,7 @@ module Ast
           return text if text.is_a?(Regexp)
 
           # Handle /regex/ syntax in YAML strings
-          if text.is_a?(String) && text.start_with?("/") && text.end_with?("/")
+          if text.is_a?(String) && text.start_with?('/') && text.end_with?('/')
             Regexp.new(text[1..-2])
           else
             text
@@ -466,20 +463,17 @@ module Ast
           return unless has_anchor || has_key_path || boundary || !position.nil?
 
           if has_anchor && has_key_path
-            raise ArgumentError, "Recipe injection must choose exactly one partial target shape: anchor/boundary or key_path"
+            raise ArgumentError,
+                  'Recipe injection must choose exactly one partial target shape: anchor/boundary or key_path'
           end
 
-          if boundary && !has_anchor
-            raise ArgumentError, "Recipe injection.boundary requires injection.anchor"
-          end
+          raise ArgumentError, 'Recipe injection.boundary requires injection.anchor' if boundary && !has_anchor
 
-          if !position.nil? && !has_anchor
-            raise ArgumentError, "Recipe injection.position requires injection.anchor"
-          end
+          raise ArgumentError, 'Recipe injection.position requires injection.anchor' if !position.nil? && !has_anchor
 
-          if has_key_path && key_path.empty?
-            raise ArgumentError, "Recipe injection.key_path cannot be empty"
-          end
+          return unless has_key_path && key_path.empty?
+
+          raise ArgumentError, 'Recipe injection.key_path cannot be empty'
         end
       end
     end

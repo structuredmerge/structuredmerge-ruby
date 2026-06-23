@@ -7,7 +7,7 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
   let(:leading_boundary) { Ast::Merge::StructuralEdit::Boundary.new(edge: :leading, owner: survivor_before) }
   let(:trailing_boundary) { Ast::Merge::StructuralEdit::Boundary.new(edge: :trailing, owner: survivor_after) }
 
-  describe "source-preserving removal" do
+  describe 'source-preserving removal' do
     let(:source) do
       <<~TEXT
         # Before
@@ -19,13 +19,13 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
       TEXT
     end
 
-    it "removes the requested line range while preserving untouched source exactly" do
+    it 'removes the requested line range while preserving untouched source exactly' do
       plan = described_class.new(
         source: source,
         remove_start_line: 3,
         remove_end_line: 5,
         leading_boundary: leading_boundary,
-        trailing_boundary: trailing_boundary,
+        trailing_boundary: trailing_boundary
       )
 
       expect(plan.before_content).to eq("# Before\n\n")
@@ -36,7 +36,7 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
     end
   end
 
-  describe "rehome planning" do
+  describe 'rehome planning' do
     let(:leading_region) { instance_double(Ast::Merge::Comment::Region) }
     let(:inline_region) { instance_double(Ast::Merge::Comment::Region) }
     let(:orphan_region) { instance_double(Ast::Merge::Comment::Region) }
@@ -51,18 +51,18 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
         trailing_region: trailing_region,
         orphan_regions: [orphan_region],
         leading_gap: leading_gap,
-        trailing_gap: trailing_gap,
+        trailing_gap: trailing_gap
       )
     end
 
-    it "derives retained and removed owners and splits promoted fragments by surviving boundary side" do
+    it 'derives retained and removed owners and splits promoted fragments by surviving boundary side' do
       plan = described_class.new(
         source: "before\nremove\nafter\n",
         remove_start_line: 2,
         remove_end_line: 2,
         leading_boundary: leading_boundary,
         trailing_boundary: trailing_boundary,
-        removed_attachments: [removed_attachment],
+        removed_attachments: [removed_attachment]
       )
 
       expect(plan.retained_owners).to eq([survivor_before, survivor_after])
@@ -88,7 +88,7 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
       expect(trailing_plan.layout_attachment.leading_gap).to equal(trailing_gap)
     end
 
-    it "falls back to the surviving trailing boundary when no leading boundary exists" do
+    it 'falls back to the surviving trailing boundary when no leading boundary exists' do
       plan = described_class.new(
         source: "before\nremove\nafter\n",
         remove_start_line: 2,
@@ -98,9 +98,9 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
           Ast::Merge::Comment::Attachment.new(
             owner: removed_owner,
             leading_region: leading_region,
-            leading_gap: leading_gap,
-          ),
-        ],
+            leading_gap: leading_gap
+          )
+        ]
       )
 
       expect(plan.rehome_plans.size).to eq(1)
@@ -109,13 +109,13 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
       expect(plan.rehome_plans.first.layout_attachment.leading_gap).to equal(leading_gap)
     end
 
-    it "ignores empty removed attachments and produces no rehome plans when nothing survives" do
+    it 'ignores empty removed attachments and produces no rehome plans when nothing survives' do
       plan = described_class.new(
         source: "before\nremove\nafter\n",
         remove_start_line: 2,
         remove_end_line: 2,
         leading_boundary: leading_boundary,
-        removed_attachments: [Ast::Merge::Comment::Attachment.new(owner: removed_owner)],
+        removed_attachments: [Ast::Merge::Comment::Attachment.new(owner: removed_owner)]
       )
 
       expect(plan.rehome_plans).to eq([])
@@ -130,14 +130,14 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
     let(:region) { instance_double(Ast::Merge::Comment::Region) }
     let(:gap) { instance_double(Ast::Merge::Layout::Gap) }
 
-    it "retargets promoted fragments onto the trailing side of a leading boundary owner" do
+    it 'retargets promoted fragments onto the trailing side of a leading boundary owner' do
       boundary = Ast::Merge::StructuralEdit::Boundary.new(edge: :leading, owner: target_owner)
 
       plan = described_class.new(
         source_owner: source_owner,
         target_boundary: boundary,
         comment_regions: [region],
-        layout_gaps: [gap],
+        layout_gaps: [gap]
       )
 
       expect(plan).to be_leading
@@ -146,14 +146,14 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlan do
       expect(plan.layout_attachment.trailing_gap).to equal(gap)
     end
 
-    it "retargets promoted fragments onto the leading side of a trailing boundary owner" do
+    it 'retargets promoted fragments onto the leading side of a trailing boundary owner' do
       boundary = Ast::Merge::StructuralEdit::Boundary.new(edge: :trailing, owner: target_owner)
 
       plan = described_class.new(
         source_owner: source_owner,
         target_boundary: boundary,
         comment_regions: [region],
-        layout_gaps: [gap],
+        layout_gaps: [gap]
       )
 
       expect(plan).to be_trailing

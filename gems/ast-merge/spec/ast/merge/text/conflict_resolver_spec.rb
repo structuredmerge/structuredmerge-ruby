@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "ast/merge/text"
+require 'ast/merge/text'
 
 RSpec.describe Ast::Merge::Text::ConflictResolver do
   let(:template_source) { "Line one\nLine two\nLine three" }
@@ -8,31 +8,31 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
   let(:template_analysis) { Ast::Merge::Text::FileAnalysis.new(template_source) }
   let(:dest_analysis) { Ast::Merge::Text::FileAnalysis.new(dest_source) }
 
-  describe "#initialize" do
-    it "accepts preference option" do
+  describe '#initialize' do
+    it 'accepts preference option' do
       resolver = described_class.new(
         template_analysis,
         dest_analysis,
-        preference: :template,
+        preference: :template
       )
 
       expect(resolver.instance_variable_get(:@preference)).to eq(:template)
     end
 
-    it "accepts add_template_only_nodes option" do
+    it 'accepts add_template_only_nodes option' do
       resolver = described_class.new(
         template_analysis,
         dest_analysis,
-        add_template_only_nodes: true,
+        add_template_only_nodes: true
       )
 
       expect(resolver.instance_variable_get(:@add_template_only_nodes)).to be true
     end
   end
 
-  describe "#resolve" do
-    context "with identical content" do
-      it "preserves all lines" do
+  describe '#resolve' do
+    context 'with identical content' do
+      it 'preserves all lines' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
@@ -41,7 +41,7 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
         expect(result.to_s).to eq("Line one\nLine two\nLine three\n")
       end
 
-      it "records identical decisions" do
+      it 'records identical decisions' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
@@ -52,19 +52,19 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with destination-only lines" do
+    context 'with destination-only lines' do
       let(:dest_source) { "Line one\nLine two\nNew line\nLine three" }
 
-      it "preserves destination-only lines" do
+      it 'preserves destination-only lines' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
         resolver.resolve(result)
 
-        expect(result.to_s).to include("New line")
+        expect(result.to_s).to include('New line')
       end
 
-      it "records appended decision for destination-only lines" do
+      it 'records appended decision for destination-only lines' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
@@ -75,26 +75,26 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with template-only lines" do
+    context 'with template-only lines' do
       let(:dest_source) { "Line one\nLine three" }
 
-      context "when add_template_only_nodes is false (default)" do
-        it "does not add template-only lines" do
+      context 'when add_template_only_nodes is false (default)' do
+        it 'does not add template-only lines' do
           resolver = described_class.new(template_analysis, dest_analysis)
           result = Ast::Merge::Text::MergeResult.new
 
           resolver.resolve(result)
 
-          expect(result.to_s).not_to include("Line two")
+          expect(result.to_s).not_to include('Line two')
         end
       end
 
-      context "when add_template_only_nodes is true" do
-        it "adds template-only lines in template order" do
+      context 'when add_template_only_nodes is true' do
+        it 'adds template-only lines in template order' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            add_template_only_nodes: true,
+            add_template_only_nodes: true
           )
           result = Ast::Merge::Text::MergeResult.new
 
@@ -103,11 +103,11 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
           expect(result.to_s).to eq("Line one\nLine two\nLine three\n")
         end
 
-        it "records added decision for template-only lines" do
+        it 'records added decision for template-only lines' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            add_template_only_nodes: true,
+            add_template_only_nodes: true
           )
           result = Ast::Merge::Text::MergeResult.new
 
@@ -118,14 +118,14 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
         end
       end
 
-      context "when a template-only line precedes the first matched line" do
+      context 'when a template-only line precedes the first matched line' do
         let(:template_source) { "Header\nLine one\nLine two\nLine three" }
 
-        it "emits the prefix line before destination-backed content" do
+        it 'emits the prefix line before destination-backed content' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            add_template_only_nodes: true,
+            add_template_only_nodes: true
           )
           result = Ast::Merge::Text::MergeResult.new
 
@@ -136,23 +136,23 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with whitespace differences (same normalized content)" do
+    context 'with whitespace differences (same normalized content)' do
       let(:template_source) { "  Line one  \nLine two" }
       let(:dest_source) { "Line one\n  Line two  " }
 
-      context "with preference: :destination (default)" do
-        it "uses destination content" do
+      context 'with preference: :destination (default)' do
+        it 'uses destination content' do
           resolver = described_class.new(template_analysis, dest_analysis)
           result = Ast::Merge::Text::MergeResult.new
 
           resolver.resolve(result)
 
           lines = result.to_s.split("\n")
-          expect(lines[0]).to eq("Line one")
-          expect(lines[1]).to eq("  Line two  ")
+          expect(lines[0]).to eq('Line one')
+          expect(lines[1]).to eq('  Line two  ')
         end
 
-        it "records kept_destination decisions" do
+        it 'records kept_destination decisions' do
           resolver = described_class.new(template_analysis, dest_analysis)
           result = Ast::Merge::Text::MergeResult.new
 
@@ -163,27 +163,27 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
         end
       end
 
-      context "with preference: :template" do
-        it "uses template content" do
+      context 'with preference: :template' do
+        it 'uses template content' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            preference: :template,
+            preference: :template
           )
           result = Ast::Merge::Text::MergeResult.new
 
           resolver.resolve(result)
 
           lines = result.to_s.split("\n")
-          expect(lines[0]).to eq("  Line one  ")
-          expect(lines[1]).to eq("Line two")
+          expect(lines[0]).to eq('  Line one  ')
+          expect(lines[1]).to eq('Line two')
         end
 
-        it "records kept_template decisions" do
+        it 'records kept_template decisions' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            preference: :template,
+            preference: :template
           )
           result = Ast::Merge::Text::MergeResult.new
 
@@ -195,7 +195,7 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with freeze blocks" do
+    context 'with freeze blocks' do
       let(:dest_source) do
         <<~TEXT.chomp
           Line one
@@ -206,18 +206,18 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
         TEXT
       end
 
-      it "preserves freeze blocks from destination" do
+      it 'preserves freeze blocks from destination' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
         resolver.resolve(result)
 
-        expect(result.to_s).to include("# text-merge:freeze")
-        expect(result.to_s).to include("Frozen content")
-        expect(result.to_s).to include("# text-merge:unfreeze")
+        expect(result.to_s).to include('# text-merge:freeze')
+        expect(result.to_s).to include('Frozen content')
+        expect(result.to_s).to include('# text-merge:unfreeze')
       end
 
-      it "records frozen decisions" do
+      it 'records frozen decisions' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 
@@ -228,7 +228,7 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with freeze blocks in template" do
+    context 'with freeze blocks in template' do
       let(:template_source) do
         <<~TEXT.chomp
           Line one
@@ -239,32 +239,32 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
         TEXT
       end
 
-      context "when add_template_only_nodes is true" do
-        it "does not add freeze blocks from template" do
+      context 'when add_template_only_nodes is true' do
+        it 'does not add freeze blocks from template' do
           resolver = described_class.new(
             template_analysis,
             dest_analysis,
-            add_template_only_nodes: true,
+            add_template_only_nodes: true
           )
           result = Ast::Merge::Text::MergeResult.new
 
           resolver.resolve(result)
 
           # Freeze blocks from template should be skipped
-          expect(result.to_s).not_to include("Template frozen content")
+          expect(result.to_s).not_to include('Template frozen content')
         end
       end
     end
 
-    context "with destination-only lines between matched anchors" do
+    context 'with destination-only lines between matched anchors' do
       let(:template_source) { "Line one\nLine two\nTemplate only line\nLine three" }
       let(:dest_source) { "Line one\nLine two\nDestination only line\nLine three" }
 
-      it "emits template-only lines before later destination-only content" do
+      it 'emits template-only lines before later destination-only content' do
         resolver = described_class.new(
           template_analysis,
           dest_analysis,
-          add_template_only_nodes: true,
+          add_template_only_nodes: true
         )
         result = Ast::Merge::Text::MergeResult.new
 
@@ -274,11 +274,11 @@ RSpec.describe Ast::Merge::Text::ConflictResolver do
       end
     end
 
-    context "with duplicate normalized content" do
+    context 'with duplicate normalized content' do
       let(:template_source) { "Line\nLine\nLine" }
       let(:dest_source) { "  Line  \n Line \nLine" }
 
-      it "matches in order" do
+      it 'matches in order' do
         resolver = described_class.new(template_analysis, dest_analysis)
         result = Ast::Merge::Text::MergeResult.new
 

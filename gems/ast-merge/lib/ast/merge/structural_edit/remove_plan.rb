@@ -24,29 +24,30 @@ module Ast
         # @param metadata [Hash] base metadata
         # @param preserve_removed_trailing_blank_lines [Boolean] whether trailing blank lines should survive in the splice
         # @param options [Hash] extra metadata merged into +metadata+
-        def initialize(source:, remove_start_line:, remove_end_line:, leading_boundary: nil, trailing_boundary: nil, removed_attachments: [], removed_owners: nil, retained_owners: nil, metadata: {}, preserve_removed_trailing_blank_lines: true, **options)
+        def initialize(source:, remove_start_line:, remove_end_line:, leading_boundary: nil, trailing_boundary: nil,
+                       removed_attachments: [], removed_owners: nil, retained_owners: nil, metadata: {}, preserve_removed_trailing_blank_lines: true, **options)
           normalized_removed_attachments = Array(removed_attachments).compact.freeze
           @state = {
             boundaries: {
               leading: leading_boundary,
-              trailing: trailing_boundary,
+              trailing: trailing_boundary
             }.freeze,
             removed_attachments: normalized_removed_attachments,
             removed_owners: normalize_owners(removed_owners || removed_attachment_owners(normalized_removed_attachments)),
             retained_owners: normalize_owners(retained_owners || [leading_boundary&.owner, trailing_boundary&.owner]),
-            metadata: metadata.merge(options).freeze,
+            metadata: metadata.merge(options).freeze
           }.freeze
 
           validate_boundaries!
           @splice_plan = SplicePlan.new(
             source: source,
-            replacement: "",
+            replacement: '',
             replace_start_line: remove_start_line,
             replace_end_line: remove_end_line,
             leading_boundary: leading_boundary,
             trailing_boundary: trailing_boundary,
             preserve_removed_trailing_blank_lines: preserve_removed_trailing_blank_lines,
-            metadata: {source: :structural_edit_remove_plan}.merge(self.metadata),
+            metadata: { source: :structural_edit_remove_plan }.merge(self.metadata)
           )
         end
 
@@ -216,7 +217,7 @@ module Ast
             target_boundary: target_boundary,
             comment_regions: fragment_spec[:comment_regions],
             layout_gaps: fragment_spec[:layout_gaps],
-            metadata: {source: :structural_edit_remove_plan}.merge(fragment_spec[:metadata]),
+            metadata: { source: :structural_edit_remove_plan }.merge(fragment_spec[:metadata])
           )
         end
 
@@ -226,20 +227,20 @@ module Ast
               target_boundary: leading_boundary || trailing_boundary,
               comment_regions: attachment_values(attachment, :leading_region),
               layout_gaps: attachment_values(attachment, :leading_gap),
-              metadata: {kind: :leading},
+              metadata: { kind: :leading }
             },
             {
               target_boundary: leading_boundary || trailing_boundary,
               comment_regions: attachment_values(attachment, :inline_region, :orphan_regions),
               layout_gaps: [],
-              metadata: {kind: :ambiguous},
+              metadata: { kind: :ambiguous }
             },
             {
               target_boundary: trailing_boundary || leading_boundary,
               comment_regions: attachment_values(attachment, :trailing_region),
               layout_gaps: attachment_values(attachment, :trailing_gap),
-              metadata: {kind: :trailing},
-            },
+              metadata: { kind: :trailing }
+            }
           ].reject { |fragment_spec| fragment_spec[:comment_regions].empty? && fragment_spec[:layout_gaps].empty? }
         end
 
@@ -283,12 +284,12 @@ module Ast
 
         def validate_boundaries!
           if leading_boundary && !leading_boundary.leading?
-            raise ArgumentError, "leading_boundary must use edge :leading"
+            raise ArgumentError, 'leading_boundary must use edge :leading'
           end
 
           return unless trailing_boundary && !trailing_boundary.trailing?
 
-          raise ArgumentError, "trailing_boundary must use edge :trailing"
+          raise ArgumentError, 'trailing_boundary must use edge :trailing'
         end
       end
     end

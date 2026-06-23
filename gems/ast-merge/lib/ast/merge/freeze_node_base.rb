@@ -108,20 +108,20 @@ module Ast
       MARKER_PATTERNS = {
         hash_comment: {
           start: /^\s*#\s*[\w-]+:freeze\b/i,
-          end: /^\s*#\s*[\w-]+:unfreeze\b/i,
+          end: /^\s*#\s*[\w-]+:unfreeze\b/i
         },
         html_comment: {
           start: /^\s*<!--\s*[\w-]+:freeze\b.*-->/i,
-          end: /^\s*<!--\s*[\w-]+:unfreeze\b.*-->/i,
+          end: /^\s*<!--\s*[\w-]+:unfreeze\b.*-->/i
         },
         c_style_line: {
           start: %r{^\s*//\s*[\w-]+:freeze\b}i,
-          end: %r{^\s*//\s*[\w-]+:unfreeze\b}i,
+          end: %r{^\s*//\s*[\w-]+:unfreeze\b}i
         },
         c_style_block: {
           start: %r{^\s*/\*\s*[\w-]+:freeze\b.*\*/}i,
-          end: %r{^\s*/\*\s*[\w-]+:unfreeze\b.*\*/}i,
-        },
+          end: %r{^\s*/\*\s*[\w-]+:unfreeze\b.*\*/}i
+        }
       }
 
       # Default pattern when none specified
@@ -137,10 +137,10 @@ module Ast
         # @raise [ArgumentError] if name already exists or patterns invalid
         def register_pattern(name, start:, end_pattern:)
           raise ArgumentError, "Pattern :#{name} already registered" if MARKER_PATTERNS.key?(name)
-          raise ArgumentError, "Start pattern must be a Regexp" unless start.is_a?(Regexp)
-          raise ArgumentError, "End pattern must be a Regexp" unless end_pattern.is_a?(Regexp)
+          raise ArgumentError, 'Start pattern must be a Regexp' unless start.is_a?(Regexp)
+          raise ArgumentError, 'End pattern must be a Regexp' unless end_pattern.is_a?(Regexp)
 
-          MARKER_PATTERNS[name] = {start: start, end: end_pattern}
+          MARKER_PATTERNS[name] = { start: start, end: end_pattern }
         end
 
         # Get start marker pattern for a given pattern type
@@ -371,7 +371,7 @@ module Ast
       end
 
       # Alias for compatibility
-      alias_method :type, :merge_type
+      alias type merge_type
 
       # Returns a stable signature for this freeze block.
       # Override in subclasses for file-type-specific normalization.
@@ -401,7 +401,7 @@ module Ast
         raise InvalidStructureError.new(
           "Freeze block end line (#{@end_line}) is before start line (#{@start_line})",
           start_line: @start_line,
-          end_line: @end_line,
+          end_line: @end_line
         )
       end
 

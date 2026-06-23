@@ -69,10 +69,10 @@ module Ast
       # @return [Set<String>] Set of significant lowercase tokens
       def extract_tokens(text, stopwords: DEFAULT_STOPWORDS, min_length: DEFAULT_MIN_TOKEN_LENGTH)
         text.to_s
-          .downcase
-          .scan(/[[:alpha:]][[:alnum:]_-]{#{min_length - 1},}/)
-          .reject { |t| stopwords.include?(t) }
-          .to_set
+            .downcase
+            .scan(/[[:alpha:]][[:alnum:]_-]{#{min_length - 1},}/)
+            .reject { |t| stopwords.include?(t) }
+            .to_set
       end
 
       # Compute Jaccard similarity index between two sets.

@@ -38,7 +38,8 @@ module Ast
         "#{prefix} Suspected corruption (#{kind}): #{message}"
       end
 
-      def filter_items(items, mode:, kind:, message:, prefix:, error_class: CorruptionDetectedError, warner: nil, on_filter: nil)
+      def filter_items(items, mode:, kind:, message:, prefix:, error_class: CorruptionDetectedError, warner: nil,
+                       on_filter: nil)
         matches = Array(items).map { |item| [item, yield(item)] }
         return items unless matches.any? { |_, matched| matched }
         return items unless handle(
@@ -47,7 +48,7 @@ module Ast
           message: message,
           prefix: prefix,
           error_class: error_class,
-          warner: warner,
+          warner: warner
         )
 
         matches.each_with_object([]) do |(item, matched), filtered|

@@ -12,9 +12,9 @@ module Ast
     # @see Navigable::InjectionPoint Represents a location for content injection
     # @see Navigable::InjectionPointFinder Finds injection points by matching rules
     module Navigable
-      autoload :Statement, "ast/merge/navigable/statement"
-      autoload :InjectionPoint, "ast/merge/navigable/injection_point"
-      autoload :InjectionPointFinder, "ast/merge/navigable/injection_point_finder"
+      autoload :Statement, 'ast/merge/navigable/statement'
+      autoload :InjectionPoint, 'ast/merge/navigable/injection_point'
+      autoload :InjectionPointFinder, 'ast/merge/navigable/injection_point_finder'
     end
   end
 end

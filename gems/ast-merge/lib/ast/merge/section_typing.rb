@@ -65,14 +65,15 @@ module Ast
 
         # @return [Hash, nil] Additional metadata from classification
         :metadata,
-        keyword_init: true,
+        keyword_init: true
       ) do
         # Normalize the section name for matching.
         #
         # @return [String] Normalized name
         def normalized_name
-          return "" if name.nil?
+          return '' if name.nil?
           return name.to_s if name.is_a?(Symbol)
+
           name.to_s.strip.downcase
         end
 
@@ -80,7 +81,7 @@ module Ast
         #
         # @return [Boolean]
         def unclassified?
-          type == :unclassified || type == :preamble
+          %i[unclassified preamble].include?(type)
         end
       end
 
@@ -126,9 +127,7 @@ module Ast
           end
 
           # Flush remaining unclassified nodes
-          if unclassified_buffer.any?
-            sections << build_unclassified_section(unclassified_buffer)
-          end
+          sections << build_unclassified_section(unclassified_buffer) if unclassified_buffer.any?
 
           sections
         end
@@ -151,8 +150,8 @@ module Ast
           TypedSection.new(
             type: :unclassified,
             name: :unclassified,
-            node: (nodes.length == 1) ? nodes.first : nodes,
-            metadata: {node_count: nodes.length},
+            node: nodes.length == 1 ? nodes.first : nodes,
+            metadata: { node_count: nodes.length }
           )
         end
       end
@@ -267,7 +266,7 @@ module Ast
             if dest_section
               # Section exists in both - choose based on preference
               section_pref = preference_for(template_section.name, preference)
-              merged << ((section_pref == :template) ? template_section : dest_section)
+              merged << (section_pref == :template ? template_section : dest_section)
             elsif add_template_only
               merged << template_section
             end
@@ -276,8 +275,10 @@ module Ast
           # Append destination-only sections
           dest_sections.each do |dest_section|
             next if dest_section.unclassified?
+
             key = dest_section.normalized_name
             next if seen_names.include?(key)
+
             merged << dest_section
           end
 

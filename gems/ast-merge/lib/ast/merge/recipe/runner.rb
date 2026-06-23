@@ -26,7 +26,8 @@ module Ast
       #
       class Runner
         # Result of processing a single file
-        Result = Struct.new(:path, :relative_path, :status, :changed, :has_anchor, :message, :stats, :problems, :error, :content, keyword_init: true)
+        Result = Struct.new(:path, :relative_path, :status, :changed, :has_anchor, :message, :stats, :problems, :error,
+                            :content, keyword_init: true)
         # Result of a single in-memory recipe step pipeline.
         #
         # @!attribute [r] content
@@ -73,7 +74,8 @@ module Ast
         # @param verbose [Boolean] Enable verbose output
         # @param target_files [Array<String>, nil] Override recipe targets with these files
         # @param context [Hash, nil] Caller-supplied runtime context for ruby_script steps
-        def initialize(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil, context: nil, **options)
+        def initialize(recipe, dry_run: false, base_dir: nil, parser: nil, verbose: false, target_files: nil,
+                       context: nil, **_options)
           @recipe = recipe
           @dry_run = dry_run
           @base_dir = base_dir || Dir.pwd
@@ -95,12 +97,12 @@ module Ast
 
           # Use command-line targets if provided, otherwise expand from recipe
           files_to_process = if @target_files && !@target_files.empty?
-            # Expand paths relative to base_dir
-            @target_files.map { |f| File.expand_path(f, @base_dir) }
-          else
-            # Let the recipe expand targets from its own location
-            recipe.expand_targets
-          end
+                               # Expand paths relative to base_dir
+                               @target_files.map { |f| File.expand_path(f, @base_dir) }
+                             else
+                               # Let the recipe expand targets from its own location
+                               recipe.expand_targets
+                             end
 
           files_to_process.each do |target_path|
             result = process_file(target_path, template_content)
@@ -123,14 +125,15 @@ module Ast
         # @param relative_path [String, nil] Optional synthetic relative path for reporting
         # @param context [Hash, nil] Optional per-call runtime context merged into runner context
         # @return [Result]
-        def run_content(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil, **options)
+        def run_content(template_content:, destination_content:, target_path: nil, relative_path: nil, context: nil,
+                        **_options)
           @results = [process_file_steps(
-            target_path || relative_path || "(memory)",
-            relative_path || target_path || "(memory)",
+            target_path || relative_path || '(memory)',
+            relative_path || target_path || '(memory)',
             template_content,
             destination_content,
             write_changes: false,
-            context: runtime_context(context),
+            context: runtime_context(context)
           )]
           yield @results.first if block_given?
           @results.first
@@ -154,7 +157,7 @@ module Ast
             would_update: (by_status[:would_update] || []).size,
             unchanged: (by_status[:unchanged] || []).size,
             skipped: (by_status[:skipped] || []).size,
-            errors: (by_status[:error] || []).size,
+            errors: (by_status[:error] || []).size
           }
         end
 
@@ -166,8 +169,8 @@ module Ast
             {
               file: r.relative_path,
               status: r.status.to_s,
-              changed: r.changed ? "yes" : "no",
-              message: r.message,
+              changed: r.changed ? 'yes' : 'no',
+              message: r.message
             }
           end
         end
@@ -178,11 +181,11 @@ module Ast
         def summary_table
           s = summary
           [
-            {metric: "Total files", value: s[:total]},
-            {metric: "Updated", value: dry_run ? s[:would_update] : s[:updated]},
-            {metric: "Unchanged", value: s[:unchanged]},
-            {metric: "Skipped (no anchor)", value: s[:skipped]},
-            {metric: "Errors", value: s[:errors]},
+            { metric: 'Total files', value: s[:total] },
+            { metric: 'Updated', value: dry_run ? s[:would_update] : s[:updated] },
+            { metric: 'Unchanged', value: s[:unchanged] },
+            { metric: 'Skipped (no anchor)', value: s[:skipped] },
+            { metric: 'Errors', value: s[:errors] }
           ]
         end
 
@@ -192,13 +195,13 @@ module Ast
           return unless recipe.respond_to?(:file_recipe?)
           return if recipe.file_recipe?
 
-          raise ArgumentError, "Recipe has no template path; use run_content for content-only recipes"
+          raise ArgumentError, 'Recipe has no template path; use run_content for content-only recipes'
         end
 
         def load_template
           # Let the recipe resolve the template path from its own location
           path = recipe.template_absolute_path
-          raise ArgumentError, "Recipe has no template path; use run_content for content-only recipes" if path.nil?
+          raise ArgumentError, 'Recipe has no template path; use run_content for content-only recipes' if path.nil?
           raise ArgumentError, "Template not found: #{path}" unless File.exist?(path)
 
           File.read(path)
@@ -215,9 +218,9 @@ module Ast
               template_content,
               destination_content,
               write_changes: true,
-              context: runtime_context,
+              context: runtime_context
             )
-          rescue => e
+          rescue StandardError => e
             Result.new(
               path: target_path,
               relative_path: relative_path,
@@ -226,7 +229,7 @@ module Ast
               has_anchor: false,
               message: e.message,
               error: e,
-              content: destination_content,
+              content: destination_content
             )
           end
         end
@@ -238,15 +241,16 @@ module Ast
         def create_partial_template_merger(**options)
           selected_parser = (options.delete(:parser) || parser).to_sym
           partial_target = options[:partial_target]
-          raise ArgumentError, "Recipe runner requires injection.anchor or injection.key_path" unless partial_target
+          raise ArgumentError, 'Recipe runner requires injection.anchor or injection.key_path' unless partial_target
 
           case selected_parser
           when :markly, :commonmarker
             unless partial_target[:kind] == :navigable
-              raise ArgumentError, "Parser #{selected_parser.inspect} requires a navigable partial target (injection.anchor / injection.boundary)"
+              raise ArgumentError,
+                    "Parser #{selected_parser.inspect} requires a navigable partial target (injection.anchor / injection.boundary)"
             end
 
-            require "markdown/merge" unless defined?(Markdown::Merge)
+            require 'markdown/merge' unless defined?(Markdown::Merge)
             Markdown::Merge::PartialTemplateMerger.new(
               template: options.fetch(:template),
               destination: options.fetch(:destination),
@@ -261,12 +265,13 @@ module Ast
               node_typing: options[:node_typing],
               match_refiner: options[:match_refiner],
               normalize_whitespace: options[:normalize_whitespace],
-              rehydrate_link_references: options[:rehydrate_link_references],
+              rehydrate_link_references: options[:rehydrate_link_references]
             )
           when :prism
-            require "prism/merge" unless defined?(Prism::Merge)
+            require 'prism/merge' unless defined?(Prism::Merge)
             unless partial_target[:kind] == :navigable
-              raise ArgumentError, "Parser :prism currently requires a navigable partial target (injection.anchor / injection.boundary)"
+              raise ArgumentError,
+                    'Parser :prism currently requires a navigable partial target (injection.anchor / injection.boundary)'
             end
 
             Prism::Merge::PartialTemplateMerger.new(
@@ -280,16 +285,16 @@ module Ast
               replace_mode: options[:replace_mode],
               signature_generator: options[:signature_generator],
               node_typing: options[:node_typing],
-              match_refiner: options[:match_refiner],
+              match_refiner: options[:match_refiner]
             )
           when :psych
-            require "psych/merge" unless defined?(Psych::Merge)
+            require 'psych/merge' unless defined?(Psych::Merge)
             unless partial_target[:kind] == :key_path
-              raise ArgumentError, "Parser :psych currently requires injection.key_path"
+              raise ArgumentError, 'Parser :psych currently requires injection.key_path'
             end
 
             key_path = partial_target[:key_path]
-            raise ArgumentError, "Psych partial merge requires injection.key_path" if key_path.nil? || key_path.empty?
+            raise ArgumentError, 'Psych partial merge requires injection.key_path' if key_path.nil? || key_path.empty?
 
             Psych::Merge::PartialTemplateMerger.new(
               template: options.fetch(:template),
@@ -297,7 +302,7 @@ module Ast
               key_path: key_path,
               preference: options[:preference],
               add_missing: options[:add_missing],
-              when_missing: options[:when_missing],
+              when_missing: options[:when_missing]
             )
           else
             raise ArgumentError, "Unknown parser: #{selected_parser}. Supported: :markly, :commonmarker, :prism, :psych"
@@ -309,7 +314,7 @@ module Ast
 
           case selected_parser
           when :markly, :commonmarker
-            require "markdown/merge" unless defined?(Markdown::Merge)
+            require 'markdown/merge' unless defined?(Markdown::Merge)
             Markdown::Merge::SmartMerger.new(
               options.fetch(:template),
               options.fetch(:destination),
@@ -321,10 +326,10 @@ module Ast
               match_refiner: options[:match_refiner],
               freeze_token: recipe.freeze_token,
               normalize_whitespace: options[:normalize_whitespace],
-              rehydrate_link_references: options[:rehydrate_link_references],
+              rehydrate_link_references: options[:rehydrate_link_references]
             )
           when :prism
-            require "prism/merge" unless defined?(Prism::Merge)
+            require 'prism/merge' unless defined?(Prism::Merge)
             Prism::Merge::SmartMerger.new(
               options.fetch(:template),
               options.fetch(:destination),
@@ -333,10 +338,10 @@ module Ast
               signature_generator: options[:signature_generator],
               node_typing: options[:node_typing],
               match_refiner: options[:match_refiner],
-              freeze_token: recipe.freeze_token,
+              freeze_token: recipe.freeze_token
             )
           when :psych
-            require "psych/merge" unless defined?(Psych::Merge)
+            require 'psych/merge' unless defined?(Psych::Merge)
             Psych::Merge::SmartMerger.new(
               options.fetch(:template),
               options.fetch(:destination),
@@ -345,10 +350,11 @@ module Ast
               signature_generator: options[:signature_generator],
               node_typing: options[:node_typing],
               match_refiner: options[:match_refiner],
-              freeze_token: recipe.freeze_token,
+              freeze_token: recipe.freeze_token
             )
           else
-            raise ArgumentError, "Unknown parser: #{selected_parser}. Supported smart-merge parsers: :markly, :commonmarker, :prism, :psych"
+            raise ArgumentError,
+                  "Unknown parser: #{selected_parser}. Supported smart-merge parsers: :markly, :commonmarker, :prism, :psych"
           end
         end
 
@@ -361,7 +367,8 @@ module Ast
           raise ArgumentError, "Unsupported partial merge result: #{result.class}"
         end
 
-        def process_file_steps(target_path, relative_path, template_content, destination_content, write_changes:, context:)
+        def process_file_steps(target_path, relative_path, template_content, destination_content, write_changes:,
+                               context:)
           current_content = destination_content
           step_results = []
 
@@ -374,7 +381,7 @@ module Ast
               template_content: template_content,
               destination_content: destination_content,
               current_content: current_content,
-              context: context,
+              context: context
             )
 
             step_results << step_result
@@ -387,11 +394,12 @@ module Ast
             original_content: destination_content,
             final_content: current_content,
             step_results: step_results,
-            write_changes: write_changes,
+            write_changes: write_changes
           )
         end
 
-        def execute_step(step, step_index:, target_path:, relative_path:, template_content:, destination_content:, current_content:, context:)
+        def execute_step(step, step_index:, target_path:, relative_path:, template_content:, destination_content:,
+                         current_content:, context:)
           case step[:kind]
           when :partial_merge
             execute_partial_merge_step(step, template_content: template_content, current_content: current_content)
@@ -406,7 +414,7 @@ module Ast
               template_content: template_content,
               destination_content: destination_content,
               current_content: current_content,
-              context: context,
+              context: context
             )
           else
             raise ArgumentError, "Unsupported recipe step kind: #{step[:kind].inspect}"
@@ -428,7 +436,7 @@ module Ast
             node_typing: merge_options[:node_typing],
             match_refiner: merge_options[:match_refiner],
             normalize_whitespace: merge_options[:normalize_whitespace],
-            rehydrate_link_references: merge_options[:rehydrate_link_references],
+            rehydrate_link_references: merge_options[:rehydrate_link_references]
           )
 
           result = merger.merge
@@ -438,7 +446,7 @@ module Ast
             has_anchor: merge_target_found?(result),
             message: result.message,
             stats: result.stats,
-            problems: result.respond_to?(:problems) ? result.problems : nil,
+            problems: result.respond_to?(:problems) ? result.problems : nil
           )
         end
 
@@ -454,13 +462,14 @@ module Ast
             node_typing: merge_options[:node_typing],
             match_refiner: merge_options[:match_refiner],
             normalize_whitespace: merge_options[:normalize_whitespace],
-            rehydrate_link_references: merge_options[:rehydrate_link_references],
+            rehydrate_link_references: merge_options[:rehydrate_link_references]
           )
 
           normalize_smart_merge_result(merger, original_content: current_content)
         end
 
-        def execute_ruby_script_step(step, step_index:, target_path:, relative_path:, template_content:, destination_content:, current_content:, context:)
+        def execute_ruby_script_step(step, step_index:, target_path:, relative_path:, template_content:,
+                                     destination_content:, current_content:, context:)
           callable = recipe.script_loader.load_step_callable(step[:script])
           result = callable.call(
             content: current_content,
@@ -473,7 +482,7 @@ module Ast
             step: step,
             step_index: step_index,
             parser: step[:parser] || parser,
-            context: context,
+            context: context
           )
 
           normalize_script_step_result(result, original_content: current_content)
@@ -485,10 +494,10 @@ module Ast
             raw_content = merge_result.respond_to?(:content) ? merge_result.content : nil
             content = raw_content.is_a?(String) ? raw_content : merge_result.to_s
             stats = if merge_result.respond_to?(:stats)
-              merge_result.stats
-            else
-              (merger.respond_to?(:stats) ? merger.stats : {})
-            end
+                      merge_result.stats
+                    else
+                      (merger.respond_to?(:stats) ? merger.stats : {})
+                    end
             problems = merge_result.respond_to?(:problems) ? merge_result.problems : nil
           else
             content = merger.merge.to_s
@@ -500,9 +509,9 @@ module Ast
             content: content,
             changed: content != original_content,
             has_anchor: true,
-            message: (content != original_content) ? "Smart merge updated content" : "Smart merge made no changes",
+            message: content != original_content ? 'Smart merge updated content' : 'Smart merge made no changes',
             stats: stats,
-            problems: problems,
+            problems: problems
           )
         end
 
@@ -512,20 +521,20 @@ module Ast
               content: result,
               changed: result != original_content,
               has_anchor: true,
-              message: (result != original_content) ? "Script step updated content" : "Script step made no changes",
-              stats: {},
+              message: result != original_content ? 'Script step updated content' : 'Script step made no changes',
+              stats: {}
             )
           end
 
           if result.is_a?(Hash)
-            content = result[:content] || result["content"]
-            raise ArgumentError, "ruby_script step results must include :content" if content.nil?
+            content = result[:content] || result['content']
+            raise ArgumentError, 'ruby_script step results must include :content' if content.nil?
 
-            changed = if result.key?(:changed) || result.key?("changed")
-              result.key?(:changed) ? result[:changed] : result["changed"]
-            else
-              content != original_content
-            end
+            changed = if result.key?(:changed) || result.key?('changed')
+                        result.key?(:changed) ? result[:changed] : result['changed']
+                      else
+                        content != original_content
+                      end
 
             return StepResult.new(
               content: content,
@@ -533,11 +542,11 @@ module Ast
               has_anchor: if result.key?(:has_anchor)
                             result[:has_anchor]
                           else
-                            (result.key?("has_anchor") ? result["has_anchor"] : true)
+                            (result.key?('has_anchor') ? result['has_anchor'] : true)
                           end,
-              message: result[:message] || result["message"] || (changed ? "Script step updated content" : "Script step made no changes"),
-              stats: result[:stats] || result["stats"] || {},
-              problems: result[:problems] || result["problems"],
+              message: result[:message] || result['message'] || (changed ? 'Script step updated content' : 'Script step made no changes'),
+              stats: result[:stats] || result['stats'] || {},
+              problems: result[:problems] || result['problems']
             )
           end
 
@@ -545,10 +554,10 @@ module Ast
             content = result.content
             changed = result.respond_to?(:changed) ? result.changed : (content != original_content)
             has_anchor = if result.respond_to?(:section_found?) || result.respond_to?(:key_path_found?) || result.respond_to?(:has_section) || result.respond_to?(:has_key_path)
-              merge_target_found?(result)
-            else
-              true
-            end
+                           merge_target_found?(result)
+                         else
+                           true
+                         end
 
             return StepResult.new(
               content: content,
@@ -556,11 +565,11 @@ module Ast
               has_anchor: has_anchor,
               message: result.respond_to?(:message) ? result.message : nil,
               stats: result.respond_to?(:stats) ? result.stats : {},
-              problems: result.respond_to?(:problems) ? result.problems : nil,
+              problems: result.respond_to?(:problems) ? result.problems : nil
             )
           end
 
-          raise ArgumentError, "ruby_script step must return a String, Hash, or object responding to #content"
+          raise ArgumentError, 'ruby_script step must return a String, Hash, or object responding to #content'
         end
 
         def runtime_context(override = nil)
@@ -572,9 +581,7 @@ module Ast
         def normalize_runtime_context(value)
           return {} if value.nil?
 
-          unless value.respond_to?(:to_h)
-            raise ArgumentError, "Recipe runner context must be a Hash-like object"
-          end
+          raise ArgumentError, 'Recipe runner context must be a Hash-like object' unless value.respond_to?(:to_h)
 
           value.to_h.each_with_object({}) do |(key, context_value), memo|
             memo[key.respond_to?(:to_sym) ? key.to_sym : key] = context_value
@@ -592,13 +599,13 @@ module Ast
             node_typing: resolve_callable_hash(config[:node_typing]),
             match_refiner: resolve_match_refiner(config[:match_refiner]),
             normalize_whitespace: config[:normalize_whitespace] == true,
-            rehydrate_link_references: config[:rehydrate_link_references] == true,
+            rehydrate_link_references: config[:rehydrate_link_references] == true
           }
         end
 
         def resolve_add_missing(value)
           return true if value.nil?
-          return value if value == true || value == false
+          return value if [true, false].include?(value)
           return value if value.respond_to?(:call)
 
           recipe.script_loader.load_callable(value)
@@ -625,21 +632,24 @@ module Ast
           recipe.script_loader.load_callable(value)
         end
 
-        def create_result_from_steps(target_path:, relative_path:, original_content:, final_content:, step_results:, write_changes:)
+        def create_result_from_steps(target_path:, relative_path:, original_content:, final_content:, step_results:,
+                                     write_changes:)
           changed = if step_results.size == 1
-            step_results.first.changed
-          else
-            final_content != original_content
-          end
+                      step_results.first.changed
+                    else
+                      final_content != original_content
+                    end
           problems = step_results.filter_map(&:problems)
-          problems = (problems.size == 1) ? problems.first : problems unless problems.empty?
+          problems = problems.size == 1 ? problems.first : problems unless problems.empty?
           combined_stats = if step_results.size == 1
-            step_results.first.stats
-          else
-            {steps: step_results.map(&:stats)}
-          end
+                             step_results.first.stats
+                           else
+                             { steps: step_results.map(&:stats) }
+                           end
           has_anchor = step_results.any? { |step_result| step_result.has_anchor }
-          message = step_results.reverse.find { |step_result| step_result.message && !step_result.message.empty? }&.message
+          message = step_results.reverse.find do |step_result|
+            step_result.message && !step_result.message.empty?
+          end&.message
 
           if changed
             File.write(target_path, final_content) if write_changes && !dry_run
@@ -651,15 +661,15 @@ module Ast
               changed: true,
               has_anchor: has_anchor,
               message: if step_results.size > 1
-                         message || (dry_run ? "Would update" : "Updated")
+                         message || (dry_run ? 'Would update' : 'Updated')
                        elsif has_anchor
-                         dry_run ? "Would update" : "Updated"
+                         dry_run ? 'Would update' : 'Updated'
                        else
-                         message || "No matching anchor found"
+                         message || 'No matching anchor found'
                        end,
               content: final_content,
               stats: combined_stats,
-              problems: problems,
+              problems: problems
             )
           elsif has_anchor
             Result.new(
@@ -668,10 +678,10 @@ module Ast
               status: :unchanged,
               changed: false,
               has_anchor: true,
-              message: "No changes needed",
+              message: 'No changes needed',
               content: final_content,
               stats: combined_stats,
-              problems: problems,
+              problems: problems
             )
           else
             Result.new(
@@ -680,10 +690,10 @@ module Ast
               status: :skipped,
               changed: false,
               has_anchor: false,
-              message: message || "No matching anchor found",
+              message: message || 'No matching anchor found',
               content: final_content,
               stats: combined_stats,
-              problems: problems,
+              problems: problems
             )
           end
         end
@@ -697,16 +707,12 @@ module Ast
 
         def make_relative(path)
           # Try to make path relative to base_dir first
-          if path.start_with?(base_dir)
-            return path.sub("#{base_dir}/", "")
-          end
+          return path.sub("#{base_dir}/", '') if path.start_with?(base_dir)
 
           # If recipe has a path, try relative to recipe's parent directory
           if recipe.recipe_path
             recipe_base = File.dirname(recipe.recipe_path, 2)
-            if path.start_with?(recipe_base)
-              return path.sub("#{recipe_base}/", "")
-            end
+            return path.sub("#{recipe_base}/", '') if path.start_with?(recipe_base)
           end
 
           # Fall back to the path itself

@@ -14,7 +14,7 @@ module Ast
             line.chomp,
             decision: result.class::DECISION_MERGED,
             source: metadata[:source] || :merged,
-            original_line: metadata[:original_line],
+            original_line: metadata[:original_line]
           )
         end
       end
@@ -22,14 +22,14 @@ module Ast
       def emitter_line_metadata(analysis, line_number:)
         {
           source: emitter_source(analysis),
-          original_line: line_number,
+          original_line: line_number
         }.compact
       end
 
       def emitter_block_metadata(analysis, start_line)
         {
           source: emitter_source(analysis),
-          original_line_start: start_line,
+          original_line_start: start_line
         }.compact
       end
 

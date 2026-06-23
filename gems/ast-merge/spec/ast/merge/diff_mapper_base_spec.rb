@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "ast/merge"
+require 'ast/merge'
 
 RSpec.describe Ast::Merge::DiffMapperBase do
   before do
     # Simple struct for mock analysis
-    stub_const("MockAnalysis", Struct.new(:content, :lines, keyword_init: true))
+    stub_const('MockAnalysis', Struct.new(:content, :lines, keyword_init: true))
   end
 
   # Concrete subclass for testing
@@ -17,14 +17,14 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         mock_analysis_class.new(content: content, lines: content.lines)
       end
 
-      def map_hunk_to_paths(hunk, original_analysis)
+      def map_hunk_to_paths(hunk, _original_analysis)
         # Simple implementation: map each changed line to a path
         hunk.lines.select { |l| l.type != :context }.map do |line|
           Ast::Merge::DiffMapperBase::DiffMapping.new(
             path: ["line_#{line.old_line_num || line.new_line_num}"],
             operation: determine_operation_for_line(line),
             lines: [line],
-            hunk: hunk,
+            hunk: hunk
           )
         end
       end
@@ -43,8 +43,8 @@ RSpec.describe Ast::Merge::DiffMapperBase do
 
   let(:mapper) { test_mapper_class.new }
 
-  describe "#parse_diff" do
-    context "with a simple unified diff" do
+  describe '#parse_diff' do
+    context 'with a simple unified diff' do
       let(:diff_text) do
         <<~DIFF
           --- a/config.yml
@@ -58,14 +58,14 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         DIFF
       end
 
-      it "extracts file paths" do
+      it 'extracts file paths' do
         result = mapper.parse_diff(diff_text)
 
-        expect(result.old_file).to eq("config.yml")
-        expect(result.new_file).to eq("config.yml")
+        expect(result.old_file).to eq('config.yml')
+        expect(result.new_file).to eq('config.yml')
       end
 
-      it "parses hunks" do
+      it 'parses hunks' do
         result = mapper.parse_diff(diff_text)
 
         expect(result.hunks.length).to eq(1)
@@ -77,7 +77,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         expect(hunk.new_count).to eq(5)
       end
 
-      it "categorizes lines correctly" do
+      it 'categorizes lines correctly' do
         result = mapper.parse_diff(diff_text)
         hunk = result.hunks.first
 
@@ -90,7 +90,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         expect(removals.length).to eq(1)
       end
 
-      it "tracks line numbers correctly" do
+      it 'tracks line numbers correctly' do
         result = mapper.parse_diff(diff_text)
         hunk = result.hunks.first
 
@@ -110,7 +110,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
       end
     end
 
-    context "with multiple hunks" do
+    context 'with multiple hunks' do
       let(:diff_text) do
         <<~DIFF
           --- a/file.txt
@@ -128,7 +128,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         DIFF
       end
 
-      it "parses all hunks" do
+      it 'parses all hunks' do
         result = mapper.parse_diff(diff_text)
 
         expect(result.hunks.length).to eq(2)
@@ -137,7 +137,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
       end
     end
 
-    context "with new file (no old content)" do
+    context 'with new file (no old content)' do
       let(:diff_text) do
         <<~DIFF
           --- /dev/null
@@ -149,11 +149,11 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         DIFF
       end
 
-      it "handles new file correctly" do
+      it 'handles new file correctly' do
         result = mapper.parse_diff(diff_text)
 
-        expect(result.old_file).to eq("/dev/null")
-        expect(result.new_file).to eq("new_file.yml")
+        expect(result.old_file).to eq('/dev/null')
+        expect(result.new_file).to eq('new_file.yml')
 
         hunk = result.hunks.first
         expect(hunk.old_start).to eq(0)
@@ -164,7 +164,7 @@ RSpec.describe Ast::Merge::DiffMapperBase do
       end
     end
 
-    context "with deleted file" do
+    context 'with deleted file' do
       let(:diff_text) do
         <<~DIFF
           --- a/deleted.yml
@@ -176,11 +176,11 @@ RSpec.describe Ast::Merge::DiffMapperBase do
         DIFF
       end
 
-      it "handles deleted file correctly" do
+      it 'handles deleted file correctly' do
         result = mapper.parse_diff(diff_text)
 
-        expect(result.old_file).to eq("deleted.yml")
-        expect(result.new_file).to eq("/dev/null")
+        expect(result.old_file).to eq('deleted.yml')
+        expect(result.new_file).to eq('/dev/null')
 
         hunk = result.hunks.first
         expect(hunk.lines.all? { |l| l.type == :removal }).to be(true)
@@ -188,59 +188,59 @@ RSpec.describe Ast::Merge::DiffMapperBase do
     end
   end
 
-  describe "#determine_operation" do
+  describe '#determine_operation' do
     let(:mapper) { test_mapper_class.new }
 
-    it "returns :add for addition-only hunks" do
+    it 'returns :add for addition-only hunks' do
       hunk = described_class::DiffHunk.new(
         old_start: 1,
         old_count: 0,
         new_start: 1,
         new_count: 2,
         lines: [
-          described_class::DiffLine.new(type: :addition, content: "new1"),
-          described_class::DiffLine.new(type: :addition, content: "new2"),
+          described_class::DiffLine.new(type: :addition, content: 'new1'),
+          described_class::DiffLine.new(type: :addition, content: 'new2')
         ],
-        header: "@@ -1,0 +1,2 @@",
+        header: '@@ -1,0 +1,2 @@'
       )
 
       expect(mapper.determine_operation(hunk)).to eq(:add)
     end
 
-    it "returns :remove for removal-only hunks" do
+    it 'returns :remove for removal-only hunks' do
       hunk = described_class::DiffHunk.new(
         old_start: 1,
         old_count: 2,
         new_start: 1,
         new_count: 0,
         lines: [
-          described_class::DiffLine.new(type: :removal, content: "old1"),
-          described_class::DiffLine.new(type: :removal, content: "old2"),
+          described_class::DiffLine.new(type: :removal, content: 'old1'),
+          described_class::DiffLine.new(type: :removal, content: 'old2')
         ],
-        header: "@@ -1,2 +1,0 @@",
+        header: '@@ -1,2 +1,0 @@'
       )
 
       expect(mapper.determine_operation(hunk)).to eq(:remove)
     end
 
-    it "returns :modify for mixed hunks" do
+    it 'returns :modify for mixed hunks' do
       hunk = described_class::DiffHunk.new(
         old_start: 1,
         old_count: 1,
         new_start: 1,
         new_count: 1,
         lines: [
-          described_class::DiffLine.new(type: :removal, content: "old"),
-          described_class::DiffLine.new(type: :addition, content: "new"),
+          described_class::DiffLine.new(type: :removal, content: 'old'),
+          described_class::DiffLine.new(type: :addition, content: 'new')
         ],
-        header: "@@ -1,1 +1,1 @@",
+        header: '@@ -1,1 +1,1 @@'
       )
 
       expect(mapper.determine_operation(hunk)).to eq(:modify)
     end
   end
 
-  describe "#map" do
+  describe '#map' do
     let(:diff_text) do
       <<~DIFF
         --- a/config.yml
@@ -259,13 +259,13 @@ RSpec.describe Ast::Merge::DiffMapperBase do
       YAML
     end
 
-    it "returns DiffMapping objects" do
+    it 'returns DiffMapping objects' do
       mappings = mapper.map(diff_text, original_content)
 
       expect(mappings).to all(be_a(described_class::DiffMapping))
     end
 
-    it "includes path information" do
+    it 'includes path information' do
       mappings = mapper.map(diff_text, original_content)
 
       expect(mappings.first.path).to be_an(Array)
@@ -273,40 +273,40 @@ RSpec.describe Ast::Merge::DiffMapperBase do
     end
   end
 
-  describe "abstract methods" do
+  describe 'abstract methods' do
     let(:base_mapper) { described_class.new }
 
-    it "raises NotImplementedError for #create_analysis" do
-      expect { base_mapper.create_analysis("content") }.to raise_error(NotImplementedError)
+    it 'raises NotImplementedError for #create_analysis' do
+      expect { base_mapper.create_analysis('content') }.to raise_error(NotImplementedError)
     end
 
-    it "raises NotImplementedError for #map_hunk_to_paths" do
+    it 'raises NotImplementedError for #map_hunk_to_paths' do
       hunk = described_class::DiffHunk.new
       expect { base_mapper.map_hunk_to_paths(hunk, nil) }.to raise_error(NotImplementedError)
     end
 
-    it "raises NotImplementedError for #build_path_for_node" do
+    it 'raises NotImplementedError for #build_path_for_node' do
       expect { base_mapper.send(:build_path_for_node, nil, nil) }.to raise_error(NotImplementedError)
     end
   end
 
-  describe "#extract_file_path" do
+  describe '#extract_file_path' do
     let(:mapper) { test_mapper_class.new }
 
-    it "removes a/ prefix" do
-      expect(mapper.send(:extract_file_path, "a/path/to/file.yml")).to eq("path/to/file.yml")
+    it 'removes a/ prefix' do
+      expect(mapper.send(:extract_file_path, 'a/path/to/file.yml')).to eq('path/to/file.yml')
     end
 
-    it "removes b/ prefix" do
-      expect(mapper.send(:extract_file_path, "b/path/to/file.yml")).to eq("path/to/file.yml")
+    it 'removes b/ prefix' do
+      expect(mapper.send(:extract_file_path, 'b/path/to/file.yml')).to eq('path/to/file.yml')
     end
 
-    it "removes timestamp suffix" do
-      expect(mapper.send(:extract_file_path, "a/file.yml\t2024-01-01 12:00:00")).to eq("file.yml")
+    it 'removes timestamp suffix' do
+      expect(mapper.send(:extract_file_path, "a/file.yml\t2024-01-01 12:00:00")).to eq('file.yml')
     end
 
-    it "handles /dev/null" do
-      expect(mapper.send(:extract_file_path, "/dev/null")).to eq("/dev/null")
+    it 'handles /dev/null' do
+      expect(mapper.send(:extract_file_path, '/dev/null')).to eq('/dev/null')
     end
   end
 end

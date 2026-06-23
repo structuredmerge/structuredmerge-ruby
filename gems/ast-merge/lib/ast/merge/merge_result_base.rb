@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "digest"
+require 'digest'
 
 module Ast
   module Merge
@@ -92,7 +92,7 @@ module Ast
         frozen_blocks: [],
         stats: {},
         unresolved_cases: [],
-        **options
+        **_options
       )
         @template_analysis = template_analysis
         @dest_analysis = dest_analysis
@@ -186,7 +186,7 @@ module Ast
       # @return [Integer] Number of blank lines removed
       def normalize_blank_line_runs!(max: 1)
         max = Integer(max)
-        raise ArgumentError, "max must be >= 0" if max.negative?
+        raise ArgumentError, 'max must be >= 0' if max.negative?
 
         normalized_lines = []
         normalized_metadata = [] if instance_variable_defined?(:@line_metadata) && @line_metadata.respond_to?(:each)
@@ -217,7 +217,7 @@ module Ast
         @unresolved_cases.any?
       end
 
-      alias_method :review_required?, :unresolved?
+      alias review_required? unresolved?
 
       def add_unresolved_case(resolution_case)
         @unresolved_cases << resolution_case
@@ -241,7 +241,7 @@ module Ast
           reason: reason,
           template: template_text,
           destination: destination_text,
-          provisional_winner: provisional_winner,
+          provisional_winner: provisional_winner
         }.merge(compact_hash(conflict_fields))
         @conflicts << conflict
 
@@ -250,11 +250,11 @@ module Ast
           reason: reason,
           candidates: {
             template: template_text,
-            destination: destination_text,
+            destination: destination_text
           },
           provisional_winner: provisional_winner,
           surface_path: surface_path,
-          metadata: compact_hash(metadata),
+          metadata: compact_hash(metadata)
         )
         add_unresolved_case(resolution_case)
       end
@@ -287,7 +287,7 @@ module Ast
         Ast::Merge::UnresolvedReviewState.new(
           cases: unresolved_cases,
           selections: normalized_selections,
-          metadata: review_state_metadata(metadata, normalized_selections),
+          metadata: review_state_metadata(metadata, normalized_selections)
         )
       end
 
@@ -322,7 +322,7 @@ module Ast
           decision: decision,
           source: source,
           line: line,
-          timestamp: Time.now,
+          timestamp: Time.now
         }
       end
 
@@ -348,7 +348,10 @@ module Ast
 
         state.selections.each_key do |case_id|
           current_case = unresolved_case(case_id)
-          raise ArgumentError, "cannot apply review state: case #{case_id} is not present in the current unresolved result" unless current_case
+          unless current_case
+            raise ArgumentError,
+                  "cannot apply review state: case #{case_id} is not present in the current unresolved result"
+          end
 
           validate_review_state_selection_identity!(case_id, current_case, selection_identities[case_id])
 
@@ -366,7 +369,7 @@ module Ast
         return if current_identity.nil? || expected_identity == current_identity
 
         raise ArgumentError,
-          "cannot apply review state: case #{case_id} no longer matches the current unresolved surface"
+              "cannot apply review state: case #{case_id} no longer matches the current unresolved surface"
       end
 
       def validate_review_state_case_identity!(case_id, current_case, persisted_case)
@@ -377,40 +380,42 @@ module Ast
         return if current_identity.nil? || persisted_identity == current_identity
 
         raise ArgumentError,
-          "cannot apply review state: case #{case_id} no longer matches the current unresolved surface"
+              "cannot apply review state: case #{case_id} no longer matches the current unresolved surface"
       end
 
       def persisted_selection_identities(metadata)
-        review_state = metadata.fetch(:review_state, metadata.fetch("review_state", {})).to_h
-        review_state.fetch(:selection_identities, review_state.fetch("selection_identities", {})).to_h
-          .transform_keys(&:to_s)
+        review_state = metadata.fetch(:review_state, metadata.fetch('review_state', {})).to_h
+        review_state.fetch(:selection_identities, review_state.fetch('selection_identities', {})).to_h
+                    .transform_keys(&:to_s)
       end
 
       def persisted_review_state_replay_context(metadata)
-        review_state = metadata.fetch(:review_state, metadata.fetch("review_state", {})).to_h
-        review_state.fetch(:replay_context, review_state.fetch("replay_context", {})).to_h
+        review_state = metadata.fetch(:review_state, metadata.fetch('review_state', {})).to_h
+        review_state.fetch(:replay_context, review_state.fetch('replay_context', {})).to_h
       end
 
       def review_identity_for_case(resolution_case)
         return unless resolution_case
 
-        resolution_case.metadata[:review_identity] || resolution_case.metadata["review_identity"]
+        resolution_case.metadata[:review_identity] || resolution_case.metadata['review_identity']
       end
 
       def review_state_metadata(metadata, normalized_selections)
         metadata_hash = metadata.to_h
         selection_identities = selection_review_identities(normalized_selections)
-        review_state = metadata_hash.fetch(:review_state, metadata_hash.fetch("review_state", {})).to_h
+        review_state = metadata_hash.fetch(:review_state, metadata_hash.fetch('review_state', {})).to_h
         replay_context = review_state_replay_context
         return metadata_hash if selection_identities.empty? && replay_context.empty?
 
         merged_review_state = review_state.dup
         merged_review_state[:selection_identities] = selection_identities unless selection_identities.empty?
-        merged_review_state[:replay_context] = review_state.fetch(:replay_context, review_state.fetch("replay_context", {})).to_h
-          .merge(replay_context) unless replay_context.empty?
+        unless replay_context.empty?
+          merged_review_state[:replay_context] = review_state.fetch(:replay_context, review_state.fetch('replay_context', {})).to_h
+                                                             .merge(replay_context)
+        end
 
         metadata_hash.merge(
-          review_state: merged_review_state,
+          review_state: merged_review_state
         )
       end
 
@@ -426,7 +431,7 @@ module Ast
         compact_hash(
           merge_result_class: self.class.name,
           template_input_fingerprint: analysis_input_fingerprint(@template_analysis),
-          destination_input_fingerprint: analysis_input_fingerprint(@dest_analysis),
+          destination_input_fingerprint: analysis_input_fingerprint(@dest_analysis)
         )
       end
 
@@ -440,19 +445,19 @@ module Ast
           persisted_context: persisted_context,
           current_context: current_context,
           key: :merge_result_class,
-          mismatch_message: "cannot apply review state exported from #{persisted_context[:merge_result_class] || persisted_context["merge_result_class"]} to #{self.class.name}",
+          mismatch_message: "cannot apply review state exported from #{persisted_context[:merge_result_class] || persisted_context['merge_result_class']} to #{self.class.name}"
         )
         compare_review_state_replay_context!(
           persisted_context: persisted_context,
           current_context: current_context,
           key: :template_input_fingerprint,
-          mismatch_message: "cannot apply review state: template input fingerprint no longer matches",
+          mismatch_message: 'cannot apply review state: template input fingerprint no longer matches'
         )
         compare_review_state_replay_context!(
           persisted_context: persisted_context,
           current_context: current_context,
           key: :destination_input_fingerprint,
-          mismatch_message: "cannot apply review state: destination input fingerprint no longer matches",
+          mismatch_message: 'cannot apply review state: destination input fingerprint no longer matches'
         )
       end
 
@@ -489,7 +494,7 @@ module Ast
         apply_non_provisional_unresolved_resolution!(
           resolution_case,
           selection: selection.to_sym,
-          selected_candidate: selected_candidate,
+          selected_candidate: selected_candidate
         )
       end
 
@@ -497,7 +502,7 @@ module Ast
         line = resolution_case.metadata[:line]
         unless line && line >= 1 && line <= @lines.length
           raise ArgumentError,
-            "cannot apply non-provisional resolution for case #{resolution_case.case_id} without line metadata"
+                "cannot apply non-provisional resolution for case #{resolution_case.case_id} without line metadata"
         end
 
         @lines[line - 1] = selected_candidate

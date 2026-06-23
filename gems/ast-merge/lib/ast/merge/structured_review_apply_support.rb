@@ -13,7 +13,7 @@ module Ast
         @lines[start_index..end_index] = replacement_line_entries_for(
           resolution_case,
           selection: selection,
-          selected_candidate: selected_candidate,
+          selected_candidate: selected_candidate
         )
       end
 
@@ -50,16 +50,14 @@ module Ast
             content: line,
             decision: decision_for_selection(selection),
             source: source,
-            original_line: source_span ? source_span[0] + idx : nil,
+            original_line: source_span ? source_span[0] + idx : nil
           }
         end
       end
 
       def source_line_span_for(resolution_case, selection)
         span = Array(
-          (selection.to_sym == :template) ?
-            resolution_case.metadata[:template_lines] :
-            resolution_case.metadata[:destination_lines],
+          selection.to_sym == :template ? resolution_case.metadata[:template_lines] : resolution_case.metadata[:destination_lines]
         )
         return unless span.length == 2
 
@@ -67,7 +65,7 @@ module Ast
       end
 
       def source_for_selection(selection)
-        (selection.to_sym == :template) ? :template : :destination
+        selection.to_sym == :template ? :template : :destination
       end
 
       def decision_for_selection(selection)

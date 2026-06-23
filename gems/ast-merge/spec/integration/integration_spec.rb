@@ -9,36 +9,36 @@
 # 3. Minimal required integration of Ast::Merge::MergeResult
 # 4. Dog-fooding of the shared examples provided by ast-merge
 
-require "ast/merge/rspec/shared_examples"
+require 'ast/merge/rspec/shared_examples'
 
-RSpec.describe "Ast::Merge integration examples" do
-  describe "Minimal DebugLogger integration" do
+RSpec.describe 'Ast::Merge integration examples' do
+  describe 'Minimal DebugLogger integration' do
     # This is the MINIMAL required integration pattern for any *-merge gem.
     # Simply extend Ast::Merge::DebugLogger and configure env_var_name and log_prefix.
     # All methods (debug, info, warning, time, etc.) are inherited from the base module.
 
     # Use before block with stub_const to avoid leaky constant declaration
     before do
-      stub_const("ExampleMergeDebugLogger", Module.new do
+      stub_const('ExampleMergeDebugLogger', Module.new do
         extend Ast::Merge::DebugLogger
 
         # Configure the environment variable name for this module
-        self.env_var_name = "EXAMPLE_MERGE_DEBUG"
+        self.env_var_name = 'EXAMPLE_MERGE_DEBUG'
 
         # Configure the log prefix for this module
-        self.log_prefix = "[ExampleMerge]"
+        self.log_prefix = '[ExampleMerge]'
       end)
     end
 
     # Dog-food the shared examples to validate minimal integration
-    it_behaves_like "Ast::Merge::DebugLogger" do
+    it_behaves_like 'Ast::Merge::DebugLogger' do
       let(:described_logger) { ExampleMergeDebugLogger }
-      let(:env_var_name) { "EXAMPLE_MERGE_DEBUG" }
-      let(:log_prefix) { "[ExampleMerge]" }
+      let(:env_var_name) { 'EXAMPLE_MERGE_DEBUG' }
+      let(:log_prefix) { '[ExampleMerge]' }
     end
 
-    describe "minimal integration verification" do
-      it "only adds configuration accessors, not method redefinitions" do
+    describe 'minimal integration verification' do
+      it 'only adds configuration accessors, not method redefinitions' do
         # The module should only have singleton methods for configuration accessors
         # (env_var_name, env_var_name=, log_prefix, log_prefix=) which are set up
         # by the extended hook, NOT redefinitions of behavior methods
@@ -60,10 +60,10 @@ RSpec.describe "Ast::Merge integration examples" do
         # Verify that none of the behavior methods are redefined as singleton methods
         redefined = own_methods & behavior_methods
         expect(redefined).to be_empty,
-          "Expected no redefined behavior methods, but found: #{redefined.join(", ")}"
+                             "Expected no redefined behavior methods, but found: #{redefined.join(', ')}"
       end
 
-      it "has configuration accessors from extended hook" do
+      it 'has configuration accessors from extended hook' do
         # These are expected to be available via prepended module in extended hook
         expect(ExampleMergeDebugLogger).to respond_to(:env_var_name)
         expect(ExampleMergeDebugLogger).to respond_to(:log_prefix)
@@ -71,7 +71,7 @@ RSpec.describe "Ast::Merge integration examples" do
         expect(ExampleMergeDebugLogger).to respond_to(:log_prefix=)
       end
 
-      it "inherits all base methods via extend" do
+      it 'inherits all base methods via extend' do
         base_methods = %i[
           enabled?
           debug
@@ -88,32 +88,32 @@ RSpec.describe "Ast::Merge integration examples" do
 
         base_methods.each do |method|
           expect(ExampleMergeDebugLogger).to respond_to(method),
-            "Expected to inherit #{method} from Ast::Merge::DebugLogger"
+                                             "Expected to inherit #{method} from Ast::Merge::DebugLogger"
         end
       end
 
-      it "uses the configured env_var_name" do
-        expect(ExampleMergeDebugLogger.env_var_name).to eq("EXAMPLE_MERGE_DEBUG")
+      it 'uses the configured env_var_name' do
+        expect(ExampleMergeDebugLogger.env_var_name).to eq('EXAMPLE_MERGE_DEBUG')
       end
 
-      it "uses the configured log_prefix" do
-        expect(ExampleMergeDebugLogger.log_prefix).to eq("[ExampleMerge]")
+      it 'uses the configured log_prefix' do
+        expect(ExampleMergeDebugLogger.log_prefix).to eq('[ExampleMerge]')
       end
     end
   end
 
-  describe "Base Ast::Merge::DebugLogger (self-validation)" do
+  describe 'Base Ast::Merge::DebugLogger (self-validation)' do
     # Validate the base module itself works correctly
-    it_behaves_like "Ast::Merge::DebugLogger" do
+    it_behaves_like 'Ast::Merge::DebugLogger' do
       let(:described_logger) { Ast::Merge::DebugLogger }
-      let(:env_var_name) { "AST_MERGE_DEBUG" }
-      let(:log_prefix) { "[Ast::Merge]" }
+      let(:env_var_name) { 'AST_MERGE_DEBUG' }
+      let(:log_prefix) { '[Ast::Merge]' }
     end
   end
 
-  describe "Base Ast::Merge::FreezeNodeBase (self-validation)" do
+  describe 'Base Ast::Merge::FreezeNodeBase (self-validation)' do
     # Validate the base FreezeNodeBase class works correctly
-    it_behaves_like "Ast::Merge::FreezeNodeBase" do
+    it_behaves_like 'Ast::Merge::FreezeNodeBase' do
       let(:freeze_node_class) { Ast::Merge::FreezeNodeBase }
       let(:default_pattern_type) { :hash_comment }
       let(:build_freeze_node) do
@@ -124,9 +124,9 @@ RSpec.describe "Ast::Merge integration examples" do
     end
   end
 
-  describe "Base Ast::Merge::MergeResultBase (self-validation)" do
+  describe 'Base Ast::Merge::MergeResultBase (self-validation)' do
     # Validate the base MergeResultBase class works correctly
-    it_behaves_like "Ast::Merge::MergeResultBase" do
+    it_behaves_like 'Ast::Merge::MergeResultBase' do
       let(:merge_result_class) { Ast::Merge::MergeResultBase }
       let(:build_merge_result) { -> { Ast::Merge::MergeResultBase.new } }
     end

@@ -8,10 +8,10 @@ module Ast
     # adjacent nodes both be aware of the same gap while ensuring only one side
     # controls output at a time.
     module Layout
-      autoload :Attachment, "ast/merge/layout/attachment"
-      autoload :Augmenter, "ast/merge/layout/augmenter"
-      autoload :Gap, "ast/merge/layout/gap"
-      autoload :Policy, "ast/merge/layout/policy"
+      autoload :Attachment, 'ast/merge/layout/attachment'
+      autoload :Augmenter, 'ast/merge/layout/augmenter'
+      autoload :Gap, 'ast/merge/layout/gap'
+      autoload :Policy, 'ast/merge/layout/policy'
 
       module_function
 
@@ -24,7 +24,7 @@ module Ast
 
         {
           leading: (attachment.leading_gap if owner_controls_gap?(attachment.owner, attachment.leading_gap)),
-          trailing: (attachment.trailing_gap if owner_controls_gap?(attachment.owner, attachment.trailing_gap)),
+          trailing: (attachment.trailing_gap if owner_controls_gap?(attachment.owner, attachment.trailing_gap))
         }.compact
       end
 

@@ -17,7 +17,7 @@ module Ast
           {
             kind: kind,
             handling: handling,
-            metadata: metadata,
+            metadata: metadata
           }.compact
         end
       end

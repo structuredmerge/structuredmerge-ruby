@@ -26,20 +26,20 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlanSupport do
     end
   end
 
-  describe ".build_remove_plan" do
-    it "builds a shared RemovePlan from a contiguous statement run plus explicit neighbors" do
-      before_node = node_class.new(label: :before, source_position: {start_line: 1, end_line: 1})
-      removed_node = node_class.new(label: :removed, source_position: {start_line: 3, end_line: 4})
-      after_node = node_class.new(label: :after, source_position: {start_line: 6, end_line: 6})
+  describe '.build_remove_plan' do
+    it 'builds a shared RemovePlan from a contiguous statement run plus explicit neighbors' do
+      before_node = node_class.new(label: :before, source_position: { start_line: 1, end_line: 1 })
+      removed_node = node_class.new(label: :removed, source_position: { start_line: 3, end_line: 4 })
+      after_node = node_class.new(label: :after, source_position: { start_line: 6, end_line: 6 })
       promoted_region = instance_double(Ast::Merge::Comment::Region)
       analysis = analysis_class.new(
         source: "before\n\nremoved\nbody\n\nafter\n",
         comment_attachments: {
           removed_node.object_id => Ast::Merge::Comment::Attachment.new(
             owner: removed_node,
-            leading_region: promoted_region,
-          ),
-        },
+            leading_region: promoted_region
+          )
+        }
       )
 
       remove_plan = described_class.build_remove_plan(
@@ -47,7 +47,7 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlanSupport do
         statements: Ast::Merge::Navigable::Statement.build_list([removed_node]),
         leading_statement: Ast::Merge::Navigable::Statement.build_list([before_node]).first,
         trailing_statement: Ast::Merge::Navigable::Statement.build_list([after_node]).first,
-        source: :remove_plan_support_spec,
+        source: :remove_plan_support_spec
       )
 
       expect(remove_plan).to be_a(Ast::Merge::StructuralEdit::RemovePlan)
@@ -59,14 +59,14 @@ RSpec.describe Ast::Merge::StructuralEdit::RemovePlanSupport do
       expect(remove_plan.metadata).to include(source: :remove_plan_support_spec)
     end
 
-    it "returns nil when the statement run has no usable line range" do
+    it 'returns nil when the statement run has no usable line range' do
       analysis = analysis_class.new(source: "one\n")
       unpositioned = Struct.new(:label).new(:missing)
 
       remove_plan = described_class.build_remove_plan(
         analysis: analysis,
         statements: [unpositioned],
-        source: :remove_plan_support_spec,
+        source: :remove_plan_support_spec
       )
 
       expect(remove_plan).to be_nil

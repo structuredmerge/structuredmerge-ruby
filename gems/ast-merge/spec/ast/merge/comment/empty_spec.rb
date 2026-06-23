@@ -1,34 +1,34 @@
 # frozen_string_literal: true
 
 RSpec.describe Ast::Merge::Comment::Empty do
-  describe "#initialize" do
-    it "sets line_number" do
+  describe '#initialize' do
+    it 'sets line_number' do
       empty = described_class.new(line_number: 5)
       expect(empty.line_number).to eq(5)
     end
 
-    it "defaults text to empty string" do
+    it 'defaults text to empty string' do
       empty = described_class.new(line_number: 5)
-      expect(empty.text).to eq("")
+      expect(empty.text).to eq('')
     end
 
-    it "sets text when provided" do
-      empty = described_class.new(line_number: 5, text: "   ")
-      expect(empty.text).to eq("   ")
+    it 'sets text when provided' do
+      empty = described_class.new(line_number: 5, text: '   ')
+      expect(empty.text).to eq('   ')
     end
 
-    it "converts non-string text to string" do
+    it 'converts non-string text to string' do
       empty = described_class.new(line_number: 5, text: nil)
-      expect(empty.text).to eq("")
+      expect(empty.text).to eq('')
     end
 
-    it "sets slice to the text value" do
-      empty = described_class.new(line_number: 5, text: "  ")
-      expect(empty.slice).to eq("  ")
+    it 'sets slice to the text value' do
+      empty = described_class.new(line_number: 5, text: '  ')
+      expect(empty.slice).to eq('  ')
     end
 
-    it "sets location correctly" do
-      empty = described_class.new(line_number: 5, text: "   ")
+    it 'sets location correctly' do
+      empty = described_class.new(line_number: 5, text: '   ')
       expect(empty.location.start_line).to eq(5)
       expect(empty.location.end_line).to eq(5)
       expect(empty.location.start_column).to eq(0)
@@ -36,51 +36,51 @@ RSpec.describe Ast::Merge::Comment::Empty do
     end
   end
 
-  describe "#type" do
+  describe '#type' do
     it "returns 'empty_line'" do
       empty = described_class.new(line_number: 1)
-      expect(empty.type).to eq("empty_line")
+      expect(empty.type).to eq('empty_line')
     end
   end
 
-  describe "#signature" do
-    it "returns [:empty_line]" do
+  describe '#signature' do
+    it 'returns [:empty_line]' do
       empty = described_class.new(line_number: 1)
       expect(empty.signature).to eq([:empty_line])
     end
 
-    it "returns the same signature for all empty lines regardless of content" do
+    it 'returns the same signature for all empty lines regardless of content' do
       empty1 = described_class.new(line_number: 1)
-      empty2 = described_class.new(line_number: 10, text: "   ")
+      empty2 = described_class.new(line_number: 10, text: '   ')
       expect(empty1.signature).to eq(empty2.signature)
     end
   end
 
-  describe "#normalized_content" do
-    it "returns empty string" do
+  describe '#normalized_content' do
+    it 'returns empty string' do
       empty = described_class.new(line_number: 1)
-      expect(empty.normalized_content).to eq("")
+      expect(empty.normalized_content).to eq('')
     end
 
-    it "returns empty string even with whitespace text" do
-      empty = described_class.new(line_number: 1, text: "   ")
-      expect(empty.normalized_content).to eq("")
+    it 'returns empty string even with whitespace text' do
+      empty = described_class.new(line_number: 1, text: '   ')
+      expect(empty.normalized_content).to eq('')
     end
   end
 
-  describe "#freeze_marker?" do
-    it "returns false regardless of freeze_token" do
+  describe '#freeze_marker?' do
+    it 'returns false regardless of freeze_token' do
       empty = described_class.new(line_number: 1)
-      expect(empty.freeze_marker?("freeze")).to be false
-      expect(empty.freeze_marker?("frozen")).to be false
+      expect(empty.freeze_marker?('freeze')).to be false
+      expect(empty.freeze_marker?('frozen')).to be false
       expect(empty.freeze_marker?(nil)).to be false
     end
   end
 
-  describe "#inspect" do
-    it "returns human-readable representation" do
+  describe '#inspect' do
+    it 'returns human-readable representation' do
       empty = described_class.new(line_number: 42)
-      expect(empty.inspect).to eq("#<Comment::Empty line=42>")
+      expect(empty.inspect).to eq('#<Comment::Empty line=42>')
     end
   end
 end

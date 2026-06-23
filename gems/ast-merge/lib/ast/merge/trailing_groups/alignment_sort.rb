@@ -87,7 +87,7 @@ module Ast
         # @param entry [Hash] Alignment entry
         # @param dest_size [Integer] Number of destination statements
         # @return [Array] Comparable sort key
-        def template_only_sort_key(entry, dest_size)
+        def template_only_sort_key(entry, _dest_size)
           [2, entry[:template_index], 0, 0]
         end
       end

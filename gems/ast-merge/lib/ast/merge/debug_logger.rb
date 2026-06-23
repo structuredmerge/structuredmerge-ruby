@@ -74,7 +74,7 @@ module Ast
       # As of Ruby 4.0, benchmark is a bundled gem (not default), so it may not be available.
       # We attempt to require it at load time and set a flag for later use.
       BENCHMARK_AVAILABLE = begin
-        require "benchmark"
+        require 'benchmark'
         true
       rescue LoadError
         # benchmark gem not available (Ruby 4.0+ without explicit dependency, or unusual Ruby builds)
@@ -82,15 +82,10 @@ module Ast
       end
 
       class << self
-        # @return [String] Environment variable name to check for debug mode
-        # rubocop:disable ThreadSafety/ClassAndModuleAttributes - Configuration attribute, set once at load time
+        # @return [String] Environment variable name to check for debug mode # - Configuration attribute, set once at load time
         attr_accessor :env_var_name
-        # rubocop:enable ThreadSafety/ClassAndModuleAttributes
-
-        # @return [String] Prefix for log messages
-        # rubocop:disable ThreadSafety/ClassAndModuleAttributes - Configuration attribute, set once at load time
+        # @return [String] Prefix for log messages # - Configuration attribute, set once at load time
         attr_accessor :log_prefix
-        # rubocop:enable ThreadSafety/ClassAndModuleAttributes
 
         # Hook called when a module extends Ast::Merge::DebugLogger.
         # Sets up attr_accessor for env_var_name and log_prefix on the extending module,
@@ -115,11 +110,11 @@ module Ast
         end
       end
 
-      UNIVERSAL_DEBUG_ENV_VAR = "KETTLE_DEV_DEBUG"
+      UNIVERSAL_DEBUG_ENV_VAR = 'KETTLE_DEV_DEBUG'
 
       # Default configuration
-      self.env_var_name = "AST_MERGE_DEBUG"
-      self.log_prefix = "[Ast::Merge]"
+      self.env_var_name = 'AST_MERGE_DEBUG'
+      self.log_prefix = '[Ast::Merge]'
 
       # Check if debug mode is enabled
       #
@@ -136,7 +131,7 @@ module Ast
       def env_var_name
         if is_a?(Module) && singleton_class.method_defined?(:env_var_name)
           # Called as module method on a module that extended us
-          (self.class.superclass == Module) ? @env_var_name : self.class.env_var_name
+          self.class.superclass == Module ? @env_var_name : self.class.env_var_name
         elsif self.class.respond_to?(:env_var_name)
           self.class.env_var_name
         else
@@ -152,7 +147,7 @@ module Ast
       def log_prefix
         if is_a?(Module) && singleton_class.method_defined?(:log_prefix)
           # Called as module method on a module that extended us
-          (self.class.superclass == Module) ? @log_prefix : self.class.log_prefix
+          self.class.superclass == Module ? @log_prefix : self.class.log_prefix
         elsif self.class.respond_to?(:log_prefix)
           self.class.log_prefix
         else
@@ -220,10 +215,10 @@ module Ast
         result = nil
         timing = Benchmark.measure { result = yield }
         debug("Completed: #{operation}", {
-          real_ms: (timing.real * 1000).round(2),
-          user_ms: (timing.utime * 1000).round(2),
-          system_ms: (timing.stime * 1000).round(2),
-        })
+                real_ms: (timing.real * 1000).round(2),
+                user_ms: (timing.utime * 1000).round(2),
+                system_ms: (timing.stime * 1000).round(2)
+              })
         result
       end
 
@@ -231,7 +226,7 @@ module Ast
       #
       # @param node [Object] Node to log information about
       # @param label [String] Label for the node
-      def log_node(node, label: "Node")
+      def log_node(node, label: 'Node')
         return unless enabled?
 
         info = extract_node_info(node)
@@ -247,7 +242,7 @@ module Ast
         type_name = safe_type_name(node)
         lines = extract_lines(node)
 
-        info = {type: type_name}
+        info = { type: type_name }
         info[:lines] = lines if lines
         info
       end
@@ -259,7 +254,7 @@ module Ast
       def safe_type_name(node)
         klass = node.class
         if klass.respond_to?(:name) && klass.name
-          klass.name.split("::").last
+          klass.name.split('::').last
         else
           klass.to_s
         end

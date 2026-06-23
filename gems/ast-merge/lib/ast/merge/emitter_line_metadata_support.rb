@@ -32,7 +32,7 @@ module Ast
                            data[:original_line_start].to_i + index
                          else
                            data[:original_line]
-                         end,
+                         end
         )
       end
 

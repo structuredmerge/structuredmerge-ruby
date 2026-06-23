@@ -26,10 +26,10 @@
 #   TreeHaver RSpec documentation for parser backend tags
 
 # Load TreeHaver dependency tags first (provides parser backend tags like :markly, :prism_backend, etc.)
-require "tree_haver/rspec/dependency_tags"
+require 'tree_haver/rspec/dependency_tags'
 
 # Load Ast::Merge dependency tags (provides merge gem tags like :markly_merge, :prism_merge, etc.)
-require_relative "rspec/dependency_tags"
+require_relative 'rspec/dependency_tags'
 
 # Load Ast::Merge shared examples (for testing *-merge implementations)
-require_relative "rspec/shared_examples"
+require_relative 'rspec/shared_examples'

@@ -71,7 +71,7 @@ module Ast
               current_anchor = idx
               current_buffer = []
             else
-              entry = entry_builder ? entry_builder.call(node, idx) : {node: node, index: idx}
+              entry = entry_builder ? entry_builder.call(node, idx) : { node: node, index: idx }
               current_buffer << entry
             end
           end
@@ -112,8 +112,8 @@ module Ast
 
             # Check if all matched template indices 0..anchor have been consumed
             ready = matched_indices
-              .select { |idx| idx <= anchor }
-              .all? { |idx| consumed_indices.include?(idx) }
+                    .select { |idx| idx <= anchor }
+                    .all? { |idx| consumed_indices.include?(idx) }
             next unless ready
 
             group.each do |info|
@@ -159,7 +159,7 @@ module Ast
         # @param groups [Hash] Trailing groups hash
         # @return [Array<Symbol,Integer>] Sorted keys
         def sorted_anchors(groups)
-          groups.keys.sort_by { |k| (k == :prefix) ? -1 : k }
+          groups.keys.sort_by { |k| k == :prefix ? -1 : k }
         end
       end
     end

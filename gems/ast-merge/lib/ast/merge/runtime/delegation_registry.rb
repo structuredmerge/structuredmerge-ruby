@@ -43,7 +43,7 @@ module Ast
         def to_h
           {
             delegates: delegates.map(&:to_h),
-            metadata: metadata,
+            metadata: metadata
           }
         end
       end

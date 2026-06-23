@@ -8,23 +8,23 @@ module Ast
         def self.from_h(payload)
           payload = payload.to_h
           new(
-            case_id: payload.key?(:case_id) ? payload[:case_id] : payload.fetch("case_id"),
-            reason: payload.key?(:reason) ? payload[:reason] : payload.fetch("reason"),
-            candidates: payload.key?(:candidates) ? payload[:candidates] : payload.fetch("candidates"),
-            provisional_winner: payload[:provisional_winner] || payload["provisional_winner"],
-            surface_path: payload[:surface_path] || payload["surface_path"],
-            operation_id: payload[:operation_id] || payload["operation_id"],
-            metadata: payload.fetch(:metadata, payload.fetch("metadata", {})),
+            case_id: payload.key?(:case_id) ? payload[:case_id] : payload.fetch('case_id'),
+            reason: payload.key?(:reason) ? payload[:reason] : payload.fetch('reason'),
+            candidates: payload.key?(:candidates) ? payload[:candidates] : payload.fetch('candidates'),
+            provisional_winner: payload[:provisional_winner] || payload['provisional_winner'],
+            surface_path: payload[:surface_path] || payload['surface_path'],
+            operation_id: payload[:operation_id] || payload['operation_id'],
+            metadata: payload.fetch(:metadata, payload.fetch('metadata', {}))
           )
         end
 
         attr_reader :case_id,
-          :reason,
-          :candidates,
-          :provisional_winner,
-          :surface_path,
-          :operation_id,
-          :metadata
+                    :reason,
+                    :candidates,
+                    :provisional_winner,
+                    :surface_path,
+                    :operation_id,
+                    :metadata
 
         def initialize(
           case_id:,
@@ -59,7 +59,7 @@ module Ast
 
           candidates.fetch(selection.to_sym) do
             raise ArgumentError,
-              "selection #{selection.inspect} must be present in candidates"
+                  "selection #{selection.inspect} must be present in candidates"
           end
         end
 
@@ -71,7 +71,7 @@ module Ast
             provisional_winner: provisional_winner,
             surface_path: surface_path,
             operation_id: operation_id,
-            metadata: metadata,
+            metadata: metadata
           }.compact
         end
 
@@ -88,7 +88,7 @@ module Ast
           return if candidates.key?(provisional_winner)
 
           raise ArgumentError,
-            "provisional_winner #{provisional_winner.inspect} must be present in candidates"
+                "provisional_winner #{provisional_winner.inspect} must be present in candidates"
         end
       end
     end

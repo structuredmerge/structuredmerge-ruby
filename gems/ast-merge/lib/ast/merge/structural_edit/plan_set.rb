@@ -89,15 +89,19 @@ module Ast
 
         def ordered_splice_plans
           @ordered_splice_plans ||= splice_plans
-            .sort_by { |plan| [-plan.replace_start_line, -plan.replace_end_line] }
-            .freeze
+                                    .sort_by do |plan|
+            [
+              -plan.replace_start_line, -plan.replace_end_line
+            ]
+          end
+                                                            .freeze
         end
 
         def normalize_plan(plan)
           candidate = plan.respond_to?(:to_splice_plan) ? plan.to_splice_plan : plan
           return candidate if candidate.is_a?(SplicePlan)
 
-          raise ArgumentError, "All plans must be SplicePlan instances or respond to #to_splice_plan"
+          raise ArgumentError, 'All plans must be SplicePlan instances or respond to #to_splice_plan'
         end
 
         def validate_plans!
@@ -109,7 +113,7 @@ module Ast
             current_range = splice_plan.line_range
             if previous_range && ranges_overlap?(previous_range, current_range)
               raise ArgumentError,
-                "Structural edit plans must not overlap: #{previous_range.begin}..#{previous_range.end} overlaps #{current_range.begin}..#{current_range.end}"
+                    "Structural edit plans must not overlap: #{previous_range.begin}..#{previous_range.end} overlaps #{current_range.begin}..#{current_range.end}"
             end
 
             previous_range = current_range
@@ -119,7 +123,7 @@ module Ast
         def validate_plan_source!(splice_plan)
           return if splice_plan.source == source
 
-          raise ArgumentError, "All plans in a PlanSet must share the same source"
+          raise ArgumentError, 'All plans in a PlanSet must share the same source'
         end
 
         def ranges_overlap?(left, right)

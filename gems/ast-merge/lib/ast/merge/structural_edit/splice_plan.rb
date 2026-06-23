@@ -20,13 +20,13 @@ module Ast
         # @return [Boolean] whether trailing blank lines removed with the range may be preserved
         # @return [Hash] producer metadata
         attr_reader :source,
-          :replacement,
-          :replace_start_line,
-          :replace_end_line,
-          :leading_boundary,
-          :trailing_boundary,
-          :preserve_removed_trailing_blank_lines,
-          :metadata
+                    :replacement,
+                    :replace_start_line,
+                    :replace_end_line,
+                    :leading_boundary,
+                    :trailing_boundary,
+                    :preserve_removed_trailing_blank_lines,
+                    :metadata
 
         # Build a plan for exact line-range replacement.
         #
@@ -39,7 +39,8 @@ module Ast
         # @param preserve_removed_trailing_blank_lines [Boolean] whether to preserve trailing blank lines from removed content
         # @param metadata [Hash] base metadata
         # @param options [Hash] extra metadata merged into +metadata+
-        def initialize(source:, replacement:, replace_start_line:, replace_end_line:, leading_boundary: nil, trailing_boundary: nil, preserve_removed_trailing_blank_lines: true, metadata: {}, **options)
+        def initialize(source:, replacement:, replace_start_line:, replace_end_line:, leading_boundary: nil,
+                       trailing_boundary: nil, preserve_removed_trailing_blank_lines: true, metadata: {}, **options)
           @source = source.to_s
           @replacement = replacement.to_s
           @replace_start_line = Integer(replace_start_line)
@@ -120,7 +121,7 @@ module Ast
             replace_end_line: replace_end_line,
             leading_boundary: leading_boundary,
             trailing_boundary: trailing_boundary,
-            metadata: metadata,
+            metadata: metadata
           ).merged_content
         end
 
@@ -136,9 +137,7 @@ module Ast
         def replacement_with_preserved_boundary_layout
           result = +replacement
 
-          if preserve_removed_trailing_blank_lines?
-            result << missing_trailing_blank_line_chunks.join
-          end
+          result << missing_trailing_blank_line_chunks.join if preserve_removed_trailing_blank_lines?
 
           result
         end
@@ -165,14 +164,14 @@ module Ast
         end
 
         def validate_range!
-          raise ArgumentError, "replace_start_line must be >= 1" if replace_start_line < 1
-          raise ArgumentError, "replace_end_line must be >= replace_start_line" if replace_end_line < replace_start_line
+          raise ArgumentError, 'replace_start_line must be >= 1' if replace_start_line < 1
+          raise ArgumentError, 'replace_end_line must be >= replace_start_line' if replace_end_line < replace_start_line
 
           line_count = line_chunks.length
           return if replace_end_line <= line_count
 
           raise ArgumentError,
-            "replace_end_line #{replace_end_line} exceeds source line count #{line_count}"
+                "replace_end_line #{replace_end_line} exceeds source line count #{line_count}"
         end
       end
     end

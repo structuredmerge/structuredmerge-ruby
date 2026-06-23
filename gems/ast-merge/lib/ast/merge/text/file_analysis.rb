@@ -31,7 +31,7 @@ module Ast
         include FileAnalyzable
 
         # Default freeze token for text files
-        DEFAULT_FREEZE_TOKEN = "text-merge"
+        DEFAULT_FREEZE_TOKEN = 'text-merge'
 
         # Initialize a new FileAnalysis
         #
@@ -93,8 +93,8 @@ module Ast
             .select { |n| n.is_a?(LineNode) }
             .map(&:normalized_content)
             .reject(&:empty?)
-            .join(" ")
-            .gsub(/\s+/, " ")
+            .join(' ')
+            .gsub(/\s+/, ' ')
             .strip
         end
 
@@ -126,7 +126,7 @@ module Ast
                   start_line: freeze_start,
                   end_line: line_number,
                   content: freeze_content,
-                  reason: extract_freeze_reason(freeze_start_line),
+                  reason: extract_freeze_reason(freeze_start_line)
                 )
                 freeze_start = nil
                 freeze_start_line = nil
@@ -145,7 +145,7 @@ module Ast
           if freeze_start
             raise FreezeNodeBase::InvalidStructureError.new(
               "Unclosed freeze block starting at line #{freeze_start}",
-              start_line: freeze_start,
+              start_line: freeze_start
             )
           end
 
@@ -180,7 +180,7 @@ module Ast
           pattern = FreezeNodeBase.pattern_for(:hash_comment, @freeze_token)
           match = line.match(pattern)
           reason = match[2]&.strip
-          (reason.nil? || reason.empty?) ? nil : reason
+          reason.nil? || reason.empty? ? nil : reason
         end
       end
     end

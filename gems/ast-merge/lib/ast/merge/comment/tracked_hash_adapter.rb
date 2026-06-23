@@ -37,7 +37,7 @@ module Ast
             Comment::Line.new(
               text: line_text_from(hash, style),
               line_number: hash.fetch(:line),
-              style: style,
+              style: style
             )
           end
 
@@ -58,15 +58,15 @@ module Ast
               nodes: nodes,
               metadata: metadata.merge(
                 source: :tracked_hash,
-                tracked_hashes: normalized,
-              ).merge(options),
+                tracked_hashes: normalized
+              ).merge(options)
             )
           end
 
           private
 
           def normalize_hash(comment_hash)
-            raise ArgumentError, "comment_hash must be a Hash" unless comment_hash.is_a?(Hash)
+            raise ArgumentError, 'comment_hash must be a Hash' unless comment_hash.is_a?(Hash)
 
             comment_hash.each_with_object({}) do |(key, value), result|
               result[key.to_sym] = value
@@ -87,27 +87,28 @@ module Ast
           def validate_style!(style)
             return if style.supports_line_comments?
 
-            raise ArgumentError, "TrackedHashAdapter only supports line-comment styles"
+            raise ArgumentError, 'TrackedHashAdapter only supports line-comment styles'
           end
 
           def validate_hash!(hash)
-            raise ArgumentError, "comment hash must include :line" unless hash.key?(:line)
-            raise ArgumentError, "comment hash must include :text or :raw" unless hash.key?(:text) || hash.key?(:raw)
-            raise ArgumentError, "block comment hashes are not yet supported" if hash[:block]
+            raise ArgumentError, 'comment hash must include :line' unless hash.key?(:line)
+            raise ArgumentError, 'comment hash must include :text or :raw' unless hash.key?(:text) || hash.key?(:raw)
+            raise ArgumentError, 'block comment hashes are not yet supported' if hash[:block]
           end
 
           def line_text_from(hash, style)
             raw = hash[:raw].to_s
             unless raw.empty?
               return extracted_inline_slice(hash, raw, style) if inline_raw?(hash, raw, style)
+
               return raw
             end
 
             indent = hash.fetch(:indent, 0).to_i
             text = hash[:text].to_s
-            line = +(" " * indent)
+            line = +(' ' * indent)
             line << style.line_start.to_s
-            line << " " unless text.empty?
+            line << ' ' unless text.empty?
             line << text
             line << " #{style.line_end}" if style.line_end
             line
@@ -129,7 +130,7 @@ module Ast
             inline_slice = raw[comment_index..]
             return raw unless inline_slice.start_with?(style.line_start.to_s)
 
-            (" " * indent) + inline_slice
+            (' ' * indent) + inline_slice
           end
         end
       end

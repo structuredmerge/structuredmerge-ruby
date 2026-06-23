@@ -149,7 +149,7 @@ module Ast
         capability = comment_capability
         details = {
           source: :file_analyzable_default,
-          capability: capability.level,
+          capability: capability.level
         }
 
         if capability.none?
@@ -159,14 +159,14 @@ module Ast
             read: :source_augmented_portable_write,
             source: details[:source],
             capability: details[:capability],
-            style: details[:style],
+            style: details[:style]
           )
         else
           Ruleset::SupportStyleResolver.call(
             read: :native_read_portable_write,
             source: details[:source],
             capability: details[:capability],
-            style: details[:style],
+            style: details[:style]
           )
         end
       end
@@ -183,12 +183,12 @@ module Ast
         details = {
           source: source,
           capability: capability,
-          style: style,
+          style: style
         }
 
         Ruleset::SupportStyleResolver.call(read: read_strategy, **details)
       rescue ArgumentError => e
-        raise unless e.message.start_with?("Unknown ruleset read strategy:")
+        raise unless e.message.start_with?('Unknown ruleset read strategy:')
 
         raise ArgumentError, "Unknown comment support read strategy: #{read_strategy.inspect}"
       end
@@ -214,7 +214,7 @@ module Ast
           repair_policies: ruleset_repair_policies,
           surfaces: ruleset_surfaces,
           delegation_policies: ruleset_delegation_policies,
-          metadata: {source: :file_analyzable_default},
+          metadata: { source: :file_analyzable_default }
         )
       end
 
@@ -248,7 +248,7 @@ module Ast
       def ruleset_capabilities
         {
           layout_aware: true,
-          logical_owner: ruleset_logical_owners.any?,
+          logical_owner: ruleset_logical_owners.any?
         }
       end
 
@@ -292,8 +292,8 @@ module Ast
           nodes: [],
           metadata: {
             source: :file_analyzable_default,
-            range: range,
-          }.merge(options),
+            range: range
+          }.merge(options)
         )
       end
 
@@ -314,8 +314,8 @@ module Ast
           leading_gap: layout_attachment&.leading_gap,
           trailing_gap: layout_attachment&.trailing_gap,
           metadata: {
-            source: :file_analyzable_default,
-          }.merge(options),
+            source: :file_analyzable_default
+          }.merge(options)
         )
       end
 
@@ -341,7 +341,8 @@ module Ast
       # @param strategy [Symbol] attachment strategy override
       # @param options [Hash] attachment metadata
       # @return [Comment::Attachment]
-      def shared_comment_attachment_for(owner, tracker_attachment: nil, strategy: comment_attachment_strategy, **options)
+      def shared_comment_attachment_for(owner, tracker_attachment: nil, strategy: comment_attachment_strategy,
+                                        **options)
         case strategy
         when :layout_only
           merge_comment_attachment_with_layout(owner, nil, **options)
@@ -376,7 +377,7 @@ module Ast
           orphan_regions: comment_attachment&.orphan_regions || [],
           leading_gap: layout_attachment&.leading_gap,
           trailing_gap: layout_attachment&.trailing_gap,
-          metadata: (comment_attachment&.metadata || {}).merge(options),
+          metadata: (comment_attachment&.metadata || {}).merge(options)
         )
       end
 
@@ -396,7 +397,7 @@ module Ast
         merge_comment_attachment_with_layout(
           owner,
           augmenter_attachment || tracker_attachment,
-          **options,
+          **options
         )
       end
 
@@ -412,8 +413,8 @@ module Ast
           merge_comment_attachment_with_layout(
             owner,
             tracker_attachment,
-            **options,
-          ),
+            **options
+          )
         )
       end
 
@@ -437,14 +438,14 @@ module Ast
           leading_region: Comment::Region.new(
             kind: attachment.leading_region.kind,
             nodes: attachment.leading_region.nodes,
-            metadata: attachment.leading_region.metadata.merge(floating: true),
+            metadata: attachment.leading_region.metadata.merge(floating: true)
           ),
           inline_region: attachment.inline_region,
           trailing_region: attachment.trailing_region,
           orphan_regions: attachment.orphan_regions,
           leading_gap: attachment.leading_gap,
           trailing_gap: attachment.trailing_gap,
-          metadata: attachment.metadata,
+          metadata: attachment.metadata
         )
       end
 
@@ -463,7 +464,7 @@ module Ast
           comments: [],
           owners: owners || comment_augmenter_default_owners,
           capability: comment_capability,
-          **options,
+          **options
         )
       end
 
@@ -480,10 +481,10 @@ module Ast
       def layout_attachment_for(owner, **options)
         owners = layout_augmenter_default_owners
         augmenter = if owners.any? { |candidate| candidate.equal?(owner) }
-          layout_augmenter(**options)
-        else
-          layout_augmenter(owners: [owner], **options)
-        end
+                      layout_augmenter(**options)
+                    else
+                      layout_augmenter(owners: [owner], **options)
+                    end
 
         inferred_attachment = augmenter.attachment_for(owner)
 
@@ -492,8 +493,8 @@ module Ast
           leading_gap: inferred_attachment&.leading_gap,
           trailing_gap: inferred_attachment&.trailing_gap,
           metadata: {
-            source: :file_analyzable_default,
-          }.merge(options),
+            source: :file_analyzable_default
+          }.merge(options)
         )
       end
 
@@ -511,7 +512,7 @@ module Ast
         Layout::Augmenter.new(
           lines: lines,
           owners: owners || layout_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -622,9 +623,7 @@ module Ast
         # These are standalone structural elements (not attached to AST nodes).
         # They use content-based signatures so identical freeze blocks match.
         # This is different from FrozenWrapper which wraps AST nodes.
-        if node.is_a?(FreezeNodeBase)
-          return node.freeze_signature
-        end
+        return node.freeze_signature if node.is_a?(FreezeNodeBase)
 
         # ==========================================================================
         # CASE 2: Unwrap FrozenWrapper (and other wrappers)
@@ -645,68 +644,70 @@ module Ast
         actual_node = node.respond_to?(:unwrap) ? node.unwrap : node
 
         result = if signature_generator
-          # ==========================================================================
-          # CASE 3: Custom signature generator
-          # ==========================================================================
-          # Pass the UNWRAPPED node to the custom generator. This ensures:
-          # - Type checks work (e.g., `node.is_a?(Prism::CallNode)`)
-          # - The generator sees the real AST structure
-          # - Frozen nodes match by their underlying identity
-          #
-          # NOTE: For TreeHaver-based backends, the node already has a unified API
-          # with #text, #type, #source_position methods. For other backends, they
-          # must conform to the same API (either via TreeHaver or equivalent adapter).
-          custom_result = signature_generator.call(actual_node)
-          case custom_result
-          when Array, nil
-            # Generator returned a final signature or nil - use as-is
-            custom_result
-          else
-            # Generator returned a node (fallthrough) - compute default signature.
-            #
-            # Two conditions indicate the generator is deferring to default handling:
-            # 1. Identity equality: the generator returned the exact same object it
-            #    received (classic "I don't handle this type" passthrough pattern).
-            # 2. Known node type: the result is a recognised wrapper/node class.
-            #
-            # If neither applies, treat the return value as a final custom signature
-            # (e.g. a String, Symbol, or other non-node key).
-            if custom_result.equal?(actual_node) || fallthrough_node?(custom_result)
-              # Special case: if fallthrough result is Freezable, use freeze_signature
-              # This handles cases where the generator wraps a node in Freezable
-              if custom_result.is_a?(Freezable)
-                custom_result.freeze_signature
-              else
-                # Unwrap any wrapper and compute default signature
-                unwrapped = custom_result.respond_to?(:unwrap) ? custom_result.unwrap : custom_result
-                compute_node_signature(unwrapped)
-              end
-            else
-              # Non-node return value - pass through (allows arbitrary signature types)
-              custom_result
-            end
-          end
-        else
-          # ==========================================================================
-          # CASE 4: No custom generator - use default computation
-          # ==========================================================================
-          # Pass the UNWRAPPED node to compute_node_signature. This is critical
-          # because compute_node_signature uses type checking (e.g., case statements
-          # matching Prism::DefNode, Prism::CallNode, etc.). If we pass a
-          # FrozenWrapper, it won't match any of those types and will fall through
-          # to a generic handler, producing incorrect signatures.
-          #
-          # For FrozenWrapper nodes, the underlying AST node determines the signature
-          # (e.g., method name for DefNode, gem name for CallNode). The wrapper only
-          # affects merge preference (destination wins), not matching.
-          compute_node_signature(actual_node)
-        end
+                   # ==========================================================================
+                   # CASE 3: Custom signature generator
+                   # ==========================================================================
+                   # Pass the UNWRAPPED node to the custom generator. This ensures:
+                   # - Type checks work (e.g., `node.is_a?(Prism::CallNode)`)
+                   # - The generator sees the real AST structure
+                   # - Frozen nodes match by their underlying identity
+                   #
+                   # NOTE: For TreeHaver-based backends, the node already has a unified API
+                   # with #text, #type, #source_position methods. For other backends, they
+                   # must conform to the same API (either via TreeHaver or equivalent adapter).
+                   custom_result = signature_generator.call(actual_node)
+                   case custom_result
+                   when Array, nil
+                     # Generator returned a final signature or nil - use as-is
+                     custom_result
+                   else
+                     # Generator returned a node (fallthrough) - compute default signature.
+                     #
+                     # Two conditions indicate the generator is deferring to default handling:
+                     # 1. Identity equality: the generator returned the exact same object it
+                     #    received (classic "I don't handle this type" passthrough pattern).
+                     # 2. Known node type: the result is a recognised wrapper/node class.
+                     #
+                     # If neither applies, treat the return value as a final custom signature
+                     # (e.g. a String, Symbol, or other non-node key).
+                     if custom_result.equal?(actual_node) || fallthrough_node?(custom_result)
+                       # Special case: if fallthrough result is Freezable, use freeze_signature
+                       # This handles cases where the generator wraps a node in Freezable
+                       if custom_result.is_a?(Freezable)
+                         custom_result.freeze_signature
+                       else
+                         # Unwrap any wrapper and compute default signature
+                         unwrapped = custom_result.respond_to?(:unwrap) ? custom_result.unwrap : custom_result
+                         compute_node_signature(unwrapped)
+                       end
+                     else
+                       # Non-node return value - pass through (allows arbitrary signature types)
+                       custom_result
+                     end
+                   end
+                 else
+                   # ==========================================================================
+                   # CASE 4: No custom generator - use default computation
+                   # ==========================================================================
+                   # Pass the UNWRAPPED node to compute_node_signature. This is critical
+                   # because compute_node_signature uses type checking (e.g., case statements
+                   # matching Prism::DefNode, Prism::CallNode, etc.). If we pass a
+                   # FrozenWrapper, it won't match any of those types and will fall through
+                   # to a generic handler, producing incorrect signatures.
+                   #
+                   # For FrozenWrapper nodes, the underlying AST node determines the signature
+                   # (e.g., method name for DefNode, gem name for CallNode). The wrapper only
+                   # affects merge preference (destination wins), not matching.
+                   compute_node_signature(actual_node)
+                 end
 
-        DebugLogger.debug("Generated signature", {
-          node_type: node.class.name.split("::").last,
-          signature: result,
-          generator: signature_generator ? "custom" : "default",
-        }) if result
+        if result
+          DebugLogger.debug('Generated signature', {
+                              node_type: node.class.name.split('::').last,
+                              signature: result,
+                              generator: signature_generator ? 'custom' : 'default'
+                            })
+        end
 
         result
       end

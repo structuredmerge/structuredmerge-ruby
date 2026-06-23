@@ -30,7 +30,7 @@ module Ast
             owner: owner,
             layout_attachment: analysis.respond_to?(:layout_attachment_for) ? analysis.layout_attachment_for(owner) : nil,
             comment_attachment: analysis.respond_to?(:comment_attachment_for) ? analysis.comment_attachment_for(owner) : nil,
-            metadata: source ? {source: source} : {},
+            metadata: source ? { source: source } : {}
           )
         end
 
@@ -44,13 +44,11 @@ module Ast
             owner = statement_owner(statement)
 
             comment_attachment = if analysis.respond_to?(:comment_attachment_for)
-              analysis.comment_attachment_for(owner)
-            end
+                                   analysis.comment_attachment_for(owner)
+                                 end
             next comment_attachment if attachment_preserves_fragments?(comment_attachment)
 
-            layout_attachment = if analysis.respond_to?(:layout_attachment_for)
-              analysis.layout_attachment_for(owner)
-            end
+            layout_attachment = (analysis.layout_attachment_for(owner) if analysis.respond_to?(:layout_attachment_for))
             next layout_attachment if attachment_preserves_fragments?(layout_attachment)
           end
         end

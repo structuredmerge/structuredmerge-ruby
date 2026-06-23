@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "unresolved_support"
+require_relative 'unresolved_support'
 
 module Ast
   module Merge
@@ -153,7 +153,8 @@ module Ast
       #   - 0: invalid, raises ArgumentError
       # @param match_refiner [#call, nil] Optional match refiner for fuzzy matching
       # @param options [Hash] Additional options for forward compatibility
-      def initialize(strategy:, preference:, template_analysis:, dest_analysis:, add_template_only_nodes: false, remove_template_missing_nodes: false, recursive: true, match_refiner: nil, **options)
+      def initialize(strategy:, preference:, template_analysis:, dest_analysis:, add_template_only_nodes: false,
+                     remove_template_missing_nodes: false, recursive: true, match_refiner: nil, **_options)
         unless %i[node batch boundary].include?(strategy)
           raise ArgumentError, "Invalid strategy: #{strategy}. Must be :node, :batch, or :boundary"
         end
@@ -255,7 +256,7 @@ module Ast
       # @param dest_index [Integer] Index in destination statements
       # @return [Hash] Resolution with :source, :decision, and node references
       def resolve_node_pair(template_node, dest_node, template_index:, dest_index:)
-        raise NotImplementedError, "Subclass must implement resolve_node_pair for :node strategy"
+        raise NotImplementedError, 'Subclass must implement resolve_node_pair for :node strategy'
       end
 
       # Resolve all conflicts in batch (for :batch strategy)
@@ -264,7 +265,7 @@ module Ast
       # @param result [Object] Result object to populate
       # @return [void]
       def resolve_batch(result)
-        raise NotImplementedError, "Subclass must implement resolve_batch for :batch strategy"
+        raise NotImplementedError, 'Subclass must implement resolve_batch for :batch strategy'
       end
 
       # Resolve a boundary/section (for :boundary strategy)
@@ -278,7 +279,7 @@ module Ast
       # @param result [Object] Result object to populate
       # @return [void]
       def resolve_boundary(boundary, result)
-        raise NotImplementedError, "Subclass must implement resolve_boundary for :boundary strategy"
+        raise NotImplementedError, 'Subclass must implement resolve_boundary for :boundary strategy'
       end
 
       # Build a signature map from nodes
@@ -294,7 +295,7 @@ module Ast
           next unless sig
 
           map[sig] ||= []
-          map[sig] << {node: node, index: idx}
+          map[sig] << { node: node, index: idx }
         end
         map
       end
@@ -335,7 +336,7 @@ module Ast
           decision: DECISION_FROZEN,
           template_node: template_node,
           dest_node: dest_node,
-          reason: reason,
+          reason: reason
         }
       end
 
@@ -349,7 +350,7 @@ module Ast
           source: :destination,
           decision: DECISION_IDENTICAL,
           template_node: template_node,
-          dest_node: dest_node,
+          dest_node: dest_node
         }
       end
 
@@ -367,26 +368,26 @@ module Ast
         # Get the appropriate preference for this node pair
         # Template node's merge_type takes precedence, then dest_node's
         node_preference = if NodeTyping.typed_node?(template_node)
-          preference_for_node(template_node)
-        elsif NodeTyping.typed_node?(dest_node)
-          preference_for_node(dest_node)
-        else
-          default_preference
-        end
+                            preference_for_node(template_node)
+                          elsif NodeTyping.typed_node?(dest_node)
+                            preference_for_node(dest_node)
+                          else
+                            default_preference
+                          end
 
         if node_preference == :template
           {
             source: :template,
             decision: DECISION_TEMPLATE,
             template_node: template_node,
-            dest_node: dest_node,
+            dest_node: dest_node
           }
         else
           {
             source: :destination,
             decision: DECISION_DESTINATION,
             template_node: template_node,
-            dest_node: dest_node,
+            dest_node: dest_node
           }
         end
       end
@@ -413,14 +414,14 @@ module Ast
         preference.each do |key, value|
           unless key.is_a?(Symbol)
             raise ArgumentError,
-              "preference Hash keys must be Symbols, got #{key.class} for #{key.inspect}"
+                  "preference Hash keys must be Symbols, got #{key.class} for #{key.inspect}"
           end
 
-          unless %i[destination template].include?(value)
-            raise ArgumentError,
-              "preference Hash values must be :destination or :template, " \
-                "got #{value.inspect} for key #{key.inspect}"
-          end
+          next if %i[destination template].include?(value)
+
+          raise ArgumentError,
+                'preference Hash values must be :destination or :template, ' \
+                  "got #{value.inspect} for key #{key.inspect}"
         end
       end
 
@@ -429,15 +430,13 @@ module Ast
       # @param recursive [Boolean, Integer] The recursive value to validate
       # @raise [ArgumentError] If recursive is invalid
       def validate_recursive!(recursive)
-        return if recursive == true || recursive == false
+        return if [true, false].include?(recursive)
         return if recursive.is_a?(Integer) && recursive > 0
 
-        if recursive == 0
-          raise ArgumentError, "recursive: 0 is invalid, use false to disable recursive merging"
-        end
+        raise ArgumentError, 'recursive: 0 is invalid, use false to disable recursive merging' if recursive == 0
 
         raise ArgumentError,
-          "Invalid recursive: #{recursive.inspect}. Must be true, false, or a positive Integer"
+              "Invalid recursive: #{recursive.inspect}. Must be true, false, or a positive Integer"
       end
 
       # Check if recursive merging should be applied at a given depth.

@@ -36,7 +36,7 @@
 #   end
 
 # Load the helper module (DependencyTags methods)
-require_relative "dependency_tags_helpers"
+require_relative 'dependency_tags_helpers'
 
 # Load the RSpec configuration (exclusion filters)
-require_relative "dependency_tags_config"
+require_relative 'dependency_tags_config'
