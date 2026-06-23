@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require "ast/template"
+require 'ast/template'
