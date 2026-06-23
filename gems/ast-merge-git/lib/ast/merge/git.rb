@@ -1,57 +1,60 @@
 # frozen_string_literal: true
 
-require "json"
-require "version_gem"
+require 'json'
+require 'version_gem'
 
-require "ast/merge"
-require_relative "git/version"
+require 'ast/merge'
+require_relative 'git/version'
 
 module Ast
   module Merge
     module Git
-      PACKAGE_NAME = "ast-merge-git"
-      MERGE_CONFLICT_CATEGORY = "merge_conflict"
+      PACKAGE_NAME = 'ast-merge-git'
+      MERGE_CONFLICT_CATEGORY = 'merge_conflict'
 
       module_function
 
       def merge3(request)
         normalized = normalize_request(request)
         case normalize_language(normalized)
-        when "json"
+        when 'json'
           merge3_json(normalized)
         else
           response(
             ok: false,
             request: normalized,
             diagnostics: [{
-              severity: "error",
-              category: "unsupported_feature",
-              message: "ast-merge-git currently supports only json merge3."
+              severity: 'error',
+              category: 'unsupported_feature',
+              message: 'ast-merge-git currently supports only json merge3.'
             }]
           )
         end
       end
 
       def merge3_json(request)
-        base = parse_json_role("base", request.fetch(:base_source))
-        ours = parse_json_role("ours", request.fetch(:ours_source))
-        theirs = parse_json_role("theirs", request.fetch(:theirs_source))
+        base = parse_json_role('base', request.fetch(:base_source))
+        ours = parse_json_role('ours', request.fetch(:ours_source))
+        theirs = parse_json_role('theirs', request.fetch(:theirs_source))
         conflicts = []
         change_classifications = classify_json_changes(base, ours, theirs)
-        merged = merge_json_value(base, ours, theirs, "", conflicts)
+        merged = merge_json_value(base, ours, theirs, '', conflicts)
         if conflicts.any?
           owned_regions = json_owned_regions_for_conflicts(request, conflicts)
-          render_strategy = owned_regions.empty? ? "full_file_conflict_markers" : "owned_region_conflict_markers"
+          render_strategy = owned_regions.empty? ? 'full_file_conflict_markers' : 'owned_region_conflict_markers'
           return response(
             ok: false,
             request: request,
-            conflicted_source: render_json_owned_region_conflict_source(request, owned_regions.first) || render_conflict_source(request, conflicts),
+            conflicted_source: render_json_owned_region_conflict_source(request,
+                                                                        owned_regions.first) || render_conflict_source(
+                                                                          request, conflicts
+                                                                        ),
             conflicts: conflicts,
             change_classifications: change_classifications,
             owned_regions: owned_regions,
             render_strategy: render_strategy,
             diagnostics: [{
-              severity: "error",
+              severity: 'error',
               category: MERGE_CONFLICT_CATEGORY,
               message: "merge3 found #{conflicts.length} unresolved conflict(s)."
             }]
@@ -75,8 +78,8 @@ module Ast
           ok: false,
           request: request,
           diagnostics: [{
-            severity: "error",
-            category: "parse_error",
+            severity: 'error',
+            category: 'parse_error',
             message: e.message
           }]
         )
@@ -86,7 +89,7 @@ module Ast
         request.transform_keys(&:to_sym)
       end
 
-      def merge_comment_delta(base_comment:, ours_comment:, theirs_comment:, owner_path: "/")
+      def merge_comment_delta(base_comment:, ours_comment:, theirs_comment:, owner_path: '/')
         conflicts = []
         merged_comment =
           if ours_comment == theirs_comment
@@ -96,13 +99,13 @@ module Ast
           elsif base_comment == theirs_comment
             ours_comment
           elsif ours_comment.nil?
-            conflicts << comment_conflict("delete_edit", owner_path, "ours deleted a comment that theirs edited")
+            conflicts << comment_conflict('delete_edit', owner_path, 'ours deleted a comment that theirs edited')
             theirs_comment
           elsif theirs_comment.nil?
-            conflicts << comment_conflict("delete_edit", owner_path, "theirs deleted a comment that ours edited")
+            conflicts << comment_conflict('delete_edit', owner_path, 'theirs deleted a comment that ours edited')
             ours_comment
           else
-            conflicts << comment_conflict("edit_edit", owner_path, "comment changed differently in ours and theirs")
+            conflicts << comment_conflict('edit_edit', owner_path, 'comment changed differently in ours and theirs')
             ours_comment
           end
 
@@ -113,7 +116,8 @@ module Ast
         }
       end
 
-      def response(ok:, request:, merged_source: nil, conflicted_source: nil, conflicts: [], change_classifications: [], diagnostics: [], fallbacks: [], owned_regions: [], reparse_after_render: nil, formatting_preservation: {}, secondary_formatting_metrics: nil, render_strategy: nil)
+      def response(ok:, request:, merged_source: nil, conflicted_source: nil, conflicts: [],
+                   change_classifications: [], diagnostics: [], fallbacks: [], owned_regions: [], reparse_after_render: nil, formatting_preservation: {}, secondary_formatting_metrics: nil, render_strategy: nil)
         {
           ok: ok,
           merged_source: merged_source,
@@ -129,7 +133,7 @@ module Ast
             dialect: request[:dialect].to_s
           },
           render_report: {
-            strategy: render_strategy || (request[:render_policy].to_s.empty? ? "canonical" : request[:render_policy].to_s),
+            strategy: render_strategy || (request[:render_policy].to_s.empty? ? 'canonical' : request[:render_policy].to_s),
             **render_identity(request)
           },
           formatting_preservation: {
@@ -143,7 +147,7 @@ module Ast
               character_diff_score: 0.0
             }.merge(formatting_preservation),
             reparse_after_render: reparse_after_render,
-            render_strategy: render_strategy || (request[:render_policy].to_s.empty? ? "canonical" : request[:render_policy].to_s)
+            render_strategy: render_strategy || (request[:render_policy].to_s.empty? ? 'canonical' : request[:render_policy].to_s)
           ),
           reparse_after_render: reparse_after_render
         }
@@ -153,25 +157,25 @@ module Ast
         threshold = 0.95
         score = (formatting_preservation.fetch(:line_diff_score) + formatting_preservation.fetch(:character_diff_score)) / 2.0
         reparse_passed = reparse_after_render == true
-        no_full_file_rewrite = render_strategy != "full_file_conflict_markers"
-        coherent_conflict_markers = render_strategy != "full_file_conflict_markers"
+        no_full_file_rewrite = render_strategy != 'full_file_conflict_markers'
+        coherent_conflict_markers = render_strategy != 'full_file_conflict_markers'
         blocking_reasons = []
-        blocking_reasons << "rendered output did not reparse" unless reparse_passed
-        blocking_reasons << "formatting score is below threshold" if score < threshold
-        blocking_reasons << "full-file rewrite or conflict markers were used" unless no_full_file_rewrite
-        blocking_reasons << "conflict marker placement is not syntactically coherent" unless coherent_conflict_markers
+        blocking_reasons << 'rendered output did not reparse' unless reparse_passed
+        blocking_reasons << 'formatting score is below threshold' if score < threshold
+        blocking_reasons << 'full-file rewrite or conflict markers were used' unless no_full_file_rewrite
+        blocking_reasons << 'conflict marker placement is not syntactically coherent' unless coherent_conflict_markers
 
         {
-          status: blocking_reasons.empty? ? "recommended" : "not_recommended",
+          status: blocking_reasons.empty? ? 'recommended' : 'not_recommended',
           formatting_threshold: threshold,
           formatting_score: score,
           hard_gates: [
-            {name: "reparse_after_render", passed: reparse_passed, weighted: false},
-            {name: "no_full_file_rewrite", passed: no_full_file_rewrite, weighted: false},
-            {name: "coherent_conflict_marker_placement", passed: coherent_conflict_markers, weighted: false}
+            { name: 'reparse_after_render', passed: reparse_passed, weighted: false },
+            { name: 'no_full_file_rewrite', passed: no_full_file_rewrite, weighted: false },
+            { name: 'coherent_conflict_marker_placement', passed: coherent_conflict_markers, weighted: false }
           ],
           blocking_reasons: blocking_reasons,
-          diagnostics: ["default-driver evaluation is advisory unless explicitly required"]
+          diagnostics: ['default-driver evaluation is advisory unless explicitly required']
         }
       end
 
@@ -182,7 +186,7 @@ module Ast
             output_diff_size: 0,
             source_fragment_retention: 1.0,
             weighted: false,
-            diagnostics: ["canonical JSON has no trivia-preserving source fragments yet"]
+            diagnostics: ['canonical JSON has no trivia-preserving source fragments yet']
           }
         else
           {
@@ -190,15 +194,15 @@ module Ast
             output_diff_size: 0,
             source_fragment_retention: 0.0,
             weighted: false,
-            diagnostics: ["unresolved conflict did not produce a merged source-fragment retention measurement"]
+            diagnostics: ['unresolved conflict did not produce a merged source-fragment retention measurement']
           }
         end
       end
 
       def render_identity(request)
         case normalize_language(request)
-        when "json"
-          {backend_id: "native-json", parser_identity: "standard-json"}
+        when 'json'
+          { backend_id: 'native-json', parser_identity: 'standard-json' }
         else
           {}
         end
@@ -210,21 +214,21 @@ module Ast
         header = "/* smorg structured conflicts: #{conflicts.length} unresolved */"
         [
           header,
-          "#{"<" * marker_size} ours",
+          "#{'<' * marker_size} ours",
           request.fetch(:ours_source),
-          "#{"|" * marker_size} base",
+          "#{'|' * marker_size} base",
           request.fetch(:base_source),
-          "=" * marker_size,
+          '=' * marker_size,
           request.fetch(:theirs_source),
-          "#{">" * marker_size} theirs",
-          ""
+          "#{'>' * marker_size} theirs",
+          ''
         ].join("\n")
       end
 
       def render_json_owned_region_conflict_source(request, region)
-        return nil unless region && region.fetch(:region_kind) == "node"
+        return nil unless region && region.fetch(:region_kind) == 'node'
 
-        key = region.fetch(:owner_path).delete_prefix("/")
+        key = region.fetch(:owner_path).delete_prefix('/')
         ours_region = json_member_source(request.fetch(:ours_source), key)
         base_region = json_member_source(request.fetch(:base_source), key)
         theirs_region = json_member_source(request.fetch(:theirs_source), key)
@@ -233,18 +237,18 @@ module Ast
         marker_size = request[:conflict_marker_size].to_i
         marker_size = 7 unless marker_size.positive?
         replacement = [
-          "#{"<" * marker_size} ours",
+          "#{'<' * marker_size} ours",
           ours_region.fetch(:text),
-          "#{"|" * marker_size} base",
+          "#{'|' * marker_size} base",
           base_region.fetch(:text),
-          "=" * marker_size,
+          '=' * marker_size,
           theirs_region.fetch(:text),
-          "#{">" * marker_size} theirs"
+          "#{'>' * marker_size} theirs"
         ].join("\n")
         range = ours_region.fetch(:byte_range)
         source = request.fetch(:ours_source)
-        prefix = source.byteslice(0, range.fetch(:start)) || ""
-        suffix = source.byteslice(range.fetch(:end), source.bytesize - range.fetch(:end)) || ""
+        prefix = source.byteslice(0, range.fetch(:start)) || ''
+        suffix = source.byteslice(range.fetch(:end), source.bytesize - range.fetch(:end)) || ''
         prefix + replacement + suffix
       end
 
@@ -263,21 +267,22 @@ module Ast
       def json_owned_regions_for_conflicts(request, conflicts)
         conflicts.filter_map do |conflict|
           path = conflict.fetch(:path).to_s
-          next unless path.start_with?("/") && path.count("/") == 1
+          next unless path.start_with?('/') && path.count('/') == 1
 
-          key = path.delete_prefix("/")
+          key = path.delete_prefix('/')
           base_region = json_member_source(request.fetch(:base_source), key)
-          next unless base_region && json_member_source(request.fetch(:ours_source), key) && json_member_source(request.fetch(:theirs_source), key)
+          next unless base_region && json_member_source(request.fetch(:ours_source),
+                                                        key) && json_member_source(request.fetch(:theirs_source), key)
 
           {
             owner_path: path,
             node_id: "json:key:#{key}",
-            region_kind: "node",
+            region_kind: 'node',
             byte_range: base_region.fetch(:byte_range),
-            line_range: {start: 1, end: 1},
+            line_range: { start: 1, end: 1 },
             attached_spans: [],
-            backend_id: "native-json",
-            parser_identity: "standard-json",
+            backend_id: 'native-json',
+            parser_identity: 'standard-json',
             can_replace: true,
             can_line_merge: false,
             requires_reparse: true
@@ -288,11 +293,11 @@ module Ast
       def json_key_byte_range(source, key)
         needle = "\"#{key}\""
         start = source.index(needle)
-        return {start: 0, end: source.bytesize} unless start
+        return { start: 0, end: source.bytesize } unless start
 
         finish = start + needle.bytesize
-        finish += 1 while finish < source.bytesize && ![",", "}"].include?(source[finish])
-        {start: start, end: finish}
+        finish += 1 while finish < source.bytesize && ![',', '}'].include?(source[finish])
+        { start: start, end: finish }
       end
 
       def parse_json_role(role, source)
@@ -305,9 +310,12 @@ module Ast
         return ours if ours == theirs
         return theirs if base == ours
         return ours if base == theirs
-        return merge_json_objects(base, ours, theirs, path, conflicts) if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
+        if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
+          return merge_json_objects(base, ours, theirs, path,
+                                    conflicts)
+        end
 
-        add_conflict(conflicts, "edit_edit", path, "value changed differently in ours and theirs")
+        add_conflict(conflicts, 'edit_edit', path, 'value changed differently in ours and theirs')
         ours
       end
 
@@ -335,28 +343,30 @@ module Ast
           theirs = theirs.transform_keys(&:to_s)
           keys = (base.keys | ours.keys | theirs.keys).sort
           return keys.filter_map do |key|
-            ours_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__, ours.key?(key) ? ours[key] : :__absent__)
-            theirs_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__, theirs.key?(key) ? theirs[key] : :__absent__)
-            next if ours_change == "unchanged" && theirs_change == "unchanged"
+            ours_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__,
+                                                     ours.key?(key) ? ours[key] : :__absent__)
+            theirs_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__,
+                                                       theirs.key?(key) ? theirs[key] : :__absent__)
+            next if ours_change == 'unchanged' && theirs_change == 'unchanged'
 
-            {path: json_pointer_join("", key), ours: ours_change, theirs: theirs_change}
+            { path: json_pointer_join('', key), ours: ours_change, theirs: theirs_change }
           end
         end
 
         ours_change = classify_json_value_change(base, ours)
         theirs_change = classify_json_value_change(base, theirs)
-        return [] if ours_change == "unchanged" && theirs_change == "unchanged"
+        return [] if ours_change == 'unchanged' && theirs_change == 'unchanged'
 
-        [{path: "/", ours: ours_change, theirs: theirs_change}]
+        [{ path: '/', ours: ours_change, theirs: theirs_change }]
       end
 
       def classify_json_value_change(base, value)
-        return "unchanged" if base == :__absent__ && value == :__absent__
-        return "added" if base == :__absent__
-        return "deleted" if value == :__absent__
-        return "unchanged" if base == value
+        return 'unchanged' if base == :__absent__ && value == :__absent__
+        return 'added' if base == :__absent__
+        return 'deleted' if value == :__absent__
+        return 'unchanged' if base == value
 
-        "edited"
+        'edited'
       end
 
       def merge_json_entry(base, ours, theirs, path, conflicts)
@@ -367,19 +377,21 @@ module Ast
         return [theirs, true] if base_absent && ours_absent
         return [ours, true] if base_absent && theirs_absent
         return [ours, true] if base_absent && ours == theirs
+
         if base_absent
-          add_conflict(conflicts, "add_add", path, "same path added differently in ours and theirs")
+          add_conflict(conflicts, 'add_add', path, 'same path added differently in ours and theirs')
           return [ours, true]
         end
         return [nil, false] if ours_absent && theirs_absent
         return [nil, false] if ours_absent && base == theirs
         return [nil, false] if theirs_absent && base == ours
+
         if ours_absent
-          add_conflict(conflicts, "delete_edit", path, "ours deleted a value that theirs edited")
+          add_conflict(conflicts, 'delete_edit', path, 'ours deleted a value that theirs edited')
           return [theirs, true]
         end
         if theirs_absent
-          add_conflict(conflicts, "delete_edit", path, "theirs deleted a value that ours edited")
+          add_conflict(conflicts, 'delete_edit', path, 'theirs deleted a value that ours edited')
           return [ours, true]
         end
 
@@ -390,29 +402,29 @@ module Ast
         conflicts << {
           conflict_id: "conflict-#{conflicts.length + 1}",
           category: category,
-          path: path.empty? ? "/" : path,
+          path: path.empty? ? '/' : path,
           message: message
         }
       end
 
       def comment_conflict(category, path, message)
         {
-          conflict_id: "comment-conflict-1",
+          conflict_id: 'comment-conflict-1',
           category: category,
-          path: path.to_s.empty? ? "/" : path,
+          path: path.to_s.empty? ? '/' : path,
           message: message
         }
       end
 
       def json_pointer_join(parent, token)
-        escaped = token.to_s.gsub("~", "~0").gsub("/", "~1")
+        escaped = token.to_s.gsub('~', '~0').gsub('/', '~1')
         parent.empty? ? "/#{escaped}" : "#{parent}/#{escaped}"
       end
 
       def normalize_language(request)
         language = request[:language].to_s.strip.downcase
-        return "json" if language == "json"
-        return "json" if request[:path_name].to_s.downcase.end_with?(".json")
+        return 'json' if language == 'json'
+        return 'json' if request[:path_name].to_s.downcase.end_with?('.json')
 
         language
       end
