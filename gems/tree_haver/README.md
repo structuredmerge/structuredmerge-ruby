@@ -1,4 +1,4 @@
-<a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" width="14%" align="right"/></a>
+<a href="https://github.com/structuredmerge"><img alt="structuredmerge Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/avatar-128px.svg" width="12%" align="right"/></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver"><img alt="tree_haver Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/structuredmerge/structuredmerge-ruby/tree_haver/avatar-128px.svg" width="12%" align="right"/></a>
 
 # 🌴 TreeHaver
 
