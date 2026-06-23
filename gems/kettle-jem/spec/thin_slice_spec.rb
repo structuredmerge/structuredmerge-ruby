@@ -12373,6 +12373,11 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
+      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.6"]')
+      expect(direct_block).to include("nomono_activation_requirements = nomono_requirements")
+      expect(direct_block).to include('nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)')
+      expect(direct_block).to include("Bundler::LockfileParser")
+      expect(direct_block).to include('Kernel.send(:gem, "nomono", *nomono_activation_requirements)')
       expect(direct_block).to include('require "nomono/bundler"')
       expect(direct_block).not_to include('Gem::Specification.find_all_by_name("nomono")')
       expect(direct_block).not_to include(

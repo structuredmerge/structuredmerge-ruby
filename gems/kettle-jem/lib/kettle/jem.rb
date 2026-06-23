@@ -9535,6 +9535,20 @@ module Kettle
             (direct_sibling_local ||
               ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
           begin
+            nomono_activation_requirements = nomono_requirements
+            nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)
+            if File.file?(nomono_lockfile)
+              nomono_locked_spec = Bundler::LockfileParser
+                .new(Bundler.read_file(nomono_lockfile))
+                .specs
+                .find { |spec| spec.name == "nomono" }
+              nomono_locked = nomono_locked_spec &&
+                Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+              if nomono_locked
+                nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"]
+              end
+            end
+            Kernel.send(:gem, "nomono", *nomono_activation_requirements)
             require "nomono/bundler"
             if direct_sibling_templating && !direct_sibling_local
               ENV["#{dev_env}"] = File.expand_path("..", __dir__)
