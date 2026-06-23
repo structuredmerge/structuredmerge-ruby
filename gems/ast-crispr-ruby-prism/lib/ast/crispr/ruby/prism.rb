@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "ast/crispr"
-require "prism"
-require "version_gem"
-require_relative "prism/version"
+require 'ast/crispr'
+require 'prism'
+require 'version_gem'
+require_relative 'prism/version'
 
 module Ast
   module Crispr
@@ -44,7 +44,8 @@ module Ast
             result = Utils.parse_with_comments(document.content)
             return result if result.success?
 
-            raise Ast::Crispr::Error.new("Unable to read structural owners from #{document.source_label}", details: {source_label: document.source_label})
+            raise Ast::Crispr::Error.new("Unable to read structural owners from #{document.source_label}",
+                                         details: { source_label: document.source_label })
           end
 
           def structural_owners(document, owner_scope: :shared_default)
@@ -55,7 +56,7 @@ module Ast
             when :ruby_comments
               parse_result.comments
             else
-              raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
+              raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
 
@@ -74,7 +75,7 @@ module Ast
                 parse_result.comments.select { |comment| comment.location.start_line < owner.location.start_line }
               end
             else
-              raise Ast::Crispr::Error.new("Unsupported CRISPR comment region", details: {region: region})
+              raise Ast::Crispr::Error.new('Unsupported CRISPR comment region', details: { region: region })
             end
           end
 
@@ -89,17 +90,17 @@ module Ast
                 owner_scope: owner_scope,
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [:leading],
-                metadata: {adapter: :prism},
+                metadata: { adapter: :prism }
               )
             when :ruby_comments
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [],
-                metadata: {adapter: :prism, selector: :ruby_comments},
+                metadata: { adapter: :prism, selector: :ruby_comments }
               )
             else
-              raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
+              raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
         end
@@ -107,7 +108,8 @@ module Ast
         module Selectors
           module_function
 
-          def owner_filter(id:, limit: nil, owner_scope: :shared_default, include_trailing_gap: false, metadata: {}, &block)
+          def owner_filter(id:, limit: nil, owner_scope: :shared_default, include_trailing_gap: false, metadata: {},
+                           &block)
             Ast::Crispr::Selectors.owner_filter(
               id: id,
               limit: limit,
@@ -119,7 +121,8 @@ module Ast
             )
           end
 
-          def comment_region_owned_owner(marker:, id: nil, limit: nil, owner_scope: :shared_default, comment_region: :leading, include_trailing_gap: true, metadata: {}, **options)
+          def comment_region_owned_owner(marker:, id: nil, limit: nil, owner_scope: :shared_default,
+                                         comment_region: :leading, include_trailing_gap: true, metadata: {}, **options)
             Ast::Crispr::Selectors.comment_region_owned_owner(
               marker: marker,
               id: id,
@@ -129,11 +132,12 @@ module Ast
               include_trailing_gap: include_trailing_gap,
               adapter: Ast::Crispr::Ruby::Prism.adapter,
               metadata: metadata,
-              **options,
+              **options
             )
           end
 
-          def comment_line_block(start_text:, end_text:, id: nil, limit: nil, span: :nearest, include_trailing_gap: false, metadata: {}, **options)
+          def comment_line_block(start_text:, end_text:, id: nil, limit: nil, span: :nearest,
+                                 include_trailing_gap: false, metadata: {}, **options)
             Ast::Crispr::OwnerSelector.new(
               id: id || "ruby_comment_line_block_#{start_text}",
               limit: limit,
@@ -142,12 +146,14 @@ module Ast
                 owner_scope: :ruby_comments,
                 selector_kind: :ruby_comment_line_block,
                 selection_intent: :line_marker_block,
-                include_trailing_gap: include_trailing_gap,
+                include_trailing_gap: include_trailing_gap
               ).merge(options),
               locate: lambda do |context|
                 comments = context.structural_owners(owner_scope: :ruby_comments)
                 if span.to_sym == :outermost
-                  opening = comments.find { |comment| context.location_slice(comment.location).rstrip == start_text.to_s }
+                  opening = comments.find do |comment|
+                    context.location_slice(comment.location).rstrip == start_text.to_s
+                  end
                   closing = comments.reverse.find do |comment|
                     opening &&
                       context.location_slice(comment.location).rstrip == end_text.to_s &&
@@ -167,16 +173,18 @@ module Ast
                         end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
                         payload_kind: :comment_owned_body,
                         start_text: start_text,
-                        end_text: end_text,
-                      },
-                    ),
+                        end_text: end_text
+                      }
+                    )
                   ]
                 end
 
                 comments.each_with_index.filter_map do |comment, index|
                   next unless context.location_slice(comment.location).rstrip == start_text.to_s
 
-                  closing = comments[index + 1..]&.find { |candidate| context.location_slice(candidate.location).rstrip == end_text.to_s }
+                  closing = comments[index + 1..]&.find do |candidate|
+                    context.location_slice(candidate.location).rstrip == end_text.to_s
+                  end
                   next unless closing
 
                   end_line = closing.location.end_line
@@ -190,11 +198,11 @@ module Ast
                       end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
                       payload_kind: :comment_owned_body,
                       start_text: start_text,
-                      end_text: end_text,
-                    },
+                      end_text: end_text
+                    }
                   )
                 end
-              end,
+              end
             )
           end
         end
@@ -206,13 +214,13 @@ module Ast
             @adapter ||= Adapter.new
           end
 
-          def document_context(content:, source_label: "source", metadata: {}, **options)
+          def document_context(content:, source_label: 'source', metadata: {}, **options)
             Ast::Crispr::DocumentContext.new(
               content: content,
               source_label: source_label,
               adapter: adapter,
               metadata: metadata,
-              **options,
+              **options
             )
           end
         end

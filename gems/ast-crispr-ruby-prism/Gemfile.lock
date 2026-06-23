@@ -22,7 +22,10 @@ GEM
       service_actor (~> 3.9)
       version_gem (~> 1.1, >= 1.1.9)
     ast-merge (7.0.0)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.1)
       tree_haver (= 7.0.0)
+      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -74,8 +77,8 @@ GEM
       bundler (>= 1.14)
       version_gem (~> 1.1, >= 1.1.4)
     geom2d (0.4.1)
-    gitmoji-regex (2.0.2)
-      version_gem (~> 1.1, >= 1.1.11)
+    gitmoji-regex (2.0.3)
+      version_gem (~> 1.1, >= 1.1.13)
     hexapdf (1.9.1)
       cmdparse (~> 3.0, >= 3.0.3)
       geom2d (~> 0.4, >= 0.4.1)
@@ -88,9 +91,9 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.19.9)
-    kettle-dev (2.2.13)
+    kettle-dev (2.2.15)
       kettle-test (~> 2.0, >= 2.0.4)
-      version_gem (~> 1.1, >= 1.1.11)
+      version_gem (~> 1.1, >= 1.1.12)
     kettle-soup-cover (1.1.3)
       simplecov (~> 0.22)
       simplecov-cobertura (~> 3.0)
@@ -100,7 +103,7 @@ GEM
       simplecov-rcov (~> 0.3, >= 0.3.7)
       simplecov_json_formatter (~> 0.1, >= 0.1.4)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-test (2.0.5)
+    kettle-test (2.0.6)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
       rspec (~> 3.0)
@@ -110,8 +113,8 @@ GEM
       rspec_junit_formatter (~> 0.6)
       silent_stream (~> 1.0, >= 1.0.12)
       timecop-rspec (~> 1.0, >= 1.0.3)
-      turbo_tests2 (~> 3.1, >= 3.1.2)
-      version_gem (~> 1.1, >= 1.1.11)
+      turbo_tests2 (~> 3.1, >= 3.1.4)
+      version_gem (~> 1.1, >= 1.1.12)
     kramdown (2.5.2)
       rexml (>= 3.4.4)
     kramdown-parser-gfm (1.1.0)
@@ -133,7 +136,7 @@ GEM
       ast (~> 2.4.1)
       racc
     parslet (2.0.0)
-    pp (0.6.3)
+    pp (0.6.4)
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
@@ -297,10 +300,14 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
+    token-resolver (2.0.3)
+      parslet (~> 2.0)
+      version_gem (~> 1.1, >= 1.1.12)
     tree_haver (7.0.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
       tree_sitter_language_pack (~> 1.6)
+      version_gem (~> 1.1, >= 1.1.9)
     tree_sitter_language_pack (1.8.1-x86_64-linux)
     tsort (0.2.0)
     turbo_tests2 (3.1.4)
@@ -310,16 +317,16 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
-    version_gem (1.1.12)
-    yaml-converter (0.2.1)
+    version_gem (1.1.13)
+    yaml-converter (0.2.2)
       hexapdf (>= 1.8, < 2)
       kramdown (>= 2.4, < 3)
       kramdown-parser-gfm (~> 1.1)
-      version_gem (~> 1.1, >= 1.1.12)
+      version_gem (~> 1.1, >= 1.1.13)
     yard (0.9.44)
-    yard-fence (0.9.4)
+    yard-fence (0.9.5)
       rdoc (>= 6.11, < 8)
-      version_gem (~> 1.1, >= 1.1.11)
+      version_gem (~> 1.1, >= 1.1.13)
       yard (~> 0.9, >= 0.9.37)
     yard-junk (0.1.0)
       benchmark
@@ -328,10 +335,10 @@ GEM
       yard
     yard-relative_markdown_links (0.6.0)
       nokogiri (>= 1.14.3, < 2)
-    yard-timekeeper (0.2.1)
-      version_gem (~> 1.1, >= 1.1.9)
-    yard-yaml (0.2.1)
-      version_gem (~> 1.1, >= 1.1.11)
+    yard-timekeeper (0.2.2)
+      version_gem (~> 1.1, >= 1.1.13)
+    yard-yaml (0.2.2)
+      version_gem (~> 1.1, >= 1.1.13)
       yaml-converter (~> 0.2)
     zeitwerk (2.8.2)
     zlib (3.2.3)
@@ -386,7 +393,7 @@ CHECKSUMS
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   ast-crispr (7.0.0)
   ast-crispr-ruby-prism (7.0.0)
-  ast-merge (7.0.0) sha256=5d4143eb07170baaf54437d42977bdacef3f8c0cc8808145ca7224d61209e4dc
+  ast-merge (7.0.0)
   backports (3.25.3) sha256=94298d32dc3c40ca15633b54e282780b49e2db0c045f602ea1907e4f63a17235
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
@@ -411,14 +418,14 @@ CHECKSUMS
   erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
   gem_bench (2.0.5) sha256=0dc0fb44a5a5eb7b2f5c1c68a5b0164d72007132822c012bac3abe976b199ead
   geom2d (0.4.1) sha256=ea0998ea90c4f2752e24fe13d85a4f89bee689d151316140ebcc6369bf634ed9
-  gitmoji-regex (2.0.2) sha256=7d8648cedbd3674e086a2c37d9e8078ce109751cb1e687de077e0252f0113d94
+  gitmoji-regex (2.0.3) sha256=12906fd5306e733c7220434f646e6a442f5d3a0ec297d8079999fee56ab47ea7
   hexapdf (1.9.1) sha256=2d1f6a3622e6bc2a70a707d4c3f3fa44f5552ecd9d899f6283abb07398a84884
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.19.9) sha256=9b9025b7cdddafa38d316eca0b2358488e42d417045c1b90d216a9fefe46b79a
-  kettle-dev (2.2.13) sha256=f396b331c7b15ede36aecc1d52f33ce5ad048f713d1051d4bfe96a43538a3e36
+  kettle-dev (2.2.15) sha256=f0f44abff87cc89126193742ee323262e16bc1c9f8d76c6dd464539d9c498b4a
   kettle-soup-cover (1.1.3) sha256=a373827da22a7131d093afd32945e5b7d7a10a01ebfdded8fd2cb8230d69c8ad
-  kettle-test (2.0.5) sha256=98fd96f03c4470cd2cb0b1cef339455064d8a68bc180f70864d85fd74f41d978
+  kettle-test (2.0.6) sha256=b6019324e9b864a0b48e5a63970733a3a69411e8bf66f1f9560048856b070831
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
@@ -433,7 +440,7 @@ CHECKSUMS
   parallel_tests (5.7.0) sha256=3f1762c46ca2c223b8af8ef877217f9d76974e191bfa934f2580b58bcf1d005c
   parser (3.3.11.1) sha256=d17ace7aabe3e72c3cc94043714be27cc6f852f104d81aa284c2281aecc65d54
   parslet (2.0.0) sha256=d45130695d39b43d7e6a91f4d2ec66b388a8d822bae38de9b4de9a5fbde1f606
-  pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
+  pp (0.6.4) sha256=dfcb0fce700c41456265922884f9fe195d7fbb0674a3578e6c0f69588e82b570
   prettyprint (0.2.0) sha256=2bc9e15581a94742064a3cc8b0fb9d45aae3d03a1baa6ef80922627a0766f193
   prism (1.9.0) sha256=7b530c6a9f92c24300014919c9dcbc055bf4cdf51ec30aed099b06cd6674ef85
   psych (5.4.0) sha256=14f72d69a611af663d7d70e4a7b67d9eb1f3ae9f8d916b478961d5a0075ba5b7
@@ -492,20 +499,21 @@ CHECKSUMS
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
-  tree_haver (7.0.0) sha256=424c938036458a7f0645baa4e9d641bd8a31f17eeef52ca0e74bd3beb22510c0
+  token-resolver (2.0.3) sha256=68d673653e36d36b211be7522dee552420e7e5d49b3a95b782ad0ab280c7cd51
+  tree_haver (7.0.0)
   tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.4) sha256=c7e207e57d4352202c5496a72d850840b9c02120ed8355765abf105a568e5f1c
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
-  version_gem (1.1.12) sha256=b78f691677807997e63901e8aba1b96d4ae172ce5570ad9ceb0208eb3a0edb3d
-  yaml-converter (0.2.1) sha256=656c5248fcc08d8cafebf8114d73c72112a577d2f8d6f09cdb2d0118eaeb646a
+  version_gem (1.1.13) sha256=77f3035ac45877cd14610648fec2d23bd8c10fa13dfcf63a588825aa98587260
+  yaml-converter (0.2.2) sha256=3f2354debb29d8a43c06b7e205dddcbd36852bae5376d0aa2c3970f98a443246
   yard (0.9.44) sha256=eb087e9b631ccd887b049f303d489963945452d5e2a7eb49a5a74a7cf6887f28
-  yard-fence (0.9.4) sha256=bf236dce2ef2a552f533e19b180e5be2cb97163eb2b9163bcfa9bafb3fcb1b01
+  yard-fence (0.9.5) sha256=c25d50b90615caad6c48d4ef56a9e546877a9759f68348eead9dd91878b92c9a
   yard-junk (0.1.0) sha256=e85fe2ec1afa47313decd333447b53458cb1ed49b510b70015fdc3041a94bcdd
   yard-relative_markdown_links (0.6.0) sha256=3e5ffa85cbad9bac70bee5421774b190fb25d3bdf489323a5b3534f647d1a70e
-  yard-timekeeper (0.2.1) sha256=561bb43fd7afccefd8d09cef000d3f1e7b3b25614cb5027f35a22218141ace70
-  yard-yaml (0.2.1) sha256=90ed570ab8882260e99fd7d8e76e9c921623c77a6fb9e7242b209806d829001d
+  yard-timekeeper (0.2.2) sha256=f9d84775c58d89437f0008a7febd32662ee6ca5bbac419944d7b1d7c0211ba3e
+  yard-yaml (0.2.2) sha256=0407426850520edee2334837f5e518f4e6f95d7bdccba05d4b04a64e1a855548
   zeitwerk (2.8.2) sha256=7212a61311083c604184b1ea2574b9aa05cd14f855a0841c06985cabe9181d12
   zlib (3.2.3) sha256=5bd316698b32f31a64ab910a8b6c282442ca1626a81bbd6a1674e8522e319c20
 

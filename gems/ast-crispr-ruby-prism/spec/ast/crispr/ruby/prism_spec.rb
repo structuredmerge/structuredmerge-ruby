@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
 RSpec.describe Ast::Crispr::Ruby::Prism do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Ast::Crispr::Ruby::Prism::VERSION).not_to be_nil
   end
 
-  describe ".document_context" do
-    it "builds a context with the Prism adapter" do
-      context = described_class.document_context(content: "puts :ok\n", source_label: "example.rb")
+  describe '.document_context' do
+    it 'builds a context with the Prism adapter' do
+      context = described_class.document_context(content: "puts :ok\n", source_label: 'example.rb')
 
       expect(context.adapter).to be_a(Ast::Crispr::Ruby::Prism::Adapter)
     end
 
-    context "with a structure profile" do
-      let(:context) { described_class.document_context(content: "puts :ok\n", source_label: "example.rb") }
+    context 'with a structure profile' do
+      let(:context) { described_class.document_context(content: "puts :ok\n", source_label: 'example.rb') }
       let(:profile) { context.structure_profile(owner_scope: :top_level_statements) }
       let(:expected_owner_scope) { :top_level_statements }
       let(:expected_owner_selector) { :line_bound_statements }
@@ -21,9 +21,9 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       let(:expected_known_owner_selector) { true }
       let(:expected_supported_comment_regions) { [:leading] }
 
-      it_behaves_like "Ast::Crispr::StructureProfile contract"
+      it_behaves_like 'Ast::Crispr::StructureProfile contract'
 
-      it "supports leading comment regions" do
+      it 'supports leading comment regions' do
         expect(profile.supports_comment_region?(:leading)).to be(true)
       end
     end
@@ -32,12 +32,12 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
   describe described_class::Selectors do
     let(:target) do
       described_class.comment_region_owned_owner(
-        marker: "### MANAGED SNIPPET",
-        limit: {exactly: 1},
+        marker: '### MANAGED SNIPPET',
+        limit: { exactly: 1 }
       )
     end
 
-    it "finds the comment-region-owned structural owner span" do
+    it 'finds the comment-region-owned structural owner span' do
       content = <<~RUBY
         ### MANAGED SNIPPET
         begin
@@ -51,7 +51,7 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
         end
       RUBY
 
-      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: "Rakefile")
+      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: 'Rakefile')
       matches = target.locate_matches(context)
 
       expect(matches.size).to eq(1)
@@ -60,20 +60,20 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       expect(matches.first.slice_from(content)).to include('puts "managed"')
     end
 
-    it "surfaces the selector structure profile through the document context" do
+    it 'surfaces the selector structure profile through the document context' do
       content = <<~RUBY
         ### MANAGED SNIPPET
         puts "managed"
       RUBY
 
-      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: "Rakefile")
+      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: 'Rakefile')
       profile = target.structure_profile(context)
 
       expect(target.owner_scope).to eq(:shared_default)
       expect(profile.owner_selector).to eq(:line_bound_statements)
     end
 
-    it "finds a marker-bounded Ruby comment line block through Prism comments" do
+    it 'finds a marker-bounded Ruby comment line block through Prism comments' do
       content = <<~RUBY
         # frozen_string_literal: true
 
@@ -89,23 +89,23 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       RUBY
 
       target = described_class.comment_line_block(
-        start_text: "# <<kettle-jem:generated>> do not edit below this line",
-        end_text: "# <</kettle-jem:generated>>",
+        start_text: '# <<kettle-jem:generated>> do not edit below this line',
+        end_text: '# <</kettle-jem:generated>>',
         span: :outermost,
         include_trailing_gap: true,
-        limit: {exactly: 1},
+        limit: { exactly: 1 }
       )
-      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: "shunted.gemfile")
+      context = Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: 'shunted.gemfile')
       match = target.locate_matches(context).first
 
       expect(match.start_line).to eq(5)
       expect(match.end_line).to eq(8)
       expect(match.slice_from(content)).to include('gem "debug"')
-      expect(match.slice_from(content)).not_to include("group :test")
+      expect(match.slice_from(content)).not_to include('group :test')
     end
 
-    context "with a selector selection profile" do
-      let(:context) { Ast::Crispr::Ruby::Prism.document_context(content: "### MANAGED SNIPPET\nputs \"managed\"\n", source_label: "Rakefile") }
+    context 'with a selector selection profile' do
+      let(:context) { Ast::Crispr::Ruby::Prism.document_context(content: "### MANAGED SNIPPET\nputs \"managed\"\n", source_label: 'Rakefile') }
       let(:selection_profile) { target.selection_profile(context) }
       let(:expected_selection_owner_scope) { :shared_default }
       let(:expected_selection_owner_selector) { :line_bound_statements }
@@ -118,12 +118,12 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       let(:expected_include_trailing_gap) { true }
       let(:expected_comment_anchored) { true }
 
-      it_behaves_like "Ast::Crispr::SelectionProfile contract"
+      it_behaves_like 'Ast::Crispr::SelectionProfile contract'
     end
 
-    context "with a comment-anchored match profile" do
+    context 'with a comment-anchored match profile' do
       let(:content) { "### MANAGED SNIPPET\nputs \"managed\"\n\n" }
-      let(:context) { Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: "Rakefile") }
+      let(:context) { Ast::Crispr::Ruby::Prism.document_context(content: content, source_label: 'Rakefile') }
       let(:match_profile) { target.locate_matches(context).first.match_profile }
       let(:expected_start_boundary) { :comment_region_start }
       let(:expected_start_boundary_family) { :comment_anchor }
@@ -137,12 +137,12 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       let(:expected_match_comment_anchored) { true }
       let(:expected_trailing_gap_extended) { true }
 
-      it_behaves_like "Ast::Crispr::MatchProfile contract"
+      it_behaves_like 'Ast::Crispr::MatchProfile contract'
     end
   end
 
   describe Ast::Crispr::Replace do
-    it "fails closed when target cardinality is out of bounds" do
+    it 'fails closed when target cardinality is out of bounds' do
       content = <<~RUBY
         ### MANAGED SNIPPET
         puts "one"
@@ -151,16 +151,16 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
         puts "two"
       RUBY
 
-      target = Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(marker: "### MANAGED SNIPPET")
+      target = Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(marker: '### MANAGED SNIPPET')
       actor = described_class.result(content: content, target: target, replacement: "puts \"fresh\"\n")
 
       expect(actor.failure?).to be(true)
-      expect(actor.error).to include("matched 2 node(s); expected == 1")
+      expect(actor.error).to include('matched 2 node(s); expected == 1')
     end
   end
 
   describe Ast::Crispr::Delete do
-    it "deletes the structurally owned statement span" do
+    it 'deletes the structurally owned statement span' do
       content = <<~RUBY
         ### MANAGED SNIPPET
         begin
@@ -174,12 +174,12 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
         end
       RUBY
 
-      target = Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(marker: "### MANAGED SNIPPET")
+      target = Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(marker: '### MANAGED SNIPPET')
       actor = described_class.call(content: content, target: target)
 
       expect(actor.changed).to be(true)
-      expect(actor.updated_content).not_to include("### MANAGED SNIPPET")
-      expect(actor.updated_content).to include("task :default")
+      expect(actor.updated_content).not_to include('### MANAGED SNIPPET')
+      expect(actor.updated_content).to include('task :default')
     end
   end
 
@@ -200,9 +200,9 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
     let(:expected_explicit_replacement) { false }
     let(:expected_may_reuse_captured_text) { true }
 
-    it_behaves_like "Ast::Crispr::OperationProfile contract"
+    it_behaves_like 'Ast::Crispr::OperationProfile contract'
 
-    context "with a callable destination profile" do
+    context 'with a callable destination profile' do
       let(:content) do
         <<~RUBY
           ### MANAGED SNIPPET
@@ -220,8 +220,8 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       end
       let(:target) do
         Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(
-          marker: "### MANAGED SNIPPET",
-          limit: {at_least: 0},
+          marker: '### MANAGED SNIPPET',
+          limit: { at_least: 0 }
         )
       end
       let(:actor) do
@@ -233,7 +233,7 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
             Struct.new(:anchor).new(Struct.new(:start_line, :end_line, :node).new(line_number, line_number, nil))
           end,
           replacement: "### MANAGED SNIPPET\nputs \"new\"\n",
-          if_missing: :append,
+          if_missing: :append
         )
       end
       let(:destination_profile) { actor.destination_profile }
@@ -250,10 +250,10 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       let(:expected_append_fallback) { false }
       let(:expected_destination_anchored) { true }
 
-      it_behaves_like "Ast::Crispr::DestinationProfile contract"
+      it_behaves_like 'Ast::Crispr::DestinationProfile contract'
     end
 
-    it "removes a stale managed span and reinserts the new text at the destination anchor" do
+    it 'removes a stale managed span and reinserts the new text at the destination anchor' do
       content = <<~RUBY
         ### MANAGED SNIPPET
         begin
@@ -269,8 +269,8 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       RUBY
 
       target = Ast::Crispr::Ruby::Prism::Selectors.comment_region_owned_owner(
-        marker: "### MANAGED SNIPPET",
-        limit: {at_least: 0},
+        marker: '### MANAGED SNIPPET',
+        limit: { at_least: 0 }
       )
 
       actor = described_class.call(
@@ -288,15 +288,15 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
             warn("missing")
           end
         RUBY
-        if_missing: :append,
+        if_missing: :append
       )
 
       expect(actor.changed).to be(true)
       expect(actor.source_match_count).to eq(1)
-      expect(actor.updated_content.scan("### MANAGED SNIPPET").size).to eq(1)
+      expect(actor.updated_content.scan('### MANAGED SNIPPET').size).to eq(1)
       expect(actor.updated_content).not_to include('puts "old"')
-      expect(actor.updated_content.index('require "kettle/dev"')).to be < actor.updated_content.index("### MANAGED SNIPPET")
-      expect(actor.updated_content.index("### MANAGED SNIPPET")).to be < actor.updated_content.index("### TEMPLATING TASKS")
+      expect(actor.updated_content.index('require "kettle/dev"')).to be < actor.updated_content.index('### MANAGED SNIPPET')
+      expect(actor.updated_content.index('### MANAGED SNIPPET')).to be < actor.updated_content.index('### TEMPLATING TASKS')
       expect(actor.operation_profile.may_reuse_captured_text?).to be(true)
       expect(actor.destination_profile.callable_resolved?).to be(true)
     end
