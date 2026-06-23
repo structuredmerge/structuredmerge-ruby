@@ -73,6 +73,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated CI workflows now disable `ruby/setup-ruby` Bundler caching for
   TruffleRuby 25.0 and JRuby 9.3 and run a serial Bundler install to avoid
   legacy engine setup failures.
+- `kettle-jem install` now runs `rubocop_gradual:autocorrect` after templating
+  and before the bootstrap commit when the destination project provides
+  `bin/rake`, so project-local Ruby syntax floors can normalize generated
+  files.
 - Generated funding templates now default missing OpenCollective orgs to
   `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness

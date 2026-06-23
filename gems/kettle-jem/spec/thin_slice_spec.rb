@@ -500,12 +500,13 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
-          templates:
-            root: packaged
-            apply: true
-            entries: []
-        YAML
+        ".kettle-jem.yml" => [
+          "templates:",
+          "  root: packaged",
+          "  apply: true",
+          "  entries: []",
+          ""
+        ].join("\n"),
         ".github/workflows/tests.yml" => <<~YAML
           name: Tests
           on:
@@ -536,15 +537,16 @@ RSpec.describe Kettle::Jem do
             spec.required_ruby_version = ">= 3.2"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML,
-          workflows:
-            exec_cmd: rake spec
-          templates:
-            root: template
-            apply: true
-            entries:
-              - .github/workflows/current.yml
-        YAML
+        ".kettle-jem.yml" => [
+          "workflows:",
+          "  exec_cmd: rake spec",
+          "templates:",
+          "  root: template",
+          "  apply: true",
+          "  entries:",
+          "    - .github/workflows/current.yml",
+          ""
+        ].join("\n"),
         "template/.github/workflows/current.yml.example" => <<~YAML
           name: Current
           jobs:
@@ -3938,13 +3940,16 @@ RSpec.describe Kettle::Jem do
             spec.summary = "Example gem"
           end
         RUBY
-        ".kettle-jem.yml" => <<~YAML
-          templates:
-            root: packaged
-            apply: true
-            entries:
-              - bin/setup
-        YAML
+        ".kettle-jem.yml" => [
+          "templates:",
+          "  root: packaged",
+          "  apply: true",
+          "  entries:",
+          "    - bin/setup",
+          ""
+        ].join("\n"),
+        "Rakefile" => "task :default\n",
+        "bin/rake" => "#!/usr/bin/env ruby\n"
       })
 
       commands = []
@@ -3982,6 +3987,13 @@ RSpec.describe Kettle::Jem do
         exitstatus: 0
       )
       expect(install.fetch(:install_steps)).to include(
+        name: "rubocop_gradual_autocorrect",
+        command: ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"],
+        status: "succeeded",
+        exitstatus: 0,
+        reason: "executed"
+      )
+      expect(install.fetch(:install_steps)).to include(
         name: "bundled_handoff",
         command: kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup"),
         status: "succeeded",
@@ -3995,11 +4007,12 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
-        steps: include("bin_setup_executable", "bin_setup", "bundle_binstubs"),
+        steps: include("bin_setup_executable", "bin_setup", "bundle_binstubs", "rubocop_gradual_autocorrect"),
         statuses: hash_including(
           "bin_setup_executable" => "updated",
           "bin_setup" => "succeeded",
           "bundle_binstubs" => "succeeded",
+          "rubocop_gradual_autocorrect" => "succeeded",
           "bundle_binstub_pruning" => "already_current"
         )
       ))
@@ -4011,11 +4024,16 @@ RSpec.describe Kettle::Jem do
           "bootstrap_commit" => "skipped"
         }
       )
-      expect(commands.map { |entry| entry.fetch(:command) }).to include(
+      autocorrect_command = ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+      handoff_command = kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup")
+      command_names = commands.map { |entry| entry.fetch(:command) }
+      expect(command_names).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup")
+        autocorrect_command,
+        handoff_command
       )
+      expect(command_names.index(autocorrect_command)).to be < command_names.index(handoff_command)
       expect(commands).to all(include(chdir: root, env: {}, quiet: true))
       expect(File).to exist(setup_path)
       expect(File.executable?(setup_path)).to be(true)

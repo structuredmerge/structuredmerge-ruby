@@ -37,6 +37,7 @@ module Kettle
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
+          install_steps << rubocop_gradual_autocorrect_step(project_root)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
@@ -178,6 +179,7 @@ module Kettle
               curated_binstubs_executable
               bundle_binstub_pruning
               bundle_binstub_location_validation
+              rubocop_gradual_autocorrect
               bundle_lock_normalization
             ],
             "orchestration" => %w[bundled_handoff bootstrap_commit]
@@ -653,6 +655,29 @@ module Kettle
           %w[bundle update]
         end
 
+        def rubocop_gradual_autocorrect_step(project_root)
+          rakefile = File.join(project_root.to_s, "Rakefile")
+          bin_rake = File.join(project_root.to_s, "bin", "rake")
+          unless File.file?(rakefile) && File.file?(bin_rake)
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "missing_rake_entrypoint"
+            }
+          end
+
+          {
+            name: "rubocop_gradual_autocorrect",
+            command: rubocop_gradual_autocorrect_command,
+            status: "ready",
+            reason: "post_template_style_normalization"
+          }
+        end
+
+        def rubocop_gradual_autocorrect_command
+          ["sh", "-c", "rm -rf .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+        end
+
         def normal_lockfile_env(project_root, env)
           command_env = (env || {}).to_h.dup
           command_env["K_JEM_TEMPLATING"] = "false"
@@ -886,6 +911,8 @@ module Kettle
             when "bundled_handoff"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_lock_normalization"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "rubocop_gradual_autocorrect"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "hook_templates"
               execute_hook_templates_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
