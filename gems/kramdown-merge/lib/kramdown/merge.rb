@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "markdown-merge"
-require "kramdown"
+require 'markdown-merge'
+require 'kramdown'
 
 module Kramdown
   module Merge
     extend self
 
-    PACKAGE_NAME = "kramdown-merge"
-    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: "kramdown", family: "native").freeze
+    PACKAGE_NAME = 'kramdown-merge'
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'kramdown', family: 'native').freeze
     TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
 
     def markdown_feature_profile
@@ -24,7 +24,9 @@ module Kramdown
 
     def markdown_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       markdown_feature_profile.merge(backend: BACKEND_REFERENCE.id, backend_ref: BACKEND_REFERENCE.to_h)
     end
@@ -45,9 +47,11 @@ module Kramdown
 
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
-      return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == "markdown"
+      return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == 'markdown'
 
       ::Kramdown::Document.new(source)
       normalized = Markdown::Merge.normalize_source(source)
@@ -55,10 +59,10 @@ module Kramdown
         ok: true,
         diagnostics: [],
         analysis: {
-          kind: "markdown",
+          kind: 'markdown',
           dialect: dialect,
           normalized_source: normalized,
-          root_kind: "document",
+          root_kind: 'document',
           owners: Markdown::Merge.collect_markdown_owners(normalized)
         },
         policies: []
@@ -66,7 +70,7 @@ module Kramdown
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "parse_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
         policies: []
       }
     end
@@ -77,14 +81,19 @@ module Kramdown
 
     def merge_markdown(template_source, destination_source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown(template_source, destination_source, dialect)
     end
 
-    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
+                                                    applied_children, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs(
         template_source,
@@ -95,9 +104,12 @@ module Kramdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
+                                                                       replay_bundle, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
@@ -107,9 +119,12 @@ module Kramdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source,
+                                                                                dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
         template_source,
@@ -119,9 +134,12 @@ module Kramdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect,
+                                                                      review_state, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
         template_source,
@@ -131,9 +149,12 @@ module Kramdown
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source,
+                                                                               dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
         template_source,
@@ -150,7 +171,7 @@ module Kramdown
     def unsupported_feature_result(message)
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }],
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
         policies: []
       }
     end
