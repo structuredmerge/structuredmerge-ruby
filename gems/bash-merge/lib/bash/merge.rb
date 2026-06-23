@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # std libs
-require "set"
 
 # External gems
 # TreeHaver provides a unified cross-Ruby interface to tree-sitter.
@@ -16,15 +15,15 @@ require "set"
 # Set TREE_HAVER_BACKEND=ffi (or mri/rust) to control backend selection.
 # When MRI loads a grammar first, FFI gets incompatible pointers (symbol conflict).
 # MRI statically links tree-sitter, FFI dynamically links libtree-sitter.so.
-require "tree_haver"
+require 'tree_haver'
 
-require "version_gem"
+require 'version_gem'
 
 # Shared merge infrastructure
-require "ast/merge"
+require 'ast/merge'
 
 # This gem
-require_relative "merge/version"
+require_relative 'merge/version'
 
 # Bash::Merge provides a generic Bash script smart merge system using tree-sitter AST analysis.
 # It intelligently merges template and destination Bash scripts by identifying matching
@@ -115,14 +114,14 @@ module Bash
 
     class CorruptionDetectedError < Error; end
 
-    autoload :CommentTracker, "bash/merge/comment_tracker"
-    autoload :DebugLogger, "bash/merge/debug_logger"
-    autoload :Emitter, "bash/merge/emitter"
-    autoload :FreezeNode, "bash/merge/freeze_node"
-    autoload :FileAnalysis, "bash/merge/file_analysis"
-    autoload :MergeResult, "bash/merge/merge_result"
-    autoload :NodeWrapper, "bash/merge/node_wrapper"
-    autoload :SmartMerger, "bash/merge/smart_merger"
+    autoload :CommentTracker, 'bash/merge/comment_tracker'
+    autoload :DebugLogger, 'bash/merge/debug_logger'
+    autoload :Emitter, 'bash/merge/emitter'
+    autoload :FreezeNode, 'bash/merge/freeze_node'
+    autoload :FileAnalysis, 'bash/merge/file_analysis'
+    autoload :MergeResult, 'bash/merge/merge_result'
+    autoload :NodeWrapper, 'bash/merge/node_wrapper'
+    autoload :SmartMerger, 'bash/merge/smart_merger'
 
     class << self
       def register_backend!
@@ -160,19 +159,19 @@ module Bash
       def bash_grammar_path(diagnostics)
         TreeHaver::GrammarFinder.new(:bash).find_library_path
       rescue TreeHaver::Error => e
-        diagnostics << { kind: "bash_grammar_unavailable", message: e.message }
+        diagnostics << { kind: 'bash_grammar_unavailable', message: e.message }
         nil
       end
 
       def language_pack_process_available_for?(source, diagnostics)
         result = TreeHaver.process_with_language_pack(
-          TreeHaver::ProcessRequest.new(source: source, language: "bash")
+          TreeHaver::ProcessRequest.new(source: source, language: 'bash')
         )
         ok = result[:ok] == true
         diagnostics.concat(Array(result[:diagnostics])) unless ok
         ok
       rescue StandardError => e
-        diagnostics << { kind: "bash_language_pack_unavailable", message: e.message }
+        diagnostics << { kind: 'bash_language_pack_unavailable', message: e.message }
         false
       end
 
@@ -181,10 +180,10 @@ module Bash
         tree = parser.parse(source)
         !tree.nil? && !tree.root_node.nil?
       rescue TreeHaver::Error => e
-        diagnostics << { kind: "bash_node_parser_unavailable", message: e.message }
+        diagnostics << { kind: 'bash_node_parser_unavailable', message: e.message }
         false
       rescue StandardError => e
-        diagnostics << { kind: "bash_node_parser_unavailable", message: e.message }
+        diagnostics << { kind: 'bash_node_parser_unavailable', message: e.message }
         false
       end
     end
@@ -198,10 +197,10 @@ Bash::Merge.register_backend!
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
     :bash_merge,
-    require_path: "bash/merge",
-    merger_class: "Bash::Merge::SmartMerger",
+    require_path: 'bash/merge',
+    merger_class: 'Bash::Merge::SmartMerger',
     test_source: "#!/bin/bash\necho hello",
-    category: :code,
+    category: :code
   )
 end
 

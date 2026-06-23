@@ -22,19 +22,19 @@ module Bash
       # Check if this is a function definition
       # @return [Boolean]
       def function_definition?
-        @node.type.to_s == "function_definition"
+        @node.type.to_s == 'function_definition'
       end
 
       # Check if this is a variable assignment
       # @return [Boolean]
       def variable_assignment?
-        @node.type.to_s == "variable_assignment"
+        @node.type.to_s == 'variable_assignment'
       end
 
       # Check if this is an if statement
       # @return [Boolean]
       def if_statement?
-        @node.type.to_s == "if_statement"
+        @node.type.to_s == 'if_statement'
       end
 
       # Check if this is a for loop
@@ -46,31 +46,31 @@ module Bash
       # Check if this is a while loop
       # @return [Boolean]
       def while_statement?
-        @node.type.to_s == "while_statement"
+        @node.type.to_s == 'while_statement'
       end
 
       # Check if this is a case statement
       # @return [Boolean]
       def case_statement?
-        @node.type.to_s == "case_statement"
+        @node.type.to_s == 'case_statement'
       end
 
       # Check if this is a command
       # @return [Boolean]
       def command?
-        @node.type.to_s == "command"
+        @node.type.to_s == 'command'
       end
 
       # Check if this is a pipeline
       # @return [Boolean]
       def pipeline?
-        @node.type.to_s == "pipeline"
+        @node.type.to_s == 'pipeline'
       end
 
       # Check if this is a comment
       # @return [Boolean]
       def comment?
-        @node.type.to_s == "comment"
+        @node.type.to_s == 'comment'
       end
 
       # Get the function name if this is a function definition
@@ -79,7 +79,7 @@ module Bash
         return unless function_definition?
 
         # In bash tree-sitter, function name is in a 'name' or 'word' child
-        name_node = find_child_by_type("word") || find_child_by_field("name")
+        name_node = find_child_by_type('word') || find_child_by_field('name')
         node_text(name_node) if name_node
       end
 
@@ -89,7 +89,7 @@ module Bash
         return unless variable_assignment?
 
         # In bash tree-sitter, variable name is a child of type 'variable_name'
-        name_node = find_child_by_type("variable_name")
+        name_node = find_child_by_type('variable_name')
         node_text(name_node) if name_node
       end
 
@@ -139,20 +139,20 @@ module Bash
         node_type = node.type.to_s
 
         case node_type
-        when "program"
+        when 'program'
           # Root node - signature based on direct children structure
           child_types = []
-          node.each { |child| child_types << child.type.to_s unless child.type.to_s == "comment" }
+          node.each { |child| child_types << child.type.to_s unless child.type.to_s == 'comment' }
           [:program, child_types.length]
-        when "function_definition"
+        when 'function_definition'
           # Functions are identified by their name
           name = function_name
           [:function_definition, name]
-        when "variable_assignment"
+        when 'variable_assignment'
           # Variable assignments are identified by variable name
           name = variable_name
           [:variable_assignment, name]
-        when "command"
+        when 'command'
           # Commands identified by their command name and arguments.
           # Arguments are included so that `PATH_add exe` and `PATH_add bin`
           # get distinct signatures, while `echo "hello"` repeated twice gets
@@ -161,27 +161,27 @@ module Bash
           name = command_name
           args = extract_command_arguments(node)
           [:command, name, args, extract_command_signature_context(node)]
-        when "if_statement"
+        when 'if_statement'
           # If statements identified by their condition pattern
           condition = extract_condition_pattern(node)
           [:if_statement, condition]
-        when "for_statement", "c_style_for_statement"
+        when 'for_statement', 'c_style_for_statement'
           # For loops identified by their loop variable
           var = extract_loop_variable(node)
           [:for_statement, var]
-        when "while_statement"
+        when 'while_statement'
           # While loops identified by condition
           condition = extract_condition_pattern(node)
           [:while_statement, condition]
-        when "case_statement"
+        when 'case_statement'
           # Case statements identified by the expression being matched
           expr = extract_case_expression(node)
           [:case_statement, expr]
-        when "pipeline"
+        when 'pipeline'
           # Pipelines identified by command names in order
           commands = extract_pipeline_commands(node)
           [:pipeline, commands]
-        when "comment"
+        when 'comment'
           # Comments identified by their content
           [:comment, node_text(node).strip]
         else
@@ -197,9 +197,7 @@ module Bash
         # Extract additional context like redirections
         redirections = []
         node.each do |child|
-          if child.type.to_s.include?("redirect")
-            redirections << child.type.to_s
-          end
+          redirections << child.type.to_s if child.type.to_s.include?('redirect')
         end
         redirections.empty? ? nil : redirections.sort
       end
@@ -224,9 +222,7 @@ module Bash
           end
 
           # Everything after the command name is an argument
-          if found_command_name
-            args << node_text(child)
-          end
+          args << node_text(child) if found_command_name
         end
         args.empty? ? nil : args
       end
@@ -235,23 +231,21 @@ module Bash
         # Try to extract the test/condition from if/while statements
         # Look for test_command, compound_statement, etc.
         node.each do |child|
-          if %w[test_command bracket_command].include?(child.type.to_s)
-            return node_text(child).slice(0, 100).strip
-          end
+          return node_text(child).slice(0, 100).strip if %w[test_command bracket_command].include?(child.type.to_s)
         end
         nil
       end
 
       def extract_loop_variable(node)
         # Extract the loop variable from for statements
-        var_node = node.each.find { |child| child.type.to_s == "variable_name" }
+        var_node = node.each.find { |child| child.type.to_s == 'variable_name' }
         node_text(var_node) if var_node
       end
 
       def extract_case_expression(node)
         # Extract the expression being matched in a case statement
         node.each do |child|
-          return node_text(child).slice(0, 50).strip if child.type.to_s == "word" || child.type.to_s == "variable_name"
+          return node_text(child).slice(0, 50).strip if %w[word variable_name].include?(child.type.to_s)
         end
         nil
       end
@@ -260,11 +254,11 @@ module Bash
         # Extract command names from a pipeline
         commands = []
         node.each do |child|
-          if child.type.to_s == "command"
-            wrapper = NodeWrapper.new(child, lines: @lines, source: @source)
-            cmd_name = wrapper.command_name
-            commands << cmd_name if cmd_name
-          end
+          next unless child.type.to_s == 'command'
+
+          wrapper = NodeWrapper.new(child, lines: @lines, source: @source)
+          cmd_name = wrapper.command_name
+          commands << cmd_name if cmd_name
         end
         commands
       end

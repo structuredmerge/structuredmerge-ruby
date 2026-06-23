@@ -14,7 +14,7 @@ module Bash
       include Ast::Merge::FileAnalyzable
 
       # Default freeze token for identifying freeze blocks
-      DEFAULT_FREEZE_TOKEN = "bash-merge"
+      DEFAULT_FREEZE_TOKEN = 'bash-merge'
 
       # @return [CommentTracker] Comment tracker for this file
       attr_reader :comment_tracker
@@ -42,7 +42,7 @@ module Bash
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param parser_path [String, nil] Path to tree-sitter-bash parser library
       # @param options [Hash] Additional options (forward compatibility - ignored by FileAnalysis)
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, parser_path: nil, **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
@@ -55,18 +55,18 @@ module Bash
         @comment_tracker = CommentTracker.new(source)
 
         # Parse the Bash script
-        DebugLogger.time("FileAnalysis#parse_bash") { parse_bash }
+        DebugLogger.time('FileAnalysis#parse_bash') { parse_bash }
 
         # Extract freeze blocks and integrate with nodes
         @freeze_blocks = extract_freeze_blocks
         @nodes = integrate_nodes_and_freeze_blocks
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          nodes_count: @nodes.size,
-          freeze_blocks: @freeze_blocks.size,
-          valid: valid?,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            nodes_count: @nodes.size,
+                            freeze_blocks: @freeze_blocks.size,
+                            valid: valid?
+                          })
       end
 
       # Check if parse was successful
@@ -92,7 +92,7 @@ module Bash
         @comment_support_style ||= shared_comment_support_style(
           source: :bash_source,
           style: :hash_comment,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -121,7 +121,7 @@ module Bash
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
@@ -134,7 +134,7 @@ module Bash
         shared_comment_attachment_for(
           owner,
           tracker_attachment: comment_tracker.comment_attachment_for(owner, **options),
-          **options,
+          **options
         )
       end
 
@@ -159,7 +159,7 @@ module Bash
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -170,7 +170,7 @@ module Bash
       end
 
       # Alias for convenience - bash-merge prefers "nodes" terminology
-      alias_method :nodes, :statements
+      alias nodes statements
 
       # Check if a line is within a freeze block.
       #
@@ -213,7 +213,7 @@ module Bash
           if root
             statements = []
             root.each do |child|
-              next if child.type.to_s == "comment" # Comments handled separately
+              next if child.type.to_s == 'comment' # Comments handled separately
 
               statements << NodeWrapper.new(child, lines: @lines, source: @source)
             end
@@ -234,9 +234,7 @@ module Bash
         @ast = parser.parse(@source)
 
         # Check for parse errors in the tree
-        if @ast&.root_node&.has_error?
-          collect_parse_errors(@ast.root_node)
-        end
+        collect_parse_errors(@ast.root_node) if @ast&.root_node&.has_error?
       rescue TreeHaver::Error => e
         # TreeHaver::Error inherits from Exception, not StandardError.
         # This also catches TreeHaver::NotAvailable (subclass of Error).
@@ -249,12 +247,12 @@ module Bash
 
       def collect_parse_errors(node)
         # Collect ERROR and MISSING nodes from the tree
-        if node.type.to_s == "ERROR" || node.missing?
+        if node.type.to_s == 'ERROR' || node.missing?
           @errors << {
             type: node.type.to_s,
             start_point: node.start_point,
             end_point: node.end_point,
-            text: node.to_s,
+            text: node.to_s
           }
         end
 
@@ -273,10 +271,10 @@ module Bash
           next unless (match = line.match(freeze_pattern))
 
           marker_type = match[1]&.downcase # 'freeze' or 'unfreeze'
-          if marker_type == "freeze"
-            freeze_starts << {line: line_num, marker: line}
-          elsif marker_type == "unfreeze"
-            freeze_ends << {line: line_num, marker: line}
+          if marker_type == 'freeze'
+            freeze_starts << { line: line_num, marker: line }
+          elsif marker_type == 'unfreeze'
+            freeze_ends << { line: line_num, marker: line }
           end
         end
 
@@ -295,7 +293,7 @@ module Bash
             end_line: matching_end[:line],
             lines: @lines,
             start_marker: start_info[:marker],
-            end_marker: matching_end[:marker],
+            end_marker: matching_end[:marker]
           )
         end
 

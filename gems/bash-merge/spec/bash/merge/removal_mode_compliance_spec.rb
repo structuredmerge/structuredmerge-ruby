@@ -1,12 +1,10 @@
 # frozen_string_literal: true
 
-# rubocop:disable RSpec/SpecFilePathFormat
-
-require "spec_helper"
-require "ast/merge/rspec/shared_examples"
+require 'spec_helper'
+require 'ast/merge/rspec/shared_examples'
 
 RSpec.describe Bash::Merge::SmartMerger, :bash_grammar do
-  it_behaves_like "Ast::Merge::RemovalModeCompliance" do
+  it_behaves_like 'Ast::Merge::RemovalModeCompliance' do
     let(:merger_class) { described_class }
 
     let(:removal_mode_leading_comments_case) do
@@ -22,7 +20,7 @@ RSpec.describe Bash::Merge::SmartMerger, :bash_grammar do
             echo "destination cleanup"
           }
         BASH
-        expected: <<~BASH,
+        expected: <<~BASH
           echo "template"
 
           # Destination cleanup docs
@@ -39,7 +37,7 @@ RSpec.describe Bash::Merge::SmartMerger, :bash_grammar do
           echo "template"
           APP_MODE="destination" # destination env docs
         BASH
-        expected: <<~BASH,
+        expected: <<~BASH
           echo "template"
           # destination env docs
         BASH
@@ -59,7 +57,7 @@ RSpec.describe Bash::Merge::SmartMerger, :bash_grammar do
           # trailing note
           echo "keep"
         BASH
-        expected: <<~BASH,
+        expected: <<~BASH
           echo "template"
           # destination env docs
 
@@ -71,10 +69,8 @@ RSpec.describe Bash::Merge::SmartMerger, :bash_grammar do
 
     let(:unsupported_removal_mode_case_reasons) do
       {
-        removal_mode_recursive_case: "Bash smart merge currently has no recursive or container-level removal path",
+        removal_mode_recursive_case: 'Bash smart merge currently has no recursive or container-level removal path'
       }
     end
   end
 end
-
-# rubocop:enable RSpec/SpecFilePathFormat

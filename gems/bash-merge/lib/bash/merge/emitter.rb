@@ -16,7 +16,7 @@ module Bash
       include Ast::Merge::EmitterLineMetadataSupport
 
       # Initialize subclass-specific state
-      def initialize_subclass_state(**options)
+      def initialize_subclass_state(**_options)
         initialize_line_metadata_state
       end
 
@@ -26,13 +26,13 @@ module Bash
       end
 
       def emit_blank_line
-        append_line("")
+        append_line('')
       end
 
       # Emit a tracked comment from CommentTracker
       # @param comment [Hash] Comment with :text, :indent
       def emit_tracked_comment(comment)
-        indent = " " * (comment[:indent] || 0)
+        indent = ' ' * (comment[:indent] || 0)
         append_line("#{indent}# #{comment[:text]}")
       end
 
@@ -54,7 +54,7 @@ module Bash
       # Emit a shebang line
       #
       # @param interpreter [String] Interpreter path (e.g., "/bin/bash")
-      def emit_shebang(interpreter = "/bin/bash", metadata: nil)
+      def emit_shebang(interpreter = '/bin/bash', metadata: nil)
         append_line("#!#{interpreter}", metadata)
       end
 
@@ -65,7 +65,7 @@ module Bash
       # @param export [Boolean] Whether to export the variable
       # @param inline_comment [String, nil] Optional inline comment
       def emit_variable_assignment(name, value, export: false, inline_comment: nil, metadata: nil)
-        prefix = export ? "export " : ""
+        prefix = export ? 'export ' : ''
         line = "#{current_indent}#{prefix}#{name}=#{value}"
         line += " # #{inline_comment}" if inline_comment
         append_line(line, metadata)

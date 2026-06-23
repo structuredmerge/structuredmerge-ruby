@@ -34,7 +34,7 @@ module Bash
       def shebang?(line_num)
         return false if line_num < 1 || line_num > @lines.length
 
-        @lines[line_num - 1].start_with?("#!")
+        @lines[line_num - 1].start_with?('#!')
       end
 
       def augment(owners: [], **options)
@@ -45,7 +45,7 @@ module Bash
           style: :hash_comment,
           total_comment_count: @comments.size,
           inline_comment_count: @comments.count { |comment| !comment[:full_line] },
-          **options,
+          **options
         )
       end
 
@@ -58,7 +58,7 @@ module Bash
           line_num = idx + 1
 
           # Skip shebang lines
-          next if line.start_with?("#!")
+          next if line.start_with?('#!')
 
           parsed = @line_parser.parse(line)
           next unless parsed
@@ -69,7 +69,7 @@ module Bash
               indent: parsed.indent,
               text: parsed.text,
               full_line: true,
-              raw: parsed.raw,
+              raw: parsed.raw
             }
           elsif parsed.inline?
             comments << {
@@ -77,7 +77,7 @@ module Bash
               indent: 0,
               text: parsed.text,
               full_line: false,
-              raw: parsed.raw,
+              raw: parsed.raw
             }
           end
         end

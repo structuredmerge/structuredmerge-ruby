@@ -39,9 +39,6 @@ module Bash
       include ::Ast::Merge::Runtime::RootSessionSupport
       include ::Ast::Merge::StructuredEmitterProvenanceSupport
 
-      attr_reader :runtime_session
-      attr_reader :corruption_handling
-
       # Creates a new SmartMerger for intelligent Bash script merging.
       #
       # @param template_content [String] Template Bash source code
@@ -94,7 +91,7 @@ module Bash
         )
       end
 
-      attr_reader :remove_template_missing_nodes
+      attr_reader :runtime_session, :corruption_handling, :remove_template_missing_nodes
 
       # Perform the merge and return the result as a Bash string.
       #
@@ -126,12 +123,12 @@ module Bash
         template_analysis_debug = {
           valid: @template_analysis.valid?,
           nodes: @template_analysis.nodes.size,
-          freeze_blocks: @template_analysis.freeze_blocks.size,
+          freeze_blocks: @template_analysis.freeze_blocks.size
         }
         dest_analysis_debug = {
           valid: @dest_analysis.valid?,
           nodes: @dest_analysis.nodes.size,
-          freeze_blocks: @dest_analysis.freeze_blocks.size,
+          freeze_blocks: @dest_analysis.freeze_blocks.size
         }
 
         {
@@ -146,13 +143,13 @@ module Bash
             corruption_handling: @corruption_handling,
             freeze_token: @freeze_token,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result_obj.statistics,
           decisions: result_obj.decision_summary,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -168,8 +165,8 @@ module Bash
       # @return [Array] Array of errors
       def errors
         errors = []
-        errors.concat(@template_analysis.errors.map { |e| {source: :template, error: e} })
-        errors.concat(@dest_analysis.errors.map { |e| {source: :destination, error: e} })
+        errors.concat(@template_analysis.errors.map { |e| { source: :template, error: e } })
+        errors.concat(@dest_analysis.errors.map { |e| { source: :destination, error: e } })
         errors
       end
 
@@ -182,7 +179,7 @@ module Bash
 
       # @return [String] The default freeze token
       def default_freeze_token
-        "bash-merge"
+        'bash-merge'
       end
 
       # No separate resolver — SmartMerger handles merge logic directly
@@ -241,16 +238,16 @@ module Bash
 
         # Pre-compute position-aware trailing groups for template-only nodes.
         dest_sigs = ::Set.new
-        dest_nodes.each { |n|
+        dest_nodes.each do |n|
           sig = @dest_analysis.generate_signature(n)
           dest_sigs << sig if sig
-        }
+        end
 
         trailing_groups, all_matched_indices = build_dest_iterate_trailing_groups(
           template_nodes: template_nodes,
           dest_sigs: dest_sigs,
           signature_for: ->(node) { @template_analysis.generate_signature(node) },
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         # Emit prefix template-only nodes (before first matched template node)
@@ -303,14 +300,14 @@ module Bash
           flush_ready_trailing_groups(
             trailing_groups: trailing_groups,
             matched_indices: all_matched_indices,
-            consumed_indices: consumed_template_indices,
+            consumed_indices: consumed_template_indices
           ) { |info| emit_node_to(emitter, info[:node], @template_analysis) }
         end
 
         # Emit remaining trailing groups (tail + safety net)
         emit_remaining_trailing_groups(
           trailing_groups: trailing_groups,
-          consumed_indices: consumed_template_indices,
+          consumed_indices: consumed_template_indices
         ) { |info| emit_node_to(emitter, info[:node], @template_analysis) }
 
         emit_root_boundary_to(emitter, :postlude)
@@ -335,25 +332,25 @@ module Bash
           surface_kind: :bash_document,
           declared_language: :bash,
           effective_language: :bash,
-          operation_id: "bash-document-root",
-          delegate_name: "bash-shell",
+          operation_id: 'bash-document-root',
+          delegate_name: 'bash-shell',
           policy_context: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
-          metadata: {merger: self.class.name},
+          metadata: { merger: self.class.name },
           options: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
           language_chain: [:bash],
-          delegate_metadata: {merger: self.class.name},
+          delegate_metadata: { merger: self.class.name }
         )
       end
 
@@ -364,8 +361,8 @@ module Bash
           unresolved_cases: merge_result.unresolved_cases,
           metadata: {
             stats: merge_result.statistics,
-            decisions: merge_result.decision_summary,
-          },
+            decisions: merge_result.decision_summary
+          }
         )
       end
 
@@ -373,7 +370,7 @@ module Bash
         fail_runtime_root_session!(
           root_operation: root_operation,
           error: error,
-          kind: :merge_failed,
+          kind: :merge_failed
         )
       end
 
@@ -387,7 +384,7 @@ module Bash
         map = Hash.new { |h, k| h[k] = [] }
         nodes.each_with_index do |node, idx|
           sig = analysis.generate_signature(node)
-          map[sig] << {node: node, index: idx} if sig
+          map[sig] << { node: node, index: idx } if sig
         end
         map
       end
@@ -403,13 +400,13 @@ module Bash
           next if lines.empty?
           next if skip_root_boundary_lines?(kind, analysis, lines)
 
-          start_line = (kind == :preamble) ? 1 : (analysis.lines.length - lines.length + 1)
+          start_line = kind == :preamble ? 1 : (analysis.lines.length - lines.length + 1)
           emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, start_line))
           true
         end
       end
 
-      STANDALONE_BASH_COMMENT_LINE_RE = /\A\s*#(?!\!).*\z/
+      STANDALONE_BASH_COMMENT_LINE_RE = /\A\s*#(?!!).*\z/
       private_constant :STANDALONE_BASH_COMMENT_LINE_RE
 
       def collapse_cross_source_preamble_prefixes!(emitter)
@@ -426,23 +423,23 @@ module Bash
         should_heal = ::Ast::Merge::Healer.handle(
           mode: @corruption_handling,
           kind: :duplicate_template_preamble_prefix,
-          message: "merged Bash preamble begins with duplicated template-owned comment lines",
-          prefix: "[bash-merge]",
+          message: 'merged Bash preamble begins with duplicated template-owned comment lines',
+          prefix: '[bash-merge]',
           error_class: Bash::Merge::CorruptionDetectedError,
           warner: lambda { |formatted|
             DebugLogger.debug_warning(formatted, {
-              template_comment_lines: template_comments.length,
-              merged_comment_lines: merged_comments.length,
-              destination_specific_comment_lines: destination_specific_comments.length,
-            })
-          },
+                                        template_comment_lines: template_comments.length,
+                                        merged_comment_lines: merged_comments.length,
+                                        destination_specific_comment_lines: destination_specific_comments.length
+                                      })
+          }
         )
         return emitter unless should_heal
 
         destination_specific_entries = leading_entries.reject { |entry| template_comments.include?(entry[:line]) }
         trimmed_remainder_entries = remainder_entries.drop_while { |entry| entry[:line].strip.empty? }
         rebuilt_entries = destination_specific_entries.dup
-        rebuilt_entries << {line: "", metadata: {}} if rebuilt_entries.any? && trimmed_remainder_entries.any?
+        rebuilt_entries << { line: '', metadata: {} } if rebuilt_entries.any? && trimmed_remainder_entries.any?
         rebuilt_entries.concat(trimmed_remainder_entries)
 
         emitter.lines.replace(rebuilt_entries.map { |entry| entry[:line] })
@@ -474,7 +471,7 @@ module Bash
 
       def leading_standalone_comment_entries(emitter)
         entries = emitter.lines.each_with_index.map do |line, idx|
-          {line: line.to_s, metadata: emitter.line_metadata[idx].to_h}
+          { line: line.to_s, metadata: emitter.line_metadata[idx].to_h }
         end
 
         leading_entries = []
@@ -508,7 +505,7 @@ module Bash
 
       def preferred_root_boundary_analysis
         pref = @preference.is_a?(Hash) ? (@preference[:default] || :destination) : @preference
-        (pref == :template) ? @template_analysis : @dest_analysis
+        pref == :template ? @template_analysis : @dest_analysis
       end
 
       def root_boundary_analysis_candidates
@@ -522,7 +519,9 @@ module Bash
 
       def root_boundary_lines_for(kind, analysis)
         return [] unless analysis&.respond_to?(:statements)
-        return analysis.lines.dup if kind == :preamble && Array(analysis.statements).empty? && analysis.respond_to?(:lines) && analysis.lines.any?
+        if kind == :preamble && Array(analysis.statements).empty? && analysis.respond_to?(:lines) && analysis.lines.any?
+          return analysis.lines.dup
+        end
 
         statements = Array(analysis.statements).select do |statement|
           statement.respond_to?(:start_line) && statement.respond_to?(:end_line) && statement.start_line && statement.end_line
@@ -553,15 +552,13 @@ module Bash
         attachment = analysis.comment_attachment_for(node)
         leading_region = attachment&.leading_region
         start_line = if leading_region&.respond_to?(:start_line) && leading_region.start_line
-          leading_region.start_line
-        else
-          leading_comments = analysis.comment_tracker.leading_comments_before(node.start_line)
-          leading_comments.first&.fetch(:line, nil) || node.start_line
-        end
+                       leading_region.start_line
+                     else
+                       leading_comments = analysis.comment_tracker.leading_comments_before(node.start_line)
+                       leading_comments.first&.fetch(:line, nil) || node.start_line
+                     end
 
-        while start_line > 1 && analysis.line_at(start_line - 1)&.strip == ""
-          start_line -= 1
-        end
+        start_line -= 1 while start_line > 1 && analysis.line_at(start_line - 1)&.strip == ''
 
         start_line
       end
@@ -581,7 +578,7 @@ module Bash
             @template_analysis,
             comment_source_node: comment_source_node,
             comment_source_analysis: comment_source_analysis,
-            inline_comment: inline_comment,
+            inline_comment: inline_comment
           )
         end
       end
@@ -693,7 +690,7 @@ module Bash
         raw_line = analysis.line_at(node.start_line)
         return unless raw_line
 
-        "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, "")}"
+        "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, '')}"
       end
 
       # Determine preference for a matched pair, respecting per-type overrides.
@@ -732,7 +729,7 @@ module Bash
           template_text: template_text,
           destination_text: dest_text,
           provisional_winner: provisional_winner,
-          case_prefix: "bash",
+          case_prefix: 'bash',
           case_parts: [dest_node.type, identifier],
           surface_path: surface_path,
           metadata: {
@@ -744,13 +741,13 @@ module Bash
               provisional_winner: provisional_winner,
               surface_path: surface_path,
               node_type: dest_node.type,
-              identifier: identifier,
-            ),
+              identifier: identifier
+            )
           },
           conflict_fields: {
             node_type: dest_node.type,
-            identifier: identifier,
-          },
+            identifier: identifier
+          }
         )
       end
 
@@ -758,35 +755,36 @@ module Bash
         unresolved_identifier_for_nodes(
           dest_node,
           template_node,
-          methods: %i[function_name variable_name command_name],
+          methods: %i[function_name variable_name command_name]
         )
       end
 
       def resolution_surface_path(template_node, dest_node)
         identifier = resolution_identifier(template_node, dest_node)
         unresolved_surface_path_for(
-          unresolved_typed_path_segment(dest_node.type, identifier: identifier, node: dest_node, fallback: nil),
+          unresolved_typed_path_segment(dest_node.type, identifier: identifier, node: dest_node, fallback: nil)
         )
       end
 
       # Emit a single node (with its leading comments) to an emitter.
-      def emit_node_to(emitter, node, analysis, comment_source_node: node, comment_source_analysis: analysis, inline_comment: nil)
+      def emit_node_to(emitter, node, analysis, comment_source_node: node, comment_source_analysis: analysis,
+                       inline_comment: nil)
         # Emit the node content
-        if node.start_line && node.end_line
-          emit_leading_segment_to(emitter, comment_source_node, comment_source_analysis)
-          lines = (node.start_line..node.end_line).filter_map { |ln| analysis.line_at(ln) }
-          emitter.emit_raw_lines(
-            apply_inline_comment(lines, inline_comment),
-            metadata: emitter_block_metadata(analysis, node.start_line),
-          )
-        end
+        return unless node.start_line && node.end_line
+
+        emit_leading_segment_to(emitter, comment_source_node, comment_source_analysis)
+        lines = (node.start_line..node.end_line).filter_map { |ln| analysis.line_at(ln) }
+        emitter.emit_raw_lines(
+          apply_inline_comment(lines, inline_comment),
+          metadata: emitter_block_metadata(analysis, node.start_line)
+        )
       end
 
       def apply_inline_comment(lines, inline_comment)
         return lines if inline_comment.nil? || lines.empty?
 
         updated_lines = lines.dup
-        updated_lines[-1] = "#{updated_lines[-1].rstrip} #{inline_comment[:raw].sub(/\A\s+/, "")}"
+        updated_lines[-1] = "#{updated_lines[-1].rstrip} #{inline_comment[:raw].sub(/\A\s+/, '')}"
         updated_lines
       end
 

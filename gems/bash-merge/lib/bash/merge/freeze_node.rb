@@ -88,13 +88,13 @@ module Bash
       def validate_structure!
         validate_line_order!
 
-        if @lines.empty? || @lines.all?(&:nil?)
-          raise InvalidStructureError.new(
-            "Freeze block is empty",
-            start_line: @start_line,
-            end_line: @end_line,
-          )
-        end
+        return unless @lines.empty? || @lines.all?(&:nil?)
+
+        raise InvalidStructureError.new(
+          'Freeze block is empty',
+          start_line: @start_line,
+          end_line: @end_line
+        )
       end
     end
   end
