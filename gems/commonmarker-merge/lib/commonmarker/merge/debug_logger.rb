@@ -18,8 +18,8 @@ module Commonmarker
     module DebugLogger
       Markdown::Merge::WrapperSupport.configure_debug_logger!(
         debug_logger_module: self,
-        env_var_name: "COMMONMARKER_MERGE_DEBUG",
-        log_prefix: "[commonmarker-merge]",
+        env_var_name: 'COMMONMARKER_MERGE_DEBUG',
+        log_prefix: '[commonmarker-merge]'
       )
     end
   end

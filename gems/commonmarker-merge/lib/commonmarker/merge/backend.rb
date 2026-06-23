@@ -20,8 +20,8 @@ module Commonmarker
       Markdown::Merge::BackendSupport.install!(
         backend_module: self,
         backend_name: :commonmarker,
-        gem_name: "commonmarker",
-        require_path: "commonmarker/merge",
+        gem_name: 'commonmarker',
+        require_path: 'commonmarker/merge'
       )
 
       # Commonmarker language wrapper
@@ -60,7 +60,7 @@ module Commonmarker
 
         Markdown::Merge::BackendSupport.configure_markdown_only_language_class!(
           self,
-          backend_label: "Commonmarker",
+          backend_label: 'Commonmarker'
         )
       end
 
@@ -71,8 +71,9 @@ module Commonmarker
         # @param source [String] Markdown source to parse
         # @return [Tree] Parsed tree
         def parse(source)
-          raise "Language not set" unless language
-          Backend.available? or raise "Commonmarker not available"
+          raise 'Language not set' unless language
+
+          Backend.available? or raise 'Commonmarker not available'
 
           opts = language.options || {}
           doc = ::Commonmarker.parse(source, options: opts)
@@ -87,12 +88,12 @@ module Commonmarker
         Markdown::Merge::BackendSupport.configure_node_link_and_navigation!(
           self,
           next_sibling_selector: :next_sibling,
-          prev_sibling_selector: :previous_sibling,
+          prev_sibling_selector: :previous_sibling
         )
         Markdown::Merge::BackendSupport.configure_node_heading_and_code_block_helpers!(
           self,
-          heading_matcher: ->(node) { node.type == "heading" },
-          code_block_matcher: ->(node) { node.type == "code_block" },
+          heading_matcher: ->(node) { node.type == 'heading' },
+          code_block_matcher: ->(node) { node.type == 'code_block' }
         )
 
         # Get the node type as a string
@@ -103,7 +104,7 @@ module Commonmarker
         end
 
         # Alias for TreeHaver compatibility
-        alias_method :kind, :type
+        alias kind type
 
         # Get the text content of this node
         #
@@ -149,10 +150,8 @@ module Commonmarker
           if inner_node.respond_to?(:source_position)
             begin
               pos = inner_node.source_position
-              if pos && pos[:start_line]
-                return Point.new(pos[:start_line] - 1, (pos[:start_column] || 1) - 1)
-              end
-            rescue
+              return Point.new(pos[:start_line] - 1, (pos[:start_column] || 1) - 1) if pos && pos[:start_line]
+            rescue StandardError
               nil
             end
           end
@@ -161,7 +160,7 @@ module Commonmarker
           begin
             pos = inner_node.sourcepos
             return Point.new(pos[0] - 1, pos[1] - 1) if pos
-          rescue
+          rescue StandardError
             nil
           end
 
@@ -174,10 +173,8 @@ module Commonmarker
           if inner_node.respond_to?(:source_position)
             begin
               pos = inner_node.source_position
-              if pos && pos[:end_line]
-                return Point.new(pos[:end_line] - 1, (pos[:end_column] || 1) - 1)
-              end
-            rescue
+              return Point.new(pos[:end_line] - 1, (pos[:end_column] || 1) - 1) if pos && pos[:end_line]
+            rescue StandardError
               nil
             end
           end
@@ -185,7 +182,7 @@ module Commonmarker
           begin
             pos = inner_node.sourcepos
             return Point.new(pos[2] - 1, pos[3] - 1) if pos
-          rescue
+          rescue StandardError
             nil
           end
 

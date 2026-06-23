@@ -49,7 +49,7 @@ module Commonmarker
         default_inner_merge_code_blocks: -> { DEFAULT_INNER_MERGE_CODE_BLOCKS },
         file_analysis_class: -> { FileAnalysis },
         template_parse_error_class: -> { TemplateParseError },
-        destination_parse_error_class: -> { DestinationParseError },
+        destination_parse_error_class: -> { DestinationParseError }
       )
     end
   end

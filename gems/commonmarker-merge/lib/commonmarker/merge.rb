@@ -1,25 +1,25 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "markdown-merge"
-require "commonmarker"
+require 'markdown-merge'
+require 'commonmarker'
 
 module Commonmarker
   module Merge
     extend self
 
-    PACKAGE_NAME = "commonmarker-merge"
-    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: "commonmarker", family: "native").freeze
+    PACKAGE_NAME = 'commonmarker-merge'
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'commonmarker', family: 'native').freeze
     TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
     Markdown::Merge::WrapperSupport.install!(
       wrapper_module: self,
-      require_prefix: "commonmarker/merge",
-      default_freeze_token: "commonmarker-merge",
+      require_prefix: 'commonmarker/merge',
+      default_freeze_token: 'commonmarker-merge',
       default_inner_merge_code_blocks: false,
       registry_tag: :commonmarker_merge,
-      merger_class: "Commonmarker::Merge::SmartMerger",
+      merger_class: 'Commonmarker::Merge::SmartMerger'
     )
 
     def markdown_feature_profile
@@ -32,7 +32,9 @@ module Commonmarker
 
     def markdown_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       markdown_feature_profile.merge(backend: BACKEND_REFERENCE.id, backend_ref: BACKEND_REFERENCE.to_h)
     end
@@ -53,7 +55,9 @@ module Commonmarker
 
     def parse_markdown(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       ::Commonmarker.parse(source)
       normalized = Markdown::Merge.normalize_source(source)
@@ -61,10 +65,10 @@ module Commonmarker
         ok: true,
         diagnostics: [],
         analysis: {
-          kind: "markdown",
+          kind: 'markdown',
           dialect: dialect,
           normalized_source: normalized,
-          root_kind: "document",
+          root_kind: 'document',
           owners: Markdown::Merge.collect_markdown_owners(normalized)
         },
         policies: []
@@ -72,7 +76,7 @@ module Commonmarker
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "parse_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
         policies: []
       }
     end
@@ -83,7 +87,9 @@ module Commonmarker
 
     def merge_markdown(template_source, destination_source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       template = parse_markdown(template_source, dialect, backend: backend)
       return template unless template[:ok]
@@ -101,9 +107,9 @@ module Commonmarker
       )
       destination_paths = destination_sections.to_h { |section| [section[:path], true] }
       merged_sections = destination_sections.map { |section| section[:text] }.reject(&:empty?) +
-        template_sections
-          .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
-          .map { |section| section[:text] }
+                        template_sections
+                        .reject { |section| destination_paths[section[:path]] || section[:text].empty? }
+                        .map { |section| section[:text] }
 
       {
         ok: true,
@@ -113,9 +119,12 @@ module Commonmarker
       }
     end
 
-    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
+                                                    applied_children, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs(
         template_source,
@@ -126,9 +135,12 @@ module Commonmarker
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
+                                                                       replay_bundle, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
@@ -138,9 +150,12 @@ module Commonmarker
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source,
+                                                                                dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_replay_bundle_envelope(
         template_source,
@@ -150,9 +165,12 @@ module Commonmarker
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect,
+                                                                      review_state, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state(
         template_source,
@@ -162,9 +180,12 @@ module Commonmarker
       )
     end
 
-    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source,
+                                                                               dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Markdown backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
+      end
 
       Markdown::Merge.merge_markdown_with_reviewed_nested_outputs_from_review_state_envelope(
         template_source,
@@ -181,7 +202,7 @@ module Commonmarker
     def unsupported_feature_result(message)
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }],
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
         policies: []
       }
     end

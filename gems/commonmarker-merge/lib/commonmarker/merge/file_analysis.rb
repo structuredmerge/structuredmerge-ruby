@@ -22,11 +22,11 @@ module Commonmarker
     class FileAnalysis < Markdown::Merge::FileAnalysis
       # Default freeze token for commonmarker-merge
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "commonmarker-merge"
+      DEFAULT_FREEZE_TOKEN = 'commonmarker-merge'
 
       Markdown::Merge::WrapperSupport.configure_file_analysis_subclass!(
         self,
-        default_backend: :commonmarker,
+        default_backend: :commonmarker
       )
     end
   end

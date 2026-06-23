@@ -13,7 +13,7 @@ module Commonmarker
         self,
         default_backend: :commonmarker,
         file_analysis_class: -> { FileAnalysis },
-        smart_merger_class: -> { SmartMerger },
+        smart_merger_class: -> { SmartMerger }
       )
     end
   end
