@@ -7489,22 +7489,48 @@ module Kettle
       return content unless readme_config.is_a?(Hash)
 
       configured_specs = normalized_readme_logo_specs(readme_config["top_logos"] || readme_config["top_logo_options"])
+      legacy_mode_migrated = configured_specs.empty?
+      if legacy_mode_migrated
+        legacy_options = legacy_readme_top_logo_mode_options(readme_config["top_logo_mode"])
+        configured_specs = legacy_options.map { |option| {type: option, width: nil} }
+      end
       configured = configured_specs.map { |spec| spec.fetch(:type) }
       return content if configured.empty?
 
       top_logo_specs = configured_specs.select { |spec| README_TOP_LOGO_DEFAULTS.include?(spec.fetch(:type)) }
       h2_synopsis_logo_specs = normalized_readme_logo_specs(readme_config["h2_synopsis_logos"])
       h2_synopsis_logo_specs = configured_specs.select { |spec| README_H2_SYNOPSIS_LOGO_DEFAULTS.include?(spec.fetch(:type)) } if h2_synopsis_logo_specs.empty?
+      if legacy_mode_migrated && h2_synopsis_logo_specs.empty?
+        h2_synopsis_logo_specs = README_H2_SYNOPSIS_LOGO_DEFAULTS.map { |option| {type: option, width: nil} }
+      end
       top_logos = top_logo_specs.map { |spec| readme_logo_config_value(spec) }
       h2_synopsis_logos = h2_synopsis_logo_specs.map { |spec| readme_logo_config_value(spec) }
       return content if h2_synopsis_logos.empty? && top_logos == configured
 
-      migrated = replace_yaml_scalar_path(content, %w[readme top_logos], top_logos.join(","))
+      migrated = if readme_config.key?("top_logos")
+        replace_yaml_scalar_path(content, %w[readme top_logos], top_logos.join(","))
+      else
+        insert_yaml_scalar_after_path(content, %w[readme], "top_logos", top_logos.join(","))
+      end
       return replace_yaml_scalar_path(migrated, %w[readme h2_synopsis_logos], h2_synopsis_logos.join(",")) if readme_config.key?("h2_synopsis_logos")
 
       insert_yaml_scalar_after_path(migrated, %w[readme top_logos], "h2_synopsis_logos", h2_synopsis_logos.join(","))
     rescue Psych::Exception
       content
+    end
+
+    def legacy_readme_top_logo_mode_options(value)
+      raw = value.to_s.strip
+      return [] if raw.empty?
+
+      normalized = raw.downcase.tr("-", "_").gsub(/\s*,\s*/, ",").tr(" ", "_")
+      mapped = README_TOP_LOGO_LEGACY_MODE_MAP[normalized]
+      return mapped if mapped
+
+      normalized.split(",").filter_map do |option|
+        option = option.strip
+        README_TOP_LOGO_OPTIONS.include?(option) ? option : nil
+      end
     end
 
     def readme_logo_config_value(spec)
@@ -7547,12 +7573,19 @@ module Kettle
 
     def insert_yaml_scalar_after_path(content, path, key, value)
       lines = content.to_s.lines
-      entry = yaml_scalar_path_entries(content).find { |candidate| candidate.fetch(:path) == path }
+      scalar_entry = yaml_scalar_path_entries(content).find { |candidate| candidate.fetch(:path) == path }
+      mapping_entry = yaml_mapping_path_entries(content).find { |candidate| candidate.fetch(:path) == path }
+      entry = scalar_entry || mapping_entry
       return content unless entry
 
-      line_index = entry.fetch(:line)
+      line_index = entry.key?(:line) ? entry.fetch(:line) : entry.fetch(:start_line)
       indent = lines[line_index].to_s[/\A\s*/].to_s
-      lines.insert(line_index + 1, "#{indent}#{key}: #{yaml_config_scalar_literal(value, path: path[0...-1] + [key])}\n")
+      scalar_path = path[0...-1] + [key]
+      if mapping_entry && !scalar_entry
+        indent = "#{indent}  "
+        scalar_path = path + [key]
+      end
+      lines.insert(line_index + 1, "#{indent}#{key}: #{yaml_config_scalar_literal(value, path: scalar_path)}\n")
       lines.join
     end
 

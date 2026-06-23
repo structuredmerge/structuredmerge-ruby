@@ -137,13 +137,20 @@ rubygems:
 #       - "8.0"
 #     gemfile_pattern: "ar-{version}.x"
 
-# README top logo mode.
-# Controls whether the generated README header includes the GitHub org logo,
-# the project logo, or both after the shared Galtzo and ruby-lang logos.
-# Supported values: org, project, org_and_project
-# Default (when key is absent): org_and_project
+# README top logos.
+# Comma-separated list of optional logo entries for the generated README header.
+# top_logos render above the title; h2_synopsis_logos render inline with the Synopsis H2.
+# Supported values: related-org, ruby, org, project, optionally followed by |width.
+# Examples: org|12%, ruby|96px
+# Default widths: top 1 logo => 14%, top 2 logos => 12%, Synopsis 1 logo => 10%, Synopsis 2 logos => 8%.
+# Default (when keys are absent): top_logos: org,project; h2_synopsis_logos: related-org,ruby
+# Legacy top_logo_mode values map as:
+#   org => related-org,ruby,org
+#   project => related-org,ruby,project
+#   org_and_project => related-org,ruby,org,project
 readme:
-  top_logo_mode: org
+  top_logos: "org"
+  h2_synopsis_logos: "related-org,ruby"
   # Sections to preserve from the destination README during template merging.
   # These section headings (case-insensitive) will keep the destination body
   # instead of being overwritten by the template. Default when absent:

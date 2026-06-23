@@ -10983,6 +10983,34 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "migrates legacy-only README top logo mode config" do
+    content = <<~YAML
+      readme:
+        top_logo_mode: org
+    YAML
+
+    migrated = described_class.send(:sync_kettle_config_env_overrides, content, {})
+    config = YAML.safe_load(migrated)
+
+    expect(config.dig("readme", "top_logos")).to eq("org")
+    expect(config.dig("readme", "h2_synopsis_logos")).to eq("related-org,ruby")
+    expect(config.fetch("readme")).not_to have_key("top_logo_mode")
+  end
+
+  it "migrates comma-separated legacy README top logo mode config" do
+    content = <<~YAML
+      readme:
+        top_logo_mode: org, project
+    YAML
+
+    migrated = described_class.send(:sync_kettle_config_env_overrides, content, {})
+    config = YAML.safe_load(migrated)
+
+    expect(config.dig("readme", "top_logos")).to eq("org,project")
+    expect(config.dig("readme", "h2_synopsis_logos")).to eq("related-org,ruby")
+    expect(config.fetch("readme")).not_to have_key("top_logo_mode")
+  end
+
   it "preserves explicit kettle config values while refreshing the config template" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
