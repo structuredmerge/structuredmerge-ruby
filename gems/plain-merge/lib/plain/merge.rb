@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "tree_haver"
+require 'tree_haver'
 
 module Plain
   module Merge
-    PACKAGE_NAME = "plain-merge"
+    PACKAGE_NAME = 'plain-merge'
     DEFAULT_TEXT_REFINEMENT_THRESHOLD = 0.7
     DEFAULT_TEXT_REFINEMENT_WEIGHTS = {
       content: 0.7,
@@ -19,14 +19,14 @@ module Plain
 
     def text_feature_profile
       {
-        family: "text",
+        family: 'text',
         supported_dialects: [],
         supported_policies: []
       }
     end
 
     def text_parse_request(source)
-      TreeHaver::ParserRequest.new(source: source, language: "text")
+      TreeHaver::ParserRequest.new(source: source, language: 'text')
     end
 
     def normalize_text(source)
@@ -34,7 +34,7 @@ module Plain
         .gsub(/\r\n?/, "\n")
         .strip
         .split(/\n\s*\n+/)
-        .map { |block| block.strip.gsub(/\s+/, " ") }
+        .map { |block| block.strip.gsub(/\s+/, ' ') }
         .reject(&:empty?)
         .join("\n\n")
     end
@@ -60,7 +60,7 @@ module Plain
       end
 
       {
-        kind: "text",
+        kind: 'text',
         normalized_source: normalized_source,
         blocks: blocks
       }
@@ -111,7 +111,7 @@ module Plain
         matched << {
           template_index: template_index,
           destination_index: destination_index,
-          phase: "exact",
+          phase: 'exact',
           score: 1.0
         }
       end
@@ -143,7 +143,7 @@ module Plain
         matched << {
           template_index: best_template_index,
           destination_index: destination_index,
-          phase: "refined",
+          phase: 'refined',
           score: best_score
         }
       end
@@ -175,7 +175,8 @@ module Plain
       }
     end
 
-    def refined_text_similarity(template_block, destination_block, template_total, destination_total, weights = DEFAULT_TEXT_REFINEMENT_WEIGHTS)
+    def refined_text_similarity(template_block, destination_block, template_total, destination_total,
+                                weights = DEFAULT_TEXT_REFINEMENT_WEIGHTS)
       content = string_similarity(template_block[:normalized], destination_block[:normalized])
       length = length_similarity(template_block[:normalized], destination_block[:normalized])
       position = position_similarity(
@@ -242,6 +243,7 @@ module Plain
 
     def length_similarity(left, right)
       return 1.0 if left.length == right.length
+
       max_length = [left.length, right.length].max
       return 1.0 if max_length.zero?
 

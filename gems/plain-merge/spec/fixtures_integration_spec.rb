@@ -2,7 +2,7 @@
 
 RSpec.describe Plain::Merge do
   def fixtures_root
-    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
 
   def read_json(path)
@@ -10,16 +10,16 @@ RSpec.describe Plain::Merge do
   end
 
   def manifest
-    @manifest ||= read_json(fixtures_root.join("conformance", "slice-24-manifest", "family-feature-profiles.json"))
+    @manifest ||= read_json(fixtures_root.join('conformance', 'slice-24-manifest', 'family-feature-profiles.json'))
   end
 
   def family_profile_fixture
-    path = Ast::Merge.conformance_family_feature_profile_path(manifest, "text")
+    path = Ast::Merge.conformance_family_feature_profile_path(manifest, 'text')
     read_json(fixtures_root.join(*path))
   end
 
   def text_fixture(role)
-    path = Ast::Merge.conformance_fixture_path(manifest, "text", role)
+    path = Ast::Merge.conformance_fixture_path(manifest, 'text', role)
     raise "missing text fixture for #{role}" unless path
 
     read_json(fixtures_root.join(*path))
@@ -29,8 +29,8 @@ RSpec.describe Plain::Merge do
     Ast::Merge.json_ready(value)
   end
 
-  it "conforms to the slice-03 analysis fixture" do
-    fixture = text_fixture("analysis")
+  it 'conforms to the slice-03 analysis fixture' do
+    fixture = text_fixture('analysis')
     analysis = described_class.analyze_text(fixture[:source])
 
     expect(analysis[:normalized_source]).to eq(fixture.dig(:expected, :normalized_source))
@@ -39,8 +39,8 @@ RSpec.describe Plain::Merge do
     ).to eq(json_ready(fixture.dig(:expected, :blocks)))
   end
 
-  it "conforms to the slice-11 exact matching fixture" do
-    fixture = text_fixture("matching_exact")
+  it 'conforms to the slice-11 exact matching fixture' do
+    fixture = text_fixture('matching_exact')
     result = described_class.match_text_blocks(fixture[:template], fixture[:destination])
 
     expect(
@@ -50,8 +50,8 @@ RSpec.describe Plain::Merge do
     expect(json_ready(result[:unmatched_destination])).to eq(json_ready(fixture.dig(:expected, :unmatched_destination)))
   end
 
-  it "conforms to the slice-05 similarity fixture" do
-    fixture = text_fixture("similarity")
+  it 'conforms to the slice-05 similarity fixture' do
+    fixture = text_fixture('similarity')
 
     fixture[:cases].each do |test_case|
       expect(described_class.similarity_score(test_case[:left], test_case[:right])).to eq(test_case[:expected_score])
@@ -67,8 +67,8 @@ RSpec.describe Plain::Merge do
     end
   end
 
-  it "conforms to the slice-13 refined matching fixture" do
-    fixture = text_fixture("merge_refined")
+  it 'conforms to the slice-13 refined matching fixture' do
+    fixture = text_fixture('merge_refined')
     result = described_class.match_text_blocks(fixture[:template], fixture[:destination])
 
     expect(
@@ -91,7 +91,7 @@ RSpec.describe Plain::Merge do
     expect(merged[:output]).to eq(fixture.dig(:expected, :output))
   end
 
-  it "conforms to the shared text family feature profile fixture" do
+  it 'conforms to the shared text family feature profile fixture' do
     expect(json_ready(described_class.text_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
   end
 end
