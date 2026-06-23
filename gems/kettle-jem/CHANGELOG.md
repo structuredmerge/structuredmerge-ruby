@@ -53,6 +53,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Gemfiles now activate the Bundler-locked `nomono` before loading
   `nomono/bundler`, avoiding global gem activation conflicts during
   templating.
+- Generated style Gemfiles now skip released RuboCop-LTS gems that were already
+  declared by earlier Gemfile evaluation, avoiding duplicate path/version
+  declarations during templating.
 - Gem templates now require `appraisal2` >= 3.1.3.
 - Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.2.
 - Generated main Gemfiles now require `nomono` >= 1.0.6.
