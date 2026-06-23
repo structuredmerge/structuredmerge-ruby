@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "tree_haver"
+require 'tree_haver'
 
 module Binary
   module Merge
-    PACKAGE_NAME = "binary-merge"
+    PACKAGE_NAME = 'binary-merge'
 
     module_function
 
     def binary_feature_profile
       {
-        family: "binary",
+        family: 'binary',
         supported_dialects: [],
         supported_policies: []
       }
@@ -29,9 +29,9 @@ module Binary
       )
     end
 
-    def unsafe_diagnostic(schema_path:, byte_range:, message:, category: "unsafe_binary_mutation")
+    def unsafe_diagnostic(schema_path:, byte_range:, message:, category: 'unsafe_binary_mutation')
       TreeHaver::BinaryDiagnostic.new(
-        severity: "error",
+        severity: 'error',
         category: category,
         message: message,
         schema_path: schema_path,
