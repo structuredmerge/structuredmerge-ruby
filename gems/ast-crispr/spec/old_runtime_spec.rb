@@ -12,7 +12,7 @@ RSpec.describe Ast::Crispr do
     end
 
     def read_ast(_document)
-      {owners: @owners, comments: @comments}
+      { owners: @owners, comments: @comments }
     end
 
     def structural_owners(document, owner_scope: :shared_default)
@@ -30,9 +30,9 @@ RSpec.describe Ast::Crispr do
     def structure_profile(owner_scope: :shared_default)
       Ast::Crispr::StructureProfile.new(
         owner_scope: owner_scope,
-        owner_selector: ((owner_scope == :shared_default) ? :line_bound_statements : owner_scope),
+        owner_selector: (owner_scope == :shared_default ? :line_bound_statements : owner_scope),
         supported_comment_regions: [:leading],
-        metadata: {adapter: :fake},
+        metadata: { adapter: :fake }
       )
     end
   end
@@ -41,62 +41,64 @@ RSpec.describe Ast::Crispr do
     [
       FakeOwner.new(location: FakeLocation.new(start_line: 1, end_line: 3), key: :managed_one),
       FakeOwner.new(location: FakeLocation.new(start_line: 5, end_line: 6), key: :managed_two),
-      FakeOwner.new(location: FakeLocation.new(start_line: 8, end_line: 9), key: :stable),
+      FakeOwner.new(location: FakeLocation.new(start_line: 8, end_line: 9), key: :stable)
     ]
   end
   let(:comments) do
     {
-      managed_one: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 1, end_line: 1), text: "### MANAGED SNIPPET")],
-      managed_two: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 5, end_line: 5), text: "### MANAGED SNIPPET")],
-      stable: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 8, end_line: 8), text: "### STABLE")],
+      managed_one: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 1, end_line: 1),
+                                          text: '### MANAGED SNIPPET')],
+      managed_two: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 5, end_line: 5),
+                                          text: '### MANAGED SNIPPET')],
+      stable: [FakeCommentRegion.new(location: FakeLocation.new(start_line: 8, end_line: 8), text: '### STABLE')]
     }
   end
   let(:adapter) { FakeAdapter.new(owners: owners, comments: comments) }
 
-  it "has a version number" do
+  it 'has a version number' do
     expect(Ast::Crispr::VERSION).not_to be_nil
   end
 
   describe described_class::Limit do
-    it "normalizes operator-string arrays into a cardinality predicate" do
-      limit = described_class.new([">= 1", "<= 3"])
+    it 'normalizes operator-string arrays into a cardinality predicate' do
+      limit = described_class.new(['>= 1', '<= 3'])
 
       expect(limit.allows?(0)).to be(false)
       expect(limit.allows?(2)).to be(true)
       expect(limit.allows?(4)).to be(false)
-      expect(limit.describe).to eq(">= 1 and <= 3")
+      expect(limit.describe).to eq('>= 1 and <= 3')
     end
   end
 
   describe described_class::Selectors do
-    it "surfaces adapter structure-profile metadata through the selector" do
+    it 'surfaces adapter structure-profile metadata through the selector' do
       content = <<~TEXT
         ### MANAGED SNIPPET
         puts "one"
       TEXT
 
       target = described_class.owner_filter(
-        id: "managed",
-        adapter: adapter,
+        id: 'managed',
+        adapter: adapter
       ) { |_context, owner| owner.key == :managed_one }
 
-      context = Ast::Crispr::DocumentContext.new(content: content, source_label: "snippet.rb", adapter: adapter)
+      context = Ast::Crispr::DocumentContext.new(content: content, source_label: 'snippet.rb', adapter: adapter)
       profile = target.structure_profile(context)
 
       expect(target.owner_scope).to eq(:shared_default)
       expect(profile.supports_comment_region?(:leading)).to be(true)
     end
 
-    context "with an owner-filter selection profile" do
+    context 'with an owner-filter selection profile' do
       let(:content) { "### MANAGED SNIPPET\nputs \"one\"\n" }
       let(:target) do
         described_class.owner_filter(
-          id: "managed",
+          id: 'managed',
           adapter: adapter,
-          include_trailing_gap: true,
+          include_trailing_gap: true
         ) { |_context, owner| owner.key == :managed_one }
       end
-      let(:context) { Ast::Crispr::DocumentContext.new(content: content, source_label: "snippet.rb", adapter: adapter) }
+      let(:context) { Ast::Crispr::DocumentContext.new(content: content, source_label: 'snippet.rb', adapter: adapter) }
       let(:selection_profile) { target.selection_profile(context) }
       let(:expected_selection_owner_scope) { :shared_default }
       let(:expected_selection_owner_selector) { :line_bound_statements }
@@ -109,19 +111,19 @@ RSpec.describe Ast::Crispr do
       let(:expected_include_trailing_gap) { true }
       let(:expected_comment_anchored) { false }
 
-      it_behaves_like "Ast::Crispr::SelectionProfile contract"
+      it_behaves_like 'Ast::Crispr::SelectionProfile contract'
     end
 
-    context "with an owner-filter match profile" do
+    context 'with an owner-filter match profile' do
       let(:content) { "### MANAGED SNIPPET\nputs \"one\"\n\n" }
       let(:target) do
         described_class.owner_filter(
-          id: "managed",
+          id: 'managed',
           adapter: adapter,
-          include_trailing_gap: true,
+          include_trailing_gap: true
         ) { |_context, owner| owner.key == :managed_one }
       end
-      let(:context) { Ast::Crispr::DocumentContext.new(content: content, source_label: "snippet.rb", adapter: adapter) }
+      let(:context) { Ast::Crispr::DocumentContext.new(content: content, source_label: 'snippet.rb', adapter: adapter) }
       let(:match_profile) { target.locate_matches(context).first.match_profile }
       let(:expected_start_boundary) { :owner_start }
       let(:expected_start_boundary_family) { :structural_owner }
@@ -135,28 +137,28 @@ RSpec.describe Ast::Crispr do
       let(:expected_match_comment_anchored) { false }
       let(:expected_trailing_gap_extended) { true }
 
-      it_behaves_like "Ast::Crispr::MatchProfile contract"
+      it_behaves_like 'Ast::Crispr::MatchProfile contract'
     end
 
-    it "finds a structurally owned span via owner_filter" do
+    it 'finds a structurally owned span via owner_filter' do
       content = <<~TEXT
         ### MANAGED SNIPPET
         puts "one"
-        
+
         ### MANAGED SNIPPET
         puts "two"
         puts "still managed"
-        
+
         ### STABLE
         puts "stable"
       TEXT
 
       target = described_class.owner_filter(
-        id: "stable-owner",
-        adapter: adapter,
+        id: 'stable-owner',
+        adapter: adapter
       ) { |_context, owner| owner.key == :stable }
 
-      context = Ast::Crispr::DocumentContext.new(content: content, source_label: "snippet.rb", adapter: adapter)
+      context = Ast::Crispr::DocumentContext.new(content: content, source_label: 'snippet.rb', adapter: adapter)
       matches = target.locate_matches(context)
 
       expect(matches.size).to eq(1)
@@ -164,25 +166,25 @@ RSpec.describe Ast::Crispr do
       expect(matches.first.end_line).to eq(9)
     end
 
-    it "finds the comment-region-owned structural owner span" do
+    it 'finds the comment-region-owned structural owner span' do
       content = <<~TEXT
         ### MANAGED SNIPPET
         puts "one"
-        
+
         ### MANAGED SNIPPET
         puts "two"
         puts "still managed"
-        
+
         ### STABLE
         puts "stable"
       TEXT
 
       target = described_class.comment_region_owned_owner(
-        marker: "### STABLE",
+        marker: '### STABLE',
         adapter: adapter,
-        limit: {exactly: 1},
+        limit: { exactly: 1 }
       )
-      context = Ast::Crispr::DocumentContext.new(content: content, source_label: "snippet.rb", adapter: adapter)
+      context = Ast::Crispr::DocumentContext.new(content: content, source_label: 'snippet.rb', adapter: adapter)
       matches = target.locate_matches(context)
 
       expect(matches.size).to eq(1)
@@ -191,7 +193,7 @@ RSpec.describe Ast::Crispr do
       expect(matches.first.slice_from(content)).to include('puts "stable"')
     end
 
-    it "finds the outer text line block between repeated exact markers" do
+    it 'finds the outer text line block between repeated exact markers' do
       content = <<~TEXT
         # before
         # <<tool:generated>>
@@ -204,22 +206,22 @@ RSpec.describe Ast::Crispr do
       TEXT
 
       target = described_class.line_block(
-        start_line_text: "# <<tool:generated>>",
-        end_line_text: "# <</tool:generated>>",
-        limit: {exactly: 1},
+        start_line_text: '# <<tool:generated>>',
+        end_line_text: '# <</tool:generated>>',
+        limit: { exactly: 1 }
       )
-      context = Ast::Crispr::DocumentContext.new(content: content, source_label: "plain.txt")
+      context = Ast::Crispr::DocumentContext.new(content: content, source_label: 'plain.txt')
       matches = target.locate_matches(context)
 
       expect(matches.size).to eq(1)
       expect(matches.first.start_line).to eq(2)
       expect(matches.first.end_line).to eq(7)
-      expect(matches.first.slice_from(content)).to include("one")
-      expect(matches.first.slice_from(content)).to include("two")
-      expect(matches.first.slice_from(content)).not_to include("# after")
+      expect(matches.first.slice_from(content)).to include('one')
+      expect(matches.first.slice_from(content)).to include('two')
+      expect(matches.first.slice_from(content)).not_to include('# after')
     end
 
-    it "can include the blank trailing gap after a text line block" do
+    it 'can include the blank trailing gap after a text line block' do
       content = <<~TEXT
         # <<tool:generated>>
         one
@@ -229,28 +231,28 @@ RSpec.describe Ast::Crispr do
       TEXT
 
       target = described_class.line_block(
-        start_line_text: "# <<tool:generated>>",
-        end_line_text: "# <</tool:generated>>",
+        start_line_text: '# <<tool:generated>>',
+        end_line_text: '# <</tool:generated>>',
         include_trailing_gap: true,
-        limit: {exactly: 1},
+        limit: { exactly: 1 }
       )
-      context = Ast::Crispr::DocumentContext.new(content: content, source_label: "plain.txt")
+      context = Ast::Crispr::DocumentContext.new(content: content, source_label: 'plain.txt')
       match = target.locate_matches(context).first
 
       expect(match.end_line).to eq(4)
       expect(match.slice_from(content)).to end_with("\n\n")
-      expect(match.slice_from(content)).not_to include("# after")
+      expect(match.slice_from(content)).not_to include('# after')
     end
 
-    context "with a comment-region-owned selection profile" do
+    context 'with a comment-region-owned selection profile' do
       let(:target) do
         described_class.comment_region_owned_owner(
-          marker: "### STABLE",
+          marker: '### STABLE',
           adapter: adapter,
-          limit: {exactly: 1},
+          limit: { exactly: 1 }
         )
       end
-      let(:context) { Ast::Crispr::DocumentContext.new(content: "### STABLE\nputs \"stable\"\n", source_label: "snippet.rb", adapter: adapter) }
+      let(:context) { Ast::Crispr::DocumentContext.new(content: "### STABLE\nputs \"stable\"\n", source_label: 'snippet.rb', adapter: adapter) }
       let(:selection_profile) { target.selection_profile(context) }
       let(:expected_selection_owner_scope) { :shared_default }
       let(:expected_selection_owner_selector) { :line_bound_statements }
@@ -263,18 +265,18 @@ RSpec.describe Ast::Crispr do
       let(:expected_include_trailing_gap) { true }
       let(:expected_comment_anchored) { true }
 
-      it_behaves_like "Ast::Crispr::SelectionProfile contract"
+      it_behaves_like 'Ast::Crispr::SelectionProfile contract'
     end
 
-    context "with a comment-region-owned match profile" do
+    context 'with a comment-region-owned match profile' do
       let(:target) do
         described_class.comment_region_owned_owner(
-          marker: "### STABLE",
+          marker: '### STABLE',
           adapter: adapter,
-          limit: {exactly: 1},
+          limit: { exactly: 1 }
         )
       end
-      let(:context) { Ast::Crispr::DocumentContext.new(content: "### STABLE\nputs \"stable\"\n\n", source_label: "snippet.rb", adapter: adapter) }
+      let(:context) { Ast::Crispr::DocumentContext.new(content: "### STABLE\nputs \"stable\"\n\n", source_label: 'snippet.rb', adapter: adapter) }
       let(:match_profile) { target.locate_matches(context).first.match_profile }
       let(:expected_start_boundary) { :comment_region_start }
       let(:expected_start_boundary_family) { :comment_anchor }
@@ -288,12 +290,12 @@ RSpec.describe Ast::Crispr do
       let(:expected_match_comment_anchored) { true }
       let(:expected_trailing_gap_extended) { true }
 
-      it_behaves_like "Ast::Crispr::MatchProfile contract"
+      it_behaves_like 'Ast::Crispr::MatchProfile contract'
     end
   end
 
   describe described_class::DocumentContext do
-    let(:context) { described_class.new(content: "puts :ok\n", source_label: "snippet.rb", adapter: adapter) }
+    let(:context) { described_class.new(content: "puts :ok\n", source_label: 'snippet.rb', adapter: adapter) }
     let(:profile) { context.structure_profile(owner_scope: :shared_default) }
     let(:expected_owner_scope) { :shared_default }
     let(:expected_owner_selector) { :line_bound_statements }
@@ -301,14 +303,14 @@ RSpec.describe Ast::Crispr do
     let(:expected_known_owner_selector) { true }
     let(:expected_supported_comment_regions) { [:leading] }
 
-    it_behaves_like "Ast::Crispr::StructureProfile contract"
+    it_behaves_like 'Ast::Crispr::StructureProfile contract'
 
-    it "answers comment-region support" do
+    it 'answers comment-region support' do
       expect(profile.supports_comment_region?(:leading)).to be(true)
     end
   end
 
-  describe "operation profiles" do
+  describe 'operation profiles' do
     describe Ast::Crispr::Replace do
       let(:operation_profile) { described_class.operation_profile }
       let(:expected_operation_kind) { :replace }
@@ -326,7 +328,7 @@ RSpec.describe Ast::Crispr do
       let(:expected_explicit_replacement) { true }
       let(:expected_may_reuse_captured_text) { false }
 
-      it_behaves_like "Ast::Crispr::OperationProfile contract"
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
 
     describe Ast::Crispr::Delete do
@@ -346,7 +348,7 @@ RSpec.describe Ast::Crispr do
       let(:expected_explicit_replacement) { false }
       let(:expected_may_reuse_captured_text) { false }
 
-      it_behaves_like "Ast::Crispr::OperationProfile contract"
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
 
     describe Ast::Crispr::Insert do
@@ -366,7 +368,7 @@ RSpec.describe Ast::Crispr do
       let(:expected_explicit_replacement) { true }
       let(:expected_may_reuse_captured_text) { false }
 
-      it_behaves_like "Ast::Crispr::OperationProfile contract"
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
 
     describe Ast::Crispr::Move do
@@ -386,35 +388,35 @@ RSpec.describe Ast::Crispr do
       let(:expected_explicit_replacement) { false }
       let(:expected_may_reuse_captured_text) { true }
 
-      it_behaves_like "Ast::Crispr::OperationProfile contract"
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
   end
 
   describe described_class::Replace do
-    it "fails closed when target cardinality is out of bounds" do
+    it 'fails closed when target cardinality is out of bounds' do
       content = <<~TEXT
         ### MANAGED SNIPPET
         puts "one"
-        
+
         ### MANAGED SNIPPET
         puts "two"
         puts "still managed"
       TEXT
 
       target = Ast::Crispr::Selectors.comment_region_owned_owner(
-        marker: "### MANAGED SNIPPET",
-        adapter: adapter,
+        marker: '### MANAGED SNIPPET',
+        adapter: adapter
       )
       actor = described_class.result(content: content, target: target, replacement: "puts \"fresh\"\n")
 
       expect(actor.failure?).to be(true)
-      expect(actor.error).to include("matched 2 node(s); expected == 1")
+      expect(actor.error).to include('matched 2 node(s); expected == 1')
       expect(actor.operation_profile.operation_kind).to eq(:replace)
     end
   end
 
   describe described_class::Insert do
-    it "appends when configured and no destination is resolved" do
+    it 'appends when configured and no destination is resolved' do
       content = <<~RUBY
         task :default do
           puts "ok"
@@ -425,7 +427,7 @@ RSpec.describe Ast::Crispr do
         content: content,
         text: "### MANAGED SNIPPET\nputs \"managed\"\n",
         destination: nil,
-        if_missing: :append,
+        if_missing: :append
       )
 
       expect(actor.updated_content.rstrip).to end_with(<<~RUBY.rstrip)
@@ -435,13 +437,13 @@ RSpec.describe Ast::Crispr do
       expect(actor.operation_profile.supports_if_missing?).to be(true)
     end
 
-    context "with an append-fallback destination profile" do
+    context 'with an append-fallback destination profile' do
       let(:actor) do
         described_class.call(
           content: "task :default do\n  puts \"ok\"\nend\n",
           text: "### MANAGED SNIPPET\nputs \"managed\"\n",
           destination: nil,
-          if_missing: :append,
+          if_missing: :append
         )
       end
       let(:destination_profile) { actor.destination_profile }
@@ -458,7 +460,7 @@ RSpec.describe Ast::Crispr do
       let(:expected_append_fallback) { true }
       let(:expected_destination_anchored) { false }
 
-      it_behaves_like "Ast::Crispr::DestinationProfile contract"
+      it_behaves_like 'Ast::Crispr::DestinationProfile contract'
     end
   end
 end

@@ -1,37 +1,37 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
+require_relative 'spec_helper'
 
 RSpec.describe Ast::Crispr do
-  it "conforms to the ast-crispr package boundary fixture" do
+  it 'conforms to the ast-crispr package boundary fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-916-ast-crispr-package-boundary",
-      "ast-crispr-package-boundary.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-916-ast-crispr-package-boundary',
+      'ast-crispr-package-boundary.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
     expect(described_class.boundary_report).to eq(fixture.fetch(:boundary))
-    expect(described_class.ast_merge_contract_anchor).to eq("Ast::Merge.structured_edit")
+    expect(described_class.ast_merge_contract_anchor).to eq('Ast::Merge.structured_edit')
   end
 end
 
 RSpec.describe Ast::Crispr::MatchProfile do
-  it "conforms to the ast-crispr match profile helper fixture" do
+  it 'conforms to the ast-crispr match profile helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-918-ast-crispr-match-profile-helpers",
-      "ast-crispr-match-profile-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-918-ast-crispr-match-profile-helpers',
+      'ast-crispr-match-profile-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -43,16 +43,16 @@ RSpec.describe Ast::Crispr::MatchProfile do
 end
 
 RSpec.describe Ast::Crispr::Limit do
-  it "conforms to the ast-crispr limit helper fixture" do
+  it 'conforms to the ast-crispr limit helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-917-ast-crispr-limit-helpers",
-      "ast-crispr-limit-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-917-ast-crispr-limit-helpers',
+      'ast-crispr-limit-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -72,16 +72,16 @@ RSpec.describe Ast::Crispr::Limit do
 end
 
 RSpec.describe Ast::Crispr::SelectionProfile do
-  it "conforms to the ast-crispr selection profile helper fixture" do
+  it 'conforms to the ast-crispr selection profile helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-919-ast-crispr-selection-profile-helpers",
-      "ast-crispr-selection-profile-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-919-ast-crispr-selection-profile-helpers',
+      'ast-crispr-selection-profile-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -93,16 +93,16 @@ RSpec.describe Ast::Crispr::SelectionProfile do
 end
 
 RSpec.describe Ast::Crispr::DestinationProfile do
-  it "conforms to the ast-crispr destination profile helper fixture" do
+  it 'conforms to the ast-crispr destination profile helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-920-ast-crispr-destination-profile-helpers",
-      "ast-crispr-destination-profile-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-920-ast-crispr-destination-profile-helpers',
+      'ast-crispr-destination-profile-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -114,16 +114,16 @@ RSpec.describe Ast::Crispr::DestinationProfile do
 end
 
 RSpec.describe Ast::Crispr::OperationProfile do
-  it "conforms to the ast-crispr operation profile helper fixture" do
+  it 'conforms to the ast-crispr operation profile helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-921-ast-crispr-operation-profile-helpers",
-      "ast-crispr-operation-profile-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-921-ast-crispr-operation-profile-helpers',
+      'ast-crispr-operation-profile-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -134,17 +134,17 @@ RSpec.describe Ast::Crispr::OperationProfile do
   end
 end
 
-RSpec.describe "Ast::Crispr operation helpers" do
-  it "conforms to the ast-crispr operation helper fixture" do
+RSpec.describe 'Ast::Crispr operation helpers' do
+  it 'conforms to the ast-crispr operation helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-922-ast-crispr-operation-helpers",
-      "ast-crispr-operation-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-922-ast-crispr-operation-helpers',
+      'ast-crispr-operation-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 
@@ -162,17 +162,17 @@ RSpec.describe "Ast::Crispr operation helpers" do
   end
 end
 
-RSpec.describe "Ast::Crispr batch operation helpers" do
-  it "conforms to the ast-crispr batch operation helper fixture" do
+RSpec.describe 'Ast::Crispr batch operation helpers' do
+  it 'conforms to the ast-crispr batch operation helper fixture' do
     fixture_path = Pathname(__dir__).join(
-      "..",
-      "..",
-      "..",
-      "..",
-      "fixtures",
-      "diagnostics",
-      "slice-923-ast-crispr-batch-operation-helpers",
-      "ast-crispr-batch-operation-helpers.json"
+      '..',
+      '..',
+      '..',
+      '..',
+      'fixtures',
+      'diagnostics',
+      'slice-923-ast-crispr-batch-operation-helpers',
+      'ast-crispr-batch-operation-helpers.json'
     )
     fixture = JSON.parse(fixture_path.read, symbolize_names: true)
 

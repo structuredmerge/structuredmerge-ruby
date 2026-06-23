@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require "ast/merge"
-require "service_actor"
-require "version_gem"
-require_relative "crispr/version"
+require 'ast/merge'
+require 'service_actor'
+require 'version_gem'
+require_relative 'crispr/version'
 
 module Ast
   module Crispr
-    PACKAGE_NAME = "ast-crispr"
+    PACKAGE_NAME = 'ast-crispr'
 
     class Error < StandardError
       attr_reader :code, :details
 
-      def initialize(message, code: "ast_crispr_error", details: {}, **options)
+      def initialize(message, code: 'ast_crispr_error', details: {}, **options)
         @code = code
         @details = details.merge(options)
         super(message)
@@ -39,13 +39,13 @@ module Ast
       end
 
       def describe
-        constraints.map(&:description).join(" and ")
+        constraints.map(&:description).join(' and ')
       end
 
       private
 
       def normalize(limit, **options)
-        spec = limit.nil? ? options.fetch(:default, {exactly: 1}) : limit
+        spec = limit.nil? ? options.fetch(:default, { exactly: 1 }) : limit
 
         case spec
         when Limit
@@ -57,36 +57,59 @@ module Ast
         when String
           [constraint_for_operator(spec)]
         else
-          raise Error.new("Unsupported CRISPR limit specification", code: "ast_crispr_limit_unsupported", details: {spec: spec.inspect, limit: spec.inspect})
+          raise Error.new('Unsupported CRISPR limit specification', code: 'ast_crispr_limit_unsupported',
+                                                                    details: { spec: spec.inspect, limit: spec.inspect })
         end
       end
 
       def normalize_hash(spec)
         constraints = []
-        constraints << constraint("== #{spec.fetch(:exactly)}") { |count| count == spec.fetch(:exactly) } if spec.key?(:exactly)
-        constraints << constraint("<= #{spec.fetch(:at_most)}") { |count| count <= spec.fetch(:at_most) } if spec.key?(:at_most)
-        constraints << constraint(">= #{spec.fetch(:at_least)}") { |count| count >= spec.fetch(:at_least) } if spec.key?(:at_least)
-        constraints << constraint("between #{spec.fetch(:between)}") { |count| spec.fetch(:between).cover?(count) } if spec.key?(:between)
-        constraints << constraint("<= 1") { |count| count <= 1 } if spec[:none_or_one]
-        raise Error.new("CRISPR limit must define at least one constraint", code: "ast_crispr_limit_empty", details: {spec: spec.inspect, limit: spec.inspect}) if constraints.empty?
+        if spec.key?(:exactly)
+          constraints << constraint("== #{spec.fetch(:exactly)}") do |count|
+            count == spec.fetch(:exactly)
+          end
+        end
+        if spec.key?(:at_most)
+          constraints << constraint("<= #{spec.fetch(:at_most)}") do |count|
+            count <= spec.fetch(:at_most)
+          end
+        end
+        if spec.key?(:at_least)
+          constraints << constraint(">= #{spec.fetch(:at_least)}") do |count|
+            count >= spec.fetch(:at_least)
+          end
+        end
+        if spec.key?(:between)
+          constraints << constraint("between #{spec.fetch(:between)}") do |count|
+            spec.fetch(:between).cover?(count)
+          end
+        end
+        constraints << constraint('<= 1') { |count| count <= 1 } if spec[:none_or_one]
+        if constraints.empty?
+          raise Error.new('CRISPR limit must define at least one constraint', code: 'ast_crispr_limit_empty',
+                                                                              details: { spec: spec.inspect, limit: spec.inspect })
+        end
 
         constraints
       end
 
       def constraint_for_operator(spec)
         match = /\A(==|!=|<=|>=|<|>)\s*(\d+)\z/.match(spec.strip)
-        raise Error.new("Invalid CRISPR limit expression", code: "ast_crispr_limit_invalid_expression", details: {spec: spec.inspect, limit: spec.inspect}) unless match
+        unless match
+          raise Error.new('Invalid CRISPR limit expression', code: 'ast_crispr_limit_invalid_expression',
+                                                             details: { spec: spec.inspect, limit: spec.inspect })
+        end
 
         operator = match[1]
         value = match[2].to_i
         predicate = lambda do |count|
           case operator
-          when "==" then count == value
-          when "!=" then count != value
-          when "<=" then count <= value
-          when ">=" then count >= value
-          when "<" then count < value
-          when ">" then count > value
+          when '==' then count == value
+          when '!=' then count != value
+          when '<=' then count <= value
+          when '>=' then count >= value
+          when '<' then count < value
+          when '>' then count > value
           else false
           end
         end
@@ -101,13 +124,16 @@ module Ast
     class Match
       attr_reader :target, :node, :start_line, :end_line, :metadata
 
-      def initialize(target: nil, node: nil, start_line:, end_line:, metadata: {}, **options)
+      def initialize(start_line:, end_line:, target: nil, node: nil, metadata: {}, **options)
         @target = target
         @node = node
         @start_line = Integer(start_line)
         @end_line = Integer(end_line)
         @metadata = metadata.merge(options)
-        raise Error.new("CRISPR match end_line must be >= start_line", details: {start_line: @start_line, end_line: @end_line}) if @end_line < @start_line
+        return unless @end_line < @start_line
+
+        raise Error.new('CRISPR match end_line must be >= start_line',
+                        details: { start_line: @start_line, end_line: @end_line })
       end
 
       def with_target(target)
@@ -118,7 +144,7 @@ module Ast
           node: node,
           start_line: start_line,
           end_line: end_line,
-          metadata: metadata,
+          metadata: metadata
         )
       end
 
@@ -128,7 +154,7 @@ module Ast
 
       def slice_from(content)
         lines = content.to_s.lines
-        return "" if lines.empty?
+        return '' if lines.empty?
 
         lines[(start_line - 1)..(end_line - 1)].to_a.join
       end
@@ -138,7 +164,7 @@ module Ast
           start_boundary: metadata.fetch(:start_boundary, :owner_start),
           end_boundary: metadata.fetch(:end_boundary, :owner_end),
           payload_kind: metadata.fetch(:payload_kind, :structural_owner_body),
-          metadata: metadata,
+          metadata: metadata
         )
       end
     end
@@ -147,36 +173,36 @@ module Ast
       KNOWN_START_BOUNDARIES = {
         owner_start: {
           family: :structural_owner,
-          description: "Span starts at the structural owner's boundary",
+          description: "Span starts at the structural owner's boundary"
         },
         comment_region_start: {
           family: :comment_anchor,
-          description: "Span starts at an owning comment-region boundary",
-        },
+          description: 'Span starts at an owning comment-region boundary'
+        }
       }.freeze
       KNOWN_END_BOUNDARIES = {
         owner_end: {
           family: :structural_owner,
-          description: "Span ends at the structural owner's boundary",
+          description: "Span ends at the structural owner's boundary"
         },
         owner_end_plus_trailing_gap: {
           family: :gap_extension,
-          description: "Span extends past the owner boundary to include trailing blank-line gap",
-        },
+          description: 'Span extends past the owner boundary to include trailing blank-line gap'
+        }
       }.freeze
       KNOWN_PAYLOAD_KINDS = {
         structural_owner_body: {
           family: :owner_body,
-          description: "Span represents a structural owner's body",
+          description: "Span represents a structural owner's body"
         },
         comment_owned_body: {
           family: :comment_owned,
-          description: "Span represents a structural owner body selected through an owning comment marker",
+          description: 'Span represents a structural owner body selected through an owning comment marker'
         },
         section_branch: {
           family: :section_branch,
-          description: "Span represents a heading-owned section branch payload",
-        },
+          description: 'Span represents a heading-owned section branch payload'
+        }
       }.freeze
 
       attr_reader :start_boundary, :end_boundary, :payload_kind, :metadata
@@ -257,7 +283,7 @@ module Ast
           known_payload_kind: known_payload_kind?,
           comment_anchored: comment_anchored?,
           trailing_gap_extended: trailing_gap_extended?,
-          metadata: metadata,
+          metadata: metadata
         }
       end
 
@@ -267,21 +293,21 @@ module Ast
         boundary = value&.to_sym
         return boundary if KNOWN_START_BOUNDARIES.include?(boundary)
 
-        raise Error.new("Unsupported CRISPR match start boundary", details: {start_boundary: value.inspect})
+        raise Error.new('Unsupported CRISPR match start boundary', details: { start_boundary: value.inspect })
       end
 
       def normalize_end_boundary(value)
         boundary = value&.to_sym
         return boundary if KNOWN_END_BOUNDARIES.include?(boundary)
 
-        raise Error.new("Unsupported CRISPR match end boundary", details: {end_boundary: value.inspect})
+        raise Error.new('Unsupported CRISPR match end boundary', details: { end_boundary: value.inspect })
       end
 
       def normalize_payload_kind(value)
         kind = value&.to_sym
         return kind if KNOWN_PAYLOAD_KINDS.include?(kind)
 
-        raise Error.new("Unsupported CRISPR match payload kind", details: {payload_kind: value.inspect})
+        raise Error.new('Unsupported CRISPR match payload kind', details: { payload_kind: value.inspect })
       end
     end
 
@@ -289,41 +315,42 @@ module Ast
       KNOWN_RESOLUTION_KINDS = {
         append_fallback: {
           family: :append,
-          description: "Insertion fell back to appending at the end of the document",
+          description: 'Insertion fell back to appending at the end of the document'
         },
         anchor_after_statement: {
           family: :anchored,
-          description: "Insertion resolved a statement anchor and spliced after it",
-        },
+          description: 'Insertion resolved a statement anchor and spliced after it'
+        }
       }.freeze
       KNOWN_RESOLUTION_SOURCES = {
         none: {
           family: :implicit,
-          description: "No destination object was provided",
+          description: 'No destination object was provided'
         },
         callable: {
           family: :callable,
-          description: "Destination was resolved from a callable",
+          description: 'Destination was resolved from a callable'
         },
         selector: {
           family: :selector,
-          description: "Destination was resolved from an owner selector anchor",
-        },
+          description: 'Destination was resolved from an owner selector anchor'
+        }
       }.freeze
       KNOWN_ANCHOR_BOUNDARIES = {
         none: {
           family: :none,
-          description: "No anchor boundary was used",
+          description: 'No anchor boundary was used'
         },
         statement_end_plus_following_gap: {
           family: :gap_preserving_statement,
-          description: "Insertion anchored after a statement and preserved its following blank-line gap",
-        },
+          description: 'Insertion anchored after a statement and preserved its following blank-line gap'
+        }
       }.freeze
 
       attr_reader :resolution_kind, :resolution_source, :anchor_boundary, :metadata
 
-      def initialize(resolution_kind:, resolution_source:, anchor_boundary:, used_if_missing: false, metadata: {}, **options)
+      def initialize(resolution_kind:, resolution_source:, anchor_boundary:, used_if_missing: false, metadata: {},
+                     **options)
         @resolution_kind = normalize_resolution_kind(resolution_kind)
         @resolution_source = normalize_resolution_source(resolution_source)
         @anchor_boundary = normalize_anchor_boundary(anchor_boundary)
@@ -401,7 +428,7 @@ module Ast
           used_if_missing: used_if_missing?,
           append_fallback: append_fallback?,
           anchored: anchored?,
-          metadata: metadata,
+          metadata: metadata
         }
       end
 
@@ -411,21 +438,22 @@ module Ast
         kind = value&.to_sym
         return kind if KNOWN_RESOLUTION_KINDS.include?(kind)
 
-        raise Error.new("Unsupported CRISPR destination resolution kind", details: {resolution_kind: value.inspect})
+        raise Error.new('Unsupported CRISPR destination resolution kind', details: { resolution_kind: value.inspect })
       end
 
       def normalize_resolution_source(value)
         source = value&.to_sym
         return source if KNOWN_RESOLUTION_SOURCES.include?(source)
 
-        raise Error.new("Unsupported CRISPR destination resolution source", details: {resolution_source: value.inspect})
+        raise Error.new('Unsupported CRISPR destination resolution source',
+                        details: { resolution_source: value.inspect })
       end
 
       def normalize_anchor_boundary(value)
         boundary = value&.to_sym
         return boundary if KNOWN_ANCHOR_BOUNDARIES.include?(boundary)
 
-        raise Error.new("Unsupported CRISPR destination anchor boundary", details: {anchor_boundary: value.inspect})
+        raise Error.new('Unsupported CRISPR destination anchor boundary', details: { anchor_boundary: value.inspect })
       end
     end
 
@@ -476,7 +504,7 @@ module Ast
           owner_selector_family: owner_selector_family,
           known_owner_selector: known_owner_selector?,
           supported_comment_regions: supported_comment_regions,
-          metadata: metadata,
+          metadata: metadata
         }
       end
     end
@@ -485,21 +513,23 @@ module Ast
       KNOWN_SELECTION_INTENTS = {
         predicate_filter: {
           family: :predicate,
-          description: "Predicate-based structural owner filtering",
+          description: 'Predicate-based structural owner filtering'
         },
         comment_anchored_owner: {
           family: :comment_anchor,
-          description: "Comment-region marker anchored owner selection",
+          description: 'Comment-region marker anchored owner selection'
         },
         section_branch: {
           family: :section_branch,
-          description: "Heading-owned section branch selection",
-        },
+          description: 'Heading-owned section branch selection'
+        }
       }.freeze
 
-      attr_reader :owner_scope, :selector_kind, :selection_intent, :comment_region, :include_trailing_gap, :structure_profile, :metadata
+      attr_reader :owner_scope, :selector_kind, :selection_intent, :comment_region, :include_trailing_gap,
+                  :structure_profile, :metadata
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile:, comment_region: nil, include_trailing_gap: false, metadata: {}, **options)
+      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile:, comment_region: nil,
+                     include_trailing_gap: false, metadata: {}, **options)
         @owner_scope = owner_scope&.to_sym
         @selector_kind = selector_kind&.to_sym
         @selection_intent = selection_intent&.to_sym
@@ -545,7 +575,7 @@ module Ast
           comment_region: comment_region,
           include_trailing_gap: include_trailing_gap,
           comment_anchored: comment_anchored?,
-          metadata: metadata,
+          metadata: metadata
         }
       end
     end
@@ -554,27 +584,28 @@ module Ast
       KNOWN_OPERATION_KINDS = {
         replace: {
           family: :rewrite,
-          description: "Replace selected content with explicit replacement text",
+          description: 'Replace selected content with explicit replacement text'
         },
         delete: {
           family: :removal,
-          description: "Delete selected content without inserting replacement text",
+          description: 'Delete selected content without inserting replacement text'
         },
         insert: {
           family: :insertion,
-          description: "Insert explicit text at a destination anchor or append fallback",
+          description: 'Insert explicit text at a destination anchor or append fallback'
         },
         move: {
           family: :relocation,
-          description: "Relocate selected content or explicit replacement text to a destination anchor",
-        },
+          description: 'Relocate selected content or explicit replacement text to a destination anchor'
+        }
       }.freeze
       KNOWN_REQUIREMENTS = %i[none optional required].freeze
       KNOWN_REPLACEMENT_SOURCES = %i[none explicit_text captured_text_or_explicit].freeze
 
       attr_reader :operation_kind, :source_requirement, :destination_requirement, :replacement_source, :metadata
 
-      def initialize(operation_kind:, source_requirement:, destination_requirement:, replacement_source:, captures_source_text: false, supports_if_missing: false, metadata: {}, **options)
+      def initialize(operation_kind:, source_requirement:, destination_requirement:, replacement_source:,
+                     captures_source_text: false, supports_if_missing: false, metadata: {}, **options)
         @operation_kind = operation_kind&.to_sym
         @source_requirement = normalize_requirement(source_requirement, :source_requirement)
         @destination_requirement = normalize_requirement(destination_requirement, :destination_requirement)
@@ -638,7 +669,7 @@ module Ast
           replacement_source: replacement_source,
           captures_source_text: captures_source_text?,
           supports_if_missing: supports_if_missing?,
-          metadata: metadata,
+          metadata: metadata
         }
       end
 
@@ -648,43 +679,47 @@ module Ast
         requirement = value&.to_sym
         return requirement if KNOWN_REQUIREMENTS.include?(requirement)
 
-        raise Error.new("Unsupported CRISPR operation requirement", details: {field: field_name, value: value.inspect})
+        raise Error.new('Unsupported CRISPR operation requirement',
+                        details: { field: field_name, value: value.inspect })
       end
 
       def normalize_replacement_source(value)
         replacement = value&.to_sym
         return replacement if KNOWN_REPLACEMENT_SOURCES.include?(replacement)
 
-        raise Error.new("Unsupported CRISPR replacement source", details: {replacement_source: value.inspect})
+        raise Error.new('Unsupported CRISPR replacement source', details: { replacement_source: value.inspect })
       end
     end
 
     module Adapters
       class Null
         def read_ast(document)
-          raise Error.new("A CRISPR document adapter is required", details: {source_label: document.source_label})
+          raise Error.new('A CRISPR document adapter is required', details: { source_label: document.source_label })
         end
 
         def structural_owners(document, owner_scope: :shared_default)
-          raise Error.new("A CRISPR document adapter is required", details: {source_label: document.source_label, owner_scope: owner_scope})
+          raise Error.new('A CRISPR document adapter is required',
+                          details: { source_label: document.source_label, owner_scope: owner_scope })
         end
 
         def comment_regions_for(document, owner, region: :leading, owner_scope: :shared_default)
           raise Error.new(
-            "A CRISPR document adapter is required",
-            details: {source_label: document.source_label, owner: owner.inspect, region: region, owner_scope: owner_scope},
+            'A CRISPR document adapter is required',
+            details: { source_label: document.source_label, owner: owner.inspect, region: region,
+                       owner_scope: owner_scope }
           )
         end
 
         def comment_region_text(document, comment_region)
-          raise Error.new("A CRISPR document adapter is required", details: {source_label: document.source_label, comment_region: comment_region.inspect})
+          raise Error.new('A CRISPR document adapter is required',
+                          details: { source_label: document.source_label, comment_region: comment_region.inspect })
         end
 
         def structure_profile(owner_scope: :shared_default)
           StructureProfile.new(
             owner_scope: owner_scope,
             owner_selector: owner_scope,
-            metadata: {source: :null_adapter},
+            metadata: { source: :null_adapter }
           )
         end
       end
@@ -693,7 +728,7 @@ module Ast
     class DocumentContext
       attr_reader :content, :source_label, :metadata, :adapter
 
-      def initialize(content:, source_label: "source", adapter: Adapters::Null.new, metadata: {}, **options)
+      def initialize(content:, source_label: 'source', adapter: Adapters::Null.new, metadata: {}, **options)
         @content = content.to_s
         @source_label = source_label
         @adapter = adapter
@@ -727,7 +762,7 @@ module Ast
           StructureProfile.new(
             owner_scope: owner_scope,
             owner_selector: owner_scope,
-            metadata: {source: :document_context_default},
+            metadata: { source: :document_context_default }
           )
         end
       end
@@ -738,9 +773,7 @@ module Ast
 
       def expand_following_gap(line_number)
         last_line = line_number
-        while line_blank?(last_line + 1)
-          last_line += 1
-        end
+        last_line += 1 while line_blank?(last_line + 1)
         last_line
       end
 
@@ -760,7 +793,7 @@ module Ast
         @locate = locate
         @owned_span = owned_span
         @anchor = anchor
-        @limit = Limit.coerce(limit, default: {exactly: 1})
+        @limit = Limit.coerce(limit, default: { exactly: 1 })
         @metadata = metadata.merge(options)
       end
 
@@ -811,7 +844,7 @@ module Ast
           comment_region: comment_region,
           include_trailing_gap: include_trailing_gap?,
           structure_profile: structure_profile(context),
-          metadata: metadata,
+          metadata: metadata
         )
       end
 
@@ -824,16 +857,17 @@ module Ast
         when Hash
           Match.new(target: self, **candidate)
         else
-          if candidate.respond_to?(:location) && candidate.location
-            Match.new(
-              target: self,
-              node: candidate,
-              start_line: candidate.location.start_line,
-              end_line: candidate.location.end_line,
-            )
-          else
-            raise Error.new("Unsupported CRISPR match result", details: {target: id, candidate: candidate.inspect})
+          unless candidate.respond_to?(:location) && candidate.location
+            raise Error.new('Unsupported CRISPR match result', details: { target: id, candidate: candidate.inspect })
           end
+
+          Match.new(
+            target: self,
+            node: candidate,
+            start_line: candidate.location.start_line,
+            end_line: candidate.location.end_line
+          )
+
         end
       end
 
@@ -849,8 +883,9 @@ module Ast
     module Selectors
       module_function
 
-      def owner_filter(id:, limit: nil, owner_scope: :shared_default, include_trailing_gap: false, adapter: nil, metadata: {}, &block)
-        raise ArgumentError, "owner_filter requires a block" unless block
+      def owner_filter(id:, limit: nil, owner_scope: :shared_default, include_trailing_gap: false, adapter: nil,
+                       metadata: {}, &block)
+        raise ArgumentError, 'owner_filter requires a block' unless block
 
         OwnerSelector.new(
           id: id,
@@ -861,7 +896,7 @@ module Ast
             owner_scope: owner_scope,
             selector_kind: :owner_filter,
             selection_intent: :predicate_filter,
-            include_trailing_gap: include_trailing_gap,
+            include_trailing_gap: include_trailing_gap
           ),
           locate: lambda do |context|
             context.structural_owners(owner_scope: owner_scope).filter_map do |owner|
@@ -878,21 +913,22 @@ module Ast
                 base_metadata = {
                   start_boundary: :owner_start,
                   end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
-                  payload_kind: :structural_owner_body,
+                  payload_kind: :structural_owner_body
                 }
                 Match.new(
                   node: owner,
                   start_line: owner.location.start_line,
                   end_line: end_line,
-                  metadata: base_metadata.merge((match == true) ? {} : match.to_h),
+                  metadata: base_metadata.merge(match == true ? {} : match.to_h)
                 )
               end
             end
-          end,
+          end
         )
       end
 
-      def comment_region_owned_owner(marker:, id: nil, limit: nil, owner_scope: :shared_default, comment_region: :leading, include_trailing_gap: true, adapter: nil, metadata: {}, **options)
+      def comment_region_owned_owner(marker:, id: nil, limit: nil, owner_scope: :shared_default,
+                                     comment_region: :leading, include_trailing_gap: true, adapter: nil, metadata: {}, **options)
         marker_text = marker.to_s.rstrip
         OwnerSelector.new(
           id: id || marker_text,
@@ -904,11 +940,12 @@ module Ast
             comment_region: comment_region,
             selector_kind: :comment_region_owned_owner,
             selection_intent: :comment_anchored_owner,
-            include_trailing_gap: include_trailing_gap,
+            include_trailing_gap: include_trailing_gap
           ),
           locate: lambda do |context|
             context.structural_owners(owner_scope: owner_scope).filter_map do |owner|
-              marker_region = context.comment_regions_for(owner, region: comment_region, owner_scope: owner_scope).find do |region|
+              marker_region = context.comment_regions_for(owner, region: comment_region,
+                                                                 owner_scope: owner_scope).find do |region|
                 context.comment_region_text(region) == marker_text
               end
               next unless marker_region
@@ -926,16 +963,17 @@ module Ast
                   marker: marker_text,
                   owner_scope: owner_scope,
                   comment_region: comment_region,
-                  region: marker_region,
-                },
+                  region: marker_region
+                }
               )
             end
           end,
-          **options,
+          **options
         )
       end
 
-      def line_block(start_line_text:, end_line_text:, id: nil, limit: nil, include_trailing_gap: false, metadata: {}, **options)
+      def line_block(start_line_text:, end_line_text:, id: nil, limit: nil, include_trailing_gap: false, metadata: {},
+                     **options)
         OwnerSelector.new(
           id: id || "line_block_#{start_line_text}",
           limit: limit,
@@ -945,7 +983,7 @@ module Ast
             owner_scope: :text_lines,
             selector_kind: :line_block,
             selection_intent: :line_marker_block,
-            include_trailing_gap: include_trailing_gap,
+            include_trailing_gap: include_trailing_gap
           ).merge(options),
           locate: lambda do |context|
             lines = context.content.to_s.lines
@@ -969,11 +1007,11 @@ module Ast
                   end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
                   payload_kind: :structural_owner_body,
                   start_line_text: start_line_text,
-                  end_line_text: end_line_text,
-                },
-              ),
+                  end_line_text: end_line_text
+                }
+              )
             ]
-          end,
+          end
         )
       end
 
@@ -1005,7 +1043,7 @@ module Ast
 
         raise Error.new(
           "CRISPR target #{target.id.inspect} matched #{count} node(s); expected #{target.limit.describe}",
-          details: {target: target.id, count: count, limit: target.limit.describe},
+          details: { target: target.id, count: count, limit: target.limit.describe }
         )
       end
 
@@ -1016,7 +1054,7 @@ module Ast
             source: source,
             replace_start_line: match.start_line,
             replace_end_line: match.end_line,
-            replacement: replacement,
+            replacement: replacement
           )
         end
         Ast::Merge::StructuralEdit::PlanSet.new(source: source, plans: plans).merged_content
@@ -1027,29 +1065,41 @@ module Ast
         ranges.each_cons(2) do |left, right|
           next if left.end < right.begin
 
-          raise Error.new("CRISPR target spans overlap", details: {left: left, right: right})
+          raise Error.new('CRISPR target spans overlap', details: { left: left, right: right })
         end
       end
 
       def insertion_from(content, destination, if_missing:, source_label:)
-        return append_destination_resolution(source: :none, used_if_missing: true) if destination.nil? && if_missing == :append
-        raise Error.new("Missing CRISPR insertion destination", details: {source_label: source_label}) if destination.nil?
+        if destination.nil? && if_missing == :append
+          return append_destination_resolution(source: :none,
+                                               used_if_missing: true)
+        end
+        if destination.nil?
+          raise Error.new('Missing CRISPR insertion destination',
+                          details: { source_label: source_label })
+        end
 
         target = destination if destination.is_a?(OwnerSelector)
         context = context_for(content: content, source_label: source_label, target: target)
         anchor, resolution_source = if destination.is_a?(OwnerSelector)
-          matches = normalize_matches(destination, context)
-          raise Error.new("CRISPR destination target cannot be empty", details: {target: destination.id}) if matches.empty?
+                                      matches = normalize_matches(destination, context)
+                                      if matches.empty?
+                                        raise Error.new('CRISPR destination target cannot be empty',
+                                                        details: { target: destination.id })
+                                      end
 
-          [destination.resolve_anchor(context, matches.first), :selector]
-        else
-          [invoke_callable(destination, context), :callable]
-        end
+                                      [destination.resolve_anchor(context, matches.first), :selector]
+                                    else
+                                      [invoke_callable(destination, context), :callable]
+                                    end
 
         if anchor.nil?
-          return append_destination_resolution(source: resolution_source, used_if_missing: true) if if_missing == :append
+          if if_missing == :append
+            return append_destination_resolution(source: resolution_source,
+                                                 used_if_missing: true)
+          end
 
-          raise Error.new("Unable to resolve CRISPR insertion destination", details: {source_label: source_label})
+          raise Error.new('Unable to resolve CRISPR insertion destination', details: { source_label: source_label })
         end
 
         anchored_destination_resolution(anchor, source: resolution_source)
@@ -1066,7 +1116,7 @@ module Ast
         lines = content.lines
         start_line = statement_start_line(injection_point.anchor)
         end_line = expand_following_blank_lines(lines, statement_end_line(injection_point.anchor))
-        raise Error.new("CRISPR insertion anchor is missing statement location") unless start_line && end_line
+        raise Error.new('CRISPR insertion anchor is missing statement location') unless start_line && end_line
 
         replacement = lines[(start_line - 1)..(end_line - 1)].join + text.to_s.rstrip + "\n\n"
         Ast::Merge::StructuralEdit::PlanSet.new(
@@ -1076,9 +1126,9 @@ module Ast
               source: content,
               replace_start_line: start_line,
               replace_end_line: end_line,
-              replacement: replacement,
-            ),
-          ],
+              replacement: replacement
+            )
+          ]
         ).merged_content
       end
 
@@ -1092,9 +1142,7 @@ module Ast
 
       def expand_following_blank_lines(lines, line_number)
         last_line = line_number
-        while !lines[last_line].nil? && lines[last_line].strip.empty?
-          last_line += 1
-        end
+        last_line += 1 while !lines[last_line].nil? && lines[last_line].strip.empty?
         last_line
       end
 
@@ -1117,8 +1165,8 @@ module Ast
             resolution_kind: :append_fallback,
             resolution_source: source,
             anchor_boundary: :none,
-            used_if_missing: used_if_missing,
-          ),
+            used_if_missing: used_if_missing
+          )
         )
       end
 
@@ -1130,8 +1178,8 @@ module Ast
             resolution_kind: :anchor_after_statement,
             resolution_source: source,
             anchor_boundary: :statement_end_plus_following_gap,
-            used_if_missing: false,
-          ),
+            used_if_missing: false
+          )
         )
       end
 
@@ -1161,7 +1209,8 @@ module Ast
         end
 
         def operation_profile
-          @operation_profile || raise(Error.new("CRISPR operation profile is not declared", details: {operation_class: name}))
+          @operation_profile || raise(Error.new('CRISPR operation profile is not declared',
+                                                details: { operation_class: name }))
         end
       end
     end
@@ -1176,13 +1225,13 @@ module Ast
         destination_requirement: :none,
         replacement_source: :explicit_text,
         captures_source_text: true,
-        supports_if_missing: false,
+        supports_if_missing: false
       )
 
       input :content, type: String
       input :target, type: OwnerSelector
       input :replacement, allow_nil: true, default: nil
-      input :source_label, type: String, default: "source"
+      input :source_label, type: String, default: 'source'
 
       output :updated_content
       output :matches, default: -> { [] }
@@ -1220,12 +1269,12 @@ module Ast
         destination_requirement: :none,
         replacement_source: :none,
         captures_source_text: true,
-        supports_if_missing: false,
+        supports_if_missing: false
       )
 
       input :content, type: String
       input :target, type: OwnerSelector
-      input :source_label, type: String, default: "source"
+      input :source_label, type: String, default: 'source'
 
       output :updated_content
       output :matches, default: -> { [] }
@@ -1239,8 +1288,8 @@ module Ast
         actor = Replace.result(
           content: content,
           target: target,
-          replacement: "",
-          source_label: source_label,
+          replacement: '',
+          source_label: source_label
         )
         fail!(error: actor.error, details: actor.details) if actor.failure?
 
@@ -1262,14 +1311,14 @@ module Ast
         destination_requirement: :optional,
         replacement_source: :explicit_text,
         captures_source_text: false,
-        supports_if_missing: true,
+        supports_if_missing: true
       )
 
       input :content, type: String
       input :text, type: String
       input :destination, allow_nil: true, default: nil
       input :if_missing, type: Symbol, default: :raise
-      input :source_label, type: String, default: "source"
+      input :source_label, type: String, default: 'source'
 
       output :updated_content
       output :changed, default: false
@@ -1296,7 +1345,7 @@ module Ast
         destination_requirement: :optional,
         replacement_source: :captured_text_or_explicit,
         captures_source_text: true,
-        supports_if_missing: true,
+        supports_if_missing: true
       )
 
       input :content, type: String
@@ -1304,7 +1353,7 @@ module Ast
       input :destination, allow_nil: true, default: nil
       input :replacement, allow_nil: true, default: nil
       input :if_missing, type: Symbol, default: :raise
-      input :source_label, type: String, default: "source"
+      input :source_label, type: String, default: 'source'
 
       output :updated_content
       output :source_matches, default: -> { [] }
@@ -1322,7 +1371,7 @@ module Ast
           self.source_matches = normalize_matches(source_target, context)
           self.source_match_count = source_matches.size
           self.captured_text = capture_text(content, source_matches)
-          working_content = replace_line_ranges(content, source_matches, "") unless source_matches.empty?
+          working_content = replace_line_ranges(content, source_matches, '') unless source_matches.empty?
         end
 
         text_to_insert = replacement.nil? ? captured_text.to_s : replacement.to_s
@@ -1330,7 +1379,8 @@ module Ast
           if text_to_insert.empty?
             working_content
           else
-            updated_content, profile = insert_text(working_content, text_to_insert, destination: destination, if_missing: if_missing, source_label: source_label)
+            updated_content, profile = insert_text(working_content, text_to_insert, destination: destination,
+                                                                                    if_missing: if_missing, source_label: source_label)
             self.destination_profile = profile
             updated_content
           end
@@ -1362,7 +1412,7 @@ module Ast
 
       def stringified_report(hash)
         hash.reject { |key, _| key == :metadata }
-          .transform_values { |value| stringify_report_value(value) }
+            .transform_values { |value| stringify_report_value(value) }
       end
     end
 
@@ -1373,7 +1423,7 @@ module Ast
         data = to_h.merge(
           start_boundary_family: start_boundary_family || :unknown,
           end_boundary_family: end_boundary_family || :unknown,
-          payload_family: payload_family || :unknown,
+          payload_family: payload_family || :unknown
         )
         stringified_report(data)
       end
@@ -1398,22 +1448,23 @@ module Ast
         owner_filter: { family: :owner_filter },
         comment_region_owner: { family: :comment_anchor },
         comment_region_owned_owner: { family: :comment_anchor },
-        heading_section: { family: :section_branch },
+        heading_section: { family: :section_branch }
       }.freeze
       KNOWN_COMMENT_REGIONS = {
         leading: { family: :leading },
         trailing: { family: :trailing },
-        inline: { family: :inline },
+        inline: { family: :inline }
       }.freeze
       COMPAT_SELECTION_INTENT_FAMILIES = {
         predicate_filter: :predicate,
         comment_anchored_owner: :comment_anchor,
         comment_region_filter: :comment,
         section_branch: :section_branch,
-        section_heading: :section,
+        section_heading: :section
       }.freeze
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil, comment_region: nil, include_trailing_gap: false, metadata: {}, **options)
+      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil,
+                     comment_region: nil, include_trailing_gap: false, metadata: {}, **options)
         @owner_scope = owner_scope&.to_sym
         @selector_kind = selector_kind&.to_sym
         @selection_intent = selection_intent&.to_sym
@@ -1422,7 +1473,7 @@ module Ast
         @structure_profile = structure_profile || StructureProfile.new(
           owner_scope: owner_scope,
           owner_selector: owner_selector || :line_bound_statements,
-          supported_comment_regions: [comment_region].compact,
+          supported_comment_regions: [comment_region].compact
         )
         @metadata = metadata.merge(options).freeze
       end
@@ -1442,7 +1493,7 @@ module Ast
           known_selection_intent: COMPAT_SELECTION_INTENT_FAMILIES.key?(selection_intent),
           comment_region_family: comment_region_family || :unknown,
           known_comment_region: known_comment_region,
-          comment_anchored: known_comment_region || selector_kind_family == :comment_anchor || COMPAT_SELECTION_INTENT_FAMILIES[selection_intent] == :comment,
+          comment_anchored: known_comment_region || selector_kind_family == :comment_anchor || COMPAT_SELECTION_INTENT_FAMILIES[selection_intent] == :comment
         )
         stringified_report(data)
       end
@@ -1475,7 +1526,7 @@ module Ast
           known_resolution_source: KNOWN_RESOLUTION_SOURCES.key?(resolution_source),
           resolution_family: resolution_family || :unknown,
           resolution_source_family: resolution_source_family || :unknown,
-          anchor_boundary_family: anchor_boundary_family || :unknown,
+          anchor_boundary_family: anchor_boundary_family || :unknown
         )
         stringified_report(data)
       end
@@ -1507,7 +1558,7 @@ module Ast
           supports_destination: supports_destination?,
           requires_destination: requires_destination?,
           explicit_replacement: explicit_replacement?,
-          may_reuse_captured_text: may_reuse_captured_text?,
+          may_reuse_captured_text: may_reuse_captured_text?
         )
         stringified_report(data)
       end
@@ -1543,75 +1594,75 @@ module Ast
 
     class << self
       def ast_merge_contract_anchor
-        "Ast::Merge.structured_edit"
+        'Ast::Merge.structured_edit'
       end
 
       def boundary_report
         {
           package: PACKAGE_NAME,
-          layer: "structural_edit_tool",
-          status: "active_thin_package",
-          base_contract_package: "ast-merge",
+          layer: 'structural_edit_tool',
+          status: 'active_thin_package',
+          base_contract_package: 'ast-merge',
           relationship: {
             ast_merge: [
-              "owns portable structured-edit envelope contracts",
-              "owns transport, report, replay, review, and provider handoff vocabulary",
-              "remains the substrate for provider-neutral fixtures"
+              'owns portable structured-edit envelope contracts',
+              'owns transport, report, replay, review, and provider handoff vocabulary',
+              'remains the substrate for provider-neutral fixtures'
             ],
             ast_crispr: [
-              "owns ergonomic structural-edit selectors, profiles, and operation helpers",
-              "wraps ast-merge contracts instead of forking them",
-              "may grow compatibility helpers for old ast-crispr concepts after fixture-backed review"
+              'owns ergonomic structural-edit selectors, profiles, and operation helpers',
+              'wraps ast-merge contracts instead of forking them',
+              'may grow compatibility helpers for old ast-crispr concepts after fixture-backed review'
             ],
             provider_packages: [
-              "own parser-specific execution and metadata projection",
-              "may expose provider adapters consumed by ast-crispr",
-              "keep raw parser details behind normalized tree metadata or semantic sidecars"
+              'own parser-specific execution and metadata projection',
+              'may expose provider adapters consumed by ast-crispr',
+              'keep raw parser details behind normalized tree metadata or semantic sidecars'
             ],
             ast_template: [
-              "orchestrates template and directory workflows",
-              "invokes structural edits through ast-merge or ast-crispr registries/envelopes",
-              "does not own parser-specific selectors"
+              'orchestrates template and directory workflows',
+              'invokes structural edits through ast-merge or ast-crispr registries/envelopes',
+              'does not own parser-specific selectors'
             ]
           },
           implementations: [
             {
-              language: "go",
-              package_name: "astcrispr",
-              import: "github.com/structuredmerge/structuredmerge-go/astcrispr"
+              language: 'go',
+              package_name: 'astcrispr',
+              import: 'github.com/structuredmerge/structuredmerge-go/astcrispr'
             },
             {
-              language: "ruby",
-              package_name: "ast-crispr",
-              require: "ast/crispr"
+              language: 'ruby',
+              package_name: 'ast-crispr',
+              require: 'ast/crispr'
             },
             {
-              language: "rust",
-              package_name: "ast-crispr",
-              crate: "ast_crispr"
+              language: 'rust',
+              package_name: 'ast-crispr',
+              crate: 'ast_crispr'
             },
             {
-              language: "typescript",
-              package_name: "@structuredmerge/ast-crispr",
-              import: "@structuredmerge/ast-crispr"
+              language: 'typescript',
+              package_name: '@structuredmerge/ast-crispr',
+              import: '@structuredmerge/ast-crispr'
             }
           ],
           initial_exports: [
-            "package identity",
-            "boundary report",
-            "ast-merge structured-edit contract anchor",
-            "limit helpers",
-            "match profile helpers",
-            "selection profile helpers",
-            "destination profile helpers",
-            "operation profile helpers",
-            "replace/delete/insert/move helpers",
-            "batch operation helpers"
+            'package identity',
+            'boundary report',
+            'ast-merge structured-edit contract anchor',
+            'limit helpers',
+            'match profile helpers',
+            'selection profile helpers',
+            'destination profile helpers',
+            'operation profile helpers',
+            'replace/delete/insert/move helpers',
+            'batch operation helpers'
           ],
           future_exports: [],
           metadata: {
-            source: "legacy_crispr_reference",
-            decision: "Keep ast-merge as the base contract layer and revive ast-crispr as a separate thin package in every implementation."
+            source: 'legacy_crispr_reference',
+            decision: 'Keep ast-merge as the base contract layer and revive ast-crispr as a separate thin package in every implementation.'
           }
         }
       end
@@ -1620,15 +1671,15 @@ module Ast
         Limit.coerce(spec)
       end
 
-      def match_profile(start_boundary: "owner_start", end_boundary: "owner_end", payload_kind: "structural_owner_body")
+      def match_profile(start_boundary: 'owner_start', end_boundary: 'owner_end', payload_kind: 'structural_owner_body')
         MatchProfile.new(start_boundary: start_boundary, end_boundary: end_boundary, payload_kind: payload_kind)
       end
 
       def selection_profile(
-        owner_scope: "shared_default",
-        owner_selector: "line_bound_statements",
-        selector_kind: "owner_filter",
-        selection_intent: "predicate_filter",
+        owner_scope: 'shared_default',
+        owner_selector: 'line_bound_statements',
+        selector_kind: 'owner_filter',
+        selection_intent: 'predicate_filter',
         comment_region: nil,
         include_trailing_gap: false
       )
@@ -1643,9 +1694,9 @@ module Ast
       end
 
       def destination_profile(
-        resolution_kind: "append_fallback",
-        resolution_source: "none",
-        anchor_boundary: "none",
+        resolution_kind: 'append_fallback',
+        resolution_source: 'none',
+        anchor_boundary: 'none',
         used_if_missing: false
       )
         DestinationProfile.new(
@@ -1657,10 +1708,10 @@ module Ast
       end
 
       def operation_profile(
-        operation_kind: "replace",
-        source_requirement: "required",
-        destination_requirement: "none",
-        replacement_source: "explicit_text",
+        operation_kind: 'replace',
+        source_requirement: 'required',
+        destination_requirement: 'none',
+        replacement_source: 'explicit_text',
         captures_source_text: false,
         supports_if_missing: false
       )
@@ -1676,10 +1727,10 @@ module Ast
 
       def replace_operation
         OperationProfile.new(
-          operation_kind: "replace",
-          source_requirement: "required",
-          destination_requirement: "none",
-          replacement_source: "explicit_text",
+          operation_kind: 'replace',
+          source_requirement: 'required',
+          destination_requirement: 'none',
+          replacement_source: 'explicit_text',
           captures_source_text: true,
           supports_if_missing: false
         )
@@ -1687,10 +1738,10 @@ module Ast
 
       def delete_operation
         OperationProfile.new(
-          operation_kind: "delete",
-          source_requirement: "required",
-          destination_requirement: "none",
-          replacement_source: "none",
+          operation_kind: 'delete',
+          source_requirement: 'required',
+          destination_requirement: 'none',
+          replacement_source: 'none',
           captures_source_text: true,
           supports_if_missing: false
         )
@@ -1698,10 +1749,10 @@ module Ast
 
       def insert_operation
         OperationProfile.new(
-          operation_kind: "insert",
-          source_requirement: "none",
-          destination_requirement: "optional",
-          replacement_source: "explicit_text",
+          operation_kind: 'insert',
+          source_requirement: 'none',
+          destination_requirement: 'optional',
+          replacement_source: 'explicit_text',
           captures_source_text: false,
           supports_if_missing: true
         )
@@ -1709,10 +1760,10 @@ module Ast
 
       def move_operation
         OperationProfile.new(
-          operation_kind: "move",
-          source_requirement: "optional",
-          destination_requirement: "optional",
-          replacement_source: "captured_text_or_explicit",
+          operation_kind: 'move',
+          source_requirement: 'optional',
+          destination_requirement: 'optional',
+          replacement_source: 'captured_text_or_explicit',
           captures_source_text: true,
           supports_if_missing: true
         )
