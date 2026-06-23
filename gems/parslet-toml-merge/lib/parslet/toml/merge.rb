@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "toml-merge"
-require "toml"
+require 'toml-merge'
+require 'toml'
 
 module Parslet
   module Toml
     module Merge
       extend self
 
-      PACKAGE_NAME = "parslet-toml-merge"
+      PACKAGE_NAME = 'parslet-toml-merge'
       BACKEND = TreeHaver::PARSLET_BACKEND
 
       def toml_feature_profile
@@ -49,7 +49,7 @@ module Parslet
       def parse_toml(source, dialect, backend: nil)
         requested = backend.to_s.empty? ? BACKEND.id : backend.to_s
         return unsupported_feature_result("Unsupported TOML backend #{requested}.") unless requested == BACKEND.id
-        return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == "toml"
+        return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == 'toml'
 
         syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)
         return { ok: false, diagnostics: syntax_result[:diagnostics], policies: [] } unless syntax_result[:ok]
@@ -73,7 +73,7 @@ module Parslet
       def unsupported_feature_result(message)
         {
           ok: false,
-          diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }],
+          diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
           policies: []
         }
       end
