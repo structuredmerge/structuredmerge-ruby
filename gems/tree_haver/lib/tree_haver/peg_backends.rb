@@ -2,13 +2,13 @@
 
 module TreeHaver
   CITRUS_BACKEND = BackendReference.new(
-    id: "citrus",
-    family: "peg"
+    id: 'citrus',
+    family: 'peg'
   ).freeze
 
   PARSLET_BACKEND = BackendReference.new(
-    id: "parslet",
-    family: "peg"
+    id: 'parslet',
+    family: 'peg'
   ).freeze
 
   BackendRegistry.register(CITRUS_BACKEND)
@@ -47,14 +47,14 @@ module TreeHaver
       {
         ok: false,
         backend_ref: CITRUS_BACKEND,
-        diagnostics: [{ severity: "error", category: "parse_error", message: "Citrus parse failed." }]
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: 'Citrus parse failed.' }]
       }
     end
   rescue StandardError => e
     {
       ok: false,
       backend_ref: CITRUS_BACKEND,
-      diagnostics: [{ severity: "error", category: "parse_error", message: e.message }]
+      diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }]
     }
   end
 
@@ -70,7 +70,7 @@ module TreeHaver
     {
       ok: false,
       backend_ref: PARSLET_BACKEND,
-      diagnostics: [{ severity: "error", category: "parse_error", message: e.message }]
+      diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }]
     }
   end
 end

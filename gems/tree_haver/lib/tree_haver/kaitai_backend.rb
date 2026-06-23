@@ -2,8 +2,8 @@
 
 module TreeHaver
   KAITAI_STRUCT_BACKEND = BackendReference.new(
-    id: "kaitai-struct",
-    family: "kaitai"
+    id: 'kaitai-struct',
+    family: 'kaitai'
   ).freeze
 
   BackendRegistry.register(KAITAI_STRUCT_BACKEND)

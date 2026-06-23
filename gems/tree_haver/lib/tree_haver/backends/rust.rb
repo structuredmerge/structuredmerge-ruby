@@ -50,23 +50,24 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
             # tree_stump uses magnus which requires MRI's C API
             # It doesn't work on JRuby or TruffleRuby
-            if RUBY_ENGINE == "ruby"
-              require "tree_stump"
-              @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            if RUBY_ENGINE == 'ruby'
+              require 'tree_stump'
+              @loaded = true
             else
-              @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = false
             end
           rescue LoadError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           rescue StandardError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -74,8 +75,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -86,12 +87,13 @@ module TreeHaver
         #   # => { backend: :rust, query: true, bytes_field: true, incremental: false, comment_support: :nodes_only }
         def capabilities
           return {} unless available?
+
           {
             backend: :rust,
             query: true,
             bytes_field: true,
-            incremental: false,  # TreeStump doesn't currently expose incremental parsing to Ruby
-            comment_support: :nodes_only,
+            incremental: false, # TreeStump doesn't currently expose incremental parsing to Ruby
+            comment_support: :nodes_only
           }
         end
       end
@@ -146,7 +148,7 @@ module TreeHaver
         end
 
         # Alias eql? to ==
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Load a language from a shared library path
         #
@@ -159,7 +161,7 @@ module TreeHaver
         #   lang = TreeHaver::Backends::Rust::Language.from_library("/usr/local/lib/libtree-sitter-toml.so")
         class << self
           def from_library(path, symbol: nil, name: nil) # rubocop:disable Lint/UnusedMethodArgument
-            raise TreeHaver::NotAvailable, "tree_stump not available" unless Rust.available?
+            raise TreeHaver::NotAvailable, 'tree_stump not available' unless Rust.available?
 
             # Validate the path exists before calling register_lang to provide a clear error
             raise TreeHaver::NotAvailable, "Language library not found: #{path}" unless File.exist?(path)
@@ -175,7 +177,7 @@ module TreeHaver
           end
 
           # Backward-compatible alias for from_library
-          alias_method :from_path, :from_library
+          alias from_path from_library
         end
       end
 
@@ -187,7 +189,8 @@ module TreeHaver
         #
         # @raise [TreeHaver::NotAvailable] if tree_stump is not available
         def initialize
-          raise TreeHaver::NotAvailable, "tree_stump not available" unless Rust.available?
+          raise TreeHaver::NotAvailable, 'tree_stump not available' unless Rust.available?
+
           @parser = ::TreeStump::Parser.new
         end
 

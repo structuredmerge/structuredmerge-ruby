@@ -33,21 +33,21 @@ module TreeHaver
       return unless path
 
       # Extract filename without extension: "libtree-sitter-toml" or "toml"
-      filename = File.basename(path, ".*")
+      filename = File.basename(path, '.*')
 
       # Handle multi-part extensions like .so.0.24
-      filename = filename.sub(/\.so(\.\d+)*\z/, "")
+      filename = filename.sub(/\.so(\.\d+)*\z/, '')
 
       # Match patterns and normalize to tree_sitter_<lang>
       case filename
       when /\Alib[-_]?tree[-_]sitter[-_](.+)\z/
-        "tree_sitter_#{Regexp.last_match(1).tr("-", "_")}"
+        "tree_sitter_#{Regexp.last_match(1).tr('-', '_')}"
       when /\Atree[-_]sitter[-_](.+)\z/
-        "tree_sitter_#{Regexp.last_match(1).tr("-", "_")}"
+        "tree_sitter_#{Regexp.last_match(1).tr('-', '_')}"
       else
         # Assume filename is just the language name (e.g., "toml.so" -> "tree_sitter_toml")
         # Also strip "lib" prefix if present (e.g., "libtoml.so" -> "tree_sitter_toml")
-        lang = filename.sub(/\Alib/, "").tr("-", "_")
+        lang = filename.sub(/\Alib/, '').tr('-', '_')
         "tree_sitter_#{lang}"
       end
     end
@@ -64,7 +64,7 @@ module TreeHaver
       return unless symbol
 
       # Strip the "tree_sitter_" prefix to get the language name
-      symbol.sub(/\Atree_sitter_/, "")
+      symbol.sub(/\Atree_sitter_/, '')
     end
 
     # Derive language name from a symbol
@@ -74,7 +74,7 @@ module TreeHaver
     def derive_language_name_from_symbol(symbol)
       return unless symbol
 
-      symbol.sub(/\Atree_sitter_/, "")
+      symbol.sub(/\Atree_sitter_/, '')
     end
   end
 end

@@ -35,17 +35,17 @@ module TreeHaver
     # Default directories that are generally trusted for system libraries
     # These are searched by the dynamic linker anyway
     DEFAULT_TRUSTED_DIRECTORIES = [
-      "/usr/lib",
-      "/usr/lib64",
-      "/usr/lib/x86_64-linux-gnu",
-      "/usr/lib/aarch64-linux-gnu",
-      "/usr/local/lib",
-      "/opt/homebrew/lib",
-      "/opt/local/lib",
+      '/usr/lib',
+      '/usr/lib64',
+      '/usr/lib/x86_64-linux-gnu',
+      '/usr/lib/aarch64-linux-gnu',
+      '/usr/local/lib',
+      '/opt/homebrew/lib',
+      '/opt/local/lib'
     ].freeze
 
     # Environment variable for adding trusted directories (comma-separated)
-    TRUSTED_DIRS_ENV_VAR = "TREE_HAVER_TRUSTED_DIRS"
+    TRUSTED_DIRS_ENV_VAR = 'TREE_HAVER_TRUSTED_DIRS'
 
     # Maximum reasonable path length (prevents DoS via extremely long paths)
     MAX_PATH_LENGTH = 4096
@@ -60,7 +60,7 @@ module TreeHaver
     # Pattern for valid symbol names (C identifier format)
     VALID_SYMBOL_PATTERN = /\A[a-zA-Z_][a-zA-Z0-9_]*\z/
 
-    @custom_trusted_directories = [] # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+    @custom_trusted_directories = []
     @mutex = Mutex.new
 
     module_function
@@ -74,8 +74,8 @@ module TreeHaver
       # Add user-local XDG directories (computed at call time from HOME)
       begin
         home = Dir.home
-        dirs << File.join(home, ".local", "lib", "tree-sitter")
-        dirs << File.join(home, ".local", "lib")
+        dirs << File.join(home, '.local', 'lib', 'tree-sitter')
+        dirs << File.join(home, '.local', 'lib')
       rescue ArgumentError
         # HOME not set — skip user-local dirs
       end
@@ -84,14 +84,14 @@ module TreeHaver
       @mutex.synchronize { dirs.concat(@custom_trusted_directories) }
 
       # Add directories from environment variable
-      ENV[TRUSTED_DIRS_ENV_VAR]&.split(",")&.each do |dir|
+      ENV[TRUSTED_DIRS_ENV_VAR]&.split(',')&.each do |dir|
         expanded = File.expand_path(dir.strip)
         # simplecov:disable
         # File.expand_path always returns absolute paths on Unix/macOS.
         # This guard exists for defensive programming on exotic platforms
         # where expand_path might behave differently, but cannot be tested
         # in standard CI environments.
-        dirs << expanded if expanded.start_with?("/")
+        dirs << expanded if expanded.start_with?('/')
         # simplecov:enable
       end
 
@@ -120,7 +120,7 @@ module TreeHaver
       # This guard exists for defensive programming on exotic platforms
       # where expand_path might behave differently, but cannot be tested
       # in standard CI environments.
-      unless expanded.start_with?("/")
+      unless expanded.start_with?('/')
         raise ArgumentError, "Trusted directory must be an absolute path: #{directory.inspect}"
       end
       # simplecov:enable
@@ -185,11 +185,11 @@ module TreeHaver
       return false if path.include?("\0") # Null byte injection
 
       # Must be absolute path (prevents relative path traversal)
-      return false unless path.start_with?("/") || windows_absolute_path?(path)
+      return false unless path.start_with?('/') || windows_absolute_path?(path)
 
       # Check for path traversal attempts
-      return false if path.include?("/../") || path.end_with?("/..")
-      return false if path.include?("/./") || path.end_with?("/.")
+      return false if path.include?('/../') || path.end_with?('/..')
+      return false if path.include?('/./') || path.end_with?('/.')
 
       # Validate extension
       # Allow versioned .so files like .so.0, .so.14, etc. (common on Linux)
@@ -200,9 +200,7 @@ module TreeHaver
       return false unless filename.match?(VALID_FILENAME_PATTERN)
 
       # Optionally require the path to be in a trusted directory
-      if require_trusted_dir
-        return false unless in_trusted_directory?(path)
-      end
+      return false if require_trusted_dir && !in_trusted_directory?(path)
 
       true
     end
@@ -302,7 +300,7 @@ module TreeHaver
     def sanitize_language_name(name)
       return if name.nil?
 
-      sanitized = name.to_s.downcase.gsub(/[^a-z0-9_]/, "")
+      sanitized = name.to_s.downcase.gsub(/[^a-z0-9_]/, '')
       return if sanitized.empty?
       return unless sanitized.match?(/\A[a-z]/)
 
@@ -317,24 +315,20 @@ module TreeHaver
       errors = []
 
       if path.nil? || path.empty?
-        errors << "Path is nil or empty"
+        errors << 'Path is nil or empty'
         return errors
       end
 
       errors << "Path exceeds maximum length (#{MAX_PATH_LENGTH})" if path.length > MAX_PATH_LENGTH
-      errors << "Path contains null byte" if path.include?("\0")
-      errors << "Path is not absolute" unless path.start_with?("/") || windows_absolute_path?(path)
-      errors << "Path contains traversal sequence (/../)" if path.include?("/../") || path.end_with?("/..")
-      errors << "Path contains traversal sequence (/./)" if path.include?("/./") || path.end_with?("/.")
+      errors << 'Path contains null byte' if path.include?("\0")
+      errors << 'Path is not absolute' unless path.start_with?('/') || windows_absolute_path?(path)
+      errors << 'Path contains traversal sequence (/../)' if path.include?('/../') || path.end_with?('/..')
+      errors << 'Path contains traversal sequence (/./)' if path.include?('/./') || path.end_with?('/.')
 
-      unless has_valid_extension?(path)
-        errors << "Path does not have allowed extension (.so, .so.X, .dylib, .dll)"
-      end
+      errors << 'Path does not have allowed extension (.so, .so.X, .dylib, .dll)' unless has_valid_extension?(path)
 
       filename = File.basename(path)
-      unless filename.match?(VALID_FILENAME_PATTERN)
-        errors << "Filename contains invalid characters"
-      end
+      errors << 'Filename contains invalid characters' unless filename.match?(VALID_FILENAME_PATTERN)
 
       errors
     end
@@ -342,7 +336,7 @@ module TreeHaver
     # @api private
     def windows_absolute_path?(path)
       # Match Windows absolute paths like C:\path or D:/path
-      path.match?(/\A[A-Za-z]:[\\\/]/)
+      path.match?(%r{\A[A-Za-z]:[\\/]})
     end
 
     # @api private

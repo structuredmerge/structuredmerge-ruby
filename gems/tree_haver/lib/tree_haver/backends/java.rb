@@ -70,12 +70,12 @@ module TreeHaver
     # @see https://central.sonatype.com/artifact/io.github.tree-sitter/jtreesitter Maven Central
     module Java
       # The Java package for java-tree-sitter
-      JAVA_PACKAGE = "io.github.treesitter.jtreesitter"
+      JAVA_PACKAGE = 'io.github.treesitter.jtreesitter'
 
       @load_attempted = false
       @loaded = false
-      @java_classes = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
-      @runtime_lookup = nil  # Cached SymbolLookup for libtree-sitter.so
+      @java_classes = {}
+      @runtime_lookup = nil # Cached SymbolLookup for libtree-sitter.so
 
       module_function
 
@@ -107,13 +107,14 @@ module TreeHaver
         # simplecov:disable
         # This method requires JRuby and cannot be tested on MRI/CRuby.
         # JRuby-specific CI jobs would test this code.
-        require "java"
+        require 'java'
 
         # Add JARs to classpath
-        dir = ENV["TREE_SITTER_JAVA_JARS_DIR"]
+        dir = ENV['TREE_SITTER_JAVA_JARS_DIR']
         if dir && Dir.exist?(dir)
-          Dir[File.join(dir, "**", "*.jar")].each do |jar|
+          Dir[File.join(dir, '**', '*.jar')].each do |jar|
             next if $CLASSPATH.include?(jar)
+
             $CLASSPATH << jar
           end
         end
@@ -133,21 +134,21 @@ module TreeHaver
       def configure_native_library_path!
         # simplecov:disable
         # This method requires JRuby and cannot be tested on MRI/CRuby.
-        lib_path = ENV["TREE_SITTER_RUNTIME_LIB"]
+        lib_path = ENV['TREE_SITTER_RUNTIME_LIB']
         return unless lib_path && File.exist?(lib_path)
 
         lib_dir = File.dirname(lib_path)
-        current_path = java.lang.System.getProperty("java.library.path") || ""
+        current_path = java.lang.System.getProperty('java.library.path') || ''
 
         unless current_path.include?(lib_dir)
           new_path = current_path.empty? ? lib_dir : "#{lib_dir}:#{current_path}"
-          java.lang.System.setProperty("java.library.path", new_path)
+          java.lang.System.setProperty('java.library.path', new_path)
 
           # Also set jna.library.path in case it uses JNA
-          java.lang.System.setProperty("jna.library.path", new_path)
+          java.lang.System.setProperty('jna.library.path', new_path)
         end
         # simplecov:enable
-      rescue => _error
+      rescue StandardError => _e
         # Ignore errors setting library path
       end
 
@@ -165,9 +166,10 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = check_availability # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
+          @loaded = check_availability
         end
 
         # Reset the load state (primarily for testing)
@@ -175,21 +177,21 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_error = nil # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loader = nil # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @java_classes = {} # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
+          @load_error = nil
+          @loader = nil
+          @java_classes = {}
         end
 
         private
 
         def check_availability
           # 1. Check Ruby engine
-          return false unless RUBY_ENGINE == "jruby"
+          return false unless RUBY_ENGINE == 'jruby'
 
           # 2. Check for required JARs via environment variable
-          jars_dir = ENV["TREE_SITTER_JAVA_JARS_DIR"]
+          jars_dir = ENV['TREE_SITTER_JAVA_JARS_DIR']
           return false unless jars_dir && Dir.exist?(jars_dir)
 
           # 3. Check if we can load the classes
@@ -227,13 +229,14 @@ module TreeHaver
         # simplecov:disable
         # This method returns meaningful data only on JRuby when java-tree-sitter is available.
         return {} unless available?
+
         {
           backend: :java,
           parse: true,
           query: true, # java-tree-sitter supports the Query API
           bytes_field: true,
           incremental: true, # java-tree-sitter supports Parser.parse(Tree, String)
-          comment_support: :nodes_only,
+          comment_support: :nodes_only
         }
         # simplecov:enable
       end
@@ -291,10 +294,10 @@ module TreeHaver
           return unless other.backend == @backend
 
           # Compare by path first, then symbol
-          cmp = (@path || "") <=> (other.path || "")
+          cmp = (@path || '') <=> (other.path || '')
           return cmp if cmp.nonzero?
 
-          (@symbol || "") <=> (other.symbol || "")
+          (@symbol || '') <=> (other.symbol || '')
         end
 
         # Hash value for this language (for use in Sets/Hashes)
@@ -304,7 +307,7 @@ module TreeHaver
         end
 
         # Alias eql? to ==
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Load a language from a shared library
         #
@@ -335,7 +338,7 @@ module TreeHaver
         #   )
         class << self
           def from_library(path, symbol: nil, name: nil)
-            raise TreeHaver::NotAvailable, "Java backend not available" unless Java.available?
+            raise TreeHaver::NotAvailable, 'Java backend not available' unless Java.available?
 
             # Use shared utility for consistent symbol derivation across backends
             # If symbol not provided, derive from name or path
@@ -352,7 +355,7 @@ module TreeHaver
               # We cache this lookup at the module level
               unless Java.runtime_lookup
                 # Use libraryLookup(String, Arena) to search LD_LIBRARY_PATH
-                Java.runtime_lookup = symbol_lookup_class.libraryLookup("libtree-sitter.so", arena)
+                Java.runtime_lookup = symbol_lookup_class.libraryLookup('libtree-sitter.so', arena)
               end
 
               # Now load the grammar library
@@ -379,30 +382,30 @@ module TreeHaver
               error_msg = "Failed to load language '#{sym}' from #{path}: #{e.message}"
               if root_cause.is_a?(::Java::JavaLang::UnsatisfiedLinkError)
                 unresolved = root_cause.message.to_s
-                if unresolved.include?("ts_language_version")
+                if unresolved.include?('ts_language_version')
                   # This specific symbol was renamed in tree-sitter 0.24
                   error_msg += "\n\nVersion mismatch detected: The grammar was built against " \
-                    "tree-sitter < 0.24 (uses ts_language_version), but your runtime library " \
+                    'tree-sitter < 0.24 (uses ts_language_version), but your runtime library ' \
                     "is tree-sitter >= 0.24 (uses ts_language_abi_version).\n\n" \
                     "Solutions:\n" \
                     "1. Rebuild the grammar against your version of tree-sitter\n" \
                     "2. Install a matching version of tree-sitter (< 0.24)\n" \
-                    "3. Find a pre-built grammar compatible with tree-sitter 0.24+"
-                elsif unresolved.include?("ts_language") || unresolved.include?("ts_parser")
+                    '3. Find a pre-built grammar compatible with tree-sitter 0.24+'
+                elsif unresolved.include?('ts_language') || unresolved.include?('ts_parser')
                   error_msg += "\n\nThe grammar library has unresolved tree-sitter symbols. " \
-                    "Ensure libtree-sitter.so is in LD_LIBRARY_PATH and version-compatible " \
-                    "with the grammar."
+                    'Ensure libtree-sitter.so is in LD_LIBRARY_PATH and version-compatible ' \
+                    'with the grammar.'
                 end
               end
               raise TreeHaver::NotAvailable, error_msg
             rescue ::Java::JavaLang::UnsatisfiedLinkError => e
               raise TreeHaver::NotAvailable,
-                "Native library error loading #{path}: #{e.message}. " \
-                  "Ensure the library is in LD_LIBRARY_PATH."
+                    "Native library error loading #{path}: #{e.message}. " \
+                      'Ensure the library is in LD_LIBRARY_PATH.'
             rescue ::Java::JavaLang::IllegalArgumentException => e
               raise TreeHaver::NotAvailable,
-                "Could not find library '#{path}': #{e.message}. " \
-                  "Ensure it's in LD_LIBRARY_PATH or provide an absolute path."
+                    "Could not find library '#{path}': #{e.message}. " \
+                      "Ensure it's in LD_LIBRARY_PATH or provide an absolute path."
             end
           end
 
@@ -421,14 +424,14 @@ module TreeHaver
           #   # tree-sitter-toml-0.23.2.jar from Maven Central
           #   lang = TreeHaver::Backends::Java::Language.load_by_name("toml")
           def load_by_name(name)
-            raise TreeHaver::NotAvailable, "Java backend not available" unless Java.available?
+            raise TreeHaver::NotAvailable, 'Java backend not available' unless Java.available?
 
             # Try to find the grammar library in standard locations
             # Look for library names like "tree-sitter-toml" or "libtree-sitter-toml"
             lib_names = [
               "tree-sitter-#{name}",
               "libtree-sitter-#{name}",
-              "tree_sitter_#{name}",
+              "tree_sitter_#{name}"
             ]
 
             begin
@@ -437,7 +440,7 @@ module TreeHaver
 
               # Ensure runtime lookup is available
               unless Java.runtime_lookup
-                Java.runtime_lookup = symbol_lookup_class.libraryLookup("libtree-sitter.so", arena)
+                Java.runtime_lookup = symbol_lookup_class.libraryLookup('libtree-sitter.so', arena)
               end
 
               # Try each library name
@@ -452,9 +455,9 @@ module TreeHaver
 
               unless grammar_lookup
                 raise TreeHaver::NotAvailable,
-                  "Failed to load language '#{name}': Library not found. " \
-                    "Ensure the grammar library (e.g., libtree-sitter-#{name}.so) " \
-                    "is in LD_LIBRARY_PATH."
+                      "Failed to load language '#{name}': Library not found. " \
+                        "Ensure the grammar library (e.g., libtree-sitter-#{name}.so) " \
+                        'is in LD_LIBRARY_PATH.'
               end
 
               combined_lookup = grammar_lookup.or(Java.runtime_lookup)
@@ -463,15 +466,15 @@ module TreeHaver
               new(java_lang, symbol: sym)
             rescue ::Java::JavaLang::RuntimeException => e
               raise TreeHaver::NotAvailable,
-                "Failed to load language '#{name}': #{e.message}. " \
-                  "Ensure the grammar library (e.g., libtree-sitter-#{name}.so) " \
-                  "is in LD_LIBRARY_PATH."
+                    "Failed to load language '#{name}': #{e.message}. " \
+                      "Ensure the grammar library (e.g., libtree-sitter-#{name}.so) " \
+                      'is in LD_LIBRARY_PATH.'
             end
           end
         end
 
         class << self
-          alias_method :from_path, :from_library
+          alias from_path from_library
         end
       end
 
@@ -494,7 +497,8 @@ module TreeHaver
         #
         # @raise [TreeHaver::NotAvailable] if Java backend is not available
         def initialize
-          raise TreeHaver::NotAvailable, "Java backend not available" unless Java.available?
+          raise TreeHaver::NotAvailable, 'Java backend not available' unless Java.available?
+
           @parser = Java.java_classes[:Parser].new
         end
 
@@ -518,7 +522,8 @@ module TreeHaver
           java_result = @parser.parse(source)
           # jtreesitter 0.26.0 returns Optional<Tree>
           java_tree = unwrap_optional(java_result)
-          raise TreeHaver::Error, "Parser returned no tree" unless java_tree
+          raise TreeHaver::Error, 'Parser returned no tree' unless java_tree
+
           Tree.new(java_tree)
         end
 
@@ -539,23 +544,24 @@ module TreeHaver
           if old_tree
             # Get the actual Java Tree object
             java_old_tree = if old_tree.is_a?(Tree)
-              old_tree.impl
-            else
-              unwrap_optional(old_tree)
-            end
+                              old_tree.impl
+                            else
+                              unwrap_optional(old_tree)
+                            end
 
             java_result = if java_old_tree
-              # jtreesitter 0.26.0 API: parse(String source, Tree oldTree)
-              @parser.parse(source, java_old_tree)
-            else
-              @parser.parse(source)
-            end
+                            # jtreesitter 0.26.0 API: parse(String source, Tree oldTree)
+                            @parser.parse(source, java_old_tree)
+                          else
+                            @parser.parse(source)
+                          end
           else
             java_result = @parser.parse(source)
           end
           # jtreesitter 0.26.0 returns Optional<Tree>
           java_tree = unwrap_optional(java_result)
-          raise TreeHaver::Error, "Parser returned no tree" unless java_tree
+          raise TreeHaver::Error, 'Parser returned no tree' unless java_tree
+
           Tree.new(java_tree)
         end
 
@@ -569,6 +575,7 @@ module TreeHaver
         # @return [Object, nil] unwrapped value or nil if empty
         def unwrap_optional(value)
           return value unless value.respond_to?(:isPresent)
+
           value.isPresent ? value.get : nil
         end
       end
@@ -619,12 +626,14 @@ module TreeHaver
           result = @impl.rootNode
           # jtreesitter 0.26.0: rootNode() may return Optional<Node> or Node directly
           java_node = if result.respond_to?(:isPresent)
-            raise TreeHaver::Error, "Tree has no root node" unless result.isPresent
-            result.get
-          else
-            result
-          end
-          raise TreeHaver::Error, "Tree has no root node" unless java_node
+                        raise TreeHaver::Error, 'Tree has no root node' unless result.isPresent
+
+                        result.get
+                      else
+                        result
+                      end
+          raise TreeHaver::Error, 'Tree has no root node' unless java_node
+
           Node.new(java_node)
         end
 
@@ -651,7 +660,7 @@ module TreeHaver
             new_end_byte,
             start_pt,
             old_end_pt,
-            new_end_pt,
+            new_end_pt
           )
 
           @impl.edit(input_edit)
@@ -724,6 +733,7 @@ module TreeHaver
           # Handle Java Optional
           if result.respond_to?(:isPresent)
             return unless result.isPresent
+
             java_node = result.get
           else
             # Direct Node return (some jtreesitter versions)
@@ -748,6 +758,7 @@ module TreeHaver
           # Handle Java Optional
           if result.respond_to?(:isPresent)
             return unless result.isPresent
+
             java_node = result.get
           else
             # Direct Node return (some jtreesitter versions)
@@ -763,6 +774,7 @@ module TreeHaver
         # @return [void]
         def each
           return enum_for(:each) unless block_given?
+
           child_count.times do |i|
             yield child(i)
           end
@@ -787,7 +799,7 @@ module TreeHaver
         # @return [Hash] with :row and :column keys
         def start_point
           pt = @impl.startPoint
-          {row: pt.row, column: pt.column}
+          { row: pt.row, column: pt.column }
         end
 
         # Get the end point (row, column)
@@ -795,7 +807,7 @@ module TreeHaver
         # @return [Hash] with :row and :column keys
         def end_point
           pt = @impl.endPoint
-          {row: pt.row, column: pt.column}
+          { row: pt.row, column: pt.column }
         end
 
         # Check if this node has an error
@@ -830,6 +842,7 @@ module TreeHaver
           # Handle Java Optional
           if result.respond_to?(:isPresent)
             return unless result.isPresent
+
             java_node = result.get
           else
             java_node = result
@@ -849,6 +862,7 @@ module TreeHaver
           # Handle Java Optional
           if result.respond_to?(:isPresent)
             return unless result.isPresent
+
             java_node = result.get
           else
             java_node = result
@@ -868,6 +882,7 @@ module TreeHaver
           # Handle Java Optional
           if result.respond_to?(:isPresent)
             return unless result.isPresent
+
             java_node = result.get
           else
             java_node = result

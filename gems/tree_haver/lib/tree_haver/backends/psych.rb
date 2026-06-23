@@ -28,19 +28,20 @@ module TreeHaver
       # @return [Boolean] true if psych is available
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
-            require "psych"
-            @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            require 'psych'
+            @loaded = true
           rescue LoadError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           rescue StandardError
             # simplecov:disable defensive code - StandardError during require is extremely rare
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:enable
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -48,8 +49,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -57,6 +58,7 @@ module TreeHaver
         # @return [Hash{Symbol => Object}] capability map
         def capabilities
           return {} unless available?
+
           {
             backend: :psych,
             query: false,           # Psych doesn't have tree-sitter-style queries
@@ -65,7 +67,7 @@ module TreeHaver
             pure_ruby: false,       # Psych has native libyaml C extension
             yaml_only: true,        # Psych only parses YAML
             error_tolerant: false,  # Psych raises on syntax errors
-            comment_support: :none,
+            comment_support: :none
           }
         end
       end
@@ -109,8 +111,8 @@ module TreeHaver
 
             unless lang_name == :yaml
               raise TreeHaver::NotAvailable,
-                "Psych backend only supports YAML, not #{lang_name}. " \
-                  "Use a tree-sitter backend for #{lang_name} support."
+                    "Psych backend only supports YAML, not #{lang_name}. " \
+                      "Use a tree-sitter backend for #{lang_name} support."
             end
 
             yaml
@@ -133,8 +135,9 @@ module TreeHaver
         # @return [Tree] Parsed tree
         # @raise [::Psych::SyntaxError] on syntax errors
         def parse(source)
-          raise "Language not set" unless language
-          Psych.available? or raise "Psych not available"
+          raise 'Language not set' unless language
+
+          Psych.available? or raise 'Psych not available'
 
           ast = ::Psych.parse_stream(source)
           Tree.new(ast, source)
@@ -194,7 +197,7 @@ module TreeHaver
         #
         # @return [String] Node type
         def type
-          inner_node.class.name.split("::").last.downcase
+          inner_node.class.name.split('::').last.downcase
         end
 
         # Alias for type (API compatibility)
@@ -337,7 +340,7 @@ module TreeHaver
         #
         # @return [String] Extracted text
         def extract_text_from_location
-          return "" unless inner_node.respond_to?(:start_line) && inner_node.respond_to?(:end_line)
+          return '' unless inner_node.respond_to?(:start_line) && inner_node.respond_to?(:end_line)
 
           start_ln = inner_node.start_line || 0
           end_ln = inner_node.end_line || start_ln
@@ -345,19 +348,19 @@ module TreeHaver
           end_col = inner_node.end_column || 0
 
           if start_ln == end_ln
-            line = lines[start_ln] || ""
-            line[start_col...end_col] || ""
+            line = lines[start_ln] || ''
+            line[start_col...end_col] || ''
           else
             result = []
             (start_ln..end_ln).each do |ln|
-              line = lines[ln] || ""
+              line = lines[ln] || ''
               result << if ln == start_ln
-                line[start_col..]
-              elsif ln == end_ln
-                line[0...end_col]
-              else
-                line
-              end
+                          line[start_col..]
+                        elsif ln == end_ln
+                          line[0...end_col]
+                        else
+                          line
+                        end
             end
             result.compact.join
           end

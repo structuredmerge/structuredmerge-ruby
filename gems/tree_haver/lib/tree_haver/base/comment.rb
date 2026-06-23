@@ -56,13 +56,13 @@ module TreeHaver
       # Get the start position (row/column, 0-based).
       # @return [Hash{Symbol => Integer}]
       def start_point
-        {row: 0, column: 0}
+        { row: 0, column: 0 }
       end
 
       # Get the end position (row/column, 0-based).
       # @return [Hash{Symbol => Integer}]
       def end_point
-        {row: 0, column: 0}
+        { row: 0, column: 0 }
       end
 
       # Get the normalized delimiter style.
@@ -121,7 +121,7 @@ module TreeHaver
         {
           opening: opening_delimiter,
           closing: closing_delimiter,
-          body: body_text,
+          body: body_text
         }
       end
 
@@ -196,7 +196,7 @@ module TreeHaver
           start_line: start_line,
           end_line: end_line,
           start_column: start_point[:column],
-          end_column: end_point[:column],
+          end_column: end_point[:column]
         }
       end
 
@@ -296,14 +296,14 @@ module TreeHaver
 
       def extract_body_text(raw_text)
         text_without_opening = if opening_delimiter
-          raw_text.sub(/\A#{Regexp.escape(opening_delimiter)}[ \t]?/, "")
-        else
-          raw_text
-        end
+                                 raw_text.sub(/\A#{Regexp.escape(opening_delimiter)}[ \t]?/, '')
+                               else
+                                 raw_text
+                               end
 
         return text_without_opening unless closing_delimiter
 
-        text_without_opening.sub(/[ \t]*#{Regexp.escape(closing_delimiter)}\z/m, "")
+        text_without_opening.sub(/[ \t]*#{Regexp.escape(closing_delimiter)}\z/m, '')
       end
 
       def normalize_attachment_hint(hint)
@@ -313,7 +313,7 @@ module TreeHaver
         return normalized if ATTACHMENT_HINTS.include?(normalized)
 
         raise ArgumentError,
-          "Unknown comment attachment hint: #{hint.inspect}. Expected one of: #{ATTACHMENT_HINTS.join(", ")}"
+              "Unknown comment attachment hint: #{hint.inspect}. Expected one of: #{ATTACHMENT_HINTS.join(', ')}"
       end
     end
   end

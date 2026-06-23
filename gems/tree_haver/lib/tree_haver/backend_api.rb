@@ -133,7 +133,7 @@ module TreeHaver
       has_error?: %i[has_error],
       missing?: %i[is_missing? is_missing],
       next_sibling: %i[next_named_sibling],
-      prev_sibling: %i[previous_sibling previous_named_sibling prev_named_sibling],
+      prev_sibling: %i[previous_sibling previous_named_sibling prev_named_sibling]
     }.freeze
 
     class << self
@@ -147,7 +147,7 @@ module TreeHaver
           valid: true,
           errors: [],
           warnings: [],
-          capabilities: {},
+          capabilities: {}
         }
 
         # Check module-level methods
@@ -157,7 +157,7 @@ module TreeHaver
         if backend_module.const_defined?(:Language)
           validate_language(backend_module::Language, results)
         else
-          results[:errors] << "Missing Language class"
+          results[:errors] << 'Missing Language class'
           results[:valid] = false
         end
 
@@ -165,7 +165,7 @@ module TreeHaver
         if backend_module.const_defined?(:Parser)
           validate_parser(backend_module::Parser, results)
         else
-          results[:errors] << "Missing Parser class"
+          results[:errors] << 'Missing Parser class'
           results[:valid] = false
         end
 
@@ -173,20 +173,18 @@ module TreeHaver
         if backend_module.const_defined?(:Tree)
           validate_tree(backend_module::Tree, results)
         else
-          results[:warnings] << "No Tree class (backend returns raw trees)"
+          results[:warnings] << 'No Tree class (backend returns raw trees)'
         end
 
         # Check Node class if present (wrapper backends)
         if backend_module.const_defined?(:Node)
           validate_node_class(backend_module::Node, results, strict: strict)
         else
-          results[:warnings] << "No Node class (backend returns raw nodes, TreeHaver::Node will wrap)"
+          results[:warnings] << 'No Node class (backend returns raw nodes, TreeHaver::Node will wrap)'
         end
 
         # Fail on warnings in strict mode
-        if strict && results[:warnings].any?
-          results[:valid] = false
-        end
+        results[:valid] = false if strict && results[:warnings].any?
 
         results
       end
@@ -201,9 +199,9 @@ module TreeHaver
         results = validate(backend_module, strict: strict)
         unless results[:valid]
           raise TreeHaver::Error,
-            "Backend #{backend_module.name} API validation failed:\n  " \
-              "Errors: #{results[:errors].join(", ")}\n  " \
-              "Warnings: #{results[:warnings].join(", ")}"
+                "Backend #{backend_module.name} API validation failed:\n  " \
+                  "Errors: #{results[:errors].join(', ')}\n  " \
+                  "Warnings: #{results[:warnings].join(', ')}"
         end
         results
       end
@@ -218,7 +216,7 @@ module TreeHaver
           errors: [],
           warnings: [],
           supported_methods: [],
-          unsupported_methods: [],
+          unsupported_methods: []
         }
 
         # Check required methods
@@ -248,12 +246,12 @@ module TreeHaver
 
       def validate_module_methods(mod, results)
         unless mod.singleton_class.method_defined?(:available?)
-          results[:errors] << "Missing module method: available?"
+          results[:errors] << 'Missing module method: available?'
           results[:valid] = false
         end
 
         unless mod.singleton_class.method_defined?(:capabilities)
-          results[:warnings] << "Missing module method: capabilities"
+          results[:warnings] << 'Missing module method: capabilities'
           return
         end
 
@@ -264,14 +262,14 @@ module TreeHaver
         return if capabilities.nil? || capabilities.empty?
 
         unless capabilities.is_a?(Hash)
-          results[:errors] << "Backend capabilities must return a Hash"
+          results[:errors] << 'Backend capabilities must return a Hash'
           results[:valid] = false
           return
         end
 
         comment_support = capabilities[:comment_support]
         if comment_support.nil?
-          results[:warnings] << "Capabilities missing :comment_support"
+          results[:warnings] << 'Capabilities missing :comment_support'
           return
         end
 
@@ -286,7 +284,7 @@ module TreeHaver
         return unless capabilities.key?(:comment_attachment_hints)
 
         attachment_hints = capabilities[:comment_attachment_hints]
-        unless attachment_hints == true || attachment_hints == false
+        unless [true, false].include?(attachment_hints)
           results[:errors] << "Invalid :comment_attachment_hints #{attachment_hints.inspect}; expected true or false"
           results[:valid] = false
           return
@@ -300,19 +298,17 @@ module TreeHaver
         # Language-specific backends should implement it to ignore path/symbol
         # and return their single language (for API consistency)
         unless klass.singleton_class.method_defined?(:from_library)
-          results[:errors] << "Language missing required class method: from_library"
+          results[:errors] << 'Language missing required class method: from_library'
           results[:valid] = false
         end
 
         # Check for optional convenience methods
         optional_methods = LANGUAGE_OPTIONAL_CLASS_METHODS.select { |m| klass.singleton_class.method_defined?(m) }
-        if optional_methods.any?
-          results[:capabilities][:language_shortcuts] = optional_methods
-        end
+        results[:capabilities][:language_shortcuts] = optional_methods if optional_methods.any?
 
         results[:capabilities][:language] = {
           class_methods: LANGUAGE_CLASS_METHODS.select { |m| klass.singleton_class.method_defined?(m) } +
-            optional_methods,
+                         optional_methods
         }
       end
 
@@ -333,9 +329,7 @@ module TreeHaver
         end
 
         PARSER_OPTIONAL_METHODS.each do |method|
-          unless klass.method_defined?(method)
-            results[:warnings] << "Parser missing optional method: #{method}"
-          end
+          results[:warnings] << "Parser missing optional method: #{method}" unless klass.method_defined?(method)
         end
       end
 
@@ -348,9 +342,7 @@ module TreeHaver
         end
 
         TREE_OPTIONAL_METHODS.each do |method|
-          unless klass.method_defined?(method)
-            results[:warnings] << "Tree missing optional method: #{method}"
-          end
+          results[:warnings] << "Tree missing optional method: #{method}" unless klass.method_defined?(method)
         end
       end
 
@@ -363,20 +355,20 @@ module TreeHaver
         end
 
         NODE_OPTIONAL_METHODS.each do |method|
-          unless has_method_or_alias?(klass, method)
-            msg = "Node missing optional method: #{method}"
-            if strict
-              results[:errors] << msg
-              results[:valid] = false
-            else
-              results[:warnings] << msg
-            end
+          next if has_method_or_alias?(klass, method)
+
+          msg = "Node missing optional method: #{method}"
+          if strict
+            results[:errors] << msg
+            results[:valid] = false
+          else
+            results[:warnings] << msg
           end
         end
 
         results[:capabilities][:node] = {
           required: NODE_INSTANCE_METHODS.select { |m| has_method_or_alias?(klass, m) },
-          optional: NODE_OPTIONAL_METHODS.select { |m| has_method_or_alias?(klass, m) },
+          optional: NODE_OPTIONAL_METHODS.select { |m| has_method_or_alias?(klass, m) }
         }
       end
 

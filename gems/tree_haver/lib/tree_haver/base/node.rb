@@ -155,7 +155,7 @@ module TreeHaver
       end
 
       # Alias for named?
-      alias_method :structural?, :named?
+      alias structural? named?
 
       # Check if this node represents a syntax error
       # @return [Boolean] true on error
@@ -172,9 +172,9 @@ module TreeHaver
       # Get the text content of this node
       # @return [String] Node text
       def text
-        return "" unless source
+        return '' unless source
 
-        source[start_byte...end_byte] || ""
+        source[start_byte...end_byte] || ''
       end
 
       # Get a child by field name
@@ -187,13 +187,13 @@ module TreeHaver
       # Get start position (row/col) - 0-based
       # @return [Hash{Symbol => Integer}] {row: 0, column: 0}
       def start_point
-        {row: 0, column: 0}
+        { row: 0, column: 0 }
       end
 
       # Get end position (row/col) - 0-based
       # @return [Hash{Symbol => Integer}] {row: 0, column: 0}
       def end_point
-        {row: 0, column: 0}
+        { row: 0, column: 0 }
       end
 
       # -- Shared Implementation -----------------------------------------------
@@ -215,10 +215,10 @@ module TreeHaver
       def start_line
         sp = start_point
         row = if sp.is_a?(Hash)
-          sp[:row]
-        else
-          (sp.respond_to?(:row) ? sp.row : 0)
-        end
+                sp[:row]
+              else
+                (sp.respond_to?(:row) ? sp.row : 0)
+              end
         row + 1
       end
 
@@ -227,10 +227,10 @@ module TreeHaver
       def end_line
         ep = end_point
         row = if ep.is_a?(Hash)
-          ep[:row]
-        else
-          (ep.respond_to?(:row) ? ep.row : 0)
-        end
+                ep[:row]
+              else
+                (ep.respond_to?(:row) ? ep.row : 0)
+              end
         row + 1
       end
 
@@ -241,31 +241,31 @@ module TreeHaver
         ep = end_point
 
         sp_row = if sp.is_a?(Hash)
-          sp[:row]
-        else
-          (sp.respond_to?(:row) ? sp.row : 0)
-        end
+                   sp[:row]
+                 else
+                   (sp.respond_to?(:row) ? sp.row : 0)
+                 end
         sp_col = if sp.is_a?(Hash)
-          sp[:column]
-        else
-          (sp.respond_to?(:column) ? sp.column : 0)
-        end
+                   sp[:column]
+                 else
+                   (sp.respond_to?(:column) ? sp.column : 0)
+                 end
         ep_row = if ep.is_a?(Hash)
-          ep[:row]
-        else
-          (ep.respond_to?(:row) ? ep.row : 0)
-        end
+                   ep[:row]
+                 else
+                   (ep.respond_to?(:row) ? ep.row : 0)
+                 end
         ep_col = if ep.is_a?(Hash)
-          ep[:column]
-        else
-          (ep.respond_to?(:column) ? ep.column : 0)
-        end
+                   ep[:column]
+                 else
+                   (ep.respond_to?(:column) ? ep.column : 0)
+                 end
 
         {
           start_line: sp_row + 1,
           end_line: ep_row + 1,
           start_column: sp_col,
-          end_column: ep_col,
+          end_column: ep_col
         }
       end
 
@@ -276,7 +276,7 @@ module TreeHaver
         node_type = begin
           type
         rescue NotImplementedError
-          "(not implemented)"
+          '(not implemented)'
         end
         "#<#{class_name} type=#{node_type}>"
       end

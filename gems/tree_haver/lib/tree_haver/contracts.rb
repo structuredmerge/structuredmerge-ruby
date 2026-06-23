@@ -119,7 +119,8 @@ module TreeHaver
     end
   end
 
-  ParseErrorTolerance = Struct.new(:backend_ref, :language, :behavior, :tolerates_errors, :error_nodes, :diagnostics, keyword_init: true) do
+  ParseErrorTolerance = Struct.new(:backend_ref, :language, :behavior, :tolerates_errors, :error_nodes, :diagnostics,
+                                   keyword_init: true) do
     def to_h
       {
         backend_ref: backend_ref.to_h,
@@ -132,7 +133,8 @@ module TreeHaver
     end
   end
 
-  NativeParserProvider = Struct.new(:id, :family, :language, :operations, :retains_native_tree, :native_tree_visibility, :metadata_policy, keyword_init: true) do
+  NativeParserProvider = Struct.new(:id, :family, :language, :operations, :retains_native_tree,
+                                    :native_tree_visibility, :metadata_policy, keyword_init: true) do
     def to_h
       {
         id: id,
@@ -408,7 +410,8 @@ module TreeHaver
     end
   end
 
-  ProviderDiagnosticsReport = Struct.new(:provider_id, :backend_ref, :language, :status, :diagnostics, keyword_init: true) do
+  ProviderDiagnosticsReport = Struct.new(:provider_id, :backend_ref, :language, :status, :diagnostics,
+                                         keyword_init: true) do
     def to_h
       {
         provider_id: provider_id,
@@ -420,7 +423,8 @@ module TreeHaver
     end
   end
 
-  EditProjectionOperationRequest = Struct.new(:operation, :target_node_id, :target_node_path, :replacement_source, keyword_init: true) do
+  EditProjectionOperationRequest = Struct.new(:operation, :target_node_id, :target_node_path, :replacement_source,
+                                              keyword_init: true) do
     def to_h
       {
         operation: operation,
@@ -431,7 +435,8 @@ module TreeHaver
     end
   end
 
-  EditProjectionExecutionRequest = Struct.new(:provider_id, :backend_ref, :language, :source, :operations, keyword_init: true) do
+  EditProjectionExecutionRequest = Struct.new(:provider_id, :backend_ref, :language, :source, :operations,
+                                              keyword_init: true) do
     def to_h
       {
         provider_id: provider_id,
@@ -443,7 +448,8 @@ module TreeHaver
     end
   end
 
-  AppliedEditProjectionOperation = Struct.new(:operation, :target_node_id, :correlation_key, :correlation_value, keyword_init: true) do
+  AppliedEditProjectionOperation = Struct.new(:operation, :target_node_id, :correlation_key, :correlation_value,
+                                              keyword_init: true) do
     def to_h
       {
         operation: operation,
@@ -454,7 +460,8 @@ module TreeHaver
     end
   end
 
-  EditProjectionExecutionResult = Struct.new(:ok, :status, :source, :applied_operations, :diagnostics, keyword_init: true) do
+  EditProjectionExecutionResult = Struct.new(:ok, :status, :source, :applied_operations, :diagnostics,
+                                             keyword_init: true) do
     def to_h
       {
         ok: ok,
@@ -626,16 +633,18 @@ module TreeHaver
     value = path.to_s
     errors = []
 
-    errors << "path_empty" if value.empty?
-    errors << "path_too_long" if value.length > MAX_LIBRARY_PATH_LENGTH
-    errors << "path_contains_null_byte" if value.include?("\0")
-    errors << "path_not_absolute" unless value.start_with?("/") || windows_absolute_path?(value)
+    errors << 'path_empty' if value.empty?
+    errors << 'path_too_long' if value.length > MAX_LIBRARY_PATH_LENGTH
+    errors << 'path_contains_null_byte' if value.include?("\0")
+    errors << 'path_not_absolute' unless value.start_with?('/') || windows_absolute_path?(value)
 
     segments = value.split(%r{[/\\]})
-    errors << "path_contains_parent_traversal" if segments.include?("..")
-    errors << "path_contains_current_directory_traversal" if segments.include?(".")
-    errors << "path_extension_not_allowed" unless allowed_library_extension?(value)
-    errors << "filename_contains_invalid_characters" unless VALID_LIBRARY_FILENAME_PATTERN.match?(library_filename(value))
+    errors << 'path_contains_parent_traversal' if segments.include?('..')
+    errors << 'path_contains_current_directory_traversal' if segments.include?('.')
+    errors << 'path_extension_not_allowed' unless allowed_library_extension?(value)
+    unless VALID_LIBRARY_FILENAME_PATTERN.match?(library_filename(value))
+      errors << 'filename_contains_invalid_characters'
+    end
 
     errors
   end
@@ -647,7 +656,7 @@ module TreeHaver
   module_function :safe_language_name?
 
   def sanitize_language_name(name)
-    sanitized = name.to_s.downcase.gsub(/[^a-z0-9_]/, "")
+    sanitized = name.to_s.downcase.gsub(/[^a-z0-9_]/, '')
     safe_language_name?(sanitized) ? sanitized : nil
   end
   module_function :sanitize_language_name
@@ -658,7 +667,7 @@ module TreeHaver
   module_function :safe_symbol_name?
 
   def safe_backend_name?(name)
-    name.to_s == "auto" || !BackendRegistry.fetch(name.to_s).nil?
+    name.to_s == 'auto' || !BackendRegistry.fetch(name.to_s).nil?
   end
   module_function :safe_backend_name?
 
@@ -666,18 +675,18 @@ module TreeHaver
     if checks.empty?
       return BackendAvailabilityReport.new(
         backend_ref: backend_ref,
-        status: "unknown",
+        status: 'unknown',
         checks: [],
-        diagnostics: ["backend availability unknown: no checks supplied"]
+        diagnostics: ['backend availability unknown: no checks supplied']
       )
     end
 
     diagnostics = []
-    status = "available"
+    status = 'available'
     checks.each do |check|
-      next unless check.required && check.status != "available"
+      next unless check.required && check.status != 'available'
 
-      status = "unavailable"
+      status = 'unavailable'
       diagnostics << "backend unavailable: required check #{check.name} is #{check.status}"
     end
     BackendAvailabilityReport.new(backend_ref: backend_ref, status: status, checks: checks, diagnostics: diagnostics)
@@ -685,13 +694,13 @@ module TreeHaver
   module_function :build_backend_availability_report
 
   def build_provider_diagnostics_report(provider_id, backend_ref, language, diagnostics)
-    status = "clean"
+    status = 'clean'
     diagnostics.each do |diagnostic|
       if diagnostic.blocking
-        status = "blocked"
+        status = 'blocked'
         break
       end
-      status = "warning" if diagnostic.severity == "warning"
+      status = 'warning' if diagnostic.severity == 'warning'
     end
     ProviderDiagnosticsReport.new(
       provider_id: provider_id,
@@ -707,7 +716,7 @@ module TreeHaver
     if diagnostics.any?(&:blocking)
       return EditProjectionExecutionResult.new(
         ok: false,
-        status: "rejected",
+        status: 'rejected',
         source: source,
         applied_operations: [],
         diagnostics: diagnostics
@@ -716,7 +725,7 @@ module TreeHaver
 
     EditProjectionExecutionResult.new(
       ok: true,
-      status: "applied",
+      status: 'applied',
       source: source,
       applied_operations: applied_operations,
       diagnostics: diagnostics
@@ -734,14 +743,14 @@ module TreeHaver
   module_function :build_edit_projection_provider_matrix
 
   def windows_absolute_path?(path)
-    /\A[A-Za-z]:[\/\\]/.match?(path)
+    %r{\A[A-Za-z]:[/\\]}.match?(path)
   end
   module_function :windows_absolute_path?
   private_class_method :windows_absolute_path?
 
   def allowed_library_extension?(path)
     normalized_path = path.downcase
-    normalized_path.end_with?(".so", ".dylib", ".dll") || VERSIONED_SHARED_OBJECT_PATTERN.match?(normalized_path)
+    normalized_path.end_with?('.so', '.dylib', '.dll') || VERSIONED_SHARED_OBJECT_PATTERN.match?(normalized_path)
   end
   module_function :allowed_library_extension?
   private_class_method :allowed_library_extension?
@@ -752,7 +761,8 @@ module TreeHaver
   module_function :library_filename
   private_class_method :library_filename
 
-  ByteEditSpan = Struct.new(:start_byte, :old_end_byte, :new_end_byte, :start_point, :old_end_point, :new_end_point, keyword_init: true) do
+  ByteEditSpan = Struct.new(:start_byte, :old_end_byte, :new_end_byte, :start_point, :old_end_point, :new_end_point,
+                            keyword_init: true) do
     def old_range
       ByteRange.new(start_byte: start_byte, end_byte: old_end_byte)
     end
@@ -777,7 +787,8 @@ module TreeHaver
     end
   end
 
-  BinaryScalarValue = Struct.new(:kind, :value, :symbol, :raw_value, :encoding, :format, :description, keyword_init: true) do
+  BinaryScalarValue = Struct.new(:kind, :value, :symbol, :raw_value, :encoding, :format, :description,
+                                 keyword_init: true) do
     def to_h
       {
         kind: kind,
@@ -847,7 +858,8 @@ module TreeHaver
     end
   end
 
-  BinaryMergeReport = Struct.new(:format, :schema, :matched_schema_paths, :preserved_ranges, :rewritten_nodes, :checksum_updates, :nested_dispatches, :diagnostics, keyword_init: true) do
+  BinaryMergeReport = Struct.new(:format, :schema, :matched_schema_paths, :preserved_ranges, :rewritten_nodes,
+                                 :checksum_updates, :nested_dispatches, :diagnostics, keyword_init: true) do
     def to_h
       {
         format: format,
@@ -879,7 +891,8 @@ module TreeHaver
     end
   end
 
-  ZipArchiveEntry = Struct.new(:path, :normalized_path, :directory, :compression, :compressed_size, :uncompressed_size, :crc32, :local_header_range, :data_range, :central_directory_range, keyword_init: true) do
+  ZipArchiveEntry = Struct.new(:path, :normalized_path, :directory, :compression, :compressed_size, :uncompressed_size,
+                               :crc32, :local_header_range, :data_range, :central_directory_range, keyword_init: true) do
     def to_h
       {
         path: path,
@@ -896,7 +909,8 @@ module TreeHaver
     end
   end
 
-  ZipMemberDecision = Struct.new(:normalized_path, :operation, :disposition, :nested_family, :reason, keyword_init: true) do
+  ZipMemberDecision = Struct.new(:normalized_path, :operation, :disposition, :nested_family, :reason,
+                                 keyword_init: true) do
     def to_h
       {
         normalized_path: normalized_path,
@@ -919,7 +933,8 @@ module TreeHaver
     end
   end
 
-  ZipFamilyReport = Struct.new(:archive, :entries, :member_decisions, :merge_report, :unsafe_entries, keyword_init: true) do
+  ZipFamilyReport = Struct.new(:archive, :entries, :member_decisions, :merge_report, :unsafe_entries,
+                               keyword_init: true) do
     def to_h
       {
         archive: archive.to_h,
@@ -934,7 +949,8 @@ module TreeHaver
   def self.slice_byte_range(source, byte_range)
     source_bytesize = source.to_s.bytesize
     unless byte_range.valid? && byte_range.end_byte.to_i <= source_bytesize
-      raise RangeError, "invalid byte range [#{byte_range.start_byte}, #{byte_range.end_byte}) for source length #{source_bytesize}"
+      raise RangeError,
+            "invalid byte range [#{byte_range.start_byte}, #{byte_range.end_byte}) for source length #{source_bytesize}"
     end
 
     source.to_s.byteslice(byte_range.start_byte.to_i...byte_range.end_byte.to_i)
@@ -950,19 +966,22 @@ module TreeHaver
       byte_length: text.bytesize,
       diagnostics: []
     )
-  rescue RangeError => error
+  rescue RangeError => e
     SourceFragment.new(
-      text: "",
+      text: '',
       span: span,
       available: false,
       strategy: strategy,
       byte_length: 0,
-      diagnostics: [error.message]
+      diagnostics: [e.message]
     )
   end
 
   def self.byte_offset_for_point(source, point)
-    raise RangeError, "invalid source point (#{point.row}, #{point.column})" if point.row.to_i.negative? || point.column.to_i.negative?
+    if point.row.to_i.negative? || point.column.to_i.negative?
+      raise RangeError,
+            "invalid source point (#{point.row}, #{point.column})"
+    end
 
     row = 0
     column = 0
@@ -1018,7 +1037,7 @@ module TreeHaver
 
   LanguagePackAnalysis = Struct.new(:language, :dialect, :root_type, :has_error, :backend_ref, keyword_init: true) do
     def kind
-      "tree-sitter"
+      'tree-sitter'
     end
 
     def to_h
@@ -1033,9 +1052,10 @@ module TreeHaver
     end
   end
 
-  LanguagePackProcessAnalysis = Struct.new(:language, :structure, :imports, :diagnostics, :backend_ref, keyword_init: true) do
+  LanguagePackProcessAnalysis = Struct.new(:language, :structure, :imports, :diagnostics, :backend_ref,
+                                           keyword_init: true) do
     def kind
-      "tree-sitter-process"
+      'tree-sitter-process'
     end
 
     def to_h
@@ -1077,9 +1097,10 @@ module TreeHaver
     end
   end
 
-  KaitaiTreeAnalysis = Struct.new(:schema, :root, :backend_ref, :source_byte_length, :diagnostics, keyword_init: true) do
+  KaitaiTreeAnalysis = Struct.new(:schema, :root, :backend_ref, :source_byte_length, :diagnostics,
+                                  keyword_init: true) do
     def kind
-      "kaitai-tree"
+      'kaitai-tree'
     end
 
     def to_h

@@ -37,19 +37,20 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
-            require "prism"
-            @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            require 'prism'
+            @loaded = true
           rescue LoadError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           rescue StandardError
             # simplecov:disable defensive code - StandardError during require is extremely rare
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:enable
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -57,8 +58,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -69,6 +70,7 @@ module TreeHaver
         #   # => { backend: :prism, query: false, bytes_field: true, incremental: false, ruby_only: true, comment_support: :partial }
         def capabilities
           return {} unless available?
+
           {
             backend: :prism,
             query: false,           # Prism doesn't have tree-sitter-style queries (has pattern matching)
@@ -78,7 +80,7 @@ module TreeHaver
             ruby_only: true,        # Prism only parses Ruby source code
             error_tolerant: true,   # Prism has excellent error recovery
             comment_support: :partial,
-            comment_attachment_hints: true,
+            comment_attachment_hints: true
           }
         end
       end
@@ -98,11 +100,11 @@ module TreeHaver
         def initialize(name = :ruby, options: {})
           super(name, backend: :prism, options: options)
 
-          unless self.name == :ruby
-            raise TreeHaver::NotAvailable,
-              "Prism only supports Ruby parsing. " \
-                "Got language: #{name.inspect}"
-          end
+          return if self.name == :ruby
+
+          raise TreeHaver::NotAvailable,
+                'Prism only supports Ruby parsing. ' \
+                  "Got language: #{name.inspect}"
         end
 
         # Compare languages for equality by options (since name is always :ruby)
@@ -145,14 +147,14 @@ module TreeHaver
 
             unless lang_name == :ruby
               raise TreeHaver::NotAvailable,
-                "Prism backend only supports Ruby, not #{lang_name}. " \
-                  "Use a tree-sitter backend for #{lang_name} support."
+                    "Prism backend only supports Ruby, not #{lang_name}. " \
+                      "Use a tree-sitter backend for #{lang_name} support."
             end
 
             ruby
           end
 
-          alias_method :from_path, :from_library
+          alias from_path from_library
         end
       end
 
@@ -165,7 +167,8 @@ module TreeHaver
         # @raise [TreeHaver::NotAvailable] if prism is not available
         def initialize
           super
-          raise TreeHaver::NotAvailable, "prism not available" unless Prism.available?
+          raise TreeHaver::NotAvailable, 'prism not available' unless Prism.available?
+
           @options = {}
         end
 
@@ -187,11 +190,11 @@ module TreeHaver
               @options = {}
             else
               raise ArgumentError,
-                "Prism only supports Ruby parsing. Got: #{lang.inspect}"
+                    "Prism only supports Ruby parsing. Got: #{lang.inspect}"
             end
           else
             raise ArgumentError,
-              "Expected Prism::Language or :ruby, got #{lang.class}"
+                  "Expected Prism::Language or :ruby, got #{lang.class}"
           end
         end
 
@@ -201,7 +204,7 @@ module TreeHaver
         # @return [Tree] raw backend tree (wrapping happens in TreeHaver::Parser)
         # @raise [TreeHaver::NotAvailable] if no language is set
         def parse(source)
-          raise TreeHaver::NotAvailable, "No language loaded (use parser.language = :ruby)" unless @language
+          raise TreeHaver::NotAvailable, 'No language loaded (use parser.language = :ruby)' unless @language
 
           # Use Prism.parse with options
           prism_result = ::Prism.parse(source, **@options)
@@ -216,7 +219,7 @@ module TreeHaver
         # @param source [String] the Ruby source code to parse
         # @return [Tree] raw backend tree (wrapping happens in TreeHaver::Parser)
         def parse_string(old_tree, source) # rubocop:disable Lint/UnusedMethodArgument
-          parse(source)  # Prism doesn't support incremental parsing
+          parse(source) # Prism doesn't support incremental parsing
         end
       end
 
@@ -305,7 +308,9 @@ module TreeHaver
           return :inline if prefix.match?(/\S/)
 
           remaining_nonempty = Array(lines[comment.location.end_line..]).reject { |candidate| candidate.strip.empty? }
-          return :trailing if remaining_nonempty.empty? || remaining_nonempty.all? { |candidate| candidate.lstrip.start_with?("#") }
+          return :trailing if remaining_nonempty.empty? || remaining_nonempty.all? do |candidate|
+            candidate.lstrip.start_with?('#')
+          end
 
           :leading
         end
@@ -340,14 +345,14 @@ module TreeHaver
         def start_point
           {
             row: location.start_line - 1,
-            column: location.start_column,
+            column: location.start_column
           }
         end
 
         def end_point
           {
             row: location.end_line - 1,
-            column: location.end_column,
+            column: location.end_column
           }
         end
 
@@ -356,14 +361,14 @@ module TreeHaver
         end
 
         def opening_delimiter
-          "#"
+          '#'
         end
 
         class << self
           def comment_type_for(klass)
-            klass.name.split("::").last
-              .gsub(/([a-z\d])([A-Z])/, '\\1_\\2')
-              .downcase
+            klass.name.split('::').last
+                 .gsub(/([a-z\d])([A-Z])/, '\\1_\\2')
+                 .downcase
           end
         end
       end
@@ -391,11 +396,11 @@ module TreeHaver
         #
         # @return [String] node type in snake_case
         def type
-          return "nil" if inner_node.nil?
+          return 'nil' if inner_node.nil?
 
           # Convert class name to snake_case type
-          class_name = inner_node.class.name.split("::").last
-          class_name.gsub(/([A-Z])/, '_\1').downcase.sub(/^_/, "")
+          class_name = inner_node.class.name.split('::').last
+          class_name.gsub(/([A-Z])/, '_\1').downcase.sub(/^_/, '')
         end
 
         # Alias for type (API compatibility)
@@ -409,6 +414,7 @@ module TreeHaver
         # @return [Integer]
         def start_byte
           return 0 if inner_node.nil? || !inner_node.respond_to?(:location)
+
           loc = inner_node.location
           loc&.start_offset || 0
         end
@@ -418,6 +424,7 @@ module TreeHaver
         # @return [Integer]
         def end_byte
           return 0 if inner_node.nil? || !inner_node.respond_to?(:location)
+
           loc = inner_node.location
           loc&.end_offset || 0
         end
@@ -426,22 +433,24 @@ module TreeHaver
         #
         # @return [Hash{Symbol => Integer}]
         def start_point
-          return {row: 0, column: 0} if inner_node.nil? || !inner_node.respond_to?(:location)
-          loc = inner_node.location
-          return {row: 0, column: 0} unless loc
+          return { row: 0, column: 0 } if inner_node.nil? || !inner_node.respond_to?(:location)
 
-          {row: (loc.start_line - 1), column: loc.start_column}
+          loc = inner_node.location
+          return { row: 0, column: 0 } unless loc
+
+          { row: (loc.start_line - 1), column: loc.start_column }
         end
 
         # Get the end position as row/column (0-based)
         #
         # @return [Hash{Symbol => Integer}]
         def end_point
-          return {row: 0, column: 0} if inner_node.nil? || !inner_node.respond_to?(:location)
-          loc = inner_node.location
-          return {row: 0, column: 0} unless loc
+          return { row: 0, column: 0 } if inner_node.nil? || !inner_node.respond_to?(:location)
 
-          {row: (loc.end_line - 1), column: loc.end_column}
+          loc = inner_node.location
+          return { row: 0, column: 0 } unless loc
+
+          { row: (loc.end_line - 1), column: loc.end_column }
         end
 
         # Get all child nodes
@@ -458,7 +467,7 @@ module TreeHaver
         #
         # @return [String]
         def text
-          return "" if inner_node.nil?
+          return '' if inner_node.nil?
 
           if inner_node.respond_to?(:slice)
             inner_node.slice
@@ -468,7 +477,7 @@ module TreeHaver
         end
 
         # Alias for Prism compatibility
-        alias_method :slice, :text
+        alias slice text
 
         # Check if this node has errors
         #
@@ -477,11 +486,12 @@ module TreeHaver
           return false if inner_node.nil?
 
           # Check if this is an error node type
-          return true if type.include?("missing") || type.include?("error")
+          return true if type.include?('missing') || type.include?('error')
 
           # Check children recursively (Prism error nodes are usually children)
           return false unless inner_node.respond_to?(:child_nodes)
-          inner_node.child_nodes.compact.any? { |n| n.class.name.to_s.include?("Missing") }
+
+          inner_node.child_nodes.compact.any? { |n| n.class.name.to_s.include?('Missing') }
         end
 
         # Check if this node is a "missing" node (error recovery)
@@ -489,7 +499,8 @@ module TreeHaver
         # @return [Boolean]
         def missing?
           return false if inner_node.nil?
-          type.include?("missing")
+
+          type.include?('missing')
         end
 
         # Get a child by field name (Prism node accessor)
@@ -509,7 +520,7 @@ module TreeHaver
           result.is_a?(::Prism::Node) ? Node.new(result, source) : nil
         end
 
-        alias_method :field, :child_by_field_name
+        alias field child_by_field_name
 
         # String representation
         #
@@ -525,6 +536,7 @@ module TreeHaver
         # @return [Boolean]
         def respond_to_missing?(method_name, include_private = false)
           return false if inner_node.nil?
+
           inner_node.respond_to?(method_name, include_private) || super
         end
 

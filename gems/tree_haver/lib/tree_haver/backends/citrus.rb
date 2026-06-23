@@ -38,19 +38,20 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
-            require "citrus"
-            @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            require 'citrus'
+            @loaded = true
           rescue LoadError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:disable defensive code - StandardError during require is extremely rare
           rescue StandardError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:enable
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -58,8 +59,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -70,13 +71,14 @@ module TreeHaver
         #   # => { backend: :citrus, query: false, bytes_field: true, incremental: false, comment_support: :none }
         def capabilities
           return {} unless available?
+
           {
             backend: :citrus,
             query: false,          # Citrus doesn't have a query API like tree-sitter
             bytes_field: true,     # Citrus::Match provides offset and length
             incremental: false,    # Citrus doesn't support incremental parsing
             pure_ruby: true,       # Citrus is pure Ruby (portable)
-            comment_support: :none,
+            comment_support: :none
           }
         end
       end
@@ -104,8 +106,8 @@ module TreeHaver
         def initialize(grammar_module)
           unless grammar_module.respond_to?(:parse)
             raise TreeHaver::NotAvailable,
-              "Grammar module must respond to :parse. " \
-                "Expected a Citrus grammar module (e.g., TomlRB::Document)."
+                  'Grammar module must respond to :parse. ' \
+                    'Expected a Citrus grammar module (e.g., TomlRB::Document).'
           end
           @grammar_module = grammar_module
           @backend = :citrus
@@ -120,12 +122,12 @@ module TreeHaver
           # Derive name from grammar module (e.g., TomlRB::Document -> :toml)
           return :unknown unless @grammar_module.respond_to?(:name) && @grammar_module.name
 
-          name = @grammar_module.name.to_s.split("::").first.downcase
-          name.sub(/rb$/, "").to_sym
+          name = @grammar_module.name.to_s.split('::').first.downcase
+          name.sub(/rb$/, '').to_sym
         end
 
         # Alias for language_name (API compatibility)
-        alias_method :name, :language_name
+        alias name language_name
 
         # Compare languages for equality
         #
@@ -149,7 +151,7 @@ module TreeHaver
         end
 
         # Alias eql? to ==
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Load language from library path (API compatibility)
         #
@@ -171,13 +173,13 @@ module TreeHaver
           def from_library(path = nil, symbol: nil, name: nil)
             # Derive language name from path, symbol, or explicit name
             lang_name = name&.to_sym ||
-              symbol&.to_s&.sub(/^tree_sitter_/, "")&.to_sym ||
-              path && TreeHaver::LibraryPathUtils.derive_language_name_from_path(path)&.to_sym
+                        symbol&.to_s&.sub(/^tree_sitter_/, '')&.to_sym ||
+                        path && TreeHaver::LibraryPathUtils.derive_language_name_from_path(path)&.to_sym
 
             unless lang_name
               raise TreeHaver::NotAvailable,
-                "Citrus backend requires a language name. " \
-                  "Provide name: parameter or register a grammar with TreeHaver.register_language."
+                    'Citrus backend requires a language name. ' \
+                      'Provide name: parameter or register a grammar with TreeHaver.register_language.'
             end
 
             # Look up registered Citrus grammar
@@ -185,15 +187,15 @@ module TreeHaver
 
             unless registration
               raise TreeHaver::NotAvailable,
-                "No Citrus grammar registered for #{lang_name.inspect}. " \
-                  "Register one with: TreeHaver.register_language(:#{lang_name}, grammar_module: YourGrammar)"
+                    "No Citrus grammar registered for #{lang_name.inspect}. " \
+                      "Register one with: TreeHaver.register_language(:#{lang_name}, grammar_module: YourGrammar)"
             end
 
             grammar_module = registration[:grammar_module]
             new(grammar_module)
           end
 
-          alias_method :from_path, :from_library
+          alias from_path from_library
         end
       end
 
@@ -205,7 +207,8 @@ module TreeHaver
         #
         # @raise [TreeHaver::NotAvailable] if citrus gem is not available
         def initialize
-          raise TreeHaver::NotAvailable, "citrus gem not available" unless Citrus.available?
+          raise TreeHaver::NotAvailable, 'citrus gem not available' unless Citrus.available?
+
           @grammar = nil
           @backend = :citrus
         end
@@ -227,16 +230,16 @@ module TreeHaver
         def language=(grammar)
           # Accept Language wrapper or raw grammar module
           actual_grammar = case grammar
-          when Language
-            grammar.grammar_module
-          else
-            grammar
-          end
+                           when Language
+                             grammar.grammar_module
+                           else
+                             grammar
+                           end
 
           unless actual_grammar.respond_to?(:parse)
             raise ArgumentError,
-              "Expected Citrus grammar module with parse method or Language wrapper, " \
-                "got #{grammar.class}"
+                  'Expected Citrus grammar module with parse method or Language wrapper, ' \
+                    "got #{grammar.class}"
           end
           @grammar = actual_grammar
         end
@@ -248,7 +251,7 @@ module TreeHaver
         # @raise [TreeHaver::NotAvailable] if no grammar is set
         # @raise [::Citrus::ParseError] if parsing fails
         def parse(source)
-          raise TreeHaver::NotAvailable, "No grammar loaded" unless @grammar
+          raise TreeHaver::NotAvailable, 'No grammar loaded' unless @grammar
 
           begin
             citrus_match = @grammar.parse(source)
@@ -268,7 +271,7 @@ module TreeHaver
         # @param source [String] the source code to parse
         # @return [Tree] raw backend tree (wrapping happens in TreeHaver::Parser)
         def parse_string(old_tree, source) # rubocop:disable Lint/UnusedMethodArgument
-          parse(source)  # Citrus doesn't support incremental parsing
+          parse(source) # Citrus doesn't support incremental parsing
         end
       end
 
@@ -338,9 +341,9 @@ module TreeHaver
         #
         # @return [String] rule name from grammar
         def type
-          return "unknown" unless @match.respond_to?(:events)
-          return "unknown" unless @match.events.is_a?(Array)
-          return "unknown" if @match.events.empty?
+          return 'unknown' unless @match.respond_to?(:events)
+          return 'unknown' unless @match.events.is_a?(Array)
+          return 'unknown' if @match.events.empty?
 
           extract_type_from_event(@match.events.first)
         end
@@ -355,6 +358,7 @@ module TreeHaver
 
         def children
           return [] unless @match.respond_to?(:matches)
+
           @match.matches.map { |m| Node.new(m, @source) }
         end
 
@@ -403,9 +407,7 @@ module TreeHaver
           first_event = @match.events.first
 
           # Check if event has terminal? method (Citrus rule object)
-          if first_event.respond_to?(:terminal?)
-            return !first_event.terminal?
-          end
+          return !first_event.terminal? if first_event.respond_to?(:terminal?)
 
           # For Symbol events, try to look up in grammar
           if first_event.is_a?(Symbol) && @match.respond_to?(:grammar)
@@ -450,35 +452,31 @@ module TreeHaver
 
           # Try to extract rule name from string representation
           # Examples: "table", "(comment | table)*", "space?", etc.
-          if str =~ /^([a-z_][a-z0-9_]*)/i
-            return $1
-          end
+          return ::Regexp.last_match(1) if str =~ /^([a-z_][a-z0-9_]*)/i
 
           # If we have a pattern like "(rule1 | rule2)*", we can't determine
           # the type without looking at actual matches, but that causes recursion
           # So just return a generic type based on the pattern
           if /^\(.*\)\*$/.match?(str)
-            return "repeat"
+            return 'repeat'
           elsif /^\(.*\)\?$/.match?(str)
-            return "optional"
+            return 'optional'
           elsif /^.*\|.*$/.match?(str)
-            return "choice"
+            return 'choice'
           end
 
-          "unknown"
+          'unknown'
         end
 
         def calculate_point(offset)
-          return {row: 0, column: 0} if offset <= 0
+          return { row: 0, column: 0 } if offset <= 0
 
           lines_before = @source[0...offset].count("\n")
           # Find the newline before this offset (or -1 if we're on line 0)
-          line_start = if offset > 0
-            @source.rindex("\n", offset - 1)
-          end
+          line_start = (@source.rindex("\n", offset - 1) if offset > 0)
           line_start ||= -1
           column = offset - line_start - 1
-          {row: lines_before, column: column}
+          { row: lines_before, column: column }
         end
       end
 

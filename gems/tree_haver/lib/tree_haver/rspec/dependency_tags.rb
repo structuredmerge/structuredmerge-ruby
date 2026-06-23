@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "tree_haver"
+require 'tree_haver'
 
 module TreeHaver
   module RSpec
@@ -32,18 +32,18 @@ if defined?(::RSpec)
   ::RSpec.configure do |config|
     TreeHaver::BackendRegistry.registered_tags.each do |tag|
       if TreeHaver::BackendRegistry.tag_available?(tag)
-        config.filter_run_excluding(:"not_#{tag}" => true)
+        config.filter_run_excluding("not_#{tag}": true)
       else
         config.filter_run_excluding(tag => true)
       end
     end
 
     config.before(:suite) do
-      next if ENV.fetch("TREE_HAVER_DEBUG", "false").casecmp?("false")
+      next if ENV.fetch('TREE_HAVER_DEBUG', 'false').casecmp?('false')
 
       puts "\n=== TreeHaver Test Dependencies ==="
       TreeHaver::RSpec::DependencyTags.summary.each do |dep, available|
-        status = available ? "available" : "not available"
+        status = available ? 'available' : 'not available'
         puts "  #{dep}: #{status}"
       end
       puts "===================================\n"

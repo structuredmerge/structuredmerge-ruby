@@ -90,12 +90,12 @@ module TreeHaver
         if validate
           unless PathValidator.safe_library_path?(path)
             errors = PathValidator.validation_errors(path)
-            raise ArgumentError, "Unsafe library path: #{path.inspect}. Errors: #{errors.join("; ")}"
+            raise ArgumentError, "Unsafe library path: #{path.inspect}. Errors: #{errors.join('; ')}"
           end
 
           if symbol && !PathValidator.safe_symbol_name?(symbol)
             raise ArgumentError, "Unsafe symbol name: #{symbol.inspect}. " \
-              "Symbol names must be valid C identifiers."
+              'Symbol names must be valid C identifiers.'
           end
         end
 
@@ -105,19 +105,20 @@ module TreeHaver
 
         if mod.nil?
           if backend
-            raise NotAvailable, "Requested backend #{backend.inspect} is not available or does not support shared libraries"
+            raise NotAvailable,
+                  "Requested backend #{backend.inspect} is not available or does not support shared libraries"
           else
             raise NotAvailable,
-              "No native tree-sitter backend is available for loading shared libraries. " \
-                "Available native backends (MRI, Rust, FFI, Java) require platform-specific setup. " \
-                "For pure-Ruby parsing, use backend-specific Language classes directly (e.g., Prism, Psych, Citrus)."
+                  'No native tree-sitter backend is available for loading shared libraries. ' \
+                    'Available native backends (MRI, Rust, FFI, Java) require platform-specific setup. ' \
+                    'For pure-Ruby parsing, use backend-specific Language classes directly (e.g., Prism, Psych, Citrus).'
           end
         end
 
         # Backend must implement .from_library; fallback to .from_path for older impls
         # Include effective backend AND ENV vars in cache key since they affect loading
         effective_b = TreeHaver.resolve_effective_backend(backend)
-        key = [effective_b, path, symbol, name, ENV["TREE_SITTER_LANG_SYMBOL"]]
+        key = [effective_b, path, symbol, name, ENV['TREE_SITTER_LANG_SYMBOL']]
         LanguageRegistry.fetch(key) do
           if mod::Language.respond_to?(:from_library)
             mod::Language.from_library(path, symbol: symbol, name: name)
@@ -128,7 +129,7 @@ module TreeHaver
       end
       # Alias for {from_library}
       # @see from_library
-      alias_method :from_path, :from_library
+      alias from_path from_library
 
       # Dynamic helper to load a registered language by name
       #
@@ -162,42 +163,38 @@ module TreeHaver
 
         # Determine which backend type to use
         backend_type = if current_backend == Backends::Citrus
-          :citrus
-        elsif current_backend == Backends::Parslet
-          :parslet
-        else
-          :tree_sitter  # MRI, Rust, FFI, Java all use tree-sitter
-        end
+                         :citrus
+                       elsif current_backend == Backends::Parslet
+                         :parslet
+                       else
+                         :tree_sitter # MRI, Rust, FFI, Java all use tree-sitter
+                       end
 
         # Get backend-specific registration
         reg = all_backends[backend_type]
 
         # If Citrus backend is active
         if backend_type == :citrus
-          if reg && reg[:grammar_module]
-            return Backends::Citrus::Language.new(reg[:grammar_module])
-          end
+          return Backends::Citrus::Language.new(reg[:grammar_module]) if reg && reg[:grammar_module]
 
           # No Citrus grammar for this language — provide actionable error
           raise NotAvailable,
-            "No Citrus grammar registered for :#{method_name}. " \
-              "This language may only be available via tree-sitter. " \
-              "Check that the correct backend is selected (current: citrus). " \
-              "Registered backends for :#{method_name}: #{all_backends.keys.inspect}"
+                "No Citrus grammar registered for :#{method_name}. " \
+                  'This language may only be available via tree-sitter. ' \
+                  'Check that the correct backend is selected (current: citrus). ' \
+                  "Registered backends for :#{method_name}: #{all_backends.keys.inspect}"
         end
 
         # If Parslet backend is active
         if backend_type == :parslet
-          if reg && reg[:grammar_class]
-            return Backends::Parslet::Language.new(reg[:grammar_class])
-          end
+          return Backends::Parslet::Language.new(reg[:grammar_class]) if reg && reg[:grammar_class]
 
           # No Parslet grammar for this language — provide actionable error
           raise NotAvailable,
-            "No Parslet grammar registered for :#{method_name}. " \
-              "This language may only be available via tree-sitter. " \
-              "Check that the correct backend is selected (current: parslet). " \
-              "Registered backends for :#{method_name}: #{all_backends.keys.inspect}"
+                "No Parslet grammar registered for :#{method_name}. " \
+                  'This language may only be available via tree-sitter. ' \
+                  'Check that the correct backend is selected (current: parslet). ' \
+                  "Registered backends for :#{method_name}: #{all_backends.keys.inspect}"
         end
 
         # For tree-sitter backends, try to load from path
@@ -206,16 +203,16 @@ module TreeHaver
           path = kwargs[:path] || args.first || reg[:path]
           # Symbol priority: kwargs override > registration > derive from method_name
           symbol = if kwargs.key?(:symbol)
-            kwargs[:symbol]
-          elsif reg[:symbol]
-            reg[:symbol]
-          else
-            "tree_sitter_#{method_name}"
-          end
+                     kwargs[:symbol]
+                   elsif reg[:symbol]
+                     reg[:symbol]
+                   else
+                     "tree_sitter_#{method_name}"
+                   end
           # Name priority: kwargs override > derive from symbol (strip tree_sitter_ prefix)
           # Using symbol-derived name ensures ruby_tree_sitter gets the correct language name
           # e.g., "toml" not "toml_both" when symbol is "tree_sitter_toml"
-          name = kwargs[:name] || symbol&.sub(/\Atree_sitter_/, "")
+          name = kwargs[:name] || symbol&.sub(/\Atree_sitter_/, '')
 
           begin
             return from_library(path, symbol: symbol, name: name)
@@ -244,8 +241,8 @@ module TreeHaver
 
         # No appropriate registration found
         raise ArgumentError,
-          "No grammar registered for :#{method_name} compatible with #{backend_type} backend. " \
-            "Registered backends: #{all_backends.keys.inspect}"
+              "No grammar registered for :#{method_name} compatible with #{backend_type} backend. " \
+                "Registered backends: #{all_backends.keys.inspect}"
       end
 
       # @api private

@@ -26,8 +26,8 @@ module TreeHaver
 
     def register_availability_checker(name, checker = nil, &block)
       callable = checker || block
-      raise ArgumentError, "Must provide a checker callable or block" unless callable
-      raise ArgumentError, "Checker must respond to #call" unless callable.respond_to?(:call)
+      raise ArgumentError, 'Must provide a checker callable or block' unless callable
+      raise ArgumentError, 'Checker must respond to #call' unless callable.respond_to?(:call)
 
       mutex.synchronize do
         availability_checkers[name.to_sym] = callable
@@ -54,8 +54,8 @@ module TreeHaver
 
     def register_tag(tag_name, category:, backend_name: nil, require_path: nil, checker: nil, &block)
       callable = checker || block
-      raise ArgumentError, "Must provide a checker callable or block" unless callable
-      raise ArgumentError, "Checker must respond to #call" unless callable.respond_to?(:call)
+      raise ArgumentError, 'Must provide a checker callable or block' unless callable
+      raise ArgumentError, 'Checker must respond to #call' unless callable.respond_to?(:call)
       raise ArgumentError, "Invalid category: #{category}" unless CATEGORIES.include?(category)
 
       tag = tag_name.to_sym
@@ -66,7 +66,7 @@ module TreeHaver
           category: category,
           backend_name: backend.to_sym,
           require_path: require_path,
-          checker: callable,
+          checker: callable
         }
         availability_checkers[backend.to_sym] = callable
         availability_cache.delete(backend.to_sym)
@@ -140,7 +140,7 @@ module TreeHaver
 
     def inferred_backend_name(tag_name)
       tag = tag_name.to_s
-      tag = tag.delete_suffix("_backend")
+      tag = tag.delete_suffix('_backend')
       tag.to_sym
     end
     private_class_method :inferred_backend_name
@@ -167,27 +167,27 @@ module TreeHaver
     private_class_method :deep_dup
 
     def backends
-      @backends ||= {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+      @backends ||= {}
     end
     private_class_method :backends
 
     def mutex
-      @mutex ||= Mutex.new # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+      @mutex ||= Mutex.new
     end
     private_class_method :mutex
 
     def availability_checkers
-      @availability_checkers ||= {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+      @availability_checkers ||= {}
     end
     private_class_method :availability_checkers
 
     def availability_cache
-      @availability_cache ||= {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+      @availability_cache ||= {}
     end
     private_class_method :availability_cache
 
     def tag_registry
-      @tag_registry ||= {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+      @tag_registry ||= {}
     end
     private_class_method :tag_registry
   end

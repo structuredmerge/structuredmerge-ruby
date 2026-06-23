@@ -67,7 +67,7 @@ module TreeHaver
       return @available if @load_attempted
 
       @load_attempted = true
-      debug = ENV["TREE_HAVER_DEBUG"]
+      debug = ENV['TREE_HAVER_DEBUG']
 
       # Guard against nil require_path (can happen if gem_name was nil)
       if @require_path.nil? || @require_path.empty?
@@ -91,7 +91,7 @@ module TreeHaver
             available_methods = @grammar_module.methods(false).sort.first(20)
             warn("CitrusGrammarFinder: #{@grammar_const} doesn't respond to :parse")
             warn("CitrusGrammarFinder: #{@grammar_const}.class = #{@grammar_module.class}")
-            warn("CitrusGrammarFinder: #{@grammar_const} is a #{@grammar_module.is_a?(Module) ? "Module" : "non-Module"}")
+            warn("CitrusGrammarFinder: #{@grammar_const} is a #{@grammar_module.is_a?(Module) ? 'Module' : 'non-Module'}")
             warn("CitrusGrammarFinder: Available singleton methods (first 20): #{available_methods.inspect}")
             if @grammar_module.respond_to?(:instance_methods)
               instance_methods = @grammar_module.instance_methods(false).sort.first(20)
@@ -128,19 +128,15 @@ module TreeHaver
         # This happens in bundled_gems.rb:124 warning? method when caller locations return nil
         # Always warn about TypeError as it indicates a platform-specific issue
         warn("CitrusGrammarFinder: TypeError during load of '#{@require_path}': #{e.class}: #{e.message}")
-        warn("CitrusGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue")
-        if debug
-          warn("CitrusGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
-        end
+        warn('CitrusGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue')
+        warn("CitrusGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}") if debug
         @available = false
         # simplecov:enable
-      rescue => e
+      rescue StandardError => e
         # simplecov:disable defensive - catch-all for unexpected errors
         # Always warn about unexpected errors
         warn("CitrusGrammarFinder: Unexpected error: #{e.class}: #{e.message}")
-        if debug
-          warn("CitrusGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
-        end
+        warn("CitrusGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}") if debug
         @available = false
         # simplecov:enable
       end
@@ -166,16 +162,15 @@ module TreeHaver
     # @raise [NotAvailable] if grammar not available and raise_on_missing is true
     def register!(raise_on_missing: false)
       unless available?
-        if raise_on_missing
-          raise NotAvailable, not_found_message
-        end
+        raise NotAvailable, not_found_message if raise_on_missing
+
         return false
       end
 
       TreeHaver.register_language(
         @language_name,
         grammar_module: @grammar_module,
-        gem_name: @gem_name,
+        gem_name: @gem_name
       )
       true
     end
@@ -190,7 +185,7 @@ module TreeHaver
         grammar_const: @grammar_const,
         require_path: @require_path,
         available: available?,
-        grammar_module: @grammar_module&.name,
+        grammar_module: @grammar_module&.name
       }
     end
 
@@ -210,7 +205,7 @@ module TreeHaver
     # @return [Object] the constant
     # @raise [NameError] if constant not found
     def resolve_constant(const_path)
-      const_path.split("::").reduce(Object) do |mod, const_name|
+      const_path.split('::').reduce(Object) do |mod, const_name|
         mod.const_get(const_name)
       end
     end

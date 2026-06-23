@@ -82,7 +82,7 @@ module TreeHaver
     # @example Explicit backend
     #   parser = TreeHaver::Parser.new(backend: :citrus)
     def initialize(backend: nil)
-      super()  # Initialize @language from Base::Parser
+      super() # Initialize @language from Base::Parser
 
       # Convert string backend names to symbols for consistency
       backend = backend.to_sym if backend.is_a?(String)
@@ -90,20 +90,19 @@ module TreeHaver
       mod = TreeHaver.resolve_backend_module(backend)
 
       if mod.nil?
-        if backend
-          raise NotAvailable, "Requested backend #{backend.inspect} is not available"
-        else
-          raise NotAvailable, "No TreeHaver backend is available"
-        end
+        raise NotAvailable, "Requested backend #{backend.inspect} is not available" if backend
+
+        raise NotAvailable, 'No TreeHaver backend is available'
+
       end
 
       # Try to create the parser, with fallback to pure Ruby if tree-sitter fails
       # This enables auto-fallback when tree-sitter runtime isn't available
       begin
         @impl = mod::Parser.new
-        @explicit_backend = backend  # Remember for introspection (always a Symbol or nil)
+        @explicit_backend = backend # Remember for introspection (always a Symbol or nil)
       rescue NoMethodError, LoadError => e
-        # Note: FFI::NotFoundError inherits from LoadError, so it's caught here too
+        # NOTE: FFI::NotFoundError inherits from LoadError, so it's caught here too
         handle_parser_creation_failure(e, backend)
       end
     end
@@ -117,22 +116,21 @@ module TreeHaver
     def handle_parser_creation_failure(error, backend)
       # Tree-sitter backend failed (likely missing runtime library)
       # Try Citrus or Parslet as fallback if we weren't explicitly asked for a specific backend
-      if backend.nil? || backend == :auto
-        if Backends::Citrus.available?
-          @impl = Backends::Citrus::Parser.new
-          @explicit_backend = :citrus
-        elsif Backends::Parslet.available?
-          @impl = Backends::Parslet::Parser.new
-          @explicit_backend = :parslet
-        else
-          # No fallback available, re-raise original error
-          raise NotAvailable, "Tree-sitter backend failed: #{error.message}. " \
-            "Citrus/Parslet fallback not available. Install tree-sitter runtime, citrus gem, or parslet gem."
-        end
+      raise error unless backend.nil? || backend == :auto
+
+      if Backends::Citrus.available?
+        @impl = Backends::Citrus::Parser.new
+        @explicit_backend = :citrus
+      elsif Backends::Parslet.available?
+        @impl = Backends::Parslet::Parser.new
+        @explicit_backend = :parslet
       else
-        # Explicit backend was requested, don't fallback
-        raise error
+        # No fallback available, re-raise original error
+        raise NotAvailable, "Tree-sitter backend failed: #{error.message}. " \
+          'Citrus/Parslet fallback not available. Install tree-sitter runtime, citrus gem, or parslet gem.'
       end
+
+      # Explicit backend was requested, don't fallback
     end
 
     # Get the backend this parser is using (for introspection)
@@ -241,13 +239,13 @@ module TreeHaver
       if old_tree && @impl.respond_to?(:parse_string)
         # Extract the underlying implementation from our Tree wrapper
         old_impl = if old_tree.respond_to?(:inner_tree)
-          old_tree.inner_tree
-        elsif old_tree.respond_to?(:instance_variable_get)
-          # Fallback for compatibility
-          old_tree.instance_variable_get(:@inner_tree) || old_tree.instance_variable_get(:@impl) || old_tree
-        else
-          old_tree
-        end
+                     old_tree.inner_tree
+                   elsif old_tree.respond_to?(:instance_variable_get)
+                     # Fallback for compatibility
+                     old_tree.instance_variable_get(:@inner_tree) || old_tree.instance_variable_get(:@impl) || old_tree
+                   else
+                     old_tree
+                   end
         tree_impl = @impl.parse_string(old_impl, source)
         # Wrap backend tree with source so Node#text works
         Tree.new(tree_impl, source: source)
@@ -335,9 +333,9 @@ module TreeHaver
           else
             # Couldn't reload - this is an error
             raise TreeHaver::Error,
-              "Language backend mismatch: language is for #{lang.backend}, parser is #{current_backend}. " \
-                "Cannot reload language for correct backend. " \
-                "Create a new language with TreeHaver::Language.from_library when backend is #{current_backend}."
+                  "Language backend mismatch: language is for #{lang.backend}, parser is #{current_backend}. " \
+                    'Cannot reload language for correct backend. ' \
+                    "Create a new language with TreeHaver::Language.from_library when backend is #{current_backend}."
           end
         end
 
@@ -358,17 +356,19 @@ module TreeHaver
         # This shouldn't happen - all our wrappers have backend attribute
         # If we get here, it's likely a raw backend object that was passed directly
         raise TreeHaver::Error,
-          "Expected TreeHaver Language wrapper with backend attribute, got #{lang.class}. " \
-            "Use TreeHaver::Language.from_library to create language objects."
+              "Expected TreeHaver Language wrapper with backend attribute, got #{lang.class}. " \
+                'Use TreeHaver::Language.from_library to create language objects.'
       end
 
       case lang.backend
       when :mri
         return lang.to_language if lang.respond_to?(:to_language)
         return lang.inner_language if lang.respond_to?(:inner_language)
+
         lang
       when :rust
         return lang.name if lang.respond_to?(:name)
+
         lang
       when :ffi
         lang  # FFI needs wrapper for to_ptr
@@ -422,9 +422,9 @@ module TreeHaver
           return Language.from_library(
             lang.path,
             symbol: lang.respond_to?(:symbol) ? lang.symbol : nil,
-            name: lang.respond_to?(:name) ? lang.name : nil,
+            name: lang.respond_to?(:name) ? lang.name : nil
           )
-        rescue => e
+        rescue StandardError => e
           # Reload failed, continue with original
           warn("TreeHaver: Failed to reload language for backend #{target_backend}: #{e.message}") if $VERBOSE
           return

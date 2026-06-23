@@ -57,29 +57,30 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
             # ruby_tree_sitter is a C extension that only works on MRI
             # It doesn't work on JRuby or TruffleRuby
-            if RUBY_ENGINE == "ruby"
-              require "tree_sitter"
-              @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            if RUBY_ENGINE == 'ruby'
+              require 'tree_sitter'
+              @loaded = true
             else
               # simplecov:disable only runs on non-MRI engines (JRuby, TruffleRuby)
-              @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+              @loaded = false
               # simplecov:enable
             end
           rescue LoadError
             # simplecov:disable only runs when ruby_tree_sitter gem is not installed
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:enable
           rescue StandardError
             # simplecov:disable defensive code - StandardError during require is extremely rare
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
             # simplecov:enable
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -87,8 +88,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -99,12 +100,13 @@ module TreeHaver
         #   # => { backend: :mri, query: true, bytes_field: true, incremental: true, comment_support: :nodes_only }
         def capabilities
           return {} unless available?
+
           {
             backend: :mri,
             query: true,
             bytes_field: true,
             incremental: true,
-            comment_support: :nodes_only,
+            comment_support: :nodes_only
           }
         end
       end
@@ -151,7 +153,7 @@ module TreeHaver
         def language_name
           # Try to derive from symbol (e.g., "tree_sitter_toml" -> :toml)
           if @symbol
-            name = @symbol.to_s.sub(/^tree_sitter_/, "")
+            name = @symbol.to_s.sub(/^tree_sitter_/, '')
             return name.to_sym
           end
 
@@ -165,7 +167,7 @@ module TreeHaver
         end
 
         # Alias for language_name (API compatibility)
-        alias_method :name, :language_name
+        alias name language_name
 
         # Compare languages for equality
         #
@@ -179,10 +181,10 @@ module TreeHaver
           return unless other.backend == @backend
 
           # Compare by path first, then symbol
-          cmp = (@path || "") <=> (other.path || "")
+          cmp = (@path || '') <=> (other.path || '')
           return cmp if cmp.nonzero?
 
-          (@symbol || "") <=> (other.symbol || "")
+          (@symbol || '') <=> (other.symbol || '')
         end
 
         # Hash value for this language (for use in Sets/Hashes)
@@ -192,7 +194,7 @@ module TreeHaver
         end
 
         # Alias eql? to ==
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Convert to the underlying TreeSitter::Language for passing to parser
         #
@@ -200,7 +202,7 @@ module TreeHaver
         def to_language
           @inner_language
         end
-        alias_method :to_ts_language, :to_language
+        alias to_ts_language to_language
 
         # Load a language from a shared library (preferred method)
         #
@@ -228,7 +230,7 @@ module TreeHaver
           # @return [Language] wrapped language handle
           # @api private
           def from_path(path, symbol: nil, name: nil)
-            raise TreeHaver::NotAvailable, "ruby_tree_sitter not available" unless MRI.available?
+            raise TreeHaver::NotAvailable, 'ruby_tree_sitter not available' unless MRI.available?
 
             # ruby_tree_sitter's TreeSitter::Language.load takes (language_name, path_to_so)
             # where language_name is the language identifier (e.g., "toml", "json")
@@ -248,9 +250,9 @@ module TreeHaver
             # at parse time when TreeSitter constant isn't loaded yet
             if defined?(TreeSitter::TreeSitterError) && e.is_a?(TreeSitter::TreeSitterError)
               raise TreeHaver::NotAvailable, "Could not load language: #{e.message}"
-            else
-              raise # Re-raise if it's not a TreeSitter error
             end
+
+            raise # Re-raise if it's not a TreeSitter error
           end
         end
       end
@@ -263,7 +265,8 @@ module TreeHaver
         #
         # @raise [TreeHaver::NotAvailable] if ruby_tree_sitter is not available
         def initialize
-          raise TreeHaver::NotAvailable, "ruby_tree_sitter not available" unless MRI.available?
+          raise TreeHaver::NotAvailable, 'ruby_tree_sitter not available' unless MRI.available?
+
           @parser = ::TreeSitter::Parser.new
         rescue NameError => e
           # TreeSitter constant doesn't exist - backend not loaded
@@ -274,9 +277,9 @@ module TreeHaver
           # at parse time when TreeSitter constant isn't loaded yet
           if defined?(TreeSitter::TreeSitterError) && e.is_a?(TreeSitter::TreeSitterError)
             raise TreeHaver::NotAvailable, "Could not create parser: #{e.message}"
-          else
-            raise # Re-raise if it's not a TreeSitter error
           end
+
+          raise # Re-raise if it's not a TreeSitter error
         end
 
         # Set the language for this parser
@@ -289,7 +292,7 @@ module TreeHaver
           inner_lang = lang.respond_to?(:inner_language) ? lang.inner_language : lang
           @parser.language = inner_lang
           # Verify it was set
-          raise TreeHaver::NotAvailable, "Language not set correctly" if @parser.language.nil?
+          raise TreeHaver::NotAvailable, 'Language not set correctly' if @parser.language.nil?
 
           # Return the original language object (wrapped or unwrapped)
           lang
@@ -299,9 +302,9 @@ module TreeHaver
           # at parse time when TreeSitter constant isn't loaded yet
           if defined?(TreeSitter::TreeSitterError) && e.is_a?(TreeSitter::TreeSitterError)
             raise TreeHaver::NotAvailable, "Could not set language: #{e.message}"
-          else
-            raise # Re-raise if it's not a TreeSitter error
           end
+
+          raise # Re-raise if it's not a TreeSitter error
         end
 
         # Parse source code
@@ -316,7 +319,8 @@ module TreeHaver
           # Pass nil for old_tree (initial parse)
           # Return raw tree - TreeHaver::Parser will wrap it
           tree = @parser.parse_string(nil, source)
-          raise TreeHaver::NotAvailable, "Parse returned nil - is language set?" if tree.nil?
+          raise TreeHaver::NotAvailable, 'Parse returned nil - is language set?' if tree.nil?
+
           tree
         rescue Exception => e # rubocop:disable Lint/RescueException
           # TreeSitter errors inherit from Exception (not StandardError) in ruby_tree_sitter v2+
@@ -324,9 +328,9 @@ module TreeHaver
           # at parse time when TreeSitter constant isn't loaded yet
           if defined?(TreeSitter::TreeSitterError) && e.is_a?(TreeSitter::TreeSitterError)
             raise TreeHaver::NotAvailable, "Could not parse source: #{e.message}"
-          else
-            raise # Re-raise if it's not a TreeSitter error
           end
+
+          raise # Re-raise if it's not a TreeSitter error
         end
 
         # Parse source code with optional incremental parsing
@@ -348,9 +352,9 @@ module TreeHaver
           # at parse time when TreeSitter constant isn't loaded yet
           if defined?(TreeSitter::TreeSitterError) && e.is_a?(TreeSitter::TreeSitterError)
             raise TreeHaver::NotAvailable, "Could not parse source: #{e.message}"
-          else
-            raise # Re-raise if it's not a TreeSitter error
           end
+
+          raise # Re-raise if it's not a TreeSitter error
         end
       end
 

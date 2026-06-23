@@ -36,7 +36,7 @@ module TreeHaver
       end
 
       # Alias for name (tree-sitter compatibility)
-      alias_method :language_name, :name
+      alias language_name name
 
       # -- Shared Implementation ------------------------------------------------
 
@@ -68,7 +68,7 @@ module TreeHaver
       # Human-readable representation
       # @return [String]
       def inspect
-        opts = options.empty? ? "" : " options=#{options}"
+        opts = options.empty? ? '' : " options=#{options}"
         class_name = self.class.name || "#{self.class.superclass.name}(anonymous)"
         "#<#{class_name} name=#{name} backend=#{backend}#{opts}>"
       end

@@ -19,9 +19,9 @@ module TreeHaver
       # @return [Integer, nil]
       def [](key)
         case key
-        when :row, "row", 0
+        when :row, 'row', 0
           row
-        when :column, "column", 1
+        when :column, 'column', 1
           column
         end
       end
@@ -29,7 +29,7 @@ module TreeHaver
       # Convert to hash
       # @return [Hash{Symbol => Integer}]
       def to_h
-        {row: row, column: column}
+        { row: row, column: column }
       end
 
       # String representation

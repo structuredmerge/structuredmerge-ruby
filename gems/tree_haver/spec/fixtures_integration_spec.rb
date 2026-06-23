@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require "pathname"
-
 RSpec.describe TreeHaver do
   def fixtures_root
-    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
 
   def read_json(path)
@@ -12,11 +10,11 @@ RSpec.describe TreeHaver do
   end
 
   def manifest
-    @manifest ||= read_json(fixtures_root.join("conformance", "slice-24-manifest", "family-feature-profiles.json"))
+    @manifest ||= read_json(fixtures_root.join('conformance', 'slice-24-manifest', 'family-feature-profiles.json'))
   end
 
   def diagnostics_fixture(role)
-    path = Ast::Merge.conformance_fixture_path(manifest, "diagnostics", role)
+    path = Ast::Merge.conformance_fixture_path(manifest, 'diagnostics', role)
     raise "missing diagnostics fixture for #{role}" unless path
 
     read_json(fixtures_root.join(*path))
@@ -26,8 +24,8 @@ RSpec.describe TreeHaver do
     Ast::Merge.json_ready(value)
   end
 
-  it "conforms to the slice-06 parser request fixture" do
-    fixture = diagnostics_fixture("parser_request")
+  it 'conforms to the slice-06 parser request fixture' do
+    fixture = diagnostics_fixture('parser_request')
 
     request = described_class::ParserRequest.new(**fixture[:request])
     expect(json_ready(request.to_h)).to eq(json_ready(fixture[:request]))
@@ -40,36 +38,38 @@ RSpec.describe TreeHaver do
     expect(json_ready(adapter_info.to_h.slice(:backend, :supports_dialects))).to eq(json_ready(fixture[:adapter_info]))
   end
 
-  it "conforms to the slice-19 adapter policy support fixture" do
-    fixture = diagnostics_fixture("adapter_policy_support")
+  it 'conforms to the slice-19 adapter policy support fixture' do
+    fixture = diagnostics_fixture('adapter_policy_support')
     adapter_info = described_class::AdapterInfo.new(
       backend: fixture.dig(:adapter_info, :backend),
       supports_dialects: fixture.dig(:adapter_info, :supports_dialects),
       supported_policies: fixture.dig(:adapter_info, :supported_policies)
     )
-    expect(json_ready(adapter_info.to_h.slice(:backend, :supports_dialects, :supported_policies))).to eq(json_ready(fixture[:adapter_info]))
+    expect(json_ready(adapter_info.to_h.slice(:backend, :supports_dialects,
+                                              :supported_policies))).to eq(json_ready(fixture[:adapter_info]))
   end
 
-  it "conforms to the slice-20 adapter feature profile fixture" do
-    fixture = diagnostics_fixture("adapter_feature_profile")
+  it 'conforms to the slice-20 adapter feature profile fixture' do
+    fixture = diagnostics_fixture('adapter_feature_profile')
     profile = described_class::FeatureProfile.new(
       backend: fixture.dig(:feature_profile, :backend),
       supports_dialects: fixture.dig(:feature_profile, :supports_dialects),
       supported_policies: fixture.dig(:feature_profile, :supported_policies)
     )
-    expect(json_ready(profile.to_h.slice(:backend, :supports_dialects, :supported_policies))).to eq(json_ready(fixture[:feature_profile]))
+    expect(json_ready(profile.to_h.slice(:backend, :supports_dialects,
+                                         :supported_policies))).to eq(json_ready(fixture[:feature_profile]))
   end
 
-  it "conforms to the slice-25 backend registry fixture" do
-    fixture = diagnostics_fixture("backend_registry")
+  it 'conforms to the slice-25 backend registry fixture' do
+    fixture = diagnostics_fixture('backend_registry')
     backends = [
-      described_class::BackendReference.new(id: "native", family: "builtin"),
-      described_class::BackendReference.new(id: "tree-sitter", family: "tree-sitter")
+      described_class::BackendReference.new(id: 'native', family: 'builtin'),
+      described_class::BackendReference.new(id: 'tree-sitter', family: 'tree-sitter')
     ]
     expect(json_ready(backends.map(&:to_h))).to eq(json_ready(fixture[:backends]))
 
     profile = described_class::FeatureProfile.new(
-      backend: "tree-sitter",
+      backend: 'tree-sitter',
       backend_ref: backends[1],
       supports_dialects: true,
       supported_policies: []
@@ -77,121 +77,121 @@ RSpec.describe TreeHaver do
     expect(json_ready(profile.to_h[:backend_ref])).to eq(json_ready(fixture[:backends][1]))
   end
 
-  it "conforms to the tree_haver backend architecture doc inventory fixture" do
+  it 'conforms to the tree_haver backend architecture doc inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-847-tree-haver-backend-architecture-doc-inventory",
-        "tree-haver-backend-architecture-doc-inventory.json"
+        'diagnostics',
+        'slice-847-tree-haver-backend-architecture-doc-inventory',
+        'tree-haver-backend-architecture-doc-inventory.json'
       )
     )
 
     expect(fixture.fetch(:kept_contracts).map { |contract| contract.fetch(:id) }).to eq(
-      [
-        "normalized-position-api",
-        "capability-reporting",
-        "explicit-backend-context",
-        "scoped-context-restoration",
-        "single-normalized-tree-shape"
+      %w[
+        normalized-position-api
+        capability-reporting
+        explicit-backend-context
+        scoped-context-restoration
+        single-normalized-tree-shape
       ]
     )
     expect(fixture.fetch(:retired_or_downgraded_claims).map { |claim| claim.fetch(:id) }).to include(
-      "universal-ruby-backend-adapter",
-      "raw-object-wrapping-as-api",
-      "thread-local-backend-switching",
-      "backend-availability-as-rspec-tags"
+      'universal-ruby-backend-adapter',
+      'raw-object-wrapping-as-api',
+      'thread-local-backend-switching',
+      'backend-availability-as-rspec-tags'
     )
-    expect(fixture.dig(:provider_guidance, :native_object_retention)).to eq("allowed_internal_only")
-    expect(fixture.dig(:provider_guidance, :downstream_tree_shape)).to eq("normalized_tree")
+    expect(fixture.dig(:provider_guidance, :native_object_retention)).to eq('allowed_internal_only')
+    expect(fixture.dig(:provider_guidance, :downstream_tree_shape)).to eq('normalized_tree')
     expect(fixture.dig(:provider_guidance, :project_parser_specific_value_into)).to include(
-      "node metadata",
-      "semantic sidecars"
+      'node metadata',
+      'semantic sidecars'
     )
-    expect(fixture.fetch(:decision)).to include("Port the old position and capability ideas")
+    expect(fixture.fetch(:decision)).to include('Port the old position and capability ideas')
   end
 
-  it "conforms to the tree_haver backend implementation inventory fixture" do
+  it 'conforms to the tree_haver backend implementation inventory fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-848-tree-haver-old-backend-implementation-inventory",
-        "tree-haver-old-backend-implementation-inventory.json"
+        'diagnostics',
+        'slice-848-tree-haver-old-backend-implementation-inventory',
+        'tree-haver-old-backend-implementation-inventory.json'
       )
     )
     classifications = fixture.fetch(:classifications).to_h do |entry|
       [entry.fetch(:old_surface), entry]
     end
 
-    expect(classifications.fetch("Backends::MRI").fetch(:classification)).to eq("restored_native_backend")
-    expect(classifications.fetch("Backends::FFI").fetch(:replacement)).to eq("TreeHaver::Backends::FFI")
-    expect(classifications.fetch("Backends::Rust").fetch(:classification)).to eq("restored_native_backend")
-    expect(classifications.fetch("Backends::Java").fetch(:classification)).to eq("restored_native_backend")
-    expect(classifications.fetch("Backends::Prism").fetch(:classification)).to eq("provider_local")
-    expect(classifications.fetch("Backends::Psych").fetch(:classification)).to eq("provider_local")
-    expect(classifications.fetch("Backends::Citrus").fetch(:classification)).to eq("survives_as_peg_primitive")
-    expect(classifications.fetch("Backends::Parslet").fetch(:classification)).to eq("survives_as_peg_primitive")
-    expect(classifications.fetch("PathValidator").fetch(:classification)).to eq("restored_security_primitive")
+    expect(classifications.fetch('Backends::MRI').fetch(:classification)).to eq('restored_native_backend')
+    expect(classifications.fetch('Backends::FFI').fetch(:replacement)).to eq('TreeHaver::Backends::FFI')
+    expect(classifications.fetch('Backends::Rust').fetch(:classification)).to eq('restored_native_backend')
+    expect(classifications.fetch('Backends::Java').fetch(:classification)).to eq('restored_native_backend')
+    expect(classifications.fetch('Backends::Prism').fetch(:classification)).to eq('provider_local')
+    expect(classifications.fetch('Backends::Psych').fetch(:classification)).to eq('provider_local')
+    expect(classifications.fetch('Backends::Citrus').fetch(:classification)).to eq('survives_as_peg_primitive')
+    expect(classifications.fetch('Backends::Parslet').fetch(:classification)).to eq('survives_as_peg_primitive')
+    expect(classifications.fetch('PathValidator').fetch(:classification)).to eq('restored_security_primitive')
     expect(fixture.fetch(:active_backend_requirements)).to include(
-      "backend_reference",
-      "capability_or_feature_profile_fixture",
-      "conformance_path_using_backend"
+      'backend_reference',
+      'capability_or_feature_profile_fixture',
+      'conformance_path_using_backend'
     )
     expect(fixture.fetch(:current_active_backends).map { |backend| backend.fetch(:backend) }).to include(
-      "tslp",
-      "kreuzberg-language-pack",
-      "mri",
-      "rust",
-      "ffi",
-      "java",
-      "citrus",
-      "parslet",
-      "kaitai-struct"
+      'tslp',
+      'kreuzberg-language-pack',
+      'mri',
+      'rust',
+      'ffi',
+      'java',
+      'citrus',
+      'parslet',
+      'kaitai-struct'
     )
   end
 
-  it "conforms to the tree_haver grammar library path security model fixture" do
+  it 'conforms to the tree_haver grammar library path security model fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-849-tree-haver-grammar-library-path-security-model",
-        "tree-haver-grammar-library-path-security-model.json"
+        'diagnostics',
+        'slice-849-tree-haver-grammar-library-path-security-model',
+        'tree-haver-grammar-library-path-security-model.json'
       )
     )
 
     expect(fixture.fetch(:active_security_checks).map { |check| check.fetch(:id) }).to eq(
-      [
-        "library-path-shape",
-        "versioned-shared-object",
-        "name-validation",
-        "registry-backed-backend-names",
-        "stable-error-list"
+      %w[
+        library-path-shape
+        versioned-shared-object
+        name-validation
+        registry-backed-backend-names
+        stable-error-list
       ]
     )
     expect(fixture.fetch(:retired_or_inactive_old_behavior).map { |entry| entry.fetch(:id) }).to include(
-      "manual-tree-sitter-env-paths",
-      "trusted-directory-allowlist",
-      "safe-library-search-order"
+      'manual-tree-sitter-env-paths',
+      'trusted-directory-allowlist',
+      'safe-library-search-order'
     )
     expect(fixture.fetch(:current_environment_vocabulary).map { |entry| entry.fetch(:name) }).to include(
-      "TREE_HAVER_BACKEND",
-      "KETTLE_DEV_DEBUG"
+      'TREE_HAVER_BACKEND',
+      'KETTLE_DEV_DEBUG'
     )
     expect(fixture.fetch(:current_environment_vocabulary).map { |entry| entry.fetch(:loads_native_code) }.uniq).to eq(
       [false]
     )
     expect(fixture.fetch(:future_manual_path_requirements)).to include(
-      "trusted_directory_fixture",
-      "no_silent_fallback_after_invalid_explicit_path"
+      'trusted_directory_fixture',
+      'no_silent_fallback_after_invalid_explicit_path'
     )
-    expect(fixture.fetch(:decision)).to include("Do not reintroduce manual grammar shared-library search")
+    expect(fixture.fetch(:decision)).to include('Do not reintroduce manual grammar shared-library search')
   end
 
-  it "conforms to the Ruby tree_haver reference contract fixture" do
+  it 'conforms to the Ruby tree_haver reference contract fixture' do
     fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-1003-ruby-tree-haver-reference-contract",
-        "ruby-tree-haver-reference-contract.json"
+        'diagnostics',
+        'slice-1003-ruby-tree-haver-reference-contract',
+        'ruby-tree-haver-reference-contract.json'
       )
     )
 
@@ -200,24 +200,24 @@ RSpec.describe TreeHaver do
     )
   end
 
-  it "exposes PEG backend references for parser-plurality slices" do
+  it 'exposes PEG backend references for parser-plurality slices' do
     expect(json_ready(described_class::CITRUS_BACKEND.to_h)).to eq(
-      json_ready({ id: "citrus", family: "peg" })
+      json_ready({ id: 'citrus', family: 'peg' })
     )
     expect(json_ready(described_class::PARSLET_BACKEND.to_h)).to eq(
-      json_ready({ id: "parslet", family: "peg" })
+      json_ready({ id: 'parslet', family: 'peg' })
     )
 
     expect(json_ready(described_class.peg_adapter_info(described_class::CITRUS_BACKEND).to_h[:backend_ref])).to eq(
-      json_ready({ id: "citrus", family: "peg" })
+      json_ready({ id: 'citrus', family: 'peg' })
     )
     expect(json_ready(described_class.peg_feature_profile(described_class::PARSLET_BACKEND).to_h[:backend_ref])).to eq(
-      json_ready({ id: "parslet", family: "peg" })
+      json_ready({ id: 'parslet', family: 'peg' })
     )
   end
 
-  it "conforms to the slice-721 Kaitai tree-haver substrate fixture" do
-    fixture = diagnostics_fixture("kaitai_tree_haver_substrate")
+  it 'conforms to the slice-721 Kaitai tree-haver substrate fixture' do
+    fixture = diagnostics_fixture('kaitai_tree_haver_substrate')
 
     expect(json_ready(described_class::KAITAI_STRUCT_BACKEND.to_h)).to eq(json_ready(fixture[:backend]))
     expect(json_ready(described_class.kaitai_adapter_info.to_h)).to eq(json_ready(fixture[:adapter_info]))
@@ -257,14 +257,14 @@ RSpec.describe TreeHaver do
       end
     )
 
-    expect(analysis.kind).to eq("kaitai-tree")
+    expect(analysis.kind).to eq('kaitai-tree')
     expect(analysis.source_byte_length).to eq(analysis_fixture[:source_byte_length])
     expect(analysis.diagnostics.first.schema_path).to eq(analysis_fixture.dig(:diagnostics, 0, :schema_path))
     expect(json_ready(analysis.root.to_h)).to eq(json_ready(node_fixture))
   end
 
-  it "conforms to the slice-722 portable byte location contract fixture" do
-    fixture = diagnostics_fixture("portable_byte_location_contract")
+  it 'conforms to the slice-722 portable byte location contract fixture' do
+    fixture = diagnostics_fixture('portable_byte_location_contract')
     byte_range = described_class::ByteRange.new(**fixture[:byte_range])
     point = described_class::SourcePoint.new(**fixture[:source_point])
     edit_fixture = fixture[:edit_span]
@@ -285,42 +285,47 @@ RSpec.describe TreeHaver do
     expect(byte_range.contains_byte?(byte_range.end_byte)).to eq(fixture.dig(:expected, :contains_end))
     expect(byte_range.overlaps?(overlapping_range)).to eq(fixture.dig(:expected, :overlaps))
     expect(byte_range.overlaps?(disjoint_range)).to eq(fixture.dig(:expected, :disjoint))
-    expect(described_class.byte_offset_for_point(fixture[:source], point)).to eq(fixture.dig(:expected, :line_column_offset))
+    expect(described_class.byte_offset_for_point(fixture[:source],
+                                                 point)).to eq(fixture.dig(:expected, :line_column_offset))
     expect(edit_span.old_range.length).to eq(fixture.dig(:expected, :old_edit_length))
     expect(edit_span.new_range.length).to eq(fixture.dig(:expected, :new_edit_length))
     expect(edit_span.byte_delta).to eq(fixture.dig(:expected, :edit_delta))
-    expect(described_class.slice_byte_range(fixture[:source], edit_span.old_range)).to eq(fixture.dig(:expected, :old_edit_slice))
+    expect(described_class.slice_byte_range(fixture[:source],
+                                            edit_span.old_range)).to eq(fixture.dig(:expected, :old_edit_slice))
   end
 
-  it "conforms to the slice-782 normalized tree node fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-782-normalized-tree-node", "normalized-tree-node.json"))
+  it 'conforms to the slice-782 normalized tree node fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-782-normalized-tree-node',
+                                           'normalized-tree-node.json'))
 
     expect(described_class.node_roles).to eq(fixture[:node_roles])
     node = normalized_tree_node(fixture[:node])
     child = normalized_tree_node(fixture[:child])
 
-    expect(node.role).to eq("structural")
+    expect(node.role).to eq('structural')
     expect(node.child_ids.fetch(1)).to eq(child.id)
     expect(child.parent_id).to eq(node.id)
-    expect(child.field_name).to eq("declaration")
+    expect(child.field_name).to eq('declaration')
     expect(child.has_source_text).to be(true)
   end
 
-  it "conforms to the slice-786 progressive node metadata fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-786-progressive-node-metadata", "progressive-node-metadata.json"))
+  it 'conforms to the slice-786 progressive node metadata fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-786-progressive-node-metadata',
+                                           'progressive-node-metadata.json'))
     enhanced = normalized_tree_node(fixture[:enhanced_node])
     limited = normalized_tree_node(fixture[:limited_node])
 
-    expect(enhanced.backend_kind).to eq("FuncDecl")
-    expect(enhanced.semantic_roles.first).to eq("declaration")
-    expect(enhanced.metadata.dig(:go_dst, :node_path)).to eq("decls[0]")
+    expect(enhanced.backend_kind).to eq('FuncDecl')
+    expect(enhanced.semantic_roles.first).to eq('declaration')
+    expect(enhanced.metadata.dig(:go_dst, :node_path)).to eq('decls[0]')
     expect(limited.has_source_text).to be(false)
-    expect(limited.unsupported_features.fetch(1)).to eq("source_fragment")
-    expect(limited.metadata.dig(:psych, :location_support)).to eq("line_column_only")
+    expect(limited.unsupported_features.fetch(1)).to eq('source_fragment')
+    expect(limited.metadata.dig(:psych, :location_support)).to eq('line_column_only')
   end
 
-  it "conforms to the slice-787 native parser adapter contract fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-787-native-parser-adapter-contract", "native-parser-adapter-contract.json"))
+  it 'conforms to the slice-787 native parser adapter contract fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-787-native-parser-adapter-contract',
+                                           'native-parser-adapter-contract.json'))
     provider_fixture = fixture[:provider]
     provider = described_class::NativeParserProvider.new(
       id: provider_fixture[:id],
@@ -343,17 +348,18 @@ RSpec.describe TreeHaver do
       metadata: result_fixture[:metadata]
     )
 
-    expect(provider.id).to eq("go-dst")
+    expect(provider.id).to eq('go-dst')
     expect(provider.retains_native_tree).to be(true)
-    expect(provider.native_tree_visibility).to eq("provider_internal")
+    expect(provider.native_tree_visibility).to eq('provider_internal')
     expect(result.root_id).to eq(result.nodes.first.id)
-    expect(result.nodes.fetch(1).semantic_roles.fetch(1)).to eq("function")
-    expect(result.metadata.dig(:go_dst, :native_tree_visibility)).to eq("provider_internal")
+    expect(result.nodes.fetch(1).semantic_roles.fetch(1)).to eq('function')
+    expect(result.metadata.dig(:go_dst, :native_tree_visibility)).to eq('provider_internal')
     expect(result.source_fragments_available).to be(true)
   end
 
-  it "conforms to the slice-822 native provider metadata fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-822-native-provider-metadata", "native-provider-metadata.json"))
+  it 'conforms to the slice-822 native provider metadata fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-822-native-provider-metadata',
+                                           'native-provider-metadata.json'))
     metadata = described_class::NativeProviderMetadata.new(**fixture[:provider_metadata])
 
     expect(metadata.provider_id).to eq(fixture.dig(:expected, :provider_id))
@@ -369,8 +375,8 @@ RSpec.describe TreeHaver do
     expect(metadata.metadata_policy).to eq(fixture.dig(:expected, :metadata_policy))
   end
 
-  it "conforms to the slice-788 tree-haver profile fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-788-tree-haver-profile", "tree-haver-profile.json"))
+  it 'conforms to the slice-788 tree-haver profile fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-788-tree-haver-profile', 'tree-haver-profile.json'))
     profile_fixture = fixture[:profile]
     profile = described_class::TreeHaverProfile.new(
       profile_id: profile_fixture[:profile_id],
@@ -386,17 +392,18 @@ RSpec.describe TreeHaver do
       diagnostics: profile_fixture[:diagnostics]
     )
 
-    expect(profile.profile_id).to eq("go-dst-normalized-tree-v1")
-    expect(profile.backend_ref.id).to eq("go-dst")
-    expect(profile.node_roles.first).to eq("structural")
-    expect(profile.normalized_node_fields.last).to eq("metadata")
-    expect(profile.unsupported_defaults[:field_name]).to eq("null")
-    expect(profile.capability.parser_identity.name).to eq("github.com/dave/dst")
-    expect(profile.fixture_slices.first).to eq("slice-782-normalized-tree-node")
+    expect(profile.profile_id).to eq('go-dst-normalized-tree-v1')
+    expect(profile.backend_ref.id).to eq('go-dst')
+    expect(profile.node_roles.first).to eq('structural')
+    expect(profile.normalized_node_fields.last).to eq('metadata')
+    expect(profile.unsupported_defaults[:field_name]).to eq('null')
+    expect(profile.capability.parser_identity.name).to eq('github.com/dave/dst')
+    expect(profile.fixture_slices.first).to eq('slice-782-normalized-tree-node')
   end
 
-  it "conforms to the slice-789 ordered tree primitives fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-789-ordered-tree-primitives", "ordered-tree-primitives.json"))
+  it 'conforms to the slice-789 ordered tree primitives fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-789-ordered-tree-primitives',
+                                           'ordered-tree-primitives.json'))
     ordered_fixture = fixture[:ordered_tree]
     ordered = described_class::OrderedTreePrimitives.new(
       root_id: ordered_fixture[:root_id],
@@ -419,14 +426,15 @@ RSpec.describe TreeHaver do
     end
 
     expect(ordered.root_id).to eq(fixture[:root_id])
-    expect(ordered.child_order[:file].fetch(0)).to eq("imports")
-    expect(ordered.child_order[:imports].fetch(1)).to eq("import-strings")
+    expect(ordered.child_order[:file].fetch(0)).to eq('imports')
+    expect(ordered.child_order[:imports].fetch(1)).to eq('import-strings')
     expect(ordered.sibling_edges.fetch(2).previous_sibling_id).to be_nil
-    expect(ordered.sibling_edges.fetch(2).next_sibling_id).to eq("import-strings")
+    expect(ordered.sibling_edges.fetch(2).next_sibling_id).to eq('import-strings')
   end
 
-  it "conforms to the slice-783 backend capability report fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-783-backend-capability-report", "backend-capability-report.json"))
+  it 'conforms to the slice-783 backend capability report fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-783-backend-capability-report',
+                                           'backend-capability-report.json'))
     capability_fixture = fixture[:capability]
     capability = described_class::BackendCapability.new(
       backend_ref: described_class::BackendReference.new(**capability_fixture[:backend_ref]),
@@ -443,18 +451,19 @@ RSpec.describe TreeHaver do
       diagnostics: capability_fixture[:diagnostics]
     )
 
-    expect(capability.backend_ref.id).to eq("go-dst")
-    expect(capability.backend_ref.family).to eq("native")
-    expect(capability.language).to eq("go")
-    expect(capability.parser_identity.name).to eq("github.com/dave/dst")
-    expect(capability.parse_error_behavior).to eq("diagnostic_and_partial_tree")
-    expect(capability.render_strategies.first).to eq("source_fragment_reuse")
+    expect(capability.backend_ref.id).to eq('go-dst')
+    expect(capability.backend_ref.family).to eq('native')
+    expect(capability.language).to eq('go')
+    expect(capability.parser_identity.name).to eq('github.com/dave/dst')
+    expect(capability.parse_error_behavior).to eq('diagnostic_and_partial_tree')
+    expect(capability.render_strategies.first).to eq('source_fragment_reuse')
     expect(capability.normalized_tree_support).to be(true)
     expect(capability.native_node_access).to be(true)
   end
 
-  it "conforms to the slice-784 source fragment extraction fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-784-source-fragment-extraction", "source-fragment-extraction.json"))
+  it 'conforms to the slice-784 source fragment extraction fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-784-source-fragment-extraction',
+                                           'source-fragment-extraction.json'))
     fragment = described_class.extract_source_fragment(
       fixture[:source],
       source_span(fixture[:span]),
@@ -468,8 +477,9 @@ RSpec.describe TreeHaver do
     expect(fragment.diagnostics.length).to eq(fixture.dig(:fragment, :diagnostics).length)
   end
 
-  it "conforms to the slice-785 parse error tolerance fixture" do
-    fixture = read_json(fixtures_root.join("diagnostics", "slice-785-parse-error-tolerance", "parse-error-tolerance.json"))
+  it 'conforms to the slice-785 parse error tolerance fixture' do
+    fixture = read_json(fixtures_root.join('diagnostics', 'slice-785-parse-error-tolerance',
+                                           'parse-error-tolerance.json'))
     tolerance_fixture = fixture[:parse_error_tolerance]
     tolerance = described_class::ParseErrorTolerance.new(
       backend_ref: described_class::BackendReference.new(**tolerance_fixture[:backend_ref]),
@@ -486,15 +496,15 @@ RSpec.describe TreeHaver do
       diagnostics: tolerance_fixture[:diagnostics]
     )
 
-    expect(tolerance.backend_ref.id).to eq("tree-sitter-go")
-    expect(tolerance.behavior).to eq("diagnostic_and_partial_tree")
+    expect(tolerance.backend_ref.id).to eq('tree-sitter-go')
+    expect(tolerance.behavior).to eq('diagnostic_and_partial_tree')
     expect(tolerance.tolerates_errors).to be(true)
     expect(tolerance.error_nodes.first.span.range.start_byte).to eq(27)
-    expect(tolerance.diagnostics.first).to eq("partial tree contains parser error nodes")
+    expect(tolerance.diagnostics.first).to eq('partial tree contains parser error nodes')
   end
 
-  it "conforms to the slice-723 binary core contract fixture" do
-    fixture = diagnostics_fixture("binary_core_contract")
+  it 'conforms to the slice-723 binary core contract fixture' do
+    fixture = diagnostics_fixture('binary_core_contract')
     payload_fixture = fixture[:raw_payload]
     payload = described_class::BinaryRawPayload.new(
       encoding: payload_fixture[:encoding],
@@ -529,7 +539,9 @@ RSpec.describe TreeHaver do
       preserved_ranges: report_fixture[:preserved_ranges].map { |range| described_class::ByteRange.new(**range) },
       rewritten_nodes: report_fixture[:rewritten_nodes],
       checksum_updates: report_fixture[:checksum_updates],
-      nested_dispatches: report_fixture[:nested_dispatches].map { |dispatch| described_class::BinaryNestedDispatch.new(**dispatch) },
+      nested_dispatches: report_fixture[:nested_dispatches].map do |dispatch|
+        described_class::BinaryNestedDispatch.new(**dispatch)
+      end,
       diagnostics: report_fixture[:diagnostics].map do |diagnostic|
         described_class::BinaryDiagnostic.new(
           severity: diagnostic[:severity],
@@ -541,22 +553,22 @@ RSpec.describe TreeHaver do
       end
     )
 
-    payload_bytes = [payload.value].pack("H*")
-    expect(payload.encoding).to eq("hex")
+    payload_bytes = [payload.value].pack('H*')
+    expect(payload.encoding).to eq('hex')
     expect(payload_bytes.bytesize).to eq(payload.byte_length)
     expect(payload.regions.map(&:kind)).to eq(%w[header length body checksum])
     expect(payload.regions.first.byte_range.length).to eq(8)
-    expect(payload_bytes.byteslice(payload.regions.last.byte_range.start_byte...payload.regions.last.byte_range.end_byte).unpack1("H*")).to eq(payload.regions.last.expected_hex)
+    expect(payload_bytes.byteslice(payload.regions.last.byte_range.start_byte...payload.regions.last.byte_range.end_byte).unpack1('H*')).to eq(payload.regions.last.expected_hex)
     expect(scalar_values.length).to eq(9)
-    expect(scalar_values.first.kind).to eq("string")
-    expect(scalar_values.last.kind).to eq("null")
-    expect(render_policies[0].operation).to eq("preserve")
-    expect(render_policies[1].disposition).to eq("requires_renderer")
-    expect(render_policies[2].disposition).to eq("unsafe")
-    expect(report.format).to eq("png")
+    expect(scalar_values.first.kind).to eq('string')
+    expect(scalar_values.last.kind).to eq('null')
+    expect(render_policies[0].operation).to eq('preserve')
+    expect(render_policies[1].disposition).to eq('requires_renderer')
+    expect(render_policies[2].disposition).to eq('unsafe')
+    expect(report.format).to eq('png')
     expect(report.preserved_ranges.first.length).to eq(25)
-    expect(report.nested_dispatches.first.family).to eq("text")
-    expect(report.diagnostics.first.category).to eq("unsupported_checksum_rewrite")
+    expect(report.nested_dispatches.first.family).to eq('text')
+    expect(report.diagnostics.first.category).to eq('unsupported_checksum_rewrite')
   end
 
   def normalized_tree_node(fixture)
@@ -696,8 +708,8 @@ RSpec.describe TreeHaver do
     )
   end
 
-  it "conforms to the slice-724 and slice-729 ZIP family fixtures" do
-    fixture = diagnostics_fixture("zip_family_contract")
+  it 'conforms to the slice-724 and slice-729 ZIP family fixtures' do
+    fixture = diagnostics_fixture('zip_family_contract')
     report_fixture = fixture[:merge_report]
     report = described_class::ZipFamilyReport.new(
       archive: described_class::ZipArchiveInfo.new(
@@ -720,7 +732,9 @@ RSpec.describe TreeHaver do
           central_directory_range: described_class::ByteRange.new(**entry[:central_directory_range])
         )
       end,
-      member_decisions: fixture[:member_decisions].map { |decision| described_class::ZipMemberDecision.new(**decision) },
+      member_decisions: fixture[:member_decisions].map do |decision|
+        described_class::ZipMemberDecision.new(**decision)
+      end,
       unsafe_entries: fixture[:unsafe_entries].map { |entry| described_class::ZipUnsafeEntry.new(**entry) },
       merge_report: described_class::BinaryMergeReport.new(
         format: report_fixture[:format],
@@ -729,46 +743,51 @@ RSpec.describe TreeHaver do
         preserved_ranges: report_fixture[:preserved_ranges].map { |range| described_class::ByteRange.new(**range) },
         rewritten_nodes: report_fixture[:rewritten_nodes],
         checksum_updates: report_fixture[:checksum_updates],
-        nested_dispatches: report_fixture[:nested_dispatches].map { |dispatch| described_class::BinaryNestedDispatch.new(**dispatch) },
-        diagnostics: report_fixture[:diagnostics].map { |diagnostic| described_class::BinaryDiagnostic.new(**diagnostic) }
+        nested_dispatches: report_fixture[:nested_dispatches].map do |dispatch|
+          described_class::BinaryNestedDispatch.new(**dispatch)
+        end,
+        diagnostics: report_fixture[:diagnostics].map do |diagnostic|
+          described_class::BinaryDiagnostic.new(**diagnostic)
+        end
       )
     )
 
     expect(report.archive.entry_count).to eq(report.entries.length)
-    expect(report.member_decisions[1].nested_family).to eq("xml")
-    expect(report.unsafe_entries.map(&:category)).to include("path_traversal", "duplicate_normalized_path", "encrypted_member")
+    expect(report.member_decisions[1].nested_family).to eq('xml')
+    expect(report.unsafe_entries.map(&:category)).to include('path_traversal', 'duplicate_normalized_path',
+                                                             'encrypted_member')
     expect(report.merge_report.preserved_ranges.first.length).to eq(76)
   end
 
-  it "conforms to the slice-924 tree_haver edit projection support fixture" do
+  it 'conforms to the slice-924 tree_haver edit projection support fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-924-tree-haver-edit-projection-support",
-      "edit-projection-support.json"
-    ))
+                          'diagnostics',
+                          'slice-924-tree-haver-edit-projection-support',
+                          'edit-projection-support.json'
+                        ))
     support = edit_projection_support(fixture[:support])
     unsupported = edit_projection_support(fixture[:unsupported])
 
     expect(support.supports_edit_projection).to be(true)
-    expect(support.backend_ref.id).to eq("go-dst")
-    expect(support.supported_operations.first).to eq("replace_node")
-    expect(support.correlation_keys.fetch(1)).to eq("metadata.go_dst.node_path")
+    expect(support.backend_ref.id).to eq('go-dst')
+    expect(support.supported_operations.first).to eq('replace_node')
+    expect(support.correlation_keys.fetch(1)).to eq('metadata.go_dst.node_path')
     expect(support.preserves_source_fragments).to be(true)
     expect(support.unsupported_reason).to be_nil
 
     expect(unsupported.supports_edit_projection).to be(false)
-    expect(unsupported.backend_ref.id).to eq("psych")
-    expect(unsupported.unsupported_reason).to eq("backend_does_not_retain_native_tree")
+    expect(unsupported.backend_ref.id).to eq('psych')
+    expect(unsupported.unsupported_reason).to eq('backend_does_not_retain_native_tree')
     expect(unsupported.supported_operations).to be_empty
-    expect(unsupported.diagnostics.first).to eq("edit projection unavailable: native tree not retained")
+    expect(unsupported.diagnostics.first).to eq('edit projection unavailable: native tree not retained')
   end
 
-  it "conforms to the slice-925 tree_haver path validation fixture" do
+  it 'conforms to the slice-925 tree_haver path validation fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-925-tree-haver-path-validation",
-      "path-validation.json"
-    ))
+                          'diagnostics',
+                          'slice-925-tree-haver-path-validation',
+                          'path-validation.json'
+                        ))
 
     fixture[:library_path_cases].each do |test_case|
       validation = described_class.validate_library_path(test_case[:path])
@@ -780,7 +799,8 @@ RSpec.describe TreeHaver do
 
     fixture[:language_name_cases].each do |test_case|
       expect(described_class.safe_language_name?(test_case[:value])).to eq(test_case[:expected_valid]), test_case[:name]
-      expect(described_class.sanitize_language_name(test_case[:value])).to eq(test_case[:expected_sanitized]), test_case[:name]
+      expect(described_class.sanitize_language_name(test_case[:value])).to eq(test_case[:expected_sanitized]),
+                                                                           test_case[:name]
     end
 
     fixture[:symbol_name_cases].each do |test_case|
@@ -792,12 +812,12 @@ RSpec.describe TreeHaver do
     end
   end
 
-  it "conforms to the slice-926 tree_haver backend availability fixture" do
+  it 'conforms to the slice-926 tree_haver backend availability fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-926-tree-haver-backend-availability",
-      "backend-availability.json"
-    ))
+                          'diagnostics',
+                          'slice-926-tree-haver-backend-availability',
+                          'backend-availability.json'
+                        ))
 
     %i[available_report unavailable_report unknown_report].each do |name|
       expected = backend_availability_report(fixture[name])
@@ -806,12 +826,12 @@ RSpec.describe TreeHaver do
     end
   end
 
-  it "conforms to the slice-927 tree_haver provider diagnostics fixture" do
+  it 'conforms to the slice-927 tree_haver provider diagnostics fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-927-tree-haver-provider-diagnostics",
-      "provider-diagnostics.json"
-    ))
+                          'diagnostics',
+                          'slice-927-tree-haver-provider-diagnostics',
+                          'provider-diagnostics.json'
+                        ))
 
     %i[clean_report warning_report blocked_report].each do |name|
       expected = provider_diagnostics_report(fixture[name])
@@ -825,12 +845,12 @@ RSpec.describe TreeHaver do
     end
   end
 
-  it "conforms to the slice-928 edit projection execution contract fixture" do
+  it 'conforms to the slice-928 edit projection execution contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-928-go-dst-edit-projection-execution",
-      "edit-projection-execution.json"
-    ))
+                          'diagnostics',
+                          'slice-928-go-dst-edit-projection-execution',
+                          'edit-projection-execution.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -849,12 +869,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(rejected.to_h)).to eq(json_ready(unsupported.to_h))
   end
 
-  it "conforms to the slice-929 insert-child edit projection contract fixture" do
+  it 'conforms to the slice-929 insert-child edit projection contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-929-go-dst-insert-child-edit-projection",
-      "insert-child-edit-projection.json"
-    ))
+                          'diagnostics',
+                          'slice-929-go-dst-insert-child-edit-projection',
+                          'insert-child-edit-projection.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -865,12 +885,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-930 delete-node edit projection contract fixture" do
+  it 'conforms to the slice-930 delete-node edit projection contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-930-go-dst-delete-node-edit-projection",
-      "delete-node-edit-projection.json"
-    ))
+                          'diagnostics',
+                          'slice-930-go-dst-delete-node-edit-projection',
+                          'delete-node-edit-projection.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -881,12 +901,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-931 go-parser edit projection contract fixture" do
+  it 'conforms to the slice-931 go-parser edit projection contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-931-go-parser-edit-projection-execution",
-      "edit-projection-execution.json"
-    ))
+                          'diagnostics',
+                          'slice-931-go-parser-edit-projection-execution',
+                          'edit-projection-execution.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -897,12 +917,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-932 edit projection provider operation matrix fixture" do
+  it 'conforms to the slice-932 edit projection provider operation matrix fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-932-edit-projection-provider-operation-matrix",
-      "provider-operation-matrix.json"
-    ))
+                          'diagnostics',
+                          'slice-932-edit-projection-provider-operation-matrix',
+                          'provider-operation-matrix.json'
+                        ))
 
     providers = fixture[:providers].map { |provider| edit_projection_provider_matrix_entry(provider) }
     expected = edit_projection_provider_matrix(fixture[:expected_matrix])
@@ -914,12 +934,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-933 go-parser insert-child edit projection contract fixture" do
+  it 'conforms to the slice-933 go-parser insert-child edit projection contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-933-go-parser-insert-child-edit-projection",
-      "insert-child-edit-projection.json"
-    ))
+                          'diagnostics',
+                          'slice-933-go-parser-insert-child-edit-projection',
+                          'insert-child-edit-projection.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -930,12 +950,12 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-934 go-parser delete-node edit projection contract fixture" do
+  it 'conforms to the slice-934 go-parser delete-node edit projection contract fixture' do
     fixture = read_json(fixtures_root.join(
-      "diagnostics",
-      "slice-934-go-parser-delete-node-edit-projection",
-      "delete-node-edit-projection.json"
-    ))
+                          'diagnostics',
+                          'slice-934-go-parser-delete-node-edit-projection',
+                          'delete-node-edit-projection.json'
+                        ))
 
     expected = edit_projection_execution_result(fixture[:expected_result])
     result = described_class.build_edit_projection_execution_result(
@@ -946,8 +966,8 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it "conforms to the slice-100 process baseline fixture" do
-    fixture = diagnostics_fixture("process_baseline")
+  it 'conforms to the slice-100 process baseline fixture' do
+    fixture = diagnostics_fixture('process_baseline')
     result = described_class.process_with_language_pack(
       described_class::ProcessRequest.new(**fixture[:request])
     )
@@ -978,18 +998,18 @@ RSpec.describe TreeHaver do
     else
       expect(result[:diagnostics]).to contain_exactly(
         include(
-          severity: "error",
-          category: "unsupported_feature",
-          message: include("Please report this to tree-sitter-language-pack")
+          severity: 'error',
+          category: 'unsupported_feature',
+          message: include('Please report this to tree-sitter-language-pack')
         )
       )
     end
   end
 
-  it "fails closed when the language-pack result object is unreadable" do
+  it 'fails closed when the language-pack result object is unreadable' do
     unreadable_result = Class.new do
       def language
-        raise TypeError, "binding accessor failed"
+        raise TypeError, 'binding accessor failed'
       end
     end.new
 
@@ -998,7 +1018,7 @@ RSpec.describe TreeHaver do
 
     result = described_class.process_with_language_pack(
       described_class::ProcessRequest.new(
-        language: "ruby",
+        language: 'ruby',
         source: "module A\nend\n"
       )
     )
@@ -1006,54 +1026,54 @@ RSpec.describe TreeHaver do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to contain_exactly(
       include(
-        severity: "error",
-        category: "unsupported_feature",
-        message: include("Please report this to tree-sitter-language-pack")
+        severity: 'error',
+        category: 'unsupported_feature',
+        message: include('Please report this to tree-sitter-language-pack')
       )
     )
   end
 
-  it "supports temporary backend context selection" do
+  it 'supports temporary backend context selection' do
     expect(described_class.current_backend_id).to be_nil
 
-    described_class.with_backend("citrus") do
-      expect(described_class.current_backend_id).to eq("citrus")
+    described_class.with_backend('citrus') do
+      expect(described_class.current_backend_id).to eq('citrus')
 
-      described_class.with_backend("parslet") do
-        expect(described_class.current_backend_id).to eq("parslet")
+      described_class.with_backend('parslet') do
+        expect(described_class.current_backend_id).to eq('parslet')
       end
 
-      expect(described_class.current_backend_id).to eq("citrus")
+      expect(described_class.current_backend_id).to eq('citrus')
     end
 
     expect(described_class.current_backend_id).to be_nil
   end
 
-  it "uses temporary backend context selection when resolving registered parsers" do
-    require "toml"
-    require "toml-rb"
+  it 'uses temporary backend context selection when resolving registered parsers' do
+    require 'toml'
+    require 'toml-rb'
 
     described_class.register_language(
       :backend_context_toml,
       grammar_module: TomlRB::Document,
-      gem_name: "toml-rb",
+      gem_name: 'toml-rb'
     )
     described_class.register_language(
       :backend_context_toml,
       grammar_class: TOML::Parslet,
-      gem_name: "toml",
+      gem_name: 'toml'
     )
 
-    described_class.with_backend("citrus") do
+    described_class.with_backend('citrus') do
       expect(described_class.parser_for(:backend_context_toml).backend).to eq(:citrus)
     end
 
-    described_class.with_backend("parslet") do
+    described_class.with_backend('parslet') do
       expect(described_class.parser_for(:backend_context_toml).backend).to eq(:parslet)
     end
   end
 
-  it "resolves registered external native backend modules without explicit backend selection" do
+  it 'resolves registered external native backend modules without explicit backend selection' do
     backend = Module.new do
       class self::Language
         def self.rbs
@@ -1070,7 +1090,7 @@ RSpec.describe TreeHaver do
       :rbs,
       backend_module: backend,
       backend_type: :rbs,
-      gem_name: "rbs",
+      gem_name: 'rbs'
     )
 
     parser = described_class.parser_for(:rbs)
@@ -1079,16 +1099,16 @@ RSpec.describe TreeHaver do
     expect(parser.language).to eq(:rbs_language)
   end
 
-  it "provides PEG framework parsing helpers" do
-    require "toml"
-    require "toml-rb"
+  it 'provides PEG framework parsing helpers' do
+    require 'toml'
+    require 'toml-rb'
 
     citrus = described_class.parse_with_citrus("title = \"x\"\n", grammar_module: TomlRB::Document)
     expect(citrus[:ok]).to be(true)
-    expect(json_ready(citrus[:backend_ref].to_h)).to eq(json_ready({ id: "citrus", family: "peg" }))
+    expect(json_ready(citrus[:backend_ref].to_h)).to eq(json_ready({ id: 'citrus', family: 'peg' }))
 
     parslet = described_class.parse_with_parslet("title = \"x\"\n", grammar_class: TOML::Parslet)
     expect(parslet[:ok]).to be(true)
-    expect(json_ready(parslet[:backend_ref].to_h)).to eq(json_ready({ id: "parslet", family: "peg" }))
+    expect(json_ready(parslet[:backend_ref].to_h)).to eq(json_ready({ id: 'parslet', family: 'peg' }))
   end
 end

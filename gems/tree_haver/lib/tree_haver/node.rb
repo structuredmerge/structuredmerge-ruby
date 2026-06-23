@@ -106,7 +106,7 @@ module TreeHaver
       elsif @inner_node.respond_to?(:kind)
         @inner_node.kind.to_s
       else
-        raise TreeHaver::Error, "Backend node does not support type/kind"
+        raise TreeHaver::Error, 'Backend node does not support type/kind'
       end
     end
 
@@ -151,7 +151,7 @@ module TreeHaver
           Point.new(point.row, point.column)
         end
       else
-        raise TreeHaver::Error, "Backend node does not support start_point/start_position"
+        raise TreeHaver::Error, 'Backend node does not support start_point/start_position'
       end
     end
 
@@ -176,7 +176,7 @@ module TreeHaver
           Point.new(point.row, point.column)
         end
       else
-        raise TreeHaver::Error, "Backend node does not support end_point/end_position"
+        raise TreeHaver::Error, 'Backend node does not support end_point/end_position'
       end
     end
 
@@ -213,7 +213,7 @@ module TreeHaver
         start_line: start_line,
         end_line: end_line,
         start_column: start_point.column,
-        end_column: end_point.column,
+        end_column: end_point.column
       }
     end
 
@@ -234,7 +234,7 @@ module TreeHaver
         # Some backends (like TreeStump) require source as argument
         # Check arity to determine how to call
         arity = @inner_node.method(:text).arity
-        if arity == 0 || arity == -1
+        if [0, -1].include?(arity)
           # No required arguments, or optional arguments only
           @inner_node.text
         elsif arity >= 1 && @source
@@ -242,15 +242,15 @@ module TreeHaver
           @inner_node.text(@source)
         elsif @source
           # Fallback to byte extraction
-          @source[start_byte...end_byte] || ""
+          @source[start_byte...end_byte] || ''
         else
-          raise TreeHaver::Error, "Cannot extract text: backend requires source but none provided"
+          raise TreeHaver::Error, 'Cannot extract text: backend requires source but none provided'
         end
       elsif @source
         # Fallback: extract from source using byte positions
-        @source[start_byte...end_byte] || ""
+        @source[start_byte...end_byte] || ''
       else
-        raise TreeHaver::Error, "Cannot extract text: node has no text method and no source provided"
+        raise TreeHaver::Error, 'Cannot extract text: node has no text method and no source provided'
       end
     end
 
@@ -311,6 +311,7 @@ module TreeHaver
     def child(index)
       child_node = @inner_node.child(index)
       return if child_node.nil?
+
       Node.new(child_node, source: @source)
     rescue IndexError
       # Some backends (e.g., MRI w/ ruby_tree_sitter) raise IndexError for out of bounds
@@ -329,6 +330,7 @@ module TreeHaver
       if @inner_node.respond_to?(:named_child)
         child_node = @inner_node.named_child(index)
         return if child_node.nil?
+
         return Node.new(child_node, source: @source)
       end
 
@@ -340,20 +342,20 @@ module TreeHaver
 
         # Check if this child is named
         is_named = if child_node.respond_to?(:named?)
-          child_node.named?
-        elsif child_node.respond_to?(:is_named?)
-          child_node.is_named?
-        else
-          true  # Assume named if we can't determine
-        end
+                     child_node.named?
+                   elsif child_node.respond_to?(:is_named?)
+                     child_node.is_named?
+                   else
+                     true # Assume named if we can't determine
+                   end
 
-        if is_named
-          return Node.new(child_node, source: @source) if named_count == index
-          named_count += 1
-        end
+        next unless is_named
+        return Node.new(child_node, source: @source) if named_count == index
+
+        named_count += 1
       end
 
-      nil  # Index out of bounds
+      nil # Index out of bounds
     end
 
     # Get the count of named children
@@ -363,9 +365,7 @@ module TreeHaver
     # @return [Integer] Number of named children
     def named_child_count
       # Try native implementation first
-      if @inner_node.respond_to?(:named_child_count)
-        return @inner_node.named_child_count
-      end
+      return @inner_node.named_child_count if @inner_node.respond_to?(:named_child_count)
 
       # Fallback: count named children manually
       count = 0
@@ -375,12 +375,12 @@ module TreeHaver
 
         # Check if this child is named
         is_named = if child_node.respond_to?(:named?)
-          child_node.named?
-        elsif child_node.respond_to?(:is_named?)
-          child_node.is_named?
-        else
-          true  # Assume named if we can't determine
-        end
+                     child_node.named?
+                   elsif child_node.respond_to?(:is_named?)
+                     child_node.is_named?
+                   else
+                     true # Assume named if we can't determine
+                   end
 
         count += 1 if is_named
       end
@@ -408,6 +408,7 @@ module TreeHaver
     # @return [Enumerator, nil]
     def each(&block)
       return to_enum(__method__) unless block_given?
+
       children.each(&block)
     end
 
@@ -419,6 +420,7 @@ module TreeHaver
       if @inner_node.respond_to?(:child_by_field_name)
         child_node = @inner_node.child_by_field_name(name.to_s)
         return if child_node.nil?
+
         Node.new(child_node, source: @source)
       else
         # Not all backends support field names
@@ -427,15 +429,17 @@ module TreeHaver
     end
 
     # Alias for child_by_field_name
-    alias_method :field, :child_by_field_name
+    alias field child_by_field_name
 
     # Get the parent node
     #
     # @return [Node, nil] The parent node
     def parent
       return unless @inner_node.respond_to?(:parent)
+
       parent_node = @inner_node.parent
       return if parent_node.nil?
+
       Node.new(parent_node, source: @source)
     end
 
@@ -444,8 +448,10 @@ module TreeHaver
     # @return [Node, nil]
     def next_sibling
       return unless @inner_node.respond_to?(:next_sibling)
+
       sibling = @inner_node.next_sibling
       return if sibling.nil?
+
       Node.new(sibling, source: @source)
     end
 
@@ -454,8 +460,10 @@ module TreeHaver
     # @return [Node, nil]
     def prev_sibling
       return unless @inner_node.respond_to?(:prev_sibling)
+
       sibling = @inner_node.prev_sibling
       return if sibling.nil?
+
       Node.new(sibling, source: @source)
     end
 
@@ -512,11 +520,12 @@ module TreeHaver
     # @return [Boolean] true if both nodes wrap the same inner_node
     def ==(other)
       return false unless other.is_a?(Node)
+
       @inner_node == other.inner_node
     end
 
     # Alias for == to support both styles
-    alias_method :eql?, :==
+    alias eql? ==
 
     # Generate hash value for this node
     #

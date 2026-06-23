@@ -87,6 +87,7 @@ module TreeHaver
     def root_node
       root = @inner_tree.root_node
       return if root.nil?
+
       Node.new(root, source: @source)
     end
 
@@ -147,15 +148,16 @@ module TreeHaver
           new_end_byte: new_end_byte,
           start_point: start_point,
           old_end_point: old_end_point,
-          new_end_point: new_end_point,
+          new_end_point: new_end_point
         )
       end
     rescue NoMethodError => e
       # Re-raise as NotAvailable if it's about the edit method
-      raise unless e.name == :edit || e.message.include?("edit")
+      raise unless e.name == :edit || e.message.include?('edit')
+
       raise TreeHaver::NotAvailable,
-        "Incremental parsing not supported by current backend. " \
-          "Use MRI (ruby_tree_sitter), Rust (tree_stump), or Java (java-tree-sitter / jtreesitter) backend."
+            'Incremental parsing not supported by current backend. ' \
+              'Use MRI (ruby_tree_sitter), Rust (tree_stump), or Java (java-tree-sitter / jtreesitter) backend.'
     end
 
     private
@@ -203,8 +205,8 @@ module TreeHaver
     # String representation
     # @return [String]
     def inspect
-      inner_class = @inner_tree ? @inner_tree.class.name : "nil"
-      "#<#{self.class} source_length=#{@source&.bytesize || "unknown"} inner_tree=#{inner_class}>"
+      inner_class = @inner_tree ? @inner_tree.class.name : 'nil'
+      "#<#{self.class} source_length=#{@source&.bytesize || 'unknown'} inner_tree=#{inner_class}>"
     end
 
     # Check if tree responds to a method (includes delegation to inner_tree)

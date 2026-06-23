@@ -69,8 +69,8 @@ module TreeHaver
   # @api private
   module LanguageRegistry
     @mutex = Mutex.new
-    @cache = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
-    @registrations = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
+    @cache = {}
+    @registrations = {}
 
     module_function
 
@@ -153,6 +153,7 @@ module TreeHaver
     def fetch(key)
       @mutex.synchronize do
         return @cache[key] if @cache.key?(key)
+
         value = yield
         @cache[key] = value
       end

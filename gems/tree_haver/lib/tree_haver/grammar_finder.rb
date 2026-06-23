@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "rbconfig"
+require 'rbconfig'
 
 module TreeHaver
   # Registration-first utility for finding tree-sitter grammar shared libraries.
@@ -70,7 +70,7 @@ module TreeHaver
 
       if validate && !PathValidator.safe_language_name?(name_str)
         raise ArgumentError, "Invalid language name: #{language_name.inspect}. " \
-          "Language names must start with a letter and contain only lowercase letters, numbers, and underscores."
+          'Language names must start with a letter and contain only lowercase letters, numbers, and underscores.'
       end
 
       @language_name = name_str.to_sym
@@ -108,7 +108,7 @@ module TreeHaver
       ext = platform_extension
       [
         "libtree_sitter_#{@language_name}#{ext}",
-        "libtree-sitter-#{@language_name}#{ext}",
+        "libtree-sitter-#{@language_name}#{ext}"
       ]
     end
 
@@ -166,7 +166,7 @@ module TreeHaver
 
         # simplecov:disable defensive - ENV.key? true with nil value is rare edge case
         if env_path.nil?
-          @env_rejection_reason = "explicitly disabled (set to nil)"
+          @env_rejection_reason = 'explicitly disabled (set to nil)'
           return
         end
         # simplecov:enable
@@ -175,7 +175,7 @@ module TreeHaver
         # This allows users to disable tree-sitter for specific languages
         # and fall back to alternative backends like Citrus
         if env_path.empty?
-          @env_rejection_reason = "explicitly disabled (set to empty string)"
+          @env_rejection_reason = 'explicitly disabled (set to empty string)'
           return
         end
 
@@ -186,9 +186,9 @@ module TreeHaver
         # to a path, that path MUST work. Don't silently fall back to auto-discovery.
         if @env_rejection_reason
           raise TreeHaver::NotAvailable,
-            "#{env_var_name} is set to #{env_path.inspect} but #{@env_rejection_reason}. " \
-              "Either fix the path, unset the variable to use auto-discovery, " \
-              "or set it to empty string to explicitly disable this grammar."
+                "#{env_var_name} is set to #{env_path.inspect} but #{@env_rejection_reason}. " \
+                  'Either fix the path, unset the variable to use auto-discovery, ' \
+                  'or set it to empty string to explicitly disable this grammar.'
         end
 
         return env_path
@@ -207,19 +207,15 @@ module TreeHaver
     # @return [String, nil] rejection reason or nil if valid
     def validate_env_path(path)
       # Check for leading/trailing whitespace
-      if path != path.strip
-        return "contains leading or trailing whitespace (use #{path.strip.inspect})"
-      end
+      return "contains leading or trailing whitespace (use #{path.strip.inspect})" if path != path.strip
 
       # Check if path is safe
       unless PathValidator.safe_library_path?(path)
-        return "failed security validation (may contain path traversal or suspicious characters)"
+        return 'failed security validation (may contain path traversal or suspicious characters)'
       end
 
       # Check if file exists
-      unless File.exist?(path)
-        return "file does not exist"
-      end
+      return 'file does not exist' unless File.exist?(path)
 
       nil # Valid!
     end
@@ -263,7 +259,7 @@ module TreeHaver
       TreeHaver::Backends::MRI,
       TreeHaver::Backends::FFI,
       TreeHaver::Backends::Rust,
-      TreeHaver::Backends::Java,
+      TreeHaver::Backends::Java
     ].freeze
 
     class << self
@@ -290,7 +286,7 @@ module TreeHaver
             true
           end
         rescue NoMethodError, LoadError, NotAvailable => _e
-          # Note: FFI::NotFoundError inherits from LoadError, so it's caught here too
+          # NOTE: FFI::NotFoundError inherits from LoadError, so it's caught here too
           false
         end
       end
@@ -322,9 +318,8 @@ module TreeHaver
     def register!(raise_on_missing: false)
       path = find_library_path
       unless path
-        if raise_on_missing
-          raise NotAvailable, not_found_message
-        end
+        raise NotAvailable, not_found_message if raise_on_missing
+
         return false
       end
 
@@ -347,7 +342,7 @@ module TreeHaver
         library_filenames: library_filenames,
         search_paths: search_paths,
         found_path: found,
-        available: !found.nil?,
+        available: !found.nil?
       }
     end
 
@@ -360,13 +355,13 @@ module TreeHaver
       # Check if env var is set but rejected
       env_value = ENV[env_var_name]
       msg += if env_value && @env_rejection_reason
-        " #{env_var_name} is set to #{env_value.inspect} but #{@env_rejection_reason}."
-      elsif env_value && File.exist?(env_value) && !self.class.tree_sitter_runtime_usable?
-        " #{env_var_name} is set and file exists, but no tree-sitter runtime is available. " \
-          "Add ruby_tree_sitter, ffi, or tree_stump gem to your Gemfile."
-      else
-        " Searched: #{search_paths.join(", ")}."
-      end
+               " #{env_var_name} is set to #{env_value.inspect} but #{@env_rejection_reason}."
+             elsif env_value && File.exist?(env_value) && !self.class.tree_sitter_runtime_usable?
+               " #{env_var_name} is set and file exists, but no tree-sitter runtime is available. " \
+                 'Add ruby_tree_sitter, ffi, or tree_stump gem to your Gemfile.'
+             else
+               " Searched: #{search_paths.join(', ')}."
+             end
 
       msg + " Register the grammar, install tree_sitter_language_pack, or set #{env_var_name} to a valid path."
     end
@@ -395,12 +390,9 @@ module TreeHaver
       return @tree_sitter_language_pack_path if defined?(@tree_sitter_language_pack_path)
 
       @tree_sitter_language_pack_path = begin
-        require "tree_sitter_language_pack"
+        require 'tree_sitter_language_pack'
         language = @language_name.to_s
-        unless TreeSitterLanguagePack.has_language(language)
-          @tree_sitter_language_pack_rejection_reason = "language not published by tree_sitter_language_pack"
-          nil
-        else
+        if TreeSitterLanguagePack.has_language(language)
           TreeSitterLanguagePack.download([language])
           cache_dir = TreeSitterLanguagePack.cache_dir
           @tree_sitter_language_pack_cache_dir = cache_dir
@@ -408,9 +400,12 @@ module TreeHaver
           library_filenames
             .map { |filename| File.join(cache_dir, filename) }
             .find { |path| File.exist?(path) }
+        else
+          @tree_sitter_language_pack_rejection_reason = 'language not published by tree_sitter_language_pack'
+          nil
         end
       rescue LoadError
-        @tree_sitter_language_pack_rejection_reason = "tree_sitter_language_pack gem not available"
+        @tree_sitter_language_pack_rejection_reason = 'tree_sitter_language_pack gem not available'
         nil
       rescue StandardError => e
         @tree_sitter_language_pack_rejection_reason = e.message
@@ -422,7 +417,7 @@ module TreeHaver
       return @tree_sitter_language_pack_cache_dir if defined?(@tree_sitter_language_pack_cache_dir)
 
       @tree_sitter_language_pack_cache_dir = begin
-        require "tree_sitter_language_pack"
+        require 'tree_sitter_language_pack'
         TreeSitterLanguagePack.cache_dir
       rescue LoadError, StandardError
         nil
@@ -433,13 +428,13 @@ module TreeHaver
     #
     # @return [String] ".so" on Linux, ".dylib" on macOS
     def platform_extension
-      case RbConfig::CONFIG["host_os"]
+      case RbConfig::CONFIG['host_os']
       when /darwin/i
-        ".dylib"
+        '.dylib'
       when /mswin|mingw|cygwin/i
-        ".dll"
+        '.dll'
       else
-        ".so"
+        '.so'
       end
     end
   end

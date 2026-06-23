@@ -39,17 +39,18 @@ module TreeHaver
       #   end
       class << self
         def available?
-          return @loaded if @load_attempted # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @load_attempted = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+          return @loaded if @load_attempted
+
+          @load_attempted = true
           begin
-            require "parslet"
-            @loaded = true # rubocop:disable ThreadSafety/ClassInstanceVariable
+            require 'parslet'
+            @loaded = true
           rescue LoadError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           rescue StandardError
-            @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+            @loaded = false
           end
-          @loaded # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @loaded
         end
 
         # Reset the load state (primarily for testing)
@@ -57,8 +58,8 @@ module TreeHaver
         # @return [void]
         # @api private
         def reset!
-          @load_attempted = false # rubocop:disable ThreadSafety/ClassInstanceVariable
-          @loaded = false # rubocop:disable ThreadSafety/ClassInstanceVariable
+          @load_attempted = false
+          @loaded = false
         end
 
         # Get capabilities supported by this backend
@@ -69,13 +70,14 @@ module TreeHaver
         #   # => { backend: :parslet, query: false, bytes_field: true, incremental: false, comment_support: :none }
         def capabilities
           return {} unless available?
+
           {
             backend: :parslet,
             query: false,          # Parslet doesn't have a query API like tree-sitter
             bytes_field: true,     # Parslet::Slice provides offset and length
             incremental: false,    # Parslet doesn't support incremental parsing
             pure_ruby: true,       # Parslet is pure Ruby (portable)
-            comment_support: :none,
+            comment_support: :none
           }
         end
       end
@@ -103,8 +105,8 @@ module TreeHaver
         def initialize(grammar_class)
           unless valid_grammar_class?(grammar_class)
             raise TreeHaver::NotAvailable,
-              "Grammar class must be a Parslet::Parser subclass or respond to :new and return a parser with :parse. " \
-                "Expected a Parslet grammar class (e.g., TOML::Parslet)."
+                  'Grammar class must be a Parslet::Parser subclass or respond to :new and return a parser with :parse. ' \
+                    'Expected a Parslet grammar class (e.g., TOML::Parslet).'
           end
           @grammar_class = grammar_class
           @backend = :parslet
@@ -119,12 +121,12 @@ module TreeHaver
           # Derive name from grammar class (e.g., TOML::Parslet -> :toml)
           return :unknown unless @grammar_class.respond_to?(:name) && @grammar_class.name
 
-          name = @grammar_class.name.to_s.split("::").first.downcase
+          name = @grammar_class.name.to_s.split('::').first.downcase
           name.to_sym
         end
 
         # Alias for language_name (API compatibility)
-        alias_method :name, :language_name
+        alias name language_name
 
         # Compare languages for equality
         #
@@ -148,7 +150,7 @@ module TreeHaver
         end
 
         # Alias eql? to ==
-        alias_method :eql?, :==
+        alias eql? ==
 
         # Load language from library path (API compatibility)
         #
@@ -170,13 +172,13 @@ module TreeHaver
           def from_library(path = nil, symbol: nil, name: nil)
             # Derive language name from path, symbol, or explicit name
             lang_name = name&.to_sym ||
-              symbol&.to_s&.sub(/^tree_sitter_/, "")&.to_sym ||
-              path && TreeHaver::LibraryPathUtils.derive_language_name_from_path(path)&.to_sym
+                        symbol&.to_s&.sub(/^tree_sitter_/, '')&.to_sym ||
+                        path && TreeHaver::LibraryPathUtils.derive_language_name_from_path(path)&.to_sym
 
             unless lang_name
               raise TreeHaver::NotAvailable,
-                "Parslet backend requires a language name. " \
-                  "Provide name: parameter or register a grammar with TreeHaver.register_language."
+                    'Parslet backend requires a language name. ' \
+                      'Provide name: parameter or register a grammar with TreeHaver.register_language.'
             end
 
             # Look up registered Parslet grammar
@@ -184,15 +186,15 @@ module TreeHaver
 
             unless registration
               raise TreeHaver::NotAvailable,
-                "No Parslet grammar registered for #{lang_name.inspect}. " \
-                  "Register one with: TreeHaver.register_language(:#{lang_name}, grammar_class: YourGrammar)"
+                    "No Parslet grammar registered for #{lang_name.inspect}. " \
+                      "Register one with: TreeHaver.register_language(:#{lang_name}, grammar_class: YourGrammar)"
             end
 
             grammar_class = registration[:grammar_class]
             new(grammar_class)
           end
 
-          alias_method :from_path, :from_library
+          alias from_path from_library
         end
 
         private
@@ -201,9 +203,7 @@ module TreeHaver
           return false unless klass.respond_to?(:new)
 
           # Check if it's a Parslet::Parser subclass
-          if defined?(::Parslet::Parser)
-            return true if klass < ::Parslet::Parser
-          end
+          return true if defined?(::Parslet::Parser) && (klass < ::Parslet::Parser)
 
           # Fallback: check if it can create an instance that responds to parse
           begin
@@ -223,7 +223,8 @@ module TreeHaver
         #
         # @raise [TreeHaver::NotAvailable] if parslet gem is not available
         def initialize
-          raise TreeHaver::NotAvailable, "parslet gem not available" unless Parslet.available?
+          raise TreeHaver::NotAvailable, 'parslet gem not available' unless Parslet.available?
+
           @grammar = nil
           @backend = :parslet
         end
@@ -245,16 +246,16 @@ module TreeHaver
         def language=(grammar)
           # Accept Language wrapper or raw grammar class
           actual_grammar = case grammar
-          when Language
-            grammar.grammar_class
-          else
-            grammar
-          end
+                           when Language
+                             grammar.grammar_class
+                           else
+                             grammar
+                           end
 
           unless actual_grammar.respond_to?(:new)
             raise ArgumentError,
-              "Expected Parslet grammar class with new method or Language wrapper, " \
-                "got #{grammar.class}"
+                  'Expected Parslet grammar class with new method or Language wrapper, ' \
+                    "got #{grammar.class}"
           end
           @grammar = actual_grammar
         end
@@ -266,7 +267,7 @@ module TreeHaver
         # @raise [TreeHaver::NotAvailable] if no grammar is set
         # @raise [::Parslet::ParseFailed] if parsing fails
         def parse(source)
-          raise TreeHaver::NotAvailable, "No grammar loaded" unless @grammar
+          raise TreeHaver::NotAvailable, 'No grammar loaded' unless @grammar
 
           begin
             parser_instance = @grammar.new
@@ -287,7 +288,7 @@ module TreeHaver
         # @param source [String] the source code to parse
         # @return [Tree] raw backend tree (wrapping happens in TreeHaver::Parser)
         def parse_string(old_tree, source) # rubocop:disable Lint/UnusedMethodArgument
-          parse(source)  # Parslet doesn't support incremental parsing
+          parse(source) # Parslet doesn't support incremental parsing
         end
       end
 
@@ -311,7 +312,7 @@ module TreeHaver
         end
 
         def root_node
-          Node.new(@parslet_result, @source, type: "document")
+          Node.new(@parslet_result, @source, type: 'document')
         end
       end
 
@@ -430,7 +431,7 @@ module TreeHaver
           when String
             @value
           when Hash, Array
-            @source[start_byte...end_byte] || ""
+            @source[start_byte...end_byte] || ''
           else
             @value.to_s
           end
@@ -446,11 +447,13 @@ module TreeHaver
           when Hash
             keys = @value.keys
             return if index >= keys.size
+
             key = keys[index]
             Node.new(@value[key], @source, key: key)
           when Array
             return if index >= @value.size
-            Node.new(@value[index], @source, type: "element")
+
+            Node.new(@value[index], @source, type: 'element')
           end
         end
 
@@ -486,15 +489,13 @@ module TreeHaver
         private
 
         def calculate_point(offset)
-          return {row: 0, column: 0} if offset <= 0
+          return { row: 0, column: 0 } if offset <= 0
 
           lines_before = @source[0...offset].count("\n")
-          line_start = if offset > 0
-            @source.rindex("\n", offset - 1)
-          end
+          line_start = (@source.rindex("\n", offset - 1) if offset > 0)
           line_start ||= -1
           column = offset - line_start - 1
-          {row: lines_before, column: column}
+          { row: lines_before, column: column }
         end
 
         def infer_type(key)
@@ -502,15 +503,15 @@ module TreeHaver
 
           case @value
           when ::Parslet::Slice
-            "slice"
+            'slice'
           when Hash
-            "hash"
+            'hash'
           when Array
-            "array"
+            'array'
           when String
-            "string"
+            'string'
           else
-            "unknown"
+            'unknown'
           end
         end
 

@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require "json"
-require "tree_sitter_language_pack"
+require 'json'
+require 'tree_sitter_language_pack'
 
 module TreeHaver
   LanguagePackResultError = Class.new(StandardError) unless const_defined?(:LanguagePackResultError)
 
   TSLP_BACKEND = BackendReference.new(
-    id: "tslp",
-    family: "tree-sitter"
+    id: 'tslp',
+    family: 'tree-sitter'
   ).freeze
   KREUZBERG_LANGUAGE_PACK_BACKEND = BackendReference.new(
-    id: "kreuzberg-language-pack",
-    family: "tree-sitter"
+    id: 'kreuzberg-language-pack',
+    family: 'tree-sitter'
   ).freeze
 
   BackendRegistry.register(TSLP_BACKEND)
@@ -47,12 +47,12 @@ module TreeHaver
   def parse_with_language_pack(request)
     ensure_language_pack_language(request.language)
     raw = language_pack_result_hash(TreeSitterLanguagePack.process(
-      request.source,
-      JSON.generate(language: request.language, diagnostics: true)
-    ))
-    return language_pack_unsupported_result(request.language, "diagnostics", "process result was empty") unless raw
+                                      request.source,
+                                      JSON.generate(language: request.language, diagnostics: true)
+                                    ))
+    return language_pack_unsupported_result(request.language, 'diagnostics', 'process result was empty') unless raw
 
-    diagnostics = Array(raw["diagnostics"])
+    diagnostics = Array(raw['diagnostics'])
     return parse_error_result(request.language) unless diagnostics.empty?
 
     analysis = LanguagePackAnalysis.new(
@@ -64,36 +64,40 @@ module TreeHaver
     )
     parse_result(ok: true, analysis: analysis, diagnostics: [])
   rescue LanguagePackResultError => e
-    language_pack_unsupported_result(request.language, "diagnostics", e.message)
+    language_pack_unsupported_result(request.language, 'diagnostics', e.message)
   rescue StandardError => e
-    language_pack_runtime_failure(request.language, "diagnostics", e.message)
+    language_pack_runtime_failure(request.language, 'diagnostics', e.message)
   end
 
   def process_with_language_pack(request)
     ensure_language_pack_language(request.language)
     raw = language_pack_result_hash(TreeSitterLanguagePack.process(
-      request.source,
-      JSON.generate(language: request.language, structure: true, imports: true, diagnostics: true)
-    ))
-    return language_pack_unsupported_result(request.language, "structure/imports/diagnostics", "process result was empty") unless raw
+                                      request.source,
+                                      JSON.generate(language: request.language, structure: true, imports: true,
+                                                    diagnostics: true)
+                                    ))
+    unless raw
+      return language_pack_unsupported_result(request.language, 'structure/imports/diagnostics',
+                                              'process result was empty')
+    end
 
     analysis = LanguagePackProcessAnalysis.new(
-      language: raw.fetch("language"),
-      structure: normalize_structure(Array(raw["structure"])),
-      imports: normalize_imports(request.language, Array(raw["imports"])),
-      diagnostics: Array(raw["diagnostics"]).map do |item|
+      language: raw.fetch('language'),
+      structure: normalize_structure(Array(raw['structure'])),
+      imports: normalize_imports(request.language, Array(raw['imports'])),
+      diagnostics: Array(raw['diagnostics']).map do |item|
         ProcessDiagnostic.new(
-          message: item.fetch("message"),
-          severity: item.fetch("severity")
+          message: item.fetch('message'),
+          severity: item.fetch('severity')
         )
       end,
       backend_ref: TSLP_BACKEND
     )
     parse_result(ok: true, analysis: analysis, diagnostics: [])
   rescue LanguagePackResultError => e
-    language_pack_unsupported_result(request.language, "structure/imports/diagnostics", e.message)
+    language_pack_unsupported_result(request.language, 'structure/imports/diagnostics', e.message)
   rescue StandardError => e
-    language_pack_runtime_failure(request.language, "structure/imports/diagnostics", e.message)
+    language_pack_runtime_failure(request.language, 'structure/imports/diagnostics', e.message)
   end
 
   def ensure_language_pack_language(language)
@@ -108,10 +112,10 @@ module TreeHaver
     return raw.to_h if raw.respond_to?(:to_h)
     if raw.respond_to?(:language)
       return {
-        "language" => raw.language,
-        "structure" => Array(raw.structure).map { |item| language_pack_object_hash(item) },
-        "imports" => Array(raw.imports).map { |item| language_pack_object_hash(item) },
-        "diagnostics" => Array(raw.diagnostics).map { |item| language_pack_object_hash(item) },
+        'language' => raw.language,
+        'structure' => Array(raw.structure).map { |item| language_pack_object_hash(item) },
+        'imports' => Array(raw.imports).map { |item| language_pack_object_hash(item) },
+        'diagnostics' => Array(raw.diagnostics).map { |item| language_pack_object_hash(item) }
       }
     end
 
@@ -132,7 +136,11 @@ module TreeHaver
     rescue StandardError
       next
     end
-    result["children"] = Array(result["children"]).map { |child| language_pack_object_hash(child) } if result.key?("children")
+    if result.key?('children')
+      result['children'] = Array(result['children']).map do |child|
+        language_pack_object_hash(child)
+      end
+    end
     result
   end
   private_class_method :language_pack_object_hash
@@ -151,8 +159,8 @@ module TreeHaver
       ok: false,
       diagnostics: [
         diagnostic(
-          "error",
-          "unsupported_feature",
+          'error',
+          'unsupported_feature',
           "tree-sitter-language-pack did not provide readable #{feature} for #{language}. " \
           "Please report this to tree-sitter-language-pack with this detail: #{detail}"
         )
@@ -166,8 +174,8 @@ module TreeHaver
       ok: false,
       diagnostics: [
         diagnostic(
-          "error",
-          "unsupported_feature",
+          'error',
+          'unsupported_feature',
           "tree-sitter-language-pack failed while providing #{feature} for #{language}. " \
           "Please report this to tree-sitter-language-pack with this detail: #{detail}"
         )
@@ -179,11 +187,11 @@ module TreeHaver
   def normalize_structure(items)
     items.flat_map do |item|
       normalized_item = ProcessStructureItem.new(
-        kind: item.fetch("kind").downcase,
-        name: item["name"],
-        span: process_span(item.fetch("span"))
+        kind: item.fetch('kind').downcase,
+        name: item['name'],
+        span: process_span(item.fetch('span'))
       )
-      [normalized_item, *normalize_structure(Array(item["children"]))]
+      [normalized_item, *normalize_structure(Array(item['children']))]
     end
   end
   private_class_method :normalize_structure
@@ -193,8 +201,8 @@ module TreeHaver
       ok: false,
       diagnostics: [
         diagnostic(
-          "error",
-          "parse_error",
+          'error',
+          'parse_error',
           "tree-sitter-language-pack reported syntax errors for #{language}."
         )
       ]
@@ -204,12 +212,12 @@ module TreeHaver
 
   def process_span(raw)
     ProcessSpan.new(
-      start_byte: raw.fetch("start_byte"),
-      end_byte: raw.fetch("end_byte"),
-      start_row: raw["start_row"] || raw.fetch("start_line"),
-      start_col: raw["start_col"] || raw.fetch("start_column"),
-      end_row: raw["end_row"] || raw.fetch("end_line"),
-      end_col: raw["end_col"] || raw.fetch("end_column")
+      start_byte: raw.fetch('start_byte'),
+      end_byte: raw.fetch('end_byte'),
+      start_row: raw['start_row'] || raw.fetch('start_line'),
+      start_col: raw['start_col'] || raw.fetch('start_column'),
+      end_row: raw['end_row'] || raw.fetch('end_line'),
+      end_col: raw['end_col'] || raw.fetch('end_column')
     )
   end
   private_class_method :process_span
@@ -217,11 +225,11 @@ module TreeHaver
   def inferred_root_type(request)
     stripped = request.source.lstrip
     case request.language
-    when "json"
-      return "object" if stripped.start_with?("{")
-      return "array" if stripped.start_with?("[")
+    when 'json'
+      return 'object' if stripped.start_with?('{')
+      return 'array' if stripped.start_with?('[')
 
-      "scalar"
+      'scalar'
     else
       request.language
     end
@@ -231,39 +239,39 @@ module TreeHaver
   def normalize_imports(language, raw_imports)
     raw_imports.map do |item|
       source, items =
-        if language == "typescript"
+        if language == 'typescript'
           normalize_typescript_import(item)
         else
-          [item["module"] || item["source"] || "", Array(item["names"] || item["items"])]
+          [item['module'] || item['source'] || '', Array(item['names'] || item['items'])]
         end
 
       ProcessImportInfo.new(
         source: source,
         items: items,
-        span: process_span(item.fetch("span"))
+        span: process_span(item.fetch('span'))
       )
     end
   end
   private_class_method :normalize_imports
 
   def normalize_typescript_import(item)
-    raw_source = item["module"] || item["source"] || ""
+    raw_source = item['module'] || item['source'] || ''
     source = quoted_import_source(raw_source) || raw_source.strip
     names = if (named_items = braced_import_items(raw_source))
-      named_items
-        .split(",")
-        .map { |part| part.split.reject { |word| word == "type" }.join(" ") }
-        .reject(&:empty?)
-    else
-      Array(item["names"] || item["items"])
-    end
+              named_items
+                .split(',')
+                .map { |part| part.split.reject { |word| word == 'type' }.join(' ') }
+                .reject(&:empty?)
+            else
+              Array(item['names'] || item['items'])
+            end
 
     [source, names]
   end
   private_class_method :normalize_typescript_import
 
   def quoted_import_source(source)
-    ["from", "import"].each do |marker|
+    %w[from import].each do |marker|
       marker_index = source.index(marker)
       next unless marker_index
 
@@ -285,10 +293,10 @@ module TreeHaver
   private_class_method :quoted_segment
 
   def braced_import_items(source)
-    open_index = source.index("{")
+    open_index = source.index('{')
     return nil unless open_index
 
-    close_index = source.index("}", open_index + 1)
+    close_index = source.index('}', open_index + 1)
     close_index ? source[(open_index + 1)...close_index] : nil
   end
   private_class_method :braced_import_items

@@ -68,7 +68,7 @@ module TreeHaver
       return @available if @load_attempted
 
       @load_attempted = true
-      debug = ENV["TREE_HAVER_DEBUG"]
+      debug = ENV['TREE_HAVER_DEBUG']
 
       # Guard against nil require_path (can happen if gem_name was nil)
       if @require_path.nil? || @require_path.empty?
@@ -114,18 +114,14 @@ module TreeHaver
       rescue TypeError => e
         # simplecov:disable defensive - TruffleRuby-specific edge case
         warn("ParsletGrammarFinder: TypeError during load of '#{@require_path}': #{e.class}: #{e.message}")
-        warn("ParsletGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue")
-        if debug
-          warn("ParsletGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
-        end
+        warn('ParsletGrammarFinder: This may be a TruffleRuby bundled_gems.rb issue')
+        warn("ParsletGrammarFinder: TypeError backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}") if debug
         @available = false
         # simplecov:enable
-      rescue => e
+      rescue StandardError => e
         # simplecov:disable defensive - catch-all for unexpected errors
         warn("ParsletGrammarFinder: Unexpected error: #{e.class}: #{e.message}")
-        if debug
-          warn("ParsletGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}")
-        end
+        warn("ParsletGrammarFinder: backtrace:\n  #{e.backtrace&.first(10)&.join("\n  ")}") if debug
         @available = false
         # simplecov:enable
       end
@@ -151,16 +147,15 @@ module TreeHaver
     # @raise [NotAvailable] if grammar not available and raise_on_missing is true
     def register!(raise_on_missing: false)
       unless available?
-        if raise_on_missing
-          raise NotAvailable, not_found_message
-        end
+        raise NotAvailable, not_found_message if raise_on_missing
+
         return false
       end
 
       TreeHaver.register_language(
         @language_name,
         grammar_class: @grammar_class,
-        gem_name: @gem_name,
+        gem_name: @gem_name
       )
       true
     end
@@ -175,7 +170,7 @@ module TreeHaver
         grammar_const: @grammar_const,
         require_path: @require_path,
         available: available?,
-        grammar_class: @grammar_class&.name,
+        grammar_class: @grammar_class&.name
       }
     end
 
@@ -195,7 +190,7 @@ module TreeHaver
     # @return [Object] the constant
     # @raise [NameError] if constant not found
     def resolve_constant(const_path)
-      const_path.split("::").reduce(Object) do |mod, const_name|
+      const_path.split('::').reduce(Object) do |mod, const_name|
         mod.const_get(const_name)
       end
     end
@@ -208,9 +203,7 @@ module TreeHaver
       return false unless klass.respond_to?(:new)
 
       # Check if it's a Parslet::Parser subclass
-      if defined?(::Parslet::Parser)
-        return true if klass < ::Parslet::Parser
-      end
+      return true if defined?(::Parslet::Parser) && (klass < ::Parslet::Parser)
 
       # Fallback: check if it can create an instance that responds to parse
       begin
