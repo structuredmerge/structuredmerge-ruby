@@ -835,7 +835,7 @@ module Toml
       def with_resolution_path_segment(*nodes, &block)
         with_first_unresolved_path_segment(
           *nodes,
-          segment_builder: ->(node) { resolution_path_segment_for(node, resolution_identifier(node, node)) } & block
+          segment_builder: ->(node) { resolution_path_segment_for(node, resolution_identifier(node, node)) }, &block
         )
       end
 
