@@ -26,7 +26,7 @@ module Dotenv
 
       # Default freeze token for identifying freeze blocks
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "dotenv-merge"
+      DEFAULT_FREEZE_TOKEN = 'dotenv-merge'
 
       # @return [CommentTracker] Comment tracker for this file
       attr_reader :comment_tracker
@@ -37,7 +37,7 @@ module Dotenv
       # @param freeze_token [String] Token for freeze block markers (default: "dotenv-merge")
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param options [Hash] Additional options (forward compatibility - ignored by FileAnalysis)
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **_options)
         @source = source
         @freeze_token = freeze_token
         @signature_generator = signature_generator
@@ -52,13 +52,13 @@ module Dotenv
         # Extract and integrate freeze blocks
         @statements = extract_and_integrate_statements
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          lines_count: @lines.size,
-          statements_count: @statements.size,
-          freeze_blocks: freeze_blocks.size,
-          assignments: assignment_lines.size,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            lines_count: @lines.size,
+                            statements_count: @statements.size,
+                            freeze_blocks: freeze_blocks.size,
+                            assignments: assignment_lines.size
+                          })
       end
 
       # Check if parse was successful (dotenv always succeeds, may have invalid lines)
@@ -84,7 +84,7 @@ module Dotenv
         @comment_support_style ||= shared_comment_support_style(
           source: :dotenv_source,
           style: :hash_comment,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -113,7 +113,7 @@ module Dotenv
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
@@ -125,7 +125,7 @@ module Dotenv
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -138,7 +138,7 @@ module Dotenv
         shared_comment_attachment_for(
           owner,
           tracker_attachment: comment_augmenter(**options).attachment_for(owner),
-          **options,
+          **options
         )
       end
 
@@ -204,7 +204,7 @@ module Dotenv
         end
       end
 
-      # Note: fallthrough_node? is inherited from FileAnalyzable.
+      # NOTE: fallthrough_node? is inherited from FileAnalyzable.
       # EnvLine inherits from AstNode and FreezeNode inherits from FreezeNodeBase,
       # both of which are recognized by the base implementation.
 
@@ -258,17 +258,17 @@ module Dotenv
         @lines.each do |line|
           next unless line.comment?
 
-          if line.raw =~ pattern
-            marker_type = ::Regexp.last_match(1) # 'freeze' or 'unfreeze'
-            reason = ::Regexp.last_match(2)&.strip
-            reason = nil if reason&.empty?
+          next unless line.raw =~ pattern
 
-            markers << {
-              type: marker_type.to_sym,
-              line: line.line_number,
-              reason: reason,
-            }
-          end
+          marker_type = ::Regexp.last_match(1) # 'freeze' or 'unfreeze'
+          reason = ::Regexp.last_match(2)&.strip
+          reason = nil if reason&.empty?
+
+          markers << {
+            type: marker_type.to_sym,
+            line: line.line_number,
+            reason: reason
+          }
         end
 
         markers
@@ -295,7 +295,7 @@ module Dotenv
                 start_line: open_marker[:line],
                 end_line: marker[:line],
                 analysis: self,
-                reason: open_marker[:reason],
+                reason: open_marker[:reason]
               )
               open_marker = nil
             else
@@ -304,9 +304,7 @@ module Dotenv
           end
         end
 
-        if open_marker
-          DebugLogger.warning("Unclosed freeze block starting at line #{open_marker[:line]}")
-        end
+        DebugLogger.warning("Unclosed freeze block starting at line #{open_marker[:line]}") if open_marker
 
         blocks
       end

@@ -32,7 +32,7 @@ module Dotenv
           style: :hash_comment,
           total_comment_count: @comments.size,
           inline_comment_count: @comments.count { |comment| !comment[:full_line] },
-          **options,
+          **options
         )
       end
 
@@ -68,7 +68,7 @@ module Dotenv
           indent: match[:indent].length,
           text: match[:text].to_s,
           full_line: true,
-          raw: line.raw,
+          raw: line.raw
         }
       end
 
@@ -77,7 +77,7 @@ module Dotenv
         return if value_part.nil?
 
         stripped_value = value_part.lstrip
-        return if stripped_value.start_with?("\"", "'")
+        return if stripped_value.start_with?('"', "'")
 
         parsed = @line_parser.parse(value_part)
         return unless parsed&.inline?
@@ -87,13 +87,13 @@ module Dotenv
           indent: leading_indent(line.raw),
           text: parsed.text,
           full_line: false,
-          raw: parsed.raw,
+          raw: parsed.raw
         }
       end
 
       def raw_value_part(line)
-        raw = line.raw.sub(/\A\s*export\s+/, "")
-        _key_part, value_part = raw.split("=", 2)
+        raw = line.raw.sub(/\A\s*export\s+/, '')
+        _key_part, value_part = raw.split('=', 2)
         value_part
       end
 

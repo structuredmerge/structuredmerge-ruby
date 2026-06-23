@@ -92,7 +92,7 @@ module Dotenv
 
       # @return [String] The default freeze token
       def default_freeze_token
-        "dotenv-merge"
+        'dotenv-merge'
       end
 
       # @return [Class, nil] No separate resolver class for dotenv
@@ -135,7 +135,7 @@ module Dotenv
           template_nodes: template_nodes,
           dest_sigs: dest_sigs,
           signature_for: ->(node) { freeze_node?(node) ? nil : @template_analysis.generate_signature(node) },
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         matched_template_indices = Set.new
@@ -161,7 +161,7 @@ module Dotenv
             flush_ready_trailing_groups(
               trailing_groups: trailing_groups,
               matched_indices: matched_indices,
-              consumed_indices: consumed_indices,
+              consumed_indices: consumed_indices
             ) do |info|
               add_template_only_node(info[:node], info[:index])
             end
@@ -172,7 +172,7 @@ module Dotenv
 
         emit_remaining_trailing_groups(
           trailing_groups: trailing_groups,
-          consumed_indices: consumed_indices,
+          consumed_indices: consumed_indices
         ) do |info|
           add_template_only_node(info[:node], info[:index])
         end
@@ -194,7 +194,7 @@ module Dotenv
           next if freeze_node?(node)
 
           key = analysis.generate_signature(node)
-          index[key] << {node: node, index: idx}
+          index[key] << { node: node, index: idx }
         end
         index
       end
@@ -262,7 +262,7 @@ module Dotenv
         return stmt unless stmt
 
         # Check by class name
-        type_key = stmt.class.name&.split("::")&.last
+        type_key = stmt.class.name&.split('::')&.last
         callable = @node_typing[type_key] || @node_typing[type_key&.to_sym]
         return callable.call(stmt) if callable
 
@@ -282,13 +282,13 @@ module Dotenv
             stmt,
             @template_analysis,
             include_leading_segment: false,
-            include_interstitial_trailing_segment: false,
+            include_interstitial_trailing_segment: false
           ),
-          decision: MergeResult::DECISION_ADDED,
+          decision: MergeResult::DECISION_ADDED
         )
       end
 
-      def process_dest_only(dest_stmt, dest_index)
+      def process_dest_only(dest_stmt, _dest_index)
         if remove_destination_only_assignment?(dest_stmt)
           lines = removed_destination_comment_lines_for(dest_stmt)
           @result.add_raw(lines, decision: MergeResult::DECISION_DESTINATION) if lines.any?
@@ -306,9 +306,9 @@ module Dotenv
             @template_analysis,
             comment_source_node: comment_source_node,
             comment_source_analysis: comment_source_analysis,
-            inline_comment: inline_comment,
+            inline_comment: inline_comment
           ),
-          decision: MergeResult::DECISION_TEMPLATE,
+          decision: MergeResult::DECISION_TEMPLATE
         )
       end
 
@@ -366,7 +366,9 @@ module Dotenv
           owner.respond_to?(:start_line) && owner.respond_to?(:end_line) && owner.start_line && owner.end_line
         end
 
-        return analysis.lines.map(&:raw) if kind == :preamble && owners.empty? && analysis.respond_to?(:lines) && analysis.lines.any?
+        if kind == :preamble && owners.empty? && analysis.respond_to?(:lines) && analysis.lines.any?
+          return analysis.lines.map(&:raw)
+        end
         return [] if owners.empty?
 
         case kind
@@ -391,16 +393,15 @@ module Dotenv
         attachment = analysis.comment_attachment_for(node)
         leading_region = attachment&.leading_region
         start_line = if leading_region&.start_line
-          leading_region.start_line
-        elsif first_structural_owner?(node, analysis) && analysis.comment_augmenter.preamble_region&.start_line
-          analysis.comment_augmenter.preamble_region.start_line
-        else
-          node.start_line
-        end
+                       leading_region.start_line
+                     elsif first_structural_owner?(node,
+                                                   analysis) && analysis.comment_augmenter.preamble_region&.start_line
+                       analysis.comment_augmenter.preamble_region.start_line
+                     else
+                       node.start_line
+                     end
 
-        while start_line > 1 && raw_line_at(analysis, start_line - 1).to_s.strip.empty?
-          start_line -= 1
-        end
+        start_line -= 1 while start_line > 1 && raw_line_at(analysis, start_line - 1).to_s.strip.empty?
 
         start_line
       end
@@ -420,9 +421,19 @@ module Dotenv
       )
         return freeze_block_lines_for(node) if freeze_node?(node)
 
-        leading_lines = include_leading_segment ? leading_segment_lines_for(comment_source_node, comment_source_analysis) : []
+        leading_lines = if include_leading_segment
+                          leading_segment_lines_for(comment_source_node,
+                                                    comment_source_analysis)
+                        else
+                          []
+                        end
         node_lines = (node.start_line..node.end_line).filter_map { |line_number| raw_line_at(analysis, line_number) }
-        trailing_lines = include_interstitial_trailing_segment ? interstitial_trailing_segment_lines_for(node, analysis) : []
+        trailing_lines = if include_interstitial_trailing_segment
+                           interstitial_trailing_segment_lines_for(node,
+                                                                   analysis)
+                         else
+                           []
+                         end
         leading_lines + apply_inline_comment(node_lines, inline_comment) + trailing_lines
       end
 
@@ -474,7 +485,7 @@ module Dotenv
         return lines if inline_comment.nil? || lines.empty?
 
         updated_lines = lines.dup
-        updated_lines[-1] = "#{updated_lines[-1].rstrip} #{inline_comment[:raw].sub(/\A\s+/, "")}"
+        updated_lines[-1] = "#{updated_lines[-1].rstrip} #{inline_comment[:raw].sub(/\A\s+/, '')}"
         updated_lines
       end
 
@@ -482,7 +493,7 @@ module Dotenv
         raw_line = raw_line_at(analysis, node.start_line)
         return unless raw_line
 
-        "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, "")}"
+        "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, '')}"
       end
 
       def freeze_block_lines_for(node)
@@ -512,20 +523,20 @@ module Dotenv
         should_heal = ::Ast::Merge::Healer.handle(
           mode: @corruption_handling,
           kind: :duplicate_template_preamble_prefix,
-          message: "merged dotenv preamble begins with duplicated template-owned comment lines",
-          prefix: "[dotenv-merge]",
+          message: 'merged dotenv preamble begins with duplicated template-owned comment lines',
+          prefix: '[dotenv-merge]',
           error_class: Dotenv::Merge::CorruptionDetectedError,
           warner: lambda { |formatted|
             DebugLogger.debug_warning(formatted, {
-              template_comment_lines: template_comments.length,
-              merged_comment_lines: merged_comments.length,
-              destination_specific_comment_lines: destination_specific_comments.length,
-            })
-          },
+                                        template_comment_lines: template_comments.length,
+                                        merged_comment_lines: merged_comments.length,
+                                        destination_specific_comment_lines: destination_specific_comments.length
+                                      })
+          }
         )
         return content unless should_heal
 
-        remainder = remainder.sub(/\A(?:\s*\n)+/, "")
+        remainder = remainder.sub(/\A(?:\s*\n)+/, '')
         rebuilt = destination_specific_comments.join("\n")
         return rebuilt if remainder.empty?
 

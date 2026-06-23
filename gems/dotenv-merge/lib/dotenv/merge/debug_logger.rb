@@ -16,8 +16,8 @@ module Dotenv
       extend Ast::Merge::DebugLogger
 
       # Configure for dotenv-merge
-      self.env_var_name = "DOTENV_MERGE_DEBUG"
-      self.log_prefix = "[dotenv-merge]"
+      self.env_var_name = 'DOTENV_MERGE_DEBUG'
+      self.log_prefix = '[dotenv-merge]'
     end
   end
 end

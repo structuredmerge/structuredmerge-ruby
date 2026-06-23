@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Dotenv::Merge::FileAnalysis do
-  it_behaves_like "Ast::Merge::FileAnalyzable" do
+  it_behaves_like 'Ast::Merge::FileAnalyzable' do
     let(:file_analysis_class) { described_class }
     let(:freeze_node_class) { Dotenv::Merge::FreezeNode }
     let(:sample_source) { "API_KEY=secret\n" }
@@ -26,17 +26,17 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         attachment_strategy: :tracker_layout_merge,
         comment_style: :hash_comment,
         render_family: :dotenv_assignments,
-        capabilities: {layout_aware: true, logical_owner: false},
+        capabilities: { layout_aware: true, logical_owner: false },
         logical_owners: {},
         repair_policies: [],
         surfaces: [],
-        delegation_policies: [],
+        delegation_policies: []
       }
     end
   end
 
-  describe "#initialize" do
-    context "with simple dotenv file" do
+  describe '#initialize' do
+    context 'with simple dotenv file' do
       let(:source) do
         <<~DOTENV
           API_KEY=secret123
@@ -44,23 +44,23 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "parses successfully" do
+      it 'parses successfully' do
         analysis = described_class.new(source)
         expect(analysis.valid?).to be true
       end
 
-      it "extracts lines" do
+      it 'extracts lines' do
         analysis = described_class.new(source)
         expect(analysis.lines.size).to eq(2)
       end
 
-      it "extracts assignments" do
+      it 'extracts assignments' do
         analysis = described_class.new(source)
         expect(analysis.assignment_lines.size).to eq(2)
       end
     end
 
-    context "with comments and blank lines" do
+    context 'with comments and blank lines' do
       let(:source) do
         <<~DOTENV
           # Database configuration
@@ -71,18 +71,18 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "parses all lines" do
+      it 'parses all lines' do
         analysis = described_class.new(source)
         expect(analysis.lines.size).to eq(5)
       end
 
-      it "identifies assignment lines only" do
+      it 'identifies assignment lines only' do
         analysis = described_class.new(source)
         expect(analysis.assignment_lines.size).to eq(2)
       end
     end
 
-    context "with freeze blocks" do
+    context 'with freeze blocks' do
       let(:source) do
         <<~DOTENV
           PUBLIC_KEY=public
@@ -96,27 +96,27 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "detects freeze blocks" do
+      it 'detects freeze blocks' do
         analysis = described_class.new(source)
         expect(analysis.freeze_blocks.size).to eq(1)
       end
 
-      it "has correct freeze block line numbers" do
+      it 'has correct freeze block line numbers' do
         analysis = described_class.new(source)
         freeze_node = analysis.freeze_blocks.first
         expect(freeze_node.start_line).to eq(3)
         expect(freeze_node.end_line).to eq(6)
       end
 
-      it "excludes frozen lines from assignment_lines" do
+      it 'excludes frozen lines from assignment_lines' do
         analysis = described_class.new(source)
         # Only PUBLIC_KEY and DEBUG should be in assignment_lines
         keys = analysis.assignment_lines.map(&:key)
-        expect(keys).to contain_exactly("PUBLIC_KEY", "DEBUG")
+        expect(keys).to contain_exactly('PUBLIC_KEY', 'DEBUG')
       end
     end
 
-    context "with custom freeze token" do
+    context 'with custom freeze token' do
       let(:source) do
         <<~DOTENV
           KEY1=value1
@@ -126,34 +126,34 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "detects custom freeze blocks" do
-        analysis = described_class.new(source, freeze_token: "my-token")
+      it 'detects custom freeze blocks' do
+        analysis = described_class.new(source, freeze_token: 'my-token')
         expect(analysis.freeze_blocks.size).to eq(1)
       end
 
-      it "ignores default freeze token" do
+      it 'ignores default freeze token' do
         analysis = described_class.new(source)
         expect(analysis.freeze_blocks).to be_empty
       end
     end
   end
 
-  describe "#line_at" do
+  describe '#line_at' do
     let(:source) { "KEY1=value1\nKEY2=value2\n" }
     let(:analysis) { described_class.new(source) }
 
-    it "returns correct line (1-indexed)" do
-      expect(analysis.line_at(1).key).to eq("KEY1")
-      expect(analysis.line_at(2).key).to eq("KEY2")
+    it 'returns correct line (1-indexed)' do
+      expect(analysis.line_at(1).key).to eq('KEY1')
+      expect(analysis.line_at(2).key).to eq('KEY2')
     end
 
-    it "returns nil for out of range" do
+    it 'returns nil for out of range' do
       expect(analysis.line_at(0)).to be_nil
       expect(analysis.line_at(100)).to be_nil
     end
   end
 
-  describe "#signature_at" do
+  describe '#signature_at' do
     let(:source) do
       <<~DOTENV
         API_KEY=secret
@@ -162,18 +162,18 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
     let(:analysis) { described_class.new(source) }
 
-    it "returns signature for statement" do
-      expect(analysis.signature_at(0)).to eq([:env, "API_KEY"])
-      expect(analysis.signature_at(1)).to eq([:env, "DATABASE_URL"])
+    it 'returns signature for statement' do
+      expect(analysis.signature_at(0)).to eq([:env, 'API_KEY'])
+      expect(analysis.signature_at(1)).to eq([:env, 'DATABASE_URL'])
     end
 
-    it "returns nil for out of range" do
+    it 'returns nil for out of range' do
       expect(analysis.signature_at(-1)).to be_nil
       expect(analysis.signature_at(100)).to be_nil
     end
   end
 
-  describe "#env_var" do
+  describe '#env_var' do
     let(:source) do
       <<~DOTENV
         API_KEY=secret
@@ -182,18 +182,18 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
     let(:analysis) { described_class.new(source) }
 
-    it "finds env var by key" do
-      line = analysis.env_var("API_KEY")
+    it 'finds env var by key' do
+      line = analysis.env_var('API_KEY')
       expect(line).not_to be_nil
-      expect(line.value).to eq("secret")
+      expect(line.value).to eq('secret')
     end
 
-    it "returns nil for unknown key" do
-      expect(analysis.env_var("UNKNOWN")).to be_nil
+    it 'returns nil for unknown key' do
+      expect(analysis.env_var('UNKNOWN')).to be_nil
     end
   end
 
-  describe "#keys" do
+  describe '#keys' do
     let(:source) do
       <<~DOTENV
         # Comment
@@ -205,12 +205,12 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
     let(:analysis) { described_class.new(source) }
 
-    it "returns all env var keys" do
-      expect(analysis.keys).to contain_exactly("API_KEY", "DATABASE_URL", "DEBUG")
+    it 'returns all env var keys' do
+      expect(analysis.keys).to contain_exactly('API_KEY', 'DATABASE_URL', 'DEBUG')
     end
   end
 
-  describe "#structural_owners" do
+  describe '#structural_owners' do
     let(:source) do
       <<~DOTENV
         # Header docs
@@ -224,16 +224,16 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
       DOTENV
     end
 
-    it "returns assignments and freeze blocks in source order" do
+    it 'returns assignments and freeze blocks in source order' do
       analysis = described_class.new(source)
 
-      expect(analysis.structural_owners.map { |owner| owner.class.name.split("::").last }).to eq(
-        %w[EnvLine FreezeNode EnvLine],
+      expect(analysis.structural_owners.map { |owner| owner.class.name.split('::').last }).to eq(
+        %w[EnvLine FreezeNode EnvLine]
       )
     end
   end
 
-  describe "#generate_signature with custom generator" do
+  describe '#generate_signature with custom generator' do
     let(:source) do
       <<~DOTENV
         API_KEY=secret
@@ -241,21 +241,21 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
       DOTENV
     end
 
-    it "uses custom generator when provided" do
+    it 'uses custom generator when provided' do
       custom_generator = ->(node) { [:custom, node.key&.downcase] }
       analysis = described_class.new(source, signature_generator: custom_generator)
 
-      expect(analysis.signature_at(0)).to eq([:custom, "api_key"])
+      expect(analysis.signature_at(0)).to eq([:custom, 'api_key'])
     end
 
-    it "falls through when generator returns node" do
+    it 'falls through when generator returns node' do
       custom_generator = ->(node) { node }
       analysis = described_class.new(source, signature_generator: custom_generator)
 
-      expect(analysis.signature_at(0)).to eq([:env, "API_KEY"])
+      expect(analysis.signature_at(0)).to eq([:env, 'API_KEY'])
     end
 
-    it "returns nil when generator returns nil" do
+    it 'returns nil when generator returns nil' do
       custom_generator = ->(_node) { nil }
       analysis = described_class.new(source, signature_generator: custom_generator)
 
@@ -263,7 +263,7 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
   end
 
-  describe "shared comment capability" do
+  describe 'shared comment capability' do
     let(:source) do
       <<~DOTENV
         # Header docs
@@ -275,42 +275,42 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
     let(:analysis) { described_class.new(source) }
 
-    it "reports source-augmented comment capability" do
+    it 'reports source-augmented comment capability' do
       expect(analysis.comment_capability).to be_a(Ast::Merge::Comment::Capability)
       expect(analysis.comment_capability.source_augmented?).to be true
     end
 
-    it "reports source-augmented synthetic comment support style" do
+    it 'reports source-augmented synthetic comment support style' do
       expect(analysis.comment_support_style.source_augmented_portable_write?).to be true
       expect(analysis.comment_support_style.details[:source]).to eq(:dotenv_source)
       expect(analysis.comment_support_style.details[:style]).to eq(:hash_comment)
     end
 
-    it "builds shared comment nodes for full-line and inline comments" do
+    it 'builds shared comment nodes for full-line and inline comments' do
       expect(analysis.comment_nodes.map(&:line_number)).to eq([1, 3, 5])
-      expect(analysis.comment_node_at(3).to_s).to eq("# default secret")
+      expect(analysis.comment_node_at(3).to_s).to eq('# default secret')
     end
 
-    it "builds a shared comment attachment for an assignment owner" do
-      owner = analysis.env_var("API_KEY")
+    it 'builds a shared comment attachment for an assignment owner' do
+      owner = analysis.env_var('API_KEY')
       attachment = analysis.comment_attachment_for(owner)
 
       expect(attachment.leading_region).to be_nil
-      expect(analysis.comment_augmenter.preamble_region.normalized_content).to eq("Header docs")
-      expect(attachment.inline_region.normalized_content).to eq("default secret")
+      expect(analysis.comment_augmenter.preamble_region.normalized_content).to eq('Header docs')
+      expect(attachment.inline_region.normalized_content).to eq('default secret')
     end
 
-    it "builds a comment augmenter with postlude support" do
+    it 'builds a comment augmenter with postlude support' do
       augmenter = analysis.comment_augmenter
-      owner = analysis.env_var("API_KEY")
+      owner = analysis.env_var('API_KEY')
 
       expect(augmenter.attachment_for(owner).leading_region).to be_nil
-      expect(augmenter.preamble_region.normalized_content).to eq("Header docs")
-      expect(augmenter.postlude_region.normalized_content).to eq("Footer docs")
+      expect(augmenter.preamble_region.normalized_content).to eq('Header docs')
+      expect(augmenter.postlude_region.normalized_content).to eq('Footer docs')
     end
   end
 
-  describe "shared layout compliance" do
+  describe 'shared layout compliance' do
     let(:source) do
       <<~DOTENV
 
@@ -322,12 +322,12 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
 
     let(:analysis) { described_class.new(source) }
-    let(:first_owner) { analysis.env_var("API_KEY") }
-    let(:second_owner) { analysis.env_var("DEBUG") }
+    let(:first_owner) { analysis.env_var('API_KEY') }
+    let(:second_owner) { analysis.env_var('DEBUG') }
     let(:layout_augmenter) { analysis.layout_augmenter(owners: [first_owner, second_owner]) }
     let(:layout_attachment) { layout_augmenter.attachment_for(first_owner) }
 
-    it_behaves_like "Ast::Merge::Layout::Attachment" do
+    it_behaves_like 'Ast::Merge::Layout::Attachment' do
       let(:expected_attachment_owner) { first_owner }
       let(:expected_leading_gap_kind) { :preamble }
       let(:expected_trailing_gap_kind) { :interstitial }
@@ -336,7 +336,7 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
       let(:expected_trailing_controls_output) { false }
     end
 
-    it_behaves_like "Ast::Merge::Layout::Augmenter" do
+    it_behaves_like 'Ast::Merge::Layout::Augmenter' do
       let(:augmenter_owner) { first_owner }
       let(:expected_preamble_range) { 1..1 }
       let(:expected_postlude_range) { 5..5 }
@@ -345,7 +345,7 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
       let(:expected_owner_trailing_gap_kind) { :interstitial }
     end
 
-    it "surfaces inferred layout gaps on comment attachments" do
+    it 'surfaces inferred layout gaps on comment attachments' do
       attachment = analysis.comment_attachment_for(first_owner)
 
       expect(attachment.leading_gap&.kind).to eq(:preamble)
@@ -353,8 +353,8 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
   end
 
-  describe "freeze block edge cases" do
-    context "with unclosed freeze block" do
+  describe 'freeze block edge cases' do
+    context 'with unclosed freeze block' do
       let(:source) do
         <<~DOTENV
           KEY1=value1
@@ -368,7 +368,7 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
       end
     end
 
-    context "with unfreeze without freeze" do
+    context 'with unfreeze without freeze' do
       let(:source) do
         <<~DOTENV
           KEY1=value1
@@ -377,14 +377,14 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "handles gracefully" do
+      it 'handles gracefully' do
         expect { described_class.new(source) }.not_to raise_error
         analysis = described_class.new(source)
         expect(analysis.freeze_blocks).to be_empty
       end
     end
 
-    context "with nested freeze blocks" do
+    context 'with nested freeze blocks' do
       let(:source) do
         <<~DOTENV
           # dotenv-merge:freeze
@@ -395,29 +395,29 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
         DOTENV
       end
 
-      it "handles gracefully (ignores nested)" do
+      it 'handles gracefully (ignores nested)' do
         expect { described_class.new(source) }.not_to raise_error
       end
     end
   end
 
-  describe "#compute_node_signature" do
+  describe '#compute_node_signature' do
     let(:source) { "KEY=value\n" }
     let(:analysis) { described_class.new(source) }
 
-    it "returns nil for unknown node types" do
+    it 'returns nil for unknown node types' do
       unknown_node = Object.new
       result = analysis.send(:compute_node_signature, unknown_node)
       expect(result).to be_nil
     end
 
-    it "returns signature for EnvLine" do
+    it 'returns signature for EnvLine' do
       env_line = analysis.statements.first
       result = analysis.send(:compute_node_signature, env_line)
       expect(result).to be_an(Array)
     end
 
-    it "returns signature for FreezeNode" do
+    it 'returns signature for FreezeNode' do
       freeze_source = <<~DOTENV
         # dotenv-merge:freeze
         KEY=value

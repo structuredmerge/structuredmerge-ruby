@@ -43,7 +43,7 @@ module Dotenv
       # Get a signature for this freeze block
       # @return [Array] Signature based on normalized content
       def signature
-        [:FreezeNode, content.gsub(/\s+/, " ").strip]
+        [:FreezeNode, content.gsub(/\s+/, ' ').strip]
       end
 
       # Get environment variable lines within the freeze block

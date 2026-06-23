@@ -50,7 +50,7 @@ module Dotenv
 
         lines = extract_lines(statement)
         @lines.concat(lines)
-        @decisions << {decision: decision, source: :template, index: index, lines: lines.length}
+        @decisions << { decision: decision, source: :template, index: index, lines: lines.length }
       end
 
       # Add content from the destination at the given statement index
@@ -63,7 +63,7 @@ module Dotenv
 
         lines = extract_lines(statement)
         @lines.concat(lines)
-        @decisions << {decision: decision, source: :destination, index: index, lines: lines.length}
+        @decisions << { decision: decision, source: :destination, index: index, lines: lines.length }
       end
 
       # Add content from a freeze block
@@ -77,7 +77,7 @@ module Dotenv
           source: :destination,
           start_line: freeze_node.start_line,
           end_line: freeze_node.end_line,
-          lines: lines.length,
+          lines: lines.length
         }
       end
 
@@ -87,13 +87,13 @@ module Dotenv
       # @return [void]
       def add_raw(lines, decision:)
         @lines.concat(lines)
-        @decisions << {decision: decision, source: :raw, lines: lines.length}
+        @decisions << { decision: decision, source: :raw, lines: lines.length }
       end
 
       # Convert the merged result to a string
       # @return [String] The merged dotenv content
       def to_s
-        return "" if @lines.empty?
+        return '' if @lines.empty?
 
         # Join with newlines and ensure file ends with newline
         result = @lines.join("\n")
@@ -114,7 +114,7 @@ module Dotenv
         {
           total_decisions: @decisions.length,
           total_lines: @lines.length,
-          by_decision: counts,
+          by_decision: counts
         }
       end
 

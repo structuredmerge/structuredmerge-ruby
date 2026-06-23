@@ -38,7 +38,7 @@ module Dotenv
     class EnvLine < Ast::Merge::AstNode
       # Prefix for exported environment variables
       # @return [String]
-      EXPORT_PREFIX = "export "
+      EXPORT_PREFIX = 'export '
 
       # @return [String] The original raw line content
       attr_reader :raw
@@ -75,7 +75,7 @@ module Dotenv
           start_line: line_number,
           end_line: line_number,
           start_column: 0,
-          end_column: @raw.length,
+          end_column: @raw.length
         )
 
         super(slice: @raw, location: location)
@@ -84,7 +84,7 @@ module Dotenv
       # TreeHaver::Node protocol: type
       # @return [String] "env_line"
       def type
-        "env_line"
+        'env_line'
       end
 
       # Generate a unique signature for this line (used for merge matching)
@@ -163,7 +163,7 @@ module Dotenv
         stripped = @raw.strip
         if stripped.empty?
           @line_type = :blank
-        elsif stripped.start_with?("#")
+        elsif stripped.start_with?('#')
           @line_type = :comment
         else
           parse_assignment!(stripped)
@@ -181,13 +181,13 @@ module Dotenv
           line = line[EXPORT_PREFIX.length..]
         end
 
-        if line.include?("=")
-          key_part, value_part = line.split("=", 2)
+        if line.include?('=')
+          key_part, value_part = line.split('=', 2)
           key_part = key_part.strip
           if valid_key?(key_part)
             @line_type = :assignment
             @key = key_part
-            @value = unquote(value_part || "")
+            @value = unquote(value_part || '')
           else
             @line_type = :invalid
           end
@@ -214,14 +214,10 @@ module Dotenv
         value = value.strip
 
         # Double-quoted: process escape sequences
-        if value.start_with?('"') && value.end_with?('"')
-          return process_escape_sequences(value[1..-2])
-        end
+        return process_escape_sequences(value[1..-2]) if value.start_with?('"') && value.end_with?('"')
 
         # Single-quoted: literal value, no escape processing
-        if value.start_with?("'") && value.end_with?("'")
-          return value[1..-2]
-        end
+        return value[1..-2] if value.start_with?("'") && value.end_with?("'")
 
         # Unquoted: strip inline comments
         strip_inline_comment(value)
@@ -239,7 +235,7 @@ module Dotenv
           .gsub('\t', "\t")
           .gsub('\r', "\r")
           .gsub('\"', '"')
-          .gsub("\\\\", "\\")
+          .gsub('\\\\', '\\')
       end
 
       # Strip inline comments from unquoted values

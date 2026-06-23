@@ -1,14 +1,13 @@
 # frozen_string_literal: true
 
 # External gems
-require "version_gem"
-require "set"
+require 'version_gem'
 
 # Shared merge infrastructure
-require "ast/merge"
+require 'ast/merge'
 
 # This gem
-require_relative "merge/version"
+require_relative 'merge/version'
 
 module Dotenv
   module Merge
@@ -62,13 +61,13 @@ module Dotenv
     # Raised when merge-time corruption detection is configured to error.
     class CorruptionDetectedError < Error; end
 
-    autoload :DebugLogger, "dotenv/merge/debug_logger"
-    autoload :CommentTracker, "dotenv/merge/comment_tracker"
-    autoload :EnvLine, "dotenv/merge/env_line"
-    autoload :FreezeNode, "dotenv/merge/freeze_node"
-    autoload :FileAnalysis, "dotenv/merge/file_analysis"
-    autoload :MergeResult, "dotenv/merge/merge_result"
-    autoload :SmartMerger, "dotenv/merge/smart_merger"
+    autoload :DebugLogger, 'dotenv/merge/debug_logger'
+    autoload :CommentTracker, 'dotenv/merge/comment_tracker'
+    autoload :EnvLine, 'dotenv/merge/env_line'
+    autoload :FreezeNode, 'dotenv/merge/freeze_node'
+    autoload :FileAnalysis, 'dotenv/merge/file_analysis'
+    autoload :MergeResult, 'dotenv/merge/merge_result'
+    autoload :SmartMerger, 'dotenv/merge/smart_merger'
   end
 end
 
@@ -77,10 +76,10 @@ end
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
     :dotenv_merge,
-    require_path: "dotenv/merge",
-    merger_class: "Dotenv::Merge::SmartMerger",
-    test_source: "KEY=value",
-    category: :config,
+    require_path: 'dotenv/merge',
+    merger_class: 'Dotenv::Merge::SmartMerger',
+    test_source: 'KEY=value',
+    category: :config
   )
 end
 
