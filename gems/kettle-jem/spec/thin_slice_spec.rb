@@ -7259,11 +7259,11 @@ RSpec.describe Kettle::Jem do
     expect(described_class::RRRRB_MATRIX.fetch("ruby-2.4").rails_appraisals).to include("4.2.11.3", "5.2.8.1")
   end
 
-  it "serializes TruffleRuby 25 setup-ruby workaround in generated CI workflows" do
+  it "serializes legacy engine setup-ruby workaround in generated CI workflows" do
     ci = {
       default_branch: "main",
       exec_cmd: "kettle-test",
-      ruby_versions: ["truffleruby-25.0"]
+      ruby_versions: ["truffleruby-25.0", "jruby-9.3"]
     }
     workflows = [
       described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
@@ -7277,13 +7277,11 @@ RSpec.describe Kettle::Jem do
       })
     ]
 
-    workflows.each do |workflow|
-      expect(workflow).to include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' }}")
-      expect(workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
-      expect(workflow).to include("        if: ${{ matrix.ruby == 'truffleruby-25.0' }}")
-      expect(workflow).to include("          bundle config set --local path vendor/bundle")
-      expect(workflow).to include("          bundle install --jobs 1")
-    end
+    expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.3' }}"))
+    expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
+    expect(workflows).to all(include("        if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.3' }}"))
+    expect(workflows).to all(include("          bundle config set --local path vendor/bundle"))
+    expect(workflows).to all(include("          bundle install --jobs 1"))
 
     packaged_workflow = File.read(File.join(
       __dir__,
@@ -7291,6 +7289,15 @@ RSpec.describe Kettle::Jem do
     ))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
+    expect(packaged_workflow).to include("          bundle config set --local path vendor/bundle")
+    expect(packaged_workflow).to include("          bundle install --jobs 1")
+
+    packaged_workflow = File.read(File.join(
+      __dir__,
+      "../lib/kettle/jem/templates/.github/workflows/jruby-9.3.yml.example"
+    ))
+    expect(packaged_workflow).to include("bundler-cache: false")
+    expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.3")
     expect(packaged_workflow).to include("          bundle config set --local path vendor/bundle")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end

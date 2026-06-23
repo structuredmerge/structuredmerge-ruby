@@ -71,8 +71,8 @@ Please file a bug if you notice a violation of semantic versioning.
   add discrete JRuby 10.0 and TruffleRuby 33.0 workflows/badges, and include a
   TruffleRuby HEAD badge pointing at the shared heads workflow.
 - Generated CI workflows now disable `ruby/setup-ruby` Bundler caching for
-  TruffleRuby 25.0 and run a serial Bundler install to avoid its EOL parallel
-  installer crash.
+  TruffleRuby 25.0 and JRuby 9.3 and run a serial Bundler install to avoid
+  legacy engine setup failures.
 - Generated funding templates now default missing OpenCollective orgs to
   `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness
