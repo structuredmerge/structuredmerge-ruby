@@ -51,13 +51,13 @@ module Prism
           # from the extracted body text (auto-detection cannot fire without the wrapper).
           # When renaming was applied above, both sides now use preferred_var.
           template_gemspec_block_var: preferred_var || template_var,
-          dest_gemspec_block_var: preferred_var || dest_var,
+          dest_gemspec_block_var: preferred_var || dest_var
         )
         body_result = if template_body.empty? && dest_body.empty?
-          nil
-        else
-          body_merger.merge_result
-        end
+                        nil
+                      else
+                        body_merger.merge_result
+                      end
 
         node_preference = merger.send(:preference_for_node, template_node, dest_node)
         last_emitted_dest_line = nil
@@ -68,10 +68,10 @@ module Prism
         template_prefix_line_numbers = Prism::Merge::MagicCommentSupport.prefix_comment_line_numbers_for_comments(template_comments)
         dest_claimed = merger.dest_analysis.respond_to?(:claimed_lines) ? merger.dest_analysis.claimed_lines : Set.new
         template_claimed = merger.template_analysis.respond_to?(:claimed_lines) ? merger.template_analysis.claimed_lines : Set.new
-        dest_comments = dest_comments.reject { |comment|
+        dest_comments = dest_comments.reject do |comment|
           ln = comment.location.start_line
           dest_prefix_comment_lines&.include?(ln) || dest_claimed.include?(ln)
-        }
+        end
         last_skipped_template_line = nil
         if dest_prefix_comment_lines&.any? || template_claimed.any?
           template_comments = template_comments.reject do |comment|
@@ -97,17 +97,18 @@ module Prism
           comment_analysis = merger.dest_analysis
         end
 
-        source_analysis = (node_preference == :template) ? merger.template_analysis : merger.dest_analysis
-        source_node = (node_preference == :template) ? actual_template : actual_dest
+        source_analysis = node_preference == :template ? merger.template_analysis : merger.dest_analysis
+        source_node = node_preference == :template ? actual_template : actual_dest
         source_layout = merger.send(:node_body_layout_for, source_node, source_analysis)
         decision = MergeResult::DECISION_REPLACED
-        template_inline_by_line = merger.send(:wrapper_inline_comment_entries_by_line, merger.template_analysis, actual_template)
+        template_inline_by_line = merger.send(:wrapper_inline_comment_entries_by_line, merger.template_analysis,
+                                              actual_template)
         dest_inline_by_line = merger.send(:wrapper_inline_comment_entries_by_line, merger.dest_analysis, actual_dest)
         merged_body_lines = body_result ? body_result.lines.dup : []
         merged_body_metadata = body_result&.line_metadata&.dup || []
         remapped_result_lines = {}
 
-        prev_comment_line = (comment_source == :template) ? last_skipped_template_line : nil
+        prev_comment_line = comment_source == :template ? last_skipped_template_line : nil
         merger.send(
           :emit_leading_comments,
           merger.result,
@@ -115,7 +116,7 @@ module Prism
           analysis: comment_analysis,
           source: comment_source,
           decision: decision,
-          prev_comment_line: prev_comment_line,
+          prev_comment_line: prev_comment_line
         )
 
         if comment_source == :destination && leading_comments.any?
@@ -130,7 +131,7 @@ module Prism
             next_content_line: source_node.location.start_line,
             analysis: comment_analysis,
             source: comment_source,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_gap_line if comment_source == :destination && emitted_gap_line
         end
@@ -142,10 +143,13 @@ module Prism
           opening_line = opening_line.sub("|#{dest_var}|", "|#{preferred_var}|")
         end
         if node_preference == :template &&
-            template_inline_by_line[actual_template.location.start_line].empty? &&
-            !source_layout.body_starts_on_opening_line?
+           template_inline_by_line[actual_template.location.start_line].empty? &&
+           !source_layout.body_starts_on_opening_line?
           dest_opening_inline = dest_inline_by_line[actual_dest.location.start_line]
-          opening_line = merger.send(:append_inline_comment_entries, opening_line.to_s.chomp, dest_opening_inline) if dest_opening_inline.any?
+          if dest_opening_inline.any?
+            opening_line = merger.send(:append_inline_comment_entries, opening_line.to_s.chomp,
+                                       dest_opening_inline)
+          end
         end
         if source_layout.body_starts_on_opening_line? && merged_body_lines.any?
           opening_line = "#{opening_line}#{merged_body_lines.shift}"
@@ -154,8 +158,8 @@ module Prism
         merger.result.add_line(
           opening_line.chomp,
           decision: decision,
-          template_line: (node_preference == :template) ? source_node.location.start_line : nil,
-          dest_line: (node_preference == :destination) ? source_node.location.start_line : nil,
+          template_line: node_preference == :template ? source_node.location.start_line : nil,
+          dest_line: node_preference == :destination ? source_node.location.start_line : nil
         )
 
         closing_body_line = nil
@@ -171,7 +175,7 @@ module Prism
             decision: metadata[:decision] || decision,
             template_line: remap_body_line(metadata[:template_line], template_layout),
             dest_line: remap_body_line(metadata[:dest_line], dest_layout),
-            comment: metadata[:comment],
+            comment: metadata[:comment]
           )
           remapped_result_lines[metadata[:result_line]] = merger.result.line_count if metadata[:result_line]
         end
@@ -181,7 +185,7 @@ module Prism
           remapped_result_lines: remapped_result_lines,
           template_layout: template_layout,
           dest_layout: dest_layout,
-          parent_node: actual_dest || actual_template,
+          parent_node: actual_dest || actual_template
         )
 
         merger.send(:begin_node_plan_emitter).emit(
@@ -190,20 +194,23 @@ module Prism
           node_preference: node_preference,
           decision: decision,
           template_inline_by_line: template_inline_by_line,
-          dest_inline_by_line: dest_inline_by_line,
+          dest_inline_by_line: dest_inline_by_line
         )
 
         end_line = source_layout.closing_line_text
         if node_preference == :template && template_inline_by_line[actual_template.location.end_line].empty?
           dest_end_inline = dest_inline_by_line[actual_dest.location.end_line]
-          end_line = merger.send(:append_inline_comment_entries, end_line.to_s.chomp, dest_end_inline) if dest_end_inline.any?
+          if dest_end_inline.any?
+            end_line = merger.send(:append_inline_comment_entries, end_line.to_s.chomp,
+                                   dest_end_inline)
+          end
         end
         end_line = "#{closing_body_line}#{end_line}" if closing_body_line
         merger.result.add_line(
           end_line.chomp,
           decision: decision,
-          template_line: (node_preference == :template) ? source_node.location.end_line : nil,
-          dest_line: (node_preference == :destination) ? source_node.location.end_line : nil,
+          template_line: node_preference == :template ? source_node.location.end_line : nil,
+          dest_line: node_preference == :destination ? source_node.location.end_line : nil
         )
 
         template_trailing_comments = merger.send(:external_trailing_comments_for, actual_template)
@@ -225,10 +232,10 @@ module Prism
             source_node: trailing_analysis.equal?(merger.template_analysis) ? actual_template : actual_dest,
             analysis: trailing_analysis,
             source: trailing_analysis.equal?(merger.template_analysis) ? :template : :destination,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_dest_line if trailing_analysis.equal?(merger.dest_analysis)
-          return {last_emitted_dest_line: last_emitted_dest_line}
+          return { last_emitted_dest_line: last_emitted_dest_line }
         end
 
         trailing_line = source_node.location.end_line + 1
@@ -236,27 +243,28 @@ module Prism
         emitted_trailing_gap_line = emit_trailing_layout_gap_lines(
           analysis: source_analysis,
           owner: source_node,
-          source: (node_preference == :template) ? :template : :destination,
-          decision: decision,
+          source: node_preference == :template ? :template : :destination,
+          decision: decision
         )
 
         if emitted_trailing_gap_line
           last_emitted_dest_line = emitted_trailing_gap_line if node_preference == :destination
         elsif trailing_content && trailing_content.strip.empty?
           if node_preference == :template
-            merger.result.add_line("", decision: decision, template_line: trailing_line)
+            merger.result.add_line('', decision: decision, template_line: trailing_line)
           else
-            merger.result.add_line("", decision: decision, dest_line: trailing_line)
+            merger.result.add_line('', decision: decision, dest_line: trailing_line)
             last_emitted_dest_line = trailing_line
           end
         end
 
-        {last_emitted_dest_line: last_emitted_dest_line}
+        { last_emitted_dest_line: last_emitted_dest_line }
       end
 
       private
 
-      def remap_inner_unresolved_review_state!(body_result:, remapped_result_lines:, template_layout:, dest_layout:, parent_node:)
+      def remap_inner_unresolved_review_state!(body_result:, remapped_result_lines:, template_layout:, dest_layout:,
+                                               parent_node:)
         return unless body_result&.review_required?
 
         remapped_cases = body_result.unresolved_cases.map do |resolution_case|
@@ -265,7 +273,7 @@ module Prism
             remapped_result_lines: remapped_result_lines,
             template_layout: template_layout,
             dest_layout: dest_layout,
-            parent_node: parent_node,
+            parent_node: parent_node
           )
         end
         remapped_conflicts_by_case_id = body_result.conflicts.each_with_object({}) do |conflict, hash|
@@ -275,11 +283,15 @@ module Prism
         remapped_cases.each do |resolution_case|
           merger.result.add_unresolved_case(resolution_case)
           conflict = remapped_conflicts_by_case_id[resolution_case.metadata[:source_case_id].to_s]
-          merger.result.conflicts << remap_inner_unresolved_conflict(conflict: conflict, resolution_case: resolution_case) if conflict
+          if conflict
+            merger.result.conflicts << remap_inner_unresolved_conflict(conflict: conflict,
+                                                                       resolution_case: resolution_case)
+          end
         end
       end
 
-      def remap_inner_unresolved_case(resolution_case:, remapped_result_lines:, template_layout:, dest_layout:, parent_node:)
+      def remap_inner_unresolved_case(resolution_case:, remapped_result_lines:, template_layout:, dest_layout:,
+                                      parent_node:)
         metadata = resolution_case.metadata.dup
         metadata[:source_case_id] = resolution_case.case_id
         metadata[:result_lines] = remap_result_line_span(metadata[:result_lines], remapped_result_lines)
@@ -294,7 +306,7 @@ module Prism
           provisional_winner: resolution_case.provisional_winner,
           surface_path: remapped_surface_path(resolution_case, parent_node, metadata),
           operation_id: resolution_case.operation_id,
-          metadata: metadata,
+          metadata: metadata
         )
       end
 
@@ -345,7 +357,7 @@ module Prism
       end
 
       def recursive_parent_surface_segment(node)
-        node_type = node.class.name.split("::").last
+        node_type = node.class.name.split('::').last
         merger.send(:unresolved_typed_path_segment, node_type, node: node, fallback: node_type)
       end
 
@@ -358,7 +370,7 @@ module Prism
       end
 
       def parent_segment_token(node)
-        "#{node.class.name.split("::").last.gsub(/([a-z\d])([A-Z])/, '\\1_\\2').downcase}-#{node.location.start_line}"
+        "#{node.class.name.split('::').last.gsub(/([a-z\d])([A-Z])/, '\\1_\\2').downcase}-#{node.location.start_line}"
       end
 
       def emit_trailing_layout_gap_lines(analysis:, owner:, source:, decision:)

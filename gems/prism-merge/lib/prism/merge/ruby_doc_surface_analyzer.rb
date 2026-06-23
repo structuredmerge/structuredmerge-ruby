@@ -63,10 +63,10 @@ module Prism
         owner_reference = owner_reference_for(owner, owner_signature)
         doc_entries = Array(region.metadata[:entries]).select { |entry| doc_comment_content?(entry) }
         span = if doc_entries.empty?
-          region.start_line..region.end_line
-        else
-          doc_entries.first[:line]..doc_entries.last[:line]
-        end
+                 region.start_line..region.end_line
+               else
+                 doc_entries.first[:line]..doc_entries.last[:line]
+               end
         owned_entries = doc_comment_entries(region, span)
         owned_line_numbers = owned_entries.map { |entry| entry[:line] }
         owned_entry_indexes = owned_entries.map { |entry| entry[:entry_index] }
@@ -75,7 +75,7 @@ module Prism
           surface_kind: :ruby_doc_comment,
           effective_language: @doc_language,
           address: "document[0] > ruby_doc_comment[#{owner_reference}]",
-          parent_address: "document[0]",
+          parent_address: 'document[0]',
           span: span,
           reconstruction_strategy: :rewrite_with_prefix_preservation,
           metadata: {
@@ -85,8 +85,8 @@ module Prism
             comment_prefix: comment_prefix_for(span.begin),
             line_numbers: owned_line_numbers,
             owned_entry_indexes: owned_entry_indexes,
-            line_span: span,
-          },
+            line_span: span
+          }
         )
       end
 
@@ -132,9 +132,9 @@ module Prism
             body_relative_span: (body_start_index + 1)..body_end_index,
             comment_prefix: surface.metadata[:comment_prefix],
             preserved_boundaries: {
-              tag_header: doc_entries[tag_index][:raw],
-            },
-          },
+              tag_header: doc_entries[tag_index][:raw]
+            }
+          }
         )
       end
 
@@ -154,14 +154,14 @@ module Prism
 
         line_numbers = surface.metadata[:line_numbers] || surface.span&.to_a || []
         line_numbers.map do |line_number|
-          raw = analysis.line_at(line_number).to_s.sub(/\r?\n\z/, "")
-          {line: line_number, raw: raw}
+          raw = analysis.line_at(line_number).to_s.sub(/\r?\n\z/, '')
+          { line: line_number, raw: raw }
         end
       end
 
       def doc_comment_entries(region, span)
         entries = Array(region.metadata[:entries])
-        return span.to_a.map.with_index { |line, index| {line: line, entry_index: index} } if entries.empty?
+        return span.to_a.map.with_index { |line, index| { line: line, entry_index: index } } if entries.empty?
 
         entries
           .each_with_index
@@ -203,7 +203,7 @@ module Prism
       end
 
       def normalize_comment_content(raw)
-        raw.to_s.sub(/\A\s*#\s?/, "").strip
+        raw.to_s.sub(/\A\s*#\s?/, '').strip
       end
 
       def declared_example_language(rest)
@@ -215,14 +215,14 @@ module Prism
         if owner.respond_to?(:name) && !owner.name.nil?
           owner.name.to_s
         elsif owner_signature && !owner_signature.empty?
-          owner_signature.join(":")
+          owner_signature.join(':')
         else
           "#{normalized_owner_type(owner)}@#{owner_span_for(owner)}"
         end
       end
 
       def normalized_owner_type(owner)
-        owner.class.name.split("::").last.gsub(/Node\z/, "").downcase.to_sym
+        owner.class.name.split('::').last.gsub(/Node\z/, '').downcase.to_sym
       end
 
       def owner_span_for(owner)
@@ -230,14 +230,14 @@ module Prism
       end
 
       def comment_prefix_for(line_number)
-        line_text = analysis.line_at(line_number).to_s.sub(/\r?\n\z/, "")
-        line_text[/\A\s*#\s?/] || "# "
+        line_text = analysis.line_at(line_number).to_s.sub(/\r?\n\z/, '')
+        line_text[/\A\s*#\s?/] || '# '
       end
 
       def normalize_language(language)
         return if language.nil?
 
-        language.to_s.strip.downcase.tr("-", "_").to_sym
+        language.to_s.strip.downcase.tr('-', '_').to_sym
       end
     end
   end

@@ -49,12 +49,12 @@ module Prism
                 current_block = []
               end
               nodes << Ast::Merge::Comment::Empty.new(line_number: line_number, text: raw)
-            elsif stripped.start_with?("#")
+            elsif stripped.start_with?('#')
               # Ruby comment line
               current_block << Line.new(
                 text: raw,
                 line_number: line_number,
-                magic_comment_type: header_magic_comment_types[line_number],
+                magic_comment_type: header_magic_comment_types[line_number]
               )
             else
               # Non-comment content (shouldn't happen in comment-only files)
@@ -66,15 +66,13 @@ module Prism
               nodes << Ast::Merge::Comment::Line.new(
                 text: raw,
                 line_number: line_number,
-                style: :hash_comment,
+                style: :hash_comment
               )
             end
           end
 
           # Flush remaining block
-          if current_block.any?
-            nodes << build_block(current_block)
-          end
+          nodes << build_block(current_block) if current_block.any?
 
           nodes
         end

@@ -10,34 +10,39 @@ module Prism
         @dest_analysis = dest_analysis
       end
 
-      def normalized_clause_body_and_header_source(template_clause_node:, dest_clause_node:, clause_body:, preferred_source:)
-        return {header_source: preferred_source, clause_body: clause_body} unless template_clause_node.type.to_s == "rescue_node" && dest_clause_node.type.to_s == "rescue_node"
+      def normalized_clause_body_and_header_source(template_clause_node:, dest_clause_node:, clause_body:,
+                                                   preferred_source:)
+        unless template_clause_node.type.to_s == 'rescue_node' && dest_clause_node.type.to_s == 'rescue_node'
+          return { header_source: preferred_source,
+                   clause_body: clause_body }
+        end
 
         template_reference = rescue_node_reference_name(template_clause_node)
         dest_reference = rescue_node_reference_name(dest_clause_node)
-        return {header_source: preferred_source, clause_body: clause_body} if template_reference == dest_reference
+        return { header_source: preferred_source, clause_body: clause_body } if template_reference == dest_reference
 
         merged_references = local_variable_read_names_in_source(clause_body)
         needs_template_reference = template_reference && merged_references.include?(template_reference)
         needs_dest_reference = dest_reference && merged_references.include?(dest_reference)
 
         header_source = if needs_dest_reference && !needs_template_reference
-          :destination
-        elsif needs_template_reference && !needs_dest_reference
-          :template
-        else
-          preferred_source
-        end
+                          :destination
+                        elsif needs_template_reference && !needs_dest_reference
+                          :template
+                        else
+                          preferred_source
+                        end
 
-        chosen_reference = (header_source == :template) ? template_reference : dest_reference
-        alternate_reference = (header_source == :template) ? dest_reference : template_reference
+        chosen_reference = header_source == :template ? template_reference : dest_reference
+        alternate_reference = header_source == :template ? dest_reference : template_reference
         normalized_body = if chosen_reference && alternate_reference && merged_references.include?(alternate_reference)
-          rewrite_local_reference_in_source(clause_body, from: alternate_reference, to: chosen_reference)
-        else
-          clause_body
-        end
+                            rewrite_local_reference_in_source(clause_body, from: alternate_reference,
+                                                                           to: chosen_reference)
+                          else
+                            clause_body
+                          end
 
-        {header_source: header_source, clause_body: normalized_body}
+        { header_source: header_source, clause_body: normalized_body }
       end
 
       def merge_ordered_clause_types(primary_types, secondary_types)
@@ -66,10 +71,11 @@ module Prism
       def canonicalize_rescue_clause_order(clause_types)
         rescue_clause_types = clause_types.select { |clause_type| rescue_clause_type?(clause_type) }
         return clause_types if rescue_clause_types.length < 2
+
         ordered_rescue_types = rescue_clause_types.dup
 
         if rescue_clause_types.any? { |clause_type| broad_rescue_clause_type?(clause_type) } &&
-            rescue_clause_types.any? { |clause_type| !broad_rescue_clause_type?(clause_type) }
+           rescue_clause_types.any? { |clause_type| !broad_rescue_clause_type?(clause_type) }
           specific_rescue_types = ordered_rescue_types.reject { |clause_type| broad_rescue_clause_type?(clause_type) }
           broad_rescue_types = ordered_rescue_types.select { |clause_type| broad_rescue_clause_type?(clause_type) }
           ordered_rescue_types = specific_rescue_types + broad_rescue_types
@@ -83,7 +89,8 @@ module Prism
             right_clause_type = ordered_rescue_types[index + 1]
             next unless broader_rescue_clause_type_than?(left_clause_type, right_clause_type)
 
-            ordered_rescue_types[index], ordered_rescue_types[index + 1] = right_clause_type, left_clause_type
+            ordered_rescue_types[index] = right_clause_type
+            ordered_rescue_types[index + 1] = left_clause_type
             swapped = true
           end
 
@@ -97,14 +104,14 @@ module Prism
 
       def canonicalize_begin_clause_kind_order(clause_types)
         clause_types.each_with_index
-          .sort_by { |(clause_type, index)| [clause_kind_sort_key(clause_type), index] }
-          .map(&:first)
+                    .sort_by { |(clause_type, index)| [clause_kind_sort_key(clause_type), index] }
+                    .map(&:first)
       end
 
       private
 
       def rescue_node_reference_name(rescue_node)
-        return unless rescue_node.type.to_s == "rescue_node"
+        return unless rescue_node.type.to_s == 'rescue_node'
 
         reference = rescue_node.reference if rescue_node.respond_to?(:reference)
         return unless reference
@@ -118,12 +125,16 @@ module Prism
       def local_variable_read_names_in(node, names = [])
         return names unless node
 
-        if node.type.to_s == "local_variable_read_node"
+        if node.type.to_s == 'local_variable_read_node'
           names << node.name.to_s
-        elsif node.type.to_s == "call_node" && node.respond_to?(:variable_call?) && node.variable_call?
+        elsif node.type.to_s == 'call_node' && node.respond_to?(:variable_call?) && node.variable_call?
           names << node.name.to_s
         end
-        node.compact_child_nodes.each { |child| local_variable_read_names_in(child, names) } if node.respond_to?(:compact_child_nodes)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes.each do |child|
+            local_variable_read_names_in(child, names)
+          end
+        end
         names
       end
 
@@ -139,9 +150,9 @@ module Prism
       def local_reference_node_named?(node, name)
         return false unless node && name
 
-        if node.type.to_s == "local_variable_read_node"
+        if node.type.to_s == 'local_variable_read_node'
           node.name.to_s == name
-        elsif node.type.to_s == "call_node" && node.respond_to?(:variable_call?) && node.variable_call?
+        elsif node.type.to_s == 'call_node' && node.respond_to?(:variable_call?) && node.variable_call?
           node.name.to_s == name
         else
           false
@@ -155,7 +166,11 @@ module Prism
           offsets << [node.location.start_offset, node.location.length]
         end
 
-        node.compact_child_nodes.each { |child| local_reference_offsets_in(child, name, offsets) } if node.respond_to?(:compact_child_nodes)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes.each do |child|
+            local_reference_offsets_in(child, name, offsets)
+          end
+        end
         offsets
       end
 
@@ -192,16 +207,16 @@ module Prism
       end
 
       def normalize_exception_name(exception_name)
-        return "StandardError" if exception_name == :standard_error
+        return 'StandardError' if exception_name == :standard_error
 
-        name = exception_name.to_s.sub(/\A::/, "")
+        name = exception_name.to_s.sub(/\A::/, '')
         name.empty? ? nil : name
       end
 
       def qualify_source_constant_name(constant_name, namespace = nil)
         normalized_name = normalize_exception_name(constant_name)
         return if normalized_name.nil?
-        return normalized_name if constant_name.to_s.start_with?("::") || namespace.nil? || namespace.empty?
+        return normalized_name if constant_name.to_s.start_with?('::') || namespace.nil? || namespace.empty?
 
         "#{namespace}::#{normalized_name}"
       end
@@ -219,12 +234,13 @@ module Prism
           definitions.each_with_object({}) do |definition, hierarchy|
             next unless definition[:name] && definition[:superclass]
 
-            superclass_name = if definition[:superclass].to_s.start_with?("::")
-              normalize_exception_name(definition[:superclass])
-            else
-              candidate_name = qualify_source_constant_name(definition[:superclass], definition[:namespace])
-              defined_names.include?(candidate_name) ? candidate_name : normalize_exception_name(definition[:superclass])
-            end
+            superclass_name = if definition[:superclass].to_s.start_with?('::')
+                                normalize_exception_name(definition[:superclass])
+                              else
+                                candidate_name = qualify_source_constant_name(definition[:superclass],
+                                                                              definition[:namespace])
+                                defined_names.include?(candidate_name) ? candidate_name : normalize_exception_name(definition[:superclass])
+                              end
 
             hierarchy[definition[:name]] ||= superclass_name if superclass_name
           end
@@ -247,11 +263,15 @@ module Prism
           definitions << {
             name: class_name,
             namespace: namespace,
-            superclass: node.superclass&.slice,
+            superclass: node.superclass&.slice
           }
           collect_source_defined_exception_definitions(node.body, class_name, definitions)
         else
-          node.compact_child_nodes.each { |child| collect_source_defined_exception_definitions(child, namespace, definitions) } if node.respond_to?(:compact_child_nodes)
+          if node.respond_to?(:compact_child_nodes)
+            node.compact_child_nodes.each do |child|
+              collect_source_defined_exception_definitions(child, namespace, definitions)
+            end
+          end
         end
       end
 
@@ -259,7 +279,7 @@ module Prism
         return ::StandardError if exception_name == :standard_error
         return unless exception_name.is_a?(String) && !exception_name.empty?
 
-        exception_name.split("::").reject(&:empty?).inject(Object) { |scope, const_name| scope.const_get(const_name) }
+        exception_name.split('::').reject(&:empty?).inject(Object) { |scope, const_name| scope.const_get(const_name) }
       rescue NameError
         nil
       end

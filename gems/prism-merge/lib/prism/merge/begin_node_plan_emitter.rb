@@ -18,7 +18,7 @@ module Prism
           :begin_node_merge_planner,
           template_node: template_node,
           dest_node: dest_node,
-          node_preference: node_preference,
+          node_preference: node_preference
         ).plan.each do |step|
           emit_step(
             step,
@@ -26,14 +26,15 @@ module Prism
             decision: decision,
             template_inline_by_line: template_inline_by_line,
             dest_inline_by_line: dest_inline_by_line,
-            begin_clause_line_map: begin_clause_line_map,
+            begin_clause_line_map: begin_clause_line_map
           )
         end
       end
 
       private
 
-      def emit_step(step, node_preference:, decision:, template_inline_by_line:, dest_inline_by_line:, begin_clause_line_map:)
+      def emit_step(step, node_preference:, decision:, template_inline_by_line:, dest_inline_by_line:,
+                    begin_clause_line_map:)
         case step.kind
         when :merged_shared_clause, :fallback_shared_clause
           merger.send(:begin_node_clause_header_emitter).emit(
@@ -44,7 +45,7 @@ module Prism
             header_source: step.header_source,
             decision: decision,
             template_inline_by_line: template_inline_by_line,
-            dest_inline_by_line: dest_inline_by_line,
+            dest_inline_by_line: dest_inline_by_line
           )
 
           emit_text(step.body_text, decision: decision)
@@ -56,7 +57,7 @@ module Prism
             decision: decision,
             template_inline_by_line: template_inline_by_line,
             dest_inline_by_line: dest_inline_by_line,
-            begin_clause_line_map: begin_clause_line_map,
+            begin_clause_line_map: begin_clause_line_map
           )
         end
       end
@@ -67,24 +68,25 @@ module Prism
             line.chomp,
             decision: decision,
             template_line: nil,
-            dest_line: nil,
+            dest_line: nil
           )
         end
       end
 
-      def emit_copied_unmatched_clause(step, node_preference:, decision:, template_inline_by_line:, dest_inline_by_line:, begin_clause_line_map:)
-        region_analysis = (step.copied_analysis_side == :template) ? merger.template_analysis : merger.dest_analysis
+      def emit_copied_unmatched_clause(step, node_preference:, decision:, template_inline_by_line:,
+                                       dest_inline_by_line:, begin_clause_line_map:)
+        region_analysis = step.copied_analysis_side == :template ? merger.template_analysis : merger.dest_analysis
 
         (step.copied_region[:start_line]..step.copied_region[:end_line]).each do |line_num|
           line = required_source_line(
             region_analysis,
             line_num,
-            context: "emitting copied unmatched begin-clause region",
+            context: 'emitting copied unmatched begin-clause region'
           )
 
           if node_preference == :template &&
-              region_analysis.equal?(merger.template_analysis) &&
-              template_inline_by_line[line_num].empty?
+             region_analysis.equal?(merger.template_analysis) &&
+             template_inline_by_line[line_num].empty?
             dest_clause_line = begin_clause_line_map[line_num]
             dest_clause_inline = dest_clause_line ? dest_inline_by_line[dest_clause_line] : []
             line = merger.send(:append_inline_comment_entries, line, dest_clause_inline) if dest_clause_inline.any?
@@ -94,7 +96,7 @@ module Prism
             line,
             decision: decision,
             template_line: region_analysis.equal?(merger.template_analysis) ? line_num : nil,
-            dest_line: region_analysis.equal?(merger.dest_analysis) ? line_num : nil,
+            dest_line: region_analysis.equal?(merger.dest_analysis) ? line_num : nil
           )
         end
       end

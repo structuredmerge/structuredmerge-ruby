@@ -13,8 +13,8 @@ module Prism
         return line.chomp if line
 
         raise Prism::Merge::MissingAnalyzedLineError,
-          "#{context}: expected #{analysis.class}#line_at(#{line_num}) to return a source line, " \
-            "but it returned nil. This path requires an analysis object that matches the AST/comment ownership."
+              "#{context}: expected #{analysis.class}#line_at(#{line_num}) to return a source line, " \
+                'but it returned nil. This path requires an analysis object that matches the AST/comment ownership.'
       end
 
       def required_comment_line(analysis, comment, context:)

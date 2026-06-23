@@ -22,6 +22,7 @@ module Prism
 
         ct = NodeTypeNormalizer.canonical_type(inner_node.type, :prism)
         return :call_with_block if ct == :call && inner_node.block
+
         ct || fallback_type_name
       end
 
@@ -35,7 +36,7 @@ module Prism
 
         {
           start_line: loc.start_line,
-          end_line: loc.end_line,
+          end_line: loc.end_line
         }
       end
 
@@ -69,8 +70,8 @@ module Prism
       private
 
       def fallback_type_name
-        class_name = inner_node.class.name.to_s.split("::").last
-        class_name.sub(/Node\z/, "").gsub(/([a-z\d])([A-Z])/, "\\1_\\2").downcase.to_sym
+        class_name = inner_node.class.name.to_s.split('::').last
+        class_name.sub(/Node\z/, '').gsub(/([a-z\d])([A-Z])/, '\\1_\\2').downcase.to_sym
       end
     end
   end

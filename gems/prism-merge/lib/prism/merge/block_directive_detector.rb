@@ -23,7 +23,7 @@ module Prism
       Span = Struct.new(:kind, :start_line, :end_line, :open_marker, :close_marker, keyword_init: true)
 
       # Default legacy nocov token (older SimpleCov convention)
-      NOCOV_TOKEN = ":nocov:"
+      NOCOV_TOKEN = ':nocov:'
       SIMPLECOV_DISABLE_RE = /\A\s*#\s*simplecov\s*:\s*disable\b/i
       SIMPLECOV_ENABLE_RE = /\A\s*#\s*simplecov\s*:\s*enable\b/i
 
@@ -96,9 +96,7 @@ module Prism
 
           nested = spans.select { |s| s != span && s.start_line >= span.start_line && s.end_line <= span.end_line }
 
-          unless nested.empty?
-            inner_nodes = promote_spans_to_nodes(inner_nodes, nested, analysis: analysis)
-          end
+          inner_nodes = promote_spans_to_nodes(inner_nodes, nested, analysis: analysis) unless nested.empty?
 
           directive_node = build_directive_node(span, inner_nodes, analysis)
           # Determine insertion position:
@@ -107,11 +105,13 @@ module Prism
           #   of the first statement whose start_line is AFTER the span's start_line,
           #   or append at the end if no such statement exists.
           insert_at = if inner_indices.any?
-            inner_indices.min
-          else
-            idx_after = statements.each_with_index.find { |stmt, _| stmt_start_line(stmt).to_i > span.start_line }
-            idx_after ? idx_after.last : statements.length
-          end
+                        inner_indices.min
+                      else
+                        idx_after = statements.each_with_index.find do |stmt, _|
+                          stmt_start_line(stmt).to_i > span.start_line
+                        end
+                        idx_after ? idx_after.last : statements.length
+                      end
           result << [insert_at, directive_node, inner_indices]
           used_indices.merge(inner_indices)
         end
@@ -122,7 +122,7 @@ module Prism
       private
 
       def warn_prefix
-        @source_label ? "[prism-merge] BlockDirectiveDetector (#{@source_label}):" : "[prism-merge] BlockDirectiveDetector:"
+        @source_label ? "[prism-merge] BlockDirectiveDetector (#{@source_label}):" : '[prism-merge] BlockDirectiveDetector:'
       end
 
       # Report an unbalanced or invalid block directive.
@@ -130,11 +130,9 @@ module Prism
       # to prevent file corruption. Falls back to warn for sub-body fragments
       # (no source_label) where partial markers are expected.
       def report_unbalanced(message)
-        if @source_label
-          raise Prism::Merge::Error, "#{warn_prefix} #{message}"
-        else
-          warn("#{warn_prefix} #{message} — ignoring")
-        end
+        raise Prism::Merge::Error, "#{warn_prefix} #{message}" if @source_label
+
+        warn("#{warn_prefix} #{message} — ignoring")
       end
 
       # @return [Array<Span>]
@@ -151,7 +149,7 @@ module Prism
           line_num = idx + 1
           stripped = line.to_s.chomp
           if stripped.match?(freeze_pat)
-            stack.push({start_line: line_num, open_marker: stripped})
+            stack.push({ start_line: line_num, open_marker: stripped })
           elsif stripped.match?(unfreeze_pat)
             if (open = stack.pop)
               spans << Span.new(
@@ -159,7 +157,7 @@ module Prism
                 start_line: open[:start_line],
                 end_line: line_num,
                 open_marker: open[:open_marker],
-                close_marker: stripped,
+                close_marker: stripped
               )
             else
               report_unbalanced("unmatched #{@freeze_token}:unfreeze at line #{line_num}")
@@ -187,7 +185,7 @@ module Prism
           line_num = idx + 1
           stripped = line.to_s.chomp
           if stripped.match?(SIMPLECOV_DISABLE_RE)
-            stack.push({start_line: line_num, open_marker: stripped})
+            stack.push({ start_line: line_num, open_marker: stripped })
           elsif stripped.match?(SIMPLECOV_ENABLE_RE)
             if (open = stack.pop)
               spans << Span.new(
@@ -195,14 +193,14 @@ module Prism
                 start_line: open[:start_line],
                 end_line: line_num,
                 open_marker: open[:open_marker],
-                close_marker: stripped,
+                close_marker: stripped
               )
             else
               report_unbalanced("unmatched simplecov:enable at line #{line_num}")
             end
           elsif stripped.match?(nocov_pat)
             if stack.empty?
-              stack.push({start_line: line_num, open_marker: stripped})
+              stack.push({ start_line: line_num, open_marker: stripped })
             else
               open = stack.pop
               spans << Span.new(
@@ -210,7 +208,7 @@ module Prism
                 start_line: open[:start_line],
                 end_line: line_num,
                 open_marker: open[:open_marker],
-                close_marker: stripped,
+                close_marker: stripped
               )
             end
           end
@@ -237,16 +235,16 @@ module Prism
           spans.each_with_index do |b, j|
             next if i == j || invalid_indices.include?(j)
 
-            if (a.start_line < b.start_line && a.end_line > b.start_line && a.end_line < b.end_line) ||
-                (b.start_line < a.start_line && b.end_line > a.start_line && b.end_line < a.end_line)
-              report_unbalanced("offset-overlapping #{a.kind} block " \
-                "(lines #{a.start_line}..#{a.end_line}) and #{b.kind} block " \
-                "(lines #{b.start_line}..#{b.end_line}) — both treated as plain comments")
-              invalid_indices.add(i)
-              invalid_indices.add(j)
-              crossing = true
-              break
-            end
+            next unless (a.start_line < b.start_line && a.end_line > b.start_line && a.end_line < b.end_line) ||
+                        (b.start_line < a.start_line && b.end_line > a.start_line && b.end_line < a.end_line)
+
+            report_unbalanced("offset-overlapping #{a.kind} block " \
+              "(lines #{a.start_line}..#{a.end_line}) and #{b.kind} block " \
+              "(lines #{b.start_line}..#{b.end_line}) — both treated as plain comments")
+            invalid_indices.add(i)
+            invalid_indices.add(j)
+            crossing = true
+            break
           end
 
           valid << a unless crossing
@@ -290,7 +288,7 @@ module Prism
 
           report_unbalanced(
             "#{span.kind} block opens at line #{span.start_line} and closes at line #{span.end_line}, " \
-              "but the markers do not live at the same syntactic level",
+              'but the markers do not live at the same syntactic level'
           )
         end
       end
@@ -313,7 +311,7 @@ module Prism
             nodes: inner_nodes,
             overlapping_nodes: inner_nodes,
             start_marker: span.open_marker,
-            end_marker: span.close_marker,
+            end_marker: span.close_marker
           )
         when :nocov
           Prism::Merge::NocovNode.new(
@@ -322,7 +320,7 @@ module Prism
             analysis: analysis,
             nodes: inner_nodes,
             start_marker: span.open_marker,
-            close_marker: span.close_marker,
+            close_marker: span.close_marker
           )
         else
           raise ArgumentError, "Unknown BlockDirective kind: #{span.kind}"

@@ -67,82 +67,88 @@ module Prism
         root_operation = start_runtime_session!
 
         merge_result = if comment_only_merge?
-          merger.send(:comment_only_file_merger).merge
-        else
-          template_by_signature = merger.send(:build_signature_map, merger.template_analysis)
-          dest_by_signature = merger.send(:build_signature_map, merger.dest_analysis)
-          prepare_comment_augmenters!(template_by_signature: template_by_signature, dest_by_signature: dest_by_signature)
-          consumed_template_indices = Set.new
-          sig_cursor = Hash.new(0)
-          output_dest_line_ranges = []
-          last_output_dest_line = merger.send(:emit_dest_prefix_lines, merger.result, merger.dest_analysis)
+                         merger.send(:comment_only_file_merger).merge
+                       else
+                         template_by_signature = merger.send(:build_signature_map, merger.template_analysis)
+                         dest_by_signature = merger.send(:build_signature_map, merger.dest_analysis)
+                         prepare_comment_augmenters!(template_by_signature: template_by_signature,
+                                                     dest_by_signature: dest_by_signature)
+                         consumed_template_indices = Set.new
+                         sig_cursor = Hash.new(0)
+                         output_dest_line_ranges = []
+                         last_output_dest_line = merger.send(:emit_dest_prefix_lines, merger.result,
+                                                             merger.dest_analysis)
 
-          # Phase 1: exact signature match (existing behavior).
-          dest_sigs = ::Set.new(dest_by_signature.keys)
+                         # Phase 1: exact signature match (existing behavior).
+                         dest_sigs = ::Set.new(dest_by_signature.keys)
 
-          # Phase 2: compute similarity-matched pairs from residual orphans.
-          @similarity_pairs = compute_similarity_pairs(template_by_signature, dest_by_signature)
+                         # Phase 2: compute similarity-matched pairs from residual orphans.
+                         @similarity_pairs = compute_similarity_pairs(template_by_signature, dest_by_signature)
 
-          # Phase 3: cross-depth search, but only for orphans surviving Phases 1+2.
-          @deep_dest_sigs = compute_deep_sigs_for_orphans(
-            template_by_signature, dest_sigs
-          )
+                         # Phase 3: cross-depth search, but only for orphans surviving Phases 1+2.
+                         @deep_dest_sigs = compute_deep_sigs_for_orphans(
+                           template_by_signature, dest_sigs
+                         )
 
-          trailing_groups, _matched_indices = build_dest_iterate_trailing_groups(
-            template_nodes: merger.template_analysis.statements,
-            dest_sigs: dest_sigs,
-            signature_for: ->(node) { merger.template_analysis.generate_signature(node) },
-            add_template_only_nodes: merger.add_template_only_nodes,
-          )
-          destination_template_indices = destination_template_index_sequence(
-            template_by_signature: template_by_signature,
-          )
-          destination_signatures = merger.dest_analysis.statements.map do |dest_node|
-            merger.dest_analysis.generate_signature(dest_node)
-          end
+                         trailing_groups, _matched_indices = build_dest_iterate_trailing_groups(
+                           template_nodes: merger.template_analysis.statements,
+                           dest_sigs: dest_sigs,
+                           signature_for: ->(node) { merger.template_analysis.generate_signature(node) },
+                           add_template_only_nodes: merger.add_template_only_nodes
+                         )
+                         destination_template_indices = destination_template_index_sequence(
+                           template_by_signature: template_by_signature
+                         )
+                         destination_signatures = merger.dest_analysis.statements.map do |dest_node|
+                           merger.dest_analysis.generate_signature(dest_node)
+                         end
 
-          unless destination_tail_template_only_placement?
-            emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
-              emit_template_only_node(info, consumed_template_indices)
-            end
-          end
+                         unless destination_tail_template_only_placement?
+                           emit_prefix_trailing_group(trailing_groups, consumed_template_indices) do |info|
+                             emit_template_only_node(info, consumed_template_indices)
+                           end
+                         end
 
-          merger.dest_analysis.statements.each_with_index do |dest_node, dest_position|
-            last_output_dest_line = process_dest_node(
-              dest_node: dest_node,
-              template_by_signature: template_by_signature,
-              consumed_template_indices: consumed_template_indices,
-              sig_cursor: sig_cursor,
-              output_dest_line_ranges: output_dest_line_ranges,
-              last_output_dest_line: last_output_dest_line,
-              dest_position: dest_position,
-              destination_signatures: destination_signatures,
-              destination_template_indices: destination_template_indices,
-            )
-            emit_available_trailing_groups(
-              trailing_groups: trailing_groups,
-              consumed_indices: consumed_template_indices,
-              dest_position: dest_position,
-              destination_template_indices: destination_template_indices,
-            ) unless destination_tail_template_only_placement?
-          end
+                         merger.dest_analysis.statements.each_with_index do |dest_node, dest_position|
+                           last_output_dest_line = process_dest_node(
+                             dest_node: dest_node,
+                             template_by_signature: template_by_signature,
+                             consumed_template_indices: consumed_template_indices,
+                             sig_cursor: sig_cursor,
+                             output_dest_line_ranges: output_dest_line_ranges,
+                             last_output_dest_line: last_output_dest_line,
+                             dest_position: dest_position,
+                             destination_signatures: destination_signatures,
+                             destination_template_indices: destination_template_indices
+                           )
+                           next if destination_tail_template_only_placement?
 
-          # Safety net: emit any trailing groups whose anchor was never consumed
-          unless destination_tail_template_only_placement?
-            emit_remaining_trailing_groups(
-              trailing_groups: trailing_groups,
-              consumed_indices: consumed_template_indices,
-            ) do |info|
-              emit_template_only_node(info, consumed_template_indices)
-            end
-          end
-          emit_tail_template_only_nodes(consumed_template_indices) if destination_tail_template_only_placement?
+                           emit_available_trailing_groups(
+                             trailing_groups: trailing_groups,
+                             consumed_indices: consumed_template_indices,
+                             dest_position: dest_position,
+                             destination_template_indices: destination_template_indices
+                           )
+                         end
 
-          emit_dest_postlude_lines(last_output_dest_line)
-          normalize_layout_blank_runs(merger.result)
+                         # Safety net: emit any trailing groups whose anchor was never consumed
+                         unless destination_tail_template_only_placement?
+                           emit_remaining_trailing_groups(
+                             trailing_groups: trailing_groups,
+                             consumed_indices: consumed_template_indices
+                           ) do |info|
+                             emit_template_only_node(info, consumed_template_indices)
+                           end
+                         end
+                         if destination_tail_template_only_placement?
+                           emit_tail_template_only_nodes(consumed_template_indices)
+                         end
 
-          merger.result
-        end
+                         emit_dest_postlude_lines(last_output_dest_line)
+                         normalize_layout_blank_runs(merger.result)
+
+                         merger.result
+                       end
 
         complete_runtime_session!(root_operation, merge_result)
         merge_result
@@ -161,20 +167,20 @@ module Prism
             remove_template_missing_nodes: merger.remove_template_missing_nodes,
             corruption_handling: merger.corruption_handling,
             resolution_mode: merger.resolution_mode,
-            unresolved_policy: merger.unresolved_policy.to_h,
+            unresolved_policy: merger.unresolved_policy.to_h
           },
           metadata: {
             merger: merger.class.name,
-            render_family: merger.dest_analysis.feature_profile.render_family,
+            render_family: merger.dest_analysis.feature_profile.render_family
           },
-          delegation_registry: runtime_delegation_registry,
+          delegation_registry: runtime_delegation_registry
         )
         @runtime_session = session
 
         root_surface = runtime_document_surface
         root_delegate = session.resolve_delegate_for(root_surface, capability: :merge)
         root_operation = Ast::Merge::Runtime::Operation.new(
-          operation_id: "ruby-document-0",
+          operation_id: 'ruby-document-0',
           surface: root_surface,
           template_fragment: merger.template_content,
           destination_fragment: merger.dest_content,
@@ -182,8 +188,8 @@ module Prism
           options: {
             feature_profile: merger.dest_analysis.feature_profile.to_h,
             resolution_mode: merger.resolution_mode,
-            unresolved_policy: merger.unresolved_policy.to_h,
-          },
+            unresolved_policy: merger.unresolved_policy.to_h
+          }
         ).running!
 
         session.register(
@@ -192,9 +198,9 @@ module Prism
             operation_id: root_operation.operation_id,
             depth: 0,
             surface_path: root_surface.address,
-            language_chain: [root_surface.effective_language],
+            language_chain: [root_surface.effective_language]
           ),
-          delegate: root_delegate,
+          delegate: root_delegate
         )
         add_missing_delegate_diagnostic!(session, root_operation, capability: :merge) unless root_delegate
 
@@ -210,12 +216,18 @@ module Prism
         child_result = Ast::Merge::Runtime::ChildResult.new(
           replacement_text: merge_result.to_s,
           diagnostics: @runtime_session.diagnostics,
-          capabilities_used: delegated_child_merge_complete ? %i[top_level_merge nested_surface_discovery delegated_child_merge] : %i[top_level_merge nested_surface_discovery],
+          capabilities_used: if delegated_child_merge_complete
+                               %i[top_level_merge nested_surface_discovery
+                                  delegated_child_merge]
+                             else
+                               %i[top_level_merge
+                                  nested_surface_discovery]
+                             end,
           capabilities_missing: delegated_child_merge_complete ? [] : %i[delegated_child_merge],
           unresolved_cases: merge_result.unresolved_cases,
           metadata: {
-            decision_summary: merge_result.respond_to?(:decision_summary) ? merge_result.decision_summary : merge_result.statistics,
-          },
+            decision_summary: merge_result.respond_to?(:decision_summary) ? merge_result.decision_summary : merge_result.statistics
+          }
         )
 
         root_operation.add_diagnostic(
@@ -224,11 +236,11 @@ module Prism
             kind: :merge_completed,
             operation_id: root_operation.operation_id,
             surface_path: root_operation.surface.address,
-            message: "Completed top-level Prism merge",
+            message: 'Completed top-level Prism merge',
             metadata: {
-              child_operation_count: root_operation.children.size,
-            },
-          ),
+              child_operation_count: root_operation.children.size
+            }
+          )
         )
 
         if child_result.unresolved?
@@ -250,9 +262,9 @@ module Prism
             surface_path: root_operation.surface.address,
             message: error.message,
             metadata: {
-              error_class: error.class.name,
-            },
-          ),
+              error_class: error.class.name
+            }
+          )
         )
         merger.send(:record_runtime_session, @runtime_session)
       end
@@ -263,13 +275,13 @@ module Prism
         Ast::Merge::Runtime::Surface.new(
           surface_kind: :ruby_document,
           effective_language: :ruby,
-          address: "document[0]",
+          address: 'document[0]',
           span: max_lines.zero? ? nil : (1..max_lines),
           reconstruction_strategy: :replace_inner_span,
           metadata: {
             template_line_count: merger.template_analysis.lines.length,
-            destination_line_count: merger.dest_analysis.lines.length,
-          },
+            destination_line_count: merger.dest_analysis.lines.length
+          }
         )
       end
 
@@ -297,8 +309,8 @@ module Prism
               template_present: !pair[:template_surface].nil?,
               destination_present: !pair[:destination_surface].nil?,
               template_surface: pair[:template_surface],
-              destination_surface: pair[:destination_surface],
-            },
+              destination_surface: pair[:destination_surface]
+            }
           )
           child_operation.add_diagnostic(
             Ast::Merge::Runtime::Diagnostic.new(
@@ -306,13 +318,13 @@ module Prism
               kind: :surface_discovered,
               operation_id: operation_id,
               surface_path: surface.address,
-              message: "Discovered nested Ruby documentation surface pending delegated merge",
+              message: 'Discovered nested Ruby documentation surface pending delegated merge',
               metadata: {
                 surface_kind: surface.surface_kind,
                 template_present: !pair[:template_surface].nil?,
-                destination_present: !pair[:destination_surface].nil?,
-              },
-            ),
+                destination_present: !pair[:destination_surface].nil?
+              }
+            )
           )
           child_delegate = session.resolve_delegate_for(surface, capability: :merge)
           add_missing_delegate_diagnostic!(session, child_operation, capability: :merge) unless child_delegate
@@ -323,11 +335,11 @@ module Prism
             frame: Ast::Merge::Runtime::Frame.new(
               parent_operation_id: root_operation.operation_id,
               operation_id: operation_id,
-              depth: surface.address.split(" > ").length - 1,
+              depth: surface.address.split(' > ').length - 1,
               surface_path: surface.address,
-              language_chain: runtime_language_chain_for(surface, combined_surface_index),
+              language_chain: runtime_language_chain_for(surface, combined_surface_index)
             ),
-            delegate: session.resolve_delegate_for(surface),
+            delegate: session.resolve_delegate_for(surface)
           )
         end
 
@@ -341,9 +353,9 @@ module Prism
             surface_path: root_operation.surface.address,
             message: "Discovered #{root_operation.children.size} nested Ruby documentation surfaces",
             metadata: {
-              child_operation_ids: root_operation.children.map(&:operation_id),
-            },
-          ),
+              child_operation_ids: root_operation.children.map(&:operation_id)
+            }
+          )
         )
       end
 
@@ -355,7 +367,7 @@ module Prism
         addresses.map do |address|
           {
             template_surface: template_surfaces[address],
-            destination_surface: destination_surfaces[address],
+            destination_surface: destination_surfaces[address]
           }
         end
       end
@@ -368,16 +380,16 @@ module Prism
       end
 
       def fragment_for(surface, analysis)
-        return "" unless surface && analysis
+        return '' unless surface && analysis
 
         line_numbers = surface.metadata[:line_numbers] || surface.span&.to_a
-        return "" unless line_numbers
+        return '' unless line_numbers
 
         Array(line_numbers).map { |line_number| analysis.line_at(line_number).to_s }.join
       end
 
       def runtime_language_chain_for(surface, combined_surface_index)
-        return [:ruby] if surface.address == "document[0]"
+        return [:ruby] if surface.address == 'document[0]'
 
         parent = combined_surface_index[surface.parent_address]
         chain = parent ? runtime_language_chain_for(parent, combined_surface_index) : [:ruby]
@@ -386,38 +398,41 @@ module Prism
 
       def execute_child_operations!(session, root_operation)
         root_operation.children
-          .sort_by { |child_operation| [-session.frame_for(child_operation.operation_id).depth, child_operation.surface.address] }
-          .each do |child_operation|
-            delegate = session.resolve_delegate_for(child_operation.surface, capability: :merge)
-            next unless delegate
+                      .sort_by do |child_operation|
+          [-session.frame_for(child_operation.operation_id).depth,
+           child_operation.surface.address]
+        end
+                      .each do |child_operation|
+          delegate = session.resolve_delegate_for(child_operation.surface, capability: :merge)
+          next unless delegate
 
-            child_operation.running!
-            child_result = delegate.merge(operation: child_operation, session: session)
-            child_operation.add_diagnostic(
-              Ast::Merge::Runtime::Diagnostic.new(
-                severity: :info,
-                kind: :child_merge_completed,
-                operation_id: child_operation.operation_id,
-                surface_path: child_operation.surface.address,
-                message: "Completed delegated child merge for #{child_operation.surface.surface_kind}",
-                metadata: child_result.metadata.merge(delegate_name: delegate.name),
-              ),
+          child_operation.running!
+          child_result = delegate.merge(operation: child_operation, session: session)
+          child_operation.add_diagnostic(
+            Ast::Merge::Runtime::Diagnostic.new(
+              severity: :info,
+              kind: :child_merge_completed,
+              operation_id: child_operation.operation_id,
+              surface_path: child_operation.surface.address,
+              message: "Completed delegated child merge for #{child_operation.surface.surface_kind}",
+              metadata: child_result.metadata.merge(delegate_name: delegate.name)
             )
-            child_operation.complete!(result: child_result)
-          rescue StandardError => e
-            child_operation.fail!(
-              diagnostic: Ast::Merge::Runtime::Diagnostic.new(
-                severity: :error,
-                kind: :delegation_failed,
-                operation_id: child_operation.operation_id,
-                surface_path: child_operation.surface.address,
-                message: e.message,
-                metadata: {
-                  error_class: e.class.name,
-                  delegate_name: delegate&.name,
-                },
-              ),
+          )
+          child_operation.complete!(result: child_result)
+        rescue StandardError => e
+          child_operation.fail!(
+            diagnostic: Ast::Merge::Runtime::Diagnostic.new(
+              severity: :error,
+              kind: :delegation_failed,
+              operation_id: child_operation.operation_id,
+              surface_path: child_operation.surface.address,
+              message: e.message,
+              metadata: {
+                error_class: e.class.name,
+                delegate_name: delegate&.name
+              }
             )
+          )
         end
       end
 
@@ -425,31 +440,34 @@ module Prism
         Ast::Merge::Runtime::DelegationRegistry.new(
           delegates: [runtime_prism_delegate],
           metadata: {
-            source: :prism_merge,
-          },
+            source: :prism_merge
+          }
         )
       end
 
       def runtime_prism_delegate
         Ast::Merge::Runtime::Delegate.new(
-          name: "prism-ruby",
+          name: 'prism-ruby',
           priority: 100,
           surface_kinds: %i[ruby_document ruby_doc_comment yard_example_block],
           languages: %i[ruby yard],
           feature_profile: merger.dest_analysis.feature_profile,
           capabilities: {
             merge: %i[ruby_document ruby_doc_comment yard_example_block],
-            discover_child_surfaces: %i[ruby_document ruby_doc_comment],
+            discover_child_surfaces: %i[ruby_document ruby_doc_comment]
           },
           merge: method(:merge_runtime_surface),
           metadata: {
-            merger: merger.class.name,
-          },
+            merger: merger.class.name
+          }
         )
       end
 
       def merge_runtime_surface(operation:, session:)
-        return merge_runtime_doc_comment_surface(operation: operation, session: session) if operation.surface.surface_kind == :ruby_doc_comment
+        if operation.surface.surface_kind == :ruby_doc_comment
+          return merge_runtime_doc_comment_surface(operation: operation,
+                                                   session: session)
+        end
 
         selected_source = runtime_fragment_source_for(operation)
         replacement_text =
@@ -459,7 +477,7 @@ module Prism
           when :destination
             operation.destination_fragment
           else
-            ""
+            ''
           end
 
         Ast::Merge::Runtime::ChildResult.new(
@@ -474,8 +492,8 @@ module Prism
             template_present: operation.options[:template_present],
             destination_present: operation.options[:destination_present],
             delegate_name: operation.delegate_name,
-            session_policy: session.policy_context,
-          },
+            session_policy: session.policy_context
+          }
         )
       end
 
@@ -488,7 +506,7 @@ module Prism
           when :destination
             operation.destination_fragment
           else
-            ""
+            ''
           end
 
         replacement_text = apply_runtime_doc_children(base_text, operation, session)
@@ -505,9 +523,11 @@ module Prism
             template_present: operation.options[:template_present],
             destination_present: operation.options[:destination_present],
             delegate_name: operation.delegate_name,
-            child_operation_ids: session.operations.select { |candidate| candidate.surface.parent_address == operation.surface.address }.map(&:operation_id),
-            session_policy: session.policy_context,
-          },
+            child_operation_ids: session.operations.select do |candidate|
+              candidate.surface.parent_address == operation.surface.address
+            end.map(&:operation_id),
+            session_policy: session.policy_context
+          }
         )
       end
 
@@ -515,21 +535,25 @@ module Prism
         lines = base_text.lines(chomp: true)
 
         session.operations
-          .select do |candidate|
-            candidate.surface.parent_address == operation.surface.address &&
-              candidate.result.is_a?(Ast::Merge::Runtime::ChildResult) &&
-              candidate.surface.surface_kind == :yard_example_block
-          end
-          .sort_by { |candidate| -candidate.surface.metadata.fetch(:tag_relative_line, candidate.surface.metadata[:body_relative_span].begin - 1) }
-          .each do |child_operation|
-            lines = apply_runtime_example_child(lines, child_operation)
-          end
+               .select do |candidate|
+                 candidate.surface.parent_address == operation.surface.address &&
+                   candidate.result.is_a?(Ast::Merge::Runtime::ChildResult) &&
+                   candidate.surface.surface_kind == :yard_example_block
+               end
+               .sort_by do |candidate|
+          -candidate.surface.metadata.fetch(:tag_relative_line,
+                                            candidate.surface.metadata[:body_relative_span].begin - 1)
+        end
+               .each do |child_operation|
+                 lines = apply_runtime_example_child(lines, child_operation)
+               end
 
         join_runtime_lines(lines)
       end
 
       def apply_runtime_example_child(lines, child_operation)
-        tag_relative_line = child_operation.surface.metadata.fetch(:tag_relative_line, child_operation.surface.metadata[:body_relative_span].begin - 1)
+        tag_relative_line = child_operation.surface.metadata.fetch(:tag_relative_line,
+                                                                   child_operation.surface.metadata[:body_relative_span].begin - 1)
         body_relative_span = child_operation.surface.metadata[:body_relative_span]
         start_index = [tag_relative_line - 1, 0].max
         remove_count = body_relative_span ? (body_relative_span.end - tag_relative_line + 1) : 0
@@ -542,8 +566,8 @@ module Prism
         end
 
         block_lines = [
-          child_operation.result.preserved_boundaries[:tag_header].to_s.sub(/\r?\n\z/, ""),
-          *child_operation.result.replacement_text.lines(chomp: true),
+          child_operation.result.preserved_boundaries[:tag_header].to_s.sub(/\r?\n\z/, ''),
+          *child_operation.result.replacement_text.lines(chomp: true)
         ]
         updated = lines.dup
 
@@ -563,11 +587,11 @@ module Prism
       def runtime_blank_comment_line_for(surface)
         prefix = surface.metadata[:comment_prefix].to_s
         stripped_prefix = prefix.rstrip
-        stripped_prefix.empty? ? "#" : stripped_prefix
+        stripped_prefix.empty? ? '#' : stripped_prefix
       end
 
       def join_runtime_lines(lines)
-        return "" if lines.empty?
+        return '' if lines.empty?
 
         "#{lines.join("\n")}\n"
       end
@@ -592,7 +616,7 @@ module Prism
         return boundaries if boundaries
 
         {
-          comment_prefix: surface.metadata[:comment_prefix],
+          comment_prefix: surface.metadata[:comment_prefix]
         }.compact
       end
 
@@ -609,9 +633,9 @@ module Prism
             metadata: {
               capability: capability,
               delegate_name: operation.delegate_name,
-              surface_kind: operation.surface.surface_kind,
-            },
-          ),
+              surface_kind: operation.surface.surface_kind
+            }
+          )
         )
       end
 
@@ -679,7 +703,7 @@ module Prism
         t_candidates.each do |tc|
           d_candidates.each do |dc|
             score = jaccard(tc[:tokens], dc[:tokens])
-            scored << {t_sig: tc[:sig], d_sig: dc[:sig], score: score} if score > SIMILARITY_THRESHOLD
+            scored << { t_sig: tc[:sig], d_sig: dc[:sig], score: score } if score > SIMILARITY_THRESHOLD
           end
         end
 
@@ -721,7 +745,7 @@ module Prism
           tokens = extract_tokens(body_text, stopwords: ::Set.new, min_length: 2)
           next if tokens.size < MIN_BODY_TOKENS
 
-          candidates << {sig: sig, node: node, tokens: tokens}
+          candidates << { sig: sig, node: node, tokens: tokens }
         end
         candidates
       end
@@ -740,18 +764,18 @@ module Prism
         actual = unwrap_node(node)
         case NodeTypeNormalizer.canonical_type(actual.type.to_s, :prism)
         when :def
-          return "" unless actual.body
+          return '' unless actual.body
 
           actual.body.slice.to_s
         when :class, :module
-          return "" unless actual.body
+          return '' unless actual.body
 
           actual.body.slice.to_s
         else
           # Leaf-level nodes (calls, assignments, etc.) are not eligible
           # for body-text similarity matching — their source text is too
           # short and leads to false positives.
-          ""
+          ''
         end
       end
 
@@ -849,7 +873,8 @@ module Prism
           children.concat(extract_body(node.statements))
           subsequent = node.respond_to?(:subsequent) ? node.subsequent : node.consequent
           children.concat(extract_body(subsequent.statements)) if subsequent.respond_to?(:statements)
-          children.concat(nested_statement_children(subsequent)) if subsequent && %w[if_node else_node].include?(subsequent.type.to_s)
+          children.concat(nested_statement_children(subsequent)) if subsequent && %w[if_node
+                                                                                     else_node].include?(subsequent.type.to_s)
         when :else
           children.concat(extract_body(node.statements))
         when :begin
@@ -858,9 +883,7 @@ module Prism
           children.concat(extract_body(node.else_clause.statements)) if node.else_clause&.respond_to?(:statements)
           children.concat(extract_body(node.ensure_clause.statements)) if node.ensure_clause&.respond_to?(:statements)
         when :call
-          if node.block && node.block.type.to_s == "block_node"
-            children.concat(extract_body(node.block.body))
-          end
+          children.concat(extract_body(node.block.body)) if node.block && node.block.type.to_s == 'block_node'
         end
         children
       end
@@ -874,17 +897,18 @@ module Prism
       end
 
       def prepare_comment_augmenters!(template_by_signature:, dest_by_signature:)
-        retained = retained_owner_plan(template_by_signature: template_by_signature, dest_by_signature: dest_by_signature)
+        retained = retained_owner_plan(template_by_signature: template_by_signature,
+                                       dest_by_signature: dest_by_signature)
 
         merger.instance_variable_set(:@template_retained_owners, retained[:template])
         merger.instance_variable_set(:@dest_retained_owners, retained[:destination])
         merger.instance_variable_set(
           :@template_comment_augmenter,
-          merger.template_analysis.comment_augmenter(owners: retained[:template]),
+          merger.template_analysis.comment_augmenter(owners: retained[:template])
         )
         merger.instance_variable_set(
           :@dest_comment_augmenter,
-          merger.dest_analysis.comment_augmenter(owners: retained[:destination]),
+          merger.dest_analysis.comment_augmenter(owners: retained[:destination])
         )
       end
 
@@ -897,6 +921,7 @@ module Prism
 
         merger.template_analysis.statements.each_with_index do |node, index|
           next if consumed_template_indices.include?(index)
+
           add_tail_template_separator if template_only_node_allowed?(node)
 
           emit_template_only_node({ node: node, index: index }, consumed_template_indices)
@@ -908,9 +933,9 @@ module Prism
         return if merger.result.lines.last.to_s.empty?
 
         merger.result.add_line(
-          "",
+          '',
           decision: Prism::Merge::MergeResult::DECISION_APPENDED,
-          comment: "separator before tail template-only Ruby node"
+          comment: 'separator before tail template-only Ruby node'
         )
       end
 
@@ -946,7 +971,8 @@ module Prism
         end
       end
 
-      def emit_available_trailing_groups(trailing_groups:, consumed_indices:, dest_position:, destination_template_indices:)
+      def emit_available_trailing_groups(trailing_groups:, consumed_indices:, dest_position:,
+                                         destination_template_indices:)
         trailing_groups.each do |anchor_index, group|
           next if anchor_index == :prefix
           next unless consumed_indices.include?(anchor_index)
@@ -969,7 +995,9 @@ module Prism
 
         first_group_index = pending_group_indices.min
         future_indices = destination_template_indices[(dest_position + 1)..] || []
-        future_indices.compact.none? { |future_index| future_index < first_group_index && !consumed_indices.include?(future_index) }
+        future_indices.compact.none? do |future_index|
+          future_index < first_group_index && !consumed_indices.include?(future_index)
+        end
       end
 
       def retained_owner_plan(template_by_signature:, dest_by_signature:)
@@ -984,7 +1012,7 @@ module Prism
           template_info, cursor = next_template_match(
             candidates: template_by_signature[dest_signature],
             signature: dest_signature,
-            sig_cursor: sig_cursor,
+            sig_cursor: sig_cursor
           )
           next unless template_info
 
@@ -1013,7 +1041,7 @@ module Prism
 
         {
           template: template_retained,
-          destination: destination_retained,
+          destination: destination_retained
         }
       end
 
@@ -1036,7 +1064,7 @@ module Prism
           template_info, = peek_template_match(
             candidates: template_by_signature[dest_signature],
             signature: dest_signature,
-            sig_cursor: sig_cursor,
+            sig_cursor: sig_cursor
           )
           if defer_duplicate_destination_node?(
             dest_signature: dest_signature,
@@ -1044,7 +1072,7 @@ module Prism
             dest_position: dest_position,
             destination_signatures: destination_signatures,
             destination_template_indices: destination_template_indices,
-            consumed_template_indices: consumed_template_indices,
+            consumed_template_indices: consumed_template_indices
           )
             prune_removed_owner_leading_gap(dest_node)
             output_dest_line_ranges << node_range
@@ -1052,7 +1080,8 @@ module Prism
           end
         end
 
-        last_output_dest_line = merger.send(:emit_dest_gap_lines, merger.result, merger.dest_analysis, last_output_dest_line, dest_node)
+        last_output_dest_line = merger.send(:emit_dest_gap_lines, merger.result, merger.dest_analysis,
+                                            last_output_dest_line, dest_node)
         output_node = dest_node
         output_analysis = merger.dest_analysis
         advance_dest_output = true
@@ -1061,7 +1090,7 @@ module Prism
           template_info, cursor = next_template_match(
             candidates: template_by_signature[dest_signature],
             signature: dest_signature,
-            sig_cursor: sig_cursor,
+            sig_cursor: sig_cursor
           )
 
           if template_info
@@ -1074,7 +1103,7 @@ module Prism
               sig_cursor: sig_cursor,
               output_dest_line_ranges: output_dest_line_ranges,
               node_range: node_range,
-              last_output_dest_line: last_output_dest_line,
+              last_output_dest_line: last_output_dest_line
             )
             last_output_dest_line = emission[:last_output_dest_line]
             output_node = emission[:output_node]
@@ -1082,7 +1111,8 @@ module Prism
 
           else
             if merger.remove_template_missing_nodes
-              emission = merger.send(:emit_removed_destination_node_comments, merger.result, dest_node, merger.dest_analysis)
+              emission = merger.send(:emit_removed_destination_node_comments, merger.result, dest_node,
+                                     merger.dest_analysis)
               last_output_dest_line = emission_last_output(last_output_dest_line, emission)
               advance_dest_output = advance_dest_output?(emission)
             else
@@ -1093,7 +1123,8 @@ module Prism
           end
         else
           if merger.remove_template_missing_nodes
-            emission = merger.send(:emit_removed_destination_node_comments, merger.result, dest_node, merger.dest_analysis)
+            emission = merger.send(:emit_removed_destination_node_comments, merger.result, dest_node,
+                                   merger.dest_analysis)
             last_output_dest_line = emission_last_output(last_output_dest_line, emission)
             advance_dest_output = advance_dest_output?(emission)
           else
@@ -1109,7 +1140,7 @@ module Prism
           output_node: output_node,
           output_analysis: output_analysis,
           advance_dest_output: advance_dest_output,
-          preserve_trailing_blank_line_progress: emission&.fetch(:preserve_trailing_blank_line_progress, false),
+          preserve_trailing_blank_line_progress: emission&.fetch(:preserve_trailing_blank_line_progress, false)
         )
       end
 
@@ -1122,24 +1153,24 @@ module Prism
       def node_offset_range(node)
         location = node.location
         start_offset = if location.respond_to?(:start_offset)
-          location.start_offset
-        elsif node.respond_to?(:start_byte)
-          node.start_byte
-        else
-          location.start_line
-        end
+                         location.start_offset
+                       elsif node.respond_to?(:start_byte)
+                         node.start_byte
+                       else
+                         location.start_line
+                       end
 
         end_offset = if location.respond_to?(:end_offset)
-          location.end_offset
-        elsif node.respond_to?(:end_byte)
-          node.end_byte
-        else
-          location.end_line
-        end
+                       location.end_offset
+                     elsif node.respond_to?(:end_byte)
+                       node.end_byte
+                     else
+                       location.end_line
+                     end
 
         {
           start_offset: start_offset,
-          end_offset: end_offset,
+          end_offset: end_offset
         }
       end
 
@@ -1170,7 +1201,9 @@ module Prism
 
         template_index = template_info.fetch(:index)
         future_indices = destination_template_indices[(dest_position + 1)..] || []
-        future_indices.compact.any? { |future_index| future_index < template_index && !consumed_template_indices.include?(future_index) }
+        future_indices.compact.any? do |future_index|
+          future_index < template_index && !consumed_template_indices.include?(future_index)
+        end
       end
 
       def prune_removed_owner_leading_gap(dest_node)
@@ -1178,7 +1211,7 @@ module Prism
 
         Ast::Merge::Layout.prune_emitted_leading_gap_for_removed_owner(
           result: merger.result,
-          attachment: merger.dest_analysis.layout_attachment_for(dest_node),
+          attachment: merger.dest_analysis.layout_attachment_for(dest_node)
         )
       end
 
@@ -1186,7 +1219,8 @@ module Prism
         result.normalize_blank_line_runs!(max: 1) if result.respond_to?(:normalize_blank_line_runs!)
       end
 
-      def process_matched_node(dest_node:, dest_signature:, template_info:, cursor:, consumed_template_indices:, sig_cursor:, output_dest_line_ranges:, node_range:, last_output_dest_line:)
+      def process_matched_node(dest_node:, dest_signature:, template_info:, cursor:, consumed_template_indices:,
+                               sig_cursor:, output_dest_line_ranges:, node_range:, last_output_dest_line:)
         template_node = template_info[:node]
         consumed_template_indices << template_info[:index]
         sig_cursor[dest_signature] = cursor + 1
@@ -1196,13 +1230,13 @@ module Prism
           process_recursive_match(
             template_node: template_node,
             dest_node: dest_node,
-            last_output_dest_line: last_output_dest_line,
+            last_output_dest_line: last_output_dest_line
           )
         else
           process_non_recursive_match(
             template_node: template_node,
             dest_node: dest_node,
-            last_output_dest_line: last_output_dest_line,
+            last_output_dest_line: last_output_dest_line
           )
         end
       end
@@ -1221,7 +1255,7 @@ module Prism
           last_output_dest_line: emission_last_output(last_output_dest_line, recursive_emission),
           output_node: output_node,
           output_analysis: output_analysis,
-          preserve_trailing_blank_line_progress: true,
+          preserve_trailing_blank_line_progress: true
         }
       end
 
@@ -1247,7 +1281,7 @@ module Prism
             dest_node,
             merger.dest_analysis,
             :destination,
-            matched_template_node: template_node,
+            matched_template_node: template_node
           )
         end
 
@@ -1255,14 +1289,14 @@ module Prism
           last_output_dest_line: emission_last_output(last_output_dest_line, emission),
           output_node: output_node,
           output_analysis: output_analysis,
-          preserve_trailing_blank_line_progress: emission&.fetch(:preserve_trailing_blank_line_progress, false),
+          preserve_trailing_blank_line_progress: emission&.fetch(:preserve_trailing_blank_line_progress, false)
         }
       end
 
       def process_unresolved_non_recursive_match(template_node:, dest_node:)
         provisional_winner = merger.unresolved_policy.provisional_winner_for(
           :matched_node,
-          fallback: merger.send(:preference_for_node, template_node, dest_node),
+          fallback: merger.send(:preference_for_node, template_node, dest_node)
         )
 
         emission =
@@ -1275,7 +1309,7 @@ module Prism
               dest_node,
               merger.dest_analysis,
               :destination,
-              matched_template_node: template_node,
+              matched_template_node: template_node
             )
           end
 
@@ -1285,7 +1319,7 @@ module Prism
           template_node: template_node,
           dest_node: dest_node,
           provisional_winner: provisional_winner,
-          result_line_span: result_line_span,
+          result_line_span: result_line_span
         )
 
         emission.merge(provisional_winner: provisional_winner)
@@ -1312,14 +1346,14 @@ module Prism
           template_text: unresolved_match_candidate_text(template_node, merger.template_analysis),
           destination_text: unresolved_match_candidate_text(dest_node, merger.dest_analysis),
           provisional_winner: provisional_winner,
-          case_prefix: "prism",
+          case_prefix: 'prism',
           case_parts: [:matched_node],
           case_id: unresolved_match_case_id(dest_node, template_node),
           surface_path: surface_path,
           metadata: {
             match_kind: :matched_node,
             node_type: node_type,
-            line: (result_start_line == result_end_line) ? result_start_line : nil,
+            line: result_start_line == result_end_line ? result_start_line : nil,
             result_lines: result_line_span,
             template_lines: unresolved_match_line_span(template_node),
             destination_lines: unresolved_match_line_span(dest_node),
@@ -1331,12 +1365,12 @@ module Prism
               surface_path: surface_path,
               match_kind: :matched_node,
               node_type: node_type,
-              result_lines: result_line_span,
-            ),
+              result_lines: result_line_span
+            )
           },
           conflict_fields: {
-            line: dest_node.location.start_line,
-          },
+            line: dest_node.location.start_line
+          }
         )
       end
 
@@ -1368,13 +1402,13 @@ module Prism
       end
 
       def unresolved_match_node_type(node)
-        node.class.name.split("::").last
+        node.class.name.split('::').last
       end
 
       def unresolved_match_line_span(node)
         [
           node.location.start_line,
-          merger.send(:node_emission_support).send(:effective_end_line, node),
+          merger.send(:node_emission_support).send(:effective_end_line, node)
         ]
       end
 
@@ -1385,7 +1419,8 @@ module Prism
         [last_output_dest_line, emitted_dest_line].max
       end
 
-      def advance_last_output_dest_line(last_output_dest_line:, dest_node:, output_node:, output_analysis:, advance_dest_output: true, preserve_trailing_blank_line_progress: false)
+      def advance_last_output_dest_line(last_output_dest_line:, dest_node:, output_node:, output_analysis:,
+                                        advance_dest_output: true, preserve_trailing_blank_line_progress: false)
         return last_output_dest_line unless advance_dest_output
 
         updated_last_output_dest_line = [last_output_dest_line, dest_node.location.end_line].max
@@ -1429,7 +1464,7 @@ module Prism
           merger.result.add_line(
             line,
             decision: MergeResult::DECISION_KEPT_DEST,
-            dest_line: line_num,
+            dest_line: line_num
           )
         end
       end
@@ -1445,7 +1480,7 @@ module Prism
       def extract_body(statements_node)
         return [] unless statements_node
 
-        if statements_node.type.to_s == "statements_node"
+        if statements_node.type.to_s == 'statements_node'
           statements_node.body.compact
         elsif statements_node.respond_to?(:body)
           Array(statements_node.body).compact

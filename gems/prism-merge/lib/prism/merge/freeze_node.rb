@@ -64,7 +64,8 @@ module Prism
       # @param start_marker [String, nil] The freeze start marker text
       # @param end_marker [String, nil] The freeze end marker text
       # @param pattern_type [Symbol] Pattern type for marker matching (defaults to :hash_comment)
-      def initialize(start_line:, end_line:, analysis:, nodes: [], overlapping_nodes: nil, start_marker: nil, end_marker: nil, pattern_type: Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN)
+      def initialize(start_line:, end_line:, analysis:, nodes: [], overlapping_nodes: nil, start_marker: nil,
+                     end_marker: nil, pattern_type: Ast::Merge::FreezeNodeBase::DEFAULT_PATTERN)
         super(
           start_line: start_line,
           end_line: end_line,
@@ -150,13 +151,11 @@ module Prism
 
           # Check if node partially overlaps (invalid - unclosed/incomplete structure)
           partially_overlaps = !fully_contained && !encompasses &&
-            ((node_start < @start_line && node_end >= @start_line) ||
-             (node_start <= @end_line && node_end > @end_line))
+                               ((node_start < @start_line && node_end >= @start_line) ||
+                                (node_start <= @end_line && node_end > @end_line))
 
           # Invalid if: partial overlap OR if an unsupported node type encompasses the freeze block
-          if partially_overlaps || (encompasses && !valid_encompass)
-            unclosed << node
-          end
+          unclosed << node if partially_overlaps || (encompasses && !valid_encompass)
         end
 
         return if unclosed.empty?
@@ -166,19 +165,19 @@ module Prism
           node_start = node.location.start_line
           node_end = node.location.end_line
           overlap_type = if node_start < @start_line
-            "starts before freeze block (line #{node_start}) and ends inside (line #{node_end})"
-          else
-            "starts inside freeze block (line #{node_start}) and ends after (line #{node_end})"
-          end
-          "#{node.class.name.split("::").last} at lines #{node_start}-#{node_end} (#{overlap_type})"
-        end.join(", ")
+                           "starts before freeze block (line #{node_start}) and ends inside (line #{node_end})"
+                         else
+                           "starts inside freeze block (line #{node_start}) and ends after (line #{node_end})"
+                         end
+          "#{node.class.name.split('::').last} at lines #{node_start}-#{node_end} (#{overlap_type})"
+        end.join(', ')
 
         raise InvalidStructureError.new(
           "Freeze block at lines #{@start_line}-#{@end_line} contains incomplete nodes: #{node_descriptions}. " \
-            "A freeze block must fully contain all nodes within it, or be placed between nodes.",
+            'A freeze block must fully contain all nodes within it, or be placed between nodes.',
           start_line: @start_line,
           end_line: @end_line,
-          unclosed_nodes: unclosed,
+          unclosed_nodes: unclosed
         )
       end
     end

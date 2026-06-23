@@ -4,7 +4,7 @@ module Prism
       module_function
 
       def magic_comment_type_for_text(text)
-        stripped = text.to_s.sub(/\A#\s*/, "").strip
+        stripped = text.to_s.sub(/\A#\s*/, '').strip
 
         Comment::Line::MAGIC_COMMENT_PATTERNS.each do |type, pattern|
           return type if stripped.match?(pattern)
@@ -19,7 +19,7 @@ module Prism
         duplicate_magic_line_nums = Set.new
 
         if shebang_line?(lines.first)
-          entries << {line_num: 1, text: lines.first.to_s, kind: :shebang}
+          entries << { line_num: 1, text: lines.first.to_s, kind: :shebang }
           suppressed_line_nums << 1
         end
 
@@ -29,7 +29,7 @@ module Prism
         header_magic_types.keys.sort.each do |line_num|
           magic_type = header_magic_types[line_num]
           suppressed_line_nums << line_num
-          entries << {line_num: line_num, text: lines[line_num - 1].to_s.chomp, kind: :magic}
+          entries << { line_num: line_num, text: lines[line_num - 1].to_s.chomp, kind: :magic }
 
           if seen_magic_types.include?(magic_type)
             duplicate_magic_line_nums << line_num
@@ -42,7 +42,7 @@ module Prism
           blank_line_num = header_magic_types.keys.max + 1
 
           while blank_line_num <= lines.length && lines[blank_line_num - 1].to_s.rstrip.empty?
-            entries << {line_num: blank_line_num, text: lines[blank_line_num - 1].to_s, kind: :blank}
+            entries << { line_num: blank_line_num, text: lines[blank_line_num - 1].to_s, kind: :blank }
             suppressed_line_nums << blank_line_num
             blank_line_num += 1
           end
@@ -52,7 +52,7 @@ module Prism
           entries: entries,
           suppressed_line_nums: suppressed_line_nums,
           duplicate_magic_line_nums: duplicate_magic_line_nums,
-          header_magic_comment_types: header_magic_types,
+          header_magic_comment_types: header_magic_types
         }
       end
 
@@ -108,11 +108,11 @@ module Prism
       end
 
       def shebang_line?(line)
-        line.to_s.start_with?("#!")
+        line.to_s.start_with?('#!')
       end
 
       def shebang_comment?(comment)
-        comment&.slice&.start_with?("#!")
+        comment&.slice&.start_with?('#!')
       end
     end
   end

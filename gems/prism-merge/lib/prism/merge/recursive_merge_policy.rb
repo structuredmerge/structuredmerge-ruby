@@ -29,14 +29,15 @@ module Prism
 
           body_has_mergeable_statements?(template_body) && body_has_mergeable_statements?(dest_body)
         when :begin
-          !!(merger.send(:begin_node_has_clause_or_body?, actual_template) && merger.send(:begin_node_has_clause_or_body?, actual_dest))
+          !!(merger.send(:begin_node_has_clause_or_body?,
+                         actual_template) && merger.send(:begin_node_has_clause_or_body?, actual_dest))
         else
           false
         end
       end
 
       def body_has_mergeable_statements?(body)
-        return false unless body.type.to_s == "statements_node"
+        return false unless body.type.to_s == 'statements_node'
         return false if body.body.empty?
 
         body.body.any? { |statement| mergeable_statement?(statement) }

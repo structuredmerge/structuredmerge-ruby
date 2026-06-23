@@ -44,7 +44,8 @@ module Prism
       # @param threshold [Float] Minimum score to accept a match (default: 0.5)
       # @param name_weight [Float] Weight for name similarity (default: 0.7)
       # @param params_weight [Float] Weight for parameter similarity (default: 0.3)
-      def initialize(threshold: DEFAULT_THRESHOLD, name_weight: DEFAULT_NAME_WEIGHT, params_weight: DEFAULT_PARAMS_WEIGHT, **options)
+      def initialize(threshold: DEFAULT_THRESHOLD, name_weight: DEFAULT_NAME_WEIGHT,
+                     params_weight: DEFAULT_PARAMS_WEIGHT, **options)
         super(threshold: threshold, node_types: [:def], **options)
         @name_weight = name_weight
         @params_weight = params_weight
@@ -56,7 +57,7 @@ module Prism
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context
       # @return [Array<MatchResult>] Array of method matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         template_methods = template_nodes.select { |n| method_node?(n) }
         dest_methods = dest_nodes.select { |n| method_node?(n) }
 
@@ -161,9 +162,7 @@ module Prism
         return str1.length if str2.empty?
 
         # Ensure str1 is the shorter string for space optimization
-        if str1.length > str2.length
-          str1, str2 = str2, str1
-        end
+        str1, str2 = str2, str1 if str1.length > str2.length
 
         m = str1.length
         n = str2.length
@@ -176,11 +175,11 @@ module Prism
           curr_row[0] = j
 
           (1..m).each do |i|
-            cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1
+            cost = str1[i - 1] == str2[j - 1] ? 0 : 1
             curr_row[i] = [
               prev_row[i] + 1,      # deletion
               curr_row[i - 1] + 1,  # insertion
-              prev_row[i - 1] + cost, # substitution
+              prev_row[i - 1] + cost # substitution
             ].min
           end
 

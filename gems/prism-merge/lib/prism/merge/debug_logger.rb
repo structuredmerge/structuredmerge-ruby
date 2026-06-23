@@ -15,8 +15,8 @@ module Prism
       extend Ast::Merge::DebugLogger
 
       # Prism-specific configuration
-      self.env_var_name = "PRISM_MERGE_DEBUG"
-      self.log_prefix = "[Prism::Merge]"
+      self.env_var_name = 'PRISM_MERGE_DEBUG'
+      self.log_prefix = '[Prism::Merge]'
 
       # Override extract_node_info to handle Prism-specific node types.
       #
@@ -25,7 +25,7 @@ module Prism
       class << self
         def extract_node_info(node)
           if node.is_a?(Prism::Merge::FreezeNode)
-            return {type: "FreezeNode", lines: "#{node.start_line}..#{node.end_line}"}
+            return { type: 'FreezeNode', lines: "#{node.start_line}..#{node.end_line}" }
           end
 
           # Delegate to base implementation for other node types

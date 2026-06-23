@@ -32,7 +32,7 @@ module Prism
         end
 
         # Alias for consistency with Line#magic_comment?
-        alias_method :magic_comment?, :contains_magic_comment?
+        alias magic_comment? contains_magic_comment?
 
         # Get all magic comments in this block.
         #
@@ -61,7 +61,7 @@ module Prism
 
         # @return [String] Human-readable representation
         def inspect
-          magic = contains_magic_comment? ? " has_magic_comments" : ""
+          magic = contains_magic_comment? ? ' has_magic_comments' : ''
           "#<Prism::Merge::Comment::Block lines=#{location.start_line}..#{location.end_line}#{magic} children=#{children.size}>"
         end
       end

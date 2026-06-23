@@ -147,7 +147,7 @@ module Prism
       end
 
       def normalize_template_only_placement(value)
-        normalized = value.to_s.empty? ? "after_anchor" : value.to_s
+        normalized = value.to_s.empty? ? 'after_anchor' : value.to_s
         return normalized.to_sym if %w[after_anchor destination_tail].include?(normalized)
 
         raise ArgumentError, "Unsupported template-only placement #{value.inspect}"
@@ -172,11 +172,11 @@ module Prism
         result_obj = merge_result
         template_analysis_debug = {
           valid: @template_analysis&.valid? || false,
-          statements: @template_analysis&.statements&.size || 0,
+          statements: @template_analysis&.statements&.size || 0
         }
         dest_analysis_debug = {
           valid: @dest_analysis&.valid? || false,
-          statements: @dest_analysis&.statements&.size || 0,
+          statements: @dest_analysis&.statements&.size || 0
         }
         {
           content: result_obj.to_s,
@@ -188,13 +188,13 @@ module Prism
             freeze_token: @freeze_token,
             corruption_handling: @corruption_handling,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result_obj.respond_to?(:statistics) ? result_obj.statistics : result_obj.decision_summary,
           decisions: result_obj.respond_to?(:decision_summary) ? result_obj.decision_summary : result_obj.statistics,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -207,7 +207,7 @@ module Prism
 
       # @return [String] The default freeze token for Ruby
       def default_freeze_token
-        "prism-merge"
+        'prism-merge'
       end
 
       # @return [Class] The result class for Ruby files
@@ -229,7 +229,7 @@ module Prism
       def build_result
         MergeResult.new(
           template_analysis: @template_analysis,
-          dest_analysis: @dest_analysis,
+          dest_analysis: @dest_analysis
         )
       end
 
@@ -246,7 +246,7 @@ module Prism
       # @return [FileAnalysis]
       def parse_and_analyze(content, source)
         analysis = super
-        var_key = (source == :template) ? :template_gemspec_block_var : :dest_gemspec_block_var
+        var_key = source == :template ? :template_gemspec_block_var : :dest_gemspec_block_var
         var = @format_options[var_key]
         analysis.gemspec_block_var = var if var && analysis.respond_to?(:gemspec_block_var=)
         analysis
@@ -292,8 +292,8 @@ module Prism
           mode: corruption_handling,
           kind: kind,
           message: message,
-          prefix: "[prism-merge]",
-          error_class: Prism::Merge::CorruptionDetectedError,
+          prefix: '[prism-merge]',
+          error_class: Prism::Merge::CorruptionDetectedError
         )
       end
 
@@ -335,7 +335,7 @@ module Prism
       # @param node [Prism::Node] The node to check
       # @param analysis [FileAnalysis] The file analysis (for context)
       # @return [Boolean] true if the node contains freeze markers
-      def node_contains_freeze_blocks?(node, analysis = nil)
+      def node_contains_freeze_blocks?(node, _analysis = nil)
         return false unless @freeze_token
 
         # Get the actual node (in case it's a Wrapper)
@@ -344,9 +344,7 @@ module Prism
         freeze_pattern = /#{Regexp.escape(@freeze_token)}:freeze/i
 
         # Check if node content contains a freeze marker
-        if actual_node.respond_to?(:slice)
-          return true if actual_node.slice.match?(freeze_pattern)
-        end
+        return true if actual_node.respond_to?(:slice) && actual_node.slice.match?(freeze_pattern)
 
         false
       end
@@ -354,19 +352,19 @@ module Prism
       def validate_files!
         unless @template_analysis.valid?
           raise TemplateParseError.new(
-            "Template file has parsing errors",
+            'Template file has parsing errors',
             content: @template_content,
-            parse_result: @template_analysis.parse_result,
+            parse_result: @template_analysis.parse_result
           )
         end
 
-        unless @dest_analysis.valid?
-          raise DestinationParseError.new(
-            "Destination file has parsing errors",
-            content: @dest_content,
-            parse_result: @dest_analysis.parse_result,
-          )
-        end
+        return if @dest_analysis.valid?
+
+        raise DestinationParseError.new(
+          'Destination file has parsing errors',
+          content: @dest_content,
+          parse_result: @dest_analysis.parse_result
+        )
       end
 
       # Handle merging of files that contain only comments (no code statements).
@@ -444,7 +442,7 @@ module Prism
       def build_signature_map(analysis)
         map = Hash.new { |h, k| h[k] = [] }
         analysis.statements.each_with_index do |node, idx|
-          entry = {node: node, index: idx}
+          entry = { node: node, index: idx }
 
           # BlockDirective nodes (NocovNode, FreezeNode) wrap inner content.
           # For matching, register the directive under each child's signature
@@ -502,14 +500,15 @@ module Prism
         # incorrectly appear "frozen" even after the FreezeNode was extracted.
         dest_claimed = @dest_analysis&.claimed_lines || Set.new
         template_claimed = @template_analysis&.claimed_lines || Set.new
-        if @dest_analysis&.frozen_node?(dest_node, claimed_lines: dest_claimed)
+        if @dest_analysis&.frozen_node?(dest_node,
+                                        claimed_lines: dest_claimed) && !@template_analysis&.frozen_node?(
+                                          template_node, claimed_lines: template_claimed
+                                        )
           # Only treat as user customisation when the template counterpart does NOT
           # also carry a freeze marker.  If the template also has one, the freeze
           # block is template-originated (standalone instructions block) and we
           # should fall through to normal preference logic.
-          unless @template_analysis&.frozen_node?(template_node, claimed_lines: template_claimed)
-            return :destination
-          end
+          return :destination
         end
 
         return @preference unless @preference.is_a?(Hash)
@@ -559,7 +558,7 @@ module Prism
       def build_effective_signature_generator(signature_generator, node_typing)
         return signature_generator unless node_typing
 
-        ->(node) {
+        lambda { |node|
           # First, process through node_typing to potentially add merge_type
           processed_node = ::Ast::Merge::NodeTyping.process(node, node_typing)
 
@@ -617,7 +616,7 @@ module Prism
           result: result,
           analysis: analysis,
           last_output_line: last_output_line,
-          next_node: next_node,
+          next_node: next_node
         )
       end
 
@@ -625,7 +624,7 @@ module Prism
         node_emission_support.emit_matched_template_node(
           result: result,
           template_node: template_node,
-          dest_node: dest_node,
+          dest_node: dest_node
         )
       end
 
@@ -641,7 +640,7 @@ module Prism
           node: node,
           analysis: analysis,
           source: source,
-          matched_template_node: matched_template_node,
+          matched_template_node: matched_template_node
         )
       end
 
@@ -649,7 +648,7 @@ module Prism
         node_emission_support.emit_removed_destination_node_comments(
           result: result,
           node: node,
-          analysis: analysis,
+          analysis: analysis
         )
       end
 
@@ -664,7 +663,7 @@ module Prism
           analysis: analysis,
           source: source,
           decision: decision,
-          prev_comment_line: prev_comment_line,
+          prev_comment_line: prev_comment_line
         )
       end
 
@@ -675,7 +674,7 @@ module Prism
           next_content_line: next_content_line,
           analysis: analysis,
           source: source,
-          decision: decision,
+          decision: decision
         )
       end
 
@@ -686,7 +685,7 @@ module Prism
           source_node: source_node,
           analysis: analysis,
           source: source,
-          decision: decision,
+          decision: decision
         )
       end
 
@@ -746,12 +745,13 @@ module Prism
         begin_node_rescue_semantics.send(:rewrite_local_reference_in_source, source, from: from, to: to)
       end
 
-      def normalized_clause_body_and_header_source(template_clause_node, dest_clause_node, clause_body, preferred_source)
+      def normalized_clause_body_and_header_source(template_clause_node, dest_clause_node, clause_body,
+                                                   preferred_source)
         begin_node_rescue_semantics.normalized_clause_body_and_header_source(
           template_clause_node: template_clause_node,
           dest_clause_node: dest_clause_node,
           clause_body: clause_body,
-          preferred_source: preferred_source,
+          preferred_source: preferred_source
         )
       end
 
@@ -772,7 +772,7 @@ module Prism
           merger: self,
           template_node: template_node,
           dest_node: dest_node,
-          node_preference: node_preference,
+          node_preference: node_preference
         )
       end
 
@@ -787,7 +787,7 @@ module Prism
           dest_analysis: @dest_analysis,
           freeze_token: @freeze_token,
           raw_signature_generator: @raw_signature_generator,
-          node_typing: @node_typing,
+          node_typing: @node_typing
         )
       end
 
@@ -839,12 +839,13 @@ module Prism
         begin_node_clause_body_support.clause_body_start_line(node, region)
       end
 
-      def extract_region_body(region, analysis, body_start_line: region[:start_line] + 1, body_end_line: region[:end_line])
+      def extract_region_body(region, analysis, body_start_line: region[:start_line] + 1,
+                              body_end_line: region[:end_line])
         begin_node_clause_body_support.extract_region_body(
           region,
           analysis,
           body_start_line: body_start_line,
-          body_end_line: body_end_line,
+          body_end_line: body_end_line
         )
       end
 
@@ -866,7 +867,7 @@ module Prism
           header_source: header_source,
           decision: decision,
           template_inline_by_line: template_inline_by_line,
-          dest_inline_by_line: dest_inline_by_line,
+          dest_inline_by_line: dest_inline_by_line
         )
       end
 
@@ -890,21 +891,23 @@ module Prism
         begin_node_clause_body_support.begin_node_statement_signatures(node, analysis)
       end
 
-      def clause_body_fully_duplicated_in_preferred_begin?(clause_node, clause_analysis, preferred_begin_node, preferred_begin_analysis)
+      def clause_body_fully_duplicated_in_preferred_begin?(clause_node, clause_analysis, preferred_begin_node,
+                                                           preferred_begin_analysis)
         begin_node_clause_body_support.clause_body_fully_duplicated_in_preferred_begin?(
           clause_node,
           clause_analysis,
           preferred_begin_node,
-          preferred_begin_analysis,
+          preferred_begin_analysis
         )
       end
 
-      def merge_clause_body_recursively(template_clause_node, template_clause_region, dest_clause_node, dest_clause_region)
+      def merge_clause_body_recursively(template_clause_node, template_clause_region, dest_clause_node,
+                                        dest_clause_region)
         begin_node_clause_body_merger.merge(
           template_clause_node: template_clause_node,
           template_clause_region: template_clause_region,
           dest_clause_node: dest_clause_node,
-          dest_clause_region: dest_clause_region,
+          dest_clause_region: dest_clause_region
         )
       end
 
@@ -987,7 +990,7 @@ module Prism
       def begin_node_rescue_semantics
         @begin_node_rescue_semantics ||= BeginNodeRescueSemantics.new(
           template_analysis: @template_analysis,
-          dest_analysis: @dest_analysis,
+          dest_analysis: @dest_analysis
         )
       end
 

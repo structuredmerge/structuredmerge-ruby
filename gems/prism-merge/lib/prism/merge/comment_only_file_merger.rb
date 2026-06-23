@@ -9,7 +9,7 @@ module Prism
         @merger = merger
         @comment_only_prefix_lines = {
           template: Set.new,
-          destination: Set.new,
+          destination: Set.new
         }
       end
 
@@ -27,7 +27,7 @@ module Prism
       def merge
         @comment_only_prefix_lines = {
           template: Set.new,
-          destination: Set.new,
+          destination: Set.new
         }
 
         template_lines = merger.template_content.lines.map(&:chomp)
@@ -37,24 +37,29 @@ module Prism
 
         template_nodes = Comment::Parser.parse(template_lines)
         dest_nodes = Comment::Parser.parse(dest_lines)
-        template_context = build_comment_only_merge_context(nodes: template_nodes, lines: template_lines, source: :template)
+        template_context = build_comment_only_merge_context(nodes: template_nodes, lines: template_lines,
+                                                            source: :template)
         dest_context = build_comment_only_merge_context(nodes: dest_nodes, lines: dest_lines, source: :destination)
         output_plan = build_output_plan(template_context: template_context, dest_context: dest_context)
         retained_owners_by_source = output_plan.group_by { |entry| entry[:source] }
-          .transform_values { |entries| entries.map { |entry| entry[:node] } }
+                                               .transform_values do |entries|
+          entries.map do |entry|
+            entry[:node]
+          end
+        end
         emitted_gap_keys = {
           template: Set.new,
-          destination: Set.new,
+          destination: Set.new
         }
 
         output_plan.each do |entry|
-          context = (entry[:source] == :template) ? template_context : dest_context
+          context = entry[:source] == :template ? template_context : dest_context
           emit_comment_node_with_layout(
             node: entry[:node],
             source: entry[:source],
             context: context,
             retained_owners: retained_owners_by_source.fetch(entry[:source], []),
-            emitted_gap_keys: emitted_gap_keys,
+            emitted_gap_keys: emitted_gap_keys
           )
         end
 
@@ -86,9 +91,9 @@ module Prism
             end_line_for: method(:node_end_line),
             metadata: {
               source: :comment_only_file_merger,
-              comment_source: source,
-            },
-          ),
+              comment_source: source
+            }
+          )
         }
       end
 
@@ -110,13 +115,13 @@ module Prism
             output_template_signatures << template_signature if template_signature
 
             plan << if merger.send(:default_preference) == :template
-              {node: template_node, source: :template}
-            else
-              {node: dest_node, source: :destination}
-            end
+                      { node: template_node, source: :template }
+                    else
+                      { node: dest_node, source: :destination }
+                    end
           elsif merger.add_template_only_nodes ||
-              (merger.send(:default_preference) == :template && template_node.respond_to?(:magic_comment?) && template_node.magic_comment?)
-            plan << {node: template_node, source: :template}
+                (merger.send(:default_preference) == :template && template_node.respond_to?(:magic_comment?) && template_node.magic_comment?)
+            plan << { node: template_node, source: :template }
             output_template_signatures << template_signature if template_signature
           end
         end
@@ -125,7 +130,7 @@ module Prism
           dest_context[:nodes].each_with_index do |dest_node, index|
             next if matched_dest_indices.include?(index)
 
-            plan << {node: dest_node, source: :destination}
+            plan << { node: dest_node, source: :destination }
           end
         end
 
@@ -142,16 +147,16 @@ module Prism
       end
 
       def add_comment_node_to_result(node, source)
-        decision = (source == :template) ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
+        decision = source == :template ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
         suppressed_lines = comment_only_prefix_lines.fetch(source, Set.new)
 
         content = if node.respond_to?(:text)
-          node.text
-        elsif node.respond_to?(:content)
-          node.content
-        else
-          node.to_s
-        end
+                    node.text
+                  elsif node.respond_to?(:content)
+                    node.content
+                  else
+                    node.to_s
+                  end
 
         if node.respond_to?(:children) && node.children.any?
           node.children.each do |child|
@@ -185,7 +190,7 @@ module Prism
           owner: node,
           source: source,
           retained_owners: retained_owners,
-          emitted_gap_keys: emitted_gap_keys,
+          emitted_gap_keys: emitted_gap_keys
         )
         add_comment_node_to_result(node, source)
         emit_layout_gap_to_result(
@@ -193,7 +198,7 @@ module Prism
           owner: node,
           source: source,
           retained_owners: retained_owners,
-          emitted_gap_keys: emitted_gap_keys,
+          emitted_gap_keys: emitted_gap_keys
         )
       end
 
@@ -205,7 +210,7 @@ module Prism
         gap_key = [gap.start_line, gap.end_line]
         return if emitted_gap_keys.fetch(source).include?(gap_key)
 
-        decision = (source == :template) ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
+        decision = source == :template ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
         suppressed_lines = comment_only_prefix_lines.fetch(source, Set.new)
 
         gap.lines.each_with_index do |line, index|
@@ -243,18 +248,18 @@ module Prism
           should_heal = merger.send(
             :handle_suspected_corruption,
             kind: :duplicate_magic_comment_prefix,
-            message: "comment-only file header repeats an already-declared magic comment type",
+            message: 'comment-only file header repeats an already-declared magic comment type'
           )
 
           entries = if should_heal
-            prefix_info[:entries].reject { |entry| duplicate_magic_line_nums.include?(entry[:line_num]) }
-          else
-            prefix_info[:entries]
-          end
+                      prefix_info[:entries].reject { |entry| duplicate_magic_line_nums.include?(entry[:line_num]) }
+                    else
+                      prefix_info[:entries]
+                    end
 
           return {
             entries: entries,
-            suppressed_line_nums: prefix_info[:suppressed_line_nums],
+            suppressed_line_nums: prefix_info[:suppressed_line_nums]
           }
         end
 
@@ -271,7 +276,9 @@ module Prism
 
       def fully_suppressed_comment_only_node?(node, source)
         line_numbers = node_line_numbers(node)
-        line_numbers.any? && line_numbers.all? { |line_num| comment_only_prefix_lines.fetch(source, Set.new).include?(line_num) }
+        line_numbers.any? && line_numbers.all? do |line_num|
+          comment_only_prefix_lines.fetch(source, Set.new).include?(line_num)
+        end
       end
 
       def node_line_numbers(node)

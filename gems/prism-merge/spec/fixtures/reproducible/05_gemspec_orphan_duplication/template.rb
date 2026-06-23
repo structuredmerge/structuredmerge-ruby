@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
-  spec.name = "mylib"
-  spec.add_development_dependency("gitmoji-regex", "~> 1.0", ">= 1.0.3")
+  spec.name = 'mylib'
+  spec.add_development_dependency('gitmoji-regex', '~> 1.0', '>= 1.0.3')
 
   # HTTP recording for deterministic specs
   # In Ruby 3.5 (HEAD) the CGI library has been pared down.

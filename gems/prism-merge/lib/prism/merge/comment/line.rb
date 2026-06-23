@@ -20,7 +20,7 @@ module Prism
           frozen_string_literal: /^frozen_string_literal:\s*(true|false)$/i,
           encoding: /^(encoding|coding):\s*\S+$/i,
           warn_indent: /^warn_indent:\s*(true|false)$/i,
-          shareable_constant_value: /^shareable_constant_value:\s*\S+$/i,
+          shareable_constant_value: /^shareable_constant_value:\s*\S+$/i
         }.freeze
 
         class << self
@@ -39,7 +39,7 @@ module Prism
             new(
               text: th_comment.text,
               line_number: line_number,
-              magic_comment_type: magic_comment_types[line_number],
+              magic_comment_type: magic_comment_types[line_number]
             )
           end
         end
@@ -81,7 +81,7 @@ module Prism
           return unless magic_comment?
 
           stripped = content.strip
-          stripped.split(":", 2).last&.strip
+          stripped.split(':', 2).last&.strip
         end
 
         # Generate signature for matching.
@@ -104,7 +104,7 @@ module Prism
 
         # @return [String] Human-readable representation
         def inspect
-          magic = magic_comment? ? " magic=#{magic_comment_type}" : ""
+          magic = magic_comment? ? " magic=#{magic_comment_type}" : ''
           "#<Prism::Merge::Comment::Line line=#{line_number}#{magic} #{text.inspect}>"
         end
       end

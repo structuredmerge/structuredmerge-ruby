@@ -20,43 +20,43 @@ module Prism
         :jaccard_threshold,  # Float — min Jaccard score for satellite matching
         :max_lookahead,      # Integer — nodes to scan after anchor
         :max_lookbehind,     # Integer — nodes to scan before anchor
-        keyword_init: true,
+        keyword_init: true
       )
 
       BUNDLER_GEM_TASKS_SPEC = ChunkSpec.new(
         anchor_type: :require_call,
-        anchor_value: "bundler/gem_tasks",
+        anchor_value: 'bundler/gem_tasks',
         satellite_patterns: [],
         jaccard_threshold: 0.35,
         max_lookahead: 0,
-        max_lookbehind: 0,
+        max_lookbehind: 0
       )
 
       RSPEC_SPEC = ChunkSpec.new(
         anchor_type: :require_call,
-        anchor_value: "rspec/core/rake_task",
-        satellite_patterns: ["RSpec::Core::RakeTask.new"],
+        anchor_value: 'rspec/core/rake_task',
+        satellite_patterns: ['RSpec::Core::RakeTask.new'],
         jaccard_threshold: 0.35,
         max_lookahead: 5,
-        max_lookbehind: 2,
+        max_lookbehind: 2
       )
 
       RUBOCOP_SPEC = ChunkSpec.new(
         anchor_type: :require_call,
-        anchor_value: "rubocop/rake_task",
-        satellite_patterns: ["RuboCop::RakeTask.new"],
+        anchor_value: 'rubocop/rake_task',
+        satellite_patterns: ['RuboCop::RakeTask.new'],
         jaccard_threshold: 0.35,
         max_lookahead: 5,
-        max_lookbehind: 2,
+        max_lookbehind: 2
       )
 
       DEFAULT_TASK_SPEC = ChunkSpec.new(
         anchor_type: :task_call,
-        anchor_value: "default",
+        anchor_value: 'default',
         satellite_patterns: [],
         jaccard_threshold: 0.35,
         max_lookahead: 0,
-        max_lookbehind: 0,
+        max_lookbehind: 0
       )
 
       ALL_SPECS = [BUNDLER_GEM_TASKS_SPEC, RSPEC_SPEC, RUBOCOP_SPEC, DEFAULT_TASK_SPEC].freeze
@@ -133,10 +133,10 @@ module Prism
           next unless NodeTypeNormalizer.canonical_type(node.type.to_s, :prism) == :call
 
           matched = case spec.anchor_type
-          when :require_call then require_anchor_match?(node, spec.anchor_value)
-          when :task_call then task_anchor_match?(node, spec.anchor_value, spec.jaccard_threshold)
-          else false
-          end
+                    when :require_call then require_anchor_match?(node, spec.anchor_value)
+                    when :task_call then task_anchor_match?(node, spec.anchor_value, spec.jaccard_threshold)
+                    else false
+                    end
 
           return idx if matched
         end
@@ -144,7 +144,7 @@ module Prism
       end
 
       def require_anchor_match?(node, anchor_value)
-        return false unless node.name.to_s == "require"
+        return false unless node.name.to_s == 'require'
 
         first_arg = node.arguments&.arguments&.first
         return false unless first_arg
@@ -154,7 +154,7 @@ module Prism
       end
 
       def task_anchor_match?(node, anchor_value, threshold)
-        return false unless node.name.to_s == "task"
+        return false unless node.name.to_s == 'task'
 
         node_tokens = jaccard_tokens(node.slice.to_s)
         pattern_tokens = jaccard_tokens("task #{anchor_value}")

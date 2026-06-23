@@ -62,11 +62,11 @@ module Prism
           match_refiner: match_refiner,
           node_typing: node_typing,
           signature_generator: signature_generator,
-          corruption_handling: corruption_handling,
+          corruption_handling: corruption_handling
         )
       end
 
-      def find_section_end(statements, injection_point)
+      def find_section_end(_statements, injection_point)
         return injection_point.anchor.index unless injection_point.boundary
 
         injection_point.boundary.index - 1
@@ -74,13 +74,13 @@ module Prism
 
       def node_to_text(node, analysis = nil)
         pos = if node.respond_to?(:source_position)
-          node.source_position
-        elsif node.respond_to?(:location) && node.location
-          {
-            start_line: node.location.start_line,
-            end_line: node.location.end_line,
-          }
-        end
+                node.source_position
+              elsif node.respond_to?(:location) && node.location
+                {
+                  start_line: node.location.start_line,
+                  end_line: node.location.end_line
+                }
+              end
         return node.text.to_s unless analysis&.respond_to?(:source) && pos
 
         analysis.source.lines[(pos[:start_line] - 1)..(pos[:end_line] - 1)].join

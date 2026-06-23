@@ -37,7 +37,7 @@ module Prism
           template_line: template_line,
           dest_line: dest_line,
           comment: comment,
-          result_line: @lines.length,
+          result_line: @lines.length
         }
         track_decision(decision, template_line ? :template : :destination, line: template_line || dest_line)
       end
@@ -77,11 +77,15 @@ module Prism
           # Add blank lines between this comment and the previous one
           if prev_comment_line && comment_line > prev_comment_line + 1
             ((prev_comment_line + 1)...comment_line).each do |blank_line_num|
-              line = source_analysis ? required_source_line(
-                source_analysis,
-                blank_line_num,
-                context: "emitting preserved blank line between leading comments",
-              ) : ""
+              line = if source_analysis
+                       required_source_line(
+                         source_analysis,
+                         blank_line_num,
+                         context: 'emitting preserved blank line between leading comments'
+                       )
+                     else
+                       ''
+                     end
               if source == :template
                 add_line(line, decision: decision, template_line: blank_line_num)
               else
@@ -92,14 +96,14 @@ module Prism
 
           # Use source_analysis to get full line with indentation if available
           line = if source_analysis
-            required_comment_line(
-              source_analysis,
-              comment,
-              context: "emitting leading comment from analyzed source",
-            )
-          else
-            comment.slice.chomp
-          end
+                   required_comment_line(
+                     source_analysis,
+                     comment,
+                     context: 'emitting leading comment from analyzed source'
+                   )
+                 else
+                   comment.slice.chomp
+                 end
           if source == :template
             add_line(line, decision: decision, template_line: comment_line)
           else
@@ -114,11 +118,15 @@ module Prism
           last_comment_line = node_info[:leading_comments].last.location.start_line
           if start_line > last_comment_line + 1
             ((last_comment_line + 1)...start_line).each do |blank_line_num|
-              line = source_analysis ? required_source_line(
-                source_analysis,
-                blank_line_num,
-                context: "emitting preserved blank line before node body",
-              ) : ""
+              line = if source_analysis
+                       required_source_line(
+                         source_analysis,
+                         blank_line_num,
+                         context: 'emitting preserved blank line before node body'
+                       )
+                     else
+                       ''
+                     end
               if source == :template
                 add_line(line, decision: decision, template_line: blank_line_num)
               else
@@ -139,7 +147,7 @@ module Prism
             line = required_source_line(
               source_analysis,
               line_num,
-              context: "emitting analyzed node source line",
+              context: 'emitting analyzed node source line'
             )
 
             if source == :template
@@ -163,8 +171,8 @@ module Prism
               # Analysis-free mode only has node.slice, which excludes the original
               # pre-comment separator. Reattach inline comments with a canonical
               # single space instead of pretending to preserve unavailable spacing.
-              inline_text = inline_comments.map { |c| c.slice.strip }.join(" ")
-              node_lines[last_idx] = node_lines[last_idx] + " " + inline_text
+              inline_text = inline_comments.map { |c| c.slice.strip }.join(' ')
+              node_lines[last_idx] = node_lines[last_idx] + ' ' + inline_text
             end
           end
 
@@ -209,33 +217,33 @@ module Prism
       # Debug output showing merge provenance
       # @return [String]
       def debug_output
-        output = ["=== Merge Result Debug ==="]
+        output = ['=== Merge Result Debug ===']
         output << "Total lines: #{@lines.length}"
         output << "Statistics: #{statistics.inspect}"
-        output << ""
-        output << "Line-by-line provenance:"
+        output << ''
+        output << 'Line-by-line provenance:'
 
         @lines.each_with_index do |line, idx|
           meta = @line_metadata[idx]
           parts = [
             "#{idx + 1}:".rjust(4),
-            meta[:decision].to_s.ljust(20),
+            meta[:decision].to_s.ljust(20)
           ]
 
           parts << if meta[:template_line]
-            "T:#{meta[:template_line]}".ljust(8)
-          else
-            " " * 8
-          end
+                     "T:#{meta[:template_line]}".ljust(8)
+                   else
+                     ' ' * 8
+                   end
 
           parts << if meta[:dest_line]
-            "D:#{meta[:dest_line]}".ljust(8)
-          else
-            " " * 8
-          end
+                     "D:#{meta[:dest_line]}".ljust(8)
+                   else
+                     ' ' * 8
+                   end
 
           parts << "| #{line[0..60]}"
-          output << parts.join(" ")
+          output << parts.join(' ')
         end
 
         output.join("\n")
@@ -251,7 +259,7 @@ module Prism
           result_line_span: result_line_span,
           selection: selection,
           selected_lines: unresolved_candidate_lines(selected_candidate),
-          resolution_case: resolution_case,
+          resolution_case: resolution_case
         )
       end
 
@@ -269,7 +277,7 @@ module Prism
 
       def unresolved_candidate_lines(candidate)
         lines = candidate.to_s.split("\n", -1)
-        lines.empty? ? [""] : lines
+        lines.empty? ? [''] : lines
       end
 
       def replace_result_line_span!(result_line_span:, selection:, selected_lines:, resolution_case:)
@@ -277,7 +285,7 @@ module Prism
         replacement_metadata = build_replacement_metadata(
           selection: selection,
           selected_lines: selected_lines,
-          resolution_case: resolution_case,
+          resolution_case: resolution_case
         )
 
         @lines[(start_line - 1)..(end_line - 1)] = selected_lines
@@ -292,26 +300,27 @@ module Prism
           when :destination then DECISION_KEPT_DEST
           else selection
           end
-        source_line_key = (selection == :template) ? :template_line : :dest_line
-        source_line_numbers = unresolved_source_line_numbers_for(selection, selected_lines.length, resolution_case.metadata)
+        source_line_key = selection == :template ? :template_line : :dest_line
+        source_line_numbers = unresolved_source_line_numbers_for(selection, selected_lines.length,
+                                                                 resolution_case.metadata)
 
         selected_lines.each_index.map do |index|
           {
             decision: decision,
-            template_line: (source_line_key == :template_line) ? source_line_numbers[index] : nil,
-            dest_line: (source_line_key == :dest_line) ? source_line_numbers[index] : nil,
+            template_line: source_line_key == :template_line ? source_line_numbers[index] : nil,
+            dest_line: source_line_key == :dest_line ? source_line_numbers[index] : nil,
             comment: nil,
-            result_line: nil,
+            result_line: nil
           }
         end
       end
 
       def unresolved_source_line_numbers_for(selection, line_count, metadata)
-        source_lines = Array(metadata[(selection == :template) ? :template_lines : :destination_lines])
+        source_lines = Array(metadata[selection == :template ? :template_lines : :destination_lines])
         return Array.new(line_count) unless source_lines.length == 2
 
         start_line, end_line = source_lines.map(&:to_i)
-        available = (end_line >= start_line) ? (start_line..end_line).to_a : []
+        available = end_line >= start_line ? (start_line..end_line).to_a : []
         return available.take(line_count) if available.length >= line_count
 
         available + Array.new(line_count - available.length)

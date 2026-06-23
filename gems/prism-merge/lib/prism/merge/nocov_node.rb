@@ -155,7 +155,7 @@ module Prism
       # @return [Symbol]
       def merge_type = :nocov_block
 
-      alias_method :type, :merge_type
+      alias type merge_type
 
       # @return [Boolean]
       def nocov_node? = true
@@ -165,7 +165,7 @@ module Prism
         "#<Prism::Merge::NocovNode lines=#{@start_line}..#{@end_line} nodes=#{@nodes.length}>"
       end
 
-      alias_method :to_s, :inspect
+      alias to_s inspect
     end
   end
 end

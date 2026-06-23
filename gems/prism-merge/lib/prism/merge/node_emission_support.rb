@@ -26,7 +26,7 @@ module Prism
             line = required_source_line(
               analysis,
               line_num,
-              context: "emitting destination prefix line",
+              context: 'emitting destination prefix line'
             )
             result.add_line(line, decision: MergeResult::DECISION_KEPT_DEST, dest_line: line_num)
             dest_prefix_comment_lines << line_num
@@ -43,7 +43,7 @@ module Prism
           line = required_comment_line(
             analysis,
             comment,
-            context: "emitting destination prefix comment",
+            context: 'emitting destination prefix comment'
           )
 
           result.add_line(line, decision: MergeResult::DECISION_KEPT_DEST, dest_line: line_num)
@@ -52,18 +52,20 @@ module Prism
         end
 
         next_content_line = if leading_comments.any? && prefix_line_numbers.any?
-          next_comment = leading_comments.find { |comment| !prefix_line_numbers.include?(comment.location.start_line) }
-          next_comment ? next_comment.location.start_line : first_node.location.start_line
-        else
-          first_node.location.start_line
-        end
+                              next_comment = leading_comments.find do |comment|
+                                !prefix_line_numbers.include?(comment.location.start_line)
+                              end
+                              next_comment ? next_comment.location.start_line : first_node.location.start_line
+                            else
+                              first_node.location.start_line
+                            end
 
         if next_content_line > last_emitted + 1
           ((last_emitted + 1)...next_content_line).each do |gap_num|
             gap_line = required_source_line(
               analysis,
               gap_num,
-              context: "emitting destination prefix gap line",
+              context: 'emitting destination prefix gap line'
             )
             next unless gap_line.strip.empty?
 
@@ -84,7 +86,7 @@ module Prism
         leading_comments = filter_rehomed_removed_owner_comments(
           leading[:comments],
           rehomed_orphan_lines: rehomed_orphan_lines,
-          comment_role: :leading,
+          comment_role: :leading
         )
 
         merger.send(
@@ -93,7 +95,7 @@ module Prism
           leading_comments,
           analysis: analysis,
           source: :destination,
-          decision: decision,
+          decision: decision
         )
 
         if leading_comments.any?
@@ -105,7 +107,7 @@ module Prism
             next_content_line: node.location.start_line,
             analysis: analysis,
             source: :destination,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_gap_line if emitted_gap_line
         end
@@ -118,7 +120,7 @@ module Prism
             result.add_line(
               "#{indentation}#{entry[:raw].strip}",
               decision: decision,
-              dest_line: entry[:line],
+              dest_line: entry[:line]
             )
             last_emitted_dest_line = entry[:line]
           end
@@ -127,7 +129,7 @@ module Prism
         trailing_comments = filter_rehomed_removed_owner_comments(
           merger.send(:external_trailing_comments_for, node),
           rehomed_orphan_lines: rehomed_orphan_lines,
-          comment_role: :external_trailing,
+          comment_role: :external_trailing
         )
         if trailing_comments.any?
           emitted_dest_line = merger.send(
@@ -137,14 +139,14 @@ module Prism
             source_node: node,
             analysis: analysis,
             source: :destination,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_dest_line if emitted_dest_line
         end
 
         {
           last_emitted_dest_line: last_emitted_dest_line,
-          emitted_removed_owner_comments: true,
+          emitted_removed_owner_comments: true
         }
       end
 
@@ -166,7 +168,7 @@ module Prism
             owner: next_node,
             source: :destination,
             decision: MergeResult::DECISION_KEPT_DEST,
-            last_output_line: last_output_line,
+            last_output_line: last_output_line
           )
           return [last_output_line, emitted_gap_line].max if emitted_gap_line
         end
@@ -176,7 +178,7 @@ module Prism
           analysis: analysis,
           source: :destination,
           decision: MergeResult::DECISION_KEPT_DEST,
-          line_numbers: gap_start...next_start_line,
+          line_numbers: gap_start...next_start_line
         )
 
         emitted_gap_line ? [last_output_line, emitted_gap_line].max : last_output_line
@@ -197,7 +199,7 @@ module Prism
           template_node: template_node,
           dest_node: dest_node,
           template_comments: template_leading[:comments],
-          dest_comments: dest_leading[:comments],
+          dest_comments: dest_leading[:comments]
         )
         template_leading = template_leading.merge(comments: filtered_template_leading)
 
@@ -216,7 +218,7 @@ module Prism
             leading_comments, last_filtered_leading_line = filter_emitted_template_trailing_comments(leading_comments)
             leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(
               leading_comments,
-              last_filtered_line: last_filtered_leading_line,
+              last_filtered_line: last_filtered_leading_line
             )
           end
 
@@ -231,7 +233,7 @@ module Prism
             leading_comments: leading_comments,
             skipped_prefix_line: template_leading[:last_skipped_line],
             skip_for_destination_gap: destination_gap_already_precedes_template_leading_comments?(result, dest_node),
-            decision: decision,
+            decision: decision
           )
         end
 
@@ -242,7 +244,7 @@ module Prism
           analysis: leading_analysis,
           source: leading_analysis.equal?(template_analysis) ? :template : :destination,
           decision: decision,
-          prev_comment_line: last_filtered_leading_line,
+          prev_comment_line: last_filtered_leading_line
         )
 
         # Track emitted leading comments for bidirectional dedup so that
@@ -267,7 +269,7 @@ module Prism
             next_content_line: leading_analysis.equal?(template_analysis) ? template_node.location.start_line : dest_node.location.start_line,
             analysis: leading_analysis,
             source: leading_analysis.equal?(template_analysis) ? :template : :destination,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_gap_line if leading_analysis.equal?(dest_analysis) && emitted_gap_line
         end
@@ -282,7 +284,7 @@ module Prism
           line_num = template_node.location.start_line + index
 
           if index == template_source_lines.length - 1 &&
-              template_inline_entries.empty? && inline_entries.any?
+             template_inline_entries.empty? && inline_entries.any?
             line = merger.send(:append_inline_comment_entries, line, inline_entries)
           end
 
@@ -292,8 +294,11 @@ module Prism
 
         template_claimed = template_analysis.respond_to?(:claimed_lines) ? template_analysis.claimed_lines : Set.new
         dest_claimed = dest_analysis.respond_to?(:claimed_lines) ? dest_analysis.claimed_lines : Set.new
-        template_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(template_node, claimed_lines: template_claimed)
-        dest_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(dest_node, claimed_lines: dest_claimed)
+        template_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(
+          template_node, claimed_lines: template_claimed
+        )
+        dest_trailing_comments = merger.send(:wrapper_comment_support).external_trailing_comments_for(dest_node,
+                                                                                                      claimed_lines: dest_claimed)
         trailing_comments = template_trailing_comments.any? ? template_trailing_comments : dest_trailing_comments
         trailing_analysis = template_trailing_comments.any? ? template_analysis : dest_analysis
         trailing_source = trailing_analysis.equal?(template_analysis) ? :template : :destination
@@ -307,7 +312,7 @@ module Prism
             source_node: trailing_node,
             analysis: trailing_analysis,
             source: trailing_source,
-            decision: decision,
+            decision: decision
           )
           last_emitted_dest_line = emitted_dest_line if trailing_analysis.equal?(dest_analysis) && emitted_dest_line
           track_emitted_template_trailing_comments(trailing_comments) if trailing_analysis.equal?(template_analysis)
@@ -317,21 +322,21 @@ module Prism
           template_node: template_node,
           dest_node: dest_node,
           template_analysis: template_analysis,
-          dest_analysis: dest_analysis,
+          dest_analysis: dest_analysis
         )
         if orphan_regions.any?
           orphan_previous_line = if trailing_comments.any?
-            trailing_comments.last.location.start_line
-          else
-            orphan_analysis.equal?(template_analysis) ? template_node.location.end_line : dest_node.location.end_line
-          end
+                                   trailing_comments.last.location.start_line
+                                 else
+                                   orphan_analysis.equal?(template_analysis) ? template_node.location.end_line : dest_node.location.end_line
+                                 end
           emitted_orphan_line = merger.send(:wrapper_comment_support).emit_orphan_regions(
             result,
             orphan_regions,
             analysis: orphan_analysis,
             source: orphan_analysis.equal?(template_analysis) ? :template : :destination,
             decision: decision,
-            previous_line: orphan_previous_line,
+            previous_line: orphan_previous_line
           )
           last_emitted_dest_line = emitted_orphan_line if orphan_analysis.equal?(dest_analysis) && emitted_orphan_line
         end
@@ -340,7 +345,7 @@ module Prism
           return {
             last_emitted_dest_line: last_emitted_dest_line,
             preserve_trailing_blank_line_progress: true,
-            result_line_span: result_line_span,
+            result_line_span: result_line_span
           }
         end
 
@@ -352,8 +357,9 @@ module Prism
         if orphan_regions.empty?
           trailing_line = effective_end_line(template_node) + 1
           trailing_content = template_analysis.line_at(trailing_line)
-          if trailing_content && trailing_content.strip.empty? && template_node_controls_trailing_gap?(template_node, template_analysis, dest_node, dest_analysis)
-            result.add_line("", decision: decision, template_line: trailing_line)
+          if trailing_content && trailing_content.strip.empty? && template_node_controls_trailing_gap?(template_node,
+                                                                                                       template_analysis, dest_node, dest_analysis)
+            result.add_line('', decision: decision, template_line: trailing_line)
             # Advance last_emitted_dest_line to the corresponding dest position so that
             # emit_dest_gap_lines on the next iteration does not double-emit the blank.
             dest_trailing_line = dest_node.location.end_line + 1
@@ -361,11 +367,11 @@ module Prism
           end
         end
 
-        {last_emitted_dest_line: last_emitted_dest_line, result_line_span: result_line_span}
+        { last_emitted_dest_line: last_emitted_dest_line, result_line_span: result_line_span }
       end
 
       def emit_node(result:, node:, analysis:, source:, matched_template_node: nil)
-        decision = (source == :template) ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
+        decision = source == :template ? MergeResult::DECISION_KEPT_TEMPLATE : MergeResult::DECISION_KEPT_DEST
         last_emitted_dest_line = nil
         result_line_span = nil
         leading = merger.send(:filtered_leading_comments_for, node, source)
@@ -373,12 +379,13 @@ module Prism
         last_filtered_leading_line = nil
 
         if source == :destination
-          leading_comments, _ = collapse_matched_template_leading_prefix(
+          leading_comments, = collapse_matched_template_leading_prefix(
             leading_comments,
-            matched_template_node,
+            matched_template_node
           )
           leading_comments, last_filtered_leading_line = filter_emitted_template_trailing_comments(leading_comments)
-          leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(leading_comments, last_filtered_line: last_filtered_leading_line)
+          leading_comments, last_filtered_leading_line = filter_emitted_template_leading_comments(leading_comments,
+                                                                                                  last_filtered_line: last_filtered_leading_line)
           track_emitted_dest_leading_comments(leading_comments)
         elsif source == :template
           leading_comments, last_filtered_leading_line = filter_already_emitted_leading_comments(leading_comments)
@@ -394,7 +401,7 @@ module Prism
             analysis: analysis,
             leading_comments: leading_comments,
             skipped_prefix_line: leading[:last_skipped_line],
-            decision: decision,
+            decision: decision
           )
         end
 
@@ -405,7 +412,7 @@ module Prism
           analysis: analysis,
           source: source,
           decision: decision,
-          prev_comment_line: last_filtered_leading_line,
+          prev_comment_line: last_filtered_leading_line
         )
 
         if leading_comments.any?
@@ -417,7 +424,7 @@ module Prism
               line = required_source_line(
                 analysis,
                 line_num,
-                context: "emitting blank line between leading comments and node",
+                context: 'emitting blank line between leading comments and node'
               )
               if source == :template
                 result.add_line(line, decision: decision, template_line: line_num)
@@ -451,13 +458,15 @@ module Prism
         orphan_regions = orphan_regions_for(node, analysis: analysis, source: source)
 
         if trailing_comments.empty? && orphan_regions.empty?
-          trailing_gap = analysis.layout_attachment_for(node)&.trailing_gap if analysis.respond_to?(:layout_attachment_for)
+          if analysis.respond_to?(:layout_attachment_for)
+            trailing_gap = analysis.layout_attachment_for(node)&.trailing_gap
+          end
           emitted_trailing_gap_line = emit_layout_trailing_gap_lines(
             result: result,
             analysis: analysis,
             owner: node,
             source: source,
-            decision: decision,
+            decision: decision
           )
 
           if emitted_trailing_gap_line.nil?
@@ -470,9 +479,9 @@ module Prism
               trailing_content = analysis.line_at(trailing_line)
               if trailing_content && trailing_content.strip.empty?
                 if source == :template
-                  result.add_line("", decision: decision, template_line: trailing_line)
+                  result.add_line('', decision: decision, template_line: trailing_line)
                 else
-                  result.add_line("", decision: decision, dest_line: trailing_line)
+                  result.add_line('', decision: decision, dest_line: trailing_line)
                   last_emitted_dest_line = trailing_line
                 end
               end
@@ -495,7 +504,7 @@ module Prism
           line = required_comment_line(
             analysis,
             comment,
-            context: "emitting external trailing comment",
+            context: 'emitting external trailing comment'
           )
 
           if source == :template
@@ -514,17 +523,18 @@ module Prism
             analysis: analysis,
             source: source,
             decision: decision,
-            previous_line: orphan_previous_line,
+            previous_line: orphan_previous_line
           )
           last_emitted_dest_line = emitted_orphan_line if source == :destination && emitted_orphan_line
         end
 
-        {last_emitted_dest_line: last_emitted_dest_line, result_line_span: result_line_span}
+        { last_emitted_dest_line: last_emitted_dest_line, result_line_span: result_line_span }
       end
 
       private
 
-      def filter_previous_destination_owned_template_leading_comments(template_node:, dest_node:, template_comments:, dest_comments:)
+      def filter_previous_destination_owned_template_leading_comments(template_node:, dest_node:, template_comments:,
+                                                                      dest_comments:)
         return template_comments if template_comments.empty? || dest_comments.any?
 
         previous_dest_node = previous_destination_statement_for(dest_node)
@@ -534,12 +544,14 @@ module Prism
         previous_dest_leading = merger.send(:filtered_leading_comments_for, previous_dest_node, :destination)[:comments]
         return template_comments if previous_dest_leading.empty?
 
-        return template_comments unless normalized_comment_block(previous_dest_leading) == normalized_comment_block(template_comments)
+        unless normalized_comment_block(previous_dest_leading) == normalized_comment_block(template_comments)
+          return template_comments
+        end
 
         should_heal = merger.send(
           :handle_suspected_corruption,
           kind: :comment_ownership_overlap,
-          message: "template-leading comment block overlaps previous adjacent destination leading comment ownership",
+          message: 'template-leading comment block overlaps previous adjacent destination leading comment ownership'
         )
         should_heal ? [] : template_comments
       end
@@ -572,7 +584,8 @@ module Prism
         node_source_lines(node, analysis)
       end
 
-      def emit_template_blank_lines_before_leading_comments(result:, node:, analysis:, leading_comments:, skipped_prefix_line:, decision:, skip_for_destination_gap: false)
+      def emit_template_blank_lines_before_leading_comments(result:, node:, analysis:, leading_comments:,
+                                                            skipped_prefix_line:, decision:, skip_for_destination_gap: false)
         return if skipped_prefix_line || skip_for_destination_gap
         return if leading_comments.empty?
         return if previous_template_gap_already_precedes_leading_comments?(result, node, analysis, leading_comments)
@@ -589,11 +602,11 @@ module Prism
           analysis: analysis,
           source: :template,
           decision: decision,
-          line_numbers: gap_start_line...first_comment_line,
+          line_numbers: gap_start_line...first_comment_line
         )
       end
 
-      def destination_gap_already_precedes_template_leading_comments?(result, dest_node)
+      def destination_gap_already_precedes_template_leading_comments?(_result, dest_node)
         previous_dest_node = previous_destination_statement_for(dest_node)
         return false unless previous_dest_node
 
@@ -607,7 +620,7 @@ module Prism
         blank_only_gap_between?(
           analysis: merger.dest_analysis,
           start_line: previous_dest_node.location.end_line + 1,
-          end_line_exclusive: first_dest_content_line,
+          end_line_exclusive: first_dest_content_line
         )
       end
 
@@ -620,9 +633,13 @@ module Prism
         return false unless trailing_gap
 
         first_comment_line = leading_comments.first.location.start_line
-        return false unless trailing_gap.start_line == previous_node.location.end_line + 1 && trailing_gap.end_line == first_comment_line - 1
+        unless trailing_gap.start_line == previous_node.location.end_line + 1 && trailing_gap.end_line == first_comment_line - 1
+          return false
+        end
 
-        last_emitted_template_line = result.line_metadata.reverse_each.find { |metadata| metadata[:template_line] }&.fetch(:template_line)
+        last_emitted_template_line = result.line_metadata.reverse_each.find do |metadata|
+          metadata[:template_line]
+        end&.fetch(:template_line)
         last_emitted_template_line == trailing_gap.end_line
       end
 
@@ -684,7 +701,7 @@ module Prism
             required_source_line(
               analysis,
               line_num,
-              context: "emitting analyzed node source line",
+              context: 'emitting analyzed node source line'
             )
           end
         end
@@ -698,9 +715,7 @@ module Prism
         return max_end unless node.respond_to?(:compact_child_nodes)
 
         node.compact_child_nodes.each do |child|
-          if child.respond_to?(:closing_loc) && child.closing_loc
-            max_end = [max_end, child.closing_loc.start_line].max
-          end
+          max_end = [max_end, child.closing_loc.start_line].max if child.respond_to?(:closing_loc) && child.closing_loc
           max_end = [max_end, effective_end_line(child)].max
         end
         max_end
@@ -715,8 +730,8 @@ module Prism
         prefix = analysis.source.byteslice(line_start_offset...node_start_offset(node)).to_s
         suffix = analysis.source.byteslice(node_end_offset(node)...line_end_offset).to_s
         prefix_has_code = !prefix.strip.empty?
-        suffix_content = suffix.sub(/\r?\n\z/, "").lstrip
-        suffix_has_code = !suffix_content.empty? && !suffix_content.start_with?("#")
+        suffix_content = suffix.sub(/\r?\n\z/, '').lstrip
+        suffix_has_code = !suffix_content.empty? && !suffix_content.start_with?('#')
 
         prefix_has_code || suffix_has_code
       end
@@ -750,7 +765,7 @@ module Prism
       end
 
       def shebang_comment?(comment)
-        comment.slice.start_with?("#!")
+        comment.slice.start_with?('#!')
       end
 
       def dest_prefix_comment_lines
@@ -770,7 +785,7 @@ module Prism
           analysis: analysis,
           source: source,
           decision: decision,
-          line_numbers: [gap.start_line, last_output_line + 1].max..gap.end_line,
+          line_numbers: [gap.start_line, last_output_line + 1].max..gap.end_line
         )
       end
 
@@ -787,7 +802,7 @@ module Prism
           analysis: analysis,
           source: source,
           decision: decision,
-          line_numbers: gap.start_line..gap.end_line,
+          line_numbers: gap.start_line..gap.end_line
         )
       end
 
@@ -805,11 +820,11 @@ module Prism
         filtered = Ast::Merge::Healer.filter_items(
           comments,
           mode: merger.corruption_handling,
-          prefix: "[prism-merge]",
+          prefix: '[prism-merge]',
           error_class: Prism::Merge::CorruptionDetectedError,
           kind: :comment_ownership_overlap,
-          message: "destination-leading comment block overlaps previously emitted template trailing comment ownership",
-          on_filter: ->(comment) { last_filtered_line = comment.location.start_line },
+          message: 'destination-leading comment block overlaps previously emitted template trailing comment ownership',
+          on_filter: ->(comment) { last_filtered_line = comment.location.start_line }
         ) { |comment| template_trailing_texts.include?(comment.slice.strip) }
         [filtered, last_filtered_line]
       end
@@ -837,14 +852,14 @@ module Prism
         filtered = Ast::Merge::Healer.filter_items(
           comments,
           mode: merger.corruption_handling,
-          prefix: "[prism-merge]",
+          prefix: '[prism-merge]',
           error_class: Prism::Merge::CorruptionDetectedError,
           kind: :comment_ownership_overlap,
-          message: "destination-leading comment block overlaps previously emitted template leading comment ownership",
+          message: 'destination-leading comment block overlaps previously emitted template leading comment ownership',
           on_filter: lambda do |comment|
             last_filtered_line = comment.location.start_line
             prefix_lines << last_filtered_line
-          end,
+          end
         ) { |comment| template_leading_texts.include?(comment.slice.strip) }
 
         merger.instance_variable_set(:@dest_prefix_comment_lines, prefix_lines)
@@ -872,11 +887,11 @@ module Prism
         filtered = Ast::Merge::Healer.filter_items(
           comments,
           mode: merger.corruption_handling,
-          prefix: "[prism-merge]",
+          prefix: '[prism-merge]',
           error_class: Prism::Merge::CorruptionDetectedError,
           kind: :comment_ownership_overlap,
-          message: "template-leading comment block overlaps previously emitted destination leading comment ownership",
-          on_filter: ->(comment) { last_filtered_line = comment.location.start_line },
+          message: 'template-leading comment block overlaps previously emitted destination leading comment ownership',
+          on_filter: ->(comment) { last_filtered_line = comment.location.start_line }
         ) { |comment| dest_leading_texts.include?(comment.slice.strip) }
         [filtered, last_filtered_line]
       end
@@ -894,14 +909,14 @@ module Prism
         return [dest_comments, nil] unless merger.send(
           :handle_suspected_corruption,
           kind: :duplicate_template_leading_prefix,
-          message: "matched destination node starts with duplicated template-owned leading comment block",
+          message: 'matched destination node starts with duplicated template-owned leading comment block'
         )
 
         filtered = dest_comments
         last_filtered_line = nil
 
         while filtered.length > template_block.length &&
-            normalized_comment_block(filtered.first(template_block.length)) == template_block
+              normalized_comment_block(filtered.first(template_block.length)) == template_block
           removed = filtered.first(template_block.length)
           last_filtered_line = removed.last.location.start_line
           filtered = filtered.drop(template_block.length)
@@ -917,13 +932,15 @@ module Prism
 
       def filter_rehomed_removed_owner_comments(comments, rehomed_orphan_lines:, comment_role:)
         return comments if comments.empty? || rehomed_orphan_lines.empty?
+
         Ast::Merge::Healer.filter_items(
           comments,
           mode: merger.corruption_handling,
-          prefix: "[prism-merge]",
+          prefix: '[prism-merge]',
           error_class: Prism::Merge::CorruptionDetectedError,
           kind: :removed_owner_comment_overlap,
-          message: "removed destination-only node #{comment_role.to_s.tr("_", "-")} comments overlap orphan comment regions already rehomed onto a retained owner",
+          message: "removed destination-only node #{comment_role.to_s.tr('_',
+                                                                         '-')} comments overlap orphan comment regions already rehomed onto a retained owner"
         ) { |comment| rehomed_orphan_lines.include?(comment.location.start_line) }
       end
 
@@ -936,7 +953,7 @@ module Prism
           line = required_source_line(
             analysis,
             line_num,
-            context: "emitting scanned blank gap line",
+            context: 'emitting scanned blank gap line'
           )
           next unless line.strip.empty?
 

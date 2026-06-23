@@ -13,10 +13,10 @@ module Prism
     #   nodes.first.contains_magic_comment? #=> true
     #
     module Comment
-      autoload :Line, "prism/merge/comment/line"
-      autoload :RuntimeLine, "prism/merge/comment/runtime_line"
-      autoload :Block, "prism/merge/comment/block"
-      autoload :Parser, "prism/merge/comment/parser"
+      autoload :Line, 'prism/merge/comment/line'
+      autoload :RuntimeLine, 'prism/merge/comment/runtime_line'
+      autoload :Block, 'prism/merge/comment/block'
+      autoload :Parser, 'prism/merge/comment/parser'
     end
   end
 end

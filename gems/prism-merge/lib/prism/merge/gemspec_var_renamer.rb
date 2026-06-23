@@ -78,7 +78,9 @@ module Prism
           old_len = old_var.bytesize
           offsets.reverse_each do |offset|
             result.byteslice(offset, old_len)
-            result = "#{result.byteslice(0, offset)}#{new_var}#{result.byteslice(offset + old_len, result.bytesize - offset - old_len)}"
+            result = "#{result.byteslice(0,
+                                         offset)}#{new_var}#{result.byteslice(offset + old_len,
+                                                                              result.bytesize - offset - old_len)}"
           end
           result
         end
@@ -140,7 +142,7 @@ module Prism
         # @param receiver [Prism::Node] The receiver node to walk
         def record_root_receiver(receiver)
           root = receiver
-          root = root.receiver while root.type.to_s == "call_node" && root.receiver
+          root = root.receiver while root.type.to_s == 'call_node' && root.receiver
           @offsets << root.location.start_offset if root.slice == @target_var
         end
       end

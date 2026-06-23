@@ -107,11 +107,11 @@ module Prism
           local_variable_read_node: :local_var_read,
           constant_path_node: :const_path,
           call_operator_write_node: :call_op_write,
-          embedded_statements_node: :embedded,
+          embedded_statements_node: :embedded
         }.freeze,
 
         # tree-sitter-ruby backend (not yet implemented)
-        tree_sitter_ruby: {}.freeze,
+        tree_sitter_ruby: {}.freeze
       )
 
       class << self

@@ -22,56 +22,59 @@ module Prism
         # are not re-emitted after already appearing inside the BlockDirective's lines.
         dest_claimed = merger.dest_analysis.respond_to?(:claimed_lines) ? merger.dest_analysis.claimed_lines : Set.new
         template_claimed = merger.template_analysis.respond_to?(:claimed_lines) ? merger.template_analysis.claimed_lines : Set.new
-        source_claimed = (source == :destination) ? dest_claimed : template_claimed
+        source_claimed = source == :destination ? dest_claimed : template_claimed
 
         comments = if source == :destination
-          all_leading_comments.reject do |comment|
-            ln = comment.location.start_line
-            if dest_prefix_comment_lines&.include?(ln)
-              last_skipped_line = ln
-              true
-            elsif source_claimed.include?(ln)
-              last_skipped_line = ln
-              true
-            end
-          end
-        elsif dest_prefix_comment_lines&.any?
-          all_leading_comments.reject do |comment|
-            ln = comment.location.start_line
-            if prefix_line_numbers.include?(ln)
-              last_skipped_line = ln
-              true
-            elsif source_claimed.include?(ln)
-              last_skipped_line = ln
-              true
-            end
-          end
-        else
-          all_leading_comments.reject do |comment|
-            ln = comment.location.start_line
-            if source_claimed.include?(ln)
-              last_skipped_line = ln
-              true
-            end
-          end
-        end
+                     all_leading_comments.reject do |comment|
+                       ln = comment.location.start_line
+                       if dest_prefix_comment_lines&.include?(ln)
+                         last_skipped_line = ln
+                         true
+                       elsif source_claimed.include?(ln)
+                         last_skipped_line = ln
+                         true
+                       end
+                     end
+                   elsif dest_prefix_comment_lines&.any?
+                     all_leading_comments.reject do |comment|
+                       ln = comment.location.start_line
+                       if prefix_line_numbers.include?(ln)
+                         last_skipped_line = ln
+                         true
+                       elsif source_claimed.include?(ln)
+                         last_skipped_line = ln
+                         true
+                       end
+                     end
+                   else
+                     all_leading_comments.reject do |comment|
+                       ln = comment.location.start_line
+                       if source_claimed.include?(ln)
+                         last_skipped_line = ln
+                         true
+                       end
+                     end
+                   end
 
-        analysis = (source == :destination) ? merger.dest_analysis : merger.template_analysis
+        analysis = source == :destination ? merger.dest_analysis : merger.template_analysis
         attachment = comment_attachment_for(node, source: source, analysis: analysis)
         if attachment&.metadata&.fetch(:runtime_reintegrated, false) && attachment.leading_region
           runtime_line_numbers = attachment.leading_region.nodes.map { |comment| comment_node_line(comment) }
-          comments = (comments.reject { |comment| runtime_line_numbers.include?(comment.location.start_line) } + attachment.leading_region.nodes)
-            .sort_by { |comment| comment_node_line(comment).to_i }
+          comments = (comments.reject do |comment|
+            runtime_line_numbers.include?(comment.location.start_line)
+          end + attachment.leading_region.nodes)
+                     .sort_by { |comment| comment_node_line(comment).to_i }
         end
 
-        {comments: comments, last_skipped_line: last_skipped_line}
+        { comments: comments, last_skipped_line: last_skipped_line }
       end
 
       def comment_attachment_for(node, source:, analysis: nil)
         attachment = cached_comment_augmenter_for(source)&.attachment_for(node)
         attachment ||= analysis.comment_attachment_for(node) if analysis&.respond_to?(:comment_attachment_for)
 
-        runtime_attachment = runtime_comment_attachment_for(node, source: source, analysis: analysis, base_attachment: attachment)
+        runtime_attachment = runtime_comment_attachment_for(node, source: source, analysis: analysis,
+                                                                  base_attachment: attachment)
         return runtime_attachment if runtime_attachment
 
         attachment
@@ -102,7 +105,7 @@ module Prism
               line = required_source_line(
                 analysis,
                 blank_line_num,
-                context: "emitting blank line between leading comments",
+                context: 'emitting blank line between leading comments'
               )
               if source == :template
                 result.add_line(line, decision: decision, template_line: blank_line_num)
@@ -115,7 +118,7 @@ module Prism
           line = required_comment_line(
             analysis,
             comment,
-            context: "emitting leading comment",
+            context: 'emitting leading comment'
           )
           line = runtime_comment_line(comment, fallback: line)
           if source == :template
@@ -140,7 +143,7 @@ module Prism
           line = required_source_line(
             analysis,
             line_num,
-            context: "emitting blank line between comment region and content",
+            context: 'emitting blank line between comment region and content'
           )
           next unless line.strip.empty?
 
@@ -166,20 +169,22 @@ module Prism
           line_num = comment_node_line(comment_node)
           next unless line_num
 
-          gap_line = emit_blank_lines_between(
-            result,
-            last_comment_line: previous_line,
-            next_content_line: line_num,
-            analysis: analysis,
-            source: source,
-            decision: decision,
-          ) if previous_line
+          if previous_line
+            gap_line = emit_blank_lines_between(
+              result,
+              last_comment_line: previous_line,
+              next_content_line: line_num,
+              analysis: analysis,
+              source: source,
+              decision: decision
+            )
+          end
           last_emitted_line = gap_line || last_emitted_line
 
           line = required_source_line(
             analysis,
             line_num,
-            context: "emitting comment-region node",
+            context: 'emitting comment-region node'
           )
           if source == :template
             result.add_line(line, decision: decision, template_line: line_num)
@@ -198,14 +203,16 @@ module Prism
         last_emitted_line = nil
         current_previous_line = previous_line
 
-        Array(regions).sort_by { |region| region.respond_to?(:start_line) ? region.start_line.to_i : 0 }.each do |region|
+        Array(regions).sort_by do |region|
+          region.respond_to?(:start_line) ? region.start_line.to_i : 0
+        end.each do |region|
           emitted_line = emit_comment_region(
             result,
             region,
             analysis: analysis,
             source: source,
             decision: decision,
-            previous_line: current_previous_line,
+            previous_line: current_previous_line
           )
           next unless emitted_line
 
@@ -228,14 +235,14 @@ module Prism
             next_content_line: line_num,
             analysis: analysis,
             source: source,
-            decision: decision,
+            decision: decision
           )
           last_emitted_line = gap_line || last_emitted_line
 
           line = required_comment_line(
             analysis,
             comment,
-            context: "emitting external trailing comment",
+            context: 'emitting external trailing comment'
           )
           if source == :template
             result.add_line(line, decision: decision, template_line: line_num)
@@ -261,12 +268,12 @@ module Prism
 
         normalized_entries.each_with_index.reduce(line) do |memo, (entry, index)|
           separator = if memo.empty?
-            ""
-          elsif index.zero?
-            entry[:separator].to_s.empty? ? " " : entry[:separator]
-          else
-            " "
-          end
+                        ''
+                      elsif index.zero?
+                        entry[:separator].to_s.empty? ? ' ' : entry[:separator]
+                      else
+                        ' '
+                      end
 
           memo + separator + entry[:raw]
         end
@@ -280,7 +287,7 @@ module Prism
 
       def line_inline_comment_entries(analysis, line_num)
         line = analysis.line_at(line_num).to_s
-        return [] if line.strip.empty? || line.lstrip.start_with?("#")
+        return [] if line.strip.empty? || line.lstrip.start_with?('#')
         return [] unless analysis.respond_to?(:parse_result) && analysis.parse_result.respond_to?(:comments)
 
         Array(analysis.parse_result.comments).filter_map do |comment|
@@ -290,7 +297,7 @@ module Prism
           {
             line: line_num,
             raw: raw,
-            separator: inline_comment_separator_for(line, raw),
+            separator: inline_comment_separator_for(line, raw)
           }
         end
       end
@@ -320,7 +327,7 @@ module Prism
       def inline_comment_separator_for(line_text, raw_comment)
         return if line_text.to_s.empty? || raw_comment.to_s.empty?
 
-        prefix, separator, = line_text.sub(/\r?\n\z/, "").rpartition(raw_comment)
+        prefix, separator, = line_text.sub(/\r?\n\z/, '').rpartition(raw_comment)
         return unless separator == raw_comment
 
         prefix[/[ \t]+\z/]
@@ -348,8 +355,8 @@ module Prism
           trailing_gap: base_attachment.trailing_gap,
           metadata: base_attachment.metadata.merge(
             runtime_surface_address: operation.surface.address,
-            runtime_reintegrated: true,
-          ),
+            runtime_reintegrated: true
+          )
         )
       end
 
@@ -363,7 +370,7 @@ module Prism
           next false unless operation.surface.surface_kind == :ruby_doc_comment
           next false unless operation.completed? && operation.result.is_a?(Ast::Merge::Runtime::ChildResult)
 
-          candidate_surface = (source == :template) ? operation.options[:template_surface] : operation.options[:destination_surface]
+          candidate_surface = source == :template ? operation.options[:template_surface] : operation.options[:destination_surface]
           next false unless candidate_surface
 
           candidate_surface.metadata[:owner_signature] == owner_signature &&
@@ -386,15 +393,15 @@ module Prism
           nodes: nodes,
           metadata: (base_attachment.leading_region&.metadata || {}).merge(
             runtime_reintegrated: true,
-            runtime_surface_address: operation.surface.address,
-          ),
+            runtime_surface_address: operation.surface.address
+          )
         )
       end
 
       def runtime_comment_line(comment, fallback:)
         return fallback unless comment.respond_to?(:runtime_override?) && comment.runtime_override?
 
-        comment.slice.to_s.sub(/\r?\n\z/, "")
+        comment.slice.to_s.sub(/\r?\n\z/, '')
       end
 
       def runtime_reintegration_needed?(operation)
@@ -422,7 +429,7 @@ module Prism
       end
 
       def cached_comment_augmenter_for(source)
-        ivar = (source == :template) ? :@template_comment_augmenter : :@dest_comment_augmenter
+        ivar = source == :template ? :@template_comment_augmenter : :@dest_comment_augmenter
         merger.instance_variable_get(ivar)
       end
 

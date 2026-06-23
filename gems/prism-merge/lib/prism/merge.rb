@@ -1,21 +1,19 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "set"
-
-require "prism"
-require "ruby-merge"
-require "ast/merge"
-require "tree_haver"
+require 'prism'
+require 'ruby-merge'
+require 'ast/merge'
+require 'tree_haver'
 
 module Prism
   module Merge
     extend self
 
-    PACKAGE_NAME = "prism-merge"
-    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: "prism", family: "native").freeze
+    PACKAGE_NAME = 'prism-merge'
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'prism', family: 'native').freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
 
@@ -38,40 +36,40 @@ module Prism
 
     class MissingAnalyzedLineError < Error; end
 
-    autoload :BeginNodeClauseBodySupport, "prism/merge/begin_node_clause_body_support"
-    autoload :BeginNodeClauseBodyMerger, "prism/merge/begin_node_clause_body_merger"
-    autoload :BeginNodeClauseHeaderEmitter, "prism/merge/begin_node_clause_header_emitter"
-    autoload :BeginNodeMergePlanner, "prism/merge/begin_node_merge_planner"
-    autoload :BeginNodePlanEmitter, "prism/merge/begin_node_plan_emitter"
-    autoload :BeginNodeRescueSemantics, "prism/merge/begin_node_rescue_semantics"
-    autoload :BeginNodeStructure, "prism/merge/begin_node_structure"
-    autoload :BlockDirectiveDetector, "prism/merge/block_directive_detector"
-    autoload :Comment, "prism/merge/comment"
-    autoload :CommentOnlyFileMerger, "prism/merge/comment_only_file_merger"
-    autoload :DebugLogger, "prism/merge/debug_logger"
-    autoload :FileAnalysis, "prism/merge/file_analysis"
-    autoload :FreezeNode, "prism/merge/freeze_node"
-    autoload :GemspecVarRenamer, "prism/merge/gemspec_var_renamer"
-    autoload :MagicCommentSupport, "prism/merge/magic_comment_support"
-    autoload :MergeResult, "prism/merge/merge_result"
-    autoload :MethodMatchRefiner, "prism/merge/method_match_refiner"
-    autoload :NestedStatementWalker, "prism/merge/nested_statement_walker"
-    autoload :NocovNode, "prism/merge/nocov_node"
-    autoload :NoCovWrapper, "prism/merge/nocov_wrapper"
-    autoload :NodeBodyLayout, "prism/merge/node_body_layout"
-    autoload :NodeEmissionSupport, "prism/merge/node_emission_support"
-    autoload :NodeTypeNormalizer, "prism/merge/node_type_normalizer"
-    autoload :NodeWrapper, "prism/merge/node_wrapper"
-    autoload :PartialTemplateMerger, "prism/merge/partial_template_merger"
-    autoload :PartialTemplateNode, "prism/merge/partial_template_node"
-    autoload :RecursiveMergePolicy, "prism/merge/recursive_merge_policy"
-    autoload :RecursiveNodeBodyMerger, "prism/merge/recursive_node_body_merger"
-    autoload :RubyDocSurfaceAnalyzer, "prism/merge/ruby_doc_surface_analyzer"
-    autoload :ScaffoldChunkRemover, "prism/merge/scaffold_chunk_remover"
-    autoload :SmartMerger, "prism/merge/smart_merger"
-    autoload :SourceLineLookup, "prism/merge/source_line_lookup"
-    autoload :TopLevelMergeRunner, "prism/merge/top_level_merge_runner"
-    autoload :WrapperCommentSupport, "prism/merge/wrapper_comment_support"
+    autoload :BeginNodeClauseBodySupport, 'prism/merge/begin_node_clause_body_support'
+    autoload :BeginNodeClauseBodyMerger, 'prism/merge/begin_node_clause_body_merger'
+    autoload :BeginNodeClauseHeaderEmitter, 'prism/merge/begin_node_clause_header_emitter'
+    autoload :BeginNodeMergePlanner, 'prism/merge/begin_node_merge_planner'
+    autoload :BeginNodePlanEmitter, 'prism/merge/begin_node_plan_emitter'
+    autoload :BeginNodeRescueSemantics, 'prism/merge/begin_node_rescue_semantics'
+    autoload :BeginNodeStructure, 'prism/merge/begin_node_structure'
+    autoload :BlockDirectiveDetector, 'prism/merge/block_directive_detector'
+    autoload :Comment, 'prism/merge/comment'
+    autoload :CommentOnlyFileMerger, 'prism/merge/comment_only_file_merger'
+    autoload :DebugLogger, 'prism/merge/debug_logger'
+    autoload :FileAnalysis, 'prism/merge/file_analysis'
+    autoload :FreezeNode, 'prism/merge/freeze_node'
+    autoload :GemspecVarRenamer, 'prism/merge/gemspec_var_renamer'
+    autoload :MagicCommentSupport, 'prism/merge/magic_comment_support'
+    autoload :MergeResult, 'prism/merge/merge_result'
+    autoload :MethodMatchRefiner, 'prism/merge/method_match_refiner'
+    autoload :NestedStatementWalker, 'prism/merge/nested_statement_walker'
+    autoload :NocovNode, 'prism/merge/nocov_node'
+    autoload :NoCovWrapper, 'prism/merge/nocov_wrapper'
+    autoload :NodeBodyLayout, 'prism/merge/node_body_layout'
+    autoload :NodeEmissionSupport, 'prism/merge/node_emission_support'
+    autoload :NodeTypeNormalizer, 'prism/merge/node_type_normalizer'
+    autoload :NodeWrapper, 'prism/merge/node_wrapper'
+    autoload :PartialTemplateMerger, 'prism/merge/partial_template_merger'
+    autoload :PartialTemplateNode, 'prism/merge/partial_template_node'
+    autoload :RecursiveMergePolicy, 'prism/merge/recursive_merge_policy'
+    autoload :RecursiveNodeBodyMerger, 'prism/merge/recursive_node_body_merger'
+    autoload :RubyDocSurfaceAnalyzer, 'prism/merge/ruby_doc_surface_analyzer'
+    autoload :ScaffoldChunkRemover, 'prism/merge/scaffold_chunk_remover'
+    autoload :SmartMerger, 'prism/merge/smart_merger'
+    autoload :SourceLineLookup, 'prism/merge/source_line_lookup'
+    autoload :TopLevelMergeRunner, 'prism/merge/top_level_merge_runner'
+    autoload :WrapperCommentSupport, 'prism/merge/wrapper_comment_support'
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -81,7 +79,7 @@ module Prism
           :ruby,
           backend_module: TreeHaver::Backends::Prism,
           backend_type: :prism,
-          gem_name: "prism",
+          gem_name: 'prism'
         )
 
         BACKEND_REGISTRY.registered = true
@@ -98,7 +96,9 @@ module Prism
 
     def ruby_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       ruby_feature_profile.merge(backend: BACKEND_REFERENCE.id, backend_ref: BACKEND_REFERENCE.to_h)
     end
@@ -122,41 +122,41 @@ module Prism
         package: PACKAGE_NAME,
         backend: BACKEND_REFERENCE.id,
         structured_edit_profile: {
-          family: "ruby",
+          family: 'ruby',
           structure_profile: Ast::Merge.structured_edit_structure_profile(
-            owner_scope: "shared_default",
-            owner_selector: "line_bound_statements",
-            owner_selector_family: "line_oriented",
+            owner_scope: 'shared_default',
+            owner_selector: 'line_bound_statements',
+            owner_selector_family: 'line_oriented',
             known_owner_selector: true,
-            supported_comment_regions: ["leading"],
-            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            supported_comment_regions: ['leading'],
+            metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
           ),
           selection_profile: Ast::Merge.structured_edit_selection_profile(
-            owner_scope: "shared_default",
-            owner_selector: "line_bound_statements",
-            owner_selector_family: "line_oriented",
-            selector_kind: "comment_region_owned_owner",
-            selection_intent: "comment_anchored_owner",
-            selection_intent_family: "comment_anchor",
+            owner_scope: 'shared_default',
+            owner_selector: 'line_bound_statements',
+            owner_selector_family: 'line_oriented',
+            selector_kind: 'comment_region_owned_owner',
+            selection_intent: 'comment_anchored_owner',
+            selection_intent_family: 'comment_anchor',
             known_selection_intent: true,
-            comment_region: "leading",
+            comment_region: 'leading',
             include_trailing_gap: true,
             comment_anchored: true,
-            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
           ),
           match_profile: Ast::Merge.structured_edit_match_profile(
-            start_boundary: "comment_region_start",
-            start_boundary_family: "comment_anchor",
+            start_boundary: 'comment_region_start',
+            start_boundary_family: 'comment_anchor',
             known_start_boundary: true,
-            end_boundary: "owner_end_plus_trailing_gap",
-            end_boundary_family: "gap_extension",
+            end_boundary: 'owner_end_plus_trailing_gap',
+            end_boundary_family: 'gap_extension',
             known_end_boundary: true,
-            payload_kind: "comment_owned_body",
-            payload_family: "comment_owned",
+            payload_kind: 'comment_owned_body',
+            payload_family: 'comment_owned',
             known_payload_kind: true,
             comment_anchored: true,
             trailing_gap_extended: true,
-            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
           )
         }
       }
@@ -167,37 +167,37 @@ module Prism
         package: PACKAGE_NAME,
         backend: BACKEND_REFERENCE.id,
         structured_edit_request: Ast::Merge.structured_edit_request(
-          operation_kind: "replace",
+          operation_kind: 'replace',
           content: "class App\n  # managed snippet\n  old_call\nend\n",
-          source_label: "source",
-          target_selector: "managed_snippet",
-          target_selector_family: "comment_anchor",
+          source_label: 'source',
+          target_selector: 'managed_snippet',
+          target_selector_family: 'comment_anchor',
           target_selection: Ast::Merge.structured_edit_target_selection(
-            selector_kind: "comment_region_owned_owner",
-            selection_intent: "comment_anchored_owner",
-            selection_intent_family: "comment_anchor",
+            selector_kind: 'comment_region_owned_owner',
+            selection_intent: 'comment_anchored_owner',
+            selection_intent_family: 'comment_anchor',
             known_selection_intent: true,
-            comment_region: "leading",
+            comment_region: 'leading',
             include_trailing_gap: true,
             comment_anchored: true,
-            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
           ),
           target_match: Ast::Merge.structured_edit_target_match(
-            start_boundary: "comment_region_start",
-            start_boundary_family: "comment_anchor",
+            start_boundary: 'comment_region_start',
+            start_boundary_family: 'comment_anchor',
             known_start_boundary: true,
-            end_boundary: "owner_end_plus_trailing_gap",
-            end_boundary_family: "gap_extension",
+            end_boundary: 'owner_end_plus_trailing_gap',
+            end_boundary_family: 'gap_extension',
             known_end_boundary: true,
-            payload_kind: "comment_owned_body",
-            payload_family: "comment_owned",
+            payload_kind: 'comment_owned_body',
+            payload_family: 'comment_owned',
             known_payload_kind: true,
             comment_anchored: true,
             trailing_gap_extended: true,
-            metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+            metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
           ),
           payload_text: "new_call\n",
-          metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
         )
       }
     end
@@ -207,23 +207,23 @@ module Prism
         package: PACKAGE_NAME,
         backend: BACKEND_REFERENCE.id,
         structured_edit_result: Ast::Merge.structured_edit_result(
-          operation_kind: "replace",
+          operation_kind: 'replace',
           updated_content: "class App\n  # managed snippet\n  new_call\nend\n",
           changed: true,
           captured_text: "old_call\n",
           match_count: 1,
           operation_profile: Ast::Merge.structured_edit_operation_profile(
-            operation_kind: "replace",
-            operation_family: "rewrite",
+            operation_kind: 'replace',
+            operation_family: 'rewrite',
             known_operation_kind: true,
-            source_requirement: "required",
-            destination_requirement: "none",
-            replacement_source: "explicit_text",
+            source_requirement: 'required',
+            destination_requirement: 'none',
+            replacement_source: 'explicit_text',
             captures_source_text: true,
             supports_if_missing: false,
-            metadata: { source: "legacy_crispr_reference" }
+            metadata: { source: 'legacy_crispr_reference' }
           ),
-          metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
         )
       }
     end
@@ -235,7 +235,7 @@ module Prism
         structured_edit_application: Ast::Merge.structured_edit_application(
           request: ruby_structured_edit_request_projection[:structured_edit_request],
           result: ruby_structured_edit_result_projection[:structured_edit_result],
-          metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+          metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
         )
       }
     end
@@ -246,16 +246,16 @@ module Prism
         backend: BACKEND_REFERENCE.id,
         structured_edit_execution_report: Ast::Merge.structured_edit_execution_report(
           application: ruby_structured_edit_application_projection[:structured_edit_application],
-          provider_family: "ruby",
+          provider_family: 'ruby',
           provider_backend: BACKEND_REFERENCE.id,
           diagnostics: [
             {
-              severity: "warning",
-              category: "assumed_default",
-              message: "using managed snippet fallback selection."
+              severity: 'warning',
+              category: 'assumed_default',
+              message: 'using managed snippet fallback selection.'
             }
           ],
-          metadata: { source: "legacy_crispr_reference" }
+          metadata: { source: 'legacy_crispr_reference' }
         )
       }
     end
@@ -268,34 +268,34 @@ module Prism
         structured_edit_batch_request: Ast::Merge.structured_edit_batch_request(
           requests: [
             Ast::Merge.structured_edit_request(
-              operation_kind: "replace",
+              operation_kind: 'replace',
               content: content,
-              source_label: "source",
-              target_selector: "managed_snippet",
-              target_selector_family: "comment_anchor",
+              source_label: 'source',
+              target_selector: 'managed_snippet',
+              target_selector_family: 'comment_anchor',
               payload_text: "new_call\n",
-              metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
             ),
             Ast::Merge.structured_edit_request(
-              operation_kind: "insert",
+              operation_kind: 'insert',
               content: content,
-              source_label: "source",
-              destination_selector: "after_anchor_call",
-              destination_selector_family: "gap_preserving_statement",
+              source_label: 'source',
+              destination_selector: 'after_anchor_call',
+              destination_selector_family: 'gap_preserving_statement',
               payload_text: "inserted_call\n",
-              if_missing: "append",
-              metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              if_missing: 'append',
+              metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
             ),
             Ast::Merge.structured_edit_request(
-              operation_kind: "delete",
+              operation_kind: 'delete',
               content: content,
-              source_label: "source",
-              target_selector: "obsolete_snippet",
-              target_selector_family: "comment_anchor",
-              metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+              source_label: 'source',
+              target_selector: 'obsolete_snippet',
+              target_selector_family: 'comment_anchor',
+              metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
             )
           ],
-          metadata: { batch_label: "ruby_prism_triad", source: "legacy_crispr_reference" }
+          metadata: { batch_label: 'ruby_prism_triad', source: 'legacy_crispr_reference' }
         )
       }
     end
@@ -310,149 +310,151 @@ module Prism
             Ast::Merge.structured_edit_execution_report(
               application: Ast::Merge.structured_edit_application(
                 request: Ast::Merge.structured_edit_request(
-                  operation_kind: "replace",
+                  operation_kind: 'replace',
                   content: content,
-                  source_label: "source",
-                  target_selector: "managed_snippet",
-                  target_selector_family: "comment_anchor",
+                  source_label: 'source',
+                  target_selector: 'managed_snippet',
+                  target_selector_family: 'comment_anchor',
                   payload_text: "new_call\n",
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
                 result: Ast::Merge.structured_edit_result(
-                  operation_kind: "replace",
+                  operation_kind: 'replace',
                   updated_content: "class App\n  # managed snippet\n  new_call\n\n  anchor_call\n\n  # obsolete snippet\n  obsolete_call\nend\n",
                   changed: true,
                   captured_text: "old_call\n",
                   match_count: 1,
                   operation_profile: Ast::Merge.structured_edit_operation_profile(
-                    operation_kind: "replace",
-                    operation_family: "rewrite",
+                    operation_kind: 'replace',
+                    operation_family: 'rewrite',
                     known_operation_kind: true,
-                    source_requirement: "required",
-                    destination_requirement: "none",
-                    replacement_source: "explicit_text",
+                    source_requirement: 'required',
+                    destination_requirement: 'none',
+                    replacement_source: 'explicit_text',
                     captures_source_text: true,
                     supports_if_missing: false,
-                    metadata: { source: "legacy_crispr_reference" }
+                    metadata: { source: 'legacy_crispr_reference' }
                   ),
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
-                metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
               ),
-              provider_family: "ruby",
+              provider_family: 'ruby',
               provider_backend: BACKEND_REFERENCE.id,
               diagnostics: [],
-              metadata: { source: "legacy_crispr_reference" }
+              metadata: { source: 'legacy_crispr_reference' }
             ),
             Ast::Merge.structured_edit_execution_report(
               application: Ast::Merge.structured_edit_application(
                 request: Ast::Merge.structured_edit_request(
-                  operation_kind: "insert",
+                  operation_kind: 'insert',
                   content: content,
-                  source_label: "source",
-                  destination_selector: "after_anchor_call",
-                  destination_selector_family: "gap_preserving_statement",
+                  source_label: 'source',
+                  destination_selector: 'after_anchor_call',
+                  destination_selector_family: 'gap_preserving_statement',
                   payload_text: "inserted_call\n",
-                  if_missing: "append",
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  if_missing: 'append',
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
                 result: Ast::Merge.structured_edit_result(
-                  operation_kind: "insert",
+                  operation_kind: 'insert',
                   updated_content: "class App\n  # managed snippet\n  old_call\n\n  anchor_call\n  inserted_call\n\n  # obsolete snippet\n  obsolete_call\nend\n",
                   changed: true,
                   operation_profile: Ast::Merge.structured_edit_operation_profile(
-                    operation_kind: "insert",
-                    operation_family: "insertion",
+                    operation_kind: 'insert',
+                    operation_family: 'insertion',
                     known_operation_kind: true,
-                    source_requirement: "none",
-                    destination_requirement: "optional",
-                    replacement_source: "explicit_text",
+                    source_requirement: 'none',
+                    destination_requirement: 'optional',
+                    replacement_source: 'explicit_text',
                     captures_source_text: false,
                     supports_if_missing: true,
-                    metadata: { source: "legacy_crispr_reference" }
+                    metadata: { source: 'legacy_crispr_reference' }
                   ),
                   destination_profile: Ast::Merge.structured_edit_destination_profile(
-                    resolution_kind: "selector",
-                    resolution_source: "destination_selector",
-                    anchor_boundary: "after",
-                    resolution_family: "anchored",
-                    resolution_source_family: "selector",
-                    anchor_boundary_family: "gap_preserving_statement",
+                    resolution_kind: 'selector',
+                    resolution_source: 'destination_selector',
+                    anchor_boundary: 'after',
+                    resolution_family: 'anchored',
+                    resolution_source_family: 'selector',
+                    anchor_boundary_family: 'gap_preserving_statement',
                     known_resolution_kind: true,
                     known_resolution_source: true,
                     known_anchor_boundary: true,
                     used_if_missing: false,
-                    metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                    metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                   ),
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
-                metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
               ),
-              provider_family: "ruby",
+              provider_family: 'ruby',
               provider_backend: BACKEND_REFERENCE.id,
               diagnostics: [],
-              metadata: { source: "legacy_crispr_reference" }
+              metadata: { source: 'legacy_crispr_reference' }
             ),
             Ast::Merge.structured_edit_execution_report(
               application: Ast::Merge.structured_edit_application(
                 request: Ast::Merge.structured_edit_request(
-                  operation_kind: "delete",
+                  operation_kind: 'delete',
                   content: content,
-                  source_label: "source",
-                  target_selector: "obsolete_snippet",
-                  target_selector_family: "comment_anchor",
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  source_label: 'source',
+                  target_selector: 'obsolete_snippet',
+                  target_selector_family: 'comment_anchor',
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
                 result: Ast::Merge.structured_edit_result(
-                  operation_kind: "delete",
+                  operation_kind: 'delete',
                   updated_content: "class App\n  # managed snippet\n  old_call\n\n  anchor_call\nend\n",
                   changed: true,
                   captured_text: "obsolete_call\n",
                   match_count: 1,
                   operation_profile: Ast::Merge.structured_edit_operation_profile(
-                    operation_kind: "delete",
-                    operation_family: "removal",
+                    operation_kind: 'delete',
+                    operation_family: 'removal',
                     known_operation_kind: true,
-                    source_requirement: "required",
-                    destination_requirement: "none",
-                    replacement_source: "none",
+                    source_requirement: 'required',
+                    destination_requirement: 'none',
+                    replacement_source: 'none',
                     captures_source_text: true,
                     supports_if_missing: false,
-                    metadata: { source: "legacy_crispr_reference" }
+                    metadata: { source: 'legacy_crispr_reference' }
                   ),
-                  metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                  metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
                 ),
-                metadata: { family: "ruby", provider: BACKEND_REFERENCE.id, source: "legacy_crispr_reference" }
+                metadata: { family: 'ruby', provider: BACKEND_REFERENCE.id, source: 'legacy_crispr_reference' }
               ),
-              provider_family: "ruby",
+              provider_family: 'ruby',
               provider_backend: BACKEND_REFERENCE.id,
               diagnostics: [],
-              metadata: { source: "legacy_crispr_reference" }
+              metadata: { source: 'legacy_crispr_reference' }
             )
           ],
           diagnostics: [
             {
-              severity: "info",
-              category: "assumed_default",
-              message: "ruby batch preserved request ordering."
+              severity: 'info',
+              category: 'assumed_default',
+              message: 'ruby batch preserved request ordering.'
             }
           ],
-          metadata: { batch_label: "ruby_prism_triad", source: "legacy_crispr_reference" }
+          metadata: { batch_label: 'ruby_prism_triad', source: 'legacy_crispr_reference' }
         )
       }
     end
 
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       result = ::Prism.parse(source)
       unless result.success?
         return {
           ok: false,
           diagnostics: result.errors.map do |error|
-            { severity: "error", category: "parse_error", message: error.message }
+            { severity: 'error', category: 'parse_error', message: error.message }
           end,
           policies: []
         }
@@ -470,9 +472,9 @@ module Prism
       normalized_source = prism_ruby_normalize_source(source)
       body = parse_result.value.statements&.body || []
       {
-        kind: "ruby",
-        dialect: "ruby",
-        root_kind: "document",
+        kind: 'ruby',
+        dialect: 'ruby',
+        root_kind: 'document',
         source: normalized_source,
         owners: prism_ruby_analysis_owners(body),
         discovered_surfaces: prism_ruby_discovered_surfaces(normalized_source, body),
@@ -481,10 +483,12 @@ module Prism
       }
     end
 
-    def parse_ruby_normalized(source, dialect = "ruby", backend: nil)
+    def parse_ruby_normalized(source, dialect = 'ruby', backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       result = ::Prism.parse(source)
       unless result.success?
@@ -519,12 +523,12 @@ module Prism
         child_ids.concat(method_nodes.filter_map { |method| method.id if method.parent_id == "prism:class:#{index}" })
         prism_class_node(source, node, index, child_ids: child_ids)
       end
-      top_comment_nodes = comment_nodes.filter { |comment| comment.parent_id == "prism:program:0" }
+      top_comment_nodes = comment_nodes.filter { |comment| comment.parent_id == 'prism:program:0' }
 
       root = TreeHaver::NormalizedTreeNode.new(
-        id: "prism:program:0",
-        kind: "program",
-        role: "structural",
+        id: 'prism:program:0',
+        kind: 'program',
+        role: 'structural',
         parent_id: nil,
         child_ids: top_comment_nodes.map(&:id) + class_nodes.map(&:id),
         span: full_source_span(source),
@@ -534,13 +538,13 @@ module Prism
         has_source_text: true,
         source_fragment: source,
         backend_kind: root_node.class.name,
-        semantic_roles: ["compilation_unit"],
-        backend_roles: ["prism.ProgramNode"],
+        semantic_roles: ['compilation_unit'],
+        backend_roles: ['prism.ProgramNode'],
         unsupported_features: [],
         metadata: {
           prism: {
-            node_path: "program",
-            native_tree_visibility: "provider_internal"
+            node_path: 'program',
+            native_tree_visibility: 'provider_internal'
           }
         }
       )
@@ -549,7 +553,9 @@ module Prism
         ok: true,
         backend_capability: ruby_normalized_backend_capability(dialect),
         root_id: root.id,
-        nodes: [root] + top_comment_nodes + class_nodes + comment_nodes.reject { |comment| comment.parent_id == "prism:program:0" } + method_nodes,
+        nodes: [root] + top_comment_nodes + class_nodes + comment_nodes.reject do |comment|
+          comment.parent_id == 'prism:program:0'
+        end + method_nodes,
         parse_error_tolerance: ruby_prism_parse_error_tolerance,
         source_fragments_available: true,
         diagnostics: [],
@@ -565,45 +571,58 @@ module Prism
       operations = request.fetch(:operations)
 
       unless provider_id == BACKEND_REFERENCE.id && backend_id == BACKEND_REFERENCE.id
-        return edit_projection_rejection(source, "provider_id", "provider_edit_projection_unsupported", "provider #{provider_id} does not support Prism edit projection")
+        return edit_projection_rejection(source, 'provider_id', 'provider_edit_projection_unsupported',
+                                         "provider #{provider_id} does not support Prism edit projection")
       end
-      unless language == "ruby"
-        return edit_projection_rejection(source, "language", "edit_projection_language_unsupported", "language #{language} is not supported by Prism edit projection")
+      unless language == 'ruby'
+        return edit_projection_rejection(source, 'language', 'edit_projection_language_unsupported',
+                                         "language #{language} is not supported by Prism edit projection")
       end
       unless operations.length == 1
-        return edit_projection_rejection(source, "operations", "edit_projection_batch_unsupported", "Prism edit projection currently supports exactly one operation")
+        return edit_projection_rejection(source, 'operations', 'edit_projection_batch_unsupported',
+                                         'Prism edit projection currently supports exactly one operation')
       end
 
       operation = operations.first
       unless %w[replace_node insert_child delete_node].include?(operation.fetch(:operation))
-        return edit_projection_rejection(source, "operations[0].operation", "edit_projection_operation_unsupported", "Prism edit projection does not support #{operation.fetch(:operation)}")
+        return edit_projection_rejection(source, 'operations[0].operation', 'edit_projection_operation_unsupported',
+                                         "Prism edit projection does not support #{operation.fetch(:operation)}")
       end
 
-      normalized = parse_ruby_normalized(source, "ruby")
-      return edit_projection_rejection(source, "source", "edit_projection_parse_failed", normalized[:diagnostics].join("; ")) unless normalized[:ok]
+      normalized = parse_ruby_normalized(source, 'ruby')
+      unless normalized[:ok]
+        return edit_projection_rejection(source, 'source', 'edit_projection_parse_failed',
+                                         normalized[:diagnostics].join('; '))
+      end
 
       target = normalized[:nodes].find do |node|
         node.dig(:metadata, :prism, :node_path) == operation.fetch(:target_node_path)
       end
-      return edit_projection_rejection(source, "operations[0].target_node_path", "edit_projection_target_not_found", "Prism node path #{operation.fetch(:target_node_path)} was not found") unless target
+      unless target
+        return edit_projection_rejection(source, 'operations[0].target_node_path', 'edit_projection_target_not_found',
+                                         "Prism node path #{operation.fetch(:target_node_path)} was not found")
+      end
 
       range = target.dig(:span, :range)
-      output = if operation.fetch(:operation) == "delete_node"
-        delete_range = line_deletion_range(source, range)
-        source.byteslice(0...delete_range[:start_byte]) + source.byteslice(delete_range[:end_byte]..)
-      elsif operation.fetch(:operation) == "insert_child"
-        insertion_byte = class_body_insertion_byte(source, range)
-        source.byteslice(0...insertion_byte) +
-          operation.fetch(:replacement_source) +
-          "\n" +
-          source.byteslice(insertion_byte..)
-      else
-        source.byteslice(0...range[:start_byte]) +
-          operation.fetch(:replacement_source) +
-          source.byteslice(range[:end_byte]..)
+      output = if operation.fetch(:operation) == 'delete_node'
+                 delete_range = line_deletion_range(source, range)
+                 source.byteslice(0...delete_range[:start_byte]) + source.byteslice(delete_range[:end_byte]..)
+               elsif operation.fetch(:operation) == 'insert_child'
+                 insertion_byte = class_body_insertion_byte(source, range)
+                 source.byteslice(0...insertion_byte) +
+                   operation.fetch(:replacement_source) +
+                   "\n" +
+                   source.byteslice(insertion_byte..)
+               else
+                 source.byteslice(0...range[:start_byte]) +
+                   operation.fetch(:replacement_source) +
+                   source.byteslice(range[:end_byte]..)
+               end
+      reparsed = parse_ruby_normalized(output, 'ruby')
+      unless reparsed[:ok]
+        return edit_projection_rejection(source, 'operations[0].replacement_source', 'edit_projection_reparse_failed',
+                                         reparsed[:diagnostics].join('; '))
       end
-      reparsed = parse_ruby_normalized(output, "ruby")
-      return edit_projection_rejection(source, "operations[0].replacement_source", "edit_projection_reparse_failed", reparsed[:diagnostics].join("; ")) unless reparsed[:ok]
 
       TreeHaver.build_edit_projection_execution_result(
         output,
@@ -611,7 +630,7 @@ module Prism
           TreeHaver::AppliedEditProjectionOperation.new(
             operation: operation.fetch(:operation),
             target_node_id: operation.fetch(:target_node_id),
-            correlation_key: "metadata.prism.node_path",
+            correlation_key: 'metadata.prism.node_path',
             correlation_value: operation.fetch(:target_node_path)
           )
         ],
@@ -636,8 +655,10 @@ module Prism
       **options
     )
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
-      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
 
       merger = SmartMerger.new(
         template_source,
@@ -653,27 +674,29 @@ module Prism
         ok: true,
         diagnostics: [],
         output: merger.merge.to_s,
-        policies: Ruby::Merge.ruby_feature_profile.fetch(:supported_policies),
+        policies: Ruby::Merge.ruby_feature_profile.fetch(:supported_policies)
       }
     rescue Prism::Merge::ParseError => e
       {
         ok: false,
         diagnostics: [
           {
-            severity: "error",
-            category: e.is_a?(Prism::Merge::DestinationParseError) ? "destination_parse_error" : "parse_error",
-            message: e.message,
-          },
+            severity: 'error',
+            category: e.is_a?(Prism::Merge::DestinationParseError) ? 'destination_parse_error' : 'parse_error',
+            message: e.message
+          }
         ],
-        policies: [],
+        policies: []
       }
     end
 
     def ruby_dsl_signature_generator(require_aliases: nil)
       normalized_require_aliases = normalize_ruby_require_aliases(require_aliases)
-      return @ruby_dsl_signature_generator ||= lambda do |node|
-        ruby_dsl_signature_for(node) || node
-      end if normalized_require_aliases.empty?
+      if normalized_require_aliases.empty?
+        return @ruby_dsl_signature_generator ||= lambda do |node|
+          ruby_dsl_signature_for(node) || node
+        end
+      end
 
       lambda do |node|
         ruby_dsl_signature_for(node, require_aliases: normalized_require_aliases) || node
@@ -701,8 +724,8 @@ module Prism
       Array(require_aliases).each_with_object({}) do |entry, aliases|
         case entry
         when Hash
-          from = entry[:from] || entry["from"]
-          to = entry[:to] || entry["to"]
+          from = entry[:from] || entry['from']
+          to = entry[:to] || entry['to']
         when Array
           from, to = entry
         else
@@ -741,13 +764,16 @@ module Prism
       end
     end
 
-    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children, backend: nil)
+    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
+                                                applied_children, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       Ast::Merge.execute_reviewed_nested_merge(
         review_state,
-        "ruby",
+        'ruby',
         applied_children,
         merge_parent: -> { merge_ruby(template_source, destination_source, dialect, backend: backend) },
         discover_operations: lambda { |merged_output|
@@ -771,12 +797,18 @@ module Prism
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle, backend: nil)
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
+                                                                   replay_bundle, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
-      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == 'ruby' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review replay bundle does not include a reviewed nested execution for ruby.' }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs(
         template_source,
@@ -788,12 +820,18 @@ module Prism
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source,
+                                                                            dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
@@ -804,12 +842,18 @@ module Prism
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state, backend: nil)
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect,
+                                                                  review_state, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
-      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == 'ruby' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review state does not include a reviewed nested execution for ruby.' }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs(
         template_source,
@@ -821,12 +865,18 @@ module Prism
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope, backend: nil)
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source,
+                                                                           dialect, envelope, backend: nil)
       requested = backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == BACKEND_REFERENCE.id
+      unless requested == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs_from_review_state(
         template_source,
@@ -841,7 +891,7 @@ module Prism
       Ruby::Merge.ruby_discovered_surfaces(analysis)
     end
 
-    def ruby_delegated_child_operations(analysis, parent_operation_id: "ruby-document-0")
+    def ruby_delegated_child_operations(analysis, parent_operation_id: 'ruby-document-0')
       Ruby::Merge.ruby_delegated_child_operations(analysis, parent_operation_id: parent_operation_id)
     end
 
@@ -855,7 +905,7 @@ module Prism
         if (require_path = prism_ruby_require_path(node))
           owner = {
             path: "/requires/#{require_index}",
-            owner_kind: "require",
+            owner_kind: 'require',
             match_key: require_path
           }
           require_index += 1
@@ -867,7 +917,7 @@ module Prism
 
         {
           path: "/declarations/#{declaration_name}",
-          owner_kind: "declaration",
+          owner_kind: 'declaration',
           match_key: declaration_name
         }
       end.sort_by { |owner| owner[:path] }
@@ -911,14 +961,14 @@ module Prism
       start_line = filtered_entries.first.fetch(:line)
       end_line = filtered_entries.last.fetch(:line)
       doc_surface = Ast::Merge.discovered_surface(
-        surface_kind: "ruby_doc_comment",
-        declared_language: "yard",
-        effective_language: "yard",
+        surface_kind: 'ruby_doc_comment',
+        declared_language: 'yard',
+        effective_language: 'yard',
         address: "document[0] > ruby_doc_comment[#{owner_name}]",
-        parent_address: "document[0]",
-        owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: "/declarations/#{owner_name}"),
+        parent_address: 'document[0]',
+        owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: "/declarations/#{owner_name}"),
         span: Ast::Merge.surface_span(start_line: start_line, end_line: end_line),
-        reconstruction_strategy: "rewrite_with_prefix_preservation",
+        reconstruction_strategy: 'rewrite_with_prefix_preservation',
         metadata: {
           owner_signature: owner_name,
           comment_prefix: prism_ruby_comment_prefix(filtered_entries.first.fetch(:raw)),
@@ -933,7 +983,7 @@ module Prism
       entries = Array(surface.dig(:metadata, :entries))
       normalized = entries.map { |entry| prism_ruby_normalize_comment_content(entry.fetch(:raw)) }
       normalized.each_with_index.filter_map do |content, tag_index|
-        next unless content.start_with?("@example")
+        next unless content.start_with?('@example')
 
         body_start = tag_index + 1
         body_end = prism_ruby_next_yard_tag_index(normalized, body_start) || normalized.length
@@ -942,18 +992,19 @@ module Prism
         body_entries = entries[body_start...body_end]
         next if body_entries.nil? || body_entries.empty?
 
-        declared_language = prism_ruby_declared_example_language(content) || "ruby"
+        declared_language = prism_ruby_declared_example_language(content) || 'ruby'
         Ast::Merge.discovered_surface(
-          surface_kind: "yard_example_block",
+          surface_kind: 'yard_example_block',
           declared_language: declared_language,
           effective_language: declared_language,
           address: "#{surface.fetch(:address)} > yard_example[#{tag_index}]",
           parent_address: surface.fetch(:address),
-          owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: surface.fetch(:address)),
-          span: Ast::Merge.surface_span(start_line: body_entries.first.fetch(:line), end_line: body_entries.last.fetch(:line)),
-          reconstruction_strategy: "rewrite_with_prefix_preservation",
+          owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: surface.fetch(:address)),
+          span: Ast::Merge.surface_span(start_line: body_entries.first.fetch(:line),
+                                        end_line: body_entries.last.fetch(:line)),
+          reconstruction_strategy: 'rewrite_with_prefix_preservation',
           metadata: {
-            tag_kind: "example",
+            tag_kind: 'example',
             tag_index: tag_index,
             tag_text: content,
             comment_prefix: surface.dig(:metadata, :comment_prefix)
@@ -984,40 +1035,43 @@ module Prism
     def prism_ruby_doc_comment_content?(raw)
       content = prism_ruby_normalize_comment_content(raw)
       return false if content.empty?
-      return false if content.start_with?(":nocov:")
-      return false if %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].any? { |prefix| content.start_with?("#{prefix}:") }
+      return false if content.start_with?(':nocov:')
+      return false if %w[coding encoding frozen_string_literal shareable_constant_value typed
+                         warn_indent].any? do |prefix|
+        content.start_with?("#{prefix}:")
+      end
 
       true
     end
 
     def prism_ruby_normalize_comment_content(raw)
       stripped = raw.to_s.lstrip
-      return stripped unless stripped.start_with?("#")
+      return stripped unless stripped.start_with?('#')
 
-      stripped.delete_prefix("#").delete_prefix(" ").strip
+      stripped.delete_prefix('#').delete_prefix(' ').strip
     end
 
     def prism_ruby_comment_prefix(raw)
       raw_text = raw.to_s
-      hash_index = raw_text.index("#")
-      return "# " unless hash_index
+      hash_index = raw_text.index('#')
+      return '# ' unless hash_index
 
-      raw_text[0..hash_index] + (raw_text[hash_index + 1] == " " ? " " : "")
+      raw_text[0..hash_index] + (raw_text[hash_index + 1] == ' ' ? ' ' : '')
     end
 
     def prism_ruby_next_yard_tag_index(lines, start_index)
       lines.each_with_index do |content, index|
         next if index < start_index
-        return index if content.start_with?("@")
+        return index if content.start_with?('@')
       end
       nil
     end
 
     def prism_ruby_declared_example_language(content)
-      marker = "@example ["
+      marker = '@example ['
       return unless content.start_with?(marker)
 
-      closing_index = content.index("]", marker.length)
+      closing_index = content.index(']', marker.length)
       return unless closing_index
 
       content[marker.length...closing_index]
@@ -1028,7 +1082,7 @@ module Prism
     end
 
     def prism_ruby_comment_line?(line)
-      line.lstrip.start_with?("#")
+      line.lstrip.start_with?('#')
     end
 
     def edit_projection_rejection(source, path, code, message)
@@ -1037,8 +1091,8 @@ module Prism
         [],
         [
           TreeHaver::ProviderDiagnostic.new(
-            severity: "error",
-            category: "unsupported_feature",
+            severity: 'error',
+            category: 'unsupported_feature',
             code: code,
             message: message,
             path: path,
@@ -1065,18 +1119,18 @@ module Prism
     def ruby_normalized_backend_capability(dialect)
       TreeHaver::BackendCapability.new(
         backend_ref: BACKEND_REFERENCE,
-        language: "ruby",
+        language: 'ruby',
         parser_identity: TreeHaver::ParserIdentity.new(
-          name: "prism",
+          name: 'prism',
           version: ::Prism::VERSION,
-          implementation: "ruby"
+          implementation: 'ruby'
         ),
-        language_version: TreeHaver::LanguageVersion.new(version: "ruby", dialect: dialect),
-        parse_error_behavior: "diagnostic_without_tree",
-        source_span_support: "byte_range_and_points",
-        source_fragment_support: "source_slice",
-        render_strategies: ["source_fragment_reuse", "full_file_fallback"],
-        semantic_role_support: "backend_specific_with_portable_mapping",
+        language_version: TreeHaver::LanguageVersion.new(version: 'ruby', dialect: dialect),
+        parse_error_behavior: 'diagnostic_without_tree',
+        source_span_support: 'byte_range_and_points',
+        source_fragment_support: 'source_slice',
+        render_strategies: %w[source_fragment_reuse full_file_fallback],
+        semantic_role_support: 'backend_specific_with_portable_mapping',
         normalized_tree_support: true,
         native_node_access: true,
         diagnostics: []
@@ -1086,8 +1140,8 @@ module Prism
     def ruby_prism_parse_error_tolerance
       TreeHaver::ParseErrorTolerance.new(
         backend_ref: BACKEND_REFERENCE,
-        language: "ruby",
-        behavior: "diagnostic_without_tree",
+        language: 'ruby',
+        behavior: 'diagnostic_without_tree',
         tolerates_errors: false,
         error_nodes: [],
         diagnostics: []
@@ -1097,8 +1151,8 @@ module Prism
     def prism_normalized_metadata
       {
         prism: {
-          native_tree_retained: "true",
-          native_tree_visibility: "provider_internal"
+          native_tree_retained: 'true',
+          native_tree_visibility: 'provider_internal'
         }
       }
     end
@@ -1106,19 +1160,19 @@ module Prism
     def prism_class_node(source, node, index, child_ids:)
       TreeHaver::NormalizedTreeNode.new(
         id: "prism:class:#{index}",
-        kind: "class_declaration",
-        role: "structural",
-        parent_id: "prism:program:0",
+        kind: 'class_declaration',
+        role: 'structural',
+        parent_id: 'prism:program:0',
         child_ids: child_ids,
         span: source_span_for_location(node.location),
-        field_name: "declaration",
+        field_name: 'declaration',
         named: true,
         anonymous: false,
         has_source_text: true,
         source_fragment: source.byteslice(node.location.start_offset...node.location.end_offset),
         backend_kind: node.class.name,
-        semantic_roles: ["declaration", "class", "named_symbol"],
-        backend_roles: ["prism.ClassNode"],
+        semantic_roles: %w[declaration class named_symbol],
+        backend_roles: ['prism.ClassNode'],
         unsupported_features: [],
         metadata: {
           prism: {
@@ -1142,22 +1196,24 @@ module Prism
     end
 
     def prism_comment_node(source, comment, index, magic_comment, parent_id:)
-      directive = prism_comment_directive(source.byteslice(comment.location.start_offset...comment.location.end_offset), magic_comment)
+      directive = prism_comment_directive(
+        source.byteslice(comment.location.start_offset...comment.location.end_offset), magic_comment
+      )
       TreeHaver::NormalizedTreeNode.new(
         id: "prism:comment:#{index}",
         kind: directive.fetch(:kind),
-        role: "comment",
+        role: 'comment',
         parent_id: parent_id,
         child_ids: [],
         span: source_span_for_location(comment.location),
-        field_name: "comment",
+        field_name: 'comment',
         named: false,
         anonymous: false,
         has_source_text: true,
         source_fragment: source.byteslice(comment.location.start_offset...comment.location.end_offset),
         backend_kind: comment.class.name,
         semantic_roles: directive.fetch(:semantic_roles),
-        backend_roles: ["prism.Comment"],
+        backend_roles: ['prism.Comment'],
         unsupported_features: [],
         metadata: {
           prism: {
@@ -1173,36 +1229,36 @@ module Prism
     def prism_comment_directive(comment_text, magic_comment)
       if comment_text.strip.match?(/\A#\s*smorg:freeze\b/)
         {
-          kind: "freeze_directive",
-          directive_kind: "freeze",
-          semantic_roles: ["comment", "directive", "freeze"]
+          kind: 'freeze_directive',
+          directive_kind: 'freeze',
+          semantic_roles: %w[comment directive freeze]
         }
       elsif magic_comment
         {
-          kind: "magic_comment",
-          directive_kind: "magic_comment",
-          semantic_roles: ["comment", "directive", "magic_comment"],
+          kind: 'magic_comment',
+          directive_kind: 'magic_comment',
+          semantic_roles: %w[comment directive magic_comment],
           magic_key: magic_comment.key,
           magic_value: magic_comment.value
         }
       elsif coverage_directive_comment?(comment_text)
         {
-          kind: "coverage_directive",
-          directive_kind: "coverage",
-          semantic_roles: ["comment", "directive", "coverage"]
+          kind: 'coverage_directive',
+          directive_kind: 'coverage',
+          semantic_roles: %w[comment directive coverage]
         }
       else
         {
-          kind: "comment",
-          directive_kind: "comment",
-          semantic_roles: ["comment"]
+          kind: 'comment',
+          directive_kind: 'comment',
+          semantic_roles: ['comment']
         }
       end
     end
 
     def coverage_directive_comment?(comment_text)
       stripped = comment_text.strip
-      stripped == "# :nocov:" || stripped.match?(/\A#\s*simplecov\s*:\s*(?:disable|enable)\b/i)
+      stripped == '# :nocov:' || stripped.match?(/\A#\s*simplecov\s*:\s*(?:disable|enable)\b/i)
     end
 
     def magic_comment_for(comment, magic_comments)
@@ -1216,29 +1272,29 @@ module Prism
       body.each_with_index do |node, index|
         next unless node.is_a?(::Prism::ClassNode)
         next unless comment.location.start_offset > node.location.start_offset &&
-          comment.location.end_offset < node.location.end_offset
+                    comment.location.end_offset < node.location.end_offset
 
         return "prism:class:#{index}"
       end
-      "prism:program:0"
+      'prism:program:0'
     end
 
     def prism_method_node(source, node, class_index, method_index)
       TreeHaver::NormalizedTreeNode.new(
         id: "prism:def:#{method_index}",
-        kind: "method_declaration",
-        role: "structural",
+        kind: 'method_declaration',
+        role: 'structural',
         parent_id: "prism:class:#{class_index}",
         child_ids: [],
         span: source_span_for_location(node.location),
-        field_name: "body",
+        field_name: 'body',
         named: true,
         anonymous: false,
         has_source_text: true,
         source_fragment: source.byteslice(node.location.start_offset...node.location.end_offset),
         backend_kind: node.class.name,
-        semantic_roles: ["declaration", "method", "named_symbol"],
-        backend_roles: ["prism.DefNode"],
+        semantic_roles: %w[declaration method named_symbol],
+        backend_roles: ['prism.DefNode'],
         unsupported_features: [],
         metadata: {
           prism: {
@@ -1315,10 +1371,10 @@ Prism::Merge.register_backend!
 if defined?(Ast::Merge::RSpec::MergeGemRegistry)
   Ast::Merge::RSpec::MergeGemRegistry.register(
     :prism_merge,
-    require_path: "prism/merge",
-    merger_class: "Prism::Merge::SmartMerger",
-    test_source: "def foo; end",
-    category: :code,
+    require_path: 'prism/merge',
+    merger_class: 'Prism::Merge::SmartMerger',
+    test_source: 'def foo; end',
+    category: :code
   )
 end
 

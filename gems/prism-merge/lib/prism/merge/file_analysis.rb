@@ -29,7 +29,7 @@ module Prism
             comment_nodes: true,
             owner_count: @owners.size,
             comment_count: @analysis.tree.comments.size,
-            **details,
+            **details
           )
           @attachments_by_owner = {}
           @preamble_region = nil
@@ -48,7 +48,9 @@ module Prism
           claimed = {}
 
           if @analysis.send(:comment_only_file?)
-            entries = @analysis.send(:native_comment_entries_in_range, 1..@analysis.lines.length).select { |entry| entry[:full_line] }
+            entries = @analysis.send(:native_comment_entries_in_range, 1..@analysis.lines.length).select do |entry|
+              entry[:full_line]
+            end
             @preamble_region = @analysis.send(:build_comment_region, :preamble, entries) if entries.any?
             return
           end
@@ -62,7 +64,8 @@ module Prism
           end
 
           if @owners.empty?
-            @preamble_region = @analysis.comment_region_for_range(1..@analysis.lines.length, kind: :preamble, full_line_only: true)
+            @preamble_region = @analysis.comment_region_for_range(1..@analysis.lines.length, kind: :preamble,
+                                                                                             full_line_only: true)
             return
           end
 
@@ -75,7 +78,8 @@ module Prism
               node.line_number if node.respond_to?(:line_number)
             end&.compact || []
 
-            preamble_entries = @analysis.send(:native_comment_entries_in_range, 1..(first_owner_start - 1)).select do |entry|
+            preamble_entries = @analysis.send(:native_comment_entries_in_range,
+                                              1..(first_owner_start - 1)).select do |entry|
               entry[:full_line] && !attached_leading_lines.include?(entry[:line])
             end
             if preamble_entries.any?
@@ -85,7 +89,10 @@ module Prism
           end
 
           if last_owner_end && last_owner_end < @analysis.lines.length
-            postlude_entries = @analysis.send(:native_comment_entries_in_range, (last_owner_end + 1)..@analysis.lines.length).select { |entry| entry[:full_line] }
+            postlude_entries = @analysis.send(:native_comment_entries_in_range,
+                                              (last_owner_end + 1)..@analysis.lines.length).select do |entry|
+              entry[:full_line]
+            end
             if postlude_entries.any?
               @postlude_region = @analysis.send(:build_comment_region, :postlude, postlude_entries)
               claim_entries!(claimed, postlude_entries)
@@ -125,7 +132,7 @@ module Prism
             orphan_regions: current.orphan_regions + [region],
             leading_gap: current.leading_gap,
             trailing_gap: current.trailing_gap,
-            metadata: current.metadata,
+            metadata: current.metadata
           )
         end
 
@@ -156,7 +163,7 @@ module Prism
       end
 
       # Default freeze token for identifying freeze blocks
-      DEFAULT_FREEZE_TOKEN = "prism-merge"
+      DEFAULT_FREEZE_TOKEN = 'prism-merge'
 
       # Canonical placeholder used in signatures to normalize the gemspec block variable.
       # When `Gem::Specification.new do |spec|` uses a different name from the template
@@ -180,8 +187,9 @@ module Prism
       # that subsequent calls to +nodes_with_comments+ use the updated placeholder.
       def gemspec_block_var=(var)
         return if @gemspec_block_var == var
+
         @gemspec_block_var = var
-        @nodes_with_comments = nil  # invalidate memoised cache
+        @nodes_with_comments = nil # invalidate memoised cache
       end
 
       # Lines claimed by promoted BlockDirective nodes.
@@ -201,7 +209,8 @@ module Prism
       # @param freeze_token [String] Token for freeze block markers (default: "prism-merge")
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param options [Hash] Additional options for forward compatibility
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, source_label: nil,
+                     **_options)
         @source = source
         @lines = source.lines
         @freeze_token = freeze_token
@@ -213,9 +222,9 @@ module Prism
         # Store the full tree_haver result so downstream code can use @tree.comments
         # (normalized, deduplicated, with attachment hints) rather than accessing raw
         # Prism::Comment objects via @parse_result.comments or node.location.leading_comments.
-        @tree = DebugLogger.time("FileAnalysis#parse") {
+        @tree = DebugLogger.time('FileAnalysis#parse') do
           TreeHaver.parser_for(:ruby).parse(source)
-        }
+        end
         @parse_result = @tree.parse_result
         @gemspec_block_var = detect_gemspec_block_var
 
@@ -226,11 +235,11 @@ module Prism
         # Extract and validate structure
         @statements = extract_and_integrate_all_nodes
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          statements_count: @statements.size,
-          frozen_nodes_count: frozen_nodes.size,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            statements_count: @statements.size,
+                            frozen_nodes_count: frozen_nodes.size
+                          })
       end
 
       # Check if parse was successful
@@ -254,7 +263,7 @@ module Prism
           style: :hash_comment,
           attachment_hints: true,
           comment_nodes: true,
-          comment_count: comment_nodes.size,
+          comment_count: comment_nodes.size
         )
       end
 
@@ -268,7 +277,7 @@ module Prism
         @comment_support_style ||= shared_comment_support_style(
           source: :prism,
           style: :hash_comment,
-          read_strategy: :native_read_portable_write,
+          read_strategy: :native_read_portable_write
         )
       end
 
@@ -282,22 +291,22 @@ module Prism
 
       def ruleset_repair_policies
         [
-          {kind: :comment_ownership_overlap, handling: :heal},
-          {kind: :duplicate_template_leading_prefix, handling: :heal},
+          { kind: :comment_ownership_overlap, handling: :heal },
+          { kind: :duplicate_template_leading_prefix, handling: :heal }
         ]
       end
 
       def ruleset_surfaces
         [
-          {name: :ruby_doc_comment, selector: :native_attachment},
-          {name: :yard_example_block, selector: :yard_example_tag},
+          { name: :ruby_doc_comment, selector: :native_attachment },
+          { name: :yard_example_block, selector: :yard_example_tag }
         ]
       end
 
       def ruleset_delegation_policies
         [
-          {surface_name: :ruby_doc_comment, strategy: :same_ruleset},
-          {surface_name: :yard_example_block, strategy: :same_ruleset},
+          { surface_name: :ruby_doc_comment, strategy: :same_ruleset },
+          { surface_name: :yard_example_block, strategy: :same_ruleset }
         ]
       end
 
@@ -325,7 +334,7 @@ module Prism
       def comment_region_for_range(range, kind:, full_line_only: false)
         entries = native_comment_entries_in_range(range)
         entries = entries.select { |entry| entry[:full_line] } if full_line_only
-        build_comment_region(kind, entries, metadata: {range: range, full_line_only: full_line_only})
+        build_comment_region(kind, entries, metadata: { range: range, full_line_only: full_line_only })
       end
 
       # Build a native shared comment attachment for an owner.
@@ -336,14 +345,12 @@ module Prism
       def comment_attachment_for(owner, **options)
         leading_entries = owner_leading_comment_entries(owner)
         split_preamble = split_first_owner_preamble?(owner, leading_entries)
-        if split_preamble
-          _preamble_entries, leading_entries = split_first_owner_preamble_entries(leading_entries)
-        end
+        _preamble_entries, leading_entries = split_first_owner_preamble_entries(leading_entries) if split_preamble
 
         leading_region = build_comment_region(
           :leading,
           leading_entries,
-          metadata: split_preamble ? {floating: true} : {},
+          metadata: split_preamble ? { floating: true } : {}
         )
         inline_region = build_comment_region(:inline, owner_inline_comment_entries(owner))
         trailing_region = build_comment_region(:trailing, owner_trailing_comment_entries(owner))
@@ -358,8 +365,8 @@ module Prism
           trailing_gap: layout_attachment.trailing_gap,
           metadata: {
             source: :prism_native,
-            line_num: owner_start_line(owner),
-          }.merge(options),
+            line_num: owner_start_line(owner)
+          }.merge(options)
         )
       end
 
@@ -380,17 +387,17 @@ module Prism
       def layout_attachment_for(owner, **options)
         owners = layout_augmenter_default_owners
         augmenter = if owners.any? { |candidate| candidate.equal?(owner) }
-          layout_augmenter(**options)
-        else
-          layout_augmenter(owners: [owner], **options)
-        end
+                      layout_augmenter(**options)
+                    else
+                      layout_augmenter(owners: [owner], **options)
+                    end
 
         augmenter.attachment_for(owner) || Ast::Merge::Layout::Attachment.new(
           owner: owner,
           metadata: {
             source: :prism_native,
-            line_num: owner_start_line(owner),
-          }.merge(options),
+            line_num: owner_start_line(owner)
+          }.merge(options)
         )
       end
 
@@ -503,7 +510,7 @@ module Prism
         # Prism node types. Statements may be wrapped in FrozenWrapper; unwrap
         # them here.
         statements.select { |node| node.is_a?(Ast::Merge::Freezable) }
-          .map { |node| node.respond_to?(:unwrap) ? node.unwrap : node }
+                  .map { |node| node.respond_to?(:unwrap) ? node.unwrap : node }
       end
 
       class << self
@@ -520,13 +527,12 @@ module Prism
           parse_result.attach_comments!
         # simplecov:disable defensive - JRuby compatibility for Comments class autoloading
         rescue NameError => e
-          if e.message.include?("Comments")
-            # On JRuby, the Comments class needs to be explicitly required
-            require "prism/parse_result/comments"
-            parse_result.attach_comments!
-          else
-            raise
-          end
+          raise unless e.message.include?('Comments')
+
+          # On JRuby, the Comments class needs to be explicitly required
+          require 'prism/parse_result/comments'
+          parse_result.attach_comments!
+
           # simplecov:enable
         end
       end
@@ -552,9 +558,9 @@ module Prism
           start_line_for: method(:owner_start_line),
           end_line_for: method(:owner_end_line),
           metadata: {
-            source: :prism_native,
+            source: :prism_native
           },
-          **options,
+          **options
         )
       end
 
@@ -564,24 +570,24 @@ module Prism
 
       def native_comment_entries
         @native_comment_entries ||= if comment_only_file?
-          comment_entries_from_comment_only_statements
-        else
-          # Use the flat, deduplicated list from tree_haver rather than
-          # re-collecting from node.location.leading_comments (which can
-          # produce duplicates when a comment is attached to multiple nodes).
-          # Two exclusions are required to match the scope of the old path:
-          # 1. Lines claimed by promoted BlockDirective nodes (FreezeNode /
-          #    NocovNode): those comments live inside synthetic nodes and must
-          #    not appear as orphan preamble/postlude regions in the augmenter.
-          # 2. Comments nested inside a top-level statement's body (e.g. coverage
-          #    directives inside a `task :default do...end` block): those are
-          #    handled during recursive body merging and must not appear at the
-          #    file level either.
-          @tree.comments
-            .reject { |th_comment| claimed_lines.include?(th_comment.location.start_line) }
-            .reject { |th_comment| nested_in_top_level_statement?(th_comment.location.start_line) }
-            .map { |th_comment| native_comment_entry_from_tree(th_comment) }
-        end
+                                      comment_entries_from_comment_only_statements
+                                    else
+                                      # Use the flat, deduplicated list from tree_haver rather than
+                                      # re-collecting from node.location.leading_comments (which can
+                                      # produce duplicates when a comment is attached to multiple nodes).
+                                      # Two exclusions are required to match the scope of the old path:
+                                      # 1. Lines claimed by promoted BlockDirective nodes (FreezeNode /
+                                      #    NocovNode): those comments live inside synthetic nodes and must
+                                      #    not appear as orphan preamble/postlude regions in the augmenter.
+                                      # 2. Comments nested inside a top-level statement's body (e.g. coverage
+                                      #    directives inside a `task :default do...end` block): those are
+                                      #    handled during recursive body merging and must not appear at the
+                                      #    file level either.
+                                      @tree.comments
+                                           .reject { |th_comment| claimed_lines.include?(th_comment.location.start_line) }
+                                           .reject { |th_comment| nested_in_top_level_statement?(th_comment.location.start_line) }
+                                           .map { |th_comment| native_comment_entry_from_tree(th_comment) }
+                                    end
       end
 
       # Returns true if +line+ falls strictly inside the body of any top-level
@@ -611,8 +617,8 @@ module Prism
           nodes: entries.map { |entry| entry[:node] },
           metadata: {
             source: :prism_native,
-            entries: entries,
-          }.merge(metadata),
+            entries: entries
+          }.merge(metadata)
         )
       end
 
@@ -658,7 +664,9 @@ module Prism
 
         preamble_entries = groups.first
         remaining_lines = groups.drop(1).flatten.map { |entry| entry[:line] }
-        remaining_entries = Array(leading_entries).reject { |entry| preamble_entries.include?(entry) }.sort_by { |entry| entry[:line] }
+        remaining_entries = Array(leading_entries).reject do |entry|
+          preamble_entries.include?(entry)
+        end.sort_by { |entry| entry[:line] }
         return [[], leading_entries] if remaining_lines.empty? || remaining_entries.empty?
 
         [preamble_entries, remaining_entries]
@@ -710,7 +718,7 @@ module Prism
         raw = th_comment.text.chomp
         {
           line: line,
-          text: raw.sub(/\A\s*#\s?/, ""),
+          text: raw.sub(/\A\s*#\s?/, ''),
           raw: raw,
           separator: inline_comment_separator_for(line, raw),
           # tree_haver classifies: :leading (full-line before code), :trailing (full-line
@@ -720,8 +728,8 @@ module Prism
           node: Prism::Merge::Comment::Line.new(
             text: raw,
             line_number: line,
-            magic_comment_type: native_header_magic_comment_types[line],
-          ),
+            magic_comment_type: native_header_magic_comment_types[line]
+          )
         }
       end
 
@@ -736,7 +744,7 @@ module Prism
         raw = comment.slice.chomp
         {
           line: line,
-          text: comment.slice.sub(/\A\s*#\s?/, ""),
+          text: comment.slice.sub(/\A\s*#\s?/, ''),
           raw: raw,
           separator: inline_comment_separator_for(line, raw),
           full_line: full_line_comment?(comment, attached_as: attached_as),
@@ -744,8 +752,8 @@ module Prism
           node: Prism::Merge::Comment::Line.new(
             text: raw,
             line_number: line,
-            magic_comment_type: native_header_magic_comment_types[line],
-          ),
+            magic_comment_type: native_header_magic_comment_types[line]
+          )
         }
       end
 
@@ -769,7 +777,7 @@ module Prism
           raw: node.text,
           full_line: true,
           attached_as: :comment_only,
-          node: node,
+          node: node
         }
       end
 
@@ -781,13 +789,13 @@ module Prism
         return true if attached_as == :leading
 
         line = @lines[comment.location.start_line - 1].to_s
-        line.lstrip.start_with?("#")
+        line.lstrip.start_with?('#')
       end
 
       def inline_comment_separator_for(line_number, raw_comment)
         return if raw_comment.to_s.empty?
 
-        line_text = line_at(line_number).to_s.sub(/\r?\n\z/, "")
+        line_text = line_at(line_number).to_s.sub(/\r?\n\z/, '')
         prefix, separator, = line_text.rpartition(raw_comment)
         return unless separator == raw_comment
 
@@ -822,32 +830,30 @@ module Prism
 
         body = @parse_result.value.statements
         raw_nodes = if body.nil?
-          # simplecov:disable defensive
-          []
-          # simplecov:enable
-        elsif body.type.to_s == "statements_node"
-          body.body.compact
-        else
-          # simplecov:disable defensive
-          [body].compact
-          # simplecov:enable
-        end
+                      # simplecov:disable defensive
+                      []
+                    # simplecov:enable
+                    elsif body.type.to_s == 'statements_node'
+                      body.body.compact
+                    else
+                      # simplecov:disable defensive
+                      [body].compact
+                      # simplecov:enable
+                    end
 
-        if raw_nodes.empty? && @lines.any?
-          return Comment::Parser.parse(@lines)
-        end
+        return Comment::Parser.parse(@lines) if raw_nodes.empty? && @lines.any?
 
         # Detect block directive spans (freeze and nocov) from raw source lines.
         # Directives are promoted to FreezeNode / NocovNode synthetic nodes.
         # This runs AFTER Prism's attach_comments! to avoid being misled by Prism's
         # leading-comment attachment, which can hoist standalone freeze/unfreeze
         # instruction blocks onto the first code node.
-        freeze_tok = (@freeze_token.nil? || @freeze_token.empty?) ? nil : @freeze_token
+        freeze_tok = @freeze_token.nil? || @freeze_token.empty? ? nil : @freeze_token
         detector = BlockDirectiveDetector.new(
           @lines,
           freeze_token: freeze_tok,
           nocov_token: BlockDirectiveDetector::NOCOV_TOKEN,
-          source_label: @source_label,
+          source_label: @source_label
         )
         spans = detector.detect_spans
         promoted = detector.promote_spans_to_nodes(raw_nodes, spans, analysis: self)
@@ -900,7 +906,7 @@ module Prism
               leading_comments: [],
               inline_comments: [],
               signature: stmt.signature,
-              line_range: stmt.location.start_line..stmt.location.end_line,
+              line_range: stmt.location.start_line..stmt.location.end_line
             }
           else
             # Unwrap any FrozenWrapper to provide the underlying Prism node as
@@ -914,7 +920,7 @@ module Prism
               leading_comments: (stmt.location.respond_to?(:leading_comments) ? stmt.location.leading_comments : []),
               inline_comments: (stmt.location.respond_to?(:trailing_comments) ? stmt.location.trailing_comments : []),
               signature: generate_signature(actual_node),
-              line_range: stmt.location.start_line..stmt.location.end_line,
+              line_range: stmt.location.start_line..stmt.location.end_line
             }
           end
         end
@@ -1003,18 +1009,14 @@ module Prism
       def compute_node_signature(node)
         # Handle our custom AST nodes (CommentBlock, CommentLine, EmptyLine, etc.)
         # These have their own signature method that returns the appropriate format
-        if node.is_a?(Ast::Merge::AstNode)
-          return node.signature
-        end
+        return node.signature if node.is_a?(Ast::Merge::AstNode)
 
         # BlockDirective nodes (NocovNode, etc.) that are not FreezeNodeBase:
         # call their own #signature method.  NocovNode#signature delegates to the
         # inner content so a NocovNode in the template can match the same bare node
         # in the dest (and vice-versa), preventing duplication on each merge run.
         # FreezeNodeBase is handled earlier in generate_signature via freeze_signature.
-        if node.is_a?(Ast::Merge::BlockDirective) && !node.is_a?(Ast::Merge::FreezeNodeBase)
-          return node.signature
-        end
+        return node.signature if node.is_a?(Ast::Merge::BlockDirective) && !node.is_a?(Ast::Merge::FreezeNodeBase)
 
         # IMPORTANT: Do NOT call node.signature - Prism nodes have their own signature method
         # that returns [node_type_symbol, source_text] which is not what we want for matching.
@@ -1056,30 +1058,30 @@ module Prism
         when :def
           # Extract parameter names from ParametersNode
           params = if node.parameters
-            # Handle forwarding parameters (def foo(...)) specially
-            if node.parameters.is_a?(Prism::ForwardingParameterNode)
-              # simplecov:disable defensive - current Prism wraps ForwardingParameterNode in ParametersNode
-              [:forwarding]
-              # simplecov:enable
-            else
-              param_names = []
-              param_names.concat(node.parameters.requireds.map(&:name)) if node.parameters.requireds
-              param_names.concat(node.parameters.optionals.map(&:name)) if node.parameters.optionals
-              param_names << node.parameters.rest.name if node.parameters.rest&.respond_to?(:name)
-              param_names.concat(node.parameters.posts.map(&:name)) if node.parameters.posts
-              param_names.concat(node.parameters.keywords.map(&:name)) if node.parameters.keywords
-              # keyword_rest can be KeywordRestParameterNode (has name) or ForwardingParameterNode (no name)
-              if node.parameters.keyword_rest&.respond_to?(:name)
-                param_names << node.parameters.keyword_rest.name
-              elsif node.parameters.keyword_rest.is_a?(Prism::ForwardingParameterNode)
-                param_names << :forwarding
-              end
-              param_names << node.parameters.block.name if node.parameters.block
-              param_names
-            end
-          else
-            []
-          end
+                     # Handle forwarding parameters (def foo(...)) specially
+                     if node.parameters.is_a?(Prism::ForwardingParameterNode)
+                       # simplecov:disable defensive - current Prism wraps ForwardingParameterNode in ParametersNode
+                       [:forwarding]
+                       # simplecov:enable
+                     else
+                       param_names = []
+                       param_names.concat(node.parameters.requireds.map(&:name)) if node.parameters.requireds
+                       param_names.concat(node.parameters.optionals.map(&:name)) if node.parameters.optionals
+                       param_names << node.parameters.rest.name if node.parameters.rest&.respond_to?(:name)
+                       param_names.concat(node.parameters.posts.map(&:name)) if node.parameters.posts
+                       param_names.concat(node.parameters.keywords.map(&:name)) if node.parameters.keywords
+                       # keyword_rest can be KeywordRestParameterNode (has name) or ForwardingParameterNode (no name)
+                       if node.parameters.keyword_rest&.respond_to?(:name)
+                         param_names << node.parameters.keyword_rest.name
+                       elsif node.parameters.keyword_rest.is_a?(Prism::ForwardingParameterNode)
+                         param_names << :forwarding
+                       end
+                       param_names << node.parameters.block.name if node.parameters.block
+                       param_names
+                     end
+                   else
+                     []
+                   end
           [:def, node.name, params]
 
         # === Class/Module definitions ===
@@ -1091,14 +1093,14 @@ module Prism
           # class << self or class << expr
           expr = begin
             node.expression.slice
-          rescue
-            "self"
+          rescue StandardError
+            'self'
           end
           [:singleton_class, expr]
 
         # === Constants ===
         when :const
-          if node.type.to_s == "constant_write_node"
+          if node.type.to_s == 'constant_write_node'
             [:const, node.name]
           else
             [:const, node.target.slice]
@@ -1135,16 +1137,16 @@ module Prism
         when :if, :unless
           # Conditionals match by their condition expression
           condition_source = node.predicate.slice
-          [(node.type.to_s == "if_node") ? :if : :unless, condition_source]
+          [node.type.to_s == 'if_node' ? :if : :unless, condition_source]
 
         # === Case/Switch statements ===
         when :case
           # case expr; when ... end - match by the expression being switched on
-          predicate = node.predicate&.slice || ""
+          predicate = node.predicate&.slice || ''
           [:case, predicate]
         when :case_match
           # case expr; in ... end (pattern matching) - match by the expression
-          predicate = node.predicate&.slice || ""
+          predicate = node.predicate&.slice || ''
           [:case_match, predicate]
 
         # === Loops ===
@@ -1162,7 +1164,7 @@ module Prism
         when :begin
           # begin/rescue/ensure blocks - unique by position within parent
           # Since these don't have a natural identifier, use first statement
-          first_stmt = node.statements&.body&.first&.slice&.[](0, 30) || ""
+          first_stmt = node.statements&.body&.first&.slice&.[](0, 30) || ''
           [:begin, first_stmt]
 
         # === Method calls ===
@@ -1173,7 +1175,7 @@ module Prism
           method_name = node.name.to_s
           receiver = node.receiver&.slice
 
-          if method_name.end_with?("=")
+          if method_name.end_with?('=')
             # Assignment method: config.setting = "value"
             # Match by receiver and method name, NOT the value being assigned.
             #
@@ -1182,19 +1184,19 @@ module Prism
             # Only applies when the receiver is a plain local variable (not a chained
             # call like `spec.metadata["key"]`) and it matches the detected block param.
             effective_receiver = if @gemspec_block_var &&
-                receiver == @gemspec_block_var
-              # Normalise the gemspec block variable so `gem.name =` and `spec.name =`
-              # produce the same signature.  We rely on the slice comparison alone —
-              # the guard intentionally does NOT require Prism::LocalVariableReadNode
-              # because when body text is parsed standalone (no enclosing block), the
-              # parameter name (`gem`, `spec`, …) is parsed as a zero-arg CallNode by
-              # Prism, not as a LocalVariableReadNode.  The slice match is sufficient
-              # because chained receivers (e.g. `spec.metadata`) produce longer slices
-              # that will never equal the single-word block parameter name.
-              GEMSPEC_VAR_PLACEHOLDER
-            else
-              receiver
-            end
+                                    receiver == @gemspec_block_var
+                                   # Normalise the gemspec block variable so `gem.name =` and `spec.name =`
+                                   # produce the same signature.  We rely on the slice comparison alone —
+                                   # the guard intentionally does NOT require Prism::LocalVariableReadNode
+                                   # because when body text is parsed standalone (no enclosing block), the
+                                   # parameter name (`gem`, `spec`, …) is parsed as a zero-arg CallNode by
+                                   # Prism, not as a LocalVariableReadNode.  The slice match is sufficient
+                                   # because chained receivers (e.g. `spec.metadata`) produce longer slices
+                                   # that will never equal the single-word block parameter name.
+                                   GEMSPEC_VAR_PLACEHOLDER
+                                 else
+                                   receiver
+                                 end
             if node.block
               # simplecov:disable defensive - Ruby syntax doesn't allow blocks with assignment methods
               [:call_with_block, node.name, effective_receiver]
@@ -1223,20 +1225,20 @@ module Prism
         when :call_op_write
           receiver = node.receiver&.slice
           effective_receiver = if @gemspec_block_var && receiver == @gemspec_block_var
-            GEMSPEC_VAR_PLACEHOLDER
-          else
-            receiver
-          end
+                                 GEMSPEC_VAR_PLACEHOLDER
+                               else
+                                 receiver
+                               end
           [:call_op_write, node.write_name, effective_receiver]
 
         # === Lambdas ===
         when :lambda
           # Lambdas don't have names, but we can identify by parameter signature
           params = if node.parameters
-            node.parameters.slice
-          else
-            ""
-          end
+                     node.parameters.slice
+                   else
+                     ''
+                   end
           [:lambda, params]
 
         # === Special blocks ===
@@ -1250,12 +1252,12 @@ module Prism
         # === Parenthesized expressions ===
         when :parens
           # Usually transparent, but if it appears at top level, identify by content
-          first_expr = node.body&.body&.first&.slice&.[](0, 30) || ""
+          first_expr = node.body&.body&.first&.slice&.[](0, 30) || ''
           [:parens, first_expr]
 
         # === Embedded statements (string interpolation) ===
         when :embedded
-          [:embedded, node.statements&.slice || ""]
+          [:embedded, node.statements&.slice || '']
 
         else
           # Fallback: use class name and line number
@@ -1301,7 +1303,7 @@ module Prism
           next unless node.is_a?(Prism::CallNode)
           next unless node.name == :new
           next unless node.receiver.is_a?(Prism::ConstantPathNode)
-          next unless node.receiver.slice == "Gem::Specification"
+          next unless node.receiver.slice == 'Gem::Specification'
           next unless node.block.is_a?(Prism::BlockNode)
 
           bp = node.block.parameters
