@@ -65,8 +65,8 @@ module Psych
           scalar: :scalar,
           alias: :alias,
           document: :document,
-          stream: :stream,
-        }.freeze,
+          stream: :stream
+        }.freeze
       )
     end
   end

@@ -15,7 +15,7 @@ module Psych
       include Ast::Merge::EmitterLineMetadataSupport
 
       # Initialize subclass-specific state
-      def initialize_subclass_state(**options)
+      def initialize_subclass_state(**_options)
         initialize_line_metadata_state
       end
 
@@ -25,13 +25,13 @@ module Psych
       end
 
       def emit_blank_line
-        append_line("")
+        append_line('')
       end
 
       # Emit a tracked comment from CommentTracker
       # @param comment [Hash] Comment with :text, :indent
       def emit_tracked_comment(comment)
-        indent = " " * (comment[:indent] || 0)
+        indent = ' ' * (comment[:indent] || 0)
         append_line("#{indent}# #{comment[:text]}")
       end
 
@@ -68,7 +68,7 @@ module Psych
       # @param key [String] Key name
       # @param anchor [String, nil] Anchor name (without &)
       def emit_mapping_start(key, anchor: nil, metadata: nil)
-        anchor_str = anchor ? " &#{anchor}" : ""
+        anchor_str = anchor ? " &#{anchor}" : ''
         append_line("#{current_indent}#{key}:#{anchor_str}", metadata)
         indent
       end
@@ -83,11 +83,11 @@ module Psych
       # @param key [String, nil] Key name (nil for inline sequence)
       # @param anchor [String, nil] Anchor name
       def emit_sequence_start(key, anchor: nil, metadata: nil)
-        if key
-          anchor_str = anchor ? " &#{anchor}" : ""
-          append_line("#{current_indent}#{key}:#{anchor_str}", metadata)
-          indent
-        end
+        return unless key
+
+        anchor_str = anchor ? " &#{anchor}" : ''
+        append_line("#{current_indent}#{key}:#{anchor_str}", metadata)
+        indent
       end
 
       # Emit a sequence item
@@ -144,13 +144,13 @@ module Psych
         end
 
         base = @lines[-1].to_s.rstrip
-        comment_suffix = text.empty? ? "#" : "# #{text}"
+        comment_suffix = text.empty? ? '#' : "# #{text}"
         @lines[-1] = base.ljust([target_column.to_i, base.length + 1].max) + comment_suffix
       end
 
       def inline_comment_region_target_column(region, current_line:)
         tracked_hash = region.respond_to?(:metadata) ? Array(region.metadata[:tracked_hashes]).first : nil
-        tracked_hash && (tracked_hash[:indent] || tracked_hash["indent"])
+        tracked_hash && (tracked_hash[:indent] || tracked_hash['indent'])
       end
 
       def comment_region_nodes(region)
@@ -171,7 +171,9 @@ module Psych
 
           segment = signatures.first(segment_length)
           repeats = signatures.length / segment_length
-          return segment_length if repeats > 1 && (0...repeats).all? { |idx| signatures.slice(idx * segment_length, segment_length) == segment }
+          return segment_length if repeats > 1 && (0...repeats).all? do |idx|
+            signatures.slice(idx * segment_length, segment_length) == segment
+          end
         end
 
         nil
@@ -213,10 +215,10 @@ module Psych
 
       def escape_double_quotes(value)
         value.to_s
-          .gsub("\\", "\\\\")
-          .gsub("\"", "\\\"")
-          .gsub("\n", "\\n")
-          .gsub("\t", "\\t")
+             .gsub('\\', '\\\\')
+             .gsub('"', '\"')
+             .gsub("\n", '\\n')
+             .gsub("\t", '\\t')
       end
 
       def indent_multiline(value)
@@ -239,7 +241,7 @@ module Psych
         return true if %w[true false yes no on off null ~].include?(str.downcase)
 
         # Check for numeric values that should stay as strings
-        return true if str =~ /^\d+$/ && str.start_with?("0") && str.length > 1
+        return true if str =~ /^\d+$/ && str.start_with?('0') && str.length > 1
 
         false
       end

@@ -44,7 +44,8 @@ module Psych
       # @param threshold [Float] Minimum score to accept a match (default: 0.5)
       # @param key_weight [Float] Weight for key similarity (default: 0.7)
       # @param value_weight [Float] Weight for value similarity (default: 0.3)
-      def initialize(threshold: DEFAULT_THRESHOLD, key_weight: DEFAULT_KEY_WEIGHT, value_weight: DEFAULT_VALUE_WEIGHT, **options)
+      def initialize(threshold: DEFAULT_THRESHOLD, key_weight: DEFAULT_KEY_WEIGHT, value_weight: DEFAULT_VALUE_WEIGHT,
+                     **options)
         super(threshold: threshold, **options)
         @key_weight = key_weight
         @value_weight = value_weight
@@ -56,7 +57,7 @@ module Psych
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context
       # @return [Array<MatchResult>] Array of mapping entry matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         template_entries = template_nodes.select { |n| mapping_entry?(n) }
         dest_entries = dest_nodes.select { |n| mapping_entry?(n) }
 
@@ -109,7 +110,7 @@ module Psych
       # @param key [String] Key to normalize
       # @return [String] Normalized key
       def normalize_key(key)
-        key.downcase.gsub(/[-_]/, "")
+        key.downcase.gsub(/[-_]/, '')
       end
 
       # Compute similarity between two entry values.
@@ -226,9 +227,7 @@ module Psych
         return str1.length if str2.empty?
 
         # Ensure str1 is the shorter string for space optimization
-        if str1.length > str2.length
-          str1, str2 = str2, str1
-        end
+        str1, str2 = str2, str1 if str1.length > str2.length
 
         m = str1.length
         n = str2.length
@@ -241,11 +240,11 @@ module Psych
           curr_row[0] = j
 
           (1..m).each do |i|
-            cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1
+            cost = str1[i - 1] == str2[j - 1] ? 0 : 1
             curr_row[i] = [
               prev_row[i] + 1,      # deletion
               curr_row[i - 1] + 1,  # insertion
-              prev_row[i - 1] + cost, # substitution
+              prev_row[i - 1] + cost # substitution
             ].min
           end
 

@@ -14,7 +14,7 @@ module Psych
       include Ast::Merge::FileAnalyzable
 
       # Default freeze token for identifying freeze blocks
-      DEFAULT_FREEZE_TOKEN = "psych-merge"
+      DEFAULT_FREEZE_TOKEN = 'psych-merge'
 
       # @return [CommentTracker] Comment tracker for this file
       attr_reader :comment_tracker
@@ -34,7 +34,7 @@ module Psych
       # @param freeze_token [String] Token for freeze block markers
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param options [Hash] Additional options (forward compatibility - ignored by FileAnalysis)
-      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **options)
+      def initialize(source, freeze_token: DEFAULT_FREEZE_TOKEN, signature_generator: nil, **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
@@ -46,18 +46,18 @@ module Psych
         @comment_tracker = CommentTracker.new(source)
 
         # Parse the YAML
-        DebugLogger.time("FileAnalysis#parse_yaml") { parse_yaml }
+        DebugLogger.time('FileAnalysis#parse_yaml') { parse_yaml }
 
         # Extract freeze blocks and integrate with nodes
         @freeze_blocks = extract_freeze_blocks
         @statements = integrate_nodes_and_freeze_blocks
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          statements_count: @statements.size,
-          freeze_blocks: @freeze_blocks.size,
-          valid: valid?,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            statements_count: @statements.size,
+                            freeze_blocks: @freeze_blocks.size,
+                            valid: valid?
+                          })
       end
 
       # Check if parse was successful
@@ -83,7 +83,7 @@ module Psych
         @comment_support_style ||= shared_comment_support_style(
           source: :psych_source,
           style: :hash_comment,
-          read_strategy: :source_augmented_portable_write,
+          read_strategy: :source_augmented_portable_write
         )
       end
 
@@ -112,7 +112,7 @@ module Psych
         comment_tracker.comment_region_for_range(
           range,
           kind: kind,
-          full_line_only: full_line_only,
+          full_line_only: full_line_only
         )
       end
 
@@ -124,7 +124,7 @@ module Psych
       def comment_augmenter(owners: nil, **options)
         comment_tracker.augment(
           owners: owners || comment_augmenter_default_owners,
-          **options,
+          **options
         )
       end
 
@@ -202,16 +202,16 @@ module Psych
       # @return [Ast::Merge::Comment::Attachment]
       def comment_attachment_for(owner, line_num: nil, **options)
         base_attachment = if owner.is_a?(MappingEntry) && options.empty?
-          mapping_entry_attachment(owner)
-        else
-          @comment_tracker.comment_attachment_for(owner, line_num: line_num, **options)
-        end
+                            mapping_entry_attachment(owner)
+                          else
+                            @comment_tracker.comment_attachment_for(owner, line_num: line_num, **options)
+                          end
 
         shared_comment_attachment_for(
           owner,
           tracker_attachment: base_attachment,
           line_num: line_num,
-          **options,
+          **options
         )
       end
 
@@ -238,7 +238,8 @@ module Psych
         augmenter_attachment = comment_augmenter(owners: [owner]).attachment_for(owner)
         comment_blocks = full_line_comment_blocks_before(owner.key.start_line || 1)
         leading_comments = comment_blocks.last || []
-        floating_leading = leading_comments.any? && gap_before_comment_block?(leading_comments, owner.key.start_line || 1)
+        floating_leading = leading_comments.any? && gap_before_comment_block?(leading_comments,
+                                                                              owner.key.start_line || 1)
 
         Ast::Merge::Comment::Attachment.new(
           owner: owner,
@@ -246,19 +247,19 @@ module Psych
           inline_region: build_comment_region(:inline, [inline_comment_node_at(owner.key.start_line || 1)].compact),
           trailing_region: augmenter_attachment&.trailing_region,
           orphan_regions: comment_blocks[0...-1].map { |block| build_comment_region(:orphan, block) }.compact,
-          metadata: {key_name: owner.key_name},
+          metadata: { key_name: owner.key_name }
         )
       end
 
       def build_comment_region(kind, comments, floating: false)
         return if comments.empty?
 
-        Ast::Merge::Comment::Region.new(kind: kind, nodes: comments, metadata: {floating: floating})
+        Ast::Merge::Comment::Region.new(kind: kind, nodes: comments, metadata: { floating: floating })
       end
 
       def inline_comment_node_at(line_num)
         raw_line = @lines[line_num - 1].to_s
-        return if raw_line.strip.start_with?("#")
+        return if raw_line.strip.start_with?('#')
 
         @comment_tracker.comment_node_at(line_num)
       end
@@ -280,7 +281,7 @@ module Psych
             next
           end
 
-          break unless stripped.start_with?("#")
+          break unless stripped.start_with?('#')
 
           comment = @comment_tracker.comment_node_at(current_line)
           break unless comment
@@ -301,16 +302,14 @@ module Psych
       end
 
       def wrap_root_node(root)
-        line_num = if root.respond_to?(:start_line) && root.start_line
-          root.start_line + 1
-        end
+        line_num = (root.start_line + 1 if root.respond_to?(:start_line) && root.start_line)
 
         NodeWrapper.new(
           root,
           lines: @lines,
           leading_comments: line_num ? @comment_tracker.leading_comments_before(line_num) : [],
           inline_comment: line_num ? @comment_tracker.inline_comment_at(line_num) : nil,
-          comment_tracker: @comment_tracker,
+          comment_tracker: @comment_tracker
         )
       end
 
@@ -339,10 +338,10 @@ module Psych
           next unless (match = line.match(freeze_pattern))
 
           marker_type = match[1]&.downcase # 'freeze' or 'unfreeze'
-          if marker_type == "freeze"
-            freeze_starts << {line: line_num, marker: line}
-          elsif marker_type == "unfreeze"
-            freeze_ends << {line: line_num, marker: line}
+          if marker_type == 'freeze'
+            freeze_starts << { line: line_num, marker: line }
+          elsif marker_type == 'unfreeze'
+            freeze_ends << { line: line_num, marker: line }
           end
         end
 
@@ -361,7 +360,7 @@ module Psych
             end_line: matching_end[:line],
             lines: @lines,
             start_marker: start_info[:marker],
-            end_marker: matching_end[:marker],
+            end_marker: matching_end[:marker]
           )
         end
 
@@ -394,9 +393,7 @@ module Psych
 
             # Check if there's a freeze block that should come before this entry
             @freeze_blocks.each do |fb|
-              if fb.start_line < key_line && !all_nodes.include?(fb)
-                all_nodes << fb
-              end
+              all_nodes << fb if fb.start_line < key_line && !all_nodes.include?(fb)
             end
 
             # Add the key-value pair as a mapping entry
@@ -404,7 +401,7 @@ module Psych
               key: key_wrapper,
               value: value_wrapper,
               lines: @lines,
-              comment_tracker: @comment_tracker,
+              comment_tracker: @comment_tracker
             )
           end
         else
@@ -466,7 +463,7 @@ module Psych
           line_num: @key.start_line,
           leading_comments: @comment_tracker.leading_comments_before(@key.start_line || 1),
           inline_comment: @comment_tracker.inline_comment_at(@key.start_line || 1),
-          key_name: key_name,
+          key_name: key_name
         )
       end
 
@@ -509,7 +506,7 @@ module Psych
       # Get the content for this entry
       # @return [String]
       def content
-        return "" unless start_line && end_line
+        return '' unless start_line && end_line
 
         (start_line..end_line).map { |ln| @lines[ln - 1] }.compact.join("\n")
       end

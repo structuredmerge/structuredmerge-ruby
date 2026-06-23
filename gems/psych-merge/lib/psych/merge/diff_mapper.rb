@@ -42,7 +42,7 @@ module Psych
             path: path,
             operation: determine_operation_for_lines(lines),
             lines: lines,
-            hunk: hunk,
+            hunk: hunk
           )
         end
 
@@ -56,13 +56,11 @@ module Psych
       # @param node [MappingEntry, NodeWrapper] The AST node
       # @param analysis [FileAnalysis] The file analysis
       # @return [Array<String, Integer>] Path components
-      def build_path_for_node(node, analysis)
+      def build_path_for_node(node, _analysis)
         path = []
 
         # For MappingEntry, the key name is the primary identifier
-        if node.respond_to?(:key_name) && node.key_name
-          path << node.key_name
-        end
+        path << node.key_name if node.respond_to?(:key_name) && node.key_name
 
         path
       end
@@ -109,9 +107,7 @@ module Psych
 
         if containing_node
           # Get the top-level key
-          if containing_node.respond_to?(:key_name)
-            path << containing_node.key_name
-          end
+          path << containing_node.key_name if containing_node.respond_to?(:key_name)
 
           # Check if this line is inside a nested structure
           nested_path = find_nested_path(line_num, content, containing_node, analysis)
@@ -147,30 +143,30 @@ module Psych
             key_start = key_wrapper.start_line
             value_end = value_wrapper.end_line
 
-            if key_start && value_end && line_num >= key_start && line_num <= value_end
-              nested_path << key_wrapper.value if key_wrapper.value
+            next unless key_start && value_end && line_num >= key_start && line_num <= value_end
 
-              # Recursively check for deeper nesting
-              nested_entry = MappingEntry.new(
-                key: key_wrapper,
-                value: value_wrapper,
-                lines: analysis.lines,
-                comment_tracker: analysis.comment_tracker,
-              )
-              deeper = find_nested_path(line_num, content, nested_entry, analysis)
-              nested_path.concat(deeper)
-              break
-            end
+            nested_path << key_wrapper.value if key_wrapper.value
+
+            # Recursively check for deeper nesting
+            nested_entry = MappingEntry.new(
+              key: key_wrapper,
+              value: value_wrapper,
+              lines: analysis.lines,
+              comment_tracker: analysis.comment_tracker
+            )
+            deeper = find_nested_path(line_num, content, nested_entry, analysis)
+            nested_path.concat(deeper)
+            break
           end
         elsif value.respond_to?(:sequence?) && value.sequence?
           # For sequences, try to find the index
           items = value.sequence_items(comment_tracker: analysis.comment_tracker)
           items.each_with_index do |item, idx|
-            if item.start_line && item.end_line &&
-                line_num >= item.start_line && line_num <= item.end_line
-              nested_path << idx
-              break
-            end
+            next unless item.start_line && item.end_line &&
+                        line_num >= item.start_line && line_num <= item.end_line
+
+            nested_path << idx
+            break
           end
         end
 
@@ -198,14 +194,14 @@ module Psych
           line_indent = line.match(/^(\s*)/)[1].length
 
           # If this line has less indentation and looks like a key
-          if line_indent < indent && line =~ /^(\s*)(\w+):/
-            key = $2
-            path.unshift(key)
-            indent = line_indent
+          next unless line_indent < indent && line =~ /^(\s*)(\w+):/
 
-            # Stop if we've reached root level
-            break if indent == 0
-          end
+          key = ::Regexp.last_match(2)
+          path.unshift(key)
+          indent = line_indent
+
+          # Stop if we've reached root level
+          break if indent == 0
         end
 
         path
@@ -217,7 +213,7 @@ module Psych
       # @param hunk [DiffHunk] The containing hunk
       # @param analysis [FileAnalysis] The file analysis
       # @return [Integer, nil] The inferred line number or nil
-      def infer_insertion_line(line, hunk, analysis)
+      def infer_insertion_line(line, hunk, _analysis)
         # Find the nearest context or removal line before this addition
         line_index = hunk.lines.index(line)
         return unless line_index
@@ -225,9 +221,7 @@ module Psych
         # Look backwards for a line with an old_line_num
         (line_index - 1).downto(0) do |idx|
           prev_line = hunk.lines[idx]
-          if prev_line.old_line_num
-            return prev_line.old_line_num
-          end
+          return prev_line.old_line_num if prev_line.old_line_num
         end
 
         # If no previous line, use hunk's old_start

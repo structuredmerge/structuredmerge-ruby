@@ -2,7 +2,7 @@
 
 RSpec.describe Psych::Merge do
   def fixtures_root
-    Pathname(__dir__).join("..", "..", "..", "..", "fixtures").expand_path
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
   end
 
   def read_json(path)
@@ -13,35 +13,35 @@ RSpec.describe Psych::Merge do
     Ast::Merge.json_ready(value)
   end
 
-  it "exposes the YAML family through the Psych provider backend" do
+  it 'exposes the YAML family through the Psych provider backend' do
     family_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-95-yaml-family-feature-profile",
-        "yaml-feature-profile.json"
+        'diagnostics',
+        'slice-95-yaml-family-feature-profile',
+        'yaml-feature-profile.json'
       )
     )
     feature_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-277-yaml-provider-feature-profiles",
-        "ruby-yaml-provider-feature-profiles.json"
+        'diagnostics',
+        'slice-277-yaml-provider-feature-profiles',
+        'ruby-yaml-provider-feature-profiles.json'
       )
     )
     plan_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-278-yaml-provider-plan-contexts",
-        "ruby-yaml-provider-plan-contexts.json"
+        'diagnostics',
+        'slice-278-yaml-provider-plan-contexts',
+        'ruby-yaml-provider-plan-contexts.json'
       )
     )
 
     expect(json_ready(::Psych::Merge.yaml_feature_profile)).to eq(json_ready(family_fixture[:feature_profile]))
     expect(json_ready(::Psych::Merge.available_yaml_backends.map(&:to_h))).to eq(
-      json_ready([{ id: "psych", family: "native" }])
+      json_ready([{ id: 'psych', family: 'native' }])
     )
-    expect(json_ready(TreeHaver::BackendRegistry.fetch("psych")&.to_h)).to eq(
-      json_ready({ id: "psych", family: "native" })
+    expect(json_ready(TreeHaver::BackendRegistry.fetch('psych')&.to_h)).to eq(
+      json_ready({ id: 'psych', family: 'native' })
     )
     expect(json_ready(::Psych::Merge.yaml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :psych, :feature_profile))
@@ -49,21 +49,24 @@ RSpec.describe Psych::Merge do
     expect(json_ready(::Psych::Merge.yaml_plan_context)).to eq(json_ready(plan_fixture.dig(:providers, :psych)))
   end
 
-  it "conforms to the shared YAML analysis, matching, and merge fixtures" do
-    parse_fixture = read_json(fixtures_root.join("yaml", "slice-96-parse", "valid-document.json"))
+  it 'conforms to the shared YAML analysis, matching, and merge fixtures' do
+    parse_fixture = read_json(fixtures_root.join('yaml', 'slice-96-parse', 'valid-document.json'))
     parse_result = ::Psych::Merge.parse_yaml(parse_fixture[:source], parse_fixture[:dialect])
     expect(parse_result[:ok]).to eq(parse_fixture.dig(:expected, :ok))
     expect(parse_result.dig(:analysis, :root_kind)).to eq(parse_fixture.dig(:expected, :root_kind))
 
-    structure_fixture = read_json(fixtures_root.join("yaml", "slice-97-structure", "mapping-and-sequence.json"))
+    structure_fixture = read_json(fixtures_root.join('yaml', 'slice-97-structure', 'mapping-and-sequence.json'))
     structure_result = ::Psych::Merge.parse_yaml(structure_fixture[:source], structure_fixture[:dialect])
-    expect(json_ready(structure_result.dig(:analysis, :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
+    expect(json_ready(structure_result.dig(:analysis,
+                                           :owners))).to eq(json_ready(structure_fixture.dig(:expected, :owners)))
 
-    matching_fixture = read_json(fixtures_root.join("yaml", "slice-98-matching", "path-equality.json"))
-    template = ::Psych::Merge.parse_yaml(matching_fixture[:template], "yaml")
-    destination = ::Psych::Merge.parse_yaml(matching_fixture[:destination], "yaml")
+    matching_fixture = read_json(fixtures_root.join('yaml', 'slice-98-matching', 'path-equality.json'))
+    template = ::Psych::Merge.parse_yaml(matching_fixture[:template], 'yaml')
+    destination = ::Psych::Merge.parse_yaml(matching_fixture[:destination], 'yaml')
     matching_result = ::Psych::Merge.match_yaml_owners(template[:analysis], destination[:analysis])
-    expect(json_ready(matching_result[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
+    expect(json_ready(matching_result[:matched].map do |match|
+      [match[:template_path], match[:destination_path]]
+    end)).to eq(
       json_ready(matching_fixture.dig(:expected, :matched))
     )
     expect(json_ready(matching_result[:unmatched_template])).to eq(
@@ -73,14 +76,14 @@ RSpec.describe Psych::Merge do
       json_ready(matching_fixture.dig(:expected, :unmatched_destination))
     )
 
-    merge_fixture = read_json(fixtures_root.join("yaml", "slice-99-merge", "mapping-merge.json"))
-    merge_result = ::Psych::Merge.merge_yaml(merge_fixture[:template], merge_fixture[:destination], "yaml")
+    merge_fixture = read_json(fixtures_root.join('yaml', 'slice-99-merge', 'mapping-merge.json'))
+    merge_result = ::Psych::Merge.merge_yaml(merge_fixture[:template], merge_fixture[:destination], 'yaml')
     expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
     expect(YAML.safe_load(merge_result[:output])).to eq(YAML.safe_load(merge_fixture.dig(:expected, :output)))
-    expect(merge_result[:output]).to include("title: Structured Merge")
+    expect(merge_result[:output]).to include('title: Structured Merge')
   end
 
-  it "preserves destination YAML comments and blank lines while adding template-only keys" do
+  it 'preserves destination YAML comments and blank lines while adding template-only keys' do
     template = <<~YAML
       # project configuration
       name: kettle-jem
@@ -94,16 +97,16 @@ RSpec.describe Psych::Merge do
       local: true
     YAML
 
-    result = ::Psych::Merge.merge_yaml(template, destination, "yaml")
+    result = ::Psych::Merge.merge_yaml(template, destination, 'yaml')
 
     expect(result[:ok]).to be(true)
-    expect(result[:output]).to include("# project configuration")
+    expect(result[:output]).to include('# project configuration')
     expect(result[:output]).to include("\n\n# local operator notes\n")
-    expect(result[:output]).to include("local: true")
-    expect(result[:output]).to include("generated: true")
+    expect(result[:output]).to include('local: true')
+    expect(result[:output]).to include('generated: true')
   end
 
-  it "preserves destination YAML formatting without requiring comments" do
+  it 'preserves destination YAML formatting without requiring comments' do
     template = <<~YAML
       cff-version: 1.2.0
       title: kettle-jem
@@ -133,7 +136,7 @@ RSpec.describe Psych::Merge do
       license: See license file
     YAML
 
-    result = ::Psych::Merge.merge_yaml(template, destination, "yaml")
+    result = ::Psych::Merge.merge_yaml(template, destination, 'yaml')
 
     expect(result[:ok]).to be(true)
     expect(result[:output]).to include('title: "kettle-jem"')
@@ -143,13 +146,13 @@ RSpec.describe Psych::Merge do
         then you can use the metadata from this file.
     YAML
     expect(result[:output]).to include('  - given-names: "Peter H."')
-    expect(result[:output]).to include("    family-names: \"Boling\"")
-    expect(result[:output]).to include("  - type: url")
+    expect(result[:output]).to include('    family-names: "Boling"')
+    expect(result[:output]).to include('  - type: url')
     expect(result[:output]).to include("    value: 'https://example.test/source'")
-    expect(result[:output]).to include("license: See license file")
+    expect(result[:output]).to include('license: See license file')
   end
 
-  it "keeps matched destination YAML nodes from inheriting template comments by default" do
+  it 'keeps matched destination YAML nodes from inheriting template comments by default' do
     template = <<~YAML
       # project configuration
       templates:
@@ -161,16 +164,16 @@ RSpec.describe Psych::Merge do
         root: template
     YAML
 
-    result = ::Psych::Merge.merge_yaml(template, destination, "yaml")
+    result = ::Psych::Merge.merge_yaml(template, destination, 'yaml')
 
     expect(result[:ok]).to be(true)
-    expect(result[:output]).not_to include("# project configuration")
-    expect(result[:output]).not_to include("# Template root directory.")
-    expect(result[:output]).to include("templates:")
-    expect(result[:output]).to include("  root: template")
+    expect(result[:output]).not_to include('# project configuration')
+    expect(result[:output]).not_to include('# Template root directory.')
+    expect(result[:output]).to include('templates:')
+    expect(result[:output]).to include('  root: template')
   end
 
-  it "restores template YAML comments for matched keys when template fallback mode is selected" do
+  it 'restores template YAML comments for matched keys when template fallback mode is selected' do
     template = <<~YAML
       # project configuration
       templates:
@@ -185,54 +188,55 @@ RSpec.describe Psych::Merge do
     result = ::Psych::Merge.merge_yaml(
       template,
       destination,
-      "yaml",
+      'yaml',
       comment_merge_policy: :template_fallback_when_missing
     )
 
     expect(result[:ok]).to be(true)
-    expect(result[:output]).to include("# project configuration")
-    expect(result[:output]).to include("# Template root directory.")
-    expect(result[:output]).to include("templates:")
-    expect(result[:output]).to include("  root: template")
+    expect(result[:output]).to include('# project configuration')
+    expect(result[:output]).to include('# Template root directory.')
+    expect(result[:output]).to include('templates:')
+    expect(result[:output]).to include('  root: template')
   end
 
-  it "records emitter source provenance line metadata for raw source rendering" do
+  it 'records emitter source provenance line metadata for raw source rendering' do
     emitter = ::Psych::Merge::Emitter.new
     emitter.emit_raw_lines(
-      ["root:", "  value: destination"],
+      ['root:', '  value: destination'],
       metadata: { source: :destination, original_line_start: 4 }
     )
 
-    expect(emitter.lines).to eq(["root:", "  value: destination"])
+    expect(emitter.lines).to eq(['root:', '  value: destination'])
     expect(emitter.line_metadata).to eq(
       [
         { source: :destination, original_line: 4 },
-        { source: :destination, original_line: 5 },
+        { source: :destination, original_line: 5 }
       ]
     )
   end
 
-  it "rejects unsupported provider backend overrides" do
-    result = ::Psych::Merge.parse_yaml("root: value\n", "yaml", backend: "kreuzberg-language-pack")
+  it 'rejects unsupported provider backend overrides' do
+    result = ::Psych::Merge.parse_yaml("root: value\n", 'yaml', backend: 'kreuzberg-language-pack')
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to eq(
-      [{ severity: "error", category: "unsupported_feature", message: "Unsupported YAML backend kreuzberg-language-pack." }]
+      [{ severity: 'error', category: 'unsupported_feature',
+         message: 'Unsupported YAML backend kreuzberg-language-pack.' }]
     )
   end
 
-  it "conforms to the provider named-suite plan and manifest-report fixtures" do
+  it 'conforms to the provider named-suite plan and manifest-report fixtures' do
     plans_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-279-yaml-provider-named-suite-plans",
-        "ruby-yaml-provider-named-suite-plans.json"
+        'diagnostics',
+        'slice-279-yaml-provider-named-suite-plans',
+        'ruby-yaml-provider-named-suite-plans.json'
       )
     )
     report_fixture = read_json(
       fixtures_root.join(
-        "diagnostics",
-        "slice-280-yaml-provider-manifest-report",
-        "ruby-yaml-provider-manifest-report.json"
+        'diagnostics',
+        'slice-280-yaml-provider-manifest-report',
+        'ruby-yaml-provider-manifest-report.json'
       )
     )
 
@@ -242,11 +246,12 @@ RSpec.describe Psych::Merge do
     )
 
     entries = Ast::Merge.report_planned_named_conformance_suites(
-      Ast::Merge.plan_named_conformance_suites(report_fixture[:manifest], report_fixture.dig(:options, :psych, :contexts))
+      Ast::Merge.plan_named_conformance_suites(report_fixture[:manifest],
+                                               report_fixture.dig(:options, :psych, :contexts))
     ) do |run|
       key = "#{run[:ref][:family]}:#{run[:ref][:role]}:#{run[:ref][:case]}"
-      executions = report_fixture.dig(:executions, :psych) || report_fixture["executions"]["psych"]
-      executions[key.to_sym] || executions[key] || { outcome: "failed", messages: ["missing execution"] }
+      executions = report_fixture.dig(:executions, :psych) || report_fixture['executions']['psych']
+      executions[key.to_sym] || executions[key] || { outcome: 'failed', messages: ['missing execution'] }
     end
 
     expect(json_ready(Ast::Merge.report_named_conformance_suite_envelope(entries))).to eq(

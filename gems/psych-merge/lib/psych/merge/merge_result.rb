@@ -33,7 +33,7 @@ module Psych
           dest_lines: 0,
           merged_lines: 0,
           freeze_preserved_lines: 0,
-          total_decisions: 0,
+          total_decisions: 0
         }
       end
 
@@ -48,7 +48,7 @@ module Psych
           content: line,
           decision: decision,
           source: source,
-          original_line: original_line,
+          original_line: original_line
         }
 
         track_statistics(decision, source)
@@ -86,7 +86,7 @@ module Psych
       # @param decision [Symbol] Decision for the blank line
       # @param source [Symbol] Source
       def add_blank_line(decision: DECISION_MERGED, source: :merged)
-        add_line("", decision: decision, source: source)
+        add_line('', decision: decision, source: source)
       end
 
       # Add content from a freeze block
@@ -98,7 +98,7 @@ module Psych
             line.chomp,
             decision: DECISION_FREEZE_BLOCK,
             source: :destination,
-            original_line: freeze_node.start_line + idx,
+            original_line: freeze_node.start_line + idx
           )
         end
       end
@@ -137,7 +137,7 @@ module Psych
 
       private
 
-      def track_statistics(decision, source)
+      def track_statistics(decision, _source)
         @statistics[:total_decisions] += 1
 
         case decision

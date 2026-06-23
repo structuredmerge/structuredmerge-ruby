@@ -45,8 +45,7 @@ module Psych
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include ::Ast::Merge::Runtime::RootSessionSupport
 
-      attr_reader :runtime_session
-      attr_reader :corruption_handling
+      attr_reader :runtime_session, :corruption_handling
 
       # Creates a new SmartMerger for intelligent YAML file merging.
       #
@@ -156,12 +155,12 @@ module Psych
         template_analysis_debug = {
           valid: @template_analysis.valid?,
           statements: @template_analysis.statements.size,
-          freeze_blocks: @template_analysis.freeze_blocks.size,
+          freeze_blocks: @template_analysis.freeze_blocks.size
         }
         dest_analysis_debug = {
           valid: @dest_analysis.valid?,
           statements: @dest_analysis.statements.size,
-          freeze_blocks: @dest_analysis.freeze_blocks.size,
+          freeze_blocks: @dest_analysis.freeze_blocks.size
         }
 
         {
@@ -177,13 +176,13 @@ module Psych
             recursive: @recursive,
             freeze_token: @freeze_token,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result_obj.statistics,
           decisions: result_obj.decision_summary,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -199,8 +198,8 @@ module Psych
       # @return [Array] Array of errors
       def errors
         errors = []
-        errors.concat(@template_analysis.errors.map { |e| {source: :template, error: e} })
-        errors.concat(@dest_analysis.errors.map { |e| {source: :destination, error: e} })
+        errors.concat(@template_analysis.errors.map { |e| { source: :template, error: e } })
+        errors.concat(@dest_analysis.errors.map { |e| { source: :destination, error: e } })
         errors
       end
 
@@ -232,10 +231,10 @@ module Psych
       def perform_merge
         @resolver.resolve(@result)
 
-        DebugLogger.debug("Merge complete", {
-          lines: @result.line_count,
-          decisions: @result.statistics,
-        })
+        DebugLogger.debug('Merge complete', {
+                            lines: @result.line_count,
+                            decisions: @result.statistics
+                          })
 
         @result
       end
@@ -254,7 +253,7 @@ module Psych
           recursive: @recursive,
           match_refiner: @match_refiner,
           node_typing: @node_typing,
-          comment_merge_policy: @comment_merge_policy,
+          comment_merge_policy: @comment_merge_policy
         )
       end
 
@@ -280,28 +279,28 @@ module Psych
           surface_kind: :yaml_document,
           declared_language: :yaml,
           effective_language: :yaml,
-          operation_id: "yaml-document-root",
-          delegate_name: "psych-yaml",
-          surface_metadata: {recursive: @recursive},
+          operation_id: 'yaml-document-root',
+          delegate_name: 'psych-yaml',
+          surface_metadata: { recursive: @recursive },
           policy_context: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             recursive: @recursive,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
-          metadata: {merger: self.class.name},
+          metadata: { merger: self.class.name },
           options: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             recursive: @recursive,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
           language_chain: [:yaml],
-          delegate_metadata: {merger: self.class.name},
+          delegate_metadata: { merger: self.class.name }
         )
       end
 
@@ -312,8 +311,8 @@ module Psych
           unresolved_cases: merge_result.unresolved_cases,
           metadata: {
             stats: merge_result.statistics,
-            decisions: merge_result.decision_summary,
-          },
+            decisions: merge_result.decision_summary
+          }
         )
       end
 
@@ -321,7 +320,7 @@ module Psych
         fail_runtime_root_session!(
           root_operation: root_operation,
           error: error,
-          kind: :merge_failed,
+          kind: :merge_failed
         )
       end
     end

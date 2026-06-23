@@ -44,7 +44,7 @@ module Psych
               indent: parsed.indent,
               text: parsed.text,
               full_line: true,
-              raw: parsed.raw,
+              raw: parsed.raw
             }
           elsif parsed.inline?
             comments << {
@@ -52,7 +52,7 @@ module Psych
               indent: parsed.column,
               text: parsed.text,
               full_line: false,
-              raw: parsed.raw,
+              raw: parsed.raw
             }
           end
         end
@@ -62,7 +62,9 @@ module Psych
 
       def owner_line_num(owner)
         return owner.start_line if owner.respond_to?(:start_line) && owner.start_line
-        return owner.key.start_line if owner.respond_to?(:key) && owner.key&.respond_to?(:start_line) && owner.key.start_line
+        if owner.respond_to?(:key) && owner.key&.respond_to?(:start_line) && owner.key.start_line
+          return owner.key.start_line
+        end
 
         nil
       end

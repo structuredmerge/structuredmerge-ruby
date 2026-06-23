@@ -102,25 +102,25 @@ module Psych
       # Check if this wraps a mapping node
       # @return [Boolean]
       def mapping?
-        NodeTypeNormalizer.canonical_type(@node.class.name.split("::").last.downcase, :psych) == :mapping
+        NodeTypeNormalizer.canonical_type(@node.class.name.split('::').last.downcase, :psych) == :mapping
       end
 
       # Check if this wraps a sequence node
       # @return [Boolean]
       def sequence?
-        NodeTypeNormalizer.canonical_type(@node.class.name.split("::").last.downcase, :psych) == :sequence
+        NodeTypeNormalizer.canonical_type(@node.class.name.split('::').last.downcase, :psych) == :sequence
       end
 
       # Check if this wraps a scalar node
       # @return [Boolean]
       def scalar?
-        NodeTypeNormalizer.canonical_type(@node.class.name.split("::").last.downcase, :psych) == :scalar
+        NodeTypeNormalizer.canonical_type(@node.class.name.split('::').last.downcase, :psych) == :scalar
       end
 
       # Check if this wraps an alias node
       # @return [Boolean]
       def alias?
-        NodeTypeNormalizer.canonical_type(@node.class.name.split("::").last.downcase, :psych) == :alias
+        NodeTypeNormalizer.canonical_type(@node.class.name.split('::').last.downcase, :psych) == :alias
       end
 
       # Get the anchor name if this node has one
@@ -158,7 +158,7 @@ module Psych
             comment_tracker,
             key: extract_key_name(key_node),
             next_sibling_node: children[i + 2],
-            end_line_limit: @end_line,
+            end_line_limit: @end_line
           )
 
           entries << [key_wrapper, value_wrapper]
@@ -179,7 +179,7 @@ module Psych
             child,
             comment_tracker,
             next_sibling_node: @node.children[index + 1],
-            end_line_limit: @end_line,
+            end_line_limit: @end_line
           )
         end
       end
@@ -199,7 +199,7 @@ module Psych
       # Get the content for this node from source lines
       # @return [String]
       def content
-        return "" unless @start_line && @end_line
+        return '' unless @start_line && @end_line
 
         (@start_line..@end_line).map { |ln| @lines[ln - 1] }.join
       end
@@ -209,21 +209,21 @@ module Psych
       # @return [Ast::Merge::Comment::Attachment]
       def comment_attachment
         @comment_attachment ||= if @comment_tracker
-          @comment_tracker.comment_attachment_for(
-            self,
-            line_num: @start_line,
-            leading_comments: @leading_comments,
-            inline_comment: @inline_comment,
-            key: @key,
-          )
-        else
-          Ast::Merge::Comment::Attachment.new(
-            owner: self,
-            leading_region: build_comment_region(:leading, @leading_comments),
-            inline_region: build_comment_region(:inline, [@inline_comment].compact),
-            metadata: {key: @key},
-          )
-        end
+                                  @comment_tracker.comment_attachment_for(
+                                    self,
+                                    line_num: @start_line,
+                                    leading_comments: @leading_comments,
+                                    inline_comment: @inline_comment,
+                                    key: @key
+                                  )
+                                else
+                                  Ast::Merge::Comment::Attachment.new(
+                                    owner: self,
+                                    leading_region: build_comment_region(:leading, @leading_comments),
+                                    inline_region: build_comment_region(:inline, [@inline_comment].compact),
+                                    metadata: { key: @key }
+                                  )
+                                end
       end
 
       # @return [Ast::Merge::Comment::Region, nil]
@@ -247,14 +247,14 @@ module Psych
       # String representation for debugging
       # @return [String]
       def inspect
-        node_type = @node.class.name.split("::").last
+        node_type = @node.class.name.split('::').last
         "#<#{self.class.name} type=#{node_type} lines=#{@start_line}..#{@end_line} key=#{@key.inspect}>"
       end
 
       private
 
       def compute_signature(node)
-        node_type = NodeTypeNormalizer.canonical_type(node.class.name.split("::").last.downcase, :psych)
+        node_type = NodeTypeNormalizer.canonical_type(node.class.name.split('::').last.downcase, :psych)
         case node_type
         when :mapping
           keys = extract_mapping_keys(node)
@@ -267,7 +267,7 @@ module Psych
           [:alias, node.anchor]
         when :document
           root = node.children&.first
-          root_type = root&.class&.name&.split("::")&.last
+          root_type = root&.class&.name&.split('::')&.last
           [:document, root_type]
         when :stream
           [:stream]
@@ -281,7 +281,7 @@ module Psych
         i = 0
         while i < mapping_node.children.length
           key_node = mapping_node.children[i]
-          if NodeTypeNormalizer.canonical_type(key_node.class.name.split("::").last.downcase, :psych) == :scalar
+          if NodeTypeNormalizer.canonical_type(key_node.class.name.split('::').last.downcase, :psych) == :scalar
             keys << key_node.value
           end
           i += 2
@@ -290,7 +290,8 @@ module Psych
       end
 
       def extract_key_name(key_node)
-        return unless NodeTypeNormalizer.canonical_type(key_node.class.name.split("::").last.downcase, :psych) == :scalar
+        return unless NodeTypeNormalizer.canonical_type(key_node.class.name.split('::').last.downcase,
+                                                        :psych) == :scalar
 
         key_node.value
       end
@@ -301,7 +302,7 @@ module Psych
             child,
             comment_tracker,
             next_sibling_node: child_nodes[index + 1],
-            end_line_limit: @end_line,
+            end_line_limit: @end_line
           )
         end
       end
@@ -332,7 +333,7 @@ module Psych
           comment_tracker: comment_tracker,
           next_sibling_line_num: next_sibling_line_num,
           next_sibling_leading_comments: next_sibling_leading_comments,
-          end_line_limit: end_line_limit,
+          end_line_limit: end_line_limit
         )
       end
 
@@ -353,7 +354,7 @@ module Psych
         Ast::Merge::Comment::TrackedHashAdapter.region(
           kind: kind,
           comments: comments,
-          metadata: {key: @key},
+          metadata: { key: @key }
         )
       end
     end

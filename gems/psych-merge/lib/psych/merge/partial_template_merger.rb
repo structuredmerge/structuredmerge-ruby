@@ -68,7 +68,7 @@ module Psych
           preference: preference,
           add_template_only_nodes: add_missing,
           remove_template_missing_nodes: remove_missing,
-          recursive: recursive,
+          recursive: recursive
         )
       end
 
@@ -77,7 +77,7 @@ module Psych
       end
 
       def dump_content_value(value)
-        ::Psych.dump(value).sub(/\A---\n?/, "")
+        ::Psych.dump(value).sub(/\A---\n?/, '')
       end
 
       def deep_merge_content_value(base, overlay)
@@ -86,10 +86,10 @@ module Psych
         result = base.dup
         overlay.each do |key, value|
           result[key] = if result.key?(key) && result[key].is_a?(Hash) && value.is_a?(Hash)
-            deep_merge_content_value(result[key], value)
-          else
-            value
-          end
+                          deep_merge_content_value(result[key], value)
+                        else
+                          value
+                        end
         end
         result
       end
