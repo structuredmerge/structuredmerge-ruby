@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require_relative "markly/merge"
+require_relative 'markly/merge'

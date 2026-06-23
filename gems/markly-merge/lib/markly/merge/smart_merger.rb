@@ -54,15 +54,15 @@ module Markly
         default_backend: :markly,
         default_freeze_token: -> { DEFAULT_FREEZE_TOKEN },
         default_inner_merge_code_blocks: -> { DEFAULT_INNER_MERGE_CODE_BLOCKS },
-        default_parser_options: -> do
+        default_parser_options: lambda do
           {
             flags: ::Markly::DEFAULT,
-            extensions: [:table],
+            extensions: [:table]
           }
         end,
         file_analysis_class: -> { FileAnalysis },
         template_parse_error_class: -> { TemplateParseError },
-        destination_parse_error_class: -> { DestinationParseError },
+        destination_parse_error_class: -> { DestinationParseError }
       )
     end
   end

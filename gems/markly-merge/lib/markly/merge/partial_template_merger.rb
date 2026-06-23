@@ -13,7 +13,7 @@ module Markly
         self,
         default_backend: :markly,
         file_analysis_class: -> { FileAnalysis },
-        smart_merger_class: -> { SmartMerger },
+        smart_merger_class: -> { SmartMerger }
       )
     end
   end

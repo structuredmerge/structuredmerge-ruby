@@ -18,8 +18,8 @@ module Markly
     module DebugLogger
       Markdown::Merge::WrapperSupport.configure_debug_logger!(
         debug_logger_module: self,
-        env_var_name: "MARKLY_MERGE_DEBUG",
-        log_prefix: "[markly-merge]",
+        env_var_name: 'MARKLY_MERGE_DEBUG',
+        log_prefix: '[markly-merge]'
       )
     end
   end

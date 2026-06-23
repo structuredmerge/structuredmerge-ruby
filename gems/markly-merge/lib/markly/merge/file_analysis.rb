@@ -22,17 +22,17 @@ module Markly
     class FileAnalysis < Markdown::Merge::FileAnalysis
       # Default freeze token for markly-merge
       # @return [String]
-      DEFAULT_FREEZE_TOKEN = "markly-merge"
+      DEFAULT_FREEZE_TOKEN = 'markly-merge'
 
       Markdown::Merge::WrapperSupport.configure_file_analysis_subclass!(
         self,
         default_backend: :markly,
-        default_parser_options: -> do
+        default_parser_options: lambda do
           {
             flags: ::Markly::DEFAULT,
-            extensions: [:table],
+            extensions: [:table]
           }
-        end,
+        end
       )
     end
   end

@@ -23,11 +23,11 @@ module Markly
       Markdown::Merge::BackendSupport.install!(
         backend_module: self,
         backend_name: :markly,
-        gem_name: "markly",
-        require_path: "markly/merge",
+        gem_name: 'markly',
+        require_path: 'markly/merge',
         capabilities: {
-          gfm_extensions: true,
-        },
+          gfm_extensions: true
+        }
       )
 
       # Markly language wrapper
@@ -57,15 +57,15 @@ module Markly
         # @param extensions [Array<Symbol>] Extensions to enable (default: [:table])
         # @param options [Hash] parsing options (reserved for future use)
         def initialize(name = :markdown, flags: nil, extensions: [:table], options: {})
-          super(name, backend: :markly, options: options.merge({flags: flags, extensions: extensions}))
-          @flags = flags  # Will use Markly::DEFAULT if nil at parse time
+          super(name, backend: :markly, options: options.merge({ flags: flags, extensions: extensions }))
+          @flags = flags # Will use Markly::DEFAULT if nil at parse time
           @extensions = extensions
 
-          unless @name == :markdown
-            raise TreeHaver::NotAvailable,
-              "Markly backend only supports Markdown parsing. " \
-                "Got language: #{name.inspect}"
-          end
+          return if @name == :markdown
+
+          raise TreeHaver::NotAvailable,
+                'Markly backend only supports Markdown parsing. ' \
+                  "Got language: #{name.inspect}"
         end
 
         class << self
@@ -90,11 +90,11 @@ module Markly
 
         Markdown::Merge::BackendSupport.configure_markdown_only_language_class!(
           self,
-          backend_label: "Markly",
-          unsupported_language_message: ->(lang_name) {
+          backend_label: 'Markly',
+          unsupported_language_message: lambda { |lang_name|
             "Markly backend only supports Markdown, not #{lang_name}. " \
               "Use a tree-sitter backend for #{lang_name} support."
-          },
+          }
         )
       end
 
@@ -105,7 +105,7 @@ module Markly
         # @raise [TreeHaver::NotAvailable] if rbs gem is not available
         def initialize
           super()
-          raise TreeHaver::NotAvailable, "markly gem not available" unless Backend.available?
+          raise TreeHaver::NotAvailable, 'markly gem not available' unless Backend.available?
         end
 
         # Set the language for this parser
@@ -121,11 +121,11 @@ module Markly
               @language = Language.markdown
             else
               raise ArgumentError,
-                "Markly backend only supports Markdown parsing. Got: #{lang.inspect}"
+                    "Markly backend only supports Markdown parsing. Got: #{lang.inspect}"
             end
           else
             raise ArgumentError,
-              "Expected Backend::Language or :markdown, got #{lang.class}"
+                  "Expected Backend::Language or :markdown, got #{lang.class}"
           end
         end
 
@@ -134,8 +134,9 @@ module Markly
         # @param source [String] Markdown source to parse
         # @return [Tree] Parsed tree
         def parse(source)
-          raise "Language not set" unless language
-          Backend.available? or raise "Markly not available"
+          raise 'Language not set' unless language
+
+          Backend.available? or raise 'Markly not available'
 
           flags = language.flags || ::Markly::DEFAULT
           exts = language.extensions || [:table]
@@ -150,20 +151,20 @@ module Markly
       class Node < ::TreeHaver::Base::Node
         # Type normalization map (Markly → canonical)
         TYPE_MAP = {
-          header: "heading",
-          hrule: "thematic_break",
-          html: "html_block",
+          header: 'heading',
+          hrule: 'thematic_break',
+          html: 'html_block'
         }.freeze
 
         Markdown::Merge::BackendSupport.configure_node_link_and_navigation!(
           self,
           next_sibling_selector: :next,
-          prev_sibling_selector: :previous,
+          prev_sibling_selector: :previous
         )
         Markdown::Merge::BackendSupport.configure_node_heading_and_code_block_helpers!(
           self,
-          heading_matcher: ->(node) { node.raw_type == "header" },
-          code_block_matcher: ->(node) { node.type == "code_block" },
+          heading_matcher: ->(node) { node.raw_type == 'header' },
+          code_block_matcher: ->(node) { node.type == 'code_block' }
         )
 
         # Default source position for nodes that don't have position info
@@ -171,7 +172,7 @@ module Markly
           start_line: 1,
           start_column: 1,
           end_line: 1,
-          end_column: 1,
+          end_column: 1
         }.freeze
 
         # Get source position from the inner Markly node
@@ -180,10 +181,10 @@ module Markly
         # @api private
         def inner_source_position
           @inner_source_position ||= if inner_node.respond_to?(:source_position)
-            inner_node.source_position || DEFAULT_SOURCE_POSITION
-          else
-            DEFAULT_SOURCE_POSITION
-          end
+                                       inner_node.source_position || DEFAULT_SOURCE_POSITION
+                                     else
+                                       DEFAULT_SOURCE_POSITION
+                                     end
         end
 
         # Get the node type as a string (normalized)
@@ -212,7 +213,7 @@ module Markly
           if inner_node.respond_to?(:to_plaintext)
             begin
               inner_node.to_plaintext
-            rescue
+            rescue StandardError
               children.map(&:text).join
             end
           else
@@ -227,14 +228,14 @@ module Markly
           result = []
           child = begin
             inner_node.first_child
-          rescue
+          rescue StandardError
             nil
           end
           while child
             result << Node.new(child, source: source, lines: lines)
             child = begin
               child.next
-            rescue
+            rescue StandardError
               nil
             end
           end
@@ -255,12 +256,12 @@ module Markly
 
         def start_point
           pos = inner_source_position
-          {row: pos[:start_line] - 1, column: pos[:start_column] - 1}
+          { row: pos[:start_line] - 1, column: pos[:start_column] - 1 }
         end
 
         def end_point
           pos = inner_source_position
-          {row: pos[:end_line] - 1, column: pos[:end_column] - 1}
+          { row: pos[:end_line] - 1, column: pos[:end_column] - 1 }
         end
 
         # Convert node to CommonMark/Markdown/HTML/plaintext
