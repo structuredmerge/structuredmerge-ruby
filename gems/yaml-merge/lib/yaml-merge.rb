@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require_relative "yaml/merge"
+require_relative 'yaml/merge'

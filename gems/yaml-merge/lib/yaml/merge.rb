@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "json"
-require "yaml"
-require "tree_haver"
+require 'json'
+require 'yaml'
+require 'tree_haver'
 
 module Yaml
   module Merge
-    PACKAGE_NAME = "yaml-merge"
+    PACKAGE_NAME = 'yaml-merge'
     DESTINATION_WINS_ARRAY_POLICY = {
-      surface: "array",
-      name: "destination_wins_array"
+      surface: 'array',
+      name: 'destination_wins_array'
     }.freeze
     BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
 
@@ -20,8 +20,8 @@ module Yaml
 
     def yaml_feature_profile
       {
-        family: "yaml",
-        supported_dialects: ["yaml"],
+        family: 'yaml',
+        supported_dialects: ['yaml'],
         supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
@@ -32,7 +32,9 @@ module Yaml
 
     def yaml_backend_feature_profile(backend: nil)
       resolved_backend = resolve_backend(backend)
-      return unsupported_feature_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id
+        return unsupported_feature_result("Unsupported YAML backend #{resolved_backend}.")
+      end
 
       yaml_feature_profile.merge(
         backend: BACKEND_REFERENCE.id,
@@ -55,13 +57,15 @@ module Yaml
     end
 
     def parse_yaml(source, dialect, backend: nil)
-      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
+      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
       resolved_backend = resolve_backend(backend)
-      return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id
+        return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.")
+      end
 
       syntax_result = TreeHaver.parse_with_language_pack(
-        TreeHaver::ParserRequest.new(source: source, language: "yaml")
+        TreeHaver::ParserRequest.new(source: source, language: 'yaml')
       )
       return { ok: false, diagnostics: syntax_result[:diagnostics], policies: [] } unless syntax_result[:ok]
 
@@ -72,20 +76,20 @@ module Yaml
     end
 
     def analyze_yaml_document(parsed, dialect)
-      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == "yaml"
-      return parse_error_result("YAML documents must parse to a mapping root.") unless parsed.is_a?(Hash)
+      return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
+      return parse_error_result('YAML documents must parse to a mapping root.') unless parsed.is_a?(Hash)
 
-      validated = validate_yaml_node(parsed, "")
+      validated = validate_yaml_node(parsed, '')
       return { ok: false, diagnostics: [validated[:diagnostic]], policies: [] } unless validated[:ok]
 
       {
         ok: true,
         diagnostics: [],
         analysis: {
-          kind: "yaml",
-          dialect: "yaml",
+          kind: 'yaml',
+          dialect: 'yaml',
           normalized_source: canonical_yaml(validated[:value]),
-          root_kind: "mapping",
+          root_kind: 'mapping',
           owners: collect_yaml_owners(validated[:value])
         },
         policies: []
@@ -98,8 +102,8 @@ module Yaml
 
       {
         matched: template[:owners]
-          .filter { |owner| destination_paths[owner[:path]] }
-          .map { |owner| { template_path: owner[:path], destination_path: owner[:path] } },
+                 .filter { |owner| destination_paths[owner[:path]] }
+                 .map { |owner| { template_path: owner[:path], destination_path: owner[:path] } },
         unmatched_template: template[:owners].map { |owner| owner[:path] }.reject { |path| destination_paths[path] },
         unmatched_destination: destination[:owners].map { |owner| owner[:path] }.reject { |path| template_paths[path] }
       }
@@ -107,7 +111,9 @@ module Yaml
 
     def merge_yaml(template_source, destination_source, dialect, backend: nil)
       resolved_backend = resolve_backend(backend)
-      return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.") unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id
+        return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.")
+      end
 
       merge_yaml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
         parse_yaml(source, parse_dialect, backend: resolved_backend)
@@ -123,16 +129,18 @@ module Yaml
         return {
           ok: false,
           diagnostics: destination[:diagnostics].map do |diagnostic|
-            diagnostic[:category] == "parse_error" ? diagnostic.merge(category: "destination_parse_error") : diagnostic
+            diagnostic[:category] == 'parse_error' ? diagnostic.merge(category: 'destination_parse_error') : diagnostic
           end,
           policies: []
         }
       end
 
-      template_document = YAML.safe_load(template.dig(:analysis, :normalized_source), permitted_classes: [], aliases: false)
-      destination_document = YAML.safe_load(destination.dig(:analysis, :normalized_source), permitted_classes: [], aliases: false)
+      template_document = YAML.safe_load(template.dig(:analysis, :normalized_source), permitted_classes: [],
+                                                                                      aliases: false)
+      destination_document = YAML.safe_load(destination.dig(:analysis, :normalized_source), permitted_classes: [],
+                                                                                            aliases: false)
       unless template_document.is_a?(Hash) && destination_document.is_a?(Hash)
-        return parse_error_merge_result("YAML documents must parse to a mapping root.")
+        return parse_error_merge_result('YAML documents must parse to a mapping root.')
       end
 
       {
@@ -144,7 +152,7 @@ module Yaml
     rescue StandardError => e
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "destination_parse_error", message: e.message }],
+        diagnostics: [{ severity: 'error', category: 'destination_parse_error', message: e.message }],
         policies: []
       }
     end
@@ -183,17 +191,17 @@ module Yaml
     private_class_method :scalar?
 
     def display_path(path)
-      path.empty? ? "/" : path
+      path.empty? ? '/' : path
     end
     private_class_method :display_path
 
     def render_yaml_scalar(value)
       if value.nil?
-        ""
+        ''
       elsif value.is_a?(String)
         value.match?(/\A[A-Za-z0-9_.-]+\z/) ? value : JSON.generate(value)
-      elsif value == true || value == false
-        value ? "true" : "false"
+      elsif [true, false].include?(value)
+        value ? 'true' : 'false'
       else
         value.to_s
       end
@@ -201,7 +209,7 @@ module Yaml
     private_class_method :render_yaml_scalar
 
     def render_yaml_node(key, value, indent)
-      prefix = " " * indent
+      prefix = ' ' * indent
       if value.is_a?(Array)
         ["#{prefix}#{key}:"] + render_yaml_sequence(value, indent + 2)
       elsif value.is_a?(Hash)
@@ -222,7 +230,7 @@ module Yaml
     private_class_method :render_yaml_mapping
 
     def render_yaml_sequence(sequence, indent)
-      prefix = " " * indent
+      prefix = ' ' * indent
       sequence.flat_map do |item|
         if scalar?(item)
           ["#{prefix}- #{render_yaml_scalar(item)}"]
@@ -242,21 +250,21 @@ module Yaml
     end
     private_class_method :canonical_yaml
 
-    def collect_yaml_owners(mapping, prefix = "")
+    def collect_yaml_owners(mapping, prefix = '')
       mapping.keys.sort.flat_map do |key|
         path = "#{prefix}/#{key}"
         value = mapping[key]
         if value.is_a?(Array)
-          [{ path: path, owner_kind: "key_value", match_key: key }] +
+          [{ path: path, owner_kind: 'key_value', match_key: key }] +
             value.each_with_index.flat_map do |item, index|
               item_path = "#{path}/#{index}"
               nested = item.is_a?(Hash) ? collect_yaml_owners(item, item_path) : []
-              [{ path: item_path, owner_kind: "sequence_item" }] + nested
+              [{ path: item_path, owner_kind: 'sequence_item' }] + nested
             end
         elsif value.is_a?(Hash)
-          [{ path: path, owner_kind: "mapping", match_key: key }] + collect_yaml_owners(value, path)
+          [{ path: path, owner_kind: 'mapping', match_key: key }] + collect_yaml_owners(value, path)
         else
-          [{ path: path, owner_kind: "key_value", match_key: key }]
+          [{ path: path, owner_kind: 'key_value', match_key: key }]
         end
       end
     end
@@ -264,15 +272,15 @@ module Yaml
 
     def merge_yaml_mappings(template, destination)
       ordered_merge_keys(template, destination).each_with_object({}) do |key, merged|
-        if !template.key?(key)
-          merged[key] = destination[key]
-        elsif !destination.key?(key)
-          merged[key] = template[key]
-        elsif template[key].is_a?(Hash) && destination[key].is_a?(Hash)
-          merged[key] = merge_yaml_mappings(template[key], destination[key])
-        else
-          merged[key] = destination[key]
-        end
+        merged[key] = if !template.key?(key)
+                        destination[key]
+                      elsif !destination.key?(key)
+                        template[key]
+                      elsif template[key].is_a?(Hash) && destination[key].is_a?(Hash)
+                        merge_yaml_mappings(template[key], destination[key])
+                      else
+                        destination[key]
+                      end
       end
     end
     private_class_method :merge_yaml_mappings
@@ -283,27 +291,29 @@ module Yaml
     private_class_method :ordered_merge_keys
 
     def parse_error_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "parse_error", message: message }], policies: [] }
+      { ok: false, diagnostics: [{ severity: 'error', category: 'parse_error', message: message }], policies: [] }
     end
     private_class_method :parse_error_result
 
     def unsupported_feature_parse_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }], policies: [] }
+      { ok: false, diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
+        policies: [] }
     end
     private_class_method :unsupported_feature_parse_result
 
     def unsupported_feature_merge_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }], policies: [] }
+      { ok: false, diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
+        policies: [] }
     end
     private_class_method :unsupported_feature_merge_result
 
     def parse_error_merge_result(message)
-      { ok: false, diagnostics: [{ severity: "error", category: "parse_error", message: message }], policies: [] }
+      { ok: false, diagnostics: [{ severity: 'error', category: 'parse_error', message: message }], policies: [] }
     end
     private_class_method :parse_error_merge_result
 
     def unsupported_feature_result(message)
-      { ok: false, diagnostic: { severity: "error", category: "unsupported_feature", message: message } }
+      { ok: false, diagnostic: { severity: 'error', category: 'unsupported_feature', message: message } }
     end
     private_class_method :unsupported_feature_result
   end
