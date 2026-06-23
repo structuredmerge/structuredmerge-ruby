@@ -1,41 +1,41 @@
 # frozen_string_literal: true
 
-require "version_gem"
-require_relative "merge/version"
+require 'version_gem'
+require_relative 'merge/version'
 
-require "digest"
-require "tree_haver"
-require "ast/merge"
+require 'digest'
+require 'tree_haver'
+require 'ast/merge'
 
 module Ruby
   module Merge
     extend self
 
-    PACKAGE_NAME = "ruby-merge"
+    PACKAGE_NAME = 'ruby-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
-    DESTINATION_WINS_ARRAY_POLICY = { surface: "array", name: "destination_wins_array" }.freeze
-    DEFAULT_METHOD_MOVE_POLICY = "destination_order"
+    DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
+    DEFAULT_METHOD_MOVE_POLICY = 'destination_order'
     PERCENT_ARRAY_DELIMITER_PAIRS = {
-      "[" => "]",
-      "(" => ")",
-      "{" => "}",
-      "<" => ">"
+      '[' => ']',
+      '(' => ')',
+      '{' => '}',
+      '<' => '>'
     }.freeze
     DIRECTIVE_LINE = /\A(?::nocov:|[\w-]+:(?:freeze|unfreeze))\z/
     MAGIC_COMMENT_PREFIXES = %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].freeze
-    REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/.freeze
-    CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/.freeze
-    MODULE_PATTERN = /^\s*module\s+([A-Z]\w*(?:::\w+)*)/.freeze
-    DEF_PATTERN = /^\s*def\s+((?:self\.)?)([a-zA-Z_]\w*[!?=]?|\[\]=?|\+@|-@|\*\*|<<|>>|<=>|===|==|=~|!~|!=|[+\-*\/%&|^<>]=?|[!~`])/.freeze
-    CONSTANT_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=/.freeze
-    CONSTANT_HASH_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=\s*\{/.freeze
-    EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/.freeze
-    TAG_PREFIX = /\A@[a-z_]+\b/.freeze
+    REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/
+    CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/
+    MODULE_PATTERN = /^\s*module\s+([A-Z]\w*(?:::\w+)*)/
+    DEF_PATTERN = %r{^\s*def\s+((?:self\.)?)([a-zA-Z_]\w*[!?=]?|\[\]=?|\+@|-@|\*\*|<<|>>|<=>|===|==|=~|!~|!=|[+\-*/%&|^<>]=?|[!~`])}
+    CONSTANT_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=/
+    CONSTANT_HASH_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=\s*\{/
+    EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
+    TAG_PREFIX = /\A@[a-z_]+\b/
 
     def ruby_feature_profile
       {
-        family: "ruby",
-        supported_dialects: ["ruby"],
+        family: 'ruby',
+        supported_dialects: ['ruby'],
         supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
@@ -46,7 +46,9 @@ module Ruby
 
     def ruby_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
       ruby_feature_profile.merge(
         backend: requested,
@@ -71,10 +73,12 @@ module Ruby
 
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
-      return unsupported_feature_result("Unsupported Ruby backend #{requested}.") unless requested == TREE_SITTER_BACKEND.id
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
+      unless requested == TREE_SITTER_BACKEND.id
+        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+      end
 
-      request = TreeHaver::ParserRequest.new(source: source, language: "ruby", dialect: dialect)
+      request = TreeHaver::ParserRequest.new(source: source, language: 'ruby', dialect: dialect)
       syntax = TreeHaver.parse_with_language_pack(request)
       return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
 
@@ -94,10 +98,10 @@ module Ruby
     end
 
     def ruby_method_move_detection(template_source, destination_source, dialect)
-      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == "ruby"
+      return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
 
-      template_methods = ruby_method_projection(template_source, revision: "template")
-      destination_methods = ruby_method_projection(destination_source, revision: "destination")
+      template_methods = ruby_method_projection(template_source, revision: 'template')
+      destination_methods = ruby_method_projection(destination_source, revision: 'destination')
       destination_by_signature = destination_methods.to_h { |entry| [entry[:signature], entry] }
       template_signatures = template_methods.map { |entry| entry[:signature] }.to_h { |signature| [signature, true] }
 
@@ -118,32 +122,38 @@ module Ruby
           from_index: template_entry[:index],
           to_index: destination_entry[:index],
           confidence: moved ? 0.98 : 0.9,
-          diagnostics: [moved ? "same Ruby method signature observed at a different sibling position" : "same Ruby method signature observed at the same sibling position"]
+          diagnostics: [moved ? 'same Ruby method signature observed at a different sibling position' : 'same Ruby method signature observed at the same sibling position']
         )
       end
 
       matched_template_signatures = matches.map(&:signature).to_h { |signature| [signature, true] }
       Ast::Merge::MoveDetectionMatchingReport.new(
-        matching_id: "ruby-method-move-detection",
-        strategy: "move_detection",
-        from_revision: "template",
-        to_revision: "destination",
+        matching_id: 'ruby-method-move-detection',
+        strategy: 'move_detection',
+        from_revision: 'template',
+        to_revision: 'destination',
         capability: Ast::Merge::MoveDetectionCapability.new(
-          name: "move_detection",
+          name: 'move_detection',
           enabled: true,
           default_enabled: false,
           requires_stable_node_identity: true
         ),
         matches: matches,
-        unmatched_from: template_methods.reject { |entry| matched_template_signatures[entry[:signature]] }.map { |entry| entry[:path] },
-        unmatched_to: destination_methods.reject { |entry| template_signatures[entry[:signature]] }.map { |entry| entry[:path] },
-        diagnostics: ["Ruby method move detection uses generic move-detection matching over receiver-aware method projections"]
+        unmatched_from: template_methods.reject do |entry|
+          matched_template_signatures[entry[:signature]]
+        end.map { |entry| entry[:path] },
+        unmatched_to: destination_methods.reject do |entry|
+          template_signatures[entry[:signature]]
+        end.map { |entry| entry[:path] },
+        diagnostics: ['Ruby method move detection uses generic move-detection matching over receiver-aware method projections']
       ).to_h
     end
 
-    def merge_ruby(template_source, destination_source, dialect, merge_template_requires: false, method_move_policy: DEFAULT_METHOD_MOVE_POLICY)
+    def merge_ruby(template_source, destination_source, dialect, merge_template_requires: false,
+                   method_move_policy: DEFAULT_METHOD_MOVE_POLICY)
       template = parse_ruby(template_source, dialect)
       return template unless template[:ok]
+
       method_move_policy = normalize_method_move_policy(method_move_policy)
 
       destination = parse_ruby(destination_source, dialect)
@@ -151,27 +161,32 @@ module Ruby
         return {
           ok: false,
           diagnostics: destination[:diagnostics].map do |diagnostic|
-            diagnostic[:category] == "parse_error" ? diagnostic.merge(category: "destination_parse_error") : diagnostic
+            diagnostic[:category] == 'parse_error' ? diagnostic.merge(category: 'destination_parse_error') : diagnostic
           end,
           policies: []
         }
       end
 
-      destination_context = ruby_tslp_merge_context(destination.fetch(:analysis), role: "destination")
+      destination_context = ruby_tslp_merge_context(destination.fetch(:analysis), role: 'destination')
       return destination_context unless destination_context[:ok]
-      template_context = ruby_tslp_merge_context(template.fetch(:analysis), role: "template")
+
+      template_context = ruby_tslp_merge_context(template.fetch(:analysis), role: 'template')
       return template_context unless template_context[:ok]
 
       destination_requires = destination_context.fetch(:requires)
       template_requires = template_context.fetch(:requires)
       destination_declarations = destination_context.fetch(:declarations)
       template_declarations = template_context.fetch(:declarations)
-      template_declaration_candidates = template_declarations
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
       preamble = collect_ruby_preamble(destination_context.fetch(:source))
       sections << preamble unless preamble.empty?
-      requires = merge_template_requires ? merge_ruby_requires(destination_requires, template_requires) : destination_requires
+      requires = if merge_template_requires
+                   merge_ruby_requires(destination_requires,
+                                       template_requires)
+                 else
+                   destination_requires
+                 end
       require_block = requires.map { |entry| entry[:text] }.join("\n").strip
       sections << require_block unless require_block.empty?
       sections.concat(
@@ -199,14 +214,14 @@ module Ruby
         merge_planning: {
           method_move_policy: method_move_policy,
           method_move_detection: {
-            matching_id: "ruby-tslp-method-move-detection",
+            matching_id: 'ruby-tslp-method-move-detection',
             moved_method_count: 0,
             preserves_destination_order: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
             suppresses_duplicate_moved_methods: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
-            override_scope: "per_file_recipe"
+            override_scope: 'per_file_recipe'
           },
           intra_owner_merges: {
-            strategy: "destination_wins_tslp_owner_body",
+            strategy: 'destination_wins_tslp_owner_body',
             merge_count: 0,
             merges: []
           }
@@ -218,34 +233,34 @@ module Ruby
       analysis[:discovered_surfaces] || []
     end
 
-    def ruby_delegated_child_operations(analysis, parent_operation_id: "ruby-document-0")
+    def ruby_delegated_child_operations(analysis, parent_operation_id: 'ruby-document-0')
       surfaces = ruby_discovered_surfaces(analysis)
       doc_operation_ids = {}
       operations = []
 
       surfaces.each_with_index do |surface, index|
-        next unless surface[:surface_kind] == "ruby_doc_comment"
+        next unless surface[:surface_kind] == 'ruby_doc_comment'
 
         operation_id = "ruby-doc-comment-#{index}"
         doc_operation_ids[surface[:address]] = operation_id
         operations << Ast::Merge.delegated_child_operation(
           operation_id: operation_id,
           parent_operation_id: parent_operation_id,
-          requested_strategy: "delegate_child_surface",
-          language_chain: ["ruby", surface[:effective_language]],
+          requested_strategy: 'delegate_child_surface',
+          language_chain: ['ruby', surface[:effective_language]],
           surface: surface
         )
       end
 
       example_index = 0
       surfaces.each do |surface|
-        next unless surface[:surface_kind] == "yard_example_block"
+        next unless surface[:surface_kind] == 'yard_example_block'
 
         operations << Ast::Merge.delegated_child_operation(
           operation_id: "yard-example-#{example_index}",
           parent_operation_id: doc_operation_ids.fetch(surface[:parent_address], parent_operation_id),
-          requested_strategy: "delegate_child_surface",
-          language_chain: ["ruby", "yard", surface[:effective_language]],
+          requested_strategy: 'delegate_child_surface',
+          language_chain: ['ruby', 'yard', surface[:effective_language]],
           surface: surface
         )
         example_index += 1
@@ -269,13 +284,13 @@ module Ruby
         declaration_identity = source_owner_identity_entry(
           kind: entry[:kind],
           name: entry[:name],
-          parent_scope: "/",
+          parent_scope: '/',
           address: entry[:path],
           content: entry[:text]
         )
         method_identities = direct_body_method_entries(entry[:text]).map do |method_entry|
           source_owner_identity_entry(
-            kind: "method",
+            kind: 'method',
             name: method_entry[:signature],
             parent_scope: entry[:path],
             address: "#{entry[:path]}/methods/#{method_entry[:signature]}",
@@ -291,7 +306,7 @@ module Ruby
       template_identities = ruby_source_owner_identity_profile(template_source)
       destination_identities = ruby_source_owner_identity_profile(destination_source)
       destination_groups = destination_identities.group_by { |identity| identity[:structural_identity] }
-      template_groups = template_identities.group_by { |identity| identity[:structural_identity] }
+      template_identities.group_by { |identity| identity[:structural_identity] }
       matched_destination_addresses = {}
 
       matches = template_identities.filter_map do |template_identity|
@@ -306,7 +321,7 @@ module Ruby
           destination_address: destination_identity[:address],
           structural_identity: template_identity[:structural_identity],
           occurrence_index: template_identity[:occurrence_index],
-          confidence: "structural_ordered"
+          confidence: 'structural_ordered'
         }
       end
 
@@ -314,13 +329,17 @@ module Ruby
       {
         confidence_profile: ruby_source_owner_match_confidence_profile,
         matches: matches,
-        unmatched_template: template_identities.reject { |identity| matched_template_addresses[identity[:address]] }.map { |identity| identity[:address] },
-        unmatched_destination: destination_identities.reject { |identity| matched_destination_addresses[identity[:address]] }.map { |identity| identity[:address] },
+        unmatched_template: template_identities.reject do |identity|
+          matched_template_addresses[identity[:address]]
+        end.map { |identity| identity[:address] },
+        unmatched_destination: destination_identities.reject do |identity|
+          matched_destination_addresses[identity[:address]]
+        end.map { |identity| identity[:address] },
         diagnostics: [
           {
-            severity: "info",
-            category: "source_owner_identity_matching",
-            message: "Ruby source-owner matching reports confidence per match and uses ordered structural pairing for duplicate identities."
+            severity: 'info',
+            category: 'source_owner_identity_matching',
+            message: 'Ruby source-owner matching reports confidence per match and uses ordered structural pairing for duplicate identities.'
           }
         ]
       }
@@ -329,29 +348,33 @@ module Ruby
     def ruby_ambiguous_source_owner_identity_report(source)
       identities = ruby_source_owner_identity_profile(source)
       ambiguities = identities
-        .group_by { |identity| identity[:structural_identity] }
-        .filter_map do |structural_identity, entries|
-          next if entries.length < 2
+                    .group_by { |identity| identity[:structural_identity] }
+                    .filter_map do |structural_identity, entries|
+                      next if entries.length < 2
 
-          {
-            structural_identity: structural_identity,
-            occurrence_count: entries.length,
-            addresses: entries.map { |entry| entry[:address] },
-            ambiguity_kind: "duplicate_structural_identity",
-            resolution_model: "ordered_cursor",
-            confidence: "structural_ordered"
-          }
-        end
+                      {
+                        structural_identity: structural_identity,
+                        occurrence_count: entries.length,
+                        addresses: entries.map { |entry| entry[:address] },
+                        ambiguity_kind: 'duplicate_structural_identity',
+                        resolution_model: 'ordered_cursor',
+                        confidence: 'structural_ordered'
+                      }
+                    end
 
       {
         ambiguities: ambiguities,
-        diagnostics: ambiguities.empty? ? [] : [
-          {
-            severity: "warning",
-            category: "ambiguous_source_owner_identity",
-            message: "Repeated Ruby source-owner identities require ordered cursor matching."
-          }
-        ]
+        diagnostics: if ambiguities.empty?
+                       []
+                     else
+                       [
+                         {
+                           severity: 'warning',
+                           category: 'ambiguous_source_owner_identity',
+                           message: 'Repeated Ruby source-owner identities require ordered cursor matching.'
+                         }
+                       ]
+                     end
       }
     end
 
@@ -359,24 +382,24 @@ module Ruby
       {
         levels: [
           {
-            name: "exact",
-            meaning: "same structural identity, occurrence index, and content identity"
+            name: 'exact',
+            meaning: 'same structural identity, occurrence index, and content identity'
           },
           {
-            name: "structural_ordered",
-            meaning: "same structural identity and occurrence index"
+            name: 'structural_ordered',
+            meaning: 'same structural identity and occurrence index'
           },
           {
-            name: "content_hash",
-            meaning: "same content-derived identity when structural identity is ambiguous"
+            name: 'content_hash',
+            meaning: 'same content-derived identity when structural identity is ambiguous'
           },
           {
-            name: "token_similar",
-            meaning: "similar token content below exact content identity"
+            name: 'token_similar',
+            meaning: 'similar token content below exact content identity'
           },
           {
-            name: "unresolved",
-            meaning: "identity is ambiguous and must not be auto-matched"
+            name: 'unresolved',
+            meaning: 'identity is ambiguous and must not be auto-matched'
           }
         ]
       }
@@ -384,26 +407,27 @@ module Ruby
 
     def ruby_fallback_policy_profile
       {
-        policy_id: "ruby-source-fallback-policy",
+        policy_id: 'ruby-source-fallback-policy',
         baseline_provider: {
-          provider_id: "host_baseline_merge",
+          provider_id: 'host_baseline_merge',
           integration_point: true
         },
         scopes: %w[node subtree owned_region whole_file],
         triggers: [
-          { reason: "binary_input", scope: "whole_file" },
-          { reason: "unsupported_parser_or_backend", scope: "whole_file" },
-          { reason: "no_structural_owners", scope: "whole_file" },
-          { reason: "both_branches_create_file", scope: "whole_file" },
-          { reason: "excessive_duplicate_identities", scope: "owned_region" },
-          { reason: "timeout_or_resource_budget", scope: "whole_file" },
-          { reason: "backend_diagnostic_threshold", scope: "owned_region" }
+          { reason: 'binary_input', scope: 'whole_file' },
+          { reason: 'unsupported_parser_or_backend', scope: 'whole_file' },
+          { reason: 'no_structural_owners', scope: 'whole_file' },
+          { reason: 'both_branches_create_file', scope: 'whole_file' },
+          { reason: 'excessive_duplicate_identities', scope: 'owned_region' },
+          { reason: 'timeout_or_resource_budget', scope: 'whole_file' },
+          { reason: 'backend_diagnostic_threshold', scope: 'owned_region' }
         ],
         reporting_fields: %w[activated reason scope selected_baseline structured_result_discarded]
       }
     end
 
-    def ruby_fallback_activation_report(reason:, scope:, selected_baseline: "host_baseline_merge", structured_result_discarded: true)
+    def ruby_fallback_activation_report(reason:, scope:, selected_baseline: 'host_baseline_merge',
+                                        structured_result_discarded: true)
       {
         activated: true,
         reason: reason,
@@ -413,8 +437,8 @@ module Ruby
         policy_id: ruby_fallback_policy_profile.fetch(:policy_id),
         diagnostics: [
           {
-            severity: "warning",
-            category: "fallback_applied",
+            severity: 'warning',
+            category: 'fallback_applied',
             message: "Ruby source fallback activated for #{reason} at #{scope} scope."
           }
         ]
@@ -423,20 +447,20 @@ module Ruby
 
     def ruby_never_worse_fallback_mode
       {
-        mode_id: "never_worse_than_baseline",
+        mode_id: 'never_worse_than_baseline',
         enabled: true,
         baseline_provider: ruby_fallback_policy_profile.dig(:baseline_provider, :provider_id),
         comparison: {
-          conflict_count: "structured_must_not_exceed_baseline",
-          conflict_scope: "structured_must_not_be_broader_than_baseline",
-          data_loss: "structured_must_not_drop_clean_branch_content"
+          conflict_count: 'structured_must_not_exceed_baseline',
+          conflict_scope: 'structured_must_not_be_broader_than_baseline',
+          data_loss: 'structured_must_not_drop_clean_branch_content'
         },
-        fallback_action: "discard_structured_result_and_use_baseline",
+        fallback_action: 'discard_structured_result_and_use_baseline',
         diagnostics: [
           {
-            severity: "info",
-            category: "never_worse_fallback_mode",
-            message: "Ruby fallback comparison mode treats the host baseline merge as the safety floor."
+            severity: 'info',
+            category: 'never_worse_fallback_mode',
+            message: 'Ruby fallback comparison mode treats the host baseline merge as the safety floor.'
           }
         ]
       }
@@ -444,29 +468,29 @@ module Ruby
 
     def ruby_post_merge_validation_profile
       {
-        profile_id: "ruby-post-merge-validation",
-        phase: "post_merge_validation",
+        profile_id: 'ruby-post-merge-validation',
+        phase: 'post_merge_validation',
         separate_from: %w[merge_planning rendering],
-        checks: [
-          "reparse_merged_output",
-          "resolved_owners_present",
-          "owner_count_not_unexpectedly_lower",
-          "unchanged_significant_lines_preserved",
-          "branch_added_significant_lines_preserved",
-          "output_length_within_policy_bounds",
-          "conflict_marker_shape_compatible"
+        checks: %w[
+          reparse_merged_output
+          resolved_owners_present
+          owner_count_not_unexpectedly_lower
+          unchanged_significant_lines_preserved
+          branch_added_significant_lines_preserved
+          output_length_within_policy_bounds
+          conflict_marker_shape_compatible
         ],
         failure_outcomes: %w[fallback_to_baseline scoped_conflict hard_diagnostic_failure],
         hooks: {
-          ci: "strict",
-          exploratory: "permissive_when_explicit"
+          ci: 'strict',
+          exploratory: 'permissive_when_explicit'
         }
       }
     end
 
     def ruby_conflict_diagnostics_profile
       {
-        profile_id: "ruby-source-conflict-diagnostics",
+        profile_id: 'ruby-source-conflict-diagnostics',
         conflict_kinds: %w[
           both_modified
           both_added
@@ -480,7 +504,7 @@ module Ruby
         risk_levels: %w[text_only syntax_level semantic_risk unknown],
         marker_compatibility: {
           standard_markers: true,
-          enhanced_metadata: "sidecar_or_review_state"
+          enhanced_metadata: 'sidecar_or_review_state'
         },
         audit_fields: %w[
           owner_identity
@@ -498,24 +522,25 @@ module Ruby
 
     def ruby_formatter_policy_profile
       {
-        profile_id: "ruby-source-formatter-policy",
-        adapter_phase: "optional_post_merge_adapter",
-        semantic_validation: "not_proven_by_formatter",
-        policies: [
-          "no_formatter",
-          "validate_only",
-          "format_after_clean_merge",
-          "format_after_fallback",
-          "formatter_failure_is_warning",
-          "formatter_failure_is_hard_error"
+        profile_id: 'ruby-source-formatter-policy',
+        adapter_phase: 'optional_post_merge_adapter',
+        semantic_validation: 'not_proven_by_formatter',
+        policies: %w[
+          no_formatter
+          validate_only
+          format_after_clean_merge
+          format_after_fallback
+          formatter_failure_is_warning
+          formatter_failure_is_hard_error
         ],
-        portable_fixture_default: "no_formatter",
-        formatter_execution_in_portable_expectations: "only_when_fixture_opts_in",
+        portable_fixture_default: 'no_formatter',
+        formatter_execution_in_portable_expectations: 'only_when_fixture_opts_in',
         invariants: %w[owner_identity conflict_scope validation_semantics]
       }
     end
 
-    def ruby_formatter_adapter_report(pre_format_output:, formatted_output:, policy: "validate_only", conflict_scope: "none")
+    def ruby_formatter_adapter_report(pre_format_output:, formatted_output:, policy: 'validate_only',
+                                      conflict_scope: 'none')
       pre_format_owners = ruby_source_owner_identity_profile(pre_format_output)
       formatted_owners = ruby_source_owner_identity_profile(formatted_output)
       formatted_owner_signatures = stable_owner_signatures(formatted_owners)
@@ -525,20 +550,20 @@ module Ruby
       {
         policy: policy,
         formatter_profile: ruby_formatter_policy_profile.fetch(:profile_id),
-        adapter_phase: "optional_post_merge_adapter",
-        semantic_validation: "not_proven_by_formatter",
+        adapter_phase: 'optional_post_merge_adapter',
+        semantic_validation: 'not_proven_by_formatter',
         whitespace_repaired: whitespace_repaired,
         owners_preserved: owners_preserved,
         conflict_scope_preserved: true,
         validation_semantics_preserved: true,
         conflict_scope: conflict_scope,
-        portable_expectation: "formatter_not_executed_unless_fixture_opts_in",
+        portable_expectation: 'formatter_not_executed_unless_fixture_opts_in',
         owner_signatures: formatted_owner_signatures,
         diagnostics: [
           {
-            severity: owners_preserved ? "info" : "error",
-            category: owners_preserved ? "formatter_adapter_accepted" : "formatter_adapter_rejected",
-            message: owners_preserved ? "Ruby formatter adapter preserved owner identity, conflict scope, and validation semantics." : "Ruby formatter adapter changed owner identity and cannot be accepted as a semantic merge."
+            severity: owners_preserved ? 'info' : 'error',
+            category: owners_preserved ? 'formatter_adapter_accepted' : 'formatter_adapter_rejected',
+            message: owners_preserved ? 'Ruby formatter adapter preserved owner identity, conflict scope, and validation semantics.' : 'Ruby formatter adapter changed owner identity and cannot be accepted as a semantic merge.'
           }
         ]
       }
@@ -546,17 +571,17 @@ module Ruby
 
     def ruby_ast_node_merge_strategy_profile
       {
-        profile_id: "ruby-optional-ast-node-merge",
+        profile_id: 'ruby-optional-ast-node-merge',
         merge_surfaces: %w[owner ast_node line hybrid],
         optional_fine_grained_profiles: %w[expression argument_list hash_literal_pair],
         child_ordering_strategies: %w[destination_order successor_constraints pcs_like_triples],
-        public_contract_level: "ruleset_and_fixture",
-        default_surface: "owner",
+        public_contract_level: 'ruleset_and_fixture',
+        default_surface: 'owner',
         backend_strategy_choices: %w[entity_level ast_level line_level hybrid],
         reconstruction_policy: {
           preserve_original_text_unless_backend_declares_renderer: true,
           conflict_marker_placement_requires_text_boundary: true,
-          risky_reconstruction_outcome: "fallback_or_scoped_conflict"
+          risky_reconstruction_outcome: 'fallback_or_scoped_conflict'
         }
       }
     end
@@ -565,11 +590,11 @@ module Ruby
       {
         surface: surface,
         strategy_profile: ruby_ast_node_merge_strategy_profile.fetch(:profile_id),
-        candidate_strategy: reconstruction_risk ? "fallback_or_scoped_conflict" : "hybrid_ast_node_merge",
+        candidate_strategy: reconstruction_risk ? 'fallback_or_scoped_conflict' : 'hybrid_ast_node_merge',
         owner_level_fallback_too_blunt: !reconstruction_risk,
         successor_ordering_available: true,
         pcs_like_strategy_available: true,
-        public_contract_level: "ruleset_and_fixture",
+        public_contract_level: 'ruleset_and_fixture',
         backend_strategy_choices: ruby_ast_node_merge_strategy_profile.fetch(:backend_strategy_choices),
         inputs: {
           base: base,
@@ -578,13 +603,13 @@ module Ruby
         },
         reconstruction: {
           risky: reconstruction_risk,
-          outcome: reconstruction_risk ? "fallback_or_scoped_conflict" : "preserve_original_text_boundaries"
+          outcome: reconstruction_risk ? 'fallback_or_scoped_conflict' : 'preserve_original_text_boundaries'
         },
         diagnostics: [
           {
-            severity: reconstruction_risk ? "warning" : "info",
-            category: reconstruction_risk ? "ast_node_reconstruction_risk" : "ast_node_merge_candidate",
-            message: reconstruction_risk ? "Ruby AST-node merge candidate has ambiguous whitespace, comment, or marker reconstruction boundaries." : "Ruby AST-node merge candidate can be considered when owner-level fallback would be too blunt."
+            severity: reconstruction_risk ? 'warning' : 'info',
+            category: reconstruction_risk ? 'ast_node_reconstruction_risk' : 'ast_node_merge_candidate',
+            message: reconstruction_risk ? 'Ruby AST-node merge candidate has ambiguous whitespace, comment, or marker reconstruction boundaries.' : 'Ruby AST-node merge candidate can be considered when owner-level fallback would be too blunt.'
           }
         ]
       }
@@ -592,27 +617,27 @@ module Ruby
 
     def ruby_vcs_tool_integration_profile
       {
-        profile_id: "ruby-vcs-tool-integration",
+        profile_id: 'ruby-vcs-tool-integration',
         hosts: {
           git_merge_driver: {
-            contract: "git_merge_driver",
+            contract: 'git_merge_driver',
             placeholders: %w[%O %A %B %P],
-            output_target: "%A",
+            output_target: '%A',
             standard_marker_modes: %w[diff3 zdiff3 merge],
-            marker_size: "host_provided"
+            marker_size: 'host_provided'
           },
           jujutsu_merge_tool: {
-            contract: "jj_merge_tool",
+            contract: 'jj_merge_tool',
             roles: %w[base left right output path],
-            output_target: "output",
+            output_target: 'output',
             standard_marker_modes: %w[diff3 merge],
-            marker_size: "host_provided"
+            marker_size: 'host_provided'
           }
         },
         enhanced_markers: {
           optional: true,
           requires_host_tolerance: true,
-          default: "standard_markers"
+          default: 'standard_markers'
         },
         audit_artifact: {
           enabled: true,
@@ -621,7 +646,7 @@ module Ruby
         },
         resource_budget: {
           timeout_ms: 5000,
-          timeout_outcome: "fallback_or_driver_error",
+          timeout_outcome: 'fallback_or_driver_error',
           cannot_hang_vcs_operation: true
         },
         diagnostics: %w[
@@ -635,17 +660,17 @@ module Ruby
     end
 
     def ruby_vcs_tool_invocation_report(host:, event:, path:, timeout_ms: 5000)
-      severity = event.to_s.end_with?("error") ? "error" : "warning"
+      severity = event.to_s.end_with?('error') ? 'error' : 'warning'
 
       {
         host: host,
         event: event,
         path: path,
         integration_profile: ruby_vcs_tool_integration_profile.fetch(:profile_id),
-        marker_mode: "standard_markers",
-        marker_size: "host_provided",
+        marker_mode: 'standard_markers',
+        marker_size: 'host_provided',
         audit_artifact: {
-          format: "json",
+          format: 'json',
           required: true
         },
         timeout_ms: timeout_ms,
@@ -671,7 +696,7 @@ module Ruby
           {
             side: side.to_s,
             line: line,
-            check: "branch_added_significant_lines_preserved"
+            check: 'branch_added_significant_lines_preserved'
           }
         end
       end
@@ -680,14 +705,18 @@ module Ruby
         ok: missing.empty?,
         validation_profile: ruby_post_merge_validation_profile.fetch(:profile_id),
         failures: missing,
-        outcome: missing.empty? ? "accepted" : "hard_diagnostic_failure",
-        diagnostics: missing.empty? ? [] : [
-          {
-            severity: "error",
-            category: "silent_data_loss_prevention",
-            message: "Ruby post-merge validation detected significant input lines missing from output."
-          }
-        ]
+        outcome: missing.empty? ? 'accepted' : 'hard_diagnostic_failure',
+        diagnostics: if missing.empty?
+                       []
+                     else
+                       [
+                         {
+                           severity: 'error',
+                           category: 'silent_data_loss_prevention',
+                           message: 'Ruby post-merge validation detected significant input lines missing from output.'
+                         }
+                       ]
+                     end
       }
     end
 
@@ -700,9 +729,9 @@ module Ruby
         activated: !widened,
         diagnostics: [
           {
-            severity: widened ? "error" : "info",
-            category: widened ? "fallback_scope_widening_rejected" : "fallback_scope_accepted",
-            message: widened ? "Ruby fallback cannot widen from #{declared_scope} to #{requested_scope} without an explicit policy." : "Ruby fallback scope is within the declared policy."
+            severity: widened ? 'error' : 'info',
+            category: widened ? 'fallback_scope_widening_rejected' : 'fallback_scope_accepted',
+            message: widened ? "Ruby fallback cannot widen from #{declared_scope} to #{requested_scope} without an explicit policy." : 'Ruby fallback scope is within the declared policy.'
           }
         ]
       }
@@ -710,23 +739,23 @@ module Ruby
 
     def ruby_interstitial_merge_policy_profile
       {
-        policy_id: "ruby-source-interstitial-merge",
+        policy_id: 'ruby-source-interstitial-merge',
         separates_owner_merge: true,
         region_kinds: %w[file_header file_footer container_header container_footer between],
         owner_adjacency_fields: %w[previous_owner next_owner],
         rules: [
           {
-            region_kind: "require",
-            ordering: "destination_order_then_template_additions",
-            duplicate_key: "require_path"
+            region_kind: 'require',
+            ordering: 'destination_order_then_template_additions',
+            duplicate_key: 'require_path'
           },
           {
-            region_kind: "blank_line",
-            ownership: "preserve_declared_region_owner"
+            region_kind: 'blank_line',
+            ownership: 'preserve_declared_region_owner'
           },
           {
-            region_kind: "comment",
-            attachment: "nearest_declared_owner_or_standalone"
+            region_kind: 'comment',
+            attachment: 'nearest_declared_owner_or_standalone'
           }
         ]
       }
@@ -734,34 +763,34 @@ module Ruby
 
     def ruby_child_group_profile
       {
-        profile_id: "ruby-source-child-groups",
+        profile_id: 'ruby-source-child-groups',
         groups: [
           {
-            owner_kind: "class",
-            child_group: "methods",
-            ordering: "policy_ordered",
+            owner_kind: 'class',
+            child_group: 'methods',
+            ordering: 'policy_ordered',
             ordering_policy: DEFAULT_METHOD_MOVE_POLICY,
             commutative: false,
             visibility_sections: %w[public protected private]
           },
           {
-            owner_kind: "class",
-            child_group: "constants",
-            ordering: "destination_order_then_template_additions",
+            owner_kind: 'class',
+            child_group: 'constants',
+            ordering: 'destination_order_then_template_additions',
             commutative: false
           },
           {
-            owner_kind: "module",
-            child_group: "declarations",
-            ordering: "destination_order_then_template_additions",
+            owner_kind: 'module',
+            child_group: 'declarations',
+            ordering: 'destination_order_then_template_additions',
             commutative: false
           }
         ],
         diagnostics: [
           {
-            severity: "info",
-            category: "ruby_child_group_profile",
-            message: "Ruby child groups preserve destination order unless an explicit policy says otherwise."
+            severity: 'info',
+            category: 'ruby_child_group_profile',
+            message: 'Ruby child groups preserve destination order unless an explicit policy says otherwise.'
           }
         ]
       }
@@ -775,17 +804,21 @@ module Ruby
       {
         comments: comment_blocks.map do |block|
           previous_owner = owners.reverse.find { |owner| owner[:end_index] < block[:start_index] }
-          next_owner = owners.find { |owner| owner.fetch(:declaration_start_index, owner[:start_index]) > block[:end_index] }
+          next_owner = owners.find do |owner|
+            owner.fetch(:declaration_start_index, owner[:start_index]) > block[:end_index]
+          end
           next_owner_index = next_owner&.fetch(:declaration_start_index, next_owner&.fetch(:start_index))
           attachment = if next_owner_index && block[:end_index] + 1 == next_owner_index
-            "following_owner"
-          elsif previous_owner && next_owner_index && (block[:end_index] + 1...next_owner_index).any? { |index| lines[index].to_s.strip.empty? }
-            "preceding_owner"
-          elsif previous_owner && next_owner.nil?
-            "preceding_owner"
-          else
-            "standalone"
-          end
+                         'following_owner'
+                       elsif previous_owner && next_owner_index && (block[:end_index] + 1...next_owner_index).any? do |index|
+                         lines[index].to_s.strip.empty?
+                       end
+                         'preceding_owner'
+                       elsif previous_owner && next_owner.nil?
+                         'preceding_owner'
+                       else
+                         'standalone'
+                       end
           compact_region(
             attachment: attachment,
             previous_owner: previous_owner&.fetch(:address),
@@ -807,16 +840,17 @@ module Ruby
 
     def ruby_rename_detection_policy_profile
       {
-        policy_id: "ruby-source-rename-detection",
+        policy_id: 'ruby-source-rename-detection',
         capability: {
-          name: "rename_detection",
+          name: 'rename_detection',
           enabled: true,
           default_enabled: false,
           explicit: true
         },
-        signals: %w[body_hash_with_owner_name_normalization structural_hash token_similarity parent_scope_similarity backend_native_move_metadata],
-        clean_rename_confidence: "content_hash",
-        conflict_policy: "report_rename_plus_edit"
+        signals: %w[body_hash_with_owner_name_normalization structural_hash token_similarity parent_scope_similarity
+                    backend_native_move_metadata],
+        clean_rename_confidence: 'content_hash',
+        conflict_policy: 'report_rename_plus_edit'
       }
     end
 
@@ -826,7 +860,9 @@ module Ruby
       destination_by_parent_and_body = destination_methods.group_by do |entry|
         [entry[:parent_scope], entry[:normalized_body_identity]]
       end
-      destination_signature_keys = destination_methods.to_h { |entry| [[entry[:parent_scope], entry[:signature]], true] }
+      destination_signature_keys = destination_methods.to_h do |entry|
+        [[entry[:parent_scope], entry[:signature]], true]
+      end
       matched_destination_addresses = {}
 
       renames = template_methods.filter_map do |template_entry|
@@ -845,7 +881,7 @@ module Ruby
           from_name: template_entry[:signature],
           to_name: destination_entry[:signature],
           parent_scope: template_entry[:parent_scope],
-          confidence: "content_hash",
+          confidence: 'content_hash',
           signals: %w[body_hash_with_owner_name_normalization parent_scope_similarity],
           clean_rename: true
         }
@@ -854,14 +890,20 @@ module Ruby
       {
         policy: ruby_rename_detection_policy_profile,
         renames: renames,
-        diagnostics: renames.empty? ? [] : [
-          {
-            severity: "info",
-            category: "ruby_rename_detection",
-            message: "Ruby rename detection is explicit and reports clean same-parent method renames by normalized body hash."
-          }
-        ],
-        unmatched_destination: destination_methods.reject { |entry| matched_destination_addresses[entry[:address]] }.map { |entry| entry[:address] }
+        diagnostics: if renames.empty?
+                       []
+                     else
+                       [
+                         {
+                           severity: 'info',
+                           category: 'ruby_rename_detection',
+                           message: 'Ruby rename detection is explicit and reports clean same-parent method renames by normalized body hash.'
+                         }
+                       ]
+                     end,
+        unmatched_destination: destination_methods.reject do |entry|
+          matched_destination_addresses[entry[:address]]
+        end.map { |entry| entry[:address] }
       }
     end
 
@@ -890,12 +932,12 @@ module Ruby
           template_address: template_candidate[:address],
           destination_address: destination_candidate[:address],
           parent_scope: base_entry[:parent_scope],
-          conflict_kind: "rename_plus_edit",
-          fallback_scope: "owned_region",
-          confidence: "unresolved",
+          conflict_kind: 'rename_plus_edit',
+          fallback_scope: 'owned_region',
+          confidence: 'unresolved',
           diagnostics: [
-            "both branches renamed the same Ruby owner differently",
-            "method body identity changed on at least one side"
+            'both branches renamed the same Ruby owner differently',
+            'method body identity changed on at least one side'
           ]
         }
       end
@@ -903,13 +945,17 @@ module Ruby
       {
         policy: ruby_rename_detection_policy_profile,
         conflicts: conflicts,
-        diagnostics: conflicts.empty? ? [] : [
-          {
-            severity: "warning",
-            category: "ruby_rename_plus_edit_conflict",
-            message: "Ruby rename detection found incompatible rename-plus-edit changes."
-          }
-        ]
+        diagnostics: if conflicts.empty?
+                       []
+                     else
+                       [
+                         {
+                           severity: 'warning',
+                           category: 'ruby_rename_plus_edit_conflict',
+                           message: 'Ruby rename detection found incompatible rename-plus-edit changes.'
+                         }
+                       ]
+                     end
       }
     end
 
@@ -934,28 +980,32 @@ module Ruby
           to_parent_scope: destination_entry[:parent_scope],
           signature: template_entry[:signature],
           moved: true,
-          move_kind: "cross_container",
+          move_kind: 'cross_container',
           ordering_policy: DEFAULT_METHOD_MOVE_POLICY,
           preserves_destination_order: true,
-          confidence: "content_hash"
+          confidence: 'content_hash'
         }
       end
 
       {
         capability: {
-          name: "move_detection",
+          name: 'move_detection',
           enabled: true,
           default_enabled: false,
           requires_stable_node_identity: true
         },
         moves: moves,
-        diagnostics: moves.empty? ? [] : [
-          {
-            severity: "info",
-            category: "ruby_cross_container_method_move",
-            message: "Ruby detected same-signature method movement across containers while preserving destination order."
-          }
-        ]
+        diagnostics: if moves.empty?
+                       []
+                     else
+                       [
+                         {
+                           severity: 'info',
+                           category: 'ruby_cross_container_method_move',
+                           message: 'Ruby detected same-signature method movement across containers while preserving destination order.'
+                         }
+                       ]
+                     end
       }
     end
 
@@ -975,14 +1025,20 @@ module Ruby
 
       replacements.sort_by { |entry| -entry[:start] }.each do |entry|
         prefix = comment_prefix_for(lines[entry[:start]])
-        replacement_lines = entry[:output].empty? ? [] : entry[:output].sub(/\n\z/, "").split("\n").map { |line| "#{prefix}#{line}" }
+        replacement_lines = if entry[:output].empty?
+                              []
+                            else
+                              entry[:output].sub(/\n\z/, '').split("\n").map do |line|
+                                "#{prefix}#{line}"
+                              end
+                            end
         lines[entry[:start]..entry[:finish]] = replacement_lines
       end
 
       {
         ok: true,
         diagnostics: [],
-        output: "#{lines.join("\n").sub(/\n+\z/, "")}\n",
+        output: "#{lines.join("\n").sub(/\n+\z/, '')}\n",
         policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
@@ -990,8 +1046,8 @@ module Ruby
     def merge_ruby_with_nested_outputs(template_source, destination_source, dialect, nested_outputs)
       Ast::Merge.execute_nested_merge(
         nested_outputs,
-        default_family: "ruby",
-        request_id_prefix: "nested_ruby_child",
+        default_family: 'ruby',
+        request_id_prefix: 'nested_ruby_child',
         merge_parent: -> { merge_ruby(template_source, destination_source, dialect) },
         discover_operations: lambda { |merged_output|
           analysis = parse_ruby(merged_output, dialect)
@@ -1014,10 +1070,11 @@ module Ruby
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state, applied_children)
+    def merge_ruby_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
+                                                applied_children)
       Ast::Merge.execute_reviewed_nested_merge(
         review_state,
-        "ruby",
+        'ruby',
         applied_children,
         merge_parent: -> { merge_ruby(template_source, destination_source, dialect) },
         discover_operations: lambda { |merged_output|
@@ -1041,9 +1098,13 @@ module Ruby
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect, replay_bundle)
-      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review replay bundle does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(template_source, destination_source, dialect,
+                                                                   replay_bundle)
+      execution = Array(replay_bundle[:reviewed_nested_executions]).find { |entry| entry[:family] == 'ruby' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review replay bundle does not include a reviewed nested execution for ruby.' }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs(
         template_source,
@@ -1054,9 +1115,13 @@ module Ruby
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect, review_state)
-      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == "ruby" }
-      return { ok: false, diagnostics: [{ severity: "error", category: "configuration_error", message: "review state does not include a reviewed nested execution for ruby." }], policies: [] } unless execution
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state(template_source, destination_source, dialect,
+                                                                  review_state)
+      execution = Array(review_state[:reviewed_nested_executions]).find { |entry| entry[:family] == 'ruby' }
+      unless execution
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: 'configuration_error', message: 'review state does not include a reviewed nested execution for ruby.' }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs(
         template_source,
@@ -1067,9 +1132,13 @@ module Ruby
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source, dialect, envelope)
+    def merge_ruby_with_reviewed_nested_outputs_from_replay_bundle_envelope(template_source, destination_source,
+                                                                            dialect, envelope)
       replay_bundle, import_error = Ast::Merge.import_review_replay_bundle_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs_from_replay_bundle(
         template_source,
@@ -1079,9 +1148,13 @@ module Ruby
       )
     end
 
-    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source, dialect, envelope)
+    def merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(template_source, destination_source,
+                                                                           dialect, envelope)
       review_state, import_error = Ast::Merge.import_conformance_manifest_review_state_envelope(envelope)
-      return { ok: false, diagnostics: [{ severity: "error", category: import_error[:category], message: import_error[:message] }], policies: [] } if import_error
+      if import_error
+        return { ok: false,
+                 diagnostics: [{ severity: 'error', category: import_error[:category], message: import_error[:message] }], policies: [] }
+      end
 
       merge_ruby_with_reviewed_nested_outputs_from_review_state(
         template_source,
@@ -1111,7 +1184,8 @@ module Ruby
           next
         end
 
-        if ruby_process_import_item_at_line(process_analysis, line_number) || legacy_require_line?(line, process_analysis)
+        if ruby_process_import_item_at_line(process_analysis,
+                                            line_number) || legacy_require_line?(line, process_analysis)
           pending_comments = []
           next
         end
@@ -1136,15 +1210,15 @@ module Ruby
       declarations = declaration_entries.map do |entry|
         {
           path: entry[:path],
-          owner_kind: "declaration",
+          owner_kind: 'declaration',
           match_key: entry[:name]
         }
       end
 
       {
-        kind: "ruby",
-        dialect: "ruby",
-        root_kind: "document",
+        kind: 'ruby',
+        dialect: 'ruby',
+        root_kind: 'document',
         source: normalize_source(source),
         tree_haver_process_analysis: process_analysis,
         owners: (requires + declarations).sort_by { |owner| owner[:path] },
@@ -1167,11 +1241,13 @@ module Ruby
 
     def ruby_file_footer_text(source)
       regions = ruby_source_regions(source).fetch(:regions)
-      footer = regions.reverse.find { |region| region[:region_kind] == "interstitial" && region[:position] == "file_footer" }
-      content = footer.to_h.fetch(:content, "").strip
-      return "" if content.empty?
+      footer = regions.reverse.find do |region|
+        region[:region_kind] == 'interstitial' && region[:position] == 'file_footer'
+      end
+      content = footer.to_h.fetch(:content, '').strip
+      return '' if content.empty?
 
-      content.lines.any? { |line| !line.strip.empty? && !comment_line?(line) } ? "" : content
+      content.lines.any? { |line| !line.strip.empty? && !comment_line?(line) } ? '' : content
     end
 
     def ruby_fallback_scope_rank(scope)
@@ -1192,7 +1268,7 @@ module Ruby
 
     def significant_source_lines(source)
       normalize_source(source).lines.map(&:strip).reject do |line|
-        line.empty? || line.start_with?("#") || line == "end"
+        line.empty? || line.start_with?('#') || line == 'end'
       end
     end
 
@@ -1207,7 +1283,7 @@ module Ruby
       unsupported_lines = ruby_tslp_unsupported_top_level_lines(source, process_analysis)
       unless unsupported_lines.empty?
         return unsupported_feature_result(
-          "ruby-merge can only merge TSLP-record-backed top-level Ruby declarations and imports; #{role} has unsupported top-level content on line(s) #{unsupported_lines.join(", ")}. Use prism-merge for native Ruby merging, or report missing Ruby process records to tree-sitter-language-pack."
+          "ruby-merge can only merge TSLP-record-backed top-level Ruby declarations and imports; #{role} has unsupported top-level content on line(s) #{unsupported_lines.join(', ')}. Use prism-merge for native Ruby merging, or report missing Ruby process records to tree-sitter-language-pack."
         )
       end
 
@@ -1225,6 +1301,7 @@ module Ruby
       claimed = ruby_tslp_claimed_line_indexes(lines, process_analysis)
       lines.each_index.filter_map do |index|
         next if claimed.include?(index)
+
         line = lines[index]
         next if line.strip.empty? || comment_line?(line)
 
@@ -1261,7 +1338,7 @@ module Ruby
         return imports.each_with_index.map do |item, index|
           {
             path: "/requires/#{index}",
-            owner_kind: "require",
+            owner_kind: 'require',
             match_key: item.source.to_s
           }
         end
@@ -1280,7 +1357,7 @@ module Ruby
 
         requires << {
           path: "/requires/#{requires.length}",
-          owner_kind: "require",
+          owner_kind: 'require',
           match_key: match[1]
         }
       end
@@ -1365,7 +1442,7 @@ module Ruby
         while cursor < lines.length
           candidate = lines[cursor].strip
           depth += 1 if declaration_for_line(candidate)
-          if candidate == "end"
+          if candidate == 'end'
             depth -= 1
             if depth.zero?
               cursor += 1
@@ -1456,7 +1533,7 @@ module Ruby
     def ruby_process_structure_item_at_line(process_analysis, line_number)
       Array(process_analysis&.structure).find do |item|
         ruby_process_owner_kind(item) &&
-        item.span.start_row == line_number - 1
+          item.span.start_row == line_number - 1
       end&.then do |item|
         { kind: ruby_process_owner_kind(item), name: item.name.to_s }
       end
@@ -1464,31 +1541,29 @@ module Ruby
 
     def ruby_process_owner_kind(item)
       case item.kind.to_s
-      when "class"
-        "class"
-      when "module"
-        "module"
-      when "method", "function"
-        "def"
+      when 'class'
+        'class'
+      when 'module'
+        'module'
+      when 'method', 'function'
+        'def'
       end
     end
 
     def ruby_process_structure_kind(item)
       case item.kind.to_s
-      when "class"
-        "class"
-      when "module"
-        "module"
-      when "method", "function"
-        "def"
+      when 'class'
+        'class'
+      when 'module'
+        'module'
+      when 'method', 'function'
+        'def'
       end
     end
 
     def attached_comment_start_index(lines, declaration_index)
       index = declaration_index.to_i
-      while index.positive? && comment_line?(lines[index - 1])
-        index -= 1
-      end
+      index -= 1 while index.positive? && comment_line?(lines[index - 1])
       index
     end
 
@@ -1521,11 +1596,11 @@ module Ruby
             owner_path: destination_entry[:path],
             owner_kind: destination_entry[:kind],
             owner_name: destination_entry[:name],
-            child_group: "methods",
+            child_group: 'methods',
             child_signature: destination_method[:signature],
             child_path: "#{destination_entry[:path]}/methods/#{destination_method[:signature]}",
-            decision: "destination_wins",
-            scope: "owner_body"
+            decision: 'destination_wins',
+            scope: 'owner_body'
           }
         end
       end
@@ -1586,8 +1661,8 @@ module Ruby
     def ruby_method_shadowing_diagnostics(source)
       ruby_method_shadowing(source).map do |entry|
         {
-          severity: "warning",
-          category: "ruby_method_shadowing",
+          severity: 'warning',
+          category: 'ruby_method_shadowing',
           path: "#{entry[:owner_path]}/methods/#{entry[:method_signature]}",
           message: "Ruby method #{entry[:method_signature]} is defined #{entry[:shadowed_count] + 1} times in #{entry[:owner_path]}; the last definition shadows earlier definitions."
         }
@@ -1632,7 +1707,7 @@ module Ruby
         direct_body_declaration_entries(entry[:text]).map do |nested_entry|
           root_name = entry[:name]
           nested_name = nested_entry[:name]
-          qualified_name = nested_name.include?("::") ? nested_name : "#{root_name}::#{nested_name}"
+          qualified_name = nested_name.include?('::') ? nested_name : "#{root_name}::#{nested_name}"
           nested_entry.merge(
             name: qualified_name,
             path: "/declarations/#{qualified_name}",
@@ -1657,7 +1732,9 @@ module Ruby
     def namespace_wrapper_matched?(entry, candidates, matched)
       children = candidates.select { |candidate| candidate[:namespace_root_merge_key] == entry[:merge_key] }
       return false if children.empty?
-      return false unless direct_body_method_entries(entry[:text]).empty? && direct_body_constant_entries(entry[:text]).empty?
+      unless direct_body_method_entries(entry[:text]).empty? && direct_body_constant_entries(entry[:text]).empty?
+        return false
+      end
 
       children.all? { |child| matched[child[:merge_key]] }
     end
@@ -1675,7 +1752,8 @@ module Ruby
         template_hash = RubyHashLiteralParser.new(template_block[:hash_source]).parse
         destination_hash = RubyHashLiteralParser.new(destination_block[:hash_source]).parse
         merged_hash = merge_ruby_hash_literals(template_hash, destination_hash)
-        rendered = "#{destination_block[:prefix]}#{render_ruby_hash_literal(merged_hash, destination_block[:base_indent])}"
+        rendered = "#{destination_block[:prefix]}#{render_ruby_hash_literal(merged_hash,
+                                                                            destination_block[:base_indent])}"
         output[destination_block[:range]] = rendered
       rescue ArgumentError
         next
@@ -1693,7 +1771,9 @@ module Ruby
       missing_constants = template_constants.reject { |entry| destination_names[entry[:name]] }
       return merged_text if missing_constants.empty?
 
-      insert_declaration_body_blocks(merged_text, missing_constants.map { |entry| entry[:text] }, placement: :after_opening)
+      insert_declaration_body_blocks(merged_text, missing_constants.map do |entry|
+        entry[:text]
+      end, placement: :after_opening)
     end
 
     def merge_matched_array_constants(template_constants, destination_constants, destination_text)
@@ -1714,15 +1794,21 @@ module Ruby
     def merge_array_constant_text(template_text, destination_text)
       template_match = template_text.match(/\A(\s*[A-Z]\w*\s*=\s*)\[(.*)\]\z/)
       destination_match = destination_text.match(/\A(\s*[A-Z]\w*\s*=\s*)\[(.*)\]\z/)
-      return merge_percent_array_constant_text(template_text, destination_text) || merge_multiline_array_constant_text(template_text, destination_text) unless template_match && destination_match
+      unless template_match && destination_match
+        return merge_percent_array_constant_text(template_text,
+                                                 destination_text) || merge_multiline_array_constant_text(template_text,
+                                                                                                          destination_text)
+      end
 
       destination_elements = split_ruby_array_elements(destination_match[2])
       template_elements = split_ruby_array_elements(template_match[2])
-      destination_keys = destination_elements.map { |element| normalize_array_element_key(element) }.to_h { |key| [key, true] }
+      destination_keys = destination_elements.map do |element|
+        normalize_array_element_key(element)
+      end.to_h { |key| [key, true] }
       appended = template_elements.reject { |element| destination_keys[normalize_array_element_key(element)] }
       return destination_text if appended.empty?
 
-      "#{destination_match[1]}[#{(destination_elements + appended).join(", ")}]"
+      "#{destination_match[1]}[#{(destination_elements + appended).join(', ')}]"
     end
 
     def merge_percent_array_constant_text(template_text, destination_text)
@@ -1736,7 +1822,7 @@ module Ruby
       appended = template_elements.reject { |element| destination_keys[element] }
       return destination_text if appended.empty?
 
-      "#{destination_match[:prefix]}#{(destination_elements + appended).join(" ")}#{destination_match[:closing]}"
+      "#{destination_match[:prefix]}#{(destination_elements + appended).join(' ')}#{destination_match[:closing]}"
     end
 
     def parse_percent_array_constant_text(text)
@@ -1761,11 +1847,13 @@ module Ruby
 
       destination_elements = multiline_array_elements(destination_match[2])
       template_elements = multiline_array_elements(template_match[2])
-      destination_keys = destination_elements.map { |element| normalize_array_element_key(element[:value]) }.to_h { |key| [key, true] }
+      destination_keys = destination_elements.map do |element|
+        normalize_array_element_key(element[:value])
+      end.to_h { |key| [key, true] }
       appended = template_elements.reject { |element| destination_keys[normalize_array_element_key(element[:value])] }
       return destination_text if appended.empty?
 
-      insertion_prefix = destination_elements.last&.dig(:indent) || template_elements.first&.dig(:indent) || "  "
+      insertion_prefix = destination_elements.last&.dig(:indent) || template_elements.first&.dig(:indent) || '  '
       body = append_multiline_array_elements(destination_match[2], appended, insertion_prefix)
       "#{destination_match[1]}#{body}#{destination_match[3]}"
     end
@@ -1775,26 +1863,30 @@ module Ruby
       destination_methods = direct_body_method_entries(destination_text)
       return destination_text if template_methods.empty?
 
-      destination_method_signatures = destination_methods.map { |entry| entry[:signature] }.to_h { |signature| [signature, true] }
+      destination_method_signatures = destination_methods.map do |entry|
+        entry[:signature]
+      end.to_h { |signature| [signature, true] }
       missing_methods = template_methods.reject { |entry| destination_method_signatures[entry[:signature]] }
       return destination_text if missing_methods.empty?
 
-      public_methods, visibility_methods = missing_methods.partition { |entry| entry[:visibility] == "public" }
+      public_methods, visibility_methods = missing_methods.partition { |entry| entry[:visibility] == 'public' }
       merged_text = destination_text
       unless public_methods.empty?
         merged_text = insert_declaration_body_blocks(
           merged_text,
           public_methods.map { |entry| entry[:body_text] },
-          before_visibility: !direct_visibility_section_present?(merged_text, "public")
+          before_visibility: !direct_visibility_section_present?(merged_text, 'public')
         )
       end
       visibility_methods.group_by { |entry| entry[:visibility] }.each do |visibility, entries|
         blocks = if direct_visibility_section_present?(merged_text, visibility)
-          merged_text = insert_declaration_body_blocks(merged_text, entries.map { |entry| entry[:body_text] }, before_visibility: false)
-          next
-        else
-          entries.map { |entry| entry[:text] }
-        end
+                   merged_text = insert_declaration_body_blocks(merged_text, entries.map do |entry|
+                     entry[:body_text]
+                   end, before_visibility: false)
+                   next
+                 else
+                   entries.map { |entry| entry[:text] }
+                 end
         merged_text = insert_declaration_body_blocks(merged_text, blocks)
       end
       merged_text
@@ -1824,7 +1916,7 @@ module Ruby
     def unsupported_feature_result(message)
       {
         ok: false,
-        diagnostics: [{ severity: "error", category: "unsupported_feature", message: message }],
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
         policies: []
       }
     end
@@ -1864,8 +1956,8 @@ module Ruby
           require_path = match[1]
           owners << {
             region_id: "require:#{require_path}",
-            region_kind: "owner",
-            owner_kind: "require",
+            region_kind: 'owner',
+            owner_kind: 'require',
             address: "/requires/#{require_path}",
             match_key: require_path,
             start_index: index,
@@ -1882,10 +1974,10 @@ module Ruby
         if declaration
           start_index = pending_comments.first || index
           finish_index = ruby_block_finish_index(lines, index)
-          address = declaration[:kind] == "def" ? "/methods/#{declaration[:name]}" : "/declarations/#{declaration[:name]}"
+          address = declaration[:kind] == 'def' ? "/methods/#{declaration[:name]}" : "/declarations/#{declaration[:name]}"
           owner = {
-            region_id: "#{declaration[:kind] == "def" ? "method" : "declaration"}:#{declaration[:name]}",
-            region_kind: "owner",
+            region_id: "#{declaration[:kind] == 'def' ? 'method' : 'declaration'}:#{declaration[:name]}",
+            region_kind: 'owner',
             owner_kind: declaration[:kind],
             address: address,
             match_key: declaration[:name],
@@ -1896,7 +1988,8 @@ module Ruby
             declaration_span: line_span(index, finish_index),
             content: source_region_content(lines, start_index, finish_index)
           }
-          owner[:child_regions] = container_child_source_regions(lines, declaration, index, finish_index) if %w[class module].include?(declaration[:kind])
+          owner[:child_regions] = container_child_source_regions(lines, declaration, index, finish_index) if %w[class
+                                                                                                                module].include?(declaration[:kind])
           attached_comments = attached_comment_regions(lines, start_index, index)
           owner[:attached_comments] = attached_comments unless attached_comments.empty?
           owners << owner
@@ -1952,8 +2045,8 @@ module Ruby
         method_name = method[2]
         owner = {
           region_id: "method:#{declaration[:name]}##{method_name}",
-          region_kind: "owner",
-          owner_kind: "method",
+          region_kind: 'owner',
+          owner_kind: 'method',
           address: "/declarations/#{declaration[:name]}/methods/#{method_name}",
           match_key: method_name,
           start_index: start_index,
@@ -1978,7 +2071,8 @@ module Ruby
       )
     end
 
-    def interleave_source_regions(lines, owners, container_name: nil, container_start_index: 0, container_end_index: nil)
+    def interleave_source_regions(lines, owners, container_name: nil, container_start_index: 0,
+                                  container_end_index: nil)
       container_end_index ||= lines.length - 1
       regions = []
       cursor = container_start_index
@@ -2017,31 +2111,31 @@ module Ruby
 
     def source_interstitial_region(lines, start_index, end_index, previous_owner, next_owner, container_name: nil)
       position = if previous_owner.nil? && next_owner
-        container_name ? "container_header" : "file_header"
-      elsif previous_owner && next_owner
-        "between"
-      elsif container_name
-        "container_footer"
-      else
-        "file_footer"
-      end
+                   container_name ? 'container_header' : 'file_header'
+                 elsif previous_owner && next_owner
+                   'between'
+                 elsif container_name
+                   'container_footer'
+                 else
+                   'file_footer'
+                 end
 
       region_id = case position
-      when "container_header"
-        "class_header:#{container_name}"
-      when "container_footer"
-        "class_footer:#{container_name}"
-      when "file_header"
-        "file_header"
-      when "file_footer"
-        "file_footer"
-      else
-        "between:#{previous_owner[:region_id]}:#{next_owner[:region_id]}"
-      end
+                  when 'container_header'
+                    "class_header:#{container_name}"
+                  when 'container_footer'
+                    "class_footer:#{container_name}"
+                  when 'file_header'
+                    'file_header'
+                  when 'file_footer'
+                    'file_footer'
+                  else
+                    "between:#{previous_owner[:region_id]}:#{next_owner[:region_id]}"
+                  end
 
       compact_region(
         region_id: region_id,
-        region_kind: "interstitial",
+        region_kind: 'interstitial',
         position: position,
         previous_owner: previous_owner&.fetch(:address),
         next_owner: next_owner&.fetch(:address),
@@ -2069,20 +2163,22 @@ module Ruby
     def collect_blank_line_regions(regions)
       regions.flat_map do |region|
         child_regions = region[:child_regions] ? collect_blank_line_regions(region[:child_regions]) : []
-        current = if region[:region_kind] == "interstitial" && region[:content].to_s.lines.all? { |line| line.strip.empty? }
-          [
-            compact_region(
-              region_id: region[:region_id],
-              position: region[:position],
-              previous_owner: region[:previous_owner],
-              next_owner: region[:next_owner],
-              span: region[:span],
-              ownership: "declared_interstitial_region"
-            )
-          ]
-        else
-          []
+        current = if region[:region_kind] == 'interstitial' && region[:content].to_s.lines.all? do |line|
+          line.strip.empty?
         end
+                    [
+                      compact_region(
+                        region_id: region[:region_id],
+                        position: region[:position],
+                        previous_owner: region[:previous_owner],
+                        next_owner: region[:next_owner],
+                        span: region[:span],
+                        ownership: 'declared_interstitial_region'
+                      )
+                    ]
+                  else
+                    []
+                  end
         current + child_regions
       end
     end
@@ -2107,7 +2203,7 @@ module Ruby
 
       [
         {
-          attachment: "leading",
+          attachment: 'leading',
           start_line: start_index + 1,
           end_line: declaration_index,
           content: source_region_content(lines, start_index, declaration_index - 1)
@@ -2132,7 +2228,7 @@ module Ruby
       def parse
         parse_hash.tap do
           skip_whitespace
-          raise ArgumentError, "unexpected trailing hash literal content" unless eof?
+          raise ArgumentError, 'unexpected trailing hash literal content' unless eof?
         end
       end
 
@@ -2142,12 +2238,12 @@ module Ruby
 
       def parse_hash
         start_index = @index
-        consume("{")
+        consume('{')
         pairs = []
         trailing_comma = false
         loop do
           skip_whitespace
-          break if peek == "}"
+          break if peek == '}'
 
           key = parse_hash_key
           skip_whitespace
@@ -2159,22 +2255,23 @@ module Ruby
             value: value
           )
           skip_whitespace
-          break if peek == "}"
+          break if peek == '}'
 
-          consume(",")
+          consume(',')
           skip_whitespace
-          if peek == "}"
+          if peek == '}'
             trailing_comma = true
             break
           end
         end
-        consume("}")
-        RubyHashNode.new(pairs: pairs, inline: !source[start_index...@index].include?("\n"), trailing_comma: trailing_comma)
+        consume('}')
+        RubyHashNode.new(pairs: pairs, inline: !source[start_index...@index].include?("\n"),
+                         trailing_comma: trailing_comma)
       end
 
       def parse_value
         skip_whitespace
-        return parse_hash if peek == "{"
+        return parse_hash if peek == '{'
 
         RubyScalarNode.new(source: parse_scalar_source)
       end
@@ -2183,25 +2280,25 @@ module Ruby
         remaining = source[@index..].to_s
         if (match = remaining.match(/\A([a-zA-Z_]\w*[!?]?):/))
           @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: ":" }
+          return { key: match[1], key_source: match[1], delimiter: ':' }
         end
 
         if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2):/))
           @index += match[0].length
-          return { key: match[1][1...-1], key_source: match[1], delimiter: ":" }
+          return { key: match[1][1...-1], key_source: match[1], delimiter: ':' }
         end
 
         if (match = remaining.match(/\A(:[a-zA-Z_]\w*[!?]?)\s*=>/))
           @index += match[0].length
-          return { key: match[1].delete_prefix(":"), key_source: match[1], delimiter: "=>" }
+          return { key: match[1].delete_prefix(':'), key_source: match[1], delimiter: '=>' }
         end
 
         if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2)\s*=>/))
           @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: "=>" }
+          return { key: match[1], key_source: match[1], delimiter: '=>' }
         end
 
-        raise ArgumentError, "expected hash key"
+        raise ArgumentError, 'expected hash key'
       end
 
       def parse_scalar_source
@@ -2213,7 +2310,7 @@ module Ruby
           if string_quote
             if escape
               escape = false
-            elsif char == "\\"
+            elsif char == '\\'
               escape = true
             elsif char == string_quote
               string_quote = nil
@@ -2222,8 +2319,9 @@ module Ruby
             next
           end
 
-          break if char == "," || char == "}"
-          string_quote = char if char == "\"" || char == "'"
+          break if [',', '}'].include?(char)
+
+          string_quote = char if ['"', "'"].include?(char)
           @index += 1
         end
         source[start_index...@index].rstrip
@@ -2271,7 +2369,7 @@ module Ruby
         finish_line = hash_assignment_finish_line(lines, start_line)
         if finish_line
           block_source = lines[start_line..finish_line].join("\n")
-          hash_offset = block_source.index("{")
+          hash_offset = block_source.index('{')
           start_offset = line_start_offsets[start_line]
           finish_offset = line_start_offsets[finish_line] + lines[finish_line].length
           blocks << {
@@ -2298,7 +2396,7 @@ module Ruby
           if in_string
             if escape
               escape = false
-            elsif char == "\\"
+            elsif char == '\\'
               escape = true
             elsif char == in_string
               in_string = nil
@@ -2306,11 +2404,11 @@ module Ruby
             next
           end
 
-          if char == "\"" || char == "'"
+          if ['"', "'"].include?(char)
             in_string = char
-          elsif char == "{"
+          elsif char == '{'
             depth += 1
-          elsif char == "}"
+          elsif char == '}'
             depth -= 1
             return line_index if depth.zero?
           end
@@ -2325,7 +2423,7 @@ module Ruby
 
       entries = []
       pending_comments = []
-      current_visibility = "public"
+      current_visibility = 'public'
       visibility_start_index = nil
       visibility_consumed = false
       index = 1
@@ -2367,7 +2465,8 @@ module Ruby
           next
         end
 
-        start_index = pending_comments.first || visibility_section_start_index(visibility_start_index, visibility_consumed) || index
+        start_index = pending_comments.first || visibility_section_start_index(visibility_start_index,
+                                                                               visibility_consumed) || index
         finish_index = ruby_block_finish_index(lines, index)
         entries << {
           name: match[2],
@@ -2435,7 +2534,7 @@ module Ruby
         if string_quote
           if escape
             escape = false
-          elsif char == "\\"
+          elsif char == '\\'
             escape = true
           elsif char == string_quote
             string_quote = nil
@@ -2443,9 +2542,9 @@ module Ruby
           next
         end
 
-        if char == "\"" || char == "'"
+        if ['"', "'"].include?(char)
           string_quote = char
-        elsif char == ","
+        elsif char == ','
           elements << source[start_index...index].strip
           start_index = index + 1
         end
@@ -2461,11 +2560,11 @@ module Ruby
     def multiline_array_elements(source)
       source.to_s.lines.filter_map do |line|
         stripped = line.strip
-        next if stripped.empty? || stripped.start_with?("#")
+        next if stripped.empty? || stripped.start_with?('#')
 
         {
           indent: line[/\A\s*/],
-          value: stripped.sub(/,\z/, "")
+          value: stripped.sub(/,\z/, '')
         }
       end
     end
@@ -2474,9 +2573,9 @@ module Ruby
       body_lines = destination_body.to_s.lines.map(&:chomp)
       element_indexes = body_lines.each_index.select do |index|
         stripped = body_lines[index].strip
-        !stripped.empty? && !stripped.start_with?("#")
+        !stripped.empty? && !stripped.start_with?('#')
       end
-      trailing_comma = element_indexes.empty? || body_lines[element_indexes.last].strip.end_with?(",")
+      trailing_comma = element_indexes.empty? || body_lines[element_indexes.last].strip.end_with?(',')
 
       if trailing_comma
         insertion_lines = appended.map { |element| "#{insertion_prefix}#{element[:value]}," }
@@ -2485,15 +2584,15 @@ module Ruby
 
       body_lines[element_indexes.last] = "#{body_lines[element_indexes.last]},"
       insertion_lines = appended.each_with_index.map do |element, index|
-        suffix = index == appended.length - 1 ? "" : ","
+        suffix = index == appended.length - 1 ? '' : ','
         "#{insertion_prefix}#{element[:value]}#{suffix}"
       end
       "#{body_lines.join("\n").rstrip}\n#{insertion_lines.join("\n")}"
     end
 
     def constant_assignment_finish_index(lines, index)
-      return hash_assignment_finish_line(lines, index) || index if lines[index].include?("{")
-      return array_assignment_finish_line(lines, index) || index if lines[index].include?("[")
+      return hash_assignment_finish_line(lines, index) || index if lines[index].include?('{')
+      return array_assignment_finish_line(lines, index) || index if lines[index].include?('[')
 
       index
     end
@@ -2507,7 +2606,7 @@ module Ruby
           if in_string
             if escape
               escape = false
-            elsif char == "\\"
+            elsif char == '\\'
               escape = true
             elsif char == in_string
               in_string = nil
@@ -2515,11 +2614,11 @@ module Ruby
             next
           end
 
-          if char == "\"" || char == "'"
+          if ['"', "'"].include?(char)
             in_string = char
-          elsif char == "["
+          elsif char == '['
             depth += 1
-          elsif char == "]"
+          elsif char == ']'
             depth -= 1
             return line_index if depth.zero?
           end
@@ -2575,7 +2674,7 @@ module Ruby
       lines.each_with_index do |line, index|
         stripped = line.strip
         depth += 1 if declaration_for_line(stripped)
-        depth -= 1 if stripped == "end"
+        depth -= 1 if stripped == 'end'
         return index if depth.zero? && index.positive?
       end
       nil
@@ -2587,18 +2686,18 @@ module Ruby
       return destination_text unless closing_index
 
       insertion_index = if placement == :after_opening
-        1
-      elsif before_visibility
-        direct_visibility_section_index(lines, closing_index) || closing_index
-      else
-        closing_index
-      end
+                          1
+                        elsif before_visibility
+                          direct_visibility_section_index(lines, closing_index) || closing_index
+                        else
+                          closing_index
+                        end
       insertion = []
-      insertion << "" unless insertion_index == 1 || lines[insertion_index - 1].to_s.strip.empty?
+      insertion << '' unless insertion_index == 1 || lines[insertion_index - 1].to_s.strip.empty?
       insertion.concat(blocks.join("\n\n").split("\n"))
-      insertion << "" if insertion_index != closing_index && !lines[insertion_index].to_s.strip.empty?
+      insertion << '' if insertion_index != closing_index && !lines[insertion_index].to_s.strip.empty?
       lines.insert(insertion_index, *insertion)
-      "#{lines.join("\n").sub(/\n+\z/, "")}\n".chomp
+      "#{lines.join("\n").sub(/\n+\z/, '')}\n".chomp
     end
 
     def direct_visibility_section_present?(text, visibility)
@@ -2621,7 +2720,7 @@ module Ruby
         return index if depth == 1 && visibility_match
 
         depth += 1 if declaration_for_line(stripped)
-        depth -= 1 if stripped == "end"
+        depth -= 1 if stripped == 'end'
       end
       nil
     end
@@ -2654,36 +2753,37 @@ module Ruby
 
       child_indent = base_indent + 2
       lines = node.pairs.each_with_index.map do |pair, index|
-        suffix = index == node.pairs.length - 1 && !node.trailing_comma ? "" : ","
-        "#{" " * child_indent}#{render_ruby_hash_key(pair)} #{render_ruby_hash_literal(pair.value, child_indent)}#{suffix}"
+        suffix = index == node.pairs.length - 1 && !node.trailing_comma ? '' : ','
+        "#{' ' * child_indent}#{render_ruby_hash_key(pair)} #{render_ruby_hash_literal(pair.value,
+                                                                                       child_indent)}#{suffix}"
       end
-      "{\n#{lines.join("\n")}\n#{" " * base_indent}}"
+      "{\n#{lines.join("\n")}\n#{' ' * base_indent}}"
     end
 
     def render_inline_ruby_hash_literal(node)
       inner = node.pairs.map do |pair|
         "#{render_ruby_hash_key(pair)} #{render_ruby_hash_literal(pair.value, 0)}"
-      end.join(", ")
+      end.join(', ')
       inner = "#{inner}," if node.trailing_comma && !inner.empty?
       "{#{inner}}"
     end
 
     def render_ruby_hash_key(pair)
-      delimiter = pair.delimiter == "=>" ? "=>" : ":"
-      delimiter == "=>" ? "#{pair.key_source} =>" : "#{pair.key_source}:"
+      delimiter = pair.delimiter == '=>' ? '=>' : ':'
+      delimiter == '=>' ? "#{pair.key_source} =>" : "#{pair.key_source}:"
     end
 
     def comment_line?(line)
-      line.lstrip.start_with?("#")
+      line.lstrip.start_with?('#')
     end
 
     def declaration_for_line(line)
       if (match = CLASS_PATTERN.match(line))
-        { kind: "class", name: match[1] }
+        { kind: 'class', name: match[1] }
       elsif (match = MODULE_PATTERN.match(line))
-        { kind: "module", name: match[1] }
+        { kind: 'module', name: match[1] }
       elsif (match = DEF_PATTERN.match(line))
-        { kind: "def", name: match[2], signature: "#{match[1]}#{match[2]}" }
+        { kind: 'def', name: match[2], signature: "#{match[1]}#{match[2]}" }
       end
     end
 
@@ -2694,7 +2794,7 @@ module Ruby
         stripped = lines[cursor].strip
         depth += stripped.scan(/\bdo\b/).length
         depth += 1 if declaration_for_line(stripped) || stripped.match?(/\A(begin|if|unless|case|while|until|for)\b/)
-        depth -= 1 if stripped == "end"
+        depth -= 1 if stripped == 'end'
         return cursor if depth <= 0 && cursor > start_index
 
         cursor += 1
@@ -2727,14 +2827,14 @@ module Ruby
       start_line = filtered_entries.first[:line]
       end_line = filtered_entries.last[:line]
       doc_surface = Ast::Merge.discovered_surface(
-        surface_kind: "ruby_doc_comment",
-        declared_language: "yard",
-        effective_language: "yard",
+        surface_kind: 'ruby_doc_comment',
+        declared_language: 'yard',
+        effective_language: 'yard',
         address: "document[0] > ruby_doc_comment[#{owner_name}]",
-        parent_address: "document[0]",
-        owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: "/declarations/#{owner_name}"),
+        parent_address: 'document[0]',
+        owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: "/declarations/#{owner_name}"),
         span: Ast::Merge.surface_span(start_line: start_line, end_line: end_line),
-        reconstruction_strategy: "rewrite_with_prefix_preservation",
+        reconstruction_strategy: 'rewrite_with_prefix_preservation',
         metadata: {
           owner_signature: owner_name,
           comment_prefix: comment_prefix_for(filtered_entries.first[:raw]),
@@ -2760,18 +2860,18 @@ module Ruby
         body_entries = entries[body_start...body_end]
         next if body_entries.nil? || body_entries.empty?
 
-        declared_language = declared_example_language(match[:rest]) || "ruby"
+        declared_language = declared_example_language(match[:rest]) || 'ruby'
         Ast::Merge.discovered_surface(
-          surface_kind: "yard_example_block",
+          surface_kind: 'yard_example_block',
           declared_language: declared_language,
           effective_language: declared_language,
           address: "#{surface[:address]} > yard_example[#{tag_index}]",
           parent_address: surface[:address],
-          owner: Ast::Merge.surface_owner_ref(kind: "owned_region", address: surface[:address]),
+          owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: surface[:address]),
           span: Ast::Merge.surface_span(start_line: body_entries.first[:line], end_line: body_entries.last[:line]),
-          reconstruction_strategy: "rewrite_with_prefix_preservation",
+          reconstruction_strategy: 'rewrite_with_prefix_preservation',
           metadata: {
-            tag_kind: "example",
+            tag_kind: 'example',
             tag_index: tag_index,
             tag_text: normalized[tag_index],
             comment_prefix: surface.dig(:metadata, :comment_prefix)
@@ -2793,7 +2893,7 @@ module Ruby
     end
 
     def normalize_comment_content(raw)
-      raw.to_s.sub(/\A\s*#\s?/, "").strip
+      raw.to_s.sub(/\A\s*#\s?/, '').strip
     end
 
     def doc_comment_content?(raw)
@@ -2806,7 +2906,7 @@ module Ruby
     end
 
     def comment_prefix_for(raw)
-      raw.to_s[/\A\s*#\s*/] || "# "
+      raw.to_s[/\A\s*#\s*/] || '# '
     end
 
     def declared_example_language(rest)
@@ -2814,7 +2914,7 @@ module Ruby
       language = match && match[:language]
       return if language.nil? || language.empty?
 
-      language.downcase.tr("-", "_")
+      language.downcase.tr('-', '_')
     end
 
     module_function(

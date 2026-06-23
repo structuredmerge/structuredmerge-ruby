@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-require_relative "ruby/merge"
+require_relative 'ruby/merge'

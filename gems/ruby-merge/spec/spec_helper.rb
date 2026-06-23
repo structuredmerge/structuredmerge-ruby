@@ -7,22 +7,22 @@
 # NOTE: Gemfiles for non-coverage appraisals may not have kettle-soup-cover.
 #       The rescue LoadError handles that scenario.
 begin
-  require "kettle-soup-cover"
-  require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
-rescue LoadError => error
+  require 'kettle-soup-cover'
+  require 'simplecov' if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+rescue LoadError => e
   # check the error message and re-raise when unexpected
-  raise error unless error.message.include?("kettle")
+  raise e unless e.message.include?('kettle')
 end
 
 # External RSpec & related config
-require "kettle/test/rspec"
+require 'kettle/test/rspec'
 
 # This library
-require "ruby/merge"
+require 'ruby/merge'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
-  config.example_status_persistence_file_path = ".rspec_status"
+  config.example_status_persistence_file_path = '.rspec_status'
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
