@@ -65,8 +65,8 @@ RSpec.describe Kettle::Jem do
       },
       "appraisal2-rubocop" => {
         declaration_names: ["appraisal2-rubocop"],
-        requirement_args: %("~> 0.2", ">= 0.2.1"),
-        lock_version: "0.2.1",
+        requirement_args: %("~> 0.2", ">= 0.2.2"),
+        lock_version: "0.2.2",
         requirement_surfaces: [
           "gemfiles/modular/style.gemfile",
           "lib/kettle/jem/templates/gemfiles/modular/style.gemfile.example"
