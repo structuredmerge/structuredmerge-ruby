@@ -15,23 +15,23 @@ module Toml
       extend Ast::Merge::DebugLogger
 
       # Toml-specific configuration
-      self.env_var_name = "TREE_HAVER_DEBUG"
-      self.log_prefix = "[Toml::Merge]"
+      self.env_var_name = 'TREE_HAVER_DEBUG'
+      self.log_prefix = '[Toml::Merge]'
 
       class << self
         # Override log_node to handle Toml-specific node types.
         #
         # @param node [Object] Node to log information about
         # @param label [String] Label for the node
-        def log_node(node, label: "Node")
+        def log_node(node, label: 'Node')
           return unless enabled?
 
           info = case node
-          when Toml::Merge::NodeWrapper
-            {type: node.type.to_s, lines: "#{node.start_line}..#{node.end_line}"}
-          else
-            extract_node_info(node)
-          end
+                 when Toml::Merge::NodeWrapper
+                   { type: node.type.to_s, lines: "#{node.start_line}..#{node.end_line}" }
+                 else
+                   extract_node_info(node)
+                 end
 
           debug(label, info)
         end

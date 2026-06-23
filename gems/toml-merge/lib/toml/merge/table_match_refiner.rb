@@ -34,7 +34,7 @@ module Toml
       DEFAULT_WEIGHTS = {
         name_match: 0.5,   # Weight for table name similarity
         key_overlap: 0.3,  # Weight for shared keys
-        position: 0.2,     # Weight for position similarity
+        position: 0.2 # Weight for position similarity
       }.freeze
 
       # @return [Hash] Weights for similarity computation
@@ -55,7 +55,7 @@ module Toml
       # @param dest_nodes [Array] Unmatched nodes from destination
       # @param context [Hash] Additional context
       # @return [Array<MatchResult>] Array of table matches
-      def call(template_nodes, dest_nodes, context = {})
+      def call(template_nodes, dest_nodes, _context = {})
         template_tables = extract_tables(template_nodes)
         dest_tables = extract_tables(dest_nodes)
 
@@ -92,7 +92,12 @@ module Toml
 
         # Use node's backend if available (NodeWrapper), otherwise default
         backend = node.respond_to?(:backend) ? node.backend : nil
-        canonical = backend ? NodeTypeNormalizer.canonical_type(node.type, backend) : NodeTypeNormalizer.canonical_type(node.type)
+        canonical = if backend
+                      NodeTypeNormalizer.canonical_type(node.type,
+                                                        backend)
+                    else
+                      NodeTypeNormalizer.canonical_type(node.type)
+                    end
         NodeTypeNormalizer.table_type?(canonical)
       end
 
@@ -149,7 +154,7 @@ module Toml
           return sig[1] if sig.is_a?(Array) && sig.size > 1
         end
 
-        ""
+        ''
       end
 
       # Compute key overlap between two tables.
@@ -198,8 +203,8 @@ module Toml
         return 1.0 if total_t == 1 && total_d == 1
 
         # Normalize positions to [0, 1]
-        t_pos = (total_t > 1) ? t_idx.to_f / (total_t - 1) : 0.5
-        d_pos = (total_d > 1) ? d_idx.to_f / (total_d - 1) : 0.5
+        t_pos = total_t > 1 ? t_idx.to_f / (total_t - 1) : 0.5
+        d_pos = total_d > 1 ? d_idx.to_f / (total_d - 1) : 0.5
 
         1.0 - (t_pos - d_pos).abs
       end
@@ -224,11 +229,11 @@ module Toml
 
         (1..m).each do |i|
           (1..n).each do |j|
-            cost = (str1[i - 1] == str2[j - 1]) ? 0 : 1
+            cost = str1[i - 1] == str2[j - 1] ? 0 : 1
             d[i][j] = [
               d[i - 1][j] + 1,      # deletion
               d[i][j - 1] + 1,      # insertion
-              d[i - 1][j - 1] + cost, # substitution
+              d[i - 1][j - 1] + cost # substitution
             ].min
           end
         end

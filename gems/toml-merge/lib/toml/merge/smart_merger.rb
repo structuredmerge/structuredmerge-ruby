@@ -39,7 +39,7 @@ module Toml
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include ::Ast::Merge::Runtime::RootSessionSupport
 
-      attr_reader :runtime_session
+      attr_reader :runtime_session, :corruption_handling
 
       # @return [Symbol] The AST format being used (:tree_sitter or :citrus)
       attr_reader :backend
@@ -47,7 +47,6 @@ module Toml
       # @return [Boolean] Whether destination-only nodes should be removed while
       #   promoting their attached comments
       attr_reader :remove_template_missing_nodes
-      attr_reader :corruption_handling
 
       # Creates a new SmartMerger
       #
@@ -120,7 +119,7 @@ module Toml
           resolution_mode: @resolution_mode,
           unresolved_policy: @unresolved_policy.to_h,
           corruption_handling: @corruption_handling,
-          match_refiner: @match_refiner,
+          match_refiner: @match_refiner
         }
       end
 
@@ -146,11 +145,11 @@ module Toml
         result_obj = merge_result
         template_analysis_debug = {
           valid: @template_analysis.valid?,
-          statements: @template_analysis.statements.size,
+          statements: @template_analysis.statements.size
         }
         dest_analysis_debug = {
           valid: @dest_analysis.valid?,
-          statements: @dest_analysis.statements.size,
+          statements: @dest_analysis.statements.size
         }
 
         {
@@ -167,13 +166,13 @@ module Toml
             sort_keys: @sort_keys,
             backend: @backend,
             runtime_operation_count: runtime_session&.operations&.size || 0,
-            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0,
+            runtime_diagnostic_count: runtime_session&.diagnostics&.size || 0
           },
           runtime: runtime_session&.to_h,
           statistics: result_obj.statistics,
           decisions: result_obj.decision_summary,
           template_analysis: template_analysis_debug,
-          dest_analysis: dest_analysis_debug,
+          dest_analysis: dest_analysis_debug
         }
       end
 
@@ -186,7 +185,7 @@ module Toml
 
       # @return [String] The default freeze token (not used for TOML)
       def default_freeze_token
-        "toml-merge"
+        'toml-merge'
       end
 
       # @return [Class] The resolver class for TOML files
@@ -207,10 +206,10 @@ module Toml
 
         KeySorter.new(@result.lines_array).sort! if @sort_keys
 
-        DebugLogger.debug("Merge complete", {
-          lines: @result.line_count,
-          decisions: @result.statistics,
-        })
+        DebugLogger.debug('Merge complete', {
+                            lines: @result.line_count,
+                            decisions: @result.statistics
+                          })
 
         @result
       end
@@ -225,7 +224,7 @@ module Toml
           remove_template_missing_nodes: @remove_template_missing_nodes,
           resolution_mode: @resolution_mode,
           corruption_handling: @corruption_handling,
-          match_refiner: @match_refiner,
+          match_refiner: @match_refiner
         )
       end
 
@@ -251,27 +250,27 @@ module Toml
           surface_kind: :toml_document,
           declared_language: :toml,
           effective_language: :toml,
-          operation_id: "toml-document-root",
-          delegate_name: "toml-runtime",
+          operation_id: 'toml-document-root',
+          delegate_name: 'toml-runtime',
           policy_context: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             sort_keys: @sort_keys,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
-          metadata: {merger: self.class.name, backend: @backend},
+          metadata: { merger: self.class.name, backend: @backend },
           options: {
             preference: @preference,
             add_template_only_nodes: @add_template_only_nodes,
             remove_template_missing_nodes: @remove_template_missing_nodes,
             sort_keys: @sort_keys,
             resolution_mode: @resolution_mode,
-            unresolved_policy: @unresolved_policy.to_h,
+            unresolved_policy: @unresolved_policy.to_h
           },
           language_chain: [:toml],
-          delegate_metadata: {merger: self.class.name, backend: @backend},
+          delegate_metadata: { merger: self.class.name, backend: @backend }
         )
       end
 
@@ -283,8 +282,8 @@ module Toml
           metadata: {
             stats: merge_result.statistics,
             decisions: merge_result.decision_summary,
-            backend: @backend,
-          },
+            backend: @backend
+          }
         )
       end
 
@@ -293,14 +292,14 @@ module Toml
           root_operation: root_operation,
           error: error,
           kind: :merge_failed,
-          metadata: {backend: @backend},
+          metadata: { backend: @backend }
         )
       end
 
       # TOML FileAnalysis accepts signature_generator
       def build_full_analysis_options
         {
-          signature_generator: @signature_generator,
+          signature_generator: @signature_generator
         }
       end
     end

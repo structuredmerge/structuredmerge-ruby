@@ -16,7 +16,7 @@ module Toml
       include Ast::Merge::EmitterLineMetadataSupport
 
       # Initialize subclass-specific state
-      def initialize_subclass_state(**options)
+      def initialize_subclass_state(**_options)
         initialize_line_metadata_state
       end
 
@@ -26,13 +26,13 @@ module Toml
       end
 
       def emit_blank_line
-        append_line("")
+        append_line('')
       end
 
       # Emit a tracked comment from CommentTracker
       # @param comment [Hash] Comment with :text, :indent
       def emit_tracked_comment(comment)
-        indent = " " * (comment[:indent] || 0)
+        indent = ' ' * (comment[:indent] || 0)
         append_line("#{indent}# #{comment[:text]}")
       end
 
@@ -87,7 +87,7 @@ module Toml
       # @param key [String] Key name
       # @param pairs [Hash] Key-value pairs for the inline table
       def emit_inline_table(key, pairs, metadata: nil)
-        formatted_pairs = pairs.map { |k, v| "#{k} = #{v}" }.join(", ")
+        formatted_pairs = pairs.map { |k, v| "#{k} = #{v}" }.join(', ')
         append_line("#{current_indent}#{key} = { #{formatted_pairs} }", metadata)
       end
 
@@ -96,7 +96,7 @@ module Toml
       # @param key [String] Key name
       # @param items [Array] Array items (already formatted)
       def emit_inline_array(key, items, metadata: nil)
-        formatted_items = items.join(", ")
+        formatted_items = items.join(', ')
         append_line("#{current_indent}#{key} = [#{formatted_items}]", metadata)
       end
 
@@ -133,8 +133,6 @@ module Toml
       def to_toml
         to_s
       end
-
-      private
     end
   end
 end

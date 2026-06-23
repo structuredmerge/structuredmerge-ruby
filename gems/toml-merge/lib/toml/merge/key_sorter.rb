@@ -63,12 +63,12 @@ module Toml
 
         flush_sortable = lambda {
           unless current_entries.empty?
-            blocks << {sortable: true, entries: current_entries}
+            blocks << { sortable: true, entries: current_entries }
             current_entries = []
           end
           unless pending_comments.empty?
             # Trailing comments with no following key — emit as non-sortable
-            blocks << {sortable: false, lines: pending_comments}
+            blocks << { sortable: false, lines: pending_comments }
             pending_comments = []
           end
         }
@@ -79,18 +79,18 @@ module Toml
           if content.strip.empty?
             # Blank line = gap separator
             flush_sortable.call
-            blocks << {sortable: false, lines: [line_hash]}
+            blocks << { sortable: false, lines: [line_hash] }
           elsif TABLE_HEADER_RE.match?(content)
             # Table header = structural boundary
             flush_sortable.call
-            blocks << {sortable: false, lines: [line_hash]}
+            blocks << { sortable: false, lines: [line_hash] }
           elsif (match = KEY_VALUE_RE.match(content))
             # Key=value pair
             sort_key = match[1]
             current_entries << {
               comments: pending_comments,
               key_line: line_hash,
-              sort_key: sort_key,
+              sort_key: sort_key
             }
             pending_comments = []
           elsif COMMENT_RE.match?(content)
@@ -99,7 +99,7 @@ module Toml
           else
             # Unknown line — treat as non-sortable boundary
             flush_sortable.call
-            blocks << {sortable: false, lines: [line_hash]}
+            blocks << { sortable: false, lines: [line_hash] }
           end
         end
 

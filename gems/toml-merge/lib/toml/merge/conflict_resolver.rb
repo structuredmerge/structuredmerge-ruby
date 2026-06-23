@@ -27,7 +27,8 @@ module Toml
       # @param add_template_only_nodes [Boolean] Whether to add nodes only in template
       # @param match_refiner [#call, nil] Optional match refiner for fuzzy matching
       # @param options [Hash] Additional options for forward compatibility
-      def initialize(template_analysis, dest_analysis, preference: :destination, add_template_only_nodes: false, remove_template_missing_nodes: false, resolution_mode: :eager, corruption_handling: :heal, match_refiner: nil, **options)
+      def initialize(template_analysis, dest_analysis, preference: :destination, add_template_only_nodes: false,
+                     remove_template_missing_nodes: false, resolution_mode: :eager, corruption_handling: :heal, match_refiner: nil, **options)
         super(
           strategy: :batch,
           preference: preference,
@@ -49,7 +50,7 @@ module Toml
       #
       # @param result [MergeResult] Result object to populate
       def resolve_batch(result)
-        DebugLogger.time("ConflictResolver#resolve") do
+        DebugLogger.time('ConflictResolver#resolve') do
           @result = result
           template_statements = @template_analysis.statements
           dest_statements = @dest_analysis.statements
@@ -70,20 +71,23 @@ module Toml
             template_statements,
             dest_statements,
             @template_analysis,
-            @dest_analysis,
+            @dest_analysis
           )
 
           emit_root_boundary_region(preferred_boundary_analysis(@template_analysis, @dest_analysis), :postlude)
-          emit_comment_only_document(preferred_comment_only_analysis(@template_analysis, @dest_analysis)) if @emitter.to_s.empty?
+          if @emitter.to_s.empty?
+            emit_comment_only_document(preferred_comment_only_analysis(@template_analysis,
+                                                                       @dest_analysis))
+          end
 
           # Transfer emitter output to result
           transfer_emitter_output(result)
 
-          DebugLogger.debug("Conflict resolution complete", {
-            template_statements: template_statements.size,
-            dest_statements: dest_statements.size,
-            result_lines: result.line_count,
-          })
+          DebugLogger.debug('Conflict resolution complete', {
+                              template_statements: template_statements.size,
+                              dest_statements: dest_statements.size,
+                              result_lines: result.line_count
+                            })
         end
       end
 
@@ -116,10 +120,10 @@ module Toml
 
         # Pre-compute position-aware trailing groups for template-only nodes.
         dest_sigs = ::Set.new
-        dest_nodes.each { |n|
+        dest_nodes.each do |n|
           sig = dest_analysis.generate_signature(n)
           dest_sigs << sig if sig
-        }
+        end
         refined_template_ids = ::Set.new(refined_matches.keys.map(&:object_id))
 
         trailing_groups, all_matched_indices = build_dest_iterate_trailing_groups(
@@ -127,7 +131,7 @@ module Toml
           dest_sigs: dest_sigs,
           signature_for: ->(node) { template_analysis.generate_signature(node) },
           refined_template_ids: refined_template_ids,
-          add_template_only_nodes: @add_template_only_nodes,
+          add_template_only_nodes: @add_template_only_nodes
         )
 
         # Emit template-only nodes that precede the first matched template node
@@ -164,7 +168,7 @@ module Toml
                 template_node,
                 dest_node,
                 template_analysis,
-                dest_analysis,
+                dest_analysis
               )
 
               emit_gap_before_node(
@@ -172,7 +176,8 @@ module Toml
                 selected_analysis,
                 prev_emitted_end_line,
                 prev_emitted_analysis,
-                skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node, dest_analysis),
+                skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
+                                                                                                      dest_analysis)
               )
 
               # Both have this node - merge them
@@ -206,7 +211,7 @@ module Toml
               template_node,
               dest_node,
               template_analysis,
-              dest_analysis,
+              dest_analysis
             )
 
             # Find and consume the matching template index
@@ -225,7 +230,8 @@ module Toml
               selected_analysis,
               prev_emitted_end_line,
               prev_emitted_analysis,
-              skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node, dest_analysis),
+              skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
+                                                                                                    dest_analysis)
             )
             merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
             prev_emitted_end_line = emitted_end_line_for(selected_node)
@@ -251,7 +257,7 @@ module Toml
           flush_ready_trailing_groups(
             trailing_groups: trailing_groups,
             matched_indices: all_matched_indices,
-            consumed_indices: consumed_template_indices,
+            consumed_indices: consumed_template_indices
           ) do |info|
             emit_gap_before_node(info[:node], template_analysis, prev_emitted_end_line, prev_emitted_analysis)
             emit_node(info[:node], template_analysis)
@@ -263,7 +269,7 @@ module Toml
         # Emit remaining trailing groups (tail + safety net)
         emit_remaining_trailing_groups(
           trailing_groups: trailing_groups,
-          consumed_indices: consumed_template_indices,
+          consumed_indices: consumed_template_indices
         ) do |info|
           emit_gap_before_node(info[:node], template_analysis, prev_emitted_end_line, prev_emitted_analysis)
           emit_node(info[:node], template_analysis)
@@ -285,20 +291,20 @@ module Toml
               template_node,
               dest_node,
               template_analysis,
-              dest_analysis,
+              dest_analysis
             )
 
             comment_source_node, comment_source_analysis = if @preference == :template
-              [dest_node, dest_analysis]
-            else
-              [nil, selected_analysis]
-            end
+                                                             [dest_node, dest_analysis]
+                                                           else
+                                                             [nil, selected_analysis]
+                                                           end
 
             emit_leading_region(
               selected_node,
               selected_analysis,
               comment_source_node: comment_source_node,
-              comment_analysis: comment_source_analysis,
+              comment_analysis: comment_source_analysis
             )
 
             # Emit table header and merge children
@@ -308,8 +314,8 @@ module Toml
                 selected_node,
                 selected_analysis,
                 comment_source_node: comment_source_node,
-                comment_analysis: comment_source_analysis,
-              ),
+                comment_analysis: comment_source_analysis
+              )
             )
 
             template_children = template_node.mergeable_children
@@ -319,7 +325,7 @@ module Toml
               template_children,
               dest_children,
               template_analysis,
-              dest_analysis,
+              dest_analysis
             )
           end
         elsif @preference == :destination
@@ -332,7 +338,7 @@ module Toml
             template_node,
             template_analysis,
             comment_source_node: dest_node,
-            comment_analysis: dest_analysis,
+            comment_analysis: dest_analysis
           )
         end
       end
@@ -349,27 +355,27 @@ module Toml
           node,
           analysis,
           comment_source_node: comment_source_node,
-          comment_analysis: comment_analysis,
+          comment_analysis: comment_analysis
         )
 
         # Emit the node content
         start_line = node.start_line
         end_line = emitted_end_line_for(node)
 
-        if start_line && end_line
-          lines = []
-          (start_line..end_line).each do |line_num|
-            line = analysis.line_at(line_num)
-            lines << line if line
-          end
-          emit_node_lines(
-            lines,
-            node,
-            analysis,
-            comment_source_node: comment_source_node,
-            comment_analysis: comment_analysis,
-          )
+        return unless start_line && end_line
+
+        lines = []
+        (start_line..end_line).each do |line_num|
+          line = analysis.line_at(line_num)
+          lines << line if line
         end
+        emit_node_lines(
+          lines,
+          node,
+          analysis,
+          comment_source_node: comment_source_node,
+          comment_analysis: comment_analysis
+        )
       end
 
       # Build a map of refined matches
@@ -396,9 +402,9 @@ module Toml
 
         # Call the refiner
         matches = @match_refiner.call(unmatched_t_nodes, unmatched_d_nodes, {
-          template_analysis: @template_analysis,
-          dest_analysis: @dest_analysis,
-        })
+                                        template_analysis: @template_analysis,
+                                        dest_analysis: @dest_analysis
+                                      })
 
         # Build result map: template node -> dest node
         matches.each_with_object({}) do |match, h|
@@ -430,12 +436,12 @@ module Toml
             @emitter.emit_tracked_comment(comment.merge(indent: indent, full_line: true))
           end
         else
-          @emitter.emit_comment(inline_region.text.to_s.sub(/\A\s*#\s?/, ""))
+          @emitter.emit_comment(inline_region.text.to_s.sub(/\A\s*#\s?/, ''))
         end
       end
 
       def preferred_boundary_analysis(template_analysis, dest_analysis)
-        (@preference == :template) ? template_analysis : dest_analysis
+        @preference == :template ? template_analysis : dest_analysis
       end
 
       def preferred_comment_only_analysis(template_analysis, dest_analysis)
@@ -458,7 +464,7 @@ module Toml
           next unless candidate
 
           augmenter = candidate.comment_augmenter(owners: candidate.statements)
-          region = (kind == :preamble) ? augmenter.preamble_region : augmenter.postlude_region
+          region = kind == :preamble ? augmenter.preamble_region : augmenter.postlude_region
           boundary_lines = canonical_root_boundary_lines_for(region, candidate, kind)
           boundary_lines = fallback_root_boundary_lines_for(candidate, kind) if boundary_lines.empty?
           next if boundary_lines.empty?
@@ -505,11 +511,11 @@ module Toml
 
         should_heal = handle_suspected_corruption(
           kind: :duplicate_template_preamble_prefix,
-          message: "document preamble begins with duplicated template-owned TOML preamble lines",
+          message: 'document preamble begins with duplicated template-owned TOML preamble lines',
           context: {
             repeated_lines: repeat_count * template_lines.length,
-            remaining_lines: remainder.length,
-          },
+            remaining_lines: remainder.length
+          }
         )
         should_heal ? remainder : boundary_lines
       end
@@ -543,9 +549,7 @@ module Toml
         comparator ||= ->(left, right) { left == right }
 
         count = 0
-        while prefix_match?(lines.drop(count * prefix.length).first(prefix.length), prefix, comparator)
-          count += 1
-        end
+        count += 1 while prefix_match?(lines.drop(count * prefix.length).first(prefix.length), prefix, comparator)
         count
       end
 
@@ -583,14 +587,14 @@ module Toml
           analysis,
           :leading_region,
           comment_source_node: comment_source_node,
-          comment_analysis: comment_analysis,
+          comment_analysis: comment_analysis
         )
         return unless region
 
         region = canonical_leading_region_for(
           region,
           source_analysis: source_analysis,
-          source_node: source_node,
+          source_node: source_node
         )
 
         # Bidirectional dedup: skip this region if an identical comment block
@@ -599,11 +603,13 @@ module Toml
         if dedup_keys.any? { |key| @emitted_leading_comment_texts.include?(key) }
           should_heal = handle_suspected_corruption(
             kind: :comment_ownership_overlap,
-            message: "leading comment region overlaps previously emitted TOML comment ownership",
-            context: dedup_warning_context(region: region, analysis: source_analysis, node: node, source_node: source_node),
+            message: 'leading comment region overlaps previously emitted TOML comment ownership',
+            context: dedup_warning_context(region: region, analysis: source_analysis, node: node,
+                                           source_node: source_node)
           )
           if should_heal
-            emit_interstitial_blank_lines((region.end_line || source_node&.start_line).to_i + 1, source_node&.start_line.to_i - 1, source_analysis)
+            emit_interstitial_blank_lines((region.end_line || source_node&.start_line).to_i + 1,
+                                          source_node&.start_line.to_i - 1, source_analysis)
             return
           end
         end
@@ -611,7 +617,8 @@ module Toml
 
         emit_preceding_blank_lines(region, source_analysis)
         @emitter.emit_comment_region(region, source_lines: source_analysis&.lines)
-        emit_interstitial_blank_lines((region.end_line || source_node&.start_line).to_i + 1, source_node&.start_line.to_i - 1, source_analysis)
+        emit_interstitial_blank_lines((region.end_line || source_node&.start_line).to_i + 1,
+                                      source_node&.start_line.to_i - 1, source_analysis)
       end
 
       def dedup_keys_for_region(region)
@@ -626,7 +633,7 @@ module Toml
 
       def dedup_keys_for_lines(lines)
         normalized = Array(lines).map { |line| normalize_comment_line(line) }.join("\n")
-        normalized = normalized.sub(/\n+\z/, "")
+        normalized = normalized.sub(/\n+\z/, '')
         return [] if normalized.empty?
 
         keys = [normalized]
@@ -636,7 +643,7 @@ module Toml
       end
 
       SHARED_DEV_PREAMBLE_FIRST_LINE = /\AShared development environment for .+\.\z/
-      SHARED_DEV_PREAMBLE_SECOND_LINE = "Local overrides belong in .env.local (loaded via dotenvy through mise)."
+      SHARED_DEV_PREAMBLE_SECOND_LINE = 'Local overrides belong in .env.local (loaded via dotenvy through mise).'
       private_constant :SHARED_DEV_PREAMBLE_FIRST_LINE, :SHARED_DEV_PREAMBLE_SECOND_LINE
 
       def shared_dev_preamble_dedup_key(normalized)
@@ -646,16 +653,16 @@ module Toml
         return unless lines[1] == SHARED_DEV_PREAMBLE_SECOND_LINE
 
         canonicalized = lines.dup
-        canonicalized[0] = "Shared development environment for __MATCHED_GEM__."
+        canonicalized[0] = 'Shared development environment for __MATCHED_GEM__.'
         canonicalized.join("\n")
       end
 
       def normalize_comment_text(text)
-        text.to_s.lines.map { |line| normalize_comment_line(line) }.join("\n").sub(/\n+\z/, "")
+        text.to_s.lines.map { |line| normalize_comment_line(line) }.join("\n").sub(/\n+\z/, '')
       end
 
       def normalize_comment_line(line)
-        line.to_s.sub(/\A\s*#\s?/, "").rstrip
+        line.to_s.sub(/\A\s*#\s?/, '').rstrip
       end
 
       def canonical_leading_region_for(region, source_analysis:, source_node:)
@@ -691,18 +698,18 @@ module Toml
 
         should_heal = handle_suspected_corruption(
           kind: :duplicate_template_preamble_prefix,
-          message: "first-node leading region begins with duplicated template-owned TOML preamble comments",
+          message: 'first-node leading region begins with duplicated template-owned TOML preamble comments',
           context: {
             repeated_nodes: repeat_count * template_nodes.length,
-            remaining_nodes: remainder_nodes.length,
-          },
+            remaining_nodes: remainder_nodes.length
+          }
         )
         return region unless should_heal
 
         ::Ast::Merge::Comment::Region.new(
           kind: region.kind,
           nodes: remainder_nodes,
-          metadata: region.metadata,
+          metadata: region.metadata
         )
       end
 
@@ -746,10 +753,11 @@ module Toml
       def dedup_warning_context(region:, analysis:, node:, source_node:)
         {
           file: analysis.respond_to?(:path) ? analysis.path : nil,
-          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split("::").last,
-          source_owner_type: source_node&.respond_to?(:type) ? source_node.type : source_node&.class&.name&.split("::")&.last,
-          region_lines: [region.respond_to?(:start_line) ? region.start_line : nil, region.respond_to?(:end_line) ? region.end_line : nil],
-          normalized_content: region.normalized_content,
+          owner_type: node&.respond_to?(:type) ? node.type : node.class.name.split('::').last,
+          source_owner_type: source_node&.respond_to?(:type) ? source_node.type : source_node&.class&.name&.split('::')&.last,
+          region_lines: [region.respond_to?(:start_line) ? region.start_line : nil,
+                         region.respond_to?(:end_line) ? region.end_line : nil],
+          normalized_content: region.normalized_content
         }.compact
       end
 
@@ -758,9 +766,9 @@ module Toml
           mode: corruption_handling,
           kind: kind,
           message: message,
-          prefix: "[toml-merge]",
+          prefix: '[toml-merge]',
           error_class: Toml::Merge::CorruptionDetectedError,
-          warner: ->(formatted) { DebugLogger.debug_warning(formatted, context) },
+          warner: ->(formatted) { DebugLogger.debug_warning(formatted, context) }
         )
       end
 
@@ -789,7 +797,7 @@ module Toml
           template_text: template_text,
           destination_text: dest_text,
           provisional_winner: provisional_winner,
-          case_prefix: "toml",
+          case_prefix: 'toml',
           case_parts: [dest_node.type, identifier],
           surface_path: surface_path,
           metadata: {
@@ -801,13 +809,13 @@ module Toml
               provisional_winner: provisional_winner,
               surface_path: surface_path,
               node_type: dest_node.type,
-              identifier: identifier,
-            ),
+              identifier: identifier
+            )
           },
           conflict_fields: {
             node_type: dest_node.type,
-            identifier: identifier,
-          },
+            identifier: identifier
+          }
         )
       end
 
@@ -824,11 +832,11 @@ module Toml
         unresolved_typed_path_segment(node.type, identifier: identifier, node: node, fallback: node.type)
       end
 
-      def with_resolution_path_segment(*nodes)
+      def with_resolution_path_segment(*nodes, &block)
         with_first_unresolved_path_segment(
           *nodes,
-          segment_builder: ->(node) { resolution_path_segment_for(node, resolution_identifier(node, node)) },
-        ) { yield }
+          segment_builder: ->(node) { resolution_path_segment_for(node, resolution_identifier(node, node)) } & block
+        )
       end
 
       def inline_comment_text_for(node)
@@ -844,7 +852,7 @@ module Toml
           analysis,
           :inline_region,
           comment_source_node: comment_source_node,
-          comment_analysis: comment_analysis,
+          comment_analysis: comment_analysis
         )
         unless region && !region.empty?
           inline_comment =
@@ -853,7 +861,7 @@ module Toml
 
           if inline_comment
             raise MissingSharedInlineRegionError,
-              "Expected shared inline region for owner with inline comment"
+                  'Expected shared inline region for owner with inline comment'
           end
 
           return
@@ -863,11 +871,12 @@ module Toml
         return tracked[:text] if tracked && tracked[:text]
 
         raise MissingSharedInlineRegionError,
-          "Expected tracked inline comment metadata for shared inline region"
+              'Expected tracked inline comment metadata for shared inline region'
       end
 
       def emit_node_lines(lines, node, analysis, comment_source_node: nil, comment_analysis: analysis)
         return if lines.empty?
+
         metadata = emitter_block_metadata(analysis, node.start_line)
 
         inline_region, inline_source_analysis, = preferred_region_with_source(
@@ -875,7 +884,7 @@ module Toml
           analysis,
           :inline_region,
           comment_source_node: comment_source_node,
-          comment_analysis: comment_analysis,
+          comment_analysis: comment_analysis
         )
 
         unless inline_region && !inline_region.empty?
@@ -885,13 +894,18 @@ module Toml
 
         existing_inline_region = attachment_region(node, analysis, :inline_region)
         first_line = strip_inline_region_from_line(lines.first, existing_inline_region)
-        first_line = attach_inline_region_to_line(first_line, inline_region, source_lines: inline_source_analysis&.lines)
+        first_line = attach_inline_region_to_line(first_line, inline_region,
+                                                  source_lines: inline_source_analysis&.lines)
 
         @emitter.emit_raw_lines([first_line], metadata: emitter_line_metadata(analysis, line_number: node.start_line))
-        @emitter.emit_raw_lines(lines.drop(1), metadata: emitter_block_metadata(analysis, node.start_line + 1)) if lines.length > 1
+        return unless lines.length > 1
+
+        @emitter.emit_raw_lines(lines.drop(1),
+                                metadata: emitter_block_metadata(analysis, node.start_line + 1))
       end
 
-      def preferred_region_with_source(node, analysis, region_kind, comment_source_node: nil, comment_analysis: analysis)
+      def preferred_region_with_source(node, analysis, region_kind, comment_source_node: nil,
+                                       comment_analysis: analysis)
         primary_region = attachment_region(node, analysis, region_kind)
         return [primary_region, analysis, node] if primary_region && !primary_region.empty?
 
@@ -929,7 +943,8 @@ module Toml
         return line if raw_inline.empty?
 
         base_line = line.to_s
-        separator = inline_region_separator(inline_region, source_lines: source_lines, base_line: base_line, raw_inline: raw_inline)
+        separator = inline_region_separator(inline_region, source_lines: source_lines, base_line: base_line,
+                                                           raw_inline: raw_inline)
 
         base_line + separator + raw_inline
       end
@@ -946,9 +961,9 @@ module Toml
           end
         end
 
-        return "" if base_line.empty? || base_line.end_with?(" ", "\t") || !raw_inline.lstrip.start_with?("#")
+        return '' if base_line.empty? || base_line.end_with?(' ', "\t") || !raw_inline.lstrip.start_with?('#')
 
-        " "
+        ' '
       end
 
       def emit_interstitial_blank_lines(start_line, end_line, analysis)

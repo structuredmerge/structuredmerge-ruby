@@ -25,7 +25,7 @@ module Toml
             comments: analysis.send(:tracked_comment_entries),
             owners: analysis.send(:augmenter_delegate_owners, @owners),
             style: :hash_comment,
-            **details,
+            **details
           )
           @capability = analysis.send(:build_comment_capability, owner_count: @owners.size, **details)
           @attachments_by_owner = @owners.each_with_object({}) do |owner, result|
@@ -69,25 +69,25 @@ module Toml
       #
       # @note To force a specific backend, use TreeHaver.with_backend or TREE_HAVER_BACKEND env var.
       #   TreeHaver handles backend selection, auto-detection, and fallback.
-      def initialize(source, signature_generator: nil, parser_path: nil, **options)
+      def initialize(source, signature_generator: nil, parser_path: nil, **_options)
         @source = source
         @lines = source.lines.map(&:chomp)
         @signature_generator = signature_generator
         @parser_path = parser_path
         @errors = []
-        @backend = :tree_sitter  # Default, will be updated during parsing
+        @backend = :tree_sitter # Default, will be updated during parsing
         # **options captures any additional parameters (e.g., freeze_token, node_typing) for forward compatibility
 
         # Parse the TOML
-        DebugLogger.time("FileAnalysis#parse_toml") { parse_toml }
+        DebugLogger.time('FileAnalysis#parse_toml') { parse_toml }
 
         @statements = integrate_nodes
 
-        DebugLogger.debug("FileAnalysis initialized", {
-          signature_generator: signature_generator ? "custom" : "default",
-          statements_count: @statements.size,
-          valid: valid?,
-        })
+        DebugLogger.debug('FileAnalysis initialized', {
+                            signature_generator: signature_generator ? 'custom' : 'default',
+                            statements_count: @statements.size,
+                            valid: valid?
+                          })
       end
 
       # Check if parse was successful
@@ -114,7 +114,7 @@ module Toml
         @comment_support_style ||= shared_comment_support_style(
           source: native_comment_backend? ? @backend : :toml_source,
           style: :hash_comment,
-          read_strategy: native_comment_backend? ? :native_read_portable_write : :source_augmented_portable_write,
+          read_strategy: native_comment_backend? ? :native_read_portable_write : :source_augmented_portable_write
         )
       end
 
@@ -154,7 +154,7 @@ module Toml
           owner,
           tracker_attachment: comment_tracker.comment_attachment_for(owner, line_num: line_num, **options),
           line_num: line_num,
-          **options,
+          **options
         )
       end
 
@@ -237,12 +237,10 @@ module Toml
           wrapper = wrap_node(child, document_root: root)
           next unless wrapper
 
-          if wrapper.table? || wrapper.array_of_tables?
-            child_line = wrapper.start_line
-            if child_line && (first_table_line.nil? || child_line < first_table_line)
-              first_table_line = child_line
-            end
-          end
+          next unless wrapper.table? || wrapper.array_of_tables?
+
+          child_line = wrapper.start_line
+          first_table_line = child_line if child_line && (first_table_line.nil? || child_line < first_table_line)
         end
 
         root.each do |child|
@@ -278,10 +276,10 @@ module Toml
         # - Parslet produces Hash/Array/Slice-based nodes
         backend_sym = parser.backend
         @backend = case backend_sym
-        when :citrus then :citrus
-        when :parslet then :parslet
-        else :tree_sitter  # mri, rust, ffi, java all use tree-sitter format
-        end
+                   when :citrus then :citrus
+                   when :parslet then :parslet
+                   else :tree_sitter # mri, rust, ffi, java all use tree-sitter format
+                   end
 
         @ast = parser.parse(@source)
 
@@ -304,12 +302,12 @@ module Toml
 
       def collect_parse_errors(node)
         # Collect ERROR and MISSING nodes from the tree
-        if node.type.to_s == "ERROR" || node.missing?
+        if node.type.to_s == 'ERROR' || node.missing?
           @errors << {
             type: node.type.to_s,
             start_point: node.start_point,
             end_point: node.end_point,
-            text: node.to_s,
+            text: node.to_s
           }
         end
 
@@ -318,6 +316,7 @@ module Toml
 
       def integrate_nodes
         return [] unless valid?
+
         (root_pairs + tables)
           .select { |node| node.start_line && node.end_line }
           .sort_by { |node| node.start_line || 0 }
@@ -336,7 +335,7 @@ module Toml
           attachment_hints: true,
           comment_nodes: true,
           owner_count: owner_count,
-          comment_count: tracked_comment_entries.size,
+          comment_count: tracked_comment_entries.size
         }.merge(details)
 
         if native_comment_backend?
@@ -360,7 +359,7 @@ module Toml
           backend: @backend,
           document_root: document_root || @ast&.root_node,
           comment_tracker: comment_tracker,
-          comment_entries: tracked_comment_entries,
+          comment_entries: tracked_comment_entries
         )
       end
 
@@ -422,8 +421,8 @@ module Toml
         line = node_start_line(node)
         return unless line
 
-        raw = node_text(node).to_s.sub(/\n\z/, "")
-        return unless raw.lstrip.start_with?("#")
+        raw = node_text(node).to_s.sub(/\n\z/, '')
+        return unless raw.lstrip.start_with?('#')
 
         raw_line = line_at(line).to_s
         column = raw_line.index(raw) || node_start_column(node) || 0
@@ -440,7 +439,7 @@ module Toml
           next unless column
 
           raw_line = line.to_s
-          raw = raw_line.byteslice(column..) || ""
+          raw = raw_line.byteslice(column..) || ''
           prefix = raw_line.byteslice(0, column).to_s
           build_comment_entry(line: index + 1, column: column, prefix: prefix, raw: raw, source: :scanner)
         end
@@ -534,17 +533,17 @@ module Toml
       end
 
       def build_comment_entry(line:, column:, prefix:, raw:, source:)
-        cleaned_raw = raw.sub(/\n\z/, "")
+        cleaned_raw = raw.sub(/\n\z/, '')
         return if cleaned_raw.empty?
 
         {
           line: line,
           column: column,
           indent: prefix[/\A[ \t]*/].to_s.length,
-          text: cleaned_raw.sub(/\A\s*#\s?/, ""),
+          text: cleaned_raw.sub(/\A\s*#\s?/, ''),
           full_line: prefix.strip.empty?,
           raw: cleaned_raw,
-          source: source,
+          source: source
         }
       end
 
@@ -575,7 +574,7 @@ module Toml
       end
 
       def node_text(node)
-        return "" unless node.respond_to?(:start_byte) && node.respond_to?(:end_byte)
+        return '' unless node.respond_to?(:start_byte) && node.respond_to?(:end_byte)
 
         length = node.end_byte - node.start_byte
         return @source[node.start_byte, length].to_s if @backend == :citrus

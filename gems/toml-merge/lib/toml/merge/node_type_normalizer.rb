@@ -80,7 +80,7 @@ module Toml
           # Document structure
           document: :document,
           table: :table,
-          table_array_element: :array_of_tables,  # tree-sitter uses this name
+          table_array_element: :array_of_tables, # tree-sitter uses this name
 
           # Key-value pairs
           pair: :pair,
@@ -119,7 +119,7 @@ module Toml
           "]]": :double_bracket_close,
           "{": :brace_open,
           "}": :brace_close,
-          ",": :comma,
+          ",": :comma
         }.freeze,
 
         # Citrus/toml-rb backend node types
@@ -129,7 +129,7 @@ module Toml
           # Document structure
           document: :document,
           table: :table,
-          table_array: :array_of_tables,  # Citrus produces :table_array (not :table_array_element)
+          table_array: :array_of_tables, # Citrus produces :table_array (not :table_array_element)
 
           # Key-value pairs
           keyvalue: :pair,  # Citrus produces :keyvalue (not :pair)
@@ -188,7 +188,7 @@ module Toml
           "]]": :double_bracket_close,
           "{": :brace_open,
           "}": :brace_close,
-          ",": :comma,
+          ",": :comma
         }.freeze,
 
         # Parslet/toml gem backend node types
@@ -198,14 +198,14 @@ module Toml
         parslet: {
           # Document structure
           document: :document,
-          hash: :document,       # Root result is often a hash
+          hash: :document, # Root result is often a hash
           table: :table,
           table_array: :array_of_tables,
 
           # Key-value pairs - Parslet uses :key and :value hash keys
           key: :bare_key,
           value: :value,
-          pair: :pair,          # Synthetic type for key-value combinations
+          pair: :pair, # Synthetic type for key-value combinations
 
           # Value types - from .as(:type) rules in TOML::Parslet
           string: :string,
@@ -221,15 +221,15 @@ module Toml
           datetime_rfc3339: :datetime,
 
           # Slice types (terminal values)
-          slice: :string,       # Parslet::Slice defaults to string
+          slice: :string, # Parslet::Slice defaults to string
 
           # Structural types from Parslet result structure
-          element: :element,    # Array elements
+          element: :element, # Array elements
           array_element: :element,
 
           # Unknown/fallback
-          unknown: :unknown,
-        }.freeze,
+          unknown: :unknown
+        }.freeze
       )
 
       class << self

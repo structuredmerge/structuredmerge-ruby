@@ -36,7 +36,7 @@ module Toml
           template_lines: 0,
           dest_lines: 0,
           merged_lines: 0,
-          total_decisions: 0,
+          total_decisions: 0
         }
       end
 
@@ -51,7 +51,7 @@ module Toml
           content: line,
           decision: decision,
           source: source,
-          original_line: original_line,
+          original_line: original_line
         }
 
         track_statistics(decision, source)
@@ -76,7 +76,7 @@ module Toml
       # @param decision [Symbol] Decision for the blank line
       # @param source [Symbol] Source
       def add_blank_line(decision: DECISION_MERGED, source: :merged)
-        add_line("", decision: decision, source: source)
+        add_line('', decision: decision, source: source)
       end
 
       # Add content from a node wrapper
@@ -131,7 +131,7 @@ module Toml
 
       private
 
-      def track_statistics(decision, source)
+      def track_statistics(decision, _source)
         @statistics[:total_decisions] += 1
 
         case decision

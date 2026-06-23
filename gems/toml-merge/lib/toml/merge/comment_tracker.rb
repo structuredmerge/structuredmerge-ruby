@@ -42,8 +42,8 @@ module Toml
           metadata: {
             source: native_comment_backend? ? :toml_native : :toml_source,
             line_num: owner_line,
-            end_line: owner_last_line,
-          }.merge(options),
+            end_line: owner_last_line
+          }.merge(options)
         )
       end
 
@@ -56,10 +56,10 @@ module Toml
         return [] unless start_line
 
         end_line = if owner_table_like?(owner)
-          start_line
-        else
-          owner_end_line(owner) || start_line
-        end
+                     start_line
+                   else
+                     owner_end_line(owner) || start_line
+                   end
 
         @comment_entries.select do |entry|
           !entry[:full_line] && (start_line..end_line).cover?(entry[:line])
@@ -114,8 +114,8 @@ module Toml
           nodes: nodes,
           metadata: {
             source: native_comment_backend? ? :toml_native : :toml_source,
-            tracked_hashes: entries,
-          }.merge(metadata),
+            tracked_hashes: entries
+          }.merge(metadata)
         )
       end
 

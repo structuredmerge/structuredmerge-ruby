@@ -34,7 +34,8 @@ module Toml
         # @param inline_comment [Hash, nil] Inline comment on the node's line
         # @param backend [Symbol] The backend used for parsing (:tree_sitter or :citrus)
         # @return [NodeWrapper, nil] Wrapped node or nil if node is nil
-        def wrap(node, lines, source: nil, leading_comments: nil, inline_comment: nil, backend: :tree_sitter, comment_entries: nil, comment_tracker: nil)
+        def wrap(node, lines, source: nil, leading_comments: nil, inline_comment: nil, backend: :tree_sitter,
+                 comment_entries: nil, comment_tracker: nil)
           return if node.nil?
 
           new(
@@ -45,7 +46,7 @@ module Toml
             inline_comment: inline_comment,
             backend: backend,
             comment_entries: comment_entries,
-            comment_tracker: comment_tracker,
+            comment_tracker: comment_tracker
           )
         end
       end
@@ -84,7 +85,7 @@ module Toml
       end
 
       def node_text(ts_node)
-        return "" unless ts_node.respond_to?(:start_byte) && ts_node.respond_to?(:end_byte)
+        return '' unless ts_node.respond_to?(:start_byte) && ts_node.respond_to?(:end_byte)
 
         length = ts_node.end_byte - ts_node.start_byte
         return @source[ts_node.start_byte, length].to_s if @backend == :citrus
@@ -96,7 +97,7 @@ module Toml
         return unless pair?
         return unless @start_line && @end_line && @end_line > @start_line
 
-        line_count = [node_text(@node).sub(/\n\z/, "").lines.count, 1].max
+        line_count = [node_text(@node).sub(/\n\z/, '').lines.count, 1].max
         @end_line = @start_line + line_count - 1
       end
 
@@ -105,8 +106,7 @@ module Toml
       def canonical_type
         return parslet_element_canonical_type if parslet_element_node?
 
-        canonical = NodeTypeNormalizer.canonical_type(@node.type, @backend)
-        canonical
+        NodeTypeNormalizer.canonical_type(@node.type, @backend)
       end
 
       # Check if this node has a specific type (checks both raw and canonical)
@@ -214,12 +214,12 @@ module Toml
         # In TOML, pair has key children (bare_key, quoted_key, or dotted_key)
         @node.each do |child|
           child_canonical = NodeTypeNormalizer.canonical_type(child.type, @backend)
-          if NodeTypeNormalizer.key_type?(child_canonical)
-            key_text = node_text(child)
-            # Remove surrounding quotes if present, and strip whitespace
-            # (Citrus backend includes trailing space in key nodes)
-            return key_text&.gsub(/\A["']|["']\z/, "")&.strip
-          end
+          next unless NodeTypeNormalizer.key_type?(child_canonical)
+
+          key_text = node_text(child)
+          # Remove surrounding quotes if present, and strip whitespace
+          # (Citrus backend includes trailing space in key nodes)
+          return key_text&.gsub(/\A["']|["']\z/, '')&.strip
         end
         nil
       end
@@ -250,7 +250,7 @@ module Toml
                 document_root: @document_root,
                 comment_entries: @comment_entries,
                 comment_tracker: comment_tracker,
-                raw_text: raw_pair_value_text,
+                raw_text: raw_pair_value_text
               )
             end
           end
@@ -260,7 +260,7 @@ module Toml
             lines: @lines,
             source: @source,
             backend: @backend,
-            document_root: @document_root,
+            document_root: @document_root
           )
         end
         nil
@@ -334,7 +334,7 @@ module Toml
               lines: @lines,
               source: @source,
               backend: @backend,
-              document_root: @document_root,
+              document_root: @document_root
             )
           end
           result
@@ -375,11 +375,11 @@ module Toml
       #
       # @return [String]
       def content
-        return "" unless @start_line
+        return '' unless @start_line
 
         # For tables with Citrus backend, extend end_line to include pairs
         effective_end = effective_end_line
-        return "" unless effective_end
+        return '' unless effective_end
 
         (@start_line..effective_end).map { |ln| @lines[ln - 1] }.compact.join("\n")
       end
@@ -437,7 +437,10 @@ module Toml
         when :array
           # Arrays identified by their length
           elements_count = 0
-          node.each { |c| elements_count += 1 unless %i[comment comma bracket_open bracket_close].include?(NodeTypeNormalizer.canonical_type(c.type, @backend)) }
+          node.each do |c|
+            elements_count += 1 unless %i[comment comma bracket_open
+                                          bracket_close].include?(NodeTypeNormalizer.canonical_type(c.type, @backend))
+          end
           [:array, elements_count]
         when :string
           # Strings identified by their content
@@ -480,13 +483,15 @@ module Toml
       end
 
       def parslet_element_canonical_type
-        child_canonicals = each_child(@node).map { |child|
+        child_canonicals = each_child(@node).map do |child|
           NodeTypeNormalizer.canonical_type(child.type, @backend)
-        }
+        end
 
         return :table if child_canonicals.include?(:table)
         return :array_of_tables if child_canonicals.include?(:array_of_tables)
-        return :pair if child_canonicals.any? { |type| NodeTypeNormalizer.key_type?(type) } && child_canonicals.include?(:value)
+        return :pair if child_canonicals.any? do |type|
+          NodeTypeNormalizer.key_type?(type)
+        end && child_canonicals.include?(:value)
 
         :element
       end
@@ -509,7 +514,7 @@ module Toml
         line = @lines[@start_line - 1].to_s
         return if line.empty?
 
-        equals_index = line.index("=")
+        equals_index = line.index('=')
         return unless equals_index
 
         inline_comment = comment_tracker&.inline_comment_for(@node, line_num: @start_line)
@@ -543,11 +548,11 @@ module Toml
             # Tree-sitter: pairs contain keys directly
             child.each do |pair_child|
               pair_child_canonical = NodeTypeNormalizer.canonical_type(pair_child.type, @backend)
-              if NodeTypeNormalizer.key_type?(pair_child_canonical)
-                key_text = node_text(pair_child)&.gsub(/\A["']|["']\z/, "")&.strip
-                keys << key_text if key_text && !key_text.empty?
-                break
-              end
+              next unless NodeTypeNormalizer.key_type?(pair_child_canonical)
+
+              key_text = node_text(pair_child)&.gsub(/\A["']|["']\z/, '')&.strip
+              keys << key_text if key_text && !key_text.empty?
+              break
             end
             next
           end
@@ -557,7 +562,7 @@ module Toml
 
           # Found a key node - extract the key text (Citrus path)
           if NodeTypeNormalizer.key_type?(child_canonical)
-            key_text = node_text(child)&.gsub(/\A["']|["']\z/, "")&.strip
+            key_text = node_text(child)&.gsub(/\A["']|["']\z/, '')&.strip
             keys << key_text if key_text && !key_text.empty?
           end
         end
@@ -631,9 +636,7 @@ module Toml
           next if sibling_start <= my_start
 
           # Found a table after us - track the closest one
-          if next_table_start.nil? || sibling_start < next_table_start
-            next_table_start = sibling_start
-          end
+          next_table_start = sibling_start if next_table_start.nil? || sibling_start < next_table_start
         end
 
         next_table_start
@@ -676,7 +679,7 @@ module Toml
           backend: @backend,
           document_root: @document_root,
           comment_entries: @comment_entries,
-          comment_tracker: comment_tracker,
+          comment_tracker: comment_tracker
         )
       end
 
@@ -698,14 +701,17 @@ module Toml
       def hydrate_comment_associations!
         return unless comment_tracker
 
-        @leading_comments = comment_tracker.leading_comments_before(@start_line) unless @explicit_leading_comments || @start_line.nil?
-        @inline_comment = comment_tracker.inline_comment_for(@node, line_num: @start_line) unless @explicit_inline_comment || @start_line.nil?
+        unless @explicit_leading_comments || @start_line.nil?
+          @leading_comments = comment_tracker.leading_comments_before(@start_line)
+        end
+        return if @explicit_inline_comment || @start_line.nil?
+
+        @inline_comment = comment_tracker.inline_comment_for(@node,
+                                                             line_num: @start_line)
       end
 
       def comment_tracker
-        @comment_tracker ||= if @comment_entries.any?
-          CommentTracker.new(@lines, @comment_entries, backend: @backend)
-        end
+        @comment_tracker ||= (CommentTracker.new(@lines, @comment_entries, backend: @backend) if @comment_entries.any?)
       end
     end
   end
