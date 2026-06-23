@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require "ast/crispr"
-require "markly/merge"
-require "version_gem"
-require_relative "markly/version"
+require 'ast/crispr'
+require 'markly/merge'
+require 'version_gem'
+require_relative 'markly/version'
 
 module Ast
   module Crispr
@@ -19,7 +19,7 @@ module Ast
             :heading_source,
             :level,
             :base,
-            keyword_init: true,
+            keyword_init: true
           )
           LinkDefinitionOwner = Struct.new(
             :location,
@@ -27,13 +27,13 @@ module Ast
             :url,
             :title,
             :source,
-            keyword_init: true,
+            keyword_init: true
           )
           HtmlCommentOwner = Struct.new(
             :location,
             :text,
             :source,
-            keyword_init: true,
+            keyword_init: true
           )
           InlineReferenceOwner = Struct.new(
             :location,
@@ -44,20 +44,21 @@ module Ast
             :reference_kind,
             :label,
             :labels,
-            keyword_init: true,
+            keyword_init: true
           )
           TableRowOwner = Struct.new(
             :location,
             :source,
             :text,
-            keyword_init: true,
+            keyword_init: true
           )
 
           def read_ast(document)
             analysis = ::Markly::Merge::FileAnalysis.new(document.content)
             return analysis if analysis.valid?
 
-            raise Ast::Crispr::Error.new("Unable to read structural owners from #{document.source_label}", details: {source_label: document.source_label})
+            raise Ast::Crispr::Error.new("Unable to read structural owners from #{document.source_label}",
+                                         details: { source_label: document.source_label })
           end
 
           def structural_owners(document, owner_scope: :shared_default)
@@ -74,19 +75,19 @@ module Ast
             when :table_rows
               build_table_rows(analysis)
             else
-              raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
+              raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
 
           def comment_regions_for(_document, _owner, region: :leading, owner_scope: :shared_default)
             raise Ast::Crispr::Error.new(
-              "Unsupported CRISPR comment region",
-              details: {region: region, owner_scope: owner_scope},
+              'Unsupported CRISPR comment region',
+              details: { region: region, owner_scope: owner_scope }
             )
           end
 
           def comment_region_text(_document, _comment_region)
-            raise Ast::Crispr::Error.new("Markdown CRISPR adapter does not expose comment regions")
+            raise Ast::Crispr::Error.new('Markdown CRISPR adapter does not expose comment regions')
           end
 
           def structure_profile(owner_scope: :shared_default)
@@ -96,38 +97,38 @@ module Ast
                 owner_scope: owner_scope,
                 owner_selector: :heading_sections,
                 supported_comment_regions: [],
-                metadata: {adapter: :markly},
+                metadata: { adapter: :markly }
               )
             when :link_definitions
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
                 owner_selector: :link_definitions,
                 supported_comment_regions: [],
-                metadata: {adapter: :markly},
+                metadata: { adapter: :markly }
               )
             when :html_comments
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [],
-                metadata: {adapter: :markly, markdown_owner: :html_comment},
+                metadata: { adapter: :markly, markdown_owner: :html_comment }
               )
             when :inline_references
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
                 owner_selector: :inline_references,
                 supported_comment_regions: [],
-                metadata: {adapter: :markly, markdown_owner: :inline_reference},
+                metadata: { adapter: :markly, markdown_owner: :inline_reference }
               )
             when :table_rows
               Ast::Crispr::StructureProfile.new(
                 owner_scope: owner_scope,
                 owner_selector: :table_rows,
                 supported_comment_regions: [],
-                metadata: {adapter: :markly, markdown_owner: :table_row},
+                metadata: { adapter: :markly, markdown_owner: :table_row }
               )
             else
-              raise Ast::Crispr::Error.new("Unsupported CRISPR owner scope", details: {owner_scope: owner_scope})
+              raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
 
@@ -147,7 +148,7 @@ module Ast
                 heading_text: owner.heading_text,
                 heading_source: owner.heading_source,
                 level: owner.level,
-                base: owner.base,
+                base: owner.base
               )
             end
           end
@@ -164,7 +165,13 @@ module Ast
                 label: statement.label,
                 url: statement.url,
                 title: statement.title,
-                source: statement.respond_to?(:content) ? statement.content : analysis.source_range(position[:start_line], position[:end_line]).chomp,
+                source: if statement.respond_to?(:content)
+                          statement.content
+                        else
+                          analysis.source_range(
+                            position[:start_line], position[:end_line]
+                          ).chomp
+                        end
               )
             end
           end
@@ -174,7 +181,7 @@ module Ast
               HtmlCommentOwner.new(
                 location: Location.new(start_line: comment.location.start_line, end_line: comment.location.end_line),
                 text: comment.content,
-                source: comment.text,
+                source: comment.text
               )
             end
           end
@@ -189,12 +196,16 @@ module Ast
             ast_table_lines = {}
             ast_rows = Array(analysis.statements).flat_map do |statement|
               node = unwrap_markdown_statement(statement)
-              next [] unless node.respond_to?(:type) && node.type.to_s == "table"
+              next [] unless node.respond_to?(:type) && node.type.to_s == 'table'
 
               table_position = node.source_position
-              (table_position[:start_line]..table_position[:end_line]).each { |line| ast_table_lines[line] = true } if table_position
+              if table_position
+                (table_position[:start_line]..table_position[:end_line]).each do |line|
+                  ast_table_lines[line] = true
+                end
+              end
               Array(node.children).filter_map do |child|
-                next unless child.respond_to?(:type) && child.type.to_s == "table_row"
+                next unless child.respond_to?(:type) && child.type.to_s == 'table_row'
 
                 position = child.source_position
                 next unless position
@@ -202,7 +213,7 @@ module Ast
                 TableRowOwner.new(
                   location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
                   source: analysis.source_range(position[:start_line], position[:end_line]),
-                  text: child.to_plaintext.to_s,
+                  text: child.to_plaintext.to_s
                 )
               end
             end
@@ -216,7 +227,7 @@ module Ast
               TableRowOwner.new(
                 location: Location.new(start_line: line_number, end_line: line_number),
                 source: line,
-                text: line,
+                text: line
               )
             end
             ast_rows + loose_rows
@@ -224,19 +235,19 @@ module Ast
 
           def loose_table_row_line?(line)
             stripped = line.to_s.lstrip
-            return false unless stripped.start_with?("|")
+            return false unless stripped.start_with?('|')
 
-            stripped.include?(" |") || stripped.include?("| ")
+            stripped.include?(' |') || stripped.include?('| ')
           end
 
           def heading_statement?(statement)
             merge_type = if statement.respond_to?(:merge_type)
-              statement.merge_type
-            else
-              unwrap_markdown_statement(statement)&.type
-            end
+                           statement.merge_type
+                         else
+                           unwrap_markdown_statement(statement)&.type
+                         end
 
-            merge_type.to_s == "heading" || merge_type.to_s == "header"
+            %w[heading header].include?(merge_type.to_s)
           end
 
           def build_heading_owner(statement, analysis)
@@ -244,14 +255,14 @@ module Ast
             position = node&.source_position
             return unless node && position
 
-            heading_source = analysis.source_range(position[:start_line], position[:end_line]).sub(/\n\z/, "")
-            heading_text = node.to_plaintext.to_s.sub(/\n+\z/, "")
+            heading_source = analysis.source_range(position[:start_line], position[:end_line]).sub(/\n\z/, '')
+            heading_text = node.to_plaintext.to_s.sub(/\n+\z/, '')
             HeadingSectionOwner.new(
               location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
               heading_text: heading_text,
               heading_source: heading_source,
               level: node.header_level,
-              base: normalize_heading_base(heading_text),
+              base: normalize_heading_base(heading_text)
             )
           rescue StandardError
             nil
@@ -280,7 +291,7 @@ module Ast
           end
 
           def normalize_heading_base(text)
-            text.to_s.sub(/\A(?:\d\uFE0F?\u20E3|[^[:alnum:][:space:]])+[ \t]*/u, "").strip.downcase
+            text.to_s.sub(/\A(?:\d\uFE0F?\u20E3|[^[:alnum:][:space:]])+[ \t]*/u, '').strip.downcase
           end
 
           def inline_references_for_line(line, line_number)
@@ -307,10 +318,10 @@ module Ast
           end
 
           def inline_image_reference_at(line, index, line_number)
-            return unless line[index] == "!" && line[index + 1] == "["
+            return unless line[index] == '!' && line[index + 1] == '['
 
             alt_end = closing_bracket_index(line, index + 1)
-            return unless alt_end && line[alt_end + 1] == "["
+            return unless alt_end && line[alt_end + 1] == '['
 
             label_end = closing_bracket_index(line, alt_end + 1)
             return unless label_end
@@ -323,15 +334,15 @@ module Ast
               end_column: label_end + 1,
               reference_kind: :image_reference,
               label: label,
-              labels: [label],
+              labels: [label]
             )
           end
 
           def inline_link_reference_at(line, index, line_number)
-            return unless line[index] == "["
+            return unless line[index] == '['
 
             text_end = closing_bracket_index(line, index)
-            return unless text_end && line[text_end + 1] == "["
+            return unless text_end && line[text_end + 1] == '['
 
             label_end = closing_bracket_index(line, text_end + 1)
             return unless label_end
@@ -348,7 +359,7 @@ module Ast
               end_column: label_end + 1,
               reference_kind: labels.length > 1 ? :linked_image_reference : :link_reference,
               label: label,
-              labels: labels,
+              labels: labels
             )
           end
 
@@ -361,7 +372,7 @@ module Ast
               source: line[start_column...end_column],
               reference_kind: reference_kind,
               label: label,
-              labels: labels.compact.uniq,
+              labels: labels.compact.uniq
             )
           end
 
@@ -370,9 +381,9 @@ module Ast
             index = opening_index
             while index < text.length
               case text[index]
-              when "["
+              when '['
                 depth += 1
-              when "]"
+              when ']'
                 depth -= 1
                 return index if depth.zero?
               end
@@ -394,7 +405,7 @@ module Ast
                 owner_scope: :heading_sections,
                 selector_kind: :heading_section,
                 selection_intent: :section_branch,
-                include_trailing_gap: false,
+                include_trailing_gap: false
               ).merge(options),
               locate: lambda do |context|
                 context.structural_owners(owner_scope: :heading_sections).filter_map do |owner|
@@ -411,24 +422,24 @@ module Ast
                       payload_kind: :section_branch,
                       heading_text: owner.heading_text,
                       level: owner.level,
-                      base: owner.base,
-                    },
+                      base: owner.base
+                    }
                   )
                 end
-              end,
+              end
             )
           end
 
           def link_definition(label: nil, url: nil, id: nil, limit: nil, metadata: {}, **options)
             Ast::Crispr::OwnerSelector.new(
-              id: id || ["link_definition", label, url].compact.join(":"),
+              id: id || ['link_definition', label, url].compact.join(':'),
               limit: limit,
               metadata: metadata.merge(
                 adapter: Ast::Crispr::Markdown::Markly.adapter,
                 owner_scope: :link_definitions,
                 selector_kind: :link_definition,
                 selection_intent: :predicate_filter,
-                include_trailing_gap: false,
+                include_trailing_gap: false
               ).merge(options),
               locate: lambda do |context|
                 context.structural_owners(owner_scope: :link_definitions).filter_map do |owner|
@@ -444,11 +455,11 @@ module Ast
                       end_boundary: :owner_end,
                       payload_kind: :structural_owner_body,
                       label: owner.label,
-                      url: owner.url,
-                    },
+                      url: owner.url
+                    }
                   )
                 end
-              end,
+              end
             )
           end
 
@@ -461,7 +472,7 @@ module Ast
                 owner_scope: :html_comments,
                 selector_kind: :html_comment,
                 selection_intent: :predicate_filter,
-                include_trailing_gap: false,
+                include_trailing_gap: false
               ).merge(options),
               locate: lambda do |context|
                 context.structural_owners(owner_scope: :html_comments).filter_map do |owner|
@@ -475,24 +486,24 @@ module Ast
                       start_boundary: :owner_start,
                       end_boundary: :owner_end,
                       payload_kind: :structural_owner_body,
-                      text: owner.text,
-                    },
+                      text: owner.text
+                    }
                   )
                 end
-              end,
+              end
             )
           end
 
           def inline_reference(label: nil, reference_kind: nil, id: nil, limit: nil, metadata: {}, **options)
             Ast::Crispr::OwnerSelector.new(
-              id: id || ["inline_reference", label, reference_kind].compact.join(":"),
+              id: id || ['inline_reference', label, reference_kind].compact.join(':'),
               limit: limit,
               metadata: metadata.merge(
                 adapter: Ast::Crispr::Markdown::Markly.adapter,
                 owner_scope: :inline_references,
                 selector_kind: :inline_reference,
                 selection_intent: :predicate_filter,
-                include_trailing_gap: false,
+                include_trailing_gap: false
               ).merge(options),
               locate: lambda do |context|
                 context.structural_owners(owner_scope: :inline_references).filter_map do |owner|
@@ -511,15 +522,16 @@ module Ast
                       labels: owner.labels,
                       reference_kind: owner.reference_kind,
                       start_column: owner.start_column,
-                      end_column: owner.end_column,
-                    },
+                      end_column: owner.end_column
+                    }
                   )
                 end
-              end,
+              end
             )
           end
 
-          def html_comment_block(start_text:, end_text:, id: nil, limit: nil, span: :nearest, include_trailing_gap: false, metadata: {}, **options)
+          def html_comment_block(start_text:, end_text:, id: nil, limit: nil, span: :nearest,
+                                 include_trailing_gap: false, metadata: {}, **options)
             Ast::Crispr::OwnerSelector.new(
               id: id || "html_comment_block_#{start_text}",
               limit: limit,
@@ -528,13 +540,15 @@ module Ast
                 owner_scope: :html_comments,
                 selector_kind: :html_comment_block,
                 selection_intent: :predicate_filter,
-                include_trailing_gap: include_trailing_gap,
+                include_trailing_gap: include_trailing_gap
               ).merge(options),
               locate: lambda do |context|
                 comments = context.structural_owners(owner_scope: :html_comments)
                 if span.to_sym == :outermost
                   opening = comments.find { |comment| comment.text.to_s == start_text.to_s }
-                  closing = comments.reverse.find { |comment| opening && comment.text.to_s == end_text.to_s && comment.location.end_line >= opening.location.start_line }
+                  closing = comments.reverse.find do |comment|
+                    opening && comment.text.to_s == end_text.to_s && comment.location.end_line >= opening.location.start_line
+                  end
                   next [] unless opening && closing
 
                   end_line = closing.location.end_line
@@ -549,9 +563,9 @@ module Ast
                         end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
                         payload_kind: :structural_owner_body,
                         start_text: start_text,
-                        end_text: end_text,
-                      },
-                    ),
+                        end_text: end_text
+                      }
+                    )
                   ]
                 end
 
@@ -572,11 +586,11 @@ module Ast
                       end_boundary: (include_trailing_gap ? :owner_end_plus_trailing_gap : :owner_end),
                       payload_kind: :structural_owner_body,
                       start_text: start_text,
-                      end_text: end_text,
-                    },
+                      end_text: end_text
+                    }
                   )
                 end
-              end,
+              end
             )
           end
         end
@@ -588,13 +602,13 @@ module Ast
             @adapter ||= Adapter.new
           end
 
-          def document_context(content:, source_label: "source", metadata: {}, **options)
+          def document_context(content:, source_label: 'source', metadata: {}, **options)
             Ast::Crispr::DocumentContext.new(
               content: content,
               source_label: source_label,
               adapter: adapter,
               metadata: metadata,
-              **options,
+              **options
             )
           end
         end
