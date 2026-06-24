@@ -2875,11 +2875,14 @@ module Kettle
         git_github_url || git_source_url || metadata_github_url || homepage_github_url || metadata_source_url || homepage_url
       else
         metadata_github_url ||
-          homepage_github_url ||
           git_github_url ||
+          homepage_github_url ||
           metadata_source_url ||
-          homepage_url ||
-          git_source_url
+          git_source_url ||
+          homepage_url
+      end
+      if homepage_github_url && git_github_url && homepage_github_url != git_github_url && source_url == git_github_url
+        homepage_url = git_github_url
       end
       derived_github_user = (git_github_url && source_url == git_github_url) ? github_org_from_url(git_github_url) : nil
       entrypoint_require = rubygems_config["entrypoint_require"].to_s.strip
@@ -6616,6 +6619,12 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s if facts
       replacements = gemspec_preserved_assignments(destination_content, receiver: destination_receiver)
         .except(*env_overridden_gemspec_fields(env))
+      replacements = remove_stale_generated_gemspec_homepage_replacement(
+        replacements,
+        destination_content,
+        facts,
+        receiver: destination_receiver
+      )
       normalized_replacements = replacements.to_h do |field, source|
         replacement = normalize_gemspec_receiver(source.rstrip, from: destination_receiver, to: template_receiver)
         [field, normalize_gemspec_project_emoji(replacement, facts, field: field)]
@@ -6637,6 +6646,19 @@ module Kettle
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
+    end
+
+    def remove_stale_generated_gemspec_homepage_replacement(replacements, destination_content, facts, receiver:)
+      desired_homepage = facts.to_h.dig(:package, :homepage_url).to_s
+      return replacements if desired_homepage.empty? || !github_org_from_url(desired_homepage)
+      return replacements unless replacements.key?("homepage")
+
+      existing = gemspec_assignment_records(destination_content, receiver: receiver).find { |record| record.fetch(:field) == "homepage" }
+      existing_homepage = existing && existing.fetch(:value).to_s
+      return replacements if existing_homepage.empty? || existing_homepage == desired_homepage
+      return replacements unless github_org_from_url(existing_homepage)
+
+      replacements.except("homepage")
     end
 
     def rewrite_gemspec_version_loader(content, facts:)

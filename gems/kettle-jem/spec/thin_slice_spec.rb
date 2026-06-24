@@ -11108,6 +11108,59 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "prefers git origin over stale generated gemspec homepage metadata" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-stale-homepage-token-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/pboling/example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+              - README.md
+        YAML
+        "template/example.gemspec.example" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "{KJ|README:GH_REPOSITORY_URL}"
+          end
+        RUBY
+        "template/README.md.example" => <<~MARKDOWN
+          Source: {KJ|GH_ORG}
+          GitHub user: {KJ|GH:USER}
+          Repository: {KJ|README:GH_REPOSITORY_URL}
+        MARKDOWN
+      })
+      expect(system("git", "-C", root, "init", "-q")).to be(true)
+      expect(system("git", "-C", root, "remote", "add", "origin", "git@github.com:rubocop-lts/example.git")).to be(true)
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(plan.dig(:facts, :package, :source_url)).to eq("https://github.com/rubocop-lts/example")
+      expect(plan.dig(:facts, :package, :homepage_url)).to eq("https://github.com/rubocop-lts/example")
+      expect(template_report.fetch(:final_content)).to include("Source: rubocop-lts")
+      expect(template_report.fetch(:final_content)).to include("GitHub user: rubocop-lts")
+      expect(template_report.fetch(:final_content)).to include("Repository: https://github.com/rubocop-lts/example")
+
+      apply = described_class.apply_project(root, env: {})
+      expect(apply[:changed_files]).to include("example.gemspec")
+      expect(File.read(File.join(root, "example.gemspec"))).to include('spec.homepage = "https://github.com/rubocop-lts/example"')
+    end
+  end
+
   it "projects README top logo template tokens" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
