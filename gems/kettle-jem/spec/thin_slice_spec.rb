@@ -11632,7 +11632,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.2", require: false')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2"')
       expect(template_report.fetch(:final_content)).to include(
-        'declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)'
+        "declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)"
       )
       expect(template_report.fetch(:final_content)).to include(
         'gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2" unless declared_gems.include?("rubocop-ruby3_1")'

@@ -21,9 +21,10 @@ platform :mri do
   gem "standard", "~> 1.54", ">= 1.54.0"
 
   if ENV.fetch("RUBOCOP_LTS_LOCAL", "false").casecmp("false").zero?
-    gem "rubocop-lts", "~> 24.2", ">= 24.2.0"
-    gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.3"
-    gem "rubocop-ruby3_2", "~> 3.0", ">= 3.0.2"
+    declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
+    gem "rubocop-lts", "~> 24.2", ">= 24.2.0" unless declared_gems.include?("rubocop-lts")
+    gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.3" unless declared_gems.include?("rubocop-lts-rspec")
+    gem "rubocop-ruby3_2", "~> 3.0", ">= 3.0.2" unless declared_gems.include?("rubocop-ruby3_2")
   else
     eval_gemfile("style_local.gemfile")
   end
