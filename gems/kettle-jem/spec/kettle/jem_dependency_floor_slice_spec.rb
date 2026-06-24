@@ -18,8 +18,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
-        requirement_args: %("~> 2.2", ">= 2.2.17"),
-        lock_version: "2.2.17",
+        requirement_args: %("~> 2.2", ">= 2.2.18"),
+        lock_version: "2.2.18",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
@@ -75,6 +75,7 @@ RSpec.describe Kettle::Jem do
       "nomono" => {
         declaration_names: ["nomono"],
         requirement_args: %("~> 1.0", ">= 1.0.6"),
+        requirement_literals: [%(nomono_requirements = ["~> 1.0", ">= 1.0.6"])],
         lock_version: "1.0.6",
         requirement_surfaces: [
           "Gemfile",
@@ -100,8 +101,8 @@ RSpec.describe Kettle::Jem do
       },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
-        requirement_args: %("~> 3.1", ">= 3.1.4"),
-        lock_version: "3.1.4",
+        requirement_args: %("~> 3.1", ">= 3.1.5"),
+        lock_version: "3.1.5",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"
@@ -147,6 +148,7 @@ RSpec.describe Kettle::Jem do
         floor_declarations = config.fetch(:declaration_names).map do |declaration_name|
           %(#{declaration_name}", #{config.fetch(:requirement_args)})
         end
+        floor_declarations.concat(config.fetch(:requirement_literals, []))
 
         expect(floor_declarations.any? { |declaration| content.include?(declaration) }).to be(true)
       end
