@@ -364,6 +364,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.6"))
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
+      expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.2", require: false))
       expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
       expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(smorg_rb_local_gems = %w[))
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")

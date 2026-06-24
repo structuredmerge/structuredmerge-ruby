@@ -50,6 +50,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated templating Gemfiles now include `appraisal2-rubocop` so cold-start
+  templating bundles have the Appraisal generator formatting plugin available
+  before the style Gemfile has been installed.
 - Generated Gemfiles now activate the Bundler-locked `nomono` before loading
   `nomono/bundler`, avoiding global gem activation conflicts during
   templating.
