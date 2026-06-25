@@ -50,6 +50,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Local GitHub remotes now override generated gemspec `source_code_uri` tag URLs
+  when deriving repository owner tokens, preventing stale homepage metadata from
+  corrupting README logos and local sibling workspace env names.
 - Bootstrap configs now seed runtime URI values, OpenCollective ENV overrides,
   and Gemfile template ownership so first-time full templating does not leave
   raw URI tokens or merge legacy Gemfile dependency sets into the generated

@@ -2870,9 +2870,7 @@ module Kettle
         File.basename(gemspec_path, ".gemspec")
       homepage_url = metadata_value(gemspec_metadata, :homepage)
       metadata_source_url = metadata_value(gemspec_metadata, :source_code_uri)
-      unless static_gemspec_metadata_key_assigned?(File.read(gemspec_path), "source_code_uri")
-        metadata_source_url = nil if generated_version_tree_source_url?(metadata_source_url, metadata_value(gemspec_metadata, :version))
-      end
+      metadata_source_url = nil if generated_version_tree_source_url?(metadata_source_url, metadata_value(gemspec_metadata, :version))
       metadata_github_url = concrete_github_url(metadata_source_url)
       homepage_github_url = concrete_github_url(homepage_url)
       git_source_url = git_remote_source_url(project_root)

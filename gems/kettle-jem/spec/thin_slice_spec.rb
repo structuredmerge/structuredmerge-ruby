@@ -11219,8 +11219,10 @@ RSpec.describe Kettle::Jem do
         "example.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
             spec.name = "example"
+            spec.version = "1.2.3"
             spec.summary = "Example gem"
             spec.homepage = "https://github.com/pboling/example"
+            spec.metadata["source_code_uri"] = "\#{spec.homepage}/tree/v\#{spec.version}"
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
