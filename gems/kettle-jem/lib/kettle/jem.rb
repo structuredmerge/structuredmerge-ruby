@@ -6636,6 +6636,7 @@ module Kettle
         [field, normalize_gemspec_project_emoji(replacement, facts, field: field)]
       end
       merged = replace_gemspec_assignment_sources(template_content, normalized_replacements, receiver: template_receiver)
+      merged = insert_missing_gemspec_assignment_sources(merged, normalized_replacements, receiver: template_receiver)
       merged = merge_gemspec_files_assignment(
         merged,
         template_content: template_content,
@@ -6657,6 +6658,7 @@ module Kettle
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_version_gem_dependency_when_runtime_incompatible(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
+      merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
       rewrite_gemspec_version_loader(merged, facts: facts)
     end
@@ -6955,7 +6957,18 @@ module Kettle
     end
 
     def gemspec_preserved_assignments(source, receiver:)
-      preserved_fields = %w[
+      gemspec_assignment_records(source, receiver: receiver).each_with_object({}) do |record, assignments|
+        field = record.fetch(:field)
+        next unless gemspec_preserved_assignment_fields.include?(field)
+        next if assignments.key?(field)
+        next if record.fetch(:source).include?("TODO:")
+
+        assignments[field] = record.fetch(:source)
+      end
+    end
+
+    def gemspec_preserved_assignment_fields
+      %w[
         name
         authors
         email
@@ -6966,14 +6979,6 @@ module Kettle
         required_ruby_version
         executables
       ]
-      gemspec_assignment_records(source, receiver: receiver).each_with_object({}) do |record, assignments|
-        field = record.fetch(:field)
-        next unless preserved_fields.include?(field)
-        next if assignments.key?(field)
-        next if record.fetch(:source).include?("TODO:")
-
-        assignments[field] = record.fetch(:source)
-      end
     end
 
     def merge_gemspec_files_assignment(content, template_content:, destination_content:, template_receiver:, destination_receiver:)
@@ -7077,7 +7082,10 @@ module Kettle
         current_entry = nodes.first
 
         if current_entry && current_entry.location.start_line == record.fetch(:start_line) + body_index + 1
-          return unless gemspec_files_collection_entry_node?(current_entry)
+          unless gemspec_files_collection_entry_node?(current_entry)
+            groups = nil
+            break
+          end
 
           groups << {
             key: current_entry.slice,
@@ -7094,6 +7102,7 @@ module Kettle
         end
       end
 
+      return unless groups
       return if nodes.any?
 
       groups
@@ -7134,6 +7143,22 @@ module Kettle
         index[record.fetch(:start_line)] = record.merge(replacement: "#{replacements.fetch(field)}\n")
       end
       replace_record_ranges(content, records_by_line)
+    end
+
+    def insert_missing_gemspec_assignment_sources(content, replacements, receiver:)
+      return content if replacements.empty?
+
+      present_fields = gemspec_assignment_records(content, receiver: receiver).map { |record| record.fetch(:field) }.to_set
+      missing_sources = gemspec_preserved_assignment_fields.filter_map do |field|
+        next if present_fields.include?(field)
+
+        source = replacements[field]
+        "#{source}\n" if source
+      end
+      return content if missing_sources.empty?
+
+      first_dependency_line = gemspec_dependency_records(content, receiver: receiver).map { |record| record.fetch(:start_line) }.min
+      insert_lines_before(content, first_dependency_line || gemspec_end_line(content), missing_sources.join)
     end
 
     def preserve_gemspec_dependency_lines(template_content, destination_content, template_receiver:, destination_receiver:, facts: nil)
@@ -7293,6 +7318,56 @@ module Kettle
         [record.fetch(:start_line), record.merge(replacement: "")]
       end
       replace_record_ranges(content, records_by_line)
+    end
+
+    def remove_empty_gemspec_development_dependency_section_headings(content, receiver:)
+      lines = content.to_s.lines
+      note_index = lines.find_index { |line| line.lstrip.start_with?("# NOTE: It is preferable to list development dependencies") }
+      return content unless note_index
+
+      dependency_line_indexes = gemspec_dependency_records(content, receiver: receiver).map { |record| record.fetch(:start_line) - 1 }.to_set
+      remove_indexes = Set.new
+      index = note_index + 1
+      while index < lines.length
+        stripped = lines[index].lstrip
+        unless gemspec_dependency_section_heading_comment?(stripped)
+          index += 1
+          next
+        end
+
+        remove_heading = true
+        cursor = index + 1
+        while cursor < lines.length
+          cursor_line = lines[cursor]
+          cursor_stripped = cursor_line.lstrip
+          break if cursor_line.strip == "end" || gemspec_dependency_section_heading_comment?(cursor_stripped)
+
+          if dependency_line_indexes.include?(cursor)
+            remove_heading = false
+            break
+          end
+
+          cursor += 1
+        end
+
+        if remove_heading
+          remove_indexes << index
+          remove_indexes << (index + 1) if lines[index + 1]&.strip == ""
+        end
+        index += 1
+      end
+
+      return content if remove_indexes.empty?
+
+      ensure_trailing_newline(lines.each_with_index.reject { |_line, line_index| remove_indexes.include?(line_index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    # Prism does not expose comments as normal AST statements, so dependency-section
+    # headings are bounded to single-line comments after the gemspec development note.
+    def gemspec_dependency_section_heading_comment?(stripped_line)
+      stripped_line.start_with?("# ") &&
+        !stripped_line.start_with?("# NOTE:") &&
+        !stripped_line.start_with?("#       ")
     end
 
     def append_missing_gemspec_dependency_lines(content, destination_dependencies, receiver:)

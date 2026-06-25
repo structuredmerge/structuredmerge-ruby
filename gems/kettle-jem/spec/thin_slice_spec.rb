@@ -8773,6 +8773,200 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "keeps old runtime dependency customizations above the development dependency note block" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+        spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")              # ruby >= 2.2.0
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Dev, Test, & Release Tasks
+        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.18")      # ruby >= 2.4.0
+
+        # Security
+        spec.add_development_dependency("bundler-audit", "~> 0.9.3")             # ruby >= 2.0.0
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |gem|
+        gem.name = "demo"
+        gem.version = "1.0.0"
+        gem.add_dependency("version_gem", "~> 1.1", ">= 1.1.9")              # ruby >= 2.2.0
+        # Dev tooling (runtime dep -- kettle-jem extends kettle-dev's functionality)
+        gem.add_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")          # ruby >= 2.4.0
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Security
+        gem.add_development_dependency("bundler-audit", "~> 0.9.3")             # ruby >= 2.0.0
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
+    expect(merged).to include('spec.add_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")          # ruby >= 2.4.0')
+    expect(merged).not_to include('spec.add_development_dependency("kettle-dev"')
+    expect(merged).to include("#       visibility and discoverability.\n\n  # Security")
+    expect(merged).not_to include("#       visibility and discoverability.\n\n\n  # Security")
+
+    runtime_index = merged.index('spec.add_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")')
+    note_index = merged.index("# NOTE: It is preferable to list development dependencies in the gemspec due to increased")
+    bundler_audit_index = merged.index('spec.add_development_dependency("bundler-audit", "~> 0.9.3")')
+
+    expect(runtime_index).to be < note_index
+    expect(note_index).to be < bundler_audit_index
+  end
+
+  it "does not accumulate duplicate blank section separators across repeated gemspec merges" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+        spec.required_ruby_version = ">= 3.2.0"
+        spec.metadata["rubygems_mfa_required"] = "true"
+
+        # Specify which files are part of the released package.
+        spec.files = Dir[
+          "lib/**/*.rb",
+        ]
+        spec.require_paths = ["lib"]
+
+        # Utilities
+        spec.add_dependency("version_gem", "~> 1.1")
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Dev, Test, & Release Tasks
+        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.18")
+
+        # Security
+        spec.add_development_dependency("bundler-audit", "~> 0.9.3")
+
+        # Tasks
+        spec.add_development_dependency("rake", "~> 13.0")
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+        spec.required_ruby_version = ">= 3.2.0"
+        spec.metadata["allowed_push_host"] = "https://rubygems.org"
+        spec.metadata["rubygems_mfa_required"] = "true"
+
+        # Specify which files should be added to the gem when it is released.
+        gemspec = File.basename(__FILE__)
+        spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
+          ls.readlines("\\x0", chomp: true)
+        end
+        spec.require_paths = ["lib"]
+
+        # Utilities
+        spec.add_dependency("version_gem", "~> 1.1")
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Dev, Test, & Release Tasks
+        spec.add_development_dependency("kettle-dev", "~> 2.0")
+
+        # Security
+        spec.add_development_dependency("bundler-audit", "~> 0.9.3")
+
+        # Tasks
+        spec.add_development_dependency("rake", "~> 13.0")
+      end
+    RUBY
+    facts = {package: {name: "demo"}}
+
+    once = described_class.merge_gemspec_template_source(template, destination, facts: facts)
+    twice = described_class.merge_gemspec_template_source(template, once, facts: facts)
+
+    expect { RubyVM::InstructionSequence.compile(once) }.not_to raise_error
+    expect(once).to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n  # Specify which files")
+    expect(once).not_to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n\n  # Specify which files")
+    expect(once).to include("spec.require_paths = [\"lib\"]\n\n  # Utilities")
+    expect(once).not_to include("spec.require_paths = [\"lib\"]\n\n\n  # Utilities")
+    expect(once).to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.18\")\n\n  # Security")
+    expect(once).not_to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.18\")\n\n\n  # Security")
+    expect(once).to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n  # Tasks")
+    expect(once).not_to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n\n  # Tasks")
+    expect(twice).to eq(once)
+  end
+
+  it "replaces executable destination gemspec files assignments with template package collections" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+
+        # Specify which files are part of the released package.
+        spec.files = Dir[
+          "lib/**/*.rb",
+          "sig/**/*.rbs",
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo"
+        spec.version = "1.0.0"
+
+        # Specify which files should be added to the gem when it is released.
+        # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
+        gemspec = File.basename(__FILE__)
+        spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
+          ls.readlines("\\x0", chomp: true).reject do |f|
+            (f == gemspec) ||
+              f.start_with?(*%w[bin/ Gemfile .gitignore .rspec spec/ .github/ .rubocop.yml])
+          end
+        end
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
+
+    expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
+    expect(merged).to include("# Specify which files are part of the released package.")
+    expect(merged).to include("spec.files = Dir[")
+    expect(merged).to include('"lib/**/*.rb"')
+    expect(merged).to include('"sig/**/*.rbs"')
+    expect(merged).not_to include("IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL)")
+  end
+
+  it "normalizes destination gemspec receiver names while preserving destination-only fields" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "example"
+        spec.version = "1.0.0"
+        spec.summary = "Template summary"
+        spec.add_dependency("foo", "~> 1.0")
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |gem|
+        gem.name = "example"
+        gem.version = "2.0.0"
+        gem.summary = "Destination summary"
+        gem.authors = ["Someone"]
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "example"}})
+
+    expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
+    expect(merged).not_to match(/\bgem\./)
+    expect(merged).to include('spec.summary = "Destination summary"')
+    expect(merged).to include('spec.authors = ["Someone"]')
+    expect(merged).to include('spec.add_dependency("foo", "~> 1.0")')
+  end
+
   it "preserves zero-byte template outputs" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -11364,7 +11558,7 @@ RSpec.describe Kettle::Jem do
 
       expect(final_content).to include("spec.files = Dir[")
       expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index('"lib/**/*.rb"')
-      expect(final_content.scan(/"sig\/\*\*\/\*\.rbs"/).size).to eq(1)
+      expect(final_content.scan('"sig/**/*.rbs"').size).to eq(1)
       expect(final_content).to include('"README.md"')
     end
   end

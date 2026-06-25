@@ -24,6 +24,10 @@ Please file a bug if you notice a violation of semantic versioning.
   collection entries with template package entries so project-specific
   packaged files are not lost when the template rewrites the generated gemspec
   structure.
+- Gemspec templating now restores additional legacy Prism policy behavior for
+  destination-only metadata fields, Bundler `git ls-files` package declarations,
+  and empty development-dependency section cleanup after runtime dependency
+  promotion.
 - Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
   update the GitHub Actions SHA pin index used by generated workflow templates
   via `kettle-gha-sha-pins`.
