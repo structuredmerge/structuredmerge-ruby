@@ -6636,6 +6636,13 @@ module Kettle
         [field, normalize_gemspec_project_emoji(replacement, facts, field: field)]
       end
       merged = replace_gemspec_assignment_sources(template_content, normalized_replacements, receiver: template_receiver)
+      merged = merge_gemspec_files_assignment(
+        merged,
+        template_content: template_content,
+        destination_content: destination_content,
+        template_receiver: template_receiver,
+        destination_receiver: destination_receiver
+      )
       merged = preserve_gemspec_dependency_lines(
         merged,
         destination_content,
@@ -6967,6 +6974,147 @@ module Kettle
 
         assignments[field] = record.fetch(:source)
       end
+    end
+
+    def merge_gemspec_files_assignment(content, template_content:, destination_content:, template_receiver:, destination_receiver:)
+      merged_record = gemspec_assignment_records(content, receiver: template_receiver).find { |record| record.fetch(:field) == "files" }
+      template_record = gemspec_assignment_records(template_content, receiver: template_receiver).find { |record| record.fetch(:field) == "files" }
+      destination_record = gemspec_assignment_records(destination_content, receiver: destination_receiver).find { |record| record.fetch(:field) == "files" }
+      return content unless merged_record && template_record && destination_record
+
+      replacement = merge_gemspec_files_assignment_source(
+        merged_record: merged_record,
+        template_record: template_record,
+        destination_record: destination_record
+      )
+      replacement ||= replacement_for_nonliteral_gemspec_files_assignment(
+        template_record: template_record,
+        destination_record: destination_record,
+        template_receiver: template_receiver,
+        destination_receiver: destination_receiver
+      )
+      return content unless replacement
+
+      replace_source_range_lines(content, merged_record.fetch(:start_line), merged_record.fetch(:end_line), replacement)
+    end
+
+    def merge_gemspec_files_assignment_source(merged_record:, template_record:, destination_record:)
+      merged_parts = gemspec_files_collection_parts(merged_record)
+      template_parts = gemspec_files_collection_parts(template_record)
+      destination_parts = gemspec_files_collection_parts(destination_record)
+      return unless merged_parts && template_parts && destination_parts
+
+      combined_groups = []
+      seen = {}
+
+      [destination_parts.fetch(:groups), merged_parts.fetch(:groups), template_parts.fetch(:groups)].each do |groups|
+        groups.each do |group|
+          next if seen[group.fetch(:key)]
+
+          combined_groups << group
+          seen[group.fetch(:key)] = true
+        end
+      end
+
+      merged_parts.fetch(:opening) + combined_groups.flat_map { |group| group.fetch(:lines) }.join + merged_parts.fetch(:closing)
+    end
+
+    def replacement_for_nonliteral_gemspec_files_assignment(template_record:, destination_record:, template_receiver:, destination_receiver:)
+      return unless gemspec_files_collection_parts(template_record)
+
+      if generic_bundler_gemspec_files_assignment?(destination_record)
+        return normalize_gemspec_receiver(
+          template_record.fetch(:source),
+          from: template_receiver,
+          to: template_receiver
+        )
+      end
+
+      normalize_gemspec_receiver(destination_record.fetch(:source), from: destination_receiver, to: template_receiver)
+    end
+
+    def gemspec_files_collection_parts(record)
+      value_node = record.fetch(:value_node)
+      element_nodes = gemspec_files_collection_element_nodes(value_node)
+      return unless element_nodes
+
+      lines = record.fetch(:source).lines
+      return if lines.length < 3
+
+      groups = gemspec_files_collection_groups(record: record, element_nodes: element_nodes, lines: lines)
+      return unless groups
+
+      {
+        opening: lines.first,
+        closing: lines.last,
+        groups: groups
+      }
+    end
+
+    def gemspec_files_collection_element_nodes(value_node)
+      if gemspec_files_dir_call_node?(value_node)
+        return Array(value_node.arguments&.arguments)
+      end
+      return value_node.elements if value_node.is_a?(::Prism::ArrayNode)
+
+      nil
+    end
+
+    def gemspec_files_dir_call_node?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :[] &&
+        node.block.nil? &&
+        node.receiver&.slice == "Dir"
+    end
+
+    def gemspec_files_collection_groups(record:, element_nodes:, lines:)
+      pending = []
+      groups = []
+      body_lines = lines[1...-1]
+      nodes = element_nodes.dup
+
+      body_lines.each_with_index do |line, body_index|
+        current_entry = nodes.first
+
+        if current_entry && current_entry.location.start_line == record.fetch(:start_line) + body_index + 1
+          return unless gemspec_files_collection_entry_node?(current_entry)
+
+          groups << {
+            key: current_entry.slice,
+            lines: pending + [line]
+          }
+          pending = []
+          nodes.shift
+          next
+        end
+
+        if line.strip.empty? || line.lstrip.start_with?("#")
+          pending << line
+          next
+        end
+      end
+
+      return if nodes.any?
+
+      groups
+    end
+
+    def gemspec_files_collection_entry_node?(node)
+      node.location.start_line == node.location.end_line &&
+        (node.is_a?(::Prism::StringNode) || node.is_a?(::Prism::SplatNode))
+    end
+
+    def generic_bundler_gemspec_files_assignment?(record)
+      node = record.fetch(:value_node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :popen &&
+        node.receiver&.slice == "IO" &&
+        generic_bundler_gemspec_files_command?(node.arguments&.arguments&.first)
+    end
+
+    def generic_bundler_gemspec_files_command?(node)
+      node.is_a?(::Prism::ArrayNode) &&
+        node.elements.map { |element| ruby_static_string_value(element) } == %w[git ls-files -z]
     end
 
     def env_overridden_gemspec_fields(env)

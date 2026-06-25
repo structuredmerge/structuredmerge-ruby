@@ -20,6 +20,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Gemspec templating now structurally merges destination `spec.files`
+  collection entries with template package entries so project-specific
+  packaged files are not lost when the template rewrites the generated gemspec
+  structure.
 - Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
   update the GitHub Actions SHA pin index used by generated workflow templates
   via `kettle-gha-sha-pins`.

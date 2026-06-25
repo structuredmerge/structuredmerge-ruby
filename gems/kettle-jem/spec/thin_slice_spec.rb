@@ -11266,6 +11266,160 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "merges destination gemspec files entries into the template files assignment" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-preserve", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.files = Dir[
+              "lib/**/*.rb",
+              "rubocop-lts/**/*.yml",
+              "README.md"
+            ]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            enumerate_package_files = lambda do |root|
+              Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+                File.file?(path) && ![".", ".."].include?(File.basename(path))
+              end
+            end
+
+            spec.name = "example"
+            spec.summary = "Template summary"
+            spec.files = [
+              *enumerate_package_files.call("lib"),
+              *enumerate_package_files.call("exe"),
+              *enumerate_package_files.call("certs"),
+              *enumerate_package_files.call("sig")
+            ]
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      final_content = template_report.fetch(:final_content)
+
+      expect(final_content).to include("spec.files = [")
+      expect(final_content).to include('"rubocop-lts/**/*.yml"')
+      expect(final_content).to include('*enumerate_package_files.call("exe")')
+      expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index('*enumerate_package_files.call("lib")')
+      expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(1)
+    end
+  end
+
+  it "unions literal Dir gemspec files assignments from destination and template" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-dir-union", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.files = Dir[
+              "sig/**/*.rbs",
+              "rubocop-lts/**/*.yml",
+            ]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.files = Dir[
+              "lib/**/*.rb",
+              "sig/**/*.rbs",
+              "README.md",
+            ]
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      final_content = template_report.fetch(:final_content)
+
+      expect(final_content).to include("spec.files = Dir[")
+      expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index('"lib/**/*.rb"')
+      expect(final_content.scan(/"sig\/\*\*\/\*\.rbs"/).size).to eq(1)
+      expect(final_content).to include('"README.md"')
+    end
+  end
+
+  it "preserves custom nonliteral destination gemspec files assignments" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-custom", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            enumerate_package_files = lambda do |root|
+              Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+                File.file?(path) && ![".", ".."].include?(File.basename(path))
+              end
+            end
+            spec.files = [
+              *Dir["lib/**/*.rb"],
+              *enumerate_package_files.call("template"),
+              *Dir["sig/**/*.rbs"],
+            ]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - example.gemspec
+        YAML
+        "template/example.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.files = Dir[
+              "lib/**/*.rb",
+              "sig/**/*.rbs",
+            ]
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
+      end
+      final_content = template_report.fetch(:final_content)
+
+      expect(final_content).to include('*enumerate_package_files.call("template")')
+      expect(final_content).to include('*Dir["lib/**/*.rb"]')
+      expect(final_content.scan(/^\s*spec\.files\s*=/).size).to eq(1)
+      expect(final_content).not_to include("spec.files = Dir[\n    \"lib/**/*.rb\"")
+    end
+  end
+
   it "projects README top logo template tokens" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
