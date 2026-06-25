@@ -68,8 +68,6 @@ RSpec.describe Kettle::Jem do
         requirement_args: %("~> 0.2", ">= 0.2.2"),
         lock_version: "0.2.2",
         requirement_surfaces: [
-          "gemfiles/modular/templating.gemfile",
-          "lib/kettle/jem/templates/gemfiles/modular/templating.gemfile.example",
           "gemfiles/modular/style.gemfile",
           "lib/kettle/jem/templates/gemfiles/modular/style.gemfile.example"
         ]
