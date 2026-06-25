@@ -50,6 +50,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Bootstrap configs now seed runtime URI values, OpenCollective ENV overrides,
+  and Gemfile template ownership so first-time full templating does not leave
+  raw URI tokens or merge legacy Gemfile dependency sets into the generated
+  bundle.
 - Generated Gemfiles now activate the Bundler-locked `nomono` before loading
   `nomono/bundler`, avoiding global gem activation conflicts during
   templating.

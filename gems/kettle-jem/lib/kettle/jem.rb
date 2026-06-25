@@ -267,6 +267,7 @@ module Kettle
       %w[tokens author domain] => "KJ_AUTHOR_DOMAIN",
       %w[tokens author orcid] => "KJ_AUTHOR_ORCID",
       %w[tokens funding kofi] => "KJ_FUNDING_KOFI",
+      %w[tokens funding open_collective] => %w[OPENCOLLECTIVE_HANDLE FUNDING_ORG],
       %w[tokens funding paypal] => "KJ_FUNDING_PAYPAL",
       %w[tokens funding buymeacoffee] => "KJ_FUNDING_BUYMEACOFFEE",
       %w[tokens funding liberapay] => "KJ_FUNDING_LIBERAPAY",
@@ -1187,6 +1188,7 @@ module Kettle
             version: spec&.version.to_s,
             min_ruby: min_ruby_version(spec&.required_ruby_version),
             homepage: homepage,
+            homepage_uri: spec&.metadata.to_h.fetch("homepage_uri", nil),
             source_code_uri: spec&.metadata.to_h.fetch("source_code_uri", nil),
             funding_uri: spec&.metadata.to_h.fetch("funding_uri", nil),
             gh_org: forge.fetch(:org, nil),
@@ -1222,6 +1224,10 @@ module Kettle
           return "" unless gemspec_path
 
           File.basename(gemspec_path.to_s, ".gemspec")
+        end
+
+        def shield_token(value)
+          value.to_s.gsub("-", "--").gsub("_", "__").tr(" ", "_")
         end
 
         def derive_forge(homepage)
@@ -2975,6 +2981,8 @@ module Kettle
         bootstrap[:gemspec_path] = File.basename(gemspec_path) if gemspec_path
         bootstrap[:min_ruby] = min_ruby_token unless min_ruby_token.empty?
         bootstrap[:test_min_ruby] = config_test_min_ruby(kettle_config, min_ruby).to_s
+        bootstrap[:yard_host] = project_runtime[:yard_host].to_s
+        bootstrap[:homepage_uri] = project_runtime[:homepage_uri].to_s
         project_emoji = preferred_template_token_value(nil, nil, env, "KJ_PROJECT_EMOJI")
         project_emoji ||= readme_project_emoji(project_root)
         project_emoji ||= gemspec_project_emoji(gemspec_metadata)
@@ -7472,7 +7480,7 @@ module Kettle
 
     def sync_kettle_config_env_overrides(content, env)
       synced = KETTLE_CONFIG_ENV_SYNC_PATHS.reduce(content.to_s) do |updated, (path, env_key)|
-        value = env[env_key].to_s.strip
+        value = env_sync_value(env, env_key)
         next updated unless present_template_token_value?(value)
 
         replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value, path: path))
@@ -7481,6 +7489,14 @@ module Kettle
       synced = migrate_readme_logo_config(synced)
       synced = prune_legacy_kettle_config_keys(synced)
       sync_kettle_config_documentation_comments(synced)
+    end
+
+    def env_sync_value(env, env_key)
+      Array(env_key).each do |candidate|
+        value = env[candidate].to_s.strip
+        return value if present_template_token_value?(value)
+      end
+      ""
     end
 
     def sync_kettle_config_internal_values(content)
@@ -9499,7 +9515,7 @@ module Kettle
         kettle_rb_local_gems: kettle_rb_local_gems(config),
         package_name: package_name.to_s,
         yard_host: yard_host,
-        homepage_uri: project_homepage_uri(config, env, yard_host: yard_host),
+        homepage_uri: project_homepage_uri(config, env, yard_host: yard_host, gemspec_homepage_uri: metadata_value(gemspec_metadata, :homepage_uri)),
         project_emoji: preferred_template_token_value("💎", config["project_emoji"], env, "KJ_PROJECT_EMOJI").to_s,
         project_emoji_configured: !configured_project_emoji.to_s.empty?,
         min_divergence_threshold: preferred_template_token_value(nil, config["min_divergence_threshold"], env, "KJ_MIN_DIVERGENCE_THRESHOLD").to_s,
@@ -9609,6 +9625,7 @@ module Kettle
         metadata[:version] = spec.version.to_s if metadata_value(metadata, :version).nil?
         metadata[:min_ruby] = min_ruby_version(spec.required_ruby_version) if metadata[:min_ruby].nil?
         metadata[:homepage] = spec.homepage.to_s if metadata_value(metadata, :homepage).nil?
+        metadata[:homepage_uri] = spec.metadata.fetch("homepage_uri", nil) if metadata_value(metadata, :homepage_uri).nil?
         metadata[:source_code_uri] = spec.metadata.fetch("source_code_uri", nil) if metadata_value(metadata, :source_code_uri).nil?
         metadata[:funding_uri] = spec.metadata.fetch("funding_uri", nil) if metadata_value(metadata, :funding_uri).nil?
         metadata[:authors] = Array(spec.authors).compact.uniq if Array(metadata[:authors]).empty?
@@ -9652,6 +9669,8 @@ module Kettle
       }
       static_source_code_uri = static_gemspec_metadata_assignment(content, "source_code_uri")
       metadata[:source_code_uri] = static_source_code_uri if static_source_code_uri
+      static_homepage_uri = static_gemspec_metadata_assignment(content, "homepage_uri")
+      metadata[:homepage_uri] = static_homepage_uri if static_homepage_uri
       metadata
     end
 
@@ -9747,8 +9766,12 @@ module Kettle
       gems.uniq.join(" ")
     end
 
-    def project_homepage_uri(config, env, yard_host:)
-      derived = "https://#{yard_host}" if present_template_token_value?(yard_host)
+    def project_homepage_uri(config, env, yard_host:, gemspec_homepage_uri: nil)
+      derived = if present_template_token_value?(gemspec_homepage_uri)
+        gemspec_homepage_uri
+      elsif present_template_token_value?(yard_host)
+        "https://#{yard_host}"
+      end
       preferred_template_token_value(derived, project_runtime_config_value(config, "homepage_uri"), env, "KJ_HOMEPAGE_URI").to_s
     end
 
@@ -11663,7 +11686,9 @@ module Kettle
       recipe[:template_tokens] = {
         "KJ|MIN_DIVERGENCE_THRESHOLD" => bootstrap.fetch(:min_divergence_threshold).to_s,
         "KJ|MIN_RUBY" => bootstrap[:min_ruby].to_s,
-        "KJ|MIN_TEST_RUBY" => bootstrap[:test_min_ruby].to_s
+        "KJ|MIN_TEST_RUBY" => bootstrap[:test_min_ruby].to_s,
+        "KJ|YARD_HOST" => bootstrap[:yard_host].to_s,
+        "KJ|HOMEPAGE_URI" => bootstrap[:homepage_uri].to_s
       }
       recipe[:bootstrap_licenses] = Array(bootstrap[:licenses]).map(&:to_s).reject(&:empty?)
       recipe[:bootstrap_template_profile] = bootstrap[:template_profile].to_s unless bootstrap[:template_profile].to_s.empty?

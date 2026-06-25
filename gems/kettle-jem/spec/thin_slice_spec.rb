@@ -2772,6 +2772,109 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "seeds bootstrap config runtime URI values from gemspec metadata" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-runtime-uris", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.email = ["maintainer@example.test"]
+            spec.metadata["homepage_uri"] = "https://docs.example.test"
+          end
+        RUBY
+      })
+
+      reader_metadata = described_class::GemSpecReader.load(root)
+      expect(reader_metadata[:homepage_uri]).to eq("https://docs.example.test")
+
+      plan = described_class.plan_project(root, env: {})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      content = bootstrap_report.fetch(:final_content)
+
+      expect(content).to include('yard_host: "example.example.test"')
+      expect(content).to include('homepage_uri: "https://docs.example.test"')
+      expect(content).not_to include("{KJ|YARD_HOST}")
+      expect(content).not_to include("{KJ|HOMEPAGE_URI}")
+    end
+  end
+
+  it "syncs OpenCollective ENV into bootstrap config funding tokens" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-open-collective", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {"OPENCOLLECTIVE_HANDLE" => "example-org"})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      content = bootstrap_report.fetch(:final_content)
+      config = YAML.safe_load(content)
+
+      expect(config.dig("tokens", "funding", "open_collective")).to eq("example-org")
+      expect(content).to include('open_collective: "example-org"')
+      expect(content).not_to include('open_collective: "galtzo-floss"')
+    end
+  end
+
+  it "syncs FUNDING_ORG ENV into bootstrap config OpenCollective tokens" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-funding-org", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {"FUNDING_ORG" => "funding-org"})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      config = YAML.safe_load(bootstrap_report.fetch(:final_content))
+
+      expect(config.dig("tokens", "funding", "open_collective")).to eq("funding-org")
+    end
+  end
+
+  it "bootstraps full-template Gemfile ownership to avoid merging legacy Gemfile dependency sets" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-bootstrap-gemfile-owner", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      bootstrap_report = plan.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "kettle_config_bootstrap"
+      end
+      config = YAML.safe_load(bootstrap_report.fetch(:final_content))
+
+      expect(config.dig("files", "Gemfile", "strategy")).to eq("accept_template")
+    end
+  end
+
   it "seeds bootstrap config CI minimum Ruby no lower than 2.4" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
