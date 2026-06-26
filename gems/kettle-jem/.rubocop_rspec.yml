@@ -29,6 +29,17 @@ RSpec/DescribeClass:
     - 'spec/system/*'
     - 'spec/e2e/*'
 
+RSpec/SpecFilePathFormat:
+  Exclude:
+    - 'spec/cli_spec.rb'
+    - 'spec/old_public_spec_audit_spec.rb'
+    - 'spec/rake_tasks_spec.rb'
+    - 'spec/release_packaging_spec.rb'
+    - 'spec/self_test_task_spec.rb'
+    - 'spec/template_version_gem_bootstrap_spec.rb'
+    - 'spec/thin_slice_spec.rb'
+    - 'spec/version_gem_pattern_spec.rb'
+
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
 

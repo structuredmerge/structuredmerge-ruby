@@ -2,7 +2,7 @@
 
 require_relative "spec_helper"
 
-RSpec.describe "Kettle/Jem template version_gem bootstrap" do
+RSpec.describe Kettle::Jem do
   def write_file(root, relative_path, content)
     path = File.join(root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
@@ -44,7 +44,7 @@ RSpec.describe "Kettle/Jem template version_gem bootstrap" do
         end
       RBS
 
-      result = Kettle::Jem.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
 
       expect(result.fetch(:post_apply_steps)).to include(
         include(

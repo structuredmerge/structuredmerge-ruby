@@ -3,18 +3,12 @@
 require_relative "spec_helper"
 require "rake"
 
-RSpec.describe "kettle-jem Rake tasks" do
+RSpec.describe Kettle::Jem do
   around do |example|
     previous = Rake.application
     Rake.application = Rake::Application.new
-    tmp_root = File.join(__dir__, "tmp")
-    FileUtils.mkdir_p(tmp_root)
-    Dir.mktmpdir("kettle-jem-rake-tasks", tmp_root) do |root|
-      Dir.chdir(root) do
-        Kettle::Jem.install_tasks
-        example.run
-      end
-    end
+    described_class.install_tasks
+    example.run
   ensure
     Rake.application = previous
   end

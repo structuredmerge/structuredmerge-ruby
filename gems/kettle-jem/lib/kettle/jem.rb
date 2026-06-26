@@ -291,6 +291,11 @@ module Kettle
       RUBOCOP
       SECURITY
     ].freeze
+    KNOWN_LICENSE_TEMPLATE_BASENAMES = Dir.glob(File.join(PACKAGED_TEMPLATE_ROOT, "*.md.example"))
+      .map { |path| File.basename(path, ".md.example") }
+      .reject { |basename| NON_LICENSE_MD_BASENAMES.include?(basename) }
+      .to_set
+      .freeze
     MONOREPO_SUBGEM_README_BLOB_PATHS = %w[
       CHANGELOG.md
       CODE_OF_CONDUCT.md
@@ -12009,7 +12014,9 @@ module Kettle
       return unless files.is_a?(Hash)
 
       current = files
-      target_path.to_s.delete_prefix("./").split("/").each do |part|
+      parts = target_path.to_s.delete_prefix("./").split("/")
+      until parts.empty?
+        part = parts.shift
         return unless current.is_a?(Hash) && current.key?(part)
 
         current = current[part]
@@ -12112,10 +12119,7 @@ module Kettle
     end
 
     def known_license_template_basenames
-      @known_license_template_basenames ||= Dir.glob(File.join(PACKAGED_TEMPLATE_ROOT, "*.md.example"))
-        .map { |path| File.basename(path, ".md.example") }
-        .reject { |basename| NON_LICENSE_MD_BASENAMES.include?(basename) }
-        .to_set
+      KNOWN_LICENSE_TEMPLATE_BASENAMES
     end
 
     def active_license_basenames(config)

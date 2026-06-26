@@ -4,24 +4,23 @@ require_relative "spec_helper"
 require "open3"
 require "rubygems/package"
 
-RSpec.describe "kettle-jem release packaging" do
+RSpec.describe Kettle::Jem do
   let(:gem_root) { Pathname(__dir__).join("..").expand_path }
 
   def load_gemspec(gem_root)
-    Dir.chdir(gem_root) do
-      Gem::Specification.load("kettle-jem.gemspec")
-    end
+    Gem::Specification.load(gem_root.join("kettle-jem.gemspec").to_s)
   end
 
   it "packages runtime template assets used by packaged template application" do
     spec = load_gemspec(gem_root)
     gemspec_source = File.read(gem_root.join("kettle-jem.gemspec"))
     files = spec.files
-    expected_template_files = Dir.chdir(gem_root) do
-      Dir.glob("lib/kettle/jem/templates/**/*", File::FNM_DOTMATCH).select do |path|
-        File.file?(path) && ![".", ".."].include?(File.basename(path))
+    expected_template_files = Dir.glob(gem_root.join("lib/kettle/jem/templates/**/*").to_s, File::FNM_DOTMATCH)
+      .filter_map do |path|
+        next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
+
+        Pathname(path).relative_path_from(gem_root).to_s
       end
-    end
 
     expect(gemspec_source).to include("Module.new.tap")
     expect(gemspec_source).to include("spec.metadata[\"news_uri\"]")

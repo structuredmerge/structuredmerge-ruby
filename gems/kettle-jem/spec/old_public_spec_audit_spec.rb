@@ -2,7 +2,7 @@
 
 require_relative "spec_helper"
 
-RSpec.describe "old Kettle/Jem public spec audit" do
+RSpec.describe Kettle::Jem do
   it "records migration decisions for every old executable and task spec family" do
     audit = JSON.parse(
       File.read(File.join(__dir__, "fixtures", "old_public_spec_audit.json")),

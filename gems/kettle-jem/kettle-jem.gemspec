@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Gemspec/DependencyVersion -- Runtime dependency floors are documented inline; sibling structuredmerge gems intentionally track spec.version dynamically.
+
 # kettle-jem:freeze
 # To retain chunks of comments & code during kettle-jem templating:
 # Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
@@ -171,3 +173,4 @@ Gem::Specification.new do |spec|
   # spec.add_development_dependency("vcr", ">= 4")                        # 6.0 claims to support ruby >= 2.3, but fails on ruby 2.4
   # spec.add_development_dependency("webmock", ">= 3")                    # Last version to support ruby >= 2.3
 end
+# rubocop:enable Gemspec/DependencyVersion

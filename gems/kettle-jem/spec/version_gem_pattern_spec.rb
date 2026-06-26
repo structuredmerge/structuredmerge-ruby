@@ -1,12 +1,11 @@
 # frozen_string_literal: true
 
-RSpec.describe "active Ruby gem version_gem pattern" do
-  ruby_gems_root = Pathname(__dir__).join("..", "..").expand_path
+VERSION_GEM_PATTERN_GEMSPEC_EXAMPLES = Dir.glob(Pathname(__dir__).join("..", "..", "*", "*.gemspec")).sort.map do |gemspec_path|
+  [gemspec_path, Pathname(gemspec_path).dirname, File.basename(gemspec_path, ".gemspec")]
+end
 
-  Dir.glob(ruby_gems_root.join("*", "*.gemspec")).sort.each do |gemspec_path|
-    gem_root = Pathname(gemspec_path).dirname
-    gem_name = File.basename(gemspec_path, ".gemspec")
-
+RSpec.describe Kettle::Jem do
+  VERSION_GEM_PATTERN_GEMSPEC_EXAMPLES.each do |gemspec_path, gem_root, gem_name|
     it "keeps #{gem_name} aligned with the Kettle/Jem version_gem bootstrap shape" do
       version_paths = Dir.glob(gem_root.join("lib", "**", "version.rb"))
       expect(version_paths).not_to be_empty

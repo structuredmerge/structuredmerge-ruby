@@ -268,7 +268,8 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     previous_rake_application = Rake.application
     Rake.application = Rake::Application.new
     begin
-      Dir.chdir(gem_root) { load File.join(gem_root, "Rakefile") }
+      allow(Dir).to receive(:pwd).and_return(gem_root)
+      load File.join(gem_root, "Rakefile")
       expect(Rake::Task.task_defined?("kettle:jem:prepare")).to be(true)
       expect(Rake::Task.task_defined?("kettle:jem:template")).to be(true)
       expect(Rake::Task.task_defined?("kettle:jem:install")).to be(true)
