@@ -6,8 +6,9 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # {KJ|FREEZE_TOKEN}:unfreeze
 
-# HOW TO UPDATE APPRAISALS (Appraisal2 RuboCop plugin normalizes generated gemfiles on modern Ruby):
-#   bin/rake appraisal:update
+# HOW TO GENERATE APPRAISALS (Appraisal2 RuboCop plugin normalizes generated gemfiles on modern Ruby):
+#   bin/rake appraisal:generate
+# Use bin/rake appraisal:update only when refreshing appraisal locks is intentional.
 
 plugin "appraisal2-rubocop", require: "appraisal2/rubocop", optional: true
 

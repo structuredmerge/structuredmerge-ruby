@@ -1717,7 +1717,8 @@ module Kettle
         end
 
         def run_system_command(command, chdir:, env:, quiet:)
-          stdout, stderr, status = Open3.capture3(env || {}, *command, chdir: chdir)
+          command_env = quiet ? quiet_command_env(env) : (env || {})
+          stdout, stderr, status = Open3.capture3(command_env, *quiet_command(command, quiet: quiet), chdir: chdir)
           $stdout.print(stdout) if !quiet && !stdout.empty?
           $stderr.print(stderr) if !quiet && !stderr.empty?
           {
@@ -1726,6 +1727,29 @@ module Kettle
             stdout: stdout,
             stderr: stderr
           }
+        end
+
+        def quiet_command(command, quiet:)
+          argv = command.map(&:to_s)
+          return argv unless quiet
+          return argv unless argv.first == "bundle"
+          return argv if argv.include?("--quiet")
+
+          subcommand = argv[1]
+          return [*argv, "--quiet"] if %w[install update binstubs lock].include?(subcommand)
+
+          argv
+        end
+
+        def quiet_command_env(env)
+          (env || {}).to_h.merge(
+            "DEBUG" => "false",
+            "KETTLE_JEM_DEBUG" => "false",
+            "KETTLE_DEV_DEBUG" => "false",
+            "BUNDLE_QUIET" => "true",
+            "BUNDLE_SILENCE_ROOT_WARNING" => "true",
+            "BUNDLE_SUPPRESS_INSTALL_USING_MESSAGES" => "true"
+          )
         end
       end
     end

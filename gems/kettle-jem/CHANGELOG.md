@@ -58,6 +58,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Quiet templating orchestration now passes quiet flags and debug-suppressing
+  environment to Bundler commands.
+- Generated Appraisal guidance now defaults to `bin/rake appraisal:generate`,
+  reserving `appraisal:update` for intentional lock refreshes.
 - Local GitHub remotes now override generated gemspec `source_code_uri` tag URLs
   when deriving repository owner tokens, preventing stale homepage metadata from
   corrupting README logos and local sibling workspace env names.

@@ -4398,6 +4398,20 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "silences Bundler and debug environment for quiet orchestration commands" do
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install], quiet: true)).to eq(%w[bundle install --quiet])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install --quiet], quiet: true)).to eq(%w[bundle install --quiet])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bin/setup --quiet], quiet: true)).to eq(%w[bin/setup --quiet])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command_env("DEBUG" => "true")).to include(
+      "DEBUG" => "false",
+      "KETTLE_JEM_DEBUG" => "false",
+      "KETTLE_DEV_DEBUG" => "false",
+      "BUNDLE_QUIET" => "true",
+      "BUNDLE_SILENCE_ROOT_WARNING" => "true",
+      "BUNDLE_SUPPRESS_INSTALL_USING_MESSAGES" => "true"
+    )
+  end
+
   it "generates only curated documented binstubs" do
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
       %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
