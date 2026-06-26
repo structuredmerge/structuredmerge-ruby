@@ -335,6 +335,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Quiet templating orchestration no longer passes unsupported `--quiet`
+  switches to Bundler subcommands such as `bundle binstubs` or `bundle lock`;
+  only Bundler subcommands documented with `--quiet` receive that flag.
 - Gemspec `spec.files` merging now inserts missing trailing commas when moving
   existing collection entries before appended template entries, preventing
   invalid Ruby when a destination's former last entry had no comma.

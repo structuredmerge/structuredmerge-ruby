@@ -1736,7 +1736,7 @@ module Kettle
           return argv if argv.include?("--quiet")
 
           subcommand = argv[1]
-          return [*argv, "--quiet"] if %w[install update binstubs lock].include?(subcommand)
+          return [*argv, "--quiet"] if %w[install update].include?(subcommand)
 
           argv
         end
@@ -1746,9 +1746,10 @@ module Kettle
             "DEBUG" => "false",
             "KETTLE_JEM_DEBUG" => "false",
             "KETTLE_DEV_DEBUG" => "false",
-            "BUNDLE_QUIET" => "true",
+            "BUNDLE_IGNORE_MESSAGES" => "true",
+            "BUNDLE_SILENCE_DEPRECATIONS" => "true",
             "BUNDLE_SILENCE_ROOT_WARNING" => "true",
-            "BUNDLE_SUPPRESS_INSTALL_USING_MESSAGES" => "true"
+            "BUNDLE_VERBOSE" => "false"
           )
         end
       end

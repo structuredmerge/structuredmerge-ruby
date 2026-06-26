@@ -4401,14 +4401,18 @@ RSpec.describe Kettle::Jem do
   it "silences Bundler and debug environment for quiet orchestration commands" do
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install], quiet: true)).to eq(%w[bundle install --quiet])
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install --quiet], quiet: true)).to eq(%w[bundle install --quiet])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle update], quiet: true)).to eq(%w[bundle update --quiet])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle binstubs rake], quiet: true)).to eq(%w[bundle binstubs rake])
+    expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle lock], quiet: true)).to eq(%w[bundle lock])
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bin/setup --quiet], quiet: true)).to eq(%w[bin/setup --quiet])
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command_env("DEBUG" => "true")).to include(
       "DEBUG" => "false",
       "KETTLE_JEM_DEBUG" => "false",
       "KETTLE_DEV_DEBUG" => "false",
-      "BUNDLE_QUIET" => "true",
+      "BUNDLE_IGNORE_MESSAGES" => "true",
+      "BUNDLE_SILENCE_DEPRECATIONS" => "true",
       "BUNDLE_SILENCE_ROOT_WARNING" => "true",
-      "BUNDLE_SUPPRESS_INSTALL_USING_MESSAGES" => "true"
+      "BUNDLE_VERBOSE" => "false"
     )
   end
 
