@@ -335,6 +335,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec `spec.files` merging now inserts missing trailing commas when moving
+  existing collection entries before appended template entries, preventing
+  invalid Ruby when a destination's former last entry had no comma.
 - Gemfile templating now preserves destination-only Ruby-bucket
   `eval_gemfile` entries, preventing configured recording Gemfiles from being
   dropped when the main Gemfile template is reapplied, and restores the main

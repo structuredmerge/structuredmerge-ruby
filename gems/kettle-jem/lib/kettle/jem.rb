@@ -7076,7 +7076,25 @@ module Kettle
         end
       end
 
-      merged_parts.fetch(:opening) + combined_groups.flat_map { |group| group.fetch(:lines) }.join + merged_parts.fetch(:closing)
+      body = combined_groups.each_with_index.map do |group, index|
+        gemspec_files_collection_group_source(group, trailing_comma: index < combined_groups.length - 1)
+      end.join
+      merged_parts.fetch(:opening) + body + merged_parts.fetch(:closing)
+    end
+
+    def gemspec_files_collection_group_source(group, trailing_comma:)
+      lines = group.fetch(:lines).dup
+      return lines.join unless trailing_comma
+
+      entry_index = lines.rindex { |line| !line.strip.empty? && !line.lstrip.start_with?("#") }
+      return lines.join unless entry_index
+
+      line = lines.fetch(entry_index)
+      return lines.join if line.rstrip.end_with?(",")
+
+      newline = line.end_with?("\n") ? "\n" : ""
+      lines[entry_index] = "#{line.delete_suffix("\n").rstrip},#{newline}"
+      lines.join
     end
 
     def replacement_for_nonliteral_gemspec_files_assignment(template_record:, destination_record:, template_receiver:, destination_receiver:)

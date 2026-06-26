@@ -11640,6 +11640,7 @@ RSpec.describe Kettle::Jem do
       end
       final_content = template_report.fetch(:final_content)
 
+      expect(Prism.parse(final_content)).to be_success
       expect(final_content).to include("spec.files = [")
       expect(final_content).to include('"rubocop-lts/**/*.yml"')
       expect(final_content).to include('*enumerate_package_files.call("exe")')
@@ -11687,6 +11688,7 @@ RSpec.describe Kettle::Jem do
       end
       final_content = template_report.fetch(:final_content)
 
+      expect(Prism.parse(final_content)).to be_success
       expect(final_content).to include("spec.files = Dir[")
       expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index('"lib/**/*.rb"')
       expect(final_content.scan('"sig/**/*.rbs"').size).to eq(1)
