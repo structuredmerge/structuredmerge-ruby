@@ -5165,7 +5165,7 @@ module Kettle
       if merge_result[:ok]
         output = merge_result.fetch(:output)
         if file_type == :gemfile
-          output = merge_gemfile_eval_bucket_entries(template_content, output)
+          output = merge_gemfile_eval_bucket_entries(template_content, output, destination_content: destination_content)
           return finalize_gemfile_template_source(recipe, output, destination_content, facts: facts, template_content: template_content)
         end
         return merge_appraisals_template_policy(output, facts: facts) if file_type == :appraisals
@@ -6192,11 +6192,13 @@ module Kettle
       output
     end
 
-    def merge_gemfile_eval_bucket_entries(template_content, merged_content)
+    def merge_gemfile_eval_bucket_entries(template_content, merged_content, destination_content: nil)
       template_entries = gemfile_eval_bucket_entries(template_content)
-      return merged_content if template_entries.empty?
-
       template_by_key = template_entries.to_h { |entry| [entry.fetch(:key), entry] }
+      destination_entries = gemfile_eval_bucket_entries(destination_content)
+      destination_only_entries = destination_entries.reject { |entry| template_by_key.key?(entry.fetch(:key)) }
+      return merged_content if template_entries.empty? && destination_only_entries.empty?
+
       emitted_paths = Set.new
       insert_at = nil
       lines = []
@@ -6223,7 +6225,11 @@ module Kettle
         skip_until = entry.fetch(:end_line) + 1
       end
 
-      missing_lines = template_entries.reject { |entry| emitted_paths.include?(entry.fetch(:path)) }.map { |entry| entry.fetch(:line) }
+      existing_paths = gemfile_eval_bucket_entries(lines.join).map { |entry| entry.fetch(:path) }.to_set
+      wanted_entries = template_entries + destination_only_entries
+      missing_lines = wanted_entries
+        .reject { |entry| emitted_paths.include?(entry.fetch(:path)) || existing_paths.include?(entry.fetch(:path)) }
+        .map { |entry| entry.fetch(:section_line) }
       return ensure_trailing_newline(lines.join) if missing_lines.empty?
 
       insert_at ||= lines.length
@@ -6240,14 +6246,26 @@ module Kettle
         key = normalize_eval_gemfile_ruby_bucket(path)
         next unless key
 
+        start_line = call.location.start_line
+        end_line = ruby_node_source_end_line(call)
+        section_start_line = gemfile_eval_comment_start_line(lines, start_line)
         {
           path: path,
           key: key,
-          line: (lines[(call.location.start_line - 1)..(ruby_node_source_end_line(call) - 1)] || []).join,
-          start_line: call.location.start_line,
-          end_line: ruby_node_source_end_line(call)
+          line: (lines[(start_line - 1)..(end_line - 1)] || []).join,
+          section_line: (lines[(section_start_line - 1)..(end_line - 1)] || []).join,
+          start_line: start_line,
+          end_line: end_line
         }
       end
+    end
+
+    def gemfile_eval_comment_start_line(lines, start_line)
+      index = start_line.to_i - 2
+      return start_line if index.negative?
+
+      index -= 1 while index >= 0 && lines.fetch(index).lstrip.start_with?("#")
+      index + 2
     end
 
     def normalize_eval_gemfile_ruby_bucket(path)

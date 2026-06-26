@@ -332,6 +332,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemfile templating now preserves destination-only Ruby-bucket
+  `eval_gemfile` entries, preventing configured recording Gemfiles from being
+  dropped when the main Gemfile template is reapplied.
 - Generated templating Gemfiles no longer duplicate `appraisal2-rubocop`; the
   Appraisal generator formatter is provided by the style Gemfile loaded from
   `Appraisal.root.gemfile`.
