@@ -7583,6 +7583,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("kettle-jem")
       expect(content).to include("TREE_SITTER_LANGUAGE_PACK_DEV")
       expect(content).to include('gem "tree_sitter_language_pack", path: tree_sitter_language_pack_dev')
+      expect(content).not_to include("vendor/tree-sitter-language-pack")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end
   end
