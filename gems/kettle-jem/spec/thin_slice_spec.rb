@@ -7692,9 +7692,9 @@ RSpec.describe Kettle::Jem do
             kettle-jem
           ]
 
-          tree_sitter_language_pack_dev = ENV.fetch("TREE_SITTER_LANGUAGE_PACK_DEV", nil)
-          unless tree_sitter_language_pack_dev.to_s.empty?
-            gem "tree_sitter_language_pack", path: tree_sitter_language_pack_dev
+          tslp_dev = ENV.fetch("TSLP_DEV", nil)
+          unless tslp_dev.to_s.empty?
+            gem "tree_sitter_language_pack", path: tslp_dev
           end
         RUBY
       })
@@ -7711,8 +7711,8 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
       expect(content).to include("kettle-jem")
-      expect(content).to include("TREE_SITTER_LANGUAGE_PACK_DEV")
-      expect(content).to include('gem "tree_sitter_language_pack", path: tree_sitter_language_pack_dev')
+      expect(content).to include("TSLP_DEV")
+      expect(content).to include('gem "tree_sitter_language_pack", path: tslp_dev')
       expect(content).not_to include("vendor/tree-sitter-language-pack")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end

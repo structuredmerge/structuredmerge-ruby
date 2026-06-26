@@ -78,6 +78,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates now require `appraisal2` >= 3.1.3.
 - Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.2.
 - Generated main Gemfiles now require `nomono` >= 1.0.6.
+- Generated templating local Gemfiles now only use `TSLP_DEV` for local
+  `tree_sitter_language_pack` path overrides and no longer derive that path
+  from `SMORG_RB_DEV`.
 - Generated gemspecs now require `version_gem` >= 1.1.13.
 - Generated gemspecs now require `gitmoji-regex` >= 2.0.3.
 - Generated documentation Gemfiles now require `yaml-converter` >= 0.2.2.
