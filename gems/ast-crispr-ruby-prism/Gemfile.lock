@@ -22,10 +22,7 @@ GEM
       service_actor (~> 3.9)
       version_gem (~> 1.1, >= 1.1.9)
     ast-merge (7.0.0)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.1)
       tree_haver (= 7.0.0)
-      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -301,14 +298,10 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
-    token-resolver (2.0.3)
-      parslet (~> 2.0)
-      version_gem (~> 1.1, >= 1.1.12)
     tree_haver (7.0.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
-      version_gem (~> 1.1, >= 1.1.9)
+      tree_sitter_language_pack (~> 1.6)
     tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
       sorbet-runtime (~> 0.5)
     tsort (0.2.0)
@@ -395,7 +388,7 @@ CHECKSUMS
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
   ast-crispr (7.0.0)
   ast-crispr-ruby-prism (7.0.0)
-  ast-merge (7.0.0)
+  ast-merge (7.0.0) sha256=5d4143eb07170baaf54437d42977bdacef3f8c0cc8808145ca7224d61209e4dc
   backports (3.25.3) sha256=94298d32dc3c40ca15633b54e282780b49e2db0c045f602ea1907e4f63a17235
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
@@ -490,7 +483,7 @@ CHECKSUMS
   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_json_formatter (0.1.4) sha256=529418fbe8de1713ac2b2d612aa3daa56d316975d307244399fa4838c601b428
-  sorbet-runtime (0.6.13316)
+  sorbet-runtime (0.6.13316) sha256=c31af65275b3d2b2f52a01f2e9e2937d392d1e7fe3ccb847eb2983a755c89c6d
   standard (1.55.0) sha256=8a8f2c3e681a4db3aafde1b301561b0f3d7c5f06c160167cb744a4d7baf0426e
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -502,8 +495,7 @@ CHECKSUMS
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
-  token-resolver (2.0.3) sha256=68d673653e36d36b211be7522dee552420e7e5d49b3a95b782ad0ab280c7cd51
-  tree_haver (7.0.0)
+  tree_haver (7.0.0) sha256=424c938036458a7f0645baa4e9d641bd8a31f17eeef52ca0e74bd3beb22510c0
   tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux) sha256=ad6743a373eeac954c1b659b17af3aff1c82918b3ce9c9dc572a7c70ff843cdd
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.5) sha256=bb64259ac92a466a78635b0af555500108122dc3a6d86af109304970caeb8c2b
