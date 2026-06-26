@@ -237,7 +237,7 @@ PATH
     tree_haver (7.0.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
-      tree_sitter_language_pack (~> 1.6)
+      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
       version_gem (~> 1.1, >= 1.1.9)
 
 PATH
@@ -278,6 +278,7 @@ GEM
       bundler (>= 1.2.0)
       thor (~> 1.0)
     citrus (3.0.2)
+    commonmarker (2.8.2-arm64-darwin)
     commonmarker (2.8.2-x86_64-linux)
     commonmarker (2.8.2-x86_64-linux-musl)
     delegate (0.6.1)
@@ -353,6 +354,7 @@ GEM
     silent_stream (1.0.12)
       logger (~> 1.2)
       version_gem (>= 1.1.8, < 3)
+    sorbet-runtime (0.6.13312)
     stone_checksums (1.0.3)
       version_gem (~> 1.1, >= 1.1.9)
     thor (1.5.0)
@@ -369,7 +371,10 @@ GEM
     toml-rb (4.2.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.8.1-x86_64-linux)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin)
+      sorbet-runtime (~> 0.5)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
+      sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.1.5)
       parallel_tests (>= 3.3.0, < 6)
@@ -379,6 +384,7 @@ GEM
     zeitwerk (2.8.2)
 
 PLATFORMS
+  arm64-darwin
   x86_64-linux
   x86_64-linux-musl
 
@@ -445,6 +451,7 @@ CHECKSUMS
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.0.0)
+  commonmarker (2.8.2-arm64-darwin) sha256=cd7364f1fb9735d60218e4af0a4afbbeedbc465eb81cccca56f29a4efe2b5013
   commonmarker (2.8.2-x86_64-linux) sha256=42cfb6532b15dd5821ce99e47397923255f32dcfc81024ef4c17e01e66ac7d75
   commonmarker (2.8.2-x86_64-linux-musl) sha256=66568dce1c6f265e85d57ea7f749a148446527c7dd599c6ded4cdc819997c43e
   commonmarker-merge (7.0.0)
@@ -497,6 +504,7 @@ CHECKSUMS
   service_actor (3.9.4) sha256=e63b523630b9a7e62959b2a90113b08d2565b5de9c148557b281ef847c9539ce
   silent_stream (1.0.12) sha256=377c43aa10033fe90c33b39ea8cd97d79f2d1c4856df598efc56f3091f3ae782
   smorg-rb (7.0.0)
+  sorbet-runtime (0.6.13312) sha256=6e99d3c53b84e1da2b19fab863c6bddbcefa821173dde1906776b517449cf4e3
   stone_checksums (1.0.3) sha256=1d7ee38b7c766c523cbf12ab886ffbae519a2c48288f9d8ecc7ca0deed0701fe
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
@@ -506,7 +514,8 @@ CHECKSUMS
   toml-merge (7.0.0)
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
   tree_haver (7.0.0)
-  tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
+  tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin) sha256=b3dc68837a1a626afcbe1abb779cd987e9828a43c78e98cc70aa7e58957f3ef8
+  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux) sha256=ad6743a373eeac954c1b659b17af3aff1c82918b3ce9c9dc572a7c70ff843cdd
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.5) sha256=bb64259ac92a466a78635b0af555500108122dc3a6d86af109304970caeb8c2b
   typescript-merge (7.0.0)

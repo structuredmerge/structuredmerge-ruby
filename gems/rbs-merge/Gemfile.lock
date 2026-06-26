@@ -271,6 +271,7 @@ GEM
     simplecov-rcov (0.3.7)
       simplecov (>= 0.4.1)
     simplecov_json_formatter (0.1.4)
+    sorbet-runtime (0.6.13316)
     standard (1.55.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -304,10 +305,14 @@ GEM
       citrus (~> 3.0)
       parslet (~> 2.0)
       tree_sitter_language_pack (~> 1.6)
-    tree_sitter_language_pack (1.8.1-aarch64-linux)
-    tree_sitter_language_pack (1.8.1-arm64-darwin)
-    tree_sitter_language_pack (1.8.1-x86_64-darwin)
-    tree_sitter_language_pack (1.8.1-x86_64-linux)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux)
+      sorbet-runtime (~> 0.5)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin)
+      sorbet-runtime (~> 0.5)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-darwin)
+      sorbet-runtime (~> 0.5)
+    tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
+      sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.1.5)
       parallel_tests (>= 3.3.0, < 6)
@@ -495,6 +500,7 @@ CHECKSUMS
   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_json_formatter (0.1.4) sha256=529418fbe8de1713ac2b2d612aa3daa56d316975d307244399fa4838c601b428
+  sorbet-runtime (0.6.13316) sha256=c31af65275b3d2b2f52a01f2e9e2937d392d1e7fe3ccb847eb2983a755c89c6d
   standard (1.55.0) sha256=8a8f2c3e681a4db3aafde1b301561b0f3d7c5f06c160167cb744a4d7baf0426e
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -507,10 +513,10 @@ CHECKSUMS
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
   tree_haver (7.0.0) sha256=424c938036458a7f0645baa4e9d641bd8a31f17eeef52ca0e74bd3beb22510c0
-  tree_sitter_language_pack (1.8.1-aarch64-linux) sha256=caf297725fca8a3171d922f20927c3f2b78ea8bf6c7f55bed97d161be14775b4
-  tree_sitter_language_pack (1.8.1-arm64-darwin) sha256=7070e2e2bee2b70a1e514bdf7af43df9d5258707a8d5640749458e85469f22f1
-  tree_sitter_language_pack (1.8.1-x86_64-darwin) sha256=0f1dc08cf951be5702bafc1c9a382ca55c9ac9297b73baed7d68b72d62e4a9d0
-  tree_sitter_language_pack (1.8.1-x86_64-linux) sha256=058f1378605a19e6a966115eefef2c6b4c8d4d04b187939252948bd5a877aa1a
+  tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux) sha256=c882f4039a1a84a8ed782ef5381a8556acdb53538055d0b9b30d0cd85a0f1b0a
+  tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin) sha256=b3dc68837a1a626afcbe1abb779cd987e9828a43c78e98cc70aa7e58957f3ef8
+  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-darwin) sha256=a080abc08ef14a91a2ed7cade765f122833d4f00601060cf27c4c3279c5aac71
+  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux) sha256=ad6743a373eeac954c1b659b17af3aff1c82918b3ce9c9dc572a7c70ff843cdd
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.5) sha256=bb64259ac92a466a78635b0af555500108122dc3a6d86af109304970caeb8c2b
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
