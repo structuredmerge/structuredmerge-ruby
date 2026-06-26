@@ -3042,7 +3042,7 @@ module Kettle
         provider: "github_actions",
         default_branch: "main",
         exec_cmd: github_actions_exec_cmd(kettle_config, env),
-        recording: appraisal_recording_enabled?(kettle_config),
+        recording: project_recording_enabled?(project_root, kettle_config),
         ruby_versions: github_actions_ruby_versions(project_runtime.fetch(:test_min_ruby)),
         test_min_ruby: project_runtime.fetch(:test_min_ruby).to_s,
         obsolete_workflows: github_actions_obsolete_workflows(project_root),
@@ -5190,7 +5190,10 @@ module Kettle
         template_content: template_content,
         preserve_self_word_entries: local_gemfile_template_recipe?(recipe)
       )
-      output = guard_main_gemfile_runtime_workspace_overrides(output) if recipe.fetch(:target_path).to_s == "Gemfile"
+      if recipe.fetch(:target_path).to_s == "Gemfile"
+        output = inject_main_gemfile_recording_eval(output, facts)
+        output = guard_main_gemfile_runtime_workspace_overrides(output)
+      end
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
@@ -5811,6 +5814,34 @@ module Kettle
         preserve_self_word_entries: preserve_self_word_entries
       )
       apply_commented_gem_dependency_policy(template_content, pruned)
+    end
+
+    def inject_main_gemfile_recording_eval(content, facts)
+      return content unless facts.to_h.dig(:ci, :recording)
+      return content if gemfile_eval_paths(content).any? { |path| path.to_s.include?("gemfiles/modular/recording/") }
+
+      lines = content.to_s.lines
+      insert_at = main_gemfile_recording_insertion_index(content) || lines.length
+      lines.insert(insert_at, "# Test HTTP Interaction Recording\n", %(eval_gemfile "#{main_gemfile_recording_eval_path}"\n), "\n")
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def main_gemfile_recording_insertion_index(content)
+      lines = content.to_s.lines
+      call = ruby_call_records(content, :eval_gemfile).find do |candidate|
+        ruby_string_argument(candidate).to_s == "gemfiles/modular/style.gemfile"
+      end
+      return unless call
+
+      gemfile_eval_comment_start_line(lines, call.location.start_line) - 1
+    end
+
+    def main_gemfile_recording_eval_path
+      "gemfiles/modular/recording/r4/recording.gemfile"
+    end
+
+    def gemfile_eval_paths(content)
+      ruby_call_records(content, :eval_gemfile).filter_map { |call| ruby_string_argument(call) }
     end
 
     def merge_template_gemfile_dependency_blocks(template_content, content, removable_gems, preserve_self_word_entries: false)
@@ -12470,6 +12501,19 @@ module Kettle
       workflows = {} unless workflows.is_a?(Hash)
 
       DecisionPolicy.value_to_boolean(workflows["recording"]) == true
+    end
+
+    def project_recording_enabled?(project_root, config)
+      return true if appraisal_recording_enabled?(config)
+
+      project_appraisals_recording_enabled?(project_root)
+    end
+
+    def project_appraisals_recording_enabled?(project_root)
+      appraisals_path = File.join(project_root.to_s, "Appraisals")
+      return false unless File.file?(appraisals_path)
+
+      gemfile_eval_paths(File.read(appraisals_path)).any? { |path| path.to_s.include?("modular/recording/") }
     end
 
     def github_actions_standard_appraisal_gemfiles(config)

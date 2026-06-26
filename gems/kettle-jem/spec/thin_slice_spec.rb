@@ -7536,6 +7536,66 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "repairs missing main Gemfile recording evals from configured Appraisals" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-recording-repair", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "current" do
+            eval_gemfile "modular/recording/r4/recording.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content).to include("# Test HTTP Interaction Recording")
+      expect(content.scan('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"').size).to eq(1)
+      expect(content.index("# Test HTTP Interaction Recording")).to be < content.index("# Linting")
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
   it "removes the destination package from the main Gemfile" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
