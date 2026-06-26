@@ -11614,6 +11614,54 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves destination splat files assignments without appending duplicate template splats" do
+    template = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "example"
+        # Specify which files are part of the released package.
+        spec.files = [
+          # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
+          *enumerate_package_files.call("lib"),
+          # Executables and executable support scripts
+          *enumerate_package_files.call("exe"),
+          # Public certs for gem signing
+          *enumerate_package_files.call("certs"),
+          # Signatures
+          *enumerate_package_files.call("sig")
+        ]
+      end
+    RUBY
+    destination = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "example"
+        enumerate_package_files = lambda do |root|
+          Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+            File.file?(path) && ![".", ".."].include?(File.basename(path))
+          end
+        end
+
+        # Specify which files are part of the released package.
+        spec.files = [
+          # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
+          *enumerate_package_files.call('lib'),
+          # Executables and executable support scripts
+          *enumerate_package_files.call('exe'),
+          # Public certs for gem signing
+          *enumerate_package_files.call('certs'),
+          # Signatures
+          *enumerate_package_files.call('sig')
+        ]
+      end
+    RUBY
+
+    merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "example"}})
+
+    expect(Prism.parse(merged)).to be_success
+    expect(merged.scan(/^\s*spec\.files\s*=/).size).to eq(1)
+    expect(merged).to include("*enumerate_package_files.call('sig')\n")
+    expect(merged).not_to include('*enumerate_package_files.call("lib")')
+  end
+
   it "projects README top logo template tokens" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

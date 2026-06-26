@@ -7013,6 +7013,7 @@ module Kettle
       template_parts = gemspec_files_collection_parts(template_record)
       destination_parts = gemspec_files_collection_parts(destination_record)
       return unless merged_parts && template_parts && destination_parts
+      return if gemspec_files_collection_has_nonliteral_entries?(destination_parts)
 
       combined_groups = []
       seen = {}
@@ -7094,6 +7095,7 @@ module Kettle
 
           groups << {
             key: current_entry.slice,
+            node: current_entry,
             lines: pending + [line]
           }
           pending = []
@@ -7116,6 +7118,13 @@ module Kettle
     def gemspec_files_collection_entry_node?(node)
       node.location.start_line == node.location.end_line &&
         (node.is_a?(::Prism::StringNode) || node.is_a?(::Prism::SplatNode))
+    end
+
+    def gemspec_files_collection_has_nonliteral_entries?(parts)
+      parts.fetch(:groups).any? do |group|
+        node = group.fetch(:node)
+        !node.is_a?(::Prism::StringNode)
+      end
     end
 
     def generic_bundler_gemspec_files_assignment?(record)
