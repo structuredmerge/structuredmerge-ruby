@@ -75,9 +75,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated style Gemfiles now skip released RuboCop-LTS gems that were already
   declared by earlier Gemfile evaluation, avoiding duplicate path/version
   declarations during templating.
-- Generated style local Gemfiles now path-wire `rubocop-ruby1_8` with the rest
-  of the local RuboCop-LTS stack so `RUBOCOP_LTS_LOCAL` does not fall back to
-  broken released wrapper configs.
 - Gem templates now require `appraisal2` >= 3.1.3.
 - Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.2.
 - Generated main Gemfiles now require `nomono` >= 1.0.6.
