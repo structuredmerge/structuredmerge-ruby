@@ -22,9 +22,9 @@ end
 Kernel.send(:gem, "nomono", *nomono_activation_requirements)
 require "nomono/bundler"
 
-local_gems = %w[rubocop-lts rubocop-lts-rspec {KJ|RUBOCOP_RUBY_GEM} standard-rubocop-lts]
+local_gems = %w[rubocop-lts rubocop-lts-rspec rubocop-ruby1_8 {KJ|RUBOCOP_RUBY_GEM} standard-rubocop-lts]
 
-# export VENDORED_GEMS=rubocop-lts,rubocop-lts-rspec,{KJ|RUBOCOP_RUBY_GEM},standard-rubocop-lts
+# export VENDORED_GEMS=rubocop-lts,rubocop-lts-rspec,rubocop-ruby1_8,{KJ|RUBOCOP_RUBY_GEM},standard-rubocop-lts
 platform :mri do
   eval_nomono_gems(
     gems: local_gems,

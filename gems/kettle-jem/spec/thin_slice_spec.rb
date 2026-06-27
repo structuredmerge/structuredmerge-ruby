@@ -7736,6 +7736,7 @@ RSpec.describe Kettle::Jem do
           local_gems = %w[
             tree_haver
             ast-merge
+            rubocop-ruby1_8
             rubocop-ruby2_4
             kettle-jem
           ]
@@ -7755,6 +7756,7 @@ RSpec.describe Kettle::Jem do
 
       expect(content).to include("tree_haver")
       expect(content).to include("ast-merge")
+      expect(content).to include("rubocop-ruby1_8")
       expect(content).to include("rubocop-ruby2_4")
       expect(content).to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
