@@ -28,6 +28,7 @@ require "ast/merge"
 require "ast/crispr/markdown/markly"
 require "ast/crispr/ruby/prism"
 require "kettle/dev"
+require "kettle/rb/compat_matrix"
 require_relative "jem/version"
 
 module Kettle
@@ -59,66 +60,6 @@ module Kettle
     ].freeze
     DEFAULT_ENGINES = %w[ruby jruby truffleruby].freeze
     DEFAULT_OPENCOLLECTIVE_ORG = "galtzo-floss"
-    RRRRBMatrixEntry = Struct.new(
-      :ruby,
-      :engine,
-      :mri,
-      :workflow_ruby,
-      :rubygems,
-      :bundler,
-      :rubocop,
-      :rubocop_lts,
-      :rails,
-      :rails_appraisals,
-      :notes
-    )
-    RRRRB_MATRIX = {
-      "ruby-1.8" => RRRRBMatrixEntry.new(ruby: "1.8.7-p374", engine: "ruby", rails: "4.0.x", rubocop_lts: "0.3.0"),
-      "ruby-1.9" => RRRRBMatrixEntry.new(ruby: "1.9.3-p551", engine: "ruby", rubygems: "2.7.11", bundler: "1.17.3", rubocop: "0.41.2", rubocop_lts: "2.3.0", rails: "4.2.11.3"),
-      "jruby-1.7" => RRRRBMatrixEntry.new(ruby: "jruby-1.7.27", engine: "jruby", mri: "1.9", workflow_ruby: "1.9"),
-      "ruby-2.0" => RRRRBMatrixEntry.new(ruby: "2.0.0-p648", engine: "ruby", rubocop: "0.50.0", rubocop_lts: "4.2.0"),
-      "ruby-2.1" => RRRRBMatrixEntry.new(ruby: "2.1.10", engine: "ruby", rubocop: "0.57.2", rubocop_lts: "6.3.0"),
-      "ruby-2.2" => RRRRBMatrixEntry.new(ruby: "2.2.10", engine: "ruby", rubocop: "0.68.1", rubocop_lts: "8.3.0", rails: "5.2.8.1"),
-      "ruby-2.3" => RRRRBMatrixEntry.new(ruby: "2.3.8", engine: "ruby", rubygems: "3.3.27", bundler: "2.3.27", rubocop: "0.81.0", rubocop_lts: "10.3.0"),
-      "jruby-9.1" => RRRRBMatrixEntry.new(ruby: "jruby-9.1.17.0", engine: "jruby", mri: "2.3", workflow_ruby: "2.3", rubygems: "3.3.27", bundler: "2.3.27"),
-      "ruby-2.4" => RRRRBMatrixEntry.new(ruby: "2.4.10", engine: "ruby", rubocop: "1.12.1", rubocop_lts: "12.3.0", rails_appraisals: ["4.2.11.3", "5.2.8.1"]),
-      "ruby-2.5" => RRRRBMatrixEntry.new(ruby: "2.5.9", engine: "ruby", rubocop: "1.28.2", rubocop_lts: "14.3.0", rails: "6.0.6.1"),
-      "jruby-9.2" => RRRRBMatrixEntry.new(ruby: "jruby-9.2.21.0", engine: "jruby", mri: "2.5", workflow_ruby: "2.5", rubygems: "3.3.27", bundler: "2.3.27"),
-      "ruby-2.6" => RRRRBMatrixEntry.new(ruby: "2.6.10", engine: "ruby", rubygems: "3.4.22", bundler: "2.4.22", rubocop: "1.50.2", rubocop_lts: "16.3.0", rails: "6.1.7.10"),
-      "jruby-9.3" => RRRRBMatrixEntry.new(ruby: "jruby-9.3.15.0", engine: "jruby", mri: "2.6", workflow_ruby: "2.6", notes: ["JRuby 9.3 can require jar-dependencies ~> 0.4.1 when psych activates a newer default gem stack."]),
-      "ruby-2.7" => RRRRBMatrixEntry.new(ruby: "2.7.8", engine: "ruby", rubocop: "1.80.x", rubocop_lts: "18.4.0", rails: "7.2.2.2"),
-      "ruby-3.0" => RRRRBMatrixEntry.new(ruby: "3.0.7", engine: "ruby", rubygems: "3.5.23", bundler: "2.5.23", rubocop_lts: "20.4.0"),
-      "truffleruby-22.3" => RRRRBMatrixEntry.new(ruby: "truffleruby-22.3.1", engine: "truffleruby", mri: "3.0", workflow_ruby: "3.0", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
-      "ruby-3.1" => RRRRBMatrixEntry.new(ruby: "3.1.7", engine: "ruby", rubygems: "3.6.9", bundler: "2.6.9", rubocop_lts: "22.3.0"),
-      "truffleruby-23.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-23.0.0", engine: "truffleruby", mri: "3.1", workflow_ruby: "3.0", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby.", "psych < 5.3 is needed while Gem.ruby_version is below 3.3."]),
-      "jruby-9.4" => RRRRBMatrixEntry.new(ruby: "jruby-9.4.12.x", engine: "jruby", mri: "3.1", workflow_ruby: "3.1"),
-      "ruby-3.2" => RRRRBMatrixEntry.new(ruby: "3.2.9", engine: "ruby", rubygems: "3.7.x", bundler: "2.7.x", rubocop_lts: "24.2.0", rails: "8.0.x"),
-      "truffleruby-23.1" => RRRRBMatrixEntry.new(ruby: "truffleruby-23.1.2", engine: "truffleruby", mri: "3.2", workflow_ruby: "3.1", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby.", "Use the Ruby 3.1/Rails 7.2 appraisal in CI; Rails 8 failed on this engine.", "psych < 5.3 is needed while Gem.ruby_version is below 3.3."]),
-      "ruby-3.3" => RRRRBMatrixEntry.new(ruby: "3.3.9", engine: "ruby"),
-      "truffleruby-24.2" => RRRRBMatrixEntry.new(ruby: "truffleruby-24.2.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
-      "truffleruby-25.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-25.0.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
-      "truffleruby-33.0" => RRRRBMatrixEntry.new(ruby: "truffleruby-33.0.x", engine: "truffleruby", mri: "3.3", workflow_ruby: "3.3", notes: ["Do not upgrade RubyGems or Bundler on TruffleRuby."]),
-      "jruby-10.0" => RRRRBMatrixEntry.new(ruby: "jruby-10.0.x", engine: "jruby", mri: "3.4", workflow_ruby: "3.4"),
-      "ruby-3.4" => RRRRBMatrixEntry.new(ruby: "3.4.7", engine: "ruby")
-    }.transform_values(&:freeze).freeze
-    ENGINE_WORKFLOW_MAP = {
-      "jruby" => "jruby",
-      "jruby-9.1" => "jruby",
-      "jruby-9.2" => "jruby",
-      "jruby-9.3" => "jruby",
-      "jruby-9.4" => "jruby",
-      "truffle" => "truffleruby",
-      "truffleruby-22.3" => "truffleruby",
-      "truffleruby-23.0" => "truffleruby",
-      "truffleruby-23.1" => "truffleruby",
-      "truffleruby-24.2" => "truffleruby",
-      "truffleruby-25.0" => "truffleruby",
-      "truffleruby-33.0" => "truffleruby",
-      "jruby-10.0" => "jruby"
-    }.freeze
-    ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS = RRRRB_MATRIX.each_with_object({}) do |(name, entry), result|
-      result[name] = entry.workflow_ruby if entry.workflow_ruby
-    end.freeze
     RETIRED_GEMSPEC_DEVELOPMENT_DEPENDENCIES = %w[kettle-drift kettle-soup-cover].freeze
     FILE_DELETION_PRIMITIVES = %w[
       supplied_obsolete_file_deletion
@@ -1344,21 +1285,6 @@ module Kettle
     }.freeze
     VAR_HOME_PREFIX = %r{\A/var/home(?=/|\z)}
     VAR_HOME_TEXT = %r{/var/home(?=/|\z)}
-    RUBOCOP_VERSION_MAP = [
-      [Gem::Version.new("1.8"), "\"~> 0.3\", \">= 0.3.0\"", "rubocop-ruby1_8", "\"~> 2.0\", \">= 2.0.2\"", "r1_8-even-v0"],
-      [Gem::Version.new("1.9"), "\"~> 2.3\", \">= 2.3.0\"", "rubocop-ruby1_9", "\"~> 3.0\", \">= 3.0.2\"", "r1_9-even-v2"],
-      [Gem::Version.new("2.0"), "\"~> 4.2\", \">= 4.2.0\"", "rubocop-ruby2_0", "\"~> 3.0\", \">= 3.0.2\"", "r2_0-even-v4"],
-      [Gem::Version.new("2.1"), "\"~> 6.3\", \">= 6.3.0\"", "rubocop-ruby2_1", "\"~> 3.0\", \">= 3.0.2\"", "r2_1-even-v6"],
-      [Gem::Version.new("2.2"), "\"~> 8.3\", \">= 8.3.0\"", "rubocop-ruby2_2", "\"~> 3.0\", \">= 3.0.2\"", "r2_2-even-v8"],
-      [Gem::Version.new("2.3"), "\"~> 10.3\", \">= 10.3.0\"", "rubocop-ruby2_3", "\"~> 3.0\", \">= 3.0.2\"", "r2_3-even-v10"],
-      [Gem::Version.new("2.4"), "\"~> 12.3\", \">= 12.3.0\"", "rubocop-ruby2_4", "\"~> 3.0\", \">= 3.0.2\"", "r2_4-even-v12"],
-      [Gem::Version.new("2.5"), "\"~> 14.3\", \">= 14.3.0\"", "rubocop-ruby2_5", "\"~> 3.0\", \">= 3.0.2\"", "r2_5-even-v14"],
-      [Gem::Version.new("2.6"), "\"~> 16.3\", \">= 16.3.0\"", "rubocop-ruby2_6", "\"~> 3.0\", \">= 3.0.2\"", "r2_6-even-v16"],
-      [Gem::Version.new("2.7"), "\"~> 18.4\", \">= 18.4.0\"", "rubocop-ruby2_7", "\"~> 3.0\", \">= 3.0.2\"", "r2_7-even-v18"],
-      [Gem::Version.new("3.0"), "\"~> 20.4\", \">= 20.4.0\"", "rubocop-ruby3_0", "\"~> 3.0\", \">= 3.0.2\"", "r3_0-even-v20"],
-      [Gem::Version.new("3.1"), "\"~> 22.3\", \">= 22.3.0\"", "rubocop-ruby3_1", "\"~> 3.0\", \">= 3.0.2\"", "r3_1-even-v22"],
-      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.6\"", "r3_2-even-v24"]
-    ].freeze
     FORGE_USER_ENV_KEYS = {
       gh_user: "KJ_GH_USER",
       gl_user: "KJ_GL_USER",
@@ -11074,21 +11000,7 @@ module Kettle
     end
 
     def rubocop_tokens_for(min_ruby)
-      fallback = RUBOCOP_VERSION_MAP.first
-      selected = nil
-      RUBOCOP_VERSION_MAP.reverse_each do |minimum, lts_constraint, ruby_gem, ruby_constraint, _branch|
-        next unless min_ruby && min_ruby >= minimum
-
-        selected = [minimum, lts_constraint, ruby_gem, ruby_constraint]
-        break
-      end
-      selected ||= fallback
-      [selected[1], selected[2], selected[3]]
-    end
-
-    def rubocop_lts_branch_for_gem(gem_name)
-      entry = RUBOCOP_VERSION_MAP.find { |_minimum, _lts_constraint, ruby_gem, _ruby_constraint, _branch| ruby_gem == gem_name.to_s }
-      entry && entry[4]
+      Kettle::Rb::CompatMatrix.rubocop_template_tokens(min_ruby)
     end
 
     def min_ruby_version(requirement)
@@ -12304,10 +12216,10 @@ module Kettle
       end
 
       min_ruby = config_test_min_ruby(config)
-      workflow_floor = ENGINE_WORKFLOW_RUBY_COMPATIBILITY_FLOORS[basename]
+      workflow_floor = Kettle::Rb::CompatMatrix.workflow_ruby_floor(basename)
       return true if workflow_floor && min_ruby && Gem::Version.new(workflow_floor) < min_ruby
 
-      engine = ENGINE_WORKFLOW_MAP[basename]
+      engine = Kettle::Rb::CompatMatrix.engine_workflow(basename)
       return true if engine && !enabled_ruby_engines(config).include?(engine)
 
       version = basename[/\Aruby-(\d+\.\d+)\z/, 1]

@@ -6,6 +6,7 @@ require "open3"
 require "toml-rb"
 require "uri"
 require "yaml"
+require "kettle/rb/compat_matrix"
 
 module Kettle
   module Jem
@@ -686,7 +687,7 @@ module Kettle
           return nil unless local_root
 
           ruby_gem = report.dig(:facts, :templates, :tokens, "KJ|RUBOCOP_RUBY_GEM").to_s
-          branch = Kettle::Jem.rubocop_lts_branch_for_gem(ruby_gem)
+          branch = Kettle::Rb::CompatMatrix.rubocop_lts_branch_for_gem(ruby_gem)
           unless branch
             raise Kettle::Jem::Error, "Cannot select RUBOCOP_LTS_LOCAL branch for #{ruby_gem.inspect}"
           end

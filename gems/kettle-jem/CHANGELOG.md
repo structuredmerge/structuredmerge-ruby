@@ -58,6 +58,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Ruby, engine, Rails, RuboCop, and RuboCop LTS compatibility choices now come
+  from `Kettle::Rb::CompatMatrix` in `kettle-rb`.
+
 - Quiet templating orchestration now passes quiet flags and debug-suppressing
   environment to Bundler commands.
 - Generated Appraisal guidance now defaults to `bin/rake appraisal:generate`,
