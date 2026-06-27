@@ -8,6 +8,19 @@ RSpec.describe 'Prism reproducible merge' do
   let(:merger_class) { Prism::Merge::SmartMerger }
   let(:file_extension) { 'rb' }
 
+  describe Prism::Merge::RecursiveMergePolicy do
+    let(:merger) { instance_double(Prism::Merge::SmartMerger) }
+    let(:policy) { described_class.new(merger: merger) }
+
+    it 'treats nil block bodies as non-mergeable instead of failing' do
+      result = Prism.parse("RSpec.describe Foo do\nend\n")
+      body = result.value.statements.body.first.block.body
+
+      expect(body).to be_nil
+      expect(policy.body_has_mergeable_statements?(body)).to be(false)
+    end
+  end
+
   describe 'basic merge scenarios (destination wins by default)' do
     context 'when a method is removed in destination' do
       it_behaves_like 'a reproducible merge', '01_method_removed'

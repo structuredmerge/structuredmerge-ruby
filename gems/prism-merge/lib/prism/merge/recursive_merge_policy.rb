@@ -37,6 +37,7 @@ module Prism
       end
 
       def body_has_mergeable_statements?(body)
+        return false unless body
         return false unless body.type.to_s == 'statements_node'
         return false if body.body.empty?
 

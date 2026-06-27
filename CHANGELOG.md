@@ -69,6 +69,8 @@ Please file a bug if you notice a violation of semantic versioning.
   grammars.
 - `json-merge` now accepts devcontainer-style JSONC files with comments and
   trailing commas through its synthetic parser fallback.
+- `prism-merge` now treats empty Ruby block bodies as non-mergeable instead of
+  raising during recursive merge policy checks.
 
 ### Security
 
