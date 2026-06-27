@@ -73,8 +73,6 @@ Please file a bug if you notice a violation of semantic versioning.
   raising during recursive merge policy checks.
 - `kettle-jem` now normalizes GitHub Actions pins for all existing workflow
   files after templating, including workflows outside the active recipe set.
-- `kettle-jem` no longer persists transient `KJ_REPOSITORY_TOPOLOGY` overrides
-  into reviewed `.structuredmerge/kettle-jem.yml` config files.
 
 ### Security
 

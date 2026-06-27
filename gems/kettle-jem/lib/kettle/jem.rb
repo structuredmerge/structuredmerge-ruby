@@ -248,6 +248,7 @@ module Kettle
     ].freeze
     KETTLE_CONFIG_ENV_SYNC_PATHS = {
       %w[project_emoji] => "KJ_PROJECT_EMOJI",
+      %w[repository topology] => "KJ_REPOSITORY_TOPOLOGY",
       %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
