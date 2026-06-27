@@ -8087,6 +8087,9 @@ RSpec.describe Kettle::Jem do
 
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
       expect(content).to include("rubocop-ruby")
+      expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
+      expect(content).to include("local_gems_to_eval = local_gems - %w[example] - declared_gems")
+      expect(content).to include("gems: local_gems_to_eval")
       expect(content).not_to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
     end

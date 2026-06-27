@@ -110,6 +110,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `RUBOCOP_LTS_LOCAL` templating now switches the local `rubocop-lts/rubocop-lts`
   checkout to the branch matching the selected `rubocop-rubyN_N` wrapper before
   running setup and RuboCop Gradual normalization.
+- Generated RuboCop-LTS local style Gemfiles now exclude the current project
+  package and already-declared gems before adding local family path overrides.
 - Generated funding templates now default missing OpenCollective orgs to
   `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness

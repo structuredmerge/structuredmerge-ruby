@@ -23,11 +23,13 @@ Kernel.send(:gem, "nomono", *nomono_activation_requirements)
 require "nomono/bundler"
 
 local_gems = %w[rubocop-lts rubocop-lts-rspec rubocop-ruby3_2 standard-rubocop-lts]
+declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
+local_gems_to_eval = local_gems - %w[kettle-jem] - declared_gems
 
 # export VENDORED_GEMS=rubocop-lts,rubocop-lts-rspec,rubocop-ruby3_2,standard-rubocop-lts
 platform :mri do
   eval_nomono_gems(
-    gems: local_gems,
+    gems: local_gems_to_eval,
     prefix: "RUBOCOP_LTS",
     path_env: "RUBOCOP_LTS_LOCAL",
     vendored_gems_env: "VENDORED_GEMS",
