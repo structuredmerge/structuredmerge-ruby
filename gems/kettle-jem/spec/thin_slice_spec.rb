@@ -4981,6 +4981,68 @@ RSpec.describe Kettle::Jem do
     )
   end
 
+  it "skips the RuboCop-LTS branch switch when templating the RuboCop-LTS checkout itself" do
+    report = {
+      facts: {
+        templates: {
+          tokens: {
+            "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_2"
+          }
+        }
+      }
+    }
+
+    step = Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+      report,
+      env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"},
+      project_root: "/workspace/rubocop-lts/rubocop-lts"
+    )
+
+    expect(step).to include(
+      name: "rubocop_lts_local_branch",
+      status: "skipped",
+      path: "/workspace/rubocop-lts/rubocop-lts",
+      branch: "r3_2-even-v24",
+      reason: "destination_is_rubocop_lts_checkout"
+    )
+  end
+
+  it "skips the RuboCop-LTS branch switch when the checkout paths differ only by realpath" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubocop-lts-realpath", tmp_root) do |root|
+      local_root = File.join(root, "rubocop-lts")
+      checkout = File.join(local_root, "rubocop-lts")
+      FileUtils.mkdir_p(checkout)
+      alias_path = File.join(root, "rubocop-lts-alias")
+      File.symlink(local_root, alias_path)
+
+      report = {
+        facts: {
+          templates: {
+            tokens: {
+              "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_2"
+            }
+          }
+        }
+      }
+
+      step = Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+        report,
+        env: {"RUBOCOP_LTS_LOCAL" => alias_path},
+        project_root: checkout
+      )
+
+      expect(step).to include(
+        name: "rubocop_lts_local_branch",
+        status: "skipped",
+        path: File.join(alias_path, "rubocop-lts"),
+        branch: "r3_2-even-v24",
+        reason: "destination_is_rubocop_lts_checkout"
+      )
+    end
+  end
+
   it "does not plan a RuboCop-LTS branch switch when local RuboCop-LTS is disabled" do
     report = {
       facts: {

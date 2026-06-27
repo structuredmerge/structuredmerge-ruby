@@ -340,6 +340,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem install` no longer tries to switch the local RuboCop-LTS checkout
+  while templating the RuboCop-LTS checkout itself.
 - Generated style Gemfiles now require `rubocop-ruby3_2` >= 3.0.6 so
   Appraisal/RuboCop tasks do not select damaged packages missing
   packaged RuboCop-LTS configuration files.

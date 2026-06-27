@@ -36,7 +36,7 @@ module Kettle
           install_steps << git_drivers_step(project_root, effective_run_options)
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
-          rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env)
+          rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env, project_root: project_root)
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
           install_steps << rubocop_gradual_autocorrect_step(project_root)
@@ -681,7 +681,7 @@ module Kettle
           ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
         end
 
-        def rubocop_lts_local_branch_step(report, env:)
+        def rubocop_lts_local_branch_step(report, env:, project_root: nil)
           local_root = rubocop_lts_local_root(env)
           return nil unless local_root
 
@@ -692,6 +692,16 @@ module Kettle
           end
 
           checkout = File.join(local_root, "rubocop-lts")
+          if project_root && same_path?(project_root, checkout)
+            return {
+              name: "rubocop_lts_local_branch",
+              status: "skipped",
+              path: checkout,
+              branch: branch,
+              reason: "destination_is_rubocop_lts_checkout"
+            }
+          end
+
           current = current_git_branch(checkout)
           return {
             name: "rubocop_lts_local_branch",
@@ -709,6 +719,12 @@ module Kettle
             branch: branch,
             reason: "rubocop_lts_local_branch_matrix"
           }
+        end
+
+        def same_path?(left, right)
+          File.realpath(left.to_s) == File.realpath(right.to_s)
+        rescue Errno::ENOENT
+          File.expand_path(left.to_s) == File.expand_path(right.to_s)
         end
 
         def rubocop_lts_local_root(env)
