@@ -68,9 +68,9 @@ gem "appraisal2", "~> 3.1", ">= 3.1.1"
 gem "bundler-audit", "~> 0.9.3"
 
 if kettle_rb_dev.casecmp("false").zero?
-  gem "kettle-dev", "~> 2.2", ">= 2.2.3"
+  gem "kettle-dev", "~> 2.2", ">= 2.2.20"
 
-  gem "kettle-family", ">= 0.1.3"
+  gem "kettle-family", ">= 0.1.26"
 
   gem "kettle-test", "~> 2.0", ">= 2.0.6"
 end
