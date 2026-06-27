@@ -11530,6 +11530,43 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "does not persist transient repository topology ENV overrides into reviewed config" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-config-repository-topology-env", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".structuredmerge/kettle-jem.yml" => <<~YAML
+          project_emoji: "🫖"
+          repository:
+            topology: standalone
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .structuredmerge/kettle-jem.yml
+        YAML
+      })
+
+      apply = described_class.apply_project(
+        root,
+        env: {"KJ_REPOSITORY_TOPOLOGY" => "monorepo-subproject"},
+        run_options: {skip_commit: true}
+      )
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".structuredmerge/kettle-jem.yml" }
+      config = YAML.safe_load(report.fetch(:final_content))
+
+      expect(apply.dig(:facts, :repository, :topology)).to eq("monorepo-subproject")
+      expect(config.dig("repository", "topology")).to eq("standalone")
+      expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(report.fetch(:final_content))
+    end
+  end
+
   it "normalizes combined top logo config when Synopsis H2 logos already exist" do
     content = <<~YAML
       readme:
