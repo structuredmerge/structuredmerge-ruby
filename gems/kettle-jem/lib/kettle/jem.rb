@@ -1357,7 +1357,7 @@ module Kettle
       [Gem::Version.new("2.7"), "\"~> 18.4\", \">= 18.4.0\"", "rubocop-ruby2_7", "\"~> 3.0\", \">= 3.0.2\""],
       [Gem::Version.new("3.0"), "\"~> 20.4\", \">= 20.4.0\"", "rubocop-ruby3_0", "\"~> 3.0\", \">= 3.0.2\""],
       [Gem::Version.new("3.1"), "\"~> 22.3\", \">= 22.3.0\"", "rubocop-ruby3_1", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.2\""]
+      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.6\""]
     ].freeze
     FORGE_USER_ENV_KEYS = {
       gh_user: "KJ_GH_USER",

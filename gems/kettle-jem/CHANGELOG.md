@@ -335,6 +335,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated style Gemfiles now require `rubocop-ruby3_2` >= 3.0.6 so
+  Appraisal/RuboCop tasks do not select damaged packages missing
+  packaged RuboCop-LTS configuration files.
 - Gemspec `spec.files` merging now preserves `Dir[...]` glob expansion when
   merging destination glob entries into an array-based template assignment by
   generating concatenated `Dir[...] + [...]` package file expressions.
