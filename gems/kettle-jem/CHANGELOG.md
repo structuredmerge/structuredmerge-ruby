@@ -335,6 +335,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec `spec.files` merging now preserves `Dir[...]` glob expansion when
+  merging destination glob entries into an array-based template assignment by
+  generating concatenated `Dir[...] + [...]` package file expressions.
 - Quiet templating orchestration no longer passes unsupported `--quiet`
   switches to Bundler subcommands such as `bundle binstubs` or `bundle lock`;
   only Bundler subcommands documented with `--quiet` receive that flag.

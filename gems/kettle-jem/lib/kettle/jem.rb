@@ -7067,19 +7067,72 @@ module Kettle
       combined_groups = []
       seen = {}
 
-      [destination_parts.fetch(:groups), merged_parts.fetch(:groups), template_parts.fetch(:groups)].each do |groups|
+      [
+        [destination_parts, destination_parts.fetch(:groups)],
+        [merged_parts, merged_parts.fetch(:groups)],
+        [template_parts, template_parts.fetch(:groups)]
+      ].each do |parts, groups|
         groups.each do |group|
           next if seen[group.fetch(:key)]
 
-          combined_groups << group
+          combined_groups << group.merge(source_collection_kind: parts.fetch(:collection_kind))
           seen[group.fetch(:key)] = true
         end
+      end
+      if gemspec_files_collection_needs_concat?(merged_parts, combined_groups)
+        return gemspec_files_concat_collection_source(merged_parts, combined_groups)
       end
 
       body = combined_groups.each_with_index.map do |group, index|
         gemspec_files_collection_group_source(group, trailing_comma: index < combined_groups.length - 1)
       end.join
       merged_parts.fetch(:opening) + body + merged_parts.fetch(:closing)
+    end
+
+    def gemspec_files_collection_needs_concat?(target_parts, groups)
+      target_parts.fetch(:collection_kind) == :array &&
+        groups.any? do |group|
+          group.fetch(:source_collection_kind) == :dir &&
+            group.fetch(:node).is_a?(::Prism::StringNode)
+        end
+    end
+
+    def gemspec_files_concat_collection_source(target_parts, groups)
+      dir_groups, array_groups = groups.partition do |group|
+        group.fetch(:source_collection_kind) == :dir &&
+          group.fetch(:node).is_a?(::Prism::StringNode)
+      end
+      return gemspec_files_array_collection_source(target_parts, array_groups) if dir_groups.empty?
+      return gemspec_files_dir_collection_source(target_parts, dir_groups) if array_groups.empty?
+
+      [
+        gemspec_files_dir_collection_source(target_parts, dir_groups, closing: "] + [\n"),
+        gemspec_files_collection_body_source(array_groups),
+        target_parts.fetch(:closing)
+      ].join
+    end
+
+    def gemspec_files_dir_collection_source(target_parts, groups, closing: nil)
+      opening = target_parts.fetch(:opening).sub("= [", "= Dir[")
+      [
+        opening,
+        gemspec_files_collection_body_source(groups),
+        closing || target_parts.fetch(:closing)
+      ].join
+    end
+
+    def gemspec_files_array_collection_source(target_parts, groups)
+      [
+        target_parts.fetch(:opening),
+        gemspec_files_collection_body_source(groups),
+        target_parts.fetch(:closing)
+      ].join
+    end
+
+    def gemspec_files_collection_body_source(groups)
+      groups.each_with_index.map do |group, index|
+        gemspec_files_collection_group_source(group, trailing_comma: index < groups.length - 1)
+      end.join
     end
 
     def gemspec_files_collection_group_source(group, trailing_comma:)
@@ -7123,10 +7176,18 @@ module Kettle
       return unless groups
 
       {
+        collection_kind: gemspec_files_collection_kind(value_node),
         opening: lines.first,
         closing: lines.last,
         groups: groups
       }
+    end
+
+    def gemspec_files_collection_kind(value_node)
+      return :dir if gemspec_files_dir_call_node?(value_node)
+      return :array if value_node.is_a?(::Prism::ArrayNode)
+
+      nil
     end
 
     def gemspec_files_collection_element_nodes(value_node)
