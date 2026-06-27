@@ -6824,7 +6824,7 @@ module Kettle
         return content
       end
 
-      replacement = %(#{receiver}.required_ruby_version = ">= #{min_ruby}")
+      replacement = %(#{receiver}.required_ruby_version = ">= #{min_ruby}"#{required_ruby_version_rubocop_disable(min_ruby)})
       existing = gemspec_assignment_records(content, receiver: receiver).find { |record| record.fetch(:field) == "required_ruby_version" }
       return replace_source_range_lines(content, existing.fetch(:start_line), existing.fetch(:end_line), "#{leading_whitespace(existing.fetch(:source))}#{replacement}\n") if existing
 
@@ -6835,6 +6835,14 @@ module Kettle
       return insert_lines_after(content, homepage.fetch(:end_line), "  #{replacement}\n") if homepage
 
       content
+    end
+
+    def required_ruby_version_rubocop_disable(min_ruby)
+      return "" unless Gem::Version.new(min_ruby) < Gem::Version.new("2.0")
+
+      " # rubocop:disable Gemspec/RequiredRubyVersion"
+    rescue ArgumentError
+      ""
     end
 
     def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)

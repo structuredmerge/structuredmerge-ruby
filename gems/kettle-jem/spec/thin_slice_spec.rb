@@ -8960,7 +8960,7 @@ RSpec.describe Kettle::Jem do
       runtime_heads_content = File.read(File.join(root, "gemfiles", "modular", "runtime_heads.gemfile"))
 
       expect(gemspec_content).not_to include("version_gem")
-      expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7"')
+      expect(gemspec_content).to include('spec.required_ruby_version = ">= 1.8.7" # rubocop:disable Gemspec/RequiredRubyVersion')
       expect(apply.fetch(:post_apply_steps)).to include(hash_including(
         name: "version_gem_cleanup",
         status: "applied",
@@ -8976,6 +8976,48 @@ RSpec.describe Kettle::Jem do
       expect(runtime_heads_content).not_to include("version_gem")
       expect(runtime_heads_content).to include('eval_gemfile("x_std_libs/vHEAD.gemfile")')
       expect(File.read(File.join(root, "legacy.gemspec"))).to eq(gemspec_content)
+    end
+  end
+
+  it "does not add the RequiredRubyVersion RuboCop disable for Ruby 2+ runtime floors" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-required-ruby-version-rubocop-disable", tmp_root) do |root|
+      write_tree(root, {
+        "modern.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "modern"
+            spec.version = "0.1.0"
+            spec.summary = "Modern gem"
+            spec.homepage = "https://github.com/acme/modern"
+            spec.required_ruby_version = ">= 1.8.7"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "2.0"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - modern.gemspec
+        YAML
+        "template/modern.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "{KJ|GEM_NAME}"
+            spec.version = "0.0.0"
+            spec.summary = "Template summary"
+            spec.required_ruby_version = ">= 2.3.0"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec_report = apply.fetch(:recipe_reports).find { |report| report.fetch(:recipe_name) == "template_source_application_modern_gemspec" }
+      gemspec_content = gemspec_report.fetch(:final_content)
+
+      expect(gemspec_content).to include('spec.required_ruby_version = ">= 2.0"')
+      expect(gemspec_content).not_to include("Gemspec/RequiredRubyVersion")
     end
   end
 

@@ -343,6 +343,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated gemspecs now add an inline `Gemspec/RequiredRubyVersion` RuboCop
+  disable when the published runtime Ruby floor is below 2.0.
 - `kettle-jem install` no longer tries to switch the local RuboCop-LTS checkout
   while templating the RuboCop-LTS checkout itself.
 - Generated style Gemfiles now require `rubocop-ruby3_2` >= 3.0.6 so
