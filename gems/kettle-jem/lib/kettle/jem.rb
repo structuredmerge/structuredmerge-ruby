@@ -1345,19 +1345,19 @@ module Kettle
     VAR_HOME_PREFIX = %r{\A/var/home(?=/|\z)}
     VAR_HOME_TEXT = %r{/var/home(?=/|\z)}
     RUBOCOP_VERSION_MAP = [
-      [Gem::Version.new("1.8"), "\"~> 0.3\", \">= 0.3.0\"", "rubocop-ruby1_8", "\"~> 2.0\", \">= 2.0.2\""],
-      [Gem::Version.new("1.9"), "\"~> 2.3\", \">= 2.3.0\"", "rubocop-ruby1_9", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.0"), "\"~> 4.2\", \">= 4.2.0\"", "rubocop-ruby2_0", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.1"), "\"~> 6.3\", \">= 6.3.0\"", "rubocop-ruby2_1", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.2"), "\"~> 8.3\", \">= 8.3.0\"", "rubocop-ruby2_2", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.3"), "\"~> 10.3\", \">= 10.3.0\"", "rubocop-ruby2_3", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.4"), "\"~> 12.3\", \">= 12.3.0\"", "rubocop-ruby2_4", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.5"), "\"~> 14.3\", \">= 14.3.0\"", "rubocop-ruby2_5", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.6"), "\"~> 16.3\", \">= 16.3.0\"", "rubocop-ruby2_6", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("2.7"), "\"~> 18.4\", \">= 18.4.0\"", "rubocop-ruby2_7", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("3.0"), "\"~> 20.4\", \">= 20.4.0\"", "rubocop-ruby3_0", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("3.1"), "\"~> 22.3\", \">= 22.3.0\"", "rubocop-ruby3_1", "\"~> 3.0\", \">= 3.0.2\""],
-      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.6\""]
+      [Gem::Version.new("1.8"), "\"~> 0.3\", \">= 0.3.0\"", "rubocop-ruby1_8", "\"~> 2.0\", \">= 2.0.2\"", "r1_8-even-v0"],
+      [Gem::Version.new("1.9"), "\"~> 2.3\", \">= 2.3.0\"", "rubocop-ruby1_9", "\"~> 3.0\", \">= 3.0.2\"", "r1_9-even-v2"],
+      [Gem::Version.new("2.0"), "\"~> 4.2\", \">= 4.2.0\"", "rubocop-ruby2_0", "\"~> 3.0\", \">= 3.0.2\"", "r2_0-even-v4"],
+      [Gem::Version.new("2.1"), "\"~> 6.3\", \">= 6.3.0\"", "rubocop-ruby2_1", "\"~> 3.0\", \">= 3.0.2\"", "r2_1-even-v6"],
+      [Gem::Version.new("2.2"), "\"~> 8.3\", \">= 8.3.0\"", "rubocop-ruby2_2", "\"~> 3.0\", \">= 3.0.2\"", "r2_2-even-v8"],
+      [Gem::Version.new("2.3"), "\"~> 10.3\", \">= 10.3.0\"", "rubocop-ruby2_3", "\"~> 3.0\", \">= 3.0.2\"", "r2_3-even-v10"],
+      [Gem::Version.new("2.4"), "\"~> 12.3\", \">= 12.3.0\"", "rubocop-ruby2_4", "\"~> 3.0\", \">= 3.0.2\"", "r2_4-even-v12"],
+      [Gem::Version.new("2.5"), "\"~> 14.3\", \">= 14.3.0\"", "rubocop-ruby2_5", "\"~> 3.0\", \">= 3.0.2\"", "r2_5-even-v14"],
+      [Gem::Version.new("2.6"), "\"~> 16.3\", \">= 16.3.0\"", "rubocop-ruby2_6", "\"~> 3.0\", \">= 3.0.2\"", "r2_6-even-v16"],
+      [Gem::Version.new("2.7"), "\"~> 18.4\", \">= 18.4.0\"", "rubocop-ruby2_7", "\"~> 3.0\", \">= 3.0.2\"", "r2_7-even-v18"],
+      [Gem::Version.new("3.0"), "\"~> 20.4\", \">= 20.4.0\"", "rubocop-ruby3_0", "\"~> 3.0\", \">= 3.0.2\"", "r3_0-even-v20"],
+      [Gem::Version.new("3.1"), "\"~> 22.3\", \">= 22.3.0\"", "rubocop-ruby3_1", "\"~> 3.0\", \">= 3.0.2\"", "r3_1-even-v22"],
+      [Gem::Version.new("3.2"), "\"~> 24.2\", \">= 24.2.0\"", "rubocop-ruby3_2", "\"~> 3.0\", \">= 3.0.6\"", "r3_2-even-v24"]
     ].freeze
     FORGE_USER_ENV_KEYS = {
       gh_user: "KJ_GH_USER",
@@ -11076,7 +11076,7 @@ module Kettle
     def rubocop_tokens_for(min_ruby)
       fallback = RUBOCOP_VERSION_MAP.first
       selected = nil
-      RUBOCOP_VERSION_MAP.reverse_each do |minimum, lts_constraint, ruby_gem, ruby_constraint|
+      RUBOCOP_VERSION_MAP.reverse_each do |minimum, lts_constraint, ruby_gem, ruby_constraint, _branch|
         next unless min_ruby && min_ruby >= minimum
 
         selected = [minimum, lts_constraint, ruby_gem, ruby_constraint]
@@ -11084,6 +11084,11 @@ module Kettle
       end
       selected ||= fallback
       [selected[1], selected[2], selected[3]]
+    end
+
+    def rubocop_lts_branch_for_gem(gem_name)
+      entry = RUBOCOP_VERSION_MAP.find { |_minimum, _lts_constraint, ruby_gem, _ruby_constraint, _branch| ruby_gem == gem_name.to_s }
+      entry && entry[4]
     end
 
     def min_ruby_version(requirement)

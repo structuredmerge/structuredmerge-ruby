@@ -107,6 +107,9 @@ Please file a bug if you notice a violation of semantic versioning.
   and before the bootstrap commit when the destination project provides
   `bin/rake`, so project-local Ruby syntax floors can normalize generated
   files.
+- `RUBOCOP_LTS_LOCAL` templating now switches the local `rubocop-lts/rubocop-lts`
+  checkout to the branch matching the selected `rubocop-rubyN_N` wrapper before
+  running setup and RuboCop Gradual normalization.
 - Generated funding templates now default missing OpenCollective orgs to
   `galtzo-floss` and warn when that fallback differs from the GitHub org.
 - Shim gemspec templates now include the kettle-dev release/test harness

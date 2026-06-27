@@ -4926,6 +4926,133 @@ RSpec.describe Kettle::Jem do
     expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("custom")).to eq("custom")
   end
 
+  it "plans a RuboCop-LTS branch switch for local RuboCop-LTS templating" do
+    report = {
+      facts: {
+        templates: {
+          tokens: {
+            "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby2_4"
+          }
+        }
+      }
+    }
+
+    allow(Kettle::Jem::Tasks::InstallTask).to receive(:current_git_branch).and_return("r1_8-even-v0")
+
+    step = Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+      report,
+      env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"}
+    )
+
+    expect(step).to include(
+      name: "rubocop_lts_local_branch",
+      command: ["git", "-C", "/workspace/rubocop-lts/rubocop-lts", "switch", "r2_4-even-v12"],
+      status: "ready",
+      path: "/workspace/rubocop-lts/rubocop-lts",
+      current_branch: "r1_8-even-v0",
+      branch: "r2_4-even-v12",
+      reason: "rubocop_lts_local_branch_matrix"
+    )
+  end
+
+  it "skips the RuboCop-LTS branch switch when the local checkout is already on the matrix branch" do
+    report = {
+      facts: {
+        templates: {
+          tokens: {
+            "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby2_4"
+          }
+        }
+      }
+    }
+
+    allow(Kettle::Jem::Tasks::InstallTask).to receive(:current_git_branch).and_return("r2_4-even-v12")
+
+    step = Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+      report,
+      env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"}
+    )
+
+    expect(step).to include(
+      name: "rubocop_lts_local_branch",
+      status: "already_current",
+      path: "/workspace/rubocop-lts/rubocop-lts",
+      branch: "r2_4-even-v12"
+    )
+  end
+
+  it "does not plan a RuboCop-LTS branch switch when local RuboCop-LTS is disabled" do
+    report = {
+      facts: {
+        templates: {
+          tokens: {
+            "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby2_4"
+          }
+        }
+      }
+    }
+
+    expect(Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+      report,
+      env: {"RUBOCOP_LTS_LOCAL" => "off"}
+    )).to be_nil
+  end
+
+  it "fails local RuboCop-LTS branch planning when the selected wrapper is unknown" do
+    report = {
+      facts: {
+        templates: {
+          tokens: {
+            "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby9_9"
+          }
+        }
+      }
+    }
+
+    expect {
+      Kettle::Jem::Tasks::InstallTask.rubocop_lts_local_branch_step(
+        report,
+        env: {"RUBOCOP_LTS_LOCAL" => "/workspace/rubocop-lts"}
+      )
+    }.to raise_error(Kettle::Jem::Error, /Cannot select RUBOCOP_LTS_LOCAL branch/)
+  end
+
+  it "executes the RuboCop-LTS branch switch before later orchestration commands" do
+    commands = []
+    command_runner = lambda do |command, **|
+      commands << command
+      {success: true, exitstatus: 0, stdout: "", stderr: ""}
+    end
+
+    result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+      [
+        {
+          name: "rubocop_lts_local_branch",
+          command: ["git", "-C", "/workspace/rubocop-lts/rubocop-lts", "switch", "r2_4-even-v12"],
+          status: "ready"
+        },
+        {
+          name: "rubocop_gradual_autocorrect",
+          command: ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"],
+          status: "ready"
+        }
+      ],
+      project_root: "/project",
+      env: {},
+      run_options: {},
+      command_runner: command_runner
+    )
+
+    expect(result).to include(
+      hash_including(name: "rubocop_lts_local_branch", status: "succeeded"),
+      hash_including(name: "rubocop_gradual_autocorrect", status: "succeeded")
+    )
+    expect(commands).to eq([
+      ["git", "-C", "/workspace/rubocop-lts/rubocop-lts", "switch", "r2_4-even-v12"],
+      ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+    ])
+  end
+
   it "writes managed .gitattributes and local config for local semantic Git driver setup" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

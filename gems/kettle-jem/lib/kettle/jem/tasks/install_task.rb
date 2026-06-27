@@ -36,6 +36,8 @@ module Kettle
           install_steps << git_drivers_step(project_root, effective_run_options)
           install_steps << ensure_bin_setup_executable(project_root)
           setup_env = setup_command_env(project_root, env)
+          rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env)
+          install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
           install_steps << rubocop_gradual_autocorrect_step(project_root)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
@@ -179,6 +181,7 @@ module Kettle
               curated_binstubs_executable
               bundle_binstub_pruning
               bundle_binstub_location_validation
+              rubocop_lts_local_branch
               rubocop_gradual_autocorrect
               bundle_lock_normalization
             ],
@@ -678,6 +681,52 @@ module Kettle
           ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
         end
 
+        def rubocop_lts_local_branch_step(report, env:)
+          local_root = rubocop_lts_local_root(env)
+          return nil unless local_root
+
+          ruby_gem = report.dig(:facts, :templates, :tokens, "KJ|RUBOCOP_RUBY_GEM").to_s
+          branch = Kettle::Jem.rubocop_lts_branch_for_gem(ruby_gem)
+          unless branch
+            raise Kettle::Jem::Error, "Cannot select RUBOCOP_LTS_LOCAL branch for #{ruby_gem.inspect}"
+          end
+
+          checkout = File.join(local_root, "rubocop-lts")
+          current = current_git_branch(checkout)
+          return {
+            name: "rubocop_lts_local_branch",
+            status: "already_current",
+            path: checkout,
+            branch: branch
+          } if current == branch
+
+          {
+            name: "rubocop_lts_local_branch",
+            command: %W[git -C #{checkout} switch #{branch}],
+            status: "ready",
+            path: checkout,
+            current_branch: current,
+            branch: branch,
+            reason: "rubocop_lts_local_branch_matrix"
+          }
+        end
+
+        def rubocop_lts_local_root(env)
+          value = (env || {})["RUBOCOP_LTS_LOCAL"].to_s.strip
+          return nil if value.empty? || Kettle::Jem::DecisionPolicy.falsey?(value)
+          return File.join((env || {})["HOME"].to_s.empty? ? Dir.home : (env || {})["HOME"].to_s, "src", "rubocop-lts") if value.casecmp("true").zero? || value == "1" || value.casecmp("yes").zero? || value.casecmp("on").zero?
+          return value if value.start_with?("/")
+
+          File.join((env || {})["HOME"].to_s.empty? ? Dir.home : (env || {})["HOME"].to_s, value)
+        end
+
+        def current_git_branch(path)
+          stdout, _stderr, status = Open3.capture3("git", "-C", path.to_s, "branch", "--show-current")
+          return "" unless status.success?
+
+          stdout.to_s.strip
+        end
+
         def normal_lockfile_env(project_root, env)
           command_env = (env || {}).to_h.dup
           command_env["K_JEM_TEMPLATING"] = "false"
@@ -911,6 +960,8 @@ module Kettle
             when "bundled_handoff"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundle_lock_normalization"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_gradual_autocorrect"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
