@@ -71,6 +71,8 @@ Please file a bug if you notice a violation of semantic versioning.
   trailing commas through its synthetic parser fallback.
 - `prism-merge` now treats empty Ruby block bodies as non-mergeable instead of
   raising during recursive merge policy checks.
+- `kettle-jem` now normalizes GitHub Actions pins for all existing workflow
+  files after templating, including workflows outside the active recipe set.
 
 ### Security
 

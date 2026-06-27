@@ -3509,8 +3509,28 @@ module Kettle
       [
         template_version_gem_bootstrap_step(project_root, report),
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
+        github_actions_pin_sync_step(project_root),
         monorepo_subgem_kettle_config_profile_sync_step(project_root, report)
       ].compact
+    end
+
+    def github_actions_pin_sync_step(project_root)
+      workflow_root = File.join(project_root.to_s, ".github", "workflows")
+      return unless File.directory?(workflow_root)
+
+      changed_files = Dir[File.join(workflow_root, "*.{yml,yaml}")].sort.filter_map do |path|
+        before = File.read(path)
+        after = update_github_actions_pins(before)
+        next if after == before
+
+        File.write(path, after)
+        path.delete_prefix("#{project_root}/")
+      end
+      {
+        name: "github_actions_pin_sync",
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files
+      }
     end
 
     def monorepo_subgem_kettle_config_profile_sync_step(project_root, report)

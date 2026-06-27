@@ -831,6 +831,50 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "normalizes GitHub Action refs in existing workflows outside the active recipe set" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-unmanaged-workflow-action-pin-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 2.4"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          repository:
+            topology: monorepo-subproject
+        YAML
+        ".github/workflows/current.yml" => <<~YAML
+          name: Current MRI
+          jobs:
+            test:
+              runs-on: ubuntu-latest
+              steps:
+                - name: Checkout
+                  uses: actions/checkout@v6
+                - name: Setup Ruby
+                  uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      content = File.read(File.join(root, ".github/workflows/current.yml"))
+      post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "github_actions_pin_sync" }
+
+      expect(post_step).to include(
+        status: "applied",
+        changed_files: [".github/workflows/current.yml"]
+      )
+      expect_pinned_action(content, "actions/checkout")
+      expect_pinned_action(content, "ruby/setup-ruby")
+      expect(content).not_to include("actions/checkout@v6")
+      expect(content).not_to include("ruby/setup-ruby@v1")
+    end
+  end
+
   it "deletes skipped packaged workflows that already exist" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
