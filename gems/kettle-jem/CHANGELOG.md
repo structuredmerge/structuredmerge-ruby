@@ -343,6 +343,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- README template merging no longer duplicates preserved destination-only
+  subsections when they are already inside another preserved destination
+  section.
 - Generated gemspecs now add an inline `Gemspec/RequiredRubyVersion` RuboCop
   disable when the published runtime Ruby floor is below 2.0.
 - `kettle-jem install` no longer tries to switch the local RuboCop-LTS checkout

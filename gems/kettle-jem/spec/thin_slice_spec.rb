@@ -6512,6 +6512,55 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "does not duplicate destination-only README sections already inside a preserved parent section" do
+    template = <<~MARKDOWN
+      # Example
+
+      ## 🌻 Synopsis
+
+      Template synopsis.
+
+      ## 💡 Info
+
+      Template info.
+    MARKDOWN
+    destination = <<~MARKDOWN
+      # Example
+
+      ## Synopsis
+
+      Destination synopsis.
+
+      ### This README
+
+      This README has two jobs.
+
+      ## 💡 Info
+
+      Destination info.
+    MARKDOWN
+    preserve_config = {sections: ["synopsis", "this readme"]}
+
+    once = described_class.send(
+      :merge_readme_template,
+      template_content: template,
+      destination_content: destination,
+      preserve_config: preserve_config
+    )
+    twice = described_class.send(
+      :merge_readme_template,
+      template_content: template,
+      destination_content: once,
+      preserve_config: preserve_config
+    )
+
+    expect(once.scan(/^### This README$/).length).to eq(1)
+    expect(twice.scan(/^### This README$/).length).to eq(1)
+    expect(twice).to include(
+      "## 🌻 Synopsis\n\nDestination synopsis.\n\n### This README\n\nThis README has two jobs."
+    )
+  end
+
   it "preserves a front Important section that encloses the README badge cloud" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

@@ -11653,12 +11653,13 @@ module Kettle
     end
 
     def readme_extra_preserved_sections_by_anchor(destination_sections, template_bases, preserve_targets)
-      destination_sections.each_with_object({}) do |section, result|
+      destination_sections.each_with_index.each_with_object({}) do |(section, index), result|
         base = section.fetch(:base)
         next if template_bases.include?(base)
         next unless preserve_targets.include?(base)
+        next if readme_section_has_preserved_ancestor?(destination_sections, index, preserve_targets)
 
-        anchor = destination_sections[0...destination_sections.index(section)].reverse.find do |candidate|
+        anchor = destination_sections[0...index].reverse.find do |candidate|
           template_bases.include?(candidate.fetch(:base))
         end
         next unless anchor
@@ -11666,6 +11667,17 @@ module Kettle
         result[anchor.fetch(:base)] ||= []
         result[anchor.fetch(:base)] << section
       end
+    end
+
+    def readme_section_has_preserved_ancestor?(sections, index, preserve_targets)
+      section = sections.fetch(index)
+      section_level = section.fetch(:level).to_i
+      sections[0...index].reverse_each do |candidate|
+        next unless candidate.fetch(:level).to_i < section_level
+
+        return preserve_targets.include?(candidate.fetch(:base))
+      end
+      false
     end
 
     def preserve_readme_h1(merged_content, destination_content, preserve_config)
