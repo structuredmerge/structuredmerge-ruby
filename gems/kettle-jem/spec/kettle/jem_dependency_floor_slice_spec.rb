@@ -90,6 +90,14 @@ RSpec.describe Kettle::Jem do
           "kettle-jem.gemspec"
         ]
       },
+      "rbs" => {
+        declaration_names: ["rbs"],
+        requirement_args: %(">= 3.10"),
+        lock_version: "4.0.3",
+        requirement_surfaces: [
+          "kettle-jem.gemspec"
+        ]
+      },
       "version_gem" => {
         declaration_names: ["version_gem"],
         requirement_args: %("~> 1.1", ">= 1.1.13"),
