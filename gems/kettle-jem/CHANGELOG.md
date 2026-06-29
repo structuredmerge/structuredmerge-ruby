@@ -90,6 +90,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Root Gemfile templating now evaluates the paired modular Gemfile for direct
   runtime dependencies handled by `*_local.gemfile` overrides, preserving
   released-vs-local switching after `accept_template` Gemfile rewrites.
+- Root Gemfile templating now recognizes `eval_nomono_gems(gems: local_gems)`
+  declarations in `*_local.gemfile` files before deciding whether a runtime
+  dependency is already handled by paired modular local wiring.
 - Local GitHub remotes now override generated gemspec `source_code_uri` tag URLs
   when deriving repository owner tokens, preventing stale homepage metadata from
   corrupting README logos and local sibling workspace env names.

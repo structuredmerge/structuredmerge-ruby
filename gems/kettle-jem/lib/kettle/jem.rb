@@ -4433,7 +4433,46 @@ module Kettle
     end
 
     def gemfile_dependency_names(content)
-      gemfile_gem_call_records(content).map { |record| record.fetch(:name) }
+      gemfile_gem_call_records(content).map { |record| record.fetch(:name) } + gemfile_nomono_dependency_names(content)
+    end
+
+    def gemfile_nomono_dependency_names(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      word_arrays_by_local = ruby_local_word_array_assignments(result.value)
+      ruby_call_records(content, :eval_nomono_gems).flat_map do |call|
+        ruby_static_string_array_value(ruby_keyword_argument_node(call, :gems), word_arrays_by_local)
+      end.uniq
+    end
+
+    def ruby_local_word_array_assignments(root)
+      root.breadth_first_search_all do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && ruby_word_array_node?(node.value)
+      end.to_h do |node|
+        [node.name.to_s, ruby_word_array_names(node.value)]
+      end
+    end
+
+    def ruby_static_string_array_value(node, local_word_arrays = {})
+      case node
+      when ::Prism::ArrayNode
+        return ruby_word_array_names(node) if ruby_word_array_node?(node)
+
+        node.elements.map { |element| ruby_static_string_value(element) }
+      when ::Prism::LocalVariableReadNode
+        local_word_arrays.fetch(node.name.to_s, [])
+      else
+        []
+      end.compact
+    end
+
+    def ruby_keyword_argument_node(call, key)
+      keyword_hash = Array(call&.arguments&.arguments).find { |argument| argument.is_a?(::Prism::KeywordHashNode) }
+      assoc = keyword_hash&.elements&.find do |element|
+        element.respond_to?(:key) && element.key.respond_to?(:unescaped) && element.key.unescaped == key.to_s
+      end
+      assoc&.value
     end
 
     def appraisal_names(content)
@@ -10159,10 +10198,7 @@ module Kettle
       runtime_names = gemspec_runtime_dependency_names(gemspec_metadata) - [package_name.to_s]
       return {} if runtime_names.empty?
 
-      sibling_root = File.expand_path("..", project_root.to_s)
       runtime_names.each_with_object({}) do |gem_name, paths_by_gem|
-        next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, gem_name), gem_name)
-
         paths = local_modular_eval_paths_for_gem(project_root, gem_name)
         paths_by_gem[gem_name] = paths if paths.any?
       end

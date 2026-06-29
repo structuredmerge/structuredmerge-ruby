@@ -13944,4 +13944,66 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).to include(%(eval_gemfile "gemfiles/modular/ur_brain.gemfile"))
     end
   end
+
+  it "preserves local modular runtime wiring declared through nomono local gem lists" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono-local-modular-sibling", tmp_root) do |workspace|
+      root = File.join(workspace, "ur_brain-mcp")
+      FileUtils.mkdir_p(root)
+      write_tree(root, {
+        "ur_brain-mcp.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "ur_brain-mcp"
+            spec.version = "0.1.0"
+            spec.summary = "MCP adapter"
+            spec.homepage = "https://github.com/ur-brain/ur_brain-adapters-ruby"
+            spec.metadata["source_code_uri"] = "https://github.com/ur-brain/ur_brain-adapters-ruby"
+            spec.add_dependency "ur_brain", "~> 0.1"
+          end
+        RUBY
+        "gemfiles/modular/ur_brain_local.gemfile" => <<~RUBY,
+          require "nomono/bundler" unless defined?(Nomono)
+
+          local_gems = %w[ur_brain]
+
+          eval_nomono_gems(
+            gems: local_gems,
+            prefix: "UR_BRAIN",
+            path_env: "UR_BRAIN_DEV",
+            vendored_gems_env: "VENDORED_GEMS",
+            vendor_gem_dir_env: "VENDOR_GEM_DIR",
+            debug_env: "KETTLE_DEV_DEBUG",
+            root: %w[src my ur-brain]
+          )
+        RUBY
+        "gemfiles/modular/ur_brain.gemfile" => <<~RUBY,
+          if ENV.fetch("UR_BRAIN_DEV", "false").casecmp("false").zero?
+            gem "ur_brain", "~> 0.1"
+          else
+            eval_gemfile "ur_brain_local.gemfile"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile).not_to include("# Direct sibling dependencies")
+      expect(gemfile).not_to include("direct_sibling_gems")
+      expect(gemfile).to include(%(eval_gemfile "gemfiles/modular/ur_brain.gemfile"))
+    end
+  end
 end
