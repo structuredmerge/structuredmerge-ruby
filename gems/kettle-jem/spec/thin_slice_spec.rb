@@ -11357,7 +11357,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "adds configured named license files even when templates.entries only lists LICENSE.md" do
+  it "packages configured named license files in the generated gemspec" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-configured-license-entry-slice", tmp_root) do |root|
@@ -11374,24 +11374,20 @@ RSpec.describe Kettle::Jem do
         ".kettle-jem.yml" => <<~YAML
           licenses:
             - MIT
+          tokens:
+            author:
+              orcid: "0000-0000-0000-0000"
           templates:
             root: packaged
             apply: true
-            entries:
-              - source: gem.gemspec
-                target: example.gemspec
-              - LICENSE.md
         YAML
       })
 
       apply = described_class.apply_project(root, env: {})
       recipe_names = apply[:recipe_reports].map { |report| report.fetch(:recipe_name) }
 
-      expect(recipe_names).to include("template_source_application_LICENSE_md")
-      expect(recipe_names).to include("template_source_application_MIT_md")
-      expect(apply[:changed_files]).to include("LICENSE.md", "MIT.md")
-      expect(File).to exist(File.join(root, "LICENSE.md"))
-      expect(File).to exist(File.join(root, "MIT.md"))
+      expect(recipe_names).to include("template_source_application_example_gemspec")
+      expect(apply[:changed_files]).to include("example.gemspec")
       gemspec = File.read(File.join(root, "example.gemspec"))
       expect(gemspec).to include('"LICENSE.md"')
       expect(gemspec).to include('"MIT.md"')

@@ -11868,7 +11868,7 @@ module Kettle
       return [] unless templates.is_a?(Hash)
 
       root = template_root(project_root, templates)
-      entries = template_entries(project_root, root, templates, config)
+      entries = template_entries(project_root, root, templates)
       return [] if entries.empty?
 
       apply_templates = templates["apply"] == true
@@ -11928,29 +11928,11 @@ module Kettle
       config["tokens"].is_a?(Hash)
     end
 
-    def template_entries(project_root, root, templates, config)
-      return configured_template_entries_with_license_files(templates["entries"], config) if templates["entries"].is_a?(Array)
+    def template_entries(project_root, root, templates)
+      return templates["entries"] if templates["entries"].is_a?(Array)
       return [] if templates.key?("entries")
 
       template_inventory_entries(project_root, root.fetch(:path), templates: templates)
-    end
-
-    def configured_template_entries_with_license_files(entries, templates)
-      configured_entries = entries.dup
-      active_license_basenames(templates).sort.each do |basename|
-        license_path = "#{basename}.md"
-        next if configured_template_entry_targets(configured_entries).include?(license_path)
-
-        configured_entries << license_path
-      end
-      configured_entries
-    end
-
-    def configured_template_entry_targets(entries)
-      entries.map do |entry|
-        _source_path, target_path = template_entry_paths(entry)
-        target_path
-      end.to_set
     end
 
     def shim_template_entries(facts, config)
@@ -12309,9 +12291,7 @@ module Kettle
     end
 
     def active_license_basenames(config)
-      licenses = Array(config["resolved_licenses"])
-      licenses = Array(config["licenses"]) if licenses.empty?
-      licenses
+      Array(config["resolved_licenses"])
         .map { |license| spdx_basename(license) }
         .reject(&:empty?)
         .to_set
