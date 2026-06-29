@@ -11395,6 +11395,47 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "packages multiple configured named license files in the generated gemspec" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-configured-multi-license-entry-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.licenses = ["MIT"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          licenses:
+            - AGPL-3.0-only
+            - LicenseRef-Big-Time-Public-License
+          tokens:
+            author:
+              orcid: "0000-0000-0000-0000"
+          templates:
+            root: packaged
+            apply: true
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      recipe_names = apply[:recipe_reports].map { |report| report.fetch(:recipe_name) }
+
+      expect(recipe_names).to include("template_source_application_example_gemspec")
+      expect(apply[:changed_files]).to include("example.gemspec")
+      gemspec = File.read(File.join(root, "example.gemspec"))
+      expect(gemspec).to include('"LICENSE.md"')
+      expect(gemspec).to include('"AGPL-3.0-only.md"')
+      expect(gemspec).to include('"Big-Time-Public-License.md"')
+      expect(gemspec.index('"AGPL-3.0-only.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
+      expect(gemspec.index('"Big-Time-Public-License.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
+    end
+  end
+
   it "projects copyright holders from git blame into license templates" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
