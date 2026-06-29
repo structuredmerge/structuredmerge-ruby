@@ -348,6 +348,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec templating no longer preserves frozen `spec.files` override blocks;
+  `spec.files` is structurally merged so stale frozen package lists cannot
+  replace the merged package payload.
 - README template merging no longer duplicates preserved destination-only
   subsections when they are already inside another preserved destination
   section.

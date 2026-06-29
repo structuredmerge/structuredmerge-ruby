@@ -11984,6 +11984,70 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "merges recursive config package files without preserving stale frozen files overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-recursive-config", tmp_root) do |root|
+      write_tree(root, {
+        "standard-rubocop-lts.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "standard-rubocop-lts"
+            spec.files = Dir[
+              "config/**/*.yml",
+              "lib/**/*.rb",
+              "README.md"
+            ]
+
+            # kettle-jem:freeze
+            spec.files = Dir[
+              "config/*.yml",
+              "lib/**/*.rb",
+              "README.md"
+            ]
+            # kettle-jem:unfreeze
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - standard-rubocop-lts.gemspec
+        YAML
+        "template/standard-rubocop-lts.gemspec.example" => <<~RUBY
+          Gem::Specification.new do |spec|
+            enumerate_package_files = lambda do |root|
+              Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+                File.file?(path) && ![".", ".."].include?(File.basename(path))
+              end
+            end
+
+            spec.name = "standard-rubocop-lts"
+            spec.files = [
+              *enumerate_package_files.call("lib"),
+              *enumerate_package_files.call("exe"),
+              *enumerate_package_files.call("certs"),
+              *enumerate_package_files.call("sig")
+            ]
+          end
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_standard_rubocop_lts_gemspec"
+      end
+      final_content = template_report.fetch(:final_content)
+
+      expect(Prism.parse(final_content)).to be_success
+      expect(final_content.scan(/^\s*spec\.files\s*=/).size).to eq(1)
+      expect(final_content).to include('"config/**/*.yml"')
+      expect(final_content).to include('*enumerate_package_files.call("lib")')
+      expect(final_content).not_to include("# kettle-jem:freeze")
+      expect(final_content).not_to include('"config/*.yml"')
+    end
+  end
+
   it "unions literal Dir gemspec files assignments from destination and template" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

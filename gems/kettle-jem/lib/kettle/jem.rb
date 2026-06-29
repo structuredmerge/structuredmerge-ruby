@@ -7285,6 +7285,7 @@ module Kettle
 
       merged = content.to_s
       blocks.each do |block|
+        next if gemspec_freeze_block_structurally_managed?(block, receiver: receiver)
         next if merged.include?(block.join)
 
         insertion = "\n#{block.join}\n"
@@ -7296,6 +7297,12 @@ module Kettle
         end
       end
       ensure_trailing_newline(merged.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def gemspec_freeze_block_structurally_managed?(block, receiver:)
+      gemspec_assignment_records(block.join, receiver: receiver).any? { |record| record.fetch(:field) == "files" }
+    rescue Ast::Crispr::Error, Prism::ParseError
+      false
     end
 
     def freeze_marker_blocks(content, freeze_token: nil)
