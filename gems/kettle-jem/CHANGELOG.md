@@ -344,6 +344,7 @@ Please file a bug if you notice a violation of semantic versioning.
   constraints for every supported Ruby floor.
 - Generated style Gemfiles now treat style dependency floors as latest-Ruby
   task dependencies, independent from the gemspec runtime Ruby floor.
+- kettle-jem now requires `kettle-rb` >= 0.1.1.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 2.0.1.
 - Generated documentation Gemfiles now require `yaml-converter` >= 0.2.1
   while allowing the released 0.2 line.
