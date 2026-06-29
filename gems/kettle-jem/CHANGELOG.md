@@ -364,6 +364,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Generated root Gemfiles no longer path-wire direct sibling dependencies from
   stale sibling directories whose gemspec defines a different gem name.
+- Generated root Gemfiles now remove previously generated direct sibling wiring
+  when the current sibling directory no longer defines the dependency gem.
+- Generated RuboCop configs now activate the `rubocop-rspec` plugin for the
+  packaged RSpec RuboCop overlay.
 - Gemspec `spec.files` merging now supports the generated `Dir[...] + [...]`
   assignment shape on subsequent template runs instead of rejecting it as
   unsupported.

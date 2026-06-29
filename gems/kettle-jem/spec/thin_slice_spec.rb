@@ -2740,6 +2740,42 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "activates the RSpec RuboCop plugin when templating the RSpec RuboCop overlay" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rubocop-rspec-plugin", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .rubocop.yml
+        YAML
+        ".rubocop.yml" => <<~YAML
+          inherit_gem:
+            rubocop-lts: config/rubygem_rspec.yml
+          plugins:
+            - rubocop-on-rbs
+            - rubocop-packaging
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".rubocop.yml" }
+      config = YAML.safe_load(report.fetch(:final_content))
+
+      expect(config.fetch("plugins")).to include("rubocop-rspec", "rubocop-on-rbs", "rubocop-packaging")
+      expect(File.read(File.join(root, ".rubocop.yml"))).to eq(report.fetch(:final_content))
+    end
+  end
+
   it "seeds bootstrap config licenses from the gemspec" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -13732,6 +13768,38 @@ RSpec.describe Kettle::Jem do
             spec.add_dependency "version_gem", ">= 1"
           end
         RUBY
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+
+          nomono_requirements = ["~> 1.0", ">= 1.0.6"]
+          gem "nomono", *nomono_requirements, require: false
+
+          # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
+          direct_sibling_gems = %w[
+            rack-openid
+          ]
+          direct_sibling_dev = ENV.fetch("RUBY_OPENID_DEV", "")
+          direct_sibling_local =
+            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          if direct_sibling_gems.any? &&
+              (direct_sibling_local ||
+                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+            require "nomono/bundler"
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "RUBY_OPENID",
+              path_env: "RUBY_OPENID_DEV",
+              root: ["src", "my", "ruby-openid"]
+            )
+          end
+
+          # Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
           templates:
@@ -13750,6 +13818,7 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(gemfile).not_to include("# Direct sibling dependencies")
+      expect(gemfile).not_to include("direct_sibling_gems")
       expect(gemfile).not_to include("rack-openid")
     end
   end

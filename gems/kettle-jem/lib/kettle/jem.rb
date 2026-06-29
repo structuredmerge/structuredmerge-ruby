@@ -4569,7 +4569,8 @@ module Kettle
     end
 
     def finalize_rubocop_config(content)
-      remove_yaml_scalar_path(content, %w[AllCops TargetRubyVersion])
+      finalized = remove_yaml_scalar_path(content, %w[AllCops TargetRubyVersion])
+      ensure_yaml_top_level_sequence_items(finalized, "plugins", ["rubocop-rspec"])
     end
 
     def finalize_accepted_template_source(recipe, content, destination_content, facts:, project_root: nil)
@@ -5140,12 +5141,52 @@ module Kettle
       )
       if recipe.fetch(:target_path).to_s == "Gemfile"
         output = inject_main_gemfile_recording_eval(output, facts)
+        output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
       merge_local_gem_overrides(output, destination_content, facts: facts, template_content: template_content)
+    end
+
+    def remove_stale_main_gemfile_direct_sibling_block(content, template_content)
+      return content if template_content.to_s.include?("direct_sibling_gems = %w[")
+
+      records = main_gemfile_direct_sibling_records(content)
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
+    end
+
+    def main_gemfile_direct_sibling_records(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      assignments = body.select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :direct_sibling_gems
+      end
+      return [] if assignments.empty?
+
+      lines = content.to_s.lines
+      assignments.filter_map do |assignment|
+        block_if = body.find do |node|
+          node.is_a?(::Prism::IfNode) &&
+            node.location.start_line > assignment.location.end_line &&
+            prism_subtree_contains_call?(node, :eval_nomono_gems)
+        end
+        next unless block_if
+
+        start_line = assignment.location.start_line
+        previous = lines[start_line - 2].to_s
+        start_line -= 1 if previous.strip.start_with?("# Direct sibling dependencies")
+        {start_line: start_line, end_line: block_if.location.end_line}
+      end
     end
 
     def guard_main_gemfile_runtime_workspace_overrides(content)
@@ -8130,6 +8171,39 @@ module Kettle
         line_index = entry.fetch(:line)
         return ensure_trailing_newline(lines.each_with_index.reject { |_line, index| index == line_index }.map(&:first).join)
       end
+      content
+    end
+
+    def ensure_yaml_top_level_sequence_items(content, key, items)
+      document = Psych.parse_stream(content.to_s).children.first
+      root = document&.root
+      return content unless root.is_a?(Psych::Nodes::Mapping)
+
+      key_node, value_node = root.children.each_slice(2).find do |candidate_key, _candidate_value|
+        candidate_key.is_a?(Psych::Nodes::Scalar) && candidate_key.value.to_s == key.to_s
+      end
+      lines = content.to_s.lines
+      unless key_node
+        lines << "\n" unless lines.empty? || lines.last.strip.empty?
+        lines << "#{key}:\n"
+        items.each { |item| lines << "  - #{item}\n" }
+        return lines.join
+      end
+      return content unless value_node.is_a?(Psych::Nodes::Sequence)
+
+      existing = value_node.children.filter_map do |child|
+        child.value.to_s if child.is_a?(Psych::Nodes::Scalar)
+      end
+      missing = items.map(&:to_s) - existing
+      return content if missing.empty?
+
+      reference_line = value_node.children.last&.start_line || key_node.start_line
+      reference = lines[reference_line].to_s
+      indent = reference.start_with?("-") ? "" : reference[/\A\s*/].to_s
+      insertion_index = value_node.children.last ? value_node.children.last.end_line + 1 : key_node.end_line + 1
+      lines.insert(insertion_index, *missing.map { |item| "#{indent}- #{item}\n" })
+      lines.join
+    rescue Psych::Exception
       content
     end
 
