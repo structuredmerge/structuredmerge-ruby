@@ -10102,7 +10102,13 @@ module Kettle
       run_timestamp = Time.now
       configured_project_emoji = preferred_template_token_value(nil, config["project_emoji"], env, "KJ_PROJECT_EMOJI")
       yard_host = project_yard_host(config, env, package_name: package_name, author_domain: author_domain)
-      direct_sibling_gems = direct_sibling_runtime_gems(project_root, gemspec_metadata, package_name: package_name)
+      local_modular_eval_paths = local_modular_runtime_eval_paths(project_root, gemspec_metadata, package_name: package_name)
+      direct_sibling_gems = direct_sibling_runtime_gems(
+        project_root,
+        gemspec_metadata,
+        package_name: package_name,
+        local_modular_eval_paths: local_modular_eval_paths
+      )
       compact_hash(
         freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
         kettle_jem_version: VERSION,
@@ -10123,12 +10129,13 @@ module Kettle
         main_gemfile_direct_sibling_block: main_gemfile_direct_sibling_block(
           direct_sibling_gems,
           source_url: source_url,
-          project_root: project_root
+          project_root: project_root,
+          local_modular_eval_paths: local_modular_eval_paths.values.flatten
         )
       )
     end
 
-    def direct_sibling_runtime_gems(project_root, gemspec_metadata, package_name:)
+    def direct_sibling_runtime_gems(project_root, gemspec_metadata, package_name:, local_modular_eval_paths: {})
       return [] unless project_root && gemspec_metadata.is_a?(Hash)
 
       sibling_root = File.expand_path("..", project_root.to_s)
@@ -10139,19 +10146,60 @@ module Kettle
         name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
         next if name.empty? || name == package_name.to_s
         next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, name), name)
-        next if local_modular_gemfiles_declare_gem?(project_root, name)
+        next if Array(local_modular_eval_paths[name]).any?
         next if names.include?(name)
 
         names << name
       end
     end
 
-    def local_modular_gemfiles_declare_gem?(project_root, gem_name)
-      Dir.glob(File.join(project_root.to_s, "gemfiles", "modular", "**", "*_local.gemfile")).any? do |path|
-        gemfile_dependency_names(File.read(path)).include?(gem_name.to_s)
-      rescue Errno::ENOENT
-        false
+    def local_modular_runtime_eval_paths(project_root, gemspec_metadata, package_name:)
+      return {} unless project_root && gemspec_metadata.is_a?(Hash)
+
+      runtime_names = gemspec_runtime_dependency_names(gemspec_metadata) - [package_name.to_s]
+      return {} if runtime_names.empty?
+
+      sibling_root = File.expand_path("..", project_root.to_s)
+      runtime_names.each_with_object({}) do |gem_name, paths_by_gem|
+        next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, gem_name), gem_name)
+
+        paths = local_modular_eval_paths_for_gem(project_root, gem_name)
+        paths_by_gem[gem_name] = paths if paths.any?
       end
+    end
+
+    def local_modular_eval_paths_for_gem(project_root, gem_name)
+      Dir.glob(File.join(project_root.to_s, "gemfiles", "modular", "**", "*_local.gemfile")).filter_map do |path|
+        next unless gemfile_dependency_names(File.read(path)).include?(gem_name.to_s)
+
+        local_relative = project_relative_path(path, project_root)
+        paired_relative = paired_modular_gemfile_path(local_relative)
+        next unless paired_relative
+        next unless File.file?(File.join(project_root.to_s, paired_relative))
+
+        paired_relative
+      rescue Errno::ENOENT
+        nil
+      end
+        .uniq
+        .sort
+    end
+
+    def paired_modular_gemfile_path(local_relative_path)
+      suffix = "_local.gemfile"
+      path = local_relative_path.to_s
+      return unless path.end_with?(suffix)
+
+      "#{path[0...-suffix.length]}.gemfile"
+    end
+
+    def project_relative_path(path, project_root)
+      expanded_root = File.expand_path(project_root.to_s)
+      expanded_path = File.expand_path(path.to_s)
+      prefix = "#{expanded_root}#{File::SEPARATOR}"
+      return expanded_path unless expanded_path.start_with?(prefix)
+
+      expanded_path[prefix.length..].to_s
     end
 
     def direct_sibling_directory_defines_gem?(sibling_path, gem_name)
@@ -10174,9 +10222,19 @@ module Kettle
       end
     end
 
-    def main_gemfile_direct_sibling_block(gems, source_url:, project_root:)
+    def main_gemfile_direct_sibling_block(gems, source_url:, project_root:, local_modular_eval_paths: [])
       names = Array(gems).map(&:to_s).reject(&:empty?).uniq
-      return "" if names.empty?
+      eval_paths = Array(local_modular_eval_paths).map(&:to_s).reject(&:empty?).uniq.sort
+      return "" if names.empty? && eval_paths.empty?
+
+      blocks = []
+      if eval_paths.any?
+        blocks << [
+          "# Modular sibling dependencies (env-switched inside each modular Gemfile)",
+          *eval_paths.map { |path| %(eval_gemfile "#{path}") }
+        ].join("\n")
+      end
+      return blocks.join("\n\n") if names.empty?
 
       workspace_slug = direct_sibling_workspace_slug(source_url, project_root)
       prefix = workspace_slug.to_s.upcase.tr("-", "_")
@@ -10185,7 +10243,7 @@ module Kettle
       root_literal = ruby_array_literal(["src", "my", workspace_slug].reject(&:empty?))
       word_array = names.map { |name| "  #{name}" }.join("\n")
 
-      <<~RUBY.rstrip
+      blocks << <<~RUBY.rstrip
         # Direct sibling dependencies (env-switched via #{dev_env})
         direct_sibling_gems = %w[
         #{word_array}
@@ -10239,6 +10297,7 @@ module Kettle
           end
         end
       RUBY
+      blocks.join("\n\n")
     end
 
     def direct_sibling_workspace_slug(source_url, project_root)

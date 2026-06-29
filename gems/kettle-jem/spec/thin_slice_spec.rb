@@ -13915,6 +13915,13 @@ RSpec.describe Kettle::Jem do
           gem "ur_brain-adapters-ruby",
             path: File.join(workspace_root, "ur_brain-adapters-ruby")
         RUBY
+        "gemfiles/modular/ur_brain.gemfile" => <<~RUBY,
+          if ENV.fetch("UR_BRAIN_DEV", "false").casecmp("false").zero?
+            gem "ur_brain-adapters-ruby", "~> 0.1"
+          else
+            eval_gemfile "ur_brain_local.gemfile"
+          end
+        RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
           templates:
@@ -13934,6 +13941,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemfile).not_to include("# Direct sibling dependencies")
       expect(gemfile).not_to include("direct_sibling_gems")
+      expect(gemfile).to include(%(eval_gemfile "gemfiles/modular/ur_brain.gemfile"))
     end
   end
 end
