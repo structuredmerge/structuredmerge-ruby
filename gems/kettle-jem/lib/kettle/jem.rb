@@ -10019,10 +10019,18 @@ module Kettle
       dependencies.each_with_object([]) do |dependency, names|
         name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
         next if name.empty? || name == package_name.to_s
-        next unless File.directory?(File.join(sibling_root, name))
+        next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, name), name)
         next if names.include?(name)
 
         names << name
+      end
+    end
+
+    def direct_sibling_directory_defines_gem?(sibling_path, gem_name)
+      return false unless File.directory?(sibling_path)
+
+      Dir.glob(File.join(sibling_path, "*.gemspec")).any? do |gemspec_path|
+        metadata_value(static_project_gemspec_metadata(gemspec_path), :gem_name).to_s == gem_name.to_s
       end
     end
 

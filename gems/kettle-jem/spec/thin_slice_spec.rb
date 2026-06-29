@@ -13703,4 +13703,54 @@ RSpec.describe Kettle::Jem do
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
     end
   end
+
+  it "does not path-wire direct sibling dependencies when the sibling directory has a different gemspec name" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-name-mismatch", tmp_root) do |workspace|
+      root = File.join(workspace, "omniauth-openid")
+      stale_sibling = File.join(workspace, "rack-openid")
+      FileUtils.mkdir_p([root, stale_sibling])
+      write_tree(stale_sibling, {
+        "rack-openid2.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "rack-openid2"
+            spec.version = "2.0.3"
+            spec.summary = "Rack OpenID 2"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "omniauth-openid.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "omniauth-openid"
+            spec.version = "2.0.2"
+            spec.summary = "OpenID strategy"
+            spec.homepage = "https://github.com/ruby-openid/omniauth-openid"
+            spec.metadata["source_code_uri"] = "https://github.com/ruby-openid/omniauth-openid"
+            spec.add_dependency "rack-openid", "~> 1.4"
+            spec.add_dependency "version_gem", ">= 1"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile).not_to include("# Direct sibling dependencies")
+      expect(gemfile).not_to include("rack-openid")
+    end
+  end
 end

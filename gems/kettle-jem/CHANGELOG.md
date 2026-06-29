@@ -362,6 +362,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated root Gemfiles no longer path-wire direct sibling dependencies from
+  stale sibling directories whose gemspec defines a different gem name.
 - Gemspec `spec.files` merging now supports the generated `Dir[...] + [...]`
   assignment shape on subsequent template runs instead of rejecting it as
   unsupported.
