@@ -6644,6 +6644,11 @@ module Kettle
         template_receiver: template_receiver,
         destination_receiver: destination_receiver
       )
+      merged = insert_missing_gemspec_files_assignment(
+        merged,
+        template_content: template_content,
+        template_receiver: template_receiver
+      )
       merged = preserve_gemspec_dependency_lines(
         merged,
         destination_content,
@@ -7009,6 +7014,24 @@ module Kettle
       return content unless replacement
 
       replace_source_range_lines(content, merged_record.fetch(:start_line), merged_record.fetch(:end_line), replacement)
+    end
+
+    def insert_missing_gemspec_files_assignment(content, template_content:, template_receiver:)
+      return content if gemspec_assignment_records(content, receiver: template_receiver).any? { |record| record.fetch(:field) == "files" }
+
+      template_record = gemspec_assignment_records(template_content, receiver: template_receiver).find { |record| record.fetch(:field) == "files" }
+      return content unless template_record
+
+      insertion = "#{normalize_gemspec_receiver(template_record.fetch(:source).rstrip, from: template_receiver, to: template_receiver)}\n"
+      extra_rdoc = gemspec_assignment_records(content, receiver: template_receiver).find { |record| record.fetch(:field) == "extra_rdoc_files" }
+      return insert_lines_before(content, extra_rdoc.fetch(:start_line), "\n#{insertion}") if extra_rdoc
+
+      anchor = %w[required_ruby_version licenses homepage description summary name].filter_map do |field|
+        gemspec_assignment_records(content, receiver: template_receiver).find { |record| record.fetch(:field) == field }
+      end.first
+      return insert_lines_after(content, anchor.fetch(:end_line), "\n#{insertion}") if anchor
+
+      content
     end
 
     def merge_gemspec_files_assignment_source(merged_record:, template_record:, destination_record:)
@@ -11103,6 +11126,7 @@ module Kettle
     def license_template_tokens(license)
       {
         "KJ|LICENSE_MD_CONTENT" => license[:license_md_content].to_s,
+        "KJ|GEMSPEC:ROOT_LICENSE_FILES" => gemspec_root_license_files_token(license),
         "KJ|README:LICENSE_INTRO" => license[:readme_license_intro].to_s,
         "KJ|LICENSE:PRIMARY_SPDX" => license[:primary_spdx].to_s,
         "KJ|LICENSE_EYE:PRIMARY_SPDX" => license[:license_eye_primary_spdx].to_s,
@@ -11117,6 +11141,11 @@ module Kettle
         "KJ|README:COPYRIGHT_NOTICE" => license[:readme_copyright_notice].to_s,
         "KJ|COPYRIGHT_PREFIX" => license[:copyright_prefix].to_s
       }
+    end
+
+    def gemspec_root_license_files_token(license)
+      files = (["LICENSE.md"] + Array(license[:spdx]).map { |spdx_id| "#{spdx_basename(spdx_id)}.md" }).uniq
+      files.map { |file| "    #{file.dump},\n" }.join
     end
 
     def license_copyright_notice(copyright_lines, copyright_prefix, author)

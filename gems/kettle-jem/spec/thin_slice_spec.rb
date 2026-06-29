@@ -11366,6 +11366,8 @@ RSpec.describe Kettle::Jem do
           Gem::Specification.new do |spec|
             spec.name = "example"
             spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
             spec.licenses = ["MIT"]
           end
         RUBY
@@ -11376,6 +11378,8 @@ RSpec.describe Kettle::Jem do
             root: packaged
             apply: true
             entries:
+              - source: gem.gemspec
+                target: example.gemspec
               - LICENSE.md
         YAML
       })
@@ -11388,6 +11392,10 @@ RSpec.describe Kettle::Jem do
       expect(apply[:changed_files]).to include("LICENSE.md", "MIT.md")
       expect(File).to exist(File.join(root, "LICENSE.md"))
       expect(File).to exist(File.join(root, "MIT.md"))
+      gemspec = File.read(File.join(root, "example.gemspec"))
+      expect(gemspec).to include('"LICENSE.md"')
+      expect(gemspec).to include('"MIT.md"')
+      expect(gemspec.index('"MIT.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
     end
   end
 

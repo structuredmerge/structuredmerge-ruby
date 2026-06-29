@@ -66,6 +66,8 @@ Gem::Specification.new do |spec|
 
   # Specify which files are part of the released package.
   spec.files = [
+    # Root license files
+{KJ|GEMSPEC:ROOT_LICENSE_FILES}
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
     # Executables and executable support scripts
