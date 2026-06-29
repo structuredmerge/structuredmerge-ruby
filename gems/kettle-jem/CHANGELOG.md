@@ -357,6 +357,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec `spec.files` merging now supports the generated `Dir[...] + [...]`
+  assignment shape on subsequent template runs instead of rejecting it as
+  unsupported.
 - Existing generated gemspecs with splat-based `spec.files` assignments now
   retain configured root license files from the template instead of preserving
   the old splat-only assignment wholesale.

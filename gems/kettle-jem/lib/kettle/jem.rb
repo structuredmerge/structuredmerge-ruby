@@ -7060,7 +7060,7 @@ module Kettle
         groups.each do |group|
           next if seen[group.fetch(:key)]
 
-          combined_groups << group.merge(source_collection_kind: parts.fetch(:collection_kind))
+          combined_groups << group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, parts))
           seen[group.fetch(:key)] = true
         end
       end
@@ -7146,7 +7146,7 @@ module Kettle
     end
 
     def merge_gemspec_files_assignment_with_destination_splats(merged_parts:, destination_parts:)
-      return unless destination_parts.fetch(:collection_kind) == :array
+      return unless %i[array concat].include?(destination_parts.fetch(:collection_kind))
 
       merged_keys = merged_parts.fetch(:groups).map { |group| group.fetch(:key) }.to_set
       destination_only_nonliteral = destination_parts.fetch(:groups).any? do |group|
@@ -7155,18 +7155,22 @@ module Kettle
       return if destination_only_nonliteral
 
       destination_groups = destination_parts.fetch(:groups).to_h do |group|
-        [group.fetch(:key), group.merge(source_collection_kind: destination_parts.fetch(:collection_kind))]
+        [group.fetch(:key), group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, destination_parts))]
       end
       seen = Set.new
       groups = merged_parts.fetch(:groups).map do |group|
         key = group.fetch(:key)
         seen << key
-        destination_groups.fetch(key, group.merge(source_collection_kind: merged_parts.fetch(:collection_kind)))
+        destination_groups.fetch(key, group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, merged_parts)))
       end
       destination_parts.fetch(:groups).each do |group|
         next if seen.include?(group.fetch(:key))
 
-        groups << group.merge(source_collection_kind: destination_parts.fetch(:collection_kind))
+        groups << group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, destination_parts))
+      end
+
+      if gemspec_files_collection_needs_concat?(merged_parts, groups)
+        return gemspec_files_concat_collection_source(merged_parts, groups)
       end
 
       gemspec_files_array_collection_source(merged_parts, groups)
@@ -7174,6 +7178,14 @@ module Kettle
 
     def gemspec_files_collection_parts(record)
       value_node = record.fetch(:value_node)
+      if gemspec_files_concat_call_node?(value_node)
+        return gemspec_files_concat_collection_parts(record, value_node)
+      end
+
+      gemspec_files_single_collection_parts(record, value_node)
+    end
+
+    def gemspec_files_single_collection_parts(record, value_node)
       element_nodes = gemspec_files_collection_element_nodes(value_node)
       return unless element_nodes
 
@@ -7191,6 +7203,55 @@ module Kettle
       }
     end
 
+    def gemspec_files_concat_collection_parts(record, value_node)
+      arguments = Array(value_node.arguments&.arguments)
+      left_record = gemspec_files_child_collection_record(record, value_node.receiver)
+      right_record = gemspec_files_child_collection_record(record, arguments.first)
+      return unless left_record && right_record
+
+      left_parts = gemspec_files_single_collection_parts(
+        left_record,
+        value_node.receiver
+      )
+      right_parts = gemspec_files_single_collection_parts(
+        right_record,
+        arguments.first
+      )
+      return unless left_parts && right_parts
+
+      groups = left_parts.fetch(:groups).map do |group|
+        group.merge(source_collection_kind: left_parts.fetch(:collection_kind))
+      end
+      groups.concat(
+        right_parts.fetch(:groups).map do |group|
+          group.merge(source_collection_kind: right_parts.fetch(:collection_kind))
+        end
+      )
+
+      {
+        collection_kind: :concat,
+        opening: left_parts.fetch(:opening),
+        closing: right_parts.fetch(:closing),
+        groups: groups
+      }
+    end
+
+    def gemspec_files_child_collection_record(record, value_node)
+      source_start_line = record.fetch(:start_line)
+      lines = record.fetch(:source).lines
+      start_index = value_node.location.start_line - source_start_line
+      end_index = value_node.location.end_line - source_start_line
+      child_lines = lines[start_index..end_index]
+      return unless child_lines
+
+      record.merge(
+        value_node: value_node,
+        start_line: value_node.location.start_line,
+        end_line: value_node.location.end_line,
+        source: child_lines.join
+      )
+    end
+
     def gemspec_files_collection_kind(value_node)
       return :dir if gemspec_files_dir_call_node?(value_node)
       return :array if value_node.is_a?(::Prism::ArrayNode)
@@ -7205,6 +7266,18 @@ module Kettle
       return value_node.elements if value_node.is_a?(::Prism::ArrayNode)
 
       nil
+    end
+
+    def gemspec_files_group_collection_kind(group, parts)
+      group.fetch(:source_collection_kind, parts.fetch(:collection_kind))
+    end
+
+    def gemspec_files_concat_call_node?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :+ &&
+        node.block.nil? &&
+        node.receiver &&
+        Array(node.arguments&.arguments).length == 1
     end
 
     def gemspec_files_dir_call_node?(node)
