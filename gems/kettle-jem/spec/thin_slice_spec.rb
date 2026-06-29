@@ -11357,6 +11357,40 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "adds configured named license files even when templates.entries only lists LICENSE.md" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-configured-license-entry-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.licenses = ["MIT"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          licenses:
+            - MIT
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - LICENSE.md
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      recipe_names = apply[:recipe_reports].map { |report| report.fetch(:recipe_name) }
+
+      expect(recipe_names).to include("template_source_application_LICENSE_md")
+      expect(recipe_names).to include("template_source_application_MIT_md")
+      expect(apply[:changed_files]).to include("LICENSE.md", "MIT.md")
+      expect(File).to exist(File.join(root, "LICENSE.md"))
+      expect(File).to exist(File.join(root, "MIT.md"))
+    end
+  end
+
   it "projects copyright holders from git blame into license templates" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

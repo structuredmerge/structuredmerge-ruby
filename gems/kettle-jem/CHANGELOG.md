@@ -354,6 +354,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Packaged templating now derives named license files from configured licenses,
+  so explicit `templates.entries` lists no longer have to enumerate every
+  active license file alongside `LICENSE.md`.
 - Gemspec templating no longer preserves frozen `spec.files` override blocks;
   `spec.files` is structurally merged so stale frozen package lists cannot
   replace the merged package payload.
