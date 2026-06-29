@@ -124,4 +124,79 @@ RSpec.describe Kettle::Jem do
       expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error
     end
   end
+
+  it "removes stale root VERSION declarations when the managed version signature already exists" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-existing-rbs", tmp_root) do |root|
+      write_file(root, "kettle-rb.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "kettle-rb"
+          spec.version = "0.1.1"
+          spec.summary = "Kettle Ruby compatibility data"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+        end
+      RUBY
+      write_file(root, "lib/kettle/rb.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "rb/version"
+
+        module Kettle
+          module Rb
+          end
+        end
+
+        Kettle::Rb::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      write_file(root, "lib/kettle/rb/version.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        module Kettle
+          module Rb
+            module Version
+              VERSION = "0.1.1"
+            end
+            VERSION = Version::VERSION # Traditional Constant Location
+          end
+        end
+      RUBY
+      write_file(root, "sig/kettle/rb.rbs", <<~RBS)
+        module Kettle
+          module Rb
+            VERSION: String
+          end
+        end
+      RBS
+      write_file(root, "sig/kettle/rb/version.rbs", <<~RBS)
+        module Kettle
+          module Rb
+            module Version
+              VERSION: String
+            end
+            VERSION: String
+          end
+        end
+      RBS
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_bootstrap",
+          status: "applied",
+          changed_files: include("sig/kettle/rb.rbs")
+        )
+      )
+      root_signature = File.read(File.join(root, "sig/kettle/rb.rbs"))
+      expect(root_signature).not_to include("VERSION:")
+      loader = RBS::EnvironmentLoader.new
+      loader.add(path: Pathname(File.join(root, "sig")))
+      expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error
+    end
+  end
 end
