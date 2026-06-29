@@ -7005,13 +7005,14 @@ module Kettle
         template_record: template_record,
         destination_record: destination_record
       )
-      replacement ||= replacement_for_nonliteral_gemspec_files_assignment(
+      replacement ||= replacement_for_supported_gemspec_files_assignment(
         template_record: template_record,
         destination_record: destination_record,
-        template_receiver: template_receiver,
-        destination_receiver: destination_receiver
+        template_receiver: template_receiver
       )
-      return content unless replacement
+      unless replacement
+        raise Error, "Unsupported gemspec spec.files assignment; kettle-jem requires an AST-mergeable Array, Dir[], or known Bundler git-ls-files assignment"
+      end
 
       replace_source_range_lines(content, merged_record.fetch(:start_line), merged_record.fetch(:end_line), replacement)
     end
@@ -7039,7 +7040,13 @@ module Kettle
       template_parts = gemspec_files_collection_parts(template_record)
       destination_parts = gemspec_files_collection_parts(destination_record)
       return unless merged_parts && template_parts && destination_parts
-      return if gemspec_files_collection_has_nonliteral_entries?(destination_parts)
+
+      if gemspec_files_collection_has_nonliteral_entries?(destination_parts)
+        return merge_gemspec_files_assignment_with_destination_splats(
+          merged_parts: merged_parts,
+          destination_parts: destination_parts
+        )
+      end
 
       combined_groups = []
       seen = {}
@@ -7127,18 +7134,41 @@ module Kettle
       lines.join
     end
 
-    def replacement_for_nonliteral_gemspec_files_assignment(template_record:, destination_record:, template_receiver:, destination_receiver:)
-      return unless gemspec_files_collection_parts(template_record)
-
+    def replacement_for_supported_gemspec_files_assignment(template_record:, destination_record:, template_receiver:)
       if generic_bundler_gemspec_files_assignment?(destination_record)
-        return normalize_gemspec_receiver(
+        normalize_gemspec_receiver(
           template_record.fetch(:source),
           from: template_receiver,
           to: template_receiver
         )
       end
+    end
 
-      normalize_gemspec_receiver(destination_record.fetch(:source), from: destination_receiver, to: template_receiver)
+    def merge_gemspec_files_assignment_with_destination_splats(merged_parts:, destination_parts:)
+      return unless destination_parts.fetch(:collection_kind) == :array
+
+      merged_keys = merged_parts.fetch(:groups).map { |group| group.fetch(:key) }.to_set
+      destination_only_nonliteral = destination_parts.fetch(:groups).any? do |group|
+        !group.fetch(:node).is_a?(::Prism::StringNode) && !merged_keys.include?(group.fetch(:key))
+      end
+      return if destination_only_nonliteral
+
+      destination_groups = destination_parts.fetch(:groups).to_h do |group|
+        [group.fetch(:key), group.merge(source_collection_kind: destination_parts.fetch(:collection_kind))]
+      end
+      seen = Set.new
+      groups = merged_parts.fetch(:groups).map do |group|
+        key = group.fetch(:key)
+        seen << key
+        destination_groups.fetch(key, group.merge(source_collection_kind: merged_parts.fetch(:collection_kind)))
+      end
+      destination_parts.fetch(:groups).each do |group|
+        next if seen.include?(group.fetch(:key))
+
+        groups << group.merge(source_collection_kind: destination_parts.fetch(:collection_kind))
+      end
+
+      gemspec_files_array_collection_source(merged_parts, groups)
     end
 
     def gemspec_files_collection_parts(record)
@@ -7199,7 +7229,7 @@ module Kettle
           end
 
           groups << {
-            key: current_entry.slice,
+            key: gemspec_files_collection_entry_key(current_entry),
             node: current_entry,
             lines: pending + [line]
           }
@@ -7223,6 +7253,26 @@ module Kettle
     def gemspec_files_collection_entry_node?(node)
       node.location.start_line == node.location.end_line &&
         (node.is_a?(::Prism::StringNode) || node.is_a?(::Prism::SplatNode))
+    end
+
+    def gemspec_files_collection_entry_key(node)
+      return [:string, node.unescaped] if node.is_a?(::Prism::StringNode)
+      return [:splat, gemspec_files_splat_expression_key(node.expression)] if node.is_a?(::Prism::SplatNode)
+
+      [:source, node.slice]
+    end
+
+    def gemspec_files_splat_expression_key(node)
+      if node.is_a?(::Prism::CallNode)
+        return [
+          :call,
+          node.receiver&.slice,
+          node.name,
+          Array(node.arguments&.arguments).map { |argument| ruby_static_string_value(argument) || argument.slice }
+        ]
+      end
+
+      node&.slice
     end
 
     def gemspec_files_collection_has_nonliteral_entries?(parts)

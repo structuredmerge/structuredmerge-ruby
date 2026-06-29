@@ -12174,7 +12174,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "preserves custom nonliteral destination gemspec files assignments" do
+  it "fails hard on unsupported custom nonliteral destination gemspec files assignments" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-gemspec-files-custom", tmp_root) do |root|
@@ -12212,16 +12212,9 @@ RSpec.describe Kettle::Jem do
         RUBY
       })
 
-      plan = described_class.plan_project(root, env: {})
-      template_report = plan[:recipe_reports].find do |report|
-        report.fetch(:recipe_name) == "template_source_application_example_gemspec"
-      end
-      final_content = template_report.fetch(:final_content)
-
-      expect(final_content).to include('*enumerate_package_files.call("template")')
-      expect(final_content).to include('*Dir["lib/**/*.rb"]')
-      expect(final_content.scan(/^\s*spec\.files\s*=/).size).to eq(1)
-      expect(final_content).not_to include("spec.files = Dir[\n    \"lib/**/*.rb\"")
+      expect do
+        described_class.plan_project(root, env: {})
+      end.to raise_error(Kettle::Jem::Error, /Unsupported gemspec spec\.files assignment/)
     end
   end
 
@@ -12231,6 +12224,9 @@ RSpec.describe Kettle::Jem do
         spec.name = "example"
         # Specify which files are part of the released package.
         spec.files = [
+          # Root license files
+          "LICENSE.md",
+          "MIT.md",
           # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
           *enumerate_package_files.call("lib"),
           # Executables and executable support scripts
@@ -12269,6 +12265,9 @@ RSpec.describe Kettle::Jem do
 
     expect(Prism.parse(merged)).to be_success
     expect(merged.scan(/^\s*spec\.files\s*=/).size).to eq(1)
+    expect(merged).to include('"LICENSE.md"')
+    expect(merged).to include('"MIT.md"')
+    expect(merged.index('"MIT.md"')).to be < merged.index("*enumerate_package_files.call('lib')")
     expect(merged).to include("*enumerate_package_files.call('sig')\n")
     expect(merged).not_to include('*enumerate_package_files.call("lib")')
   end

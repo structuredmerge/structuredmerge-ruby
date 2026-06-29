@@ -354,6 +354,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Existing generated gemspecs with splat-based `spec.files` assignments now
+  retain configured root license files from the template instead of preserving
+  the old splat-only assignment wholesale.
+- Gemspec `spec.files` templating now fails hard for unsupported package-list
+  shapes instead of silently preserving destination content.
 - Generated gemspecs now package active root license files declared by the
   project license configuration.
 - Gemspec templating no longer preserves frozen `spec.files` override blocks;
