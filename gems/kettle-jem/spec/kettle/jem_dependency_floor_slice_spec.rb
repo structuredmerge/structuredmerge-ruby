@@ -164,4 +164,10 @@ RSpec.describe Kettle::Jem do
     expect(file_content("gemfiles/modular/coverage.gemfile")).to include(source_pin)
     expect(file_content("lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example")).to include(source_pin)
   end
+
+  it "does not duplicate direct gemspec development dependencies in optional Gemfiles" do
+    optional_template = file_content("lib/kettle/jem/templates/gemfiles/modular/optional.gemfile.example")
+
+    expect(optional_template).not_to include("stone_checksums")
+  end
 end

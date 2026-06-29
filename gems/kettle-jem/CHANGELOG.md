@@ -62,7 +62,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Ruby, engine, Rails, RuboCop, and RuboCop LTS compatibility choices now come
   from `Kettle::Rb::CompatMatrix` in `kettle-rb`.
 
-- Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.4.
+- Generated gemspecs now require `stone_checksums` >= 1.0.4.
+- Generated optional Gemfiles no longer duplicate the gemspec's direct
+  `stone_checksums` development dependency.
 
 - Quiet templating orchestration now passes quiet flags and debug-suppressing
   environment to Bundler commands.
