@@ -62,6 +62,13 @@ task :default do
   puts "Default task complete."
 end
 
+namespace :spec do
+  desc "Run dependency floor consistency specs"
+  task :dependency_floors do
+    sh({"K_SOUP_COV_DO" => "false"}, "bundle", "exec", "rspec", "spec/kettle/jem_dependency_floor_slice_spec.rb")
+  end
+end
+
 # simplecov:disable
 ### MONOREPO FAMILY TASKS
 if Dir.exist?(File.join(__dir__, "gems"))
