@@ -2,7 +2,9 @@
 
 require_relative "../spec_helper"
 require "open3"
+require "pathname"
 require "rake"
+require "rbs"
 
 RSpec.describe "bundle gem scaffold + kettle-jem", :system do
   let(:sandbox_root) { File.expand_path("../../../tmp/sandbox", __dir__) }
@@ -175,6 +177,12 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(File).to exist(File.join(gem_root, ".github/workflows/current.yml"))
     expect(File).to exist(File.join(gem_root, ".github/workflows/ruby-3.2.yml"))
     expect(File).to exist(File.join(gem_root, ".github/workflows/style.yml"))
+
+    root_signature = File.read(File.join(gem_root, "sig/dummy/gem.rbs"))
+    expect(root_signature).not_to include("VERSION:")
+    loader = RBS::EnvironmentLoader.new
+    loader.add(path: Pathname(File.join(gem_root, "sig")))
+    expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error
 
     rakefile = File.read(File.join(gem_root, "Rakefile"))
     expect(rakefile).to include("Kettle::Dev.install_tasks")

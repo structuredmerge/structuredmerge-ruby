@@ -704,12 +704,14 @@ module Kettle
           end
 
           current = current_git_branch(checkout)
-          return {
-            name: "rubocop_lts_local_branch",
-            status: "already_current",
-            path: checkout,
-            branch: branch
-          } if current == branch
+          if current == branch
+            return {
+              name: "rubocop_lts_local_branch",
+              status: "already_current",
+              path: checkout,
+              branch: branch
+            }
+          end
 
           {
             name: "rubocop_lts_local_branch",

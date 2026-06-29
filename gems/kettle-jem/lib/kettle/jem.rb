@@ -10147,7 +10147,7 @@ module Kettle
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
       changes << write_if_changed(project_root, signature_path, version_gem_signature_file_content(namespace: namespace)) if manage_signature_file
-      changes << remove_legacy_version_signature_alias(project_root, root_signature_path)
+      changes << remove_legacy_version_signature_alias(project_root, root_signature_path, namespace: namespace)
       changed_files = changes.compact
 
       {
@@ -10160,14 +10160,52 @@ module Kettle
       }
     end
 
-    def remove_legacy_version_signature_alias(project_root, signature_path)
+    def remove_legacy_version_signature_alias(project_root, signature_path, namespace:)
       current = read_project_file(project_root, signature_path)
       return nil if current.empty?
 
-      cleaned = current.lines.reject { |line| line.strip == "VERSION: String" }.join
+      cleaned = remove_rbs_version_constants(current, namespace: namespace)
       return nil if cleaned == current
 
       write_if_changed(project_root, signature_path, cleaned)
+    end
+
+    def remove_rbs_version_constants(content, namespace:)
+      namespace_segments = namespace.to_s.split("::").reject(&:empty?)
+      return content if namespace_segments.empty?
+
+      buffer = ::RBS::Buffer.new(name: "legacy_version_signature_alias.rbs", content: content.to_s)
+      _buffer, _directives, declarations = ::RBS::Parser.parse_signature(buffer)
+      ranges = rbs_version_constant_line_ranges(declarations, namespace_segments: namespace_segments)
+      return content if ranges.empty?
+
+      lines = content.lines
+      ranges.sort_by(&:first).reverse_each do |first_line, last_line|
+        lines[(first_line - 1)..(last_line - 1)] = []
+      end
+      lines.join
+    rescue ::RBS::ParsingError
+      content
+    end
+
+    def rbs_version_constant_line_ranges(declarations, namespace_segments:, current_segments: [])
+      declarations.flat_map do |declaration|
+        if declaration.is_a?(::RBS::AST::Declarations::Constant)
+          next [] unless current_segments == namespace_segments
+          next [] unless declaration.name.name == :VERSION
+
+          [[declaration.location.start_line, declaration.location.end_line]]
+        elsif declaration.respond_to?(:members) && declaration.respond_to?(:name)
+          child_segments = current_segments + [declaration.name.name.to_s]
+          rbs_version_constant_line_ranges(
+            declaration.members,
+            namespace_segments: namespace_segments,
+            current_segments: child_segments
+          )
+        else
+          []
+        end
+      end
     end
 
     def version_gem_version_file_content(existing_version:, namespace:, version:)

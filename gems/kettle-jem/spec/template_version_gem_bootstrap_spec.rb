@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require_relative "spec_helper"
+require "pathname"
+require "rbs"
 
 RSpec.describe Kettle::Jem do
   def write_file(root, relative_path, content)
@@ -67,6 +69,59 @@ RSpec.describe Kettle::Jem do
       expect(signature.scan("VERSION: String").length).to eq(2)
       root_signature = File.read(File.join(root, "sig/plain/merge.rbs"))
       expect(root_signature).not_to include("VERSION: String")
+    end
+  end
+
+  it "removes bundle gem scaffold literal VERSION declarations from the root signature" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-scaffold-rbs", tmp_root) do |root|
+      write_file(root, "dummy-gem.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "dummy-gem"
+          spec.version = "0.1.0"
+          spec.summary = "Dummy gem"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+        end
+      RUBY
+      write_file(root, "lib/dummy/gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "gem/version"
+
+        module Dummy
+          module Gem
+            class Error < StandardError; end
+          end
+        end
+      RUBY
+      write_file(root, "sig/dummy/gem.rbs", <<~RBS)
+        module Dummy
+          module Gem
+            VERSION: "0.1.0"
+
+            class Error < ::StandardError
+            end
+          end
+        end
+      RBS
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_bootstrap",
+          status: "applied",
+          changed_files: include("sig/dummy/gem.rbs", "sig/dummy/gem/version.rbs")
+        )
+      )
+      root_signature = File.read(File.join(root, "sig/dummy/gem.rbs"))
+      expect(root_signature).not_to include("VERSION:")
+      expect(root_signature).to include("class Error < ::StandardError")
+      loader = RBS::EnvironmentLoader.new
+      loader.add(path: Pathname(File.join(root, "sig")))
+      expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error
     end
   end
 end
