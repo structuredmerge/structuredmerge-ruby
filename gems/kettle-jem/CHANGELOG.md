@@ -84,6 +84,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Root Gemfile templating now keeps `nomono_requirements` before existing
   `gem "nomono", *nomono_requirements` calls when merging legacy local sibling
   wiring.
+- Root Gemfile templating no longer adds generic direct-sibling path wiring for
+  runtime dependencies already handled by project-specific local modular
+  Gemfiles.
 - Local GitHub remotes now override generated gemspec `source_code_uri` tag URLs
   when deriving repository owner tokens, preventing stale homepage metadata from
   corrupting README logos and local sibling workspace env names.

@@ -13882,4 +13882,58 @@ RSpec.describe Kettle::Jem do
       expect(requirement_line).to be < gem_line
     end
   end
+
+  it "does not add generic direct sibling wiring for gems already handled by local modular Gemfiles" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-local-modular-sibling", tmp_root) do |workspace|
+      root = File.join(workspace, "ur_brain-claude-code")
+      sibling = File.join(workspace, "ur_brain-adapters-ruby")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "ur_brain-adapters-ruby.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "ur_brain-adapters-ruby"
+            spec.version = "0.1.0"
+            spec.summary = "UR Brain adapters"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "ur_brain-claude-code.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "ur_brain-claude-code"
+            spec.version = "0.1.0"
+            spec.summary = "Claude Code adapter"
+            spec.homepage = "https://github.com/ur-brain/ur_brain-claude-code"
+            spec.metadata["source_code_uri"] = "https://github.com/ur-brain/ur_brain-claude-code"
+            spec.add_dependency "ur_brain-adapters-ruby", "~> 0.1"
+          end
+        RUBY
+        "gemfiles/modular/ur_brain_local.gemfile" => <<~RUBY,
+          workspace_root = File.expand_path("../..", __dir__)
+          gem "ur_brain-adapters-ruby",
+            path: File.join(workspace_root, "ur_brain-adapters-ruby")
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile).not_to include("# Direct sibling dependencies")
+      expect(gemfile).not_to include("direct_sibling_gems")
+    end
+  end
 end

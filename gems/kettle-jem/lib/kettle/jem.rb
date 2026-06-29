@@ -10139,9 +10139,18 @@ module Kettle
         name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
         next if name.empty? || name == package_name.to_s
         next unless direct_sibling_directory_defines_gem?(File.join(sibling_root, name), name)
+        next if local_modular_gemfiles_declare_gem?(project_root, name)
         next if names.include?(name)
 
         names << name
+      end
+    end
+
+    def local_modular_gemfiles_declare_gem?(project_root, gem_name)
+      Dir.glob(File.join(project_root.to_s, "gemfiles", "modular", "**", "*_local.gemfile")).any? do |path|
+        gemfile_dependency_names(File.read(path)).include?(gem_name.to_s)
+      rescue Errno::ENOENT
+        false
       end
     end
 
