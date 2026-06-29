@@ -12660,7 +12660,7 @@ RSpec.describe Kettle::Jem do
         "Style tasks run on the latest Ruby"
       )
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.0"')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.3"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
       expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
       expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.2", require: false')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2"')

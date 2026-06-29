@@ -61,6 +61,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Ruby, engine, Rails, RuboCop, and RuboCop LTS compatibility choices now come
   from `Kettle::Rb::CompatMatrix` in `kettle-rb`.
+- Generated `mise.toml` files no longer export `RUBOCOP_LTS_LOCAL=false`;
+  local RuboCop-LTS mode is now controlled by setting the variable only when a
+  local checkout should be used.
+- Generated style Gemfiles now require `rubocop-lts-rspec` >= 1.0.4.
 
 - Generated gemspecs now require `stone_checksums` >= 1.0.4.
 - Generated optional Gemfiles no longer duplicate the gemspec's direct
