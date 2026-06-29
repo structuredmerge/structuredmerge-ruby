@@ -359,7 +359,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_dependency "legacy-shim2"))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.21")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.8")))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.3")))
+      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.4")))
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
       expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.6"))
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
