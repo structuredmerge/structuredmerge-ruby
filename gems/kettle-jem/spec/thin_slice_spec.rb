@@ -13659,7 +13659,11 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).not_to include(
         'unless ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
+      expect(direct_block).to include('direct_sibling_dev_was_set = ENV.key?("RUBYTHEMS_DEV")')
+      expect(direct_block).to include('direct_sibling_dev_original = ENV.fetch("RUBYTHEMS_DEV", nil)')
       expect(direct_block).to include('ENV["RUBYTHEMS_DEV"] = File.expand_path("..", __dir__)')
+      expect(direct_block).to include('ENV["RUBYTHEMS_DEV"] = direct_sibling_dev_original')
+      expect(direct_block).to include('ENV.delete("RUBYTHEMS_DEV")')
       expect(direct_block).to include('prefix: "RUBYTHEMS"')
       expect(direct_block).to include('path_env: "RUBYTHEMS_DEV"')
       expect(direct_block).to include('root: ["src", "my", "rubythems"]')

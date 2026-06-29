@@ -88,6 +88,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated Gemfiles now activate the Bundler-locked `nomono` before loading
   `nomono/bundler`, avoiding global gem activation conflicts during
   templating.
+- Generated Gemfiles now scope templating-only direct sibling local-path
+  environment overrides to the direct dependency block so later modular
+  Gemfiles do not accidentally enter local sibling mode.
 - Generated style Gemfiles now skip released RuboCop-LTS gems that were already
   declared by earlier Gemfile evaluation, avoiding duplicate path/version
   declarations during templating.

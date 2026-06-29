@@ -10062,6 +10062,8 @@ module Kettle
         if direct_sibling_gems.any? &&
             (direct_sibling_local ||
               ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+          direct_sibling_dev_was_set = ENV.key?("#{dev_env}")
+          direct_sibling_dev_original = ENV.fetch("#{dev_env}", nil)
           begin
             nomono_activation_requirements = nomono_requirements
             nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)
@@ -10090,6 +10092,14 @@ module Kettle
             )
           rescue LoadError
             warn "Install nomono to enable #{dev_env} local sibling-gem dependencies."
+          ensure
+            if direct_sibling_templating && !direct_sibling_local
+              if direct_sibling_dev_was_set
+                ENV["#{dev_env}"] = direct_sibling_dev_original
+              else
+                ENV.delete("#{dev_env}")
+              end
+            end
           end
         end
       RUBY
