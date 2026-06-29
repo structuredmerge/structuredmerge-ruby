@@ -8353,6 +8353,53 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "removes gemspec runtime dependencies from modular Gemfile dependency lists" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-modular-gemfile-runtime-dependency", tmp_root) do |root|
+      write_tree(root, {
+        "yard-yaml.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "yard-yaml"
+            spec.summary = "YARD YAML"
+            spec.add_dependency("yaml-converter", "~> 0.2")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/documentation.gemfile
+          files:
+            gemfiles:
+              modular:
+                documentation.gemfile:
+                  strategy: accept_template
+        YAML
+        "template/gemfiles/modular/documentation.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Documentation
+          gem "kramdown", "~> 2.5", ">= 2.5.1", require: false
+          gem "yaml-converter", "~> 0.2", ">= 0.2.2", require: false
+          gem "yard", "~> 0.9", ">= 0.9.44", require: false
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/documentation.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('gem "kramdown"')
+      expect(content).to include('gem "yard"')
+      expect(content).not_to include('gem "yaml-converter"')
+      expect(File.read(File.join(root, "gemfiles/modular/documentation.gemfile"))).to eq(content)
+    end
+  end
+
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

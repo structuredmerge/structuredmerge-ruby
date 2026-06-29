@@ -2883,7 +2883,8 @@ module Kettle
             metadata_value(gemspec_metadata, :summary),
           homepage_url: homepage_url,
           source_url: source_url,
-          license_expression: license[:expression]
+          license_expression: license[:expression],
+          runtime_dependencies: gemspec_runtime_dependency_names(gemspec_metadata)
         ),
         rubygems: compact_hash(
           gemspec_path: File.basename(gemspec_path),
@@ -5751,6 +5752,7 @@ module Kettle
       package_name = facts.dig(:package, :name).to_s if facts
       removable_gems = ["appraisal"]
       removable_gems << package_name unless package_name.to_s.empty?
+      removable_gems.concat(package_runtime_dependency_names(facts))
       removable_gems << "version_gem" unless version_gem_runtime_compatible?(facts)
       pruned = remove_gemfile_dependency_blocks(content, removable_gems)
       pruned = remove_gemfile_percent_w_entries(pruned, [package_name]) unless preserve_self_word_entries
@@ -5761,6 +5763,11 @@ module Kettle
         preserve_self_word_entries: preserve_self_word_entries
       )
       apply_commented_gem_dependency_policy(template_content, pruned)
+    end
+
+    def package_runtime_dependency_names(facts)
+      dependencies = facts.to_h.dig(:package, :runtime_dependencies)
+      Array(dependencies).map(&:to_s).reject(&:empty?).uniq
     end
 
     def inject_main_gemfile_recording_eval(content, facts)
@@ -10014,6 +10021,18 @@ module Kettle
         next if name.empty? || name == package_name.to_s
         next unless File.directory?(File.join(sibling_root, name))
         next if names.include?(name)
+
+        names << name
+      end
+    end
+
+    def gemspec_runtime_dependency_names(gemspec_metadata)
+      dependencies = Array(
+        gemspec_metadata[:runtime_dependencies] || gemspec_metadata["runtime_dependencies"]
+      )
+      dependencies.each_with_object([]) do |dependency, names|
+        name = dependency.respond_to?(:name) ? dependency.name.to_s : dependency.to_s
+        next if name.empty? || names.include?(name)
 
         names << name
       end
