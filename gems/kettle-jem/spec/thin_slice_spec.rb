@@ -13822,4 +13822,64 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).not_to include("rack-openid")
     end
   end
+
+  it "keeps the nomono requirements assignment before an existing nomono gem call" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono-order", tmp_root) do |root|
+      write_tree(root, {
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+            spec.homepage = "https://github.com/ur-brain/adapter"
+            spec.metadata["source_code_uri"] = "https://github.com/ur-brain/adapter"
+            spec.add_dependency "version_gem", ">= 1"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          # Local workspace dependency wiring for *_local.gemfile overrides
+          gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+          gem "progress_bar"
+
+          require "nomono/bundler"
+
+          eval_nomono_gems(
+            gems: %w[ur_brain],
+            prefix: "UR_BRAIN",
+            path_env: "UR_BRAIN_DEV",
+            root: ["src", "my", "ur-brain"]
+          )
+
+          gemspec
+
+          nomono_requirements = ["~> 1.0", ">= 1.0.6"]
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+      requirement_line = gemfile.lines.index { |line| line.include?("nomono_requirements =") }
+      gem_line = gemfile.lines.index { |line| line.include?('gem "nomono", *nomono_requirements') }
+
+      expect(requirement_line).not_to be_nil
+      expect(gem_line).not_to be_nil
+      expect(requirement_line).to be < gem_line
+    end
+  end
 end

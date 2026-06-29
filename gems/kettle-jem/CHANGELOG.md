@@ -78,6 +78,12 @@ Please file a bug if you notice a violation of semantic versioning.
   environment to Bundler commands.
 - Generated Appraisal guidance now defaults to `bin/rake appraisal:generate`,
   reserving `appraisal:update` for intentional lock refreshes.
+
+### Fixed
+
+- Root Gemfile templating now keeps `nomono_requirements` before existing
+  `gem "nomono", *nomono_requirements` calls when merging legacy local sibling
+  wiring.
 - Local GitHub remotes now override generated gemspec `source_code_uri` tag URLs
   when deriving repository owner tokens, preventing stale homepage metadata from
   corrupting README logos and local sibling workspace env names.

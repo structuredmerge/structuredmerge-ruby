@@ -5142,6 +5142,7 @@ module Kettle
       if recipe.fetch(:target_path).to_s == "Gemfile"
         output = inject_main_gemfile_recording_eval(output, facts)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
+        output = normalize_main_gemfile_nomono_requirements(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
@@ -5207,6 +5208,50 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
       end
       output
+    end
+
+    def normalize_main_gemfile_nomono_requirements(content)
+      records = main_gemfile_nomono_requirement_records(content)
+      return content if records.fetch(:calls).empty? || records.fetch(:assignments).empty?
+
+      assignment_source = records.fetch(:assignments).first.fetch(:source).strip
+      output = records.fetch(:assignments).sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |memo, record|
+        replace_source_range_lines(
+          memo,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(memo, record.fetch(:end_line)),
+          ""
+        )
+      end
+      call = main_gemfile_nomono_requirement_records(output).fetch(:calls).first
+      return output unless call
+
+      lines = output.lines
+      insert_at = call.fetch(:start_line) - 1
+      lines.insert(insert_at, "#{assignment_source}\n")
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def main_gemfile_nomono_requirement_records(content)
+      body = prism_parse_success(content)&.value&.statements&.body || []
+      assignments = body.filter_map do |node|
+        next unless node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_requirements
+
+        {
+          start_line: node.location.start_line,
+          end_line: ruby_node_source_end_line(node),
+          source: node.location.slice
+        }
+      end
+      calls = ruby_call_records(content, :gem).filter_map do |call|
+        next unless ruby_string_argument(call) == "nomono"
+
+        {
+          start_line: call.location.start_line,
+          end_line: ruby_node_source_end_line(call)
+        }
+      end
+      {assignments: assignments, calls: calls.sort_by { |record| record.fetch(:start_line) }}
     end
 
     def collapse_nested_templating_guards(content)
