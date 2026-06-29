@@ -8208,6 +8208,39 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "excludes the current gem and already declared gems from documentation local path overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-documentation-local-gemfile-self-exclusion", tmp_root) do |root|
+      write_tree(root, {
+        "yard-yaml.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "yard-yaml"
+            spec.summary = "YARD YAML"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/documentation_local.gemfile
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/documentation_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include("local_gems = %w[yard-fence yard-timekeeper yard-yaml]")
+      expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
+      expect(content).to include("local_gems_to_eval = local_gems - %w[yard-yaml] - declared_gems")
+      expect(content).to include("gems: local_gems_to_eval")
+    end
+  end
+
   it "generates nomono in the main Gemfile before local workspace overrides need it" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
