@@ -12913,21 +12913,21 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include(
         "Style tasks run on the latest Ruby"
       )
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.0"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.1"')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
       expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
-      expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.2", require: false')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2"')
+      expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.3", require: false')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.5"')
       expect(template_report.fetch(:final_content)).to include(
         "declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)"
       )
       expect(template_report.fetch(:final_content)).to include(
-        'gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.2" unless declared_gems.include?("rubocop-ruby3_1")'
+        'gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.5" unless declared_gems.include?("rubocop-ruby3_1")'
       )
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|RUBOCOP_TARGET_RUBY" => "3.1",
-        "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.0\"",
-        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.2\"",
+        "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.1\"",
+        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.5\"",
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"
       )
     end
