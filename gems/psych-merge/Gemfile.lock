@@ -66,6 +66,7 @@ GEM
       dry-inflector (~> 1.0)
       dry-logic (~> 1.4)
       zeitwerk (~> 2.6)
+    emoji_regex (15.0.0)
     erb (6.0.4)
     gem_bench (2.0.5)
       bundler (>= 1.14)
@@ -85,9 +86,13 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.20.0)
-    kettle-dev (2.2.18)
+    kettle-dev (2.2.25)
+      emoji_regex (>= 15.0)
+      kettle-rb (~> 0.1, >= 0.1.1)
       kettle-test (~> 2.0, >= 2.0.4)
+      ruby-progressbar (~> 1.13)
       version_gem (~> 1.1, >= 1.1.13)
+    kettle-rb (0.1.1)
     kettle-soup-cover (1.1.3)
       simplecov (~> 0.22)
       simplecov-cobertura (~> 3.0)
@@ -97,13 +102,13 @@ GEM
       simplecov-rcov (~> 0.3, >= 0.3.7)
       simplecov_json_formatter (~> 0.1, >= 0.1.4)
       version_gem (~> 1.1, >= 1.1.9)
-    kettle-test (2.0.7)
+    kettle-test (2.0.9)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
       rspec (~> 3.0)
       rspec-block_is_expected (~> 1.0, >= 1.0.6)
       rspec-pending_for (~> 0.1, >= 0.1.20)
-      rspec-stubbed_env (~> 1.0, >= 1.0.4)
+      rspec-stubbed_env (~> 1.0, >= 1.0.5)
       rspec_junit_formatter (~> 0.6)
       silent_stream (~> 1.0, >= 1.0.12)
       timecop-rspec (~> 1.0, >= 1.0.3)
@@ -187,7 +192,7 @@ GEM
       ruby_engine (~> 2.0)
       ruby_version (~> 1.0)
       version_gem (~> 1.1, >= 1.1.8)
-    rspec-stubbed_env (1.0.4)
+    rspec-stubbed_env (1.0.5)
     rspec-support (3.13.7)
     rspec_junit_formatter (0.6.0)
       rspec-core (>= 2, < 4, != 2.12.0)
@@ -369,9 +374,9 @@ DEPENDENCIES
   gem_bench (~> 2.0, >= 2.0.5)
   gitmoji-regex (~> 2.0, >= 2.0.0)
   irb (~> 1.17)
-  kettle-dev (~> 2.0, >= 2.0.5)
+  kettle-dev (~> 2.0, >= 2.2.25)
   kettle-soup-cover (~> 1.0, >= 1.1.3)
-  kettle-test (~> 2.0, >= 2.0.1)
+  kettle-test (~> 2.0, >= 2.0.9)
   kramdown (~> 2.5, >= 2.5.1)
   kramdown-parser-gfm (~> 1.1)
   mutex_m (~> 0.2)
@@ -425,6 +430,7 @@ CHECKSUMS
   dry-logic (1.6.0) sha256=da6fedbc0f90fc41f9b0cc7e6f05f5d529d1efaef6c8dcc8e0733f685745cea2
   dry-schema (1.16.0) sha256=cd3aaeabc0f1af66ec82a29096d4c4fb92a0a58b9dae29a22b1bbceb78985727
   dry-types (1.9.1) sha256=baebeecdb9f8395d6c9d227b62011279440943e3ef2468fe8ccc1ba11467f178
+  emoji_regex (15.0.0) sha256=a508b2c0bee561169564e0aec96085020c900520d335e5533fd8e78e59493829
   erb (6.0.4) sha256=38e3803694be357fe2bfe312487c74beaf9fb4e5beb3e22498952fe1645b95d9
   gem_bench (2.0.5) sha256=0dc0fb44a5a5eb7b2f5c1c68a5b0164d72007132822c012bac3abe976b199ead
   geom2d (0.4.1) sha256=ea0998ea90c4f2752e24fe13d85a4f89bee689d151316140ebcc6369bf634ed9
@@ -433,9 +439,10 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.20.0) sha256=9362bc6e55a952b056abf9167cf053358181c904cb70cd6eee0808ea830fc32b
-  kettle-dev (2.2.18) sha256=0a39719c3aac69bb61a0788bb9ca4e2e127a49aa10d3dd13bb6ab34359023bd4
+  kettle-dev (2.2.25) sha256=efb4c6efbc3164c9c199e7da14edc54d6f9c02a3a0edf3c214d3fd97a0f0294b
+  kettle-rb (0.1.1) sha256=2e793d817f5150339770c547a2c72ed0c1a23b5e5a3ef46f462500dcb10dec4d
   kettle-soup-cover (1.1.3) sha256=a373827da22a7131d093afd32945e5b7d7a10a01ebfdded8fd2cb8230d69c8ad
-  kettle-test (2.0.7) sha256=d1381fe6c6b93be116fae89c8caa81150e72f2ae21cdab284ea9e19e72aa54cd
+  kettle-test (2.0.9) sha256=df8e8aa70a497ab636391c65d08f617c34e4cdfcb8d0e03907d38854e1465758
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
   language_server-protocol (3.17.0.5) sha256=fd1e39a51a28bf3eec959379985a72e296e9f9acfce46f6a79d31ca8760803cc
@@ -476,7 +483,7 @@ CHECKSUMS
   rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
   rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
   rspec-pending_for (0.1.20) sha256=2130c6c959d05b61de1955e7dd986418aec4888b6f80f0711a1f88540a09d3cb
-  rspec-stubbed_env (1.0.4) sha256=647886e16338bc4028fd18dde07944c945f773cc65afaa258930196da780e70f
+  rspec-stubbed_env (1.0.5) sha256=5a34bb8879c41c33a75dac5bb41e224aaa7be8d651f5619e826f7d48311f971e
   rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
   rspec_junit_formatter (0.6.0) sha256=40dde674e6ae4e6cc0ff560da25497677e34fefd2338cc467a8972f602b62b15
   rubocop (1.87.0) sha256=b9d9ddf55116a513f8ef2c7ae660662d8b49301f118d3f0df61865b33a5c188d
