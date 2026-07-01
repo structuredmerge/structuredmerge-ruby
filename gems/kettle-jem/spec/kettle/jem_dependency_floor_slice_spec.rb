@@ -18,8 +18,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
-        requirement_args: %("~> 2.2", ">= 2.2.24"),
-        lock_version: "2.2.24",
+        requirement_args: %("~> 2.2", ">= 2.2.25"),
+        lock_version: "2.2.25",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
@@ -28,8 +28,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-drift" => {
         declaration_names: ["kettle-drift"],
-        requirement_args: %("~> 1.0", ">= 1.0.4"),
-        lock_version: "1.0.4",
+        requirement_args: %("~> 1.0", ">= 1.0.5"),
+        lock_version: "1.0.5",
         requirement_surfaces: [
           "gemfiles/modular/templating.gemfile",
           "lib/kettle/jem.rb",
@@ -38,8 +38,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-test" => {
         declaration_names: ["kettle-test"],
-        requirement_args: %("~> 2.0", ">= 2.0.8"),
-        lock_version: "2.0.8",
+        requirement_args: %("~> 2.0", ">= 2.0.9"),
+        lock_version: "2.0.9",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"
@@ -74,9 +74,9 @@ RSpec.describe Kettle::Jem do
       },
       "nomono" => {
         declaration_names: ["nomono"],
-        requirement_args: %("~> 1.0", ">= 1.0.6"),
-        requirement_literals: [%(nomono_requirements = ["~> 1.0", ">= 1.0.6"])],
-        lock_version: "1.0.6",
+        requirement_args: %("~> 1.0", ">= 1.0.7"),
+        requirement_literals: [%(nomono_requirements = ["~> 1.0", ">= 1.0.7"])],
+        lock_version: "1.0.7",
         requirement_surfaces: [
           "Gemfile",
           "lib/kettle/jem/templates/Gemfile.example"
@@ -84,8 +84,8 @@ RSpec.describe Kettle::Jem do
       },
       "token-resolver" => {
         declaration_names: ["token-resolver"],
-        requirement_args: %("~> 2.0", ">= 2.0.3"),
-        lock_version: "2.0.3",
+        requirement_args: %("~> 2.0", ">= 2.0.4"),
+        lock_version: "2.0.4",
         requirement_surfaces: [
           "kettle-jem.gemspec"
         ]

@@ -357,11 +357,11 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.version = "0.1.0"))
       expect(generated[:"legacy-shim.gemspec"]).not_to include(%(load "lib/legacy/shim/version.rb"))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_dependency "legacy-shim2"))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.24")))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.8")))
+      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.25")))
+      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.9")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.4")))
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
-      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.6"))
+      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.7"))
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
@@ -3306,8 +3306,8 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:facts).dig(:license, :spdx)).to eq(["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"])
       expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.24"')
-      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.8"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.25"')
+      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.9"')
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
       expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.5"')
@@ -3363,8 +3363,8 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.24"')
-      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.8"')
+      expect(gemfile).to include('gem "kettle-dev", "~> 2.2", ">= 2.2.25"')
+      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.9"')
       expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.5"')
     end
   end
@@ -8303,7 +8303,8 @@ RSpec.describe Kettle::Jem do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('gem "nomono", "~> 1.0", ">= 1.0.6", require: false')
+      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.7"]')
+      expect(content).to include('gem "nomono", *nomono_requirements, require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
@@ -9243,7 +9244,7 @@ RSpec.describe Kettle::Jem do
   it "keeps the packaged gemspec template dependency floors current" do
     template = File.read(File.expand_path("../lib/kettle/jem/templates/gem.gemspec.example", __dir__))
 
-    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.2", ">= 2.2.24")))
+    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.2", ">= 2.2.25")))
     expect(template).not_to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.1", ">= 2.1.1")))
   end
 
@@ -9281,7 +9282,7 @@ RSpec.describe Kettle::Jem do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.24")
+            spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.25")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -9295,7 +9296,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include(%(spec.add_dependency("json", "~> 2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("custom-dev", ">= 1")))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.24")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.25")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.1")))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0")\n))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("rake", "~> 13.0")))
@@ -9314,7 +9315,7 @@ RSpec.describe Kettle::Jem do
             gem.name = "example"
             gem.summary = "Real summary"
             gem.required_ruby_version = ">= 2.4"
-            gem.add_dependency("kettle-test", "~> 2.0", ">= 2.0.8")
+            gem.add_dependency("kettle-test", "~> 2.0", ">= 2.0.9")
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -9334,7 +9335,7 @@ RSpec.describe Kettle::Jem do
             # NOTE: It is preferable to list development dependencies in the gemspec due to increased
             #       visibility and discoverability.
 
-            spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.8")
+            spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.9")
             spec.add_development_dependency("rake", "~> 13.0")
           end
         RUBY
@@ -9364,7 +9365,7 @@ RSpec.describe Kettle::Jem do
         #       visibility and discoverability.
 
         # Dev, Test, & Release Tasks
-        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.24")      # ruby >= 2.4.0
+        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.25")      # ruby >= 2.4.0
 
         # Security
         spec.add_development_dependency("bundler-audit", "~> 0.9.3")             # ruby >= 2.0.0
@@ -9423,7 +9424,7 @@ RSpec.describe Kettle::Jem do
         #       visibility and discoverability.
 
         # Dev, Test, & Release Tasks
-        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.24")
+        spec.add_development_dependency("kettle-dev", "~> 2.2", ">= 2.2.25")
 
         # Security
         spec.add_development_dependency("bundler-audit", "~> 0.9.3")
@@ -9473,8 +9474,8 @@ RSpec.describe Kettle::Jem do
     expect(once).not_to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n\n  # Specify which files")
     expect(once).to include("spec.require_paths = [\"lib\"]\n\n  # Utilities")
     expect(once).not_to include("spec.require_paths = [\"lib\"]\n\n\n  # Utilities")
-    expect(once).to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.24\")\n\n  # Security")
-    expect(once).not_to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.24\")\n\n\n  # Security")
+    expect(once).to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.25\")\n\n  # Security")
+    expect(once).not_to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.2\", \">= 2.2.25\")\n\n\n  # Security")
     expect(once).to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n  # Tasks")
     expect(once).not_to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n\n  # Tasks")
     expect(twice).to eq(once)
@@ -13718,7 +13719,7 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.6"]')
+      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.7"]')
       expect(direct_block).to include("nomono_activation_requirements = nomono_requirements")
       expect(direct_block).to include('nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)')
       expect(direct_block).to include("Bundler::LockfileParser")
@@ -13773,7 +13774,7 @@ RSpec.describe Kettle::Jem do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.6"]
+          nomono_requirements = ["~> 1.0", ">= 1.0.7"]
           gem "nomono", *nomono_requirements, require: false
 
           # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
@@ -13856,7 +13857,7 @@ RSpec.describe Kettle::Jem do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.6"]
+          nomono_requirements = ["~> 1.0", ">= 1.0.7"]
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"

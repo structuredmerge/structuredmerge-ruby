@@ -68,14 +68,14 @@ gem "appraisal2", "~> 3.1", ">= 3.1.1"
 gem "bundler-audit", "~> 0.9.3"
 
 if kettle_rb_dev.casecmp("false").zero?
-  gem "kettle-dev", "~> 2.2", ">= 2.2.20"
+  gem "kettle-dev", "~> 2.2", ">= 2.2.25"
 
   gem "kettle-family", ">= 0.1.32"
 
   gem "kettle-test", "~> 2.0", ">= 2.0.6"
 end
 
-gem "kettle-drift", "~> 1.0", ">= 1.0.3"
+gem "kettle-drift", "~> 1.0", ">= 1.0.5"
 
 
 gem "stone_checksums", "~> 1.0", ">= 1.0.3"

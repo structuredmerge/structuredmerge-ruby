@@ -110,7 +110,7 @@ Gem::Specification.new do |spec|
 
   # Testing
   spec.add_development_dependency('appraisal2', '~> 3.0')
-  spec.add_development_dependency('kettle-test', '~> 1.0', '>= 1.0.6')
+  spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.9')
 
   # Releasing
   spec.add_development_dependency('ruby-progressbar', '~> 1.13')
