@@ -8,8 +8,8 @@ RSpec.describe Kettle::Jem do
     {
       "appraisal2" => {
         declaration_names: ["appraisal2"],
-        requirement_args: %("~> 3.1", ">= 3.1.3"),
-        lock_version: "3.1.3",
+        requirement_args: %("~> 3.1", ">= 3.1.4"),
+        lock_version: "3.1.4",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
