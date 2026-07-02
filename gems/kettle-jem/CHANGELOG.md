@@ -86,6 +86,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- GitHub Actions workflow templating now preserves existing destination SHA
+  pins for the same action/version when accepted templates are stale, and emits
+  a final warning telling maintainers to update the workflow template pins.
 - SimpleCov templating now removes legacy kettle-soup-cover startup requires
   from `.simplecov` and upgrades modifier-form `spec_helper` coverage bootstraps
   to the full kettle-soup-cover `SimpleCov.start` block.

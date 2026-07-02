@@ -3365,6 +3365,8 @@ module Kettle
         )
       end
       run_stats = recipe_run_stats(recipe_reports, diagnostics: diagnostics)
+      warnings = Array(facts[:warnings]).map(&:to_s).reject(&:empty?)
+      warnings.concat(github_workflow_template_pin_warnings(recipe_reports))
 
       {
         mode: "plan",
@@ -3379,7 +3381,7 @@ module Kettle
         decision_evaluations: decision_evaluations,
         prompt_requests: prompt_requests,
         changed_files: changed_files,
-        warnings: Array(facts[:warnings]).map(&:to_s).reject(&:empty?).uniq,
+        warnings: warnings.uniq,
         diagnostics: diagnostics,
         run_stats: run_stats
       }
@@ -4219,6 +4221,10 @@ module Kettle
         changed = false
         deletion = nil
       end
+      if github_workflow_template_recipe?(recipe)
+        stale_pins = stale_github_workflow_template_pin_records(relative_path, final, original)
+        metadata[:stale_github_workflow_template_pins] = stale_pins unless stale_pins.empty?
+      end
       step_report = content_recipe_step_report(recipe: recipe, request: request, original: original, final: final, changed: changed, deletion: deletion)
       metadata[:decision_evaluation] = decision_evaluation
       report = content_recipe_execution_report(
@@ -4579,7 +4585,8 @@ module Kettle
 
         if github_workflow_template_recipe?(recipe)
           merged = preserve_github_workflow_project_settings(recipe, merged, original, project_root: project_root)
-          return finalize_github_workflow_template(merged, facts)
+          merged = finalize_github_workflow_template(merged, facts)
+          return preserve_newer_github_workflow_action_pins(merged, original)
         end
 
         return finalize_template_source_content(recipe, merged)
@@ -4588,7 +4595,10 @@ module Kettle
         accepted = finalize_accepted_template_source(recipe, resolved, original, facts: facts, project_root: project_root)
         accepted = preserve_github_workflow_project_settings(recipe, accepted, original, project_root: project_root) if github_workflow_template_recipe?(recipe)
         accepted = sync_kettle_config_env_overrides(accepted, env) if recipe.fetch(:target_path) == KETTLE_CONFIG_PATH
-        accepted = finalize_github_workflow_template(accepted, facts) if github_workflow_template_recipe?(recipe)
+        if github_workflow_template_recipe?(recipe)
+          accepted = finalize_github_workflow_template(accepted, facts)
+          accepted = preserve_newer_github_workflow_action_pins(accepted, original)
+        end
         return postprocess_readme_content(accepted, facts, project_root: project_root) if recipe.fetch(:target_path) == "README.md"
 
         return finalize_template_source_content(recipe, accepted)
@@ -13850,6 +13860,110 @@ module Kettle
       lines.join
     rescue Psych::Exception
       content
+    end
+
+    def preserve_newer_github_workflow_action_pins(content, destination_content)
+      destination_records = github_workflow_action_pin_records(destination_content)
+      return content if destination_records.empty?
+
+      destination_by_key = destination_records.to_h { |record| [github_workflow_action_pin_key(record), record] }
+      lines = content.to_s.lines
+      github_workflow_action_pin_records(content).each do |record|
+        destination = destination_by_key[github_workflow_action_pin_key(record)]
+        next unless destination
+        next if destination.fetch(:sha) == record.fetch(:sha)
+
+        lines[record.fetch(:line_index)] = replace_github_workflow_action_pin_sha(
+          lines.fetch(record.fetch(:line_index)),
+          destination.fetch(:sha)
+        )
+      end
+      lines.join
+    end
+
+    def stale_github_workflow_template_pin_records(relative_path, final_content, destination_content)
+      destination_records = github_workflow_action_pin_records(destination_content)
+      final_records = github_workflow_action_pin_records(final_content)
+      canonical_records = github_actions_step_pins.values.flat_map do |pin|
+        github_workflow_action_pin_records("uses: #{pin}\n")
+      end
+      return [] if destination_records.empty? || final_records.empty? || canonical_records.empty?
+
+      destination_by_key = destination_records.to_h { |record| [github_workflow_action_pin_key(record), record] }
+      canonical_by_key = canonical_records.to_h { |record| [github_workflow_action_pin_key(record), record] }
+      final_records.filter_map do |record|
+        key = github_workflow_action_pin_key(record)
+        destination = destination_by_key[key]
+        canonical = canonical_by_key[key]
+        next unless destination && canonical
+        next unless destination.fetch(:sha) == record.fetch(:sha)
+        next if canonical.fetch(:sha) == record.fetch(:sha)
+
+        {
+          path: relative_path.to_s,
+          action: record.fetch(:action),
+          version: record.fetch(:version),
+          preserved_sha: record.fetch(:sha),
+          template_sha: canonical.fetch(:sha)
+        }
+      end
+    end
+
+    def github_workflow_template_pin_warnings(recipe_reports)
+      records = recipe_reports.flat_map do |report|
+        Array(report.dig(:metadata, :stale_github_workflow_template_pins))
+      end
+      return [] if records.empty?
+
+      grouped = records.group_by { |record| record.fetch(:path) }
+      grouped.map do |path, path_records|
+        actions = path_records.map { |record| "#{record.fetch(:action)} #{record.fetch(:version)}" }.uniq.sort.join(", ")
+        [
+          "GitHub Actions template pins appear stale for #{path}:",
+          "preserved existing project pin(s) for #{actions}.",
+          "Update kettle-jem's workflow template pins."
+        ].join(" ")
+      end
+    end
+
+    def github_workflow_action_pin_records(content)
+      lines = content.to_s.lines
+      yaml_scalar_pairs(content).filter_map do |key_node, value_node|
+        next unless key_node.value.to_s == "uses"
+        next unless value_node.value.to_s.include?("@")
+
+        github_workflow_action_pin_line_record(lines[key_node.start_line], key_node.start_line)
+      end
+    rescue Psych::Exception
+      []
+    end
+
+    def github_workflow_action_pin_key(record)
+      [record.fetch(:action), record.fetch(:version)]
+    end
+
+    def github_workflow_action_pin_line_record(line, line_index)
+      # Psych intentionally drops comments, but the managed pin contract uses
+      # the trailing comment as the human version label paired with the SHA.
+      match = line.to_s.match(
+        %r{
+          \A\s*(?:-\s*)?uses:\s*
+          (?<action>[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*)
+          @(?<sha>[a-f0-9]{40})\s+\#\s*(?<version>v?[^#\s]+)
+        }x
+      )
+      return unless match
+
+      {
+        action: match[:action],
+        sha: match[:sha],
+        version: match[:version],
+        line_index: line_index
+      }
+    end
+
+    def replace_github_workflow_action_pin_sha(line, sha)
+      line.to_s.sub(/@[a-f0-9]{40}/, "@#{sha}")
     end
 
     def yaml_scalar_pairs(content)

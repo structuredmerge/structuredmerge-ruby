@@ -864,6 +864,73 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "preserves newer destination GitHub Action SHA pins when accepting workflow templates" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-action-pin-preserve-slice", tmp_root) do |root|
+      newer_checkout_sha = "1111111111111111111111111111111111111111"
+      template_checkout_sha = "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .github/workflows/current.yml
+          patterns:
+            - path: ".github/workflows/**"
+              strategy: accept_template
+        YAML
+        ".github/workflows/current.yml" => <<~YAML,
+          name: Current
+          jobs:
+            test:
+              steps:
+                - uses: actions/checkout@#{newer_checkout_sha} # v7.0.0
+                - uses: ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0
+        YAML
+        "template/.github/workflows/current.yml.example" => <<~YAML
+          name: Current
+          jobs:
+            test:
+              steps:
+                - uses: actions/checkout@#{template_checkout_sha} # v7.0.0
+                - uses: ruby/setup-ruby@v1
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/current.yml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
+      expect(content).to include("actions/checkout@#{newer_checkout_sha} # v7.0.0")
+      expect(content).not_to include("actions/checkout@#{template_checkout_sha} # v7.0.0")
+      expect(content).to include("ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0")
+      expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to contain_exactly(
+        include(
+          path: ".github/workflows/current.yml",
+          action: "actions/checkout",
+          version: "v7.0.0",
+          preserved_sha: newer_checkout_sha,
+          template_sha: template_checkout_sha
+        )
+      )
+      expect(plan.fetch(:warnings)).to contain_exactly(
+        include("GitHub Actions template pins appear stale for .github/workflows/current.yml")
+      )
+    end
+  end
+
   it "normalizes GitHub Action refs in existing workflows outside the active recipe set" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
