@@ -98,6 +98,15 @@ RSpec.describe Kettle::Jem do
           "kettle-jem.gemspec"
         ]
       },
+      "rspec-stubbed_env" => {
+        declaration_names: ["rspec-stubbed_env"],
+        requirement_args: %(">= 1.0.6"),
+        requirement_literals: [%("rspec-stubbed_env" => ">= 1.0.6")],
+        lock_version: "1.0.6",
+        requirement_surfaces: [
+          "lib/kettle/jem.rb"
+        ]
+      },
       "gitmoji-regex" => {
         declaration_names: ["gitmoji-regex"],
         requirement_args: %("~> 2.0", ">= 2.0.4"),

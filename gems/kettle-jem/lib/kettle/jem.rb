@@ -42,6 +42,9 @@ module Kettle
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
+    GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
+      "rspec-stubbed_env" => ">= 1.0.6"
+    }.freeze
     OBSOLETE_GITHUB_WORKFLOWS = %w[
       ancient.yml
       legacy.yml
@@ -7699,7 +7702,8 @@ module Kettle
       destination_dependencies = gemspec_dependency_line_index(destination_content, receiver: destination_receiver)
         .transform_values do |source|
           normalized = normalize_gemspec_receiver(source, from: destination_receiver, to: template_receiver)
-          normalize_gemspec_dependency_version_requirements(normalized, receiver: template_receiver, namespace: namespace)
+          normalized = normalize_gemspec_dependency_version_requirements(normalized, receiver: template_receiver, namespace: namespace)
+          enforce_gemspec_dependency_minimum_requirements(normalized, receiver: template_receiver)
         end
       destination_dependencies = destination_dependencies.reject do |key, _source|
         retired_gemspec_development_dependency_key?(key)
@@ -7786,6 +7790,63 @@ module Kettle
       return source if replacements.empty?
 
       replace_source_offsets(source, replacements)
+    end
+
+    def enforce_gemspec_dependency_minimum_requirements(source, receiver:)
+      replacements = ruby_call_records(source, nil).filter_map do |call|
+        next unless gemspec_dependency_call_kind(call)
+        next if receiver && call.receiver&.slice != receiver.to_s
+
+        name = ruby_string_argument(call)
+        requirement = GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS[name]
+        next unless requirement
+        next if gemspec_dependency_requirements_satisfy_floor?(ruby_string_arguments(call).drop(1), requirement)
+
+        gemspec_dependency_minimum_requirement_replacement(call, requirement)
+      end
+      return source if replacements.empty?
+
+      replace_source_offsets(source, replacements)
+    end
+
+    def gemspec_dependency_requirements_satisfy_floor?(requirements, floor_requirement)
+      floor = Gem::Requirement.new(floor_requirement).requirements.first.last
+      requirements.any? do |requirement|
+        parsed = Gem::Requirement.new(requirement.to_s).requirements
+        parsed.any? do |operator, version|
+          %w[>= > =].include?(operator.to_s) && version >= floor
+        end
+      rescue ArgumentError
+        false
+      end
+    end
+
+    def gemspec_dependency_minimum_requirement_replacement(call, requirement)
+      arguments = Array(call.arguments&.arguments)
+      floor = Gem::Requirement.new(requirement).requirements.first.last
+      existing_floor = arguments.drop(1).find do |argument|
+        value = ruby_static_string_value(argument)
+        next false unless value
+
+        parsed = Gem::Requirement.new(value).requirements
+        parsed.any? { |operator, version| %w[>= > =].include?(operator.to_s) && version < floor }
+      rescue ArgumentError
+        false
+      end
+      if existing_floor
+        {
+          start_offset: existing_floor.location.start_offset,
+          end_offset: existing_floor.location.end_offset,
+          replacement: JSON.generate(requirement)
+        }
+      else
+        insertion_offset = arguments.last.location.end_offset
+        {
+          start_offset: insertion_offset,
+          end_offset: insertion_offset,
+          replacement: ", #{JSON.generate(requirement)}"
+        }
+      end
     end
 
     def ruby_project_version_interpolated_string_source(node, receiver:, namespace:)

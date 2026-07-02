@@ -83,6 +83,8 @@ Please file a bug if you notice a violation of semantic versioning.
   environment to Bundler commands.
 - Generated Appraisal guidance now defaults to `bin/rake appraisal:generate`,
   reserving `appraisal:update` for intentional lock refreshes.
+- Gemspec templating now raises preserved `rspec-stubbed_env` dependencies to
+  `>= 1.0.6`.
 
 ### Fixed
 

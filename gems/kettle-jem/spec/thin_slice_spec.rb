@@ -9696,7 +9696,7 @@ RSpec.describe Kettle::Jem do
             gem.add_dependency("rspec", "~> 3.0")
             gem.add_dependency("rspec-block_is_expected", "~> 1.0")
             gem.add_dependency("rspec-pending_for", "~> 0.1")
-            gem.add_dependency("rspec-stubbed_env", "~> 1.0")
+            gem.add_dependency("rspec-stubbed_env", "~> 1.0", ">= 1.0.5")
             gem.add_dependency("rspec_junit_formatter", "~> 0.6")
             gem.add_dependency("silent_stream", "~> 1.0")
           end
@@ -9730,10 +9730,11 @@ RSpec.describe Kettle::Jem do
       gemspec_content = gemspec_report.fetch(:final_content)
       junit_index = gemspec_content.index(%(spec.add_dependency("rspec_junit_formatter", "~> 0.6")))
       pending_index = gemspec_content.index(%(spec.add_dependency("rspec-pending_for", "~> 0.1")))
-      stubbed_index = gemspec_content.index(%(spec.add_dependency("rspec-stubbed_env", "~> 1.0")))
+      stubbed_index = gemspec_content.index(%(spec.add_dependency("rspec-stubbed_env", "~> 1.0", ">= 1.0.6")))
 
       expect(junit_index).to be < pending_index
       expect(pending_index).to be < stubbed_index
+      expect(gemspec_content).not_to include(%(rspec-stubbed_env", "~> 1.0", ">= 1.0.5"))
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end
