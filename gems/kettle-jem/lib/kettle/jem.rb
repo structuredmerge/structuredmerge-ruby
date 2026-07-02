@@ -5359,7 +5359,7 @@ module Kettle
       return [] unless result
 
       result.value.breadth_first_search_all do |node|
-        simplecov_start_call_node?(node) || simplecov_config_require_call_node?(node)
+        simplecov_start_call_node?(node) || simplecov_config_require_call_node?(node) || simplecov_kettle_soup_cover_require_call_node?(node)
       end
     end
 
@@ -5374,6 +5374,13 @@ module Kettle
         node.name == :require &&
         node.receiver.nil? &&
         ruby_string_argument(node) == "kettle/soup/cover/config"
+    end
+
+    def simplecov_kettle_soup_cover_require_call_node?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :require &&
+        node.receiver.nil? &&
+        ruby_string_argument(node) == "kettle-soup-cover"
     end
 
     def normalize_simplecov_track_files_calls(content)
@@ -5406,8 +5413,106 @@ module Kettle
     end
 
     def normalize_spec_helper_simplecov_template_source(content)
-      output = remove_duplicate_simplecov_requires(content)
-      ensure_spec_helper_simplecov_config_require(output)
+      output = remove_duplicate_simplecov_do_cov_bootstrap_blocks(content)
+      output = ensure_spec_helper_simplecov_do_cov_bootstrap(output)
+      output = remove_duplicate_simplecov_requires(output)
+      output = ensure_spec_helper_simplecov_config_require(output)
+      ensure_spec_helper_simplecov_start(output)
+    end
+
+    def remove_duplicate_simplecov_do_cov_bootstrap_blocks(content)
+      records = simplecov_do_cov_bootstrap_records(content)
+      return content if records.length <= 1
+
+      records.drop(1).select { |record| record.fetch(:bootstrap_only) }.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(output, record.fetch(:start_line), expand_line_range_through_following_blanks(output, record.fetch(:end_line)), "")
+      end
+    end
+
+    def ensure_spec_helper_simplecov_do_cov_bootstrap(content)
+      record = simplecov_do_cov_bootstrap_records(content).first
+      return content unless record
+      return content if record.fetch(:complete)
+
+      replace_source_range_lines(
+        content,
+        record.fetch(:start_line),
+        record.fetch(:end_line),
+        spec_helper_simplecov_do_cov_bootstrap_source(leading_whitespace(record.fetch(:source)))
+      )
+    end
+
+    def spec_helper_simplecov_do_cov_bootstrap_source(indent)
+      [
+        "#{indent}if Kettle::Soup::Cover::DO_COV\n",
+        "#{indent}  require \"simplecov\" # Loads project-local .simplecov.\n",
+        "#{indent}  require \"kettle/soup/cover/config\"\n",
+        "#{indent}  SimpleCov.start\n",
+        "#{indent}end\n"
+      ].join
+    end
+
+    def simplecov_do_cov_bootstrap_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      lines = content.to_s.lines
+      result.value.breadth_first_search_all do |node|
+        node.is_a?(::Prism::IfNode) &&
+          simplecov_do_cov_predicate_node?(node.predicate) &&
+          prism_subtree_contains_simplecov_require?(node)
+      end.map do |node|
+        end_line = ruby_node_source_end_line(node)
+        source = (lines[(node.location.start_line - 1)..(end_line - 1)] || []).join
+        {
+          start_line: node.location.start_line,
+          end_line: end_line,
+          source: source,
+          bootstrap_only: simplecov_do_cov_bootstrap_only_node?(node),
+          complete: simplecov_do_cov_bootstrap_complete_node?(node)
+        }
+      end.sort_by { |record| record.fetch(:start_line) }
+    end
+
+    def simplecov_do_cov_predicate_node?(node)
+      node&.location&.slice.to_s == "Kettle::Soup::Cover::DO_COV"
+    end
+
+    def prism_subtree_contains_simplecov_require?(node)
+      node.compact_child_nodes.any? do |child|
+        simplecov_require_call_node?(child) || prism_subtree_contains_simplecov_require?(child)
+      end
+    end
+
+    def simplecov_do_cov_bootstrap_complete_node?(node)
+      subtree = prism_call_nodes(node)
+      subtree.any? { |child| simplecov_require_call_node?(child) } &&
+        subtree.any? { |child| simplecov_config_require_call_node?(child) } &&
+        subtree.any? { |child| simplecov_start_call_node?(child) }
+    end
+
+    def simplecov_do_cov_bootstrap_only_node?(node)
+      calls = prism_call_nodes(node)
+      return false if calls.empty?
+
+      calls.all? do |call|
+        simplecov_require_call_node?(call) ||
+          simplecov_config_require_call_node?(call) ||
+          simplecov_start_call_node?(call)
+      end
+    end
+
+    def prism_call_nodes(node)
+      return [] unless node
+
+      nodes = []
+      stack = [node]
+      until stack.empty?
+        current = stack.pop
+        nodes << current if current.is_a?(::Prism::CallNode)
+        stack.concat(current.compact_child_nodes)
+      end
+      nodes
     end
 
     def remove_duplicate_simplecov_requires(content)
@@ -5432,11 +5537,44 @@ module Kettle
       )
     end
 
+    def ensure_spec_helper_simplecov_start(content)
+      return content if simplecov_start_call_nodes(content).any?
+
+      config_require = simplecov_config_require_call_records(content).first
+      return content unless config_require
+
+      insert_lines_after(
+        content,
+        config_require.fetch(:end_line),
+        "#{leading_whitespace(config_require.fetch(:source))}SimpleCov.start\n"
+      )
+    end
+
+    def simplecov_require_call_node?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :require &&
+        node.receiver.nil? &&
+        ruby_string_argument(node) == "simplecov"
+    end
+
     def simplecov_require_call_records(content)
       lines = content.to_s.lines
       ruby_call_records(content, :require).filter_map do |call|
-        next unless call.receiver.nil?
-        next unless ruby_string_argument(call) == "simplecov"
+        next unless simplecov_require_call_node?(call)
+
+        end_line = ruby_node_source_end_line(call)
+        {
+          start_line: call.location.start_line,
+          end_line: end_line,
+          source: (lines[(call.location.start_line - 1)..(end_line - 1)] || []).join
+        }
+      end.sort_by { |record| record.fetch(:start_line) }
+    end
+
+    def simplecov_config_require_call_records(content)
+      lines = content.to_s.lines
+      ruby_call_records(content, :require).filter_map do |call|
+        next unless simplecov_config_require_call_node?(call)
 
         end_line = ruby_node_source_end_line(call)
         {
@@ -5453,6 +5591,15 @@ module Kettle
 
       result.value.breadth_first_search_all do |node|
         simplecov_config_require_call_node?(node)
+      end
+    end
+
+    def simplecov_start_call_nodes(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      result.value.breadth_first_search_all do |node|
+        simplecov_start_call_node?(node)
       end
     end
 

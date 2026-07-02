@@ -123,6 +123,7 @@ RSpec.describe Kettle::Jem do
       # kettle-jem:freeze
       # local coverage note
       # kettle-jem:unfreeze
+      require "kettle-soup-cover"
       require "kettle/soup/cover/config"
 
       SimpleCov.configure do
@@ -145,6 +146,7 @@ RSpec.describe Kettle::Jem do
     expect(output).to include('cover "lib/**/*.rb"')
     expect(output).to include('custom_setting "kept"')
     expect(output).to include("custom_after_config")
+    expect(output).not_to include('require "kettle-soup-cover"')
     expect(output).not_to include('require "kettle/soup/cover/config"')
     expect(output).not_to include("SimpleCov.start")
     expect(output).not_to include("track_files")
@@ -200,6 +202,34 @@ RSpec.describe Kettle::Jem do
     expect(output).not_to include("`.simplecov` is run here")
   end
 
+  it "upgrades modifier-form spec helper SimpleCov bootstrap to the kettle-soup-cover startup block" do
+    content = <<~RUBY
+      # frozen_string_literal: true
+
+      # For code coverage, must be required before all application / gem / library code.
+      begin
+        require "kettle-soup-cover"
+        require "simplecov" if Kettle::Soup::Cover::DO_COV # `.simplecov` is run here!
+      rescue LoadError => error
+        raise error unless error.message.include?("kettle")
+      end
+
+      require "active_record"
+      require "example"
+    RUBY
+
+    output = described_class.send(:normalize_spec_helper_simplecov_template_source, content)
+
+    expect(output).to include('require "kettle-soup-cover"')
+    expect(output).to include("if Kettle::Soup::Cover::DO_COV")
+    expect(output).to include('require "simplecov" # Loads project-local .simplecov.')
+    expect(output).to include('require "kettle/soup/cover/config"')
+    expect(output).to include("SimpleCov.start")
+    expect(output.index('require "kettle/soup/cover/config"')).to be < output.index("SimpleCov.start")
+    expect(output.index("SimpleCov.start")).to be < output.index('require "active_record"')
+    expect(output).not_to include("`.simplecov` is run here")
+  end
+
   it "updates old generated SimpleCov files in the same templating pass that removes keep_destination" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -229,6 +259,7 @@ RSpec.describe Kettle::Jem do
               strategy: keep_destination
         YAML
         ".simplecov" => <<~RUBY,
+          require "kettle-soup-cover"
           require "kettle/soup/cover/config"
 
           SimpleCov.start do
@@ -260,9 +291,11 @@ RSpec.describe Kettle::Jem do
 
       expect(simplecov.fetch(:final_content)).to include('cover "lib/**/*.rb"')
       expect(simplecov.fetch(:final_content)).not_to include("SimpleCov.start")
+      expect(simplecov.fetch(:final_content)).not_to include('require "kettle-soup-cover"')
       expect(simplecov.fetch(:final_content)).not_to include('require "kettle/soup/cover/config"')
       expect(spec_helper.fetch(:final_content).scan('require "simplecov"').size).to eq(1)
       expect(spec_helper.fetch(:final_content)).to include('require "kettle/soup/cover/config"')
+      expect(spec_helper.fetch(:final_content)).to include("SimpleCov.start")
       expect(kettle_config.fetch(:final_content)).not_to include(".simplecov:")
     end
   end

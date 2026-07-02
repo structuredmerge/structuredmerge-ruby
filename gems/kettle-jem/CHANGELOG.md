@@ -86,6 +86,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- SimpleCov templating now removes legacy kettle-soup-cover startup requires
+  from `.simplecov` and upgrades modifier-form `spec_helper` coverage bootstraps
+  to the full kettle-soup-cover `SimpleCov.start` block.
 - Root Gemfile templating now keeps `nomono_requirements` before existing
   `gem "nomono", *nomono_requirements` calls when merging legacy local sibling
   wiring.
