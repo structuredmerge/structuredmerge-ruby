@@ -85,8 +85,8 @@ Please file a bug if you notice a violation of semantic versioning.
   reserving `appraisal:update` for intentional lock refreshes.
 - Gemspec templating now raises preserved `rspec-stubbed_env` dependencies to
   `>= 1.0.6`.
-- Generated documentation Gemfiles now require `yard-fence` >= 0.9.6 and
-  `yard-timekeeper` >= 0.2.3.
+- Generated documentation Gemfiles now require `yard-fence` >= 0.9.6,
+  `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
 
 ### Fixed
 
