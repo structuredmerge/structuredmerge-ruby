@@ -107,6 +107,18 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gem.gemspec.example"
         ]
       },
+      "stone_checksums" => {
+        declaration_names: ["stone_checksums"],
+        requirement_args: %("~> 1.0", ">= 1.0.5"),
+        lock_version: "1.0.5",
+        requirement_surfaces: [
+          "kettle-jem.gemspec",
+          "gemfiles/modular/optional.gemfile",
+          "lib/kettle/jem.rb",
+          "lib/kettle/jem/templates/gem.gemspec.example",
+          "lib/kettle/jem/templates/shim/gem.gemspec.example"
+        ]
+      },
       "version_gem" => {
         declaration_names: ["version_gem"],
         requirement_args: %("~> 1.1", ">= 1.1.13"),

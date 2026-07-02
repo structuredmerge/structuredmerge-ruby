@@ -75,7 +75,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated gemspecs now require `appraisal2` >= 3.1.4.
 - Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.3.
 
-- Generated gemspecs now require `stone_checksums` >= 1.0.4.
+- Generated gemspecs now require `stone_checksums` >= 1.0.5.
 - Generated optional Gemfiles no longer duplicate the gemspec's direct
   `stone_checksums` development dependency.
 
