@@ -13400,7 +13400,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+          uses: ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -13495,7 +13495,7 @@ module Kettle
                 uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
               - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+                uses: ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0
                 with:
                   ruby-version: "${{ matrix.ruby }}"
                   rubygems: "${{ matrix.rubygems }}"
@@ -13790,7 +13790,7 @@ module Kettle
     def github_actions_step_pins
       {
         "actions/checkout" => "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
-        "ruby/setup-ruby" => "ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@fd52dc852530a708d68c3b7342f8d33d1df4cd55 # v2.2.1",
         "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7",
@@ -13799,9 +13799,9 @@ module Kettle
         "actions/upload-artifact" => "actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1",
         "amancevice/setup-code-climate" => "amancevice/setup-code-climate@0daf2985a225e8ac15975b4d233010e94d65b76a # v2",
         "actions/dependency-review-action" => "actions/dependency-review-action@a1d282b36b6f3519aa1f3fc636f609c47dddb294 # v5.0.0",
-        "github/codeql-action/init" => "github/codeql-action/init@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2",
-        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2",
-        "github/codeql-action/analyze" => "github/codeql-action/analyze@8aad20d150bbac5944a9f9d289da16a4b0d87c1e # v4.36.2",
+        "github/codeql-action/init" => "github/codeql-action/init@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3",
+        "github/codeql-action/autobuild" => "github/codeql-action/autobuild@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3",
+        "github/codeql-action/analyze" => "github/codeql-action/analyze@54f647b7e1bb85c95cddabcd46b0c578ec92bc1a # v4.36.3",
         "pozil/auto-assign-issue" => "pozil/auto-assign-issue@af6beea6bdf1e8eb373f061c5bc168681fc6d011 # v4.0.1",
         "apache/skywalking-eyes/dependency" => "apache/skywalking-eyes/dependency@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0",
         "sarisia/actions-status-discord" => "sarisia/actions-status-discord@eb045afee445dc055c18d3d90bd0f244fd062708 # v1.16.0"
