@@ -98,6 +98,15 @@ RSpec.describe Kettle::Jem do
           "kettle-jem.gemspec"
         ]
       },
+      "gitmoji-regex" => {
+        declaration_names: ["gitmoji-regex"],
+        requirement_args: %("~> 2.0", ">= 2.0.4"),
+        lock_version: "2.0.4",
+        requirement_surfaces: [
+          "kettle-jem.gemspec",
+          "lib/kettle/jem/templates/gem.gemspec.example"
+        ]
+      },
       "version_gem" => {
         declaration_names: ["version_gem"],
         requirement_args: %("~> 1.1", ">= 1.1.13"),
@@ -109,8 +118,8 @@ RSpec.describe Kettle::Jem do
       },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
-        requirement_args: %("~> 3.1", ">= 3.1.5"),
-        lock_version: "3.1.5",
+        requirement_args: %("~> 3.1", ">= 3.1.6"),
+        lock_version: "3.1.6",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"

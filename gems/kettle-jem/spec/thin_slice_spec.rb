@@ -3310,7 +3310,7 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.9"')
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.5"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.6"')
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
@@ -3365,7 +3365,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:changed_files)).to include("Gemfile")
       expect(gemfile).to include('gem "kettle-dev", "~> 2.3", ">= 2.3.0"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.9"')
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.5"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.6"')
     end
   end
 
@@ -9663,7 +9663,7 @@ RSpec.describe Kettle::Jem do
             spec.require_paths = ["lib"]
             spec.bindir = "exe"
             spec.executables = ["#{contract_case.fetch(:executable)}"]
-            spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.3")
+            spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.4")
           end
         RUBY
         ".kettle-jem.yml" => <<~YAML,
@@ -9708,7 +9708,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include(contract_case.fetch(:summary))
       expect(gemspec_content).to include(contract_case.fetch(:description))
       expect(gemspec_content).to include(%(spec.executables = ["#{contract_case.fetch(:executable)}"]))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.3")))
+      expect(gemspec_content).to include(%(spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.4")))
       expect(gemspec_content).not_to include("# Hence.")
       expect(gemspec_content).not_to include("add_development_dependency(\"#{package_name}\"")
       expect(File.read(File.join(root, "#{package_name}.gemspec"))).to eq(gemspec_content)
