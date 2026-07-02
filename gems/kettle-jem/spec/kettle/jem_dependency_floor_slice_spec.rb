@@ -157,16 +157,16 @@ RSpec.describe Kettle::Jem do
       },
       "yard-fence" => {
         declaration_names: ["yard-fence"],
-        requirement_args: %("~> 0.9", ">= 0.9.5"),
-        lock_version: "0.9.5",
+        requirement_args: %("~> 0.9", ">= 0.9.6"),
+        lock_version: "0.9.6",
         requirement_surfaces: [
           "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
         ]
       },
       "yard-timekeeper" => {
         declaration_names: ["yard-timekeeper"],
-        requirement_args: %("~> 0.2", ">= 0.2.2"),
-        lock_version: "0.2.2",
+        requirement_args: %("~> 0.2", ">= 0.2.3"),
+        lock_version: "0.2.3",
         requirement_surfaces: [
           "gemfiles/modular/documentation.gemfile",
           "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
