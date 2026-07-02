@@ -127,7 +127,7 @@ Please file a bug if you notice a violation of semantic versioning.
   from `SMORG_RB_DEV`.
 - Generated gemspecs now require `version_gem` >= 1.1.13.
 - Generated gemspecs now require `gitmoji-regex` >= 2.0.4.
-- Generated documentation Gemfiles now require `yaml-converter` >= 0.2.2.
+- Generated documentation Gemfiles now require `yaml-converter` >= 0.2.3.
 - Generated documentation Gemfiles now require `yard-fence` >= 0.9.5.
 - Generated documentation Gemfiles now require `yard-timekeeper` >= 0.2.2.
 - Generated documentation Gemfiles now require `yard-yaml` >= 0.2.2.

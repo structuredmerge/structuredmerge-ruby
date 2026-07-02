@@ -8485,7 +8485,7 @@ RSpec.describe Kettle::Jem do
 
           # Documentation
           gem "kramdown", "~> 2.5", ">= 2.5.1", require: false
-          gem "yaml-converter", "~> 0.2", ">= 0.2.2", require: false
+          gem "yaml-converter", "~> 0.2", ">= 0.2.3", require: false
           gem "yard", "~> 0.9", ">= 0.9.44", require: false
         RUBY
       })

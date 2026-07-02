@@ -137,6 +137,15 @@ RSpec.describe Kettle::Jem do
           "lib/kettle/jem/templates/gem.gemspec.example"
         ]
       },
+      "yaml-converter" => {
+        declaration_names: ["yaml-converter"],
+        requirement_args: %("~> 0.2", ">= 0.2.3"),
+        lock_version: "0.2.3",
+        requirement_surfaces: [
+          "gemfiles/modular/documentation.gemfile",
+          "lib/kettle/jem/templates/gemfiles/modular/documentation.gemfile.example"
+        ]
+      },
       "yard-fence" => {
         declaration_names: ["yard-fence"],
         requirement_args: %("~> 0.9", ">= 0.9.5"),
