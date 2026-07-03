@@ -7835,7 +7835,35 @@ RSpec.describe Kettle::Jem do
         )
       })
     ]
+    coverage_workflow = described_class.send(:synchronize_github_actions_coverage_ci, "", {
+      ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+    })
+    existing_workflow = <<~YAML
+      name: Existing
+      on:
+        push:
+          branches:
+            - "main"
+            - "*-stable"
+            - "r*_*-*-v*"
+    YAML
+    preserved_workflows = [
+      described_class.send(:synchronize_github_actions_ci, existing_workflow, {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, existing_workflow, {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      }),
+      described_class.send(:synchronize_github_actions_coverage_ci, existing_workflow, {
+        ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+      })
+    ]
 
+    expect(workflows + [coverage_workflow]).not_to include(include('      - "r*_*-*-v*"'))
+    expect(preserved_workflows).to all(include('      - "r*_*-*-v*"'))
     expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.3' }}"))
     expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
     expect(workflows).to all(include("        if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.3' }}"))

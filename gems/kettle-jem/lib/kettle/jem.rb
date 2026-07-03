@@ -13482,12 +13482,13 @@ module Kettle
       lines.join.gsub(/\n{3,}/, "\n\n")
     end
 
-    def synchronize_github_actions_ci(_content, facts)
+    def synchronize_github_actions_ci(content, facts)
       package = facts.fetch(:package)
       ci = facts.fetch(:ci)
       ruby_versions = ci.fetch(:ruby_versions)
       ruby_matrix = ruby_versions.map { |version| "          - \"#{version}\"" }.join("\n")
       setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
+      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
 
       <<~YAML
         name: CI
@@ -13498,8 +13499,7 @@ module Kettle
         on:
           push:
             branches:
-              - "#{ci.fetch(:default_branch)}"
-              - "*-stable"
+#{push_branches}
             tags:
               - "!*" # Do not execute on tags
           pull_request:
@@ -13538,7 +13538,7 @@ module Kettle
       YAML
     end
 
-    def synchronize_github_actions_framework_ci(_content, facts)
+    def synchronize_github_actions_framework_ci(content, facts)
       ci = facts.fetch(:ci)
       framework_matrix = ci.fetch(:framework_matrix)
       ruby_matrix = ci.fetch(:ruby_versions).map { |version| "          - \"#{version}\"" }.join("\n")
@@ -13551,6 +13551,7 @@ module Kettle
       dimension = framework_matrix.fetch(:dimension)
       label = dimension.split(/[-_]/).map { |part| part[0].to_s.upcase + part[1..].to_s }.join(" ")
       setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
+      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
 
       <<~YAML
         name: #{label} CI
@@ -13561,8 +13562,7 @@ module Kettle
         on:
           push:
             branches:
-              - "#{ci.fetch(:default_branch)}"
-              - "*-stable"
+#{push_branches}
             tags:
               - "!*" # Do not execute on tags
           pull_request:
@@ -13654,9 +13654,10 @@ module Kettle
       "#{lines.join("\n")}\n"
     end
 
-    def synchronize_github_actions_coverage_ci(_content, facts)
+    def synchronize_github_actions_coverage_ci(content, facts)
       ci = facts.fetch(:ci)
       coverage = ci.fetch(:coverage)
+      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
       <<~YAML
         name: Test Coverage
 
@@ -13677,8 +13678,7 @@ module Kettle
         on:
           push:
             branches:
-              - "#{ci.fetch(:default_branch)}"
-              - "*-stable"
+#{push_branches}
             tags:
               - "!*" # Do not execute on tags
           pull_request:
@@ -13756,6 +13756,37 @@ module Kettle
       )
       updated = append_github_actions_coverage_steps(updated, disabled_integrations: facts.dig(:integrations, :disabled)) if github_actions_coverage_enabled?(updated)
       update_github_actions_pins(updated)
+    end
+
+    def github_actions_push_branches_yaml(content, default_branch:)
+      github_actions_push_branches(content, default_branch: default_branch).map do |branch|
+        "              - #{branch.inspect}"
+      end.join("\n")
+    end
+
+    def github_actions_push_branches(content, default_branch:)
+      managed = [default_branch.to_s, "*-stable"]
+      existing = yaml_scalar_sequence_at_path(content, %w[on push branches])
+      (managed + existing).uniq
+    end
+
+    def yaml_scalar_sequence_at_path(content, path)
+      document = Psych.parse_stream(content.to_s).children.first
+      node = path.reduce(document&.root) do |current, key|
+        break nil unless current.is_a?(Psych::Nodes::Mapping)
+
+        pair = current.children.each_slice(2).find do |key_node, _value_node|
+          key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+        end
+        pair&.last
+      end
+      return [] unless node.is_a?(Psych::Nodes::Sequence)
+
+      node.children.filter_map do |child|
+        child.value.to_s if child.is_a?(Psych::Nodes::Scalar)
+      end
+    rescue Psych::Exception
+      []
     end
 
     def github_actions_coverage_enabled?(content)

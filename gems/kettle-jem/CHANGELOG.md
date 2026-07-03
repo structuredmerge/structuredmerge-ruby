@@ -90,6 +90,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated GitHub Actions workflows now preserve existing push branch filters
+  from destination workflows.
 - GitHub Actions workflow templating now preserves existing destination SHA
   pins for the same action/version when accepted templates are stale, and emits
   a final warning telling maintainers to update the workflow template pins.
