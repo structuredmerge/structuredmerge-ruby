@@ -26,6 +26,7 @@ RSpec.describe KettleJemWorkflowPins do
 
       expect(chdir).to eq(project_root)
       expect(command).not_to include("--cache-path")
+      expect(command.fetch(command.index("--upgrade") + 1)).to eq("major")
       expect { Psych.parse_stream(synthetic_workflow) }.not_to raise_error
       expect(synthetic_workflow).to include("      - name: actions/checkout\n")
 

@@ -478,6 +478,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Fixed `bin/kettle-jem-workflow-pins` so sub-action updates reported under the
   parent action repository, such as `github/codeql-action`, update the full
   pinned action path instead of being silently counted as zero updates.
+- Fixed `bin/kettle-jem-workflow-pins` to default to the same broad upgrade
+  strategy used by family workflow pin maintenance, so minor action releases
+  such as `ruby/setup-ruby` are not missed by template pin refreshes.
 - README compatibility badge pruning now compares Ruby minor series so patch
   floors like `>= 1.8.7` and `>= 2.2.2` keep their matching minor badges.
 - Gemspec template summary and description tokens now strip an already-present

@@ -894,7 +894,7 @@ RSpec.describe Kettle::Jem do
             test:
               steps:
                 - uses: actions/checkout@#{newer_checkout_sha} # v7.0.0
-                - uses: ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0
+                - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9 # v1.316.0
         YAML
         "template/.github/workflows/current.yml.example" => <<~YAML
           name: Current
@@ -915,7 +915,7 @@ RSpec.describe Kettle::Jem do
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
       expect(content).to include("actions/checkout@#{newer_checkout_sha} # v7.0.0")
       expect(content).not_to include("actions/checkout@#{template_checkout_sha} # v7.0.0")
-      expect(content).to include("ruby/setup-ruby@0dafeac902942906541bc140009cdbf32665b601 # v1.315.0")
+      expect(content).to include("ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9 # v1.316.0")
       expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to contain_exactly(
         include(
           path: ".github/workflows/current.yml",
