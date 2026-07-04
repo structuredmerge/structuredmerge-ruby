@@ -51,6 +51,12 @@ RSpec.describe KettleJemWorkflowPins do
     FileUtils.rm_rf(project_root)
   end
 
+  it "defaults the project root to the gem root relative to the bin script" do
+    options = described_class.parse_options([])
+
+    expect(options.fetch(:project_root)).to eq(File.expand_path("../..", __dir__))
+  end
+
   it "updates the pin index and workflow examples by action key" do
     result = described_class.new(project_root: project_root, options: {write: true}).run
 

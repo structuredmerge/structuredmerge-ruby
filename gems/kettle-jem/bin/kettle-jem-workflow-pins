@@ -13,6 +13,7 @@ require_relative "../lib/kettle/jem"
 class KettleJemWorkflowPins
   VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
   DEFAULT_UPGRADE_LEVEL = "major"
+  DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
 
   def initialize(project_root:, env: ENV, options: {})
     @project_root = File.expand_path(project_root)
@@ -46,14 +47,14 @@ class KettleJemWorkflowPins
 
   def self.parse_options(argv)
     options = {
-      project_root: Dir.pwd,
+      project_root: DEFAULT_PROJECT_ROOT,
       write: false,
       check: false,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
     parser.parse!(argv, into: options)
-    options[:project_root] = argv.shift || Dir.pwd
+    options[:project_root] = argv.shift || DEFAULT_PROJECT_ROOT
     raise OptionParser::InvalidArgument, "Expected at most one PROJECT_ROOT" unless argv.empty?
 
     options

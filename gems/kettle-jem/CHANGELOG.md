@@ -90,6 +90,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Fixed `bin/kettle-jem-workflow-pins` so its default project root resolves to
+  the kettle-jem gem root relative to the script instead of the caller's working
+  directory.
 - Generated GitHub Actions workflows now preserve existing push branch filters
   from destination workflows.
 - GitHub Actions workflow templating now preserves existing destination SHA
