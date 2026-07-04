@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "version_gem"
-
 require "fileutils"
 require "find"
 require "English"
@@ -14263,8 +14261,4 @@ end
 
 if File.basename($PROGRAM_NAME).match?(/\Arake(?:\z|\.)/) || defined?(Rake.application)
   Kettle::Jem.install_tasks
-end
-
-Kettle::Jem::Version.class_eval do
-  extend VersionGem::Basic
 end

@@ -61,6 +61,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `require "kettle/jem"` no longer directly loads `version_gem` by default;
+  require `kettle/jem/version_gem` for the optional `VersionGem::Basic`
+  extension.
 - Ruby, engine, Rails, RuboCop, and RuboCop LTS compatibility choices now come
   from `Kettle::Rb::CompatMatrix` in `kettle-rb`.
 - Generated `mise.toml` files no longer export `RUBOCOP_LTS_LOCAL=false`;
