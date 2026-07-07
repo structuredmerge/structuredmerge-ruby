@@ -13626,7 +13626,7 @@ module Kettle
         - name: Bundle install for legacy Ruby engine
           if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.3' }}
           run: |
-            bundle config set --local path vendor/bundle
+            bundle config set --local path "${RUNNER_TEMP}/bundle"
             bundle install --jobs 1
       YAML
       yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip

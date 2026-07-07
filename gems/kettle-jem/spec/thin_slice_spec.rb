@@ -2821,6 +2821,7 @@ RSpec.describe Kettle::Jem do
           AllCops:
             Exclude:
               - vendor/**/*
+              - "**/vendor/**/*"
           RBS:
             Enabled: true
         YAML
@@ -7867,8 +7868,11 @@ RSpec.describe Kettle::Jem do
     expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.3' }}"))
     expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
     expect(workflows).to all(include("        if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.3' }}"))
-    expect(workflows).to all(include("          bundle config set --local path vendor/bundle"))
+    expect(workflows).to all(include('          bundle config set --local path "${RUNNER_TEMP}/bundle"'))
     expect(workflows).to all(include("          bundle install --jobs 1"))
+
+    packaged_rubocop = File.read(File.join(__dir__, "../lib/kettle/jem/templates/.rubocop.yml.example"))
+    expect(packaged_rubocop).to include('    - "**/vendor/**/*"')
 
     packaged_workflow = File.read(File.join(
       __dir__,
@@ -7876,7 +7880,7 @@ RSpec.describe Kettle::Jem do
     ))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
-    expect(packaged_workflow).to include("          bundle config set --local path vendor/bundle")
+    expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
     expect(packaged_workflow).to include("          bundle install --jobs 1")
 
     packaged_workflow = File.read(File.join(
@@ -7885,7 +7889,7 @@ RSpec.describe Kettle::Jem do
     ))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.3")
-    expect(packaged_workflow).to include("          bundle config set --local path vendor/bundle")
+    expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 

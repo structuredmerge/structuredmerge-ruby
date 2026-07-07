@@ -93,6 +93,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated legacy-engine CI workflows now install Bundler gems under
+  `${RUNNER_TEMP}/bundle` instead of `vendor/bundle`, preventing Appraisal
+  installs from creating nested `gemfiles/vendor` bundles.
+- Generated RuboCop configs now exclude `**/vendor/**/*` so nested vendored
+  dependency trees are not linted.
+
 - Fixed `bin/kettle-jem-workflow-pins` so its default project root resolves to
   the kettle-jem gem root relative to the script instead of the caller's working
   directory.
