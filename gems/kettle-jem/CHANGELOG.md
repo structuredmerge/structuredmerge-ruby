@@ -72,6 +72,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated style Gemfiles now require `rubocop-lts-rspec` >= 1.0.4.
 - kettle-jem now declares and loads the direct `rbs` runtime dependency used
   by its RBS signature cleanup logic.
+- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.3.1.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.7, and
   `token-resolver` 2.0.4.
