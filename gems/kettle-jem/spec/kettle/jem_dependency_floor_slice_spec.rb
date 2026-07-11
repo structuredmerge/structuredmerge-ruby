@@ -118,8 +118,8 @@ RSpec.describe Kettle::Jem do
       },
       "stone_checksums" => {
         declaration_names: ["stone_checksums"],
-        requirement_args: %("~> 1.0", ">= 1.0.5"),
-        lock_version: "1.0.5",
+        requirement_args: %("~> 1.0", ">= 1.0.6"),
+        lock_version: "1.0.6",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "gemfiles/modular/optional.gemfile",
