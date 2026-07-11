@@ -199,4 +199,76 @@ RSpec.describe Kettle::Jem do
       expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error
     end
   end
+
+  it "preserves non-default version_gem loading when a dedicated version_gem entrypoint exists" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-non-default", tmp_root) do |root|
+      write_file(root, "nomono.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "nomono"
+          spec.version = "1.0.8"
+          spec.summary = "Nomono"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+        end
+      RUBY
+      write_file(root, ".kettle-jem.yml", <<~YAML)
+        templates:
+          root: template
+          apply: true
+          entries:
+            - nomono.gemspec
+      YAML
+      write_file(root, "template/nomono.gemspec.example", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "{KJ|GEM_NAME}"
+          spec.version = "0.0.0"
+          spec.summary = "Template summary"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+        end
+      RUBY
+      write_file(root, "lib/nomono.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "nomono/version"
+        require_relative "nomono/core"
+
+        Nomono::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      dedicated_entrypoint = <<~RUBY
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "version"
+
+        Nomono::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      write_file(root, "lib/nomono/version_gem.rb", dedicated_entrypoint)
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_bootstrap",
+          status: "applied",
+          changed_files: include("lib/nomono.rb", "lib/nomono/version.rb", "sig/nomono/version.rbs")
+        )
+      )
+      entrypoint = File.read(File.join(root, "lib/nomono.rb"))
+      expect(entrypoint).to include('require_relative "nomono/version"')
+      expect(entrypoint).to include('require_relative "nomono/core"')
+      expect(entrypoint).not_to include('require "version_gem"')
+      expect(entrypoint).not_to include("VersionGem::Basic")
+      gemspec = File.read(File.join(root, "nomono.gemspec"))
+      expect(gemspec).not_to include("version_gem")
+      expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
+    end
+  end
 end

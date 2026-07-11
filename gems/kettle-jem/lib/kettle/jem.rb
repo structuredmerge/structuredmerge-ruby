@@ -2895,6 +2895,8 @@ module Kettle
           engines: ruby_engines_config(kettle_config)
         )
       }
+      version_gem_facts = version_gem_facts_for_project(project_root, entrypoint_require)
+      facts[:version_gem] = version_gem_facts unless version_gem_facts.empty?
       facts[:shim] = shim unless shim.empty?
       repository_topology = repository_topology_for(kettle_config, env, template_selection)
       repository = repository_facts(
@@ -6953,6 +6955,7 @@ module Kettle
       merged = remove_duplicate_gemspec_assignments(merged, receiver: template_receiver, fields: %w[homepage])
       merged = remove_gemspec_self_dependency_lines(merged, package_name, receiver: template_receiver)
       merged = remove_gemspec_version_gem_dependency_when_runtime_incompatible(merged, facts, receiver: template_receiver)
+      merged = remove_gemspec_version_gem_dependency_when_non_default_entrypoint(merged, facts, receiver: template_receiver)
       merged = remove_gemspec_development_dependencies_already_runtime(merged, receiver: template_receiver)
       merged = remove_empty_gemspec_development_dependency_section_headings(merged, receiver: template_receiver)
       merged = sort_runtime_gemspec_dependency_lines(merged, receiver: template_receiver)
@@ -7143,6 +7146,13 @@ module Kettle
 
     def remove_gemspec_version_gem_dependency_when_runtime_incompatible(content, facts, receiver:)
       return content if version_gem_runtime_compatible?(facts)
+
+      cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
+      remove_ruby_comment_lines_containing(cleaned, "version_gem")
+    end
+
+    def remove_gemspec_version_gem_dependency_when_non_default_entrypoint(content, facts, receiver:)
+      return content unless facts.to_h.dig(:version_gem, :non_default_entrypoint)
 
       cleaned = remove_gemspec_dependency_lines(content, receiver: receiver, names: ["version_gem"], runtime_only: true)
       remove_ruby_comment_lines_containing(cleaned, "version_gem")
@@ -10763,7 +10773,10 @@ module Kettle
         )
       end
       current_entrypoint = read_project_file(project_root, entrypoint_path)
-      entrypoint_content = if current_entrypoint.empty?
+      non_default_version_gem = non_default_version_gem_entrypoint?(project_root, entrypoint_require)
+      entrypoint_content = if non_default_version_gem
+        version_gem_free_entrypoint_content(current_entrypoint, entrypoint_require: entrypoint_require)
+      elsif current_entrypoint.empty?
         version_gem_entrypoint_file_content(namespace: namespace, entrypoint_require: entrypoint_require)
       else
         version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
@@ -10781,6 +10794,18 @@ module Kettle
         entrypoint_path: entrypoint_path,
         signature_path: signature_path
       }
+    end
+
+    def non_default_version_gem_entrypoint?(project_root, entrypoint_require)
+      version_gem_path = File.join("lib", entrypoint_require.to_s, "version_gem.rb")
+      File.file?(File.join(project_root, version_gem_path))
+    end
+
+    def version_gem_facts_for_project(project_root, entrypoint_require)
+      version_gem_path = File.join("lib", entrypoint_require.to_s, "version_gem.rb")
+      return {} unless File.file?(File.join(project_root, version_gem_path))
+
+      {non_default_entrypoint: true, entrypoint_path: version_gem_path}
     end
 
     def remove_legacy_version_signature_alias(project_root, signature_path, namespace:)
