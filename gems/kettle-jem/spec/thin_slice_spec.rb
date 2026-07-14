@@ -5014,6 +5014,42 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "makes generated git hook scripts executable during template apply" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-hook-mode", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "1.0.0"
+            spec.summary = "Demo"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries: []
+        YAML
+        ".git-hooks/commit-msg" => "#!/bin/sh\n",
+        ".git-hooks/prepare-commit-msg" => "#!/bin/sh\n"
+      })
+      FileUtils.chmod(0o644, File.join(root, ".git-hooks", "commit-msg"))
+      FileUtils.chmod(0o644, File.join(root, ".git-hooks", "prepare-commit-msg"))
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true})
+
+      expect(apply.fetch(:post_apply_steps)).to include(hash_including(
+        name: "git_hooks_executable",
+        status: "updated",
+        changed_files: contain_exactly(".git-hooks/commit-msg", ".git-hooks/prepare-commit-msg")
+      ))
+      expect(File.executable?(File.join(root, ".git-hooks", "commit-msg"))).to be(true)
+      expect(File.executable?(File.join(root, ".git-hooks", "prepare-commit-msg"))).to be(true)
+    end
+  end
+
   it "plans local semantic Git driver setup by default" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {})
 

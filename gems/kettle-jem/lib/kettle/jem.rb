@@ -185,6 +185,10 @@ module Kettle
       "lib/**/*.rb",
       "*.gemspec"
     ].freeze
+    EXECUTABLE_GIT_HOOK_PATHS = %w[
+      .git-hooks/commit-msg
+      .git-hooks/prepare-commit-msg
+    ].freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
       "sig/gem/version.rbs"
@@ -3442,9 +3446,32 @@ module Kettle
       [
         template_version_gem_bootstrap_step(project_root, report),
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
+        git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
         monorepo_subgem_kettle_config_profile_sync_step(project_root, report)
       ].compact
+    end
+
+    def git_hooks_executable_step(project_root)
+      existing_paths = EXECUTABLE_GIT_HOOK_PATHS.select do |relative_path|
+        File.file?(File.join(project_root.to_s, relative_path))
+      end
+      return {name: "git_hooks_executable", status: "missing", changed_files: []} if existing_paths.empty?
+
+      changed_files = existing_paths.filter_map do |relative_path|
+        path = File.join(project_root.to_s, relative_path)
+        before = File.stat(path).mode
+        after = before | 0o111
+        next if before == after
+
+        FileUtils.chmod(after, path)
+        relative_path
+      end
+      {
+        name: "git_hooks_executable",
+        status: changed_files.empty? ? "already_executable" : "updated",
+        changed_files: changed_files
+      }
     end
 
     def github_actions_pin_sync_step(project_root)
