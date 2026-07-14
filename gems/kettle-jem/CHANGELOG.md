@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- JRuby 9.2 workflow templates now use the legacy-engine bundle install path
+  instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
+  setup against gem servers without the full legacy index.
 - Gemspec templating now structurally merges destination `spec.files`
   collection entries with template package entries so project-specific
   packaged files are not lost when the template rewrites the generated gemspec

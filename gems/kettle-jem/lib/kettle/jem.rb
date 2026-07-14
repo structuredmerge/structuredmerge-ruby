@@ -13708,10 +13708,10 @@ module Kettle
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
             bundler: "${{ matrix.bundler }}"
-            bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.3' }}
+            bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}
 
         - name: Bundle install for legacy Ruby engine
-          if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.3' }}
+          if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}
           run: |
             bundle config set --local path "${RUNNER_TEMP}/bundle"
             bundle install --jobs 1
