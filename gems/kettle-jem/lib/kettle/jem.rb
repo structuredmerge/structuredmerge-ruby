@@ -12716,7 +12716,7 @@ module Kettle
       return unless template_root.fetch(:kind) == "packaged"
       return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == KETTLE_CONFIG_PATH
       return {strategy: :accept_template} if target_path.to_s == "CITATION.cff"
-      return {strategy: :accept_template} if target_path.to_s == "Rakefile"
+      return {strategy: :merge, preference: :destination, add_template_only_nodes: true} if target_path.to_s == "Rakefile"
       return {strategy: :accept_template} if version_gem_template_target_path?(target_path)
       return {strategy: :accept_template} if target_path.to_s.start_with?(".github/workflows/")
       return {strategy: :accept_template} if target_path.to_s.start_with?("gemfiles/modular/")

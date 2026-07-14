@@ -158,7 +158,9 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     kettle_config = File.read(File.join(gem_root, ".structuredmerge/kettle-jem.yml"))
     expect(kettle_config).to include("# kettle-jem configuration file")
     expect(kettle_config).to include("min_divergence_threshold: 5")
-    expect(kettle_config).to include("  Rakefile:\n    strategy: accept_template")
+    expect(kettle_config).to include("  Rakefile:\n    strategy: merge")
+    expect(kettle_config).to include("    preference: destination")
+    expect(kettle_config).to include("    add_template_only_nodes: true")
     expect(bootstrap.fetch(:changed_files)).to include(
       ".github/FUNDING.yml",
       ".structuredmerge/kettle-jem.yml",
@@ -215,7 +217,7 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     )
 
     style_gemfile = File.read(File.join(gem_root, "gemfiles/modular/style.gemfile"))
-    expect(style_gemfile).to include('gem "rubocop-lts", "~> 24.2", ">= 24.2.0"')
+    expect(style_gemfile).to include('gem "rubocop-lts", "~> 24.2", ">= 24.2.1"')
     expect(style_gemfile).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
     expect(style_gemfile).not_to include('gem "rubocop-rspec", "~> 3.6"')
     expect(style_gemfile).to include('gem "rubocop-ruby3_2", "~> 3.0", ">= 3.0.6"')

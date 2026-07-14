@@ -105,6 +105,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Packaged Rakefile templating now merges destination Rakefiles by default
+  instead of replacing them wholesale, preserving project-specific rake tasks
+  such as release or adapter test helpers.
 - Version-gem namespace discovery no longer treats nested implementation
   namespaces in the public entrypoint, such as `Kettle::Dev::Tasks`, as the gem
   namespace when the existing version namespace is more specific.
