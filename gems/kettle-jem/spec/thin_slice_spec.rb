@@ -394,7 +394,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.10")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.6")))
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
-      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.7"))
+      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.8"))
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
@@ -8435,7 +8435,7 @@ RSpec.describe Kettle::Jem do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.7"]')
+      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
       expect(content).to include('gem "nomono", *nomono_requirements, require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
@@ -13852,7 +13852,7 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.7"]')
+      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
       expect(direct_block).to include("nomono_activation_requirements = nomono_requirements")
       expect(direct_block).to include('nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)')
       expect(direct_block).to include("Bundler::LockfileParser")
@@ -13907,7 +13907,7 @@ RSpec.describe Kettle::Jem do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.7"]
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
           gem "nomono", *nomono_requirements, require: false
 
           # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
@@ -13990,7 +13990,7 @@ RSpec.describe Kettle::Jem do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.7"]
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"

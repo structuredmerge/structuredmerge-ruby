@@ -82,7 +82,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.7.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
-  `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.7, and
+  `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
   `token-resolver` 2.0.4.
 - Generated gemspecs now require `appraisal2` >= 3.1.4.
 - Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.3.
