@@ -47,8 +47,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-soup-cover" => {
         declaration_names: ["kettle-soup-cover"],
-        requirement_args: %("~> 3.0.a", ">= 3.0.0.rc5"),
-        lock_version: "3.0.0.rc5",
+        requirement_args: %("~> 3.0", ">= 3.0.0"),
+        lock_version: "3.0.0",
         requirement_surfaces: [
           "gemfiles/modular/coverage.gemfile",
           "lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example"
@@ -205,11 +205,11 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "pins generated coverage bundles to the fixed SimpleCov fork branch" do
+  it "does not pin generated coverage bundles to the pre-release SimpleCov fork branch" do
     source_pin = %(gem "simplecov", github: "kettle-dev/simplecov", branch: "fix-final-parallel-worker-formatting")
 
-    expect(file_content("gemfiles/modular/coverage.gemfile")).to include(source_pin)
-    expect(file_content("lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example")).to include(source_pin)
+    expect(file_content("gemfiles/modular/coverage.gemfile")).not_to include(source_pin)
+    expect(file_content("lib/kettle/jem/templates/gemfiles/modular/coverage.gemfile.example")).not_to include(source_pin)
   end
 
   it "does not duplicate direct gemspec development dependencies in optional Gemfiles" do

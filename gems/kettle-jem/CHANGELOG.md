@@ -223,11 +223,11 @@ Please file a bug if you notice a violation of semantic versioning.
   require before `SimpleCov.start`.
 - Generated spec helpers now document that requiring SimpleCov loads the
   configuration-only `.simplecov` before coverage starts.
-- Generated coverage Gemfiles now pin SimpleCov to the fixed
+- Generated coverage Gemfiles no longer pin SimpleCov to the pre-release-only
   `kettle-dev/simplecov` `fix-final-parallel-worker-formatting` branch.
 - Generated workspace path examples now use the renamed `my` local workspace
   instead of the old `kettle-rb` checkout path.
-- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.rc5.
+- Generated coverage Gemfiles now require `kettle-soup-cover` >= 3.0.0.
 - Generated Rakefiles now use `# simplecov:disable` / `# simplecov:enable`
   blocks instead of deprecated legacy coverage markers.
 - `kettle-jem install` now uses the latest `kettle-family install` marker to
