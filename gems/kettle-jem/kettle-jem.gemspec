@@ -104,7 +104,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("commonmarker-merge", "= #{spec.version}")         # ruby >= 4.0.0
   spec.add_dependency("dotenv-merge", "= #{spec.version}")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("kettle-dev", "~> 2.3", ">= 2.3.2")                # ruby >= 2.3.0
+  spec.add_dependency("kettle-dev", "~> 2.3", ">= 2.3.3")                # ruby >= 2.3.0
   spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.1")                  # ruby >= 1.8.7
   spec.add_dependency("kramdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
@@ -118,7 +118,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
-  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")              # ruby >= 2.2.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")              # ruby >= 2.2.0
   spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

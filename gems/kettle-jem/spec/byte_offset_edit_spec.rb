@@ -8,7 +8,7 @@ RSpec.describe Kettle::Jem do
       source = <<~RUBY
         Gem::Specification.new do |spec|
           spec.summary = "🔖 release metadata"
-          spec.add_dependency("version_gem", ">= 1.1.13")
+          spec.add_dependency("demo_gem", ">= 1.0.0")
         end
       RUBY
       parse_result = Prism.parse(source)
@@ -24,13 +24,13 @@ RSpec.describe Kettle::Jem do
           {
             start_offset: floor_node.location.start_offset,
             end_offset: floor_node.location.end_offset,
-            replacement: %(">= 1.1.14")
+            replacement: %(">= 1.0.1")
           }
         ]
       )
 
       expect(updated).to include('spec.summary = "🔖 release metadata"')
-      expect(updated).to include('spec.add_dependency("version_gem", ">= 1.1.14")')
+      expect(updated).to include('spec.add_dependency("demo_gem", ">= 1.0.1")')
       expect(RubyVM::InstructionSequence.compile(updated)).to be_a(RubyVM::InstructionSequence) if defined?(RubyVM::InstructionSequence)
     end
   end

@@ -21,7 +21,7 @@ RSpec.describe Kettle::Jem do
           spec.version = "7.0.0"
           spec.summary = "Plain merge"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, "lib/plain/merge.rb", <<~RUBY)
@@ -82,7 +82,7 @@ RSpec.describe Kettle::Jem do
           spec.version = "0.1.0"
           spec.summary = "Dummy gem"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, "lib/dummy/gem.rb", <<~RUBY)
@@ -135,7 +135,7 @@ RSpec.describe Kettle::Jem do
           spec.version = "0.1.1"
           spec.summary = "Kettle Ruby compatibility data"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, "lib/kettle/rb.rb", <<~RUBY)
@@ -210,7 +210,7 @@ RSpec.describe Kettle::Jem do
           spec.version = "1.0.8"
           spec.summary = "Nomono"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, ".kettle-jem.yml", <<~YAML)
@@ -226,7 +226,7 @@ RSpec.describe Kettle::Jem do
           spec.version = "0.0.0"
           spec.summary = "Template summary"
           spec.required_ruby_version = ">= 3.2"
-          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.13")
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
         end
       RUBY
       write_file(root, "lib/nomono.rb", <<~RUBY)
