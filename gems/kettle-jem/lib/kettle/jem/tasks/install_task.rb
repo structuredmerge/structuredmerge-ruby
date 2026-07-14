@@ -425,8 +425,8 @@ module Kettle
         end
 
         def replace_character_ranges(content, replacements)
-          replacements.sort_by(&:first).reverse.reduce(content.to_s) do |updated, (start_offset, end_offset, replacement)|
-            "#{updated[0...start_offset]}#{replacement}#{updated[end_offset..]}"
+          replacements.sort_by(&:first).reverse.reduce(content.to_s) do |updated, (start_character_offset, end_character_offset, replacement)|
+            "#{updated[0...start_character_offset]}#{replacement}#{updated[end_character_offset..]}"
           end
         end
 

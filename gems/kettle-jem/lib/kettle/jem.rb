@@ -6484,9 +6484,21 @@ module Kettle
     def replace_source_offsets(content, replacements)
       output = content.to_s.dup
       replacements.sort_by { |replacement| -replacement.fetch(:start_offset) }.each do |replacement|
-        output[replacement.fetch(:start_offset)...replacement.fetch(:end_offset)] = replacement.fetch(:replacement)
+        output = replace_source_byte_range(
+          output,
+          replacement.fetch(:start_offset),
+          replacement.fetch(:end_offset),
+          replacement.fetch(:replacement)
+        )
       end
       output
+    end
+
+    def replace_source_byte_range(content, start_offset, end_offset, replacement)
+      source = content.to_s
+      before = source.byteslice(0, start_offset) || +""
+      after = source.byteslice(end_offset, source.bytesize - end_offset) || +""
+      "#{before}#{replacement}#{after}"
     end
 
     def merge_gemfile_eval_bucket_entries(template_content, merged_content, destination_content: nil)

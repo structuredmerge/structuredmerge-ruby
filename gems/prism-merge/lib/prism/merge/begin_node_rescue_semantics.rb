@@ -185,9 +185,15 @@ module Prism
 
         rewritten = source.dup
         offsets.sort_by(&:first).reverse_each do |start_offset, length|
-          rewritten[start_offset, length] = to
+          rewritten = replace_byte_range(rewritten, start_offset, start_offset + length, to)
         end
         rewritten
+      end
+
+      def replace_byte_range(source, start_offset, end_offset, replacement)
+        before = source.byteslice(0, start_offset) || +""
+        after = source.byteslice(end_offset, source.bytesize - end_offset) || +""
+        "#{before}#{replacement}#{after}"
       end
 
       def rescue_clause_type?(clause_type)

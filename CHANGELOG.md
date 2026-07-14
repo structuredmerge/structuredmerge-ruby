@@ -40,6 +40,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Byte-offset rewrites in `kettle-jem` and `prism-merge` now splice source with
+  byte-aware slicing so non-ASCII content before an edited AST node does not
+  corrupt Ruby output.
 - Current CI now aligns the root Gemfile dependency floors with local path
   gemspec floors and uses an explicit setup-ruby Bundler cache version to avoid
   stale bundle restores after dependency floor changes.

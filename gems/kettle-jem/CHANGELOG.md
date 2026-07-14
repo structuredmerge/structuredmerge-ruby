@@ -102,6 +102,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemfile and gemspec templating byte-offset rewrites now splice source with
+  byte-aware slicing so non-ASCII content before an edited AST node does not
+  corrupt generated Ruby.
 - Generated legacy-engine CI workflows now install Bundler gems under
   `${RUNNER_TEMP}/bundle` instead of `vendor/bundle`, preventing Appraisal
   installs from creating nested `gemfiles/vendor` bundles.
