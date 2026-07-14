@@ -251,6 +251,15 @@ RSpec.describe Kettle::Jem do
         end
       RUBY
       write_file(root, "lib/nomono/version_gem.rb", dedicated_entrypoint)
+      write_file(root, "spec/nomono/version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "spec_helper"
+
+        RSpec.describe Nomono::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
 
       result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
 
@@ -258,7 +267,7 @@ RSpec.describe Kettle::Jem do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("lib/nomono.rb", "lib/nomono/version.rb", "sig/nomono/version.rbs")
+          changed_files: include("lib/nomono.rb", "lib/nomono/version.rb", "sig/nomono/version.rbs", "spec/nomono/version_spec.rb")
         )
       )
       entrypoint = File.read(File.join(root, "lib/nomono.rb"))
@@ -269,6 +278,13 @@ RSpec.describe Kettle::Jem do
       gemspec = File.read(File.join(root, "nomono.gemspec"))
       expect(gemspec).not_to include("version_gem")
       expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
+      version_spec = File.read(File.join(root, "spec/nomono/version_spec.rb"))
+      expect(version_spec).to include(<<~RUBY)
+        require "spec_helper"
+        require "nomono/version_gem"
+
+        RSpec.describe Nomono::Version do
+      RUBY
     end
   end
 end

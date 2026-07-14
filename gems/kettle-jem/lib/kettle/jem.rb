@@ -10753,6 +10753,7 @@ module Kettle
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       signature_path = File.join("sig", entrypoint_require, "version.rbs")
       root_signature_path = File.join("sig", "#{entrypoint_require}.rbs")
       namespace = facts.dig(:rubygems, :namespace).to_s
@@ -10782,6 +10783,7 @@ module Kettle
         version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
+      changes << normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require) if non_default_version_gem
       changes << write_if_changed(project_root, signature_path, version_gem_signature_file_content(namespace: namespace)) if manage_signature_file
       changes << remove_legacy_version_signature_alias(project_root, root_signature_path, namespace: namespace)
       changed_files = changes.compact
@@ -10806,6 +10808,27 @@ module Kettle
       return {} unless File.file?(File.join(project_root, version_gem_path))
 
       {non_default_entrypoint: true, entrypoint_path: version_gem_path}
+    end
+
+    def normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require)
+      current = read_project_file(project_root, version_spec_path)
+      return if current.empty?
+
+      require_path = File.join(entrypoint_require.to_s, "version_gem")
+      return if ruby_top_level_require?(current, "require", require_path)
+
+      lines = current.lines
+      lines.insert(version_spec_require_insertion_index(current), %(require "#{require_path}"\n))
+      write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(lines.join))
+    end
+
+    def version_spec_require_insertion_index(content)
+      context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "version_spec.rb")
+      owners = context.structural_owners(owner_scope: :top_level_statements)
+      requires = owners.select { |owner| owner.is_a?(::Prism::CallNode) && owner.name == :require }
+      return requires.last.location.end_line if requires.any?
+
+      version_gem_require_insertion_index(content)
     end
 
     def remove_legacy_version_signature_alias(project_root, signature_path, namespace:)
