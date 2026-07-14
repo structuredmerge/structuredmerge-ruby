@@ -18,8 +18,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
-        requirement_args: %("~> 2.3", ">= 2.3.3"),
-        lock_version: "2.3.3",
+        requirement_args: %("~> 2.3", ">= 2.3.4"),
+        lock_version: "2.3.4",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
