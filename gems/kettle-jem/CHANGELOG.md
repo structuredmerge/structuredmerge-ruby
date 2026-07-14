@@ -105,6 +105,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Version-gem namespace discovery no longer treats nested implementation
+  namespaces in the public entrypoint, such as `Kettle::Dev::Tasks`, as the gem
+  namespace when the existing version namespace is more specific.
 - Gemfile and gemspec templating byte-offset rewrites now splice source with
   byte-aware slicing so non-ASCII content before an edited AST node does not
   corrupt generated Ruby.

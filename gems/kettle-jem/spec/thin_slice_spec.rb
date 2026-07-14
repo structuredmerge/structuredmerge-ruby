@@ -6453,6 +6453,60 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "does not infer nested implementation namespaces from the public entrypoint" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-entrypoint-implementation-namespace", tmp_root) do |root|
+      write_tree(root, {
+        "kettle-dev.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "kettle-dev"
+            spec.version = Module.new.tap { |mod| Kernel.load("\#{__dir__}/lib/kettle/dev/version.rb", mod) }::Kettle::Dev::Version::VERSION
+            spec.summary = "Kettle Dev"
+            spec.required_ruby_version = ">= 2.4.0"
+          end
+        RUBY
+        "lib/kettle/dev.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          require_relative "dev/version"
+
+          module Kettle
+            module Dev
+              autoload :ReleaseCLI, "kettle/dev/release_cli"
+
+              module Tasks
+                autoload :CITask, "kettle/dev/tasks/ci_task"
+              end
+            end
+          end
+        RUBY
+        "lib/kettle/dev/version.rb" => <<~RUBY,
+          # frozen_string_literal: true
+
+          module Kettle
+            module Dev
+              module Version
+                VERSION = "2.3.4"
+              end
+              VERSION = Version::VERSION
+            end
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          rubygems:
+            min_ruby: "2.4.0"
+        YAML
+      })
+
+      facts = described_class.send(:discover_facts, root, env: {}, run_options: {skip_commit: true})
+
+      expect(facts.dig(:rubygems, :namespace)).to eq("Kettle::Dev")
+      expect(facts.dig(:rubygems, :namespace)).not_to eq("Kettle::Dev::Tasks")
+    end
+  end
+
   it "normalizes generated README badge image URLs consistently with pre-release checks" do
     expect(described_class.send(:shield_token, "Example::Gem")).to eq("Example::Gem")
     expect(described_class.send(:license_compat_img, :a)).to include(

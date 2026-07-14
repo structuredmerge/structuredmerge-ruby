@@ -2832,11 +2832,17 @@ module Kettle
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       configured_namespace = rubygems_config["namespace"].to_s.strip
+      entrypoint_namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path)
+      version_namespace = existing_version_namespace(project_root, version_path)
+      metadata_namespace = metadata_value(gemspec_metadata, :namespace)
+      default_namespace = classify_namespace(name)
       namespace = configured_namespace.empty? ? nil : configured_namespace
-      namespace ||= existing_entrypoint_version_namespace(project_root, entrypoint_path) ||
-        existing_version_namespace(project_root, version_path) ||
-        metadata_value(gemspec_metadata, :namespace) ||
-        classify_namespace(name)
+      namespace ||= project_namespace(
+        entrypoint_namespace: entrypoint_namespace,
+        version_namespace: version_namespace,
+        metadata_namespace: metadata_namespace,
+        default_namespace: default_namespace
+      )
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
       project_version = git_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
@@ -10847,6 +10853,26 @@ module Kettle
       return {} unless File.file?(File.join(project_root, version_gem_path))
 
       {non_default_entrypoint: true, entrypoint_path: version_gem_path}
+    end
+
+    def project_namespace(entrypoint_namespace:, version_namespace:, metadata_namespace:, default_namespace:)
+      if namespace_descendant?(entrypoint_namespace, version_namespace)
+        return version_namespace
+      end
+
+      if namespace_descendant?(version_namespace, default_namespace) || namespace_descendant?(entrypoint_namespace, default_namespace)
+        return default_namespace
+      end
+
+      entrypoint_namespace || version_namespace || metadata_namespace || default_namespace
+    end
+
+    def namespace_descendant?(namespace, parent)
+      namespace = namespace.to_s
+      parent = parent.to_s
+      return false if namespace.empty? || parent.empty? || namespace == parent
+
+      namespace.start_with?("#{parent}::")
     end
 
     def normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require)
