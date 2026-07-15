@@ -13602,50 +13602,50 @@ module Kettle
       push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
 
       <<~YAML
-        name: CI
-
-        permissions:
-          contents: read
-
-        on:
-          push:
-            branches:
-#{push_branches}
-            tags:
-              - "!*" # Do not execute on tags
-          pull_request:
-            branches:
-              - "*"
-          workflow_dispatch:
-
-        concurrency:
-          group: "${{ github.workflow }}-${{ github.ref }}"
-          cancel-in-progress: true
-
-        jobs:
-          test:
-            if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-            name: Specs ${{ matrix.ruby }}
-            runs-on: ubuntu-latest
-            continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
-            strategy:
-              fail-fast: false
-              matrix:
-                ruby:
-        #{ruby_matrix}
-                rubygems:
-                  - default
-                bundler:
-                  - default
-
-            steps:
-              - name: Checkout #{package.fetch(:name)}
-                uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-        #{setup_ruby}
-
-              - name: Tests
-                run: bundle exec #{ci.fetch(:exec_cmd)}
+                name: CI
+        
+                permissions:
+                  contents: read
+        
+                on:
+                  push:
+                    branches:
+        #{push_branches}
+                    tags:
+                      - "!*" # Do not execute on tags
+                  pull_request:
+                    branches:
+                      - "*"
+                  workflow_dispatch:
+        
+                concurrency:
+                  group: "${{ github.workflow }}-${{ github.ref }}"
+                  cancel-in-progress: true
+        
+                jobs:
+                  test:
+                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
+                    name: Specs ${{ matrix.ruby }}
+                    runs-on: ubuntu-latest
+                    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
+                    strategy:
+                      fail-fast: false
+                      matrix:
+                        ruby:
+                #{ruby_matrix}
+                        rubygems:
+                          - default
+                        bundler:
+                          - default
+        
+                    steps:
+                      - name: Checkout #{package.fetch(:name)}
+                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        
+                #{setup_ruby}
+        
+                      - name: Tests
+                        run: bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 
@@ -13665,64 +13665,64 @@ module Kettle
       push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
 
       <<~YAML
-        name: #{label} CI
-
-        permissions:
-          contents: read
-
-        on:
-          push:
-            branches:
-#{push_branches}
-            tags:
-              - "!*" # Do not execute on tags
-          pull_request:
-            branches:
-              - "*"
-          workflow_dispatch:
-
-        concurrency:
-          group: "${{ github.workflow }}-${{ github.ref }}"
-          cancel-in-progress: true
-
-        jobs:
-          test:
-            if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-            name: Specs ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
-            runs-on: ubuntu-latest
-            continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
-            env:
-              BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
-            strategy:
-              fail-fast: false
-              matrix:
-                ruby:
-        #{ruby_matrix}
-                rubygems:
-                  - default
-                bundler:
-                  - default
-                framework:
-        #{framework_axis}
-
-            steps:
-              - name: Checkout
-                uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-        #{setup_ruby}
-
-              - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
-                id: bundleAppraisalAttempt1
-                run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
-                continue-on-error: true
-
-              - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
-                id: bundleAppraisalAttempt2
-                if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
-                run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
-
-              - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
-                run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
+                name: #{label} CI
+        
+                permissions:
+                  contents: read
+        
+                on:
+                  push:
+                    branches:
+        #{push_branches}
+                    tags:
+                      - "!*" # Do not execute on tags
+                  pull_request:
+                    branches:
+                      - "*"
+                  workflow_dispatch:
+        
+                concurrency:
+                  group: "${{ github.workflow }}-${{ github.ref }}"
+                  cancel-in-progress: true
+        
+                jobs:
+                  test:
+                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
+                    name: Specs ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
+                    runs-on: ubuntu-latest
+                    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
+                    env:
+                      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
+                    strategy:
+                      fail-fast: false
+                      matrix:
+                        ruby:
+                #{ruby_matrix}
+                        rubygems:
+                          - default
+                        bundler:
+                          - default
+                        framework:
+                #{framework_axis}
+        
+                    steps:
+                      - name: Checkout
+                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        
+                #{setup_ruby}
+        
+                      - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
+                        id: bundleAppraisalAttempt1
+                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
+                        continue-on-error: true
+        
+                      - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
+                        id: bundleAppraisalAttempt2
+                        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
+                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
+        
+                      - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
+                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
       YAML
     end
 
@@ -13770,85 +13770,85 @@ module Kettle
       coverage = ci.fetch(:coverage)
       push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
       <<~YAML
-        name: Test Coverage
-
-        permissions:
-          contents: read
-          pull-requests: write
-          id-token: write
-
-        env:
-          K_SOUP_COV_MIN_BRANCH: 100
-          K_SOUP_COV_MIN_LINE: 100
-          K_SOUP_COV_MIN_HARD: true
-          K_SOUP_COV_FORMATTERS: "xml,rcov,lcov,tty"
-          K_SOUP_COV_DO: true
-          K_SOUP_COV_MULTI_FORMATTERS: true
-          K_SOUP_COV_COMMAND_NAME: "Test Coverage"
-
-        on:
-          push:
-            branches:
-#{push_branches}
-            tags:
-              - "!*" # Do not execute on tags
-          pull_request:
-            branches:
-              - "*"
-          workflow_dispatch:
-
-        concurrency:
-          group: "${{ github.workflow }}-${{ github.ref }}"
-          cancel-in-progress: true
-
-        jobs:
-          coverage:
-            if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-            name: Code Coverage on ${{ matrix.ruby }}@current
-            runs-on: ubuntu-latest
-            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
-            env:
-              BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
-            strategy:
-              fail-fast: false
-              matrix:
-                include:
-                  - ruby: "ruby"
-                    appraisal: "#{coverage.fetch(:appraisal)}"
-                    exec_cmd: "#{coverage.fetch(:command)}"
-                    rubygems: latest
-                    bundler: latest
-
-            steps:
-              - name: Checkout
-                uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-
-              - name: Setup Ruby & RubyGems
-                uses: ruby/setup-ruby@8e41b362d2589a22a44c1cfa214b3c83052c195b # v1.318.0
-                with:
-                  ruby-version: "${{ matrix.ruby }}"
-                  rubygems: "${{ matrix.rubygems }}"
-                  bundler: "${{ matrix.bundler }}"
-                  bundler-cache: true
-
-              - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
-                id: bundleAppraisalAttempt1
-                run: bundle exec appraisal ${{ matrix.appraisal }} install
-                continue-on-error: true
-
-              - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
-                id: bundleAppraisalAttempt2
-                if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
-                run: bundle exec appraisal ${{ matrix.appraisal }} install
-
-              - name: Tests for ${{ matrix.ruby }}@current via ${{ matrix.exec_cmd }}
-                run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
-
-              - name: Verify coverage reports
-                run: |
-                  test -s coverage/lcov.info
-                  test -s coverage/coverage.xml
-        #{github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))}
+                name: Test Coverage
+        
+                permissions:
+                  contents: read
+                  pull-requests: write
+                  id-token: write
+        
+                env:
+                  K_SOUP_COV_MIN_BRANCH: 100
+                  K_SOUP_COV_MIN_LINE: 100
+                  K_SOUP_COV_MIN_HARD: true
+                  K_SOUP_COV_FORMATTERS: "xml,rcov,lcov,tty"
+                  K_SOUP_COV_DO: true
+                  K_SOUP_COV_MULTI_FORMATTERS: true
+                  K_SOUP_COV_COMMAND_NAME: "Test Coverage"
+        
+                on:
+                  push:
+                    branches:
+        #{push_branches}
+                    tags:
+                      - "!*" # Do not execute on tags
+                  pull_request:
+                    branches:
+                      - "*"
+                  workflow_dispatch:
+        
+                concurrency:
+                  group: "${{ github.workflow }}-${{ github.ref }}"
+                  cancel-in-progress: true
+        
+                jobs:
+                  coverage:
+                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
+                    name: Code Coverage on ${{ matrix.ruby }}@current
+                    runs-on: ubuntu-latest
+                    continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+                    env:
+                      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
+                    strategy:
+                      fail-fast: false
+                      matrix:
+                        include:
+                          - ruby: "ruby"
+                            appraisal: "#{coverage.fetch(:appraisal)}"
+                            exec_cmd: "#{coverage.fetch(:command)}"
+                            rubygems: latest
+                            bundler: latest
+        
+                    steps:
+                      - name: Checkout
+                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        
+                      - name: Setup Ruby & RubyGems
+                        uses: ruby/setup-ruby@8e41b362d2589a22a44c1cfa214b3c83052c195b # v1.318.0
+                        with:
+                          ruby-version: "${{ matrix.ruby }}"
+                          rubygems: "${{ matrix.rubygems }}"
+                          bundler: "${{ matrix.bundler }}"
+                          bundler-cache: true
+        
+                      - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
+                        id: bundleAppraisalAttempt1
+                        run: bundle exec appraisal ${{ matrix.appraisal }} install
+                        continue-on-error: true
+        
+                      - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
+                        id: bundleAppraisalAttempt2
+                        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
+                        run: bundle exec appraisal ${{ matrix.appraisal }} install
+        
+                      - name: Tests for ${{ matrix.ruby }}@current via ${{ matrix.exec_cmd }}
+                        run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
+        
+                      - name: Verify coverage reports
+                        run: |
+                          test -s coverage/lcov.info
+                          test -s coverage/coverage.xml
+                #{github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))}
       YAML
     end
 
