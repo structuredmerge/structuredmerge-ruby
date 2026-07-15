@@ -105,6 +105,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated dep-heads workflows now run current TruffleRuby directly from the
+  generated `gemfiles/dep_heads.gemfile`, avoiding `Appraisal.root.gemfile`
+  bootstrap failures with TruffleRuby's bundled RubyGems/Bundler and gem.coop.
 - Packaged Rakefile templating now merges destination Rakefiles by default
   instead of replacing them wholesale, preserving project-specific rake tasks
   such as release or adapter test helpers.
