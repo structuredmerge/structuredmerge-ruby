@@ -6140,7 +6140,7 @@ RSpec.describe Kettle::Jem do
           K_SOUP_COV_MIN_LINE = "92"
 
           [tools]
-          ruby = "4.0.5"
+          ruby = "4.0.6"
         TOML
       })
 
