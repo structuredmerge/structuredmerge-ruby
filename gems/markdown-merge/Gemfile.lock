@@ -18,7 +18,10 @@ GEM
       thor (>= 0.14)
     ast (2.4.3)
     ast-merge (7.0.0)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
       tree_haver (= 7.0.0)
+      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -85,13 +88,12 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.20.0)
-    kettle-dev (2.2.25)
+    kettle-dev (2.3.4)
       emoji_regex (>= 15.0)
       kettle-rb (~> 0.1, >= 0.1.1)
       kettle-test (~> 2.0, >= 2.0.4)
       ruby-progressbar (~> 1.13)
-      version_gem (~> 1.1, >= 1.1.13)
-    kettle-rb (0.1.1)
+    kettle-rb (0.1.2)
     kettle-soup-cover (1.1.3)
       simplecov (~> 0.22)
       simplecov-cobertura (~> 3.0)
@@ -305,10 +307,14 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
+    token-resolver (2.0.4)
+      parslet (~> 2.0)
+      version_gem (~> 1.1, >= 1.1.13)
     tree_haver (7.0.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
-      tree_sitter_language_pack (~> 1.6)
+      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
+      version_gem (~> 1.1, >= 1.1.9)
     tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin)
@@ -325,7 +331,7 @@ GEM
     unicode-display_width (3.2.0)
       unicode-emoji (~> 4.1)
     unicode-emoji (4.2.0)
-    version_gem (1.1.13)
+    version_gem (1.1.14)
     yaml-converter (0.2.2)
       hexapdf (>= 1.8, < 2)
       kramdown (>= 2.4, < 3)
@@ -404,11 +410,10 @@ CHECKSUMS
   ansi (1.6.0) sha256=ac9ea0c0ea8d32fb4e271348e609963ac78882f34b73836c2a02b3622e666658
   appraisal2 (3.1.3) sha256=1f71cc64246904a40e2273b0a47e399c4727924b807d3c1e124cd7482d07ed07
   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
-  ast-merge (7.0.0) sha256=5d4143eb07170baaf54437d42977bdacef3f8c0cc8808145ca7224d61209e4dc
+  ast-merge (7.0.0)
   backports (3.25.3) sha256=94298d32dc3c40ca15633b54e282780b49e2db0c045f602ea1907e4f63a17235
   benchmark (0.5.0) sha256=465df122341aedcb81a2a24b4d3bd19b6c67c1530713fd533f3ff034e419236c
   bigdecimal (4.1.2) sha256=53d217666027eab4280346fba98e7d5b66baaae1b9c3c1c0ffe89d48188a3fbd
-  bundler (4.0.15) sha256=a4ceb882fe94a0e0ac63cd0813932bbfd631a14e5ac0b7975189b19a4d28d9e7
   bundler-audit (0.9.3) sha256=81c8766c71e47d0d28a0f98c7eed028539f21a6ea3cd8f685eb6f42333c9b4e9
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   cmdparse (3.0.7) sha256=f7c5cace10bec6abf853370ae095e4b97a84ed9d847b3fb38f41cc4fbc950739
@@ -435,8 +440,8 @@ CHECKSUMS
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   irb (1.18.0) sha256=de9454a0703a54704b9811a5ef31a60c86949fbf4013fcf244fabc7c775248e3
   json (2.20.0) sha256=9362bc6e55a952b056abf9167cf053358181c904cb70cd6eee0808ea830fc32b
-  kettle-dev (2.2.25) sha256=efb4c6efbc3164c9c199e7da14edc54d6f9c02a3a0edf3c214d3fd97a0f0294b
-  kettle-rb (0.1.1) sha256=2e793d817f5150339770c547a2c72ed0c1a23b5e5a3ef46f462500dcb10dec4d
+  kettle-dev (2.3.4) sha256=3b038adabce8b036384fe0f196e07b6bb88704ea5bb06ca49d3089ad8c95d801
+  kettle-rb (0.1.2) sha256=e8aa6fd03b666f9e98a0e00d4183cb4b7ab140d33916ee692a87c1beba007eda
   kettle-soup-cover (1.1.3) sha256=a373827da22a7131d093afd32945e5b7d7a10a01ebfdded8fd2cb8230d69c8ad
   kettle-test (2.0.9) sha256=df8e8aa70a497ab636391c65d08f617c34e4cdfcb8d0e03907d38854e1465758
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
@@ -517,7 +522,8 @@ CHECKSUMS
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
-  tree_haver (7.0.0) sha256=424c938036458a7f0645baa4e9d641bd8a31f17eeef52ca0e74bd3beb22510c0
+  token-resolver (2.0.4) sha256=33b926958f504525bba3ed511ab66fbcbf8ef30390815e931436b30f27ffcad0
+  tree_haver (7.0.0)
   tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux) sha256=c882f4039a1a84a8ed782ef5381a8556acdb53538055d0b9b30d0cd85a0f1b0a
   tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin) sha256=b3dc68837a1a626afcbe1abb779cd987e9828a43c78e98cc70aa7e58957f3ef8
   tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-darwin) sha256=a080abc08ef14a91a2ed7cade765f122833d4f00601060cf27c4c3279c5aac71
@@ -526,7 +532,7 @@ CHECKSUMS
   turbo_tests2 (3.1.5) sha256=bb64259ac92a466a78635b0af555500108122dc3a6d86af109304970caeb8c2b
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
   unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
-  version_gem (1.1.13) sha256=77f3035ac45877cd14610648fec2d23bd8c10fa13dfcf63a588825aa98587260
+  version_gem (1.1.14) sha256=6b7306c7e9416d06067561981ab3444e2cecb844f26cc325ae3c27b44cf85613
   yaml-converter (0.2.2) sha256=3f2354debb29d8a43c06b7e205dddcbd36852bae5376d0aa2c3970f98a443246
   yard (0.9.44) sha256=eb087e9b631ccd887b049f303d489963945452d5e2a7eb49a5a74a7cf6887f28
   yard-fence (0.9.5) sha256=c25d50b90615caad6c48d4ef56a9e546877a9759f68348eead9dd91878b92c9a
@@ -538,4 +544,4 @@ CHECKSUMS
   zlib (3.2.3) sha256=5bd316698b32f31a64ab910a8b6c282442ca1626a81bbd6a1674e8522e319c20
 
 BUNDLED WITH
-  4.0.15
+  4.0.16
