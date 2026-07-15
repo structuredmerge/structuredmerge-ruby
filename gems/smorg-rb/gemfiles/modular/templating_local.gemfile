@@ -46,8 +46,7 @@ declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
 smorg_rb_local_gems_to_eval = smorg_rb_local_gems - %w[smorg-rb] - declared_gems
 kettle_rb_local_gems_to_eval = kettle_rb_local_gems - %w[smorg-rb] - declared_gems
 
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-
+tslp_dev = ENV.fetch('TSLP_DEV', nil)
 
 # export VENDORED_GEMS=
 platform :mri do

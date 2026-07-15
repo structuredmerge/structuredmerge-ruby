@@ -104,6 +104,10 @@ Please file a bug if you notice a violation of semantic versioning.
   `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
 - kettle-jem now requires `kettle-rb` >= 0.1.2.
 
+### Deprecated
+
+### Removed
+
 ### Fixed
 
 - Generated dep-heads workflows now run current TruffleRuby directly from the
@@ -424,12 +428,6 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated coverage Gemfiles now require `kettle-soup-cover` >= 2.0.1.
 - Generated documentation Gemfiles now require `yaml-converter` >= 0.2.1
   while allowing the released 0.2 line.
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 - Generated root Gemfiles no longer path-wire direct sibling dependencies from
   stale sibling directories whose gemspec defines a different gem name.

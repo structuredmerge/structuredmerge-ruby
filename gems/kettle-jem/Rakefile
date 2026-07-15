@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-# kettle-jem Rakefile v7.0.0 - 2026-06-25
+# kettle-jem Rakefile v7.0.0 - 2026-07-15
 # Ruby 2.3 (Safe Navigation) or higher required
 #
 # See LICENSE.md for license information.
@@ -19,7 +19,8 @@
 #
 # rake appraisal:install                      # Install Appraisal gemfiles (initial setup...
 # rake appraisal:reset                        # Delete Appraisal lockfiles (gemfiles/*.gemfile.lock)
-# rake appraisal:update                       # Update Appraisal gemfiles and run RuboCop...
+# rake appraisal:generate                     # Generate Appraisal gemfiles without resolving...
+# rake appraisal:update                       # Generate and update Appraisal gemfiles
 # rake bench                                  # Run all benchmarks (alias for bench:run)
 # rake bench:list                             # List available benchmark scripts
 # rake bench:run                              # Run all benchmark scripts (skips on CI)
@@ -60,13 +61,6 @@ require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
 desc "Default tasks aggregator"
 task :default do
   puts "Default task complete."
-end
-
-namespace :spec do
-  desc "Run dependency floor consistency specs"
-  task :dependency_floors do
-    sh({"K_SOUP_COV_DO" => "false"}, "bundle", "exec", "rspec", "spec/kettle/jem_dependency_floor_slice_spec.rb")
-  end
 end
 
 # simplecov:disable
