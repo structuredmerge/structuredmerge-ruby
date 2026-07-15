@@ -102,6 +102,7 @@ Please file a bug if you notice a violation of semantic versioning.
   `>= 1.0.6`.
 - Generated documentation Gemfiles now require `yard-fence` >= 0.9.6,
   `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
+- kettle-jem now requires `kettle-rb` >= 0.1.2.
 
 ### Fixed
 
