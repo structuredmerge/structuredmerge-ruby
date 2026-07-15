@@ -191,8 +191,8 @@ module Prism
       end
 
       def replace_byte_range(source, start_offset, end_offset, replacement)
-        before = source.byteslice(0, start_offset) || +""
-        after = source.byteslice(end_offset, source.bytesize - end_offset) || +""
+        before = source.byteslice(0, start_offset) || +''
+        after = source.byteslice(end_offset, source.bytesize - end_offset) || +''
         "#{before}#{replacement}#{after}"
       end
 
