@@ -3206,8 +3206,8 @@ RSpec.describe Kettle::Jem do
       expect(config).to include(
         "    - source: lib/gem/version.rb\n      " \
           "target: lib/tree_haver/version.rb\n    " \
-          "- source: sig/gem/version.rbs\n      " \
-          "target: sig/tree_haver/version.rbs\n"
+          "- source: sig/gem.rbs\n      " \
+          "target: sig/tree_haver.rbs\n"
       )
       expect(config).to include("    - certs/pboling.pem\n")
       expect(config).to include("    - tmp/.gitignore\n")
@@ -3300,20 +3300,20 @@ RSpec.describe Kettle::Jem do
             entries:
               - source: lib/gem/version.rb
                 target: lib/example/gem/version.rb
-              - source: sig/gem/version.rbs
-                target: sig/example/gem/version.rbs
+              - source: sig/gem.rbs
+                target: sig/example/gem.rbs
         YAML
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
 
-      expect(apply.fetch(:changed_files)).to include("lib/example/gem/version.rb", "sig/example/gem/version.rbs")
+      expect(apply.fetch(:changed_files)).to include("lib/example/gem/version.rb", "sig/example/gem.rbs")
       version_rb = File.read(File.join(root, "lib", "example", "gem", "version.rb"))
       expect(version_rb).to include("module Example")
       expect(version_rb).to include("module Gem")
       expect(version_rb).to include('VERSION = "1.2.3"')
       expect(version_rb).not_to end_with("\n\n")
-      version_rbs = File.read(File.join(root, "sig", "example", "gem", "version.rbs"))
+      version_rbs = File.read(File.join(root, "sig", "example", "gem.rbs"))
       expect(version_rbs).to include("module Example")
       expect(version_rbs).to include("module Gem")
       expect(version_rbs).to include("VERSION: String")
@@ -3390,21 +3390,69 @@ RSpec.describe Kettle::Jem do
             apply: true
             entries:
               - source: lib/gem/version.rb
-              - source: sig/gem/version.rbs
+              - source: sig/gem.rbs
         YAML
       })
 
       apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
 
-      expect(apply.fetch(:changed_files)).to include("lib/turbo_tests/version.rb", "sig/turbo_tests/version.rbs")
+      expect(apply.fetch(:changed_files)).to include("lib/turbo_tests/version.rb", "sig/turbo_tests.rbs")
       expect(apply.fetch(:changed_files)).not_to include("lib/turbo_tests2/version.rb")
       version_rb = File.read(File.join(root, "lib", "turbo_tests", "version.rb"))
       expect(version_rb).to include("module TurboTests")
-      version_rbs = File.read(File.join(root, "sig", "turbo_tests", "version.rbs"))
+      version_rbs = File.read(File.join(root, "sig", "turbo_tests.rbs"))
       expect(version_rbs).to include("module TurboTests")
       post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
       expect(post_step.fetch(:changed_files)).to include("lib/turbo_tests.rb")
       expect(post_step.fetch(:changed_files)).not_to include("lib/turbo_tests2.rb")
+    end
+  end
+
+  it "migrates legacy nested version RBS into the package-level signature" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-rbs-consolidation", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.version = "1.2.3"
+            spec.summary = "Example gem"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+          end
+        RUBY
+        "sig/example/gem/version.rbs" => <<~RBS
+          module Example
+            module Gem
+              module Version
+                VERSION: String
+              end
+
+              VERSION: String
+            end
+          end
+        RBS
+      })
+
+      step = described_class.send(
+        :version_gem_bootstrap_step,
+        root,
+        {
+          package: {name: "example-gem"},
+          rubygems: {entrypoint_require: "example/gem", namespace: "Example::Gem"},
+          project_runtime: {version: "1.2.3"}
+        }
+      )
+
+      expect(step.fetch(:changed_files)).to include("sig/example/gem.rbs", "sig/example/gem/version.rbs")
+      expect(step.fetch(:signature_path)).to eq("sig/example/gem.rbs")
+      expect(File).to exist(File.join(root, "sig", "example", "gem.rbs"))
+      expect(File).not_to exist(File.join(root, "sig", "example", "gem", "version.rbs"))
+      signature = File.read(File.join(root, "sig", "example", "gem.rbs"))
+      expect(signature).to include("module Example")
+      expect(signature).to include("module Gem")
+      expect(signature).to include("module Version")
+      expect(signature.scan("VERSION: String").size).to eq(2)
     end
   end
 
@@ -6361,10 +6409,10 @@ RSpec.describe Kettle::Jem do
       expect(install.fetch(:install_steps)).to include(
         name: "version_gem_bootstrap",
         status: "applied",
-        changed_files: ["lib/example/gem/version.rb", "lib/example/gem.rb", "sig/example/gem/version.rbs"],
+        changed_files: ["lib/example/gem/version.rb", "lib/example/gem.rb", "sig/example/gem.rbs"],
         version_path: "lib/example/gem/version.rb",
         entrypoint_path: "lib/example/gem.rb",
-        signature_path: "sig/example/gem/version.rbs"
+        signature_path: "sig/example/gem.rbs"
       )
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
@@ -6376,7 +6424,7 @@ RSpec.describe Kettle::Jem do
       expect(File.read(entrypoint_path)).to include('require "version_gem"')
       expect(File.read(entrypoint_path)).to include('require_relative "gem/version"')
       expect(File.read(entrypoint_path)).to include("Example::Gem::Version.class_eval do")
-      signature = File.read(File.join(root, "sig", "example", "gem", "version.rbs"))
+      signature = File.read(File.join(root, "sig", "example", "gem.rbs"))
       expect(signature).to include("module Example")
       expect(signature).to include("module Gem")
       expect(signature).to include("module Version")
@@ -6424,7 +6472,7 @@ RSpec.describe Kettle::Jem do
 
       step = described_class.send(:version_gem_bootstrap_step, root, facts)
       version_file = File.read(File.join(root, "lib", "oauth2", "mcp", "version.rb"))
-      signature = File.read(File.join(root, "sig", "oauth2", "mcp", "version.rbs"))
+      signature = File.read(File.join(root, "sig", "oauth2", "mcp.rbs"))
 
       expect(step.fetch(:status)).to eq("applied")
       expect(version_file).to include("module OAuth2")
