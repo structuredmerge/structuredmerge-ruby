@@ -389,6 +389,8 @@ RSpec.describe Kettle::Jem do
       )
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.version = "0.1.0"))
       expect(generated[:"legacy-shim.gemspec"]).not_to include(%(load "lib/legacy/shim/version.rb"))
+      expect(generated[:"legacy-shim.gemspec"]).to include("LICENSE.md")
+      expect(generated[:"legacy-shim.gemspec"]).not_to include("LICENSE.txt")
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_dependency "legacy-shim2"))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.5")))
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")))

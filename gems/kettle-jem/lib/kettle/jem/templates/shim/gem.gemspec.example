@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob("lib/**/*.rb") + %w[
     CHANGELOG.md
-    LICENSE.txt
+    LICENSE.md
     README.md
   ].select { |path| File.exist?(path) }
   spec.require_paths = ["lib"]

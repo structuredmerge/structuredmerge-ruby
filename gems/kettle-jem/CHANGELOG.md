@@ -85,6 +85,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Gem templates and generated root Gemfiles now require `kettle-test` >= 2.0.11.
 - Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.12.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
+- Shim gemspec templates now include `LICENSE.md`, matching the generated
+  license template filename, instead of the nonexistent `LICENSE.txt`.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
   `token-resolver` 2.0.4.
