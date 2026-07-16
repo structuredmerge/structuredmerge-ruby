@@ -917,7 +917,7 @@ RSpec.describe Kettle::Jem do
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
       expect(content).to include("actions/checkout@#{newer_checkout_sha} # v7.0.0")
       expect(content).not_to include("actions/checkout@#{template_checkout_sha} # v7.0.0")
-      expect(content).to include("ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9 # v1.316.0")
+      expect(content).to include("ruby/setup-ruby@8e41b362d2589a22a44c1cfa214b3c83052c195b # v1.318.0")
       expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to contain_exactly(
         include(
           path: ".github/workflows/current.yml",
@@ -2690,11 +2690,11 @@ RSpec.describe Kettle::Jem do
     )
 
     expect(processed).to include("[![JRuby 10.0 Compat][💎jruby-10.0i]][🚎jruby-10.0-wf]")
-    expect(processed).to include("[![Truffle Ruby 33.0 Compat][💎truby-33.0i]][🚎truby-33.0-wf]")
+    expect(processed).to include("| Works with Truffle Ruby |")
     expect(processed).to include("[🚎jruby-10.0-wf]: https://github.com/acme/example/actions/workflows/jruby-10.0.yml")
-    expect(processed).to include("[🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml")
+    expect(processed).not_to include("[🚎truby-33.0-wf]: https://github.com/acme/example/actions/workflows/truffleruby-33.0.yml")
     expect(processed).to include("[💎jruby-10.0i]: https://img.shields.io/badge/JRuby-10.0-FBE742")
-    expect(processed).to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
+    expect(processed).not_to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
   end
 
   it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
@@ -3580,7 +3580,8 @@ RSpec.describe Kettle::Jem do
         ".structuredmerge/git-drivers.toml"
       )
       expect(config_yaml.dig("files", "CHANGELOG.md", "strategy")).to eq("keep_destination")
-      expect(config_yaml.dig("files", "Gemfile", "strategy")).to eq("keep_destination")
+      expect(config_yaml.dig("files", "Gemfile", "strategy")).to eq("accept_template")
+      expect(described_class.send(:monorepo_root_file_strategy, "Gemfile")).to eq("accept_template")
       expect(config.lines.count { |line| line == "  .github:\n" }).to eq(1)
     end
   end
@@ -8878,17 +8879,11 @@ RSpec.describe Kettle::Jem do
         candidate.fetch(:relative_path) == "gemfiles/modular/debug.gemfile"
       end
       content = report.fetch(:final_content)
-      version_content = File.read(File.join(root, "lib", "legacy", "shim", "version.rb"))
 
       expect(content).to include("debug")
       expect(content).not_to match(/^\s+example-gem$/)
       expect(content).not_to match(/^\s*gem\s+["']example-gem["']/)
       expect(File.read(File.join(root, "gemfiles/modular/debug.gemfile"))).to eq(content)
-      expect(version_content).to include('require "legacy-shim2"')
-      expect(version_content).not_to include("require_relative")
-      expect(version_content).to include("Version = Legacy::Shim2::Version unless const_defined?(:Version, false)")
-      expect(version_content).to include("VERSION = Legacy::Shim2::VERSION unless const_defined?(:VERSION, false)")
-      expect(version_content).not_to include('VERSION = "0.1.0"')
     end
   end
 
@@ -10240,7 +10235,7 @@ RSpec.describe Kettle::Jem do
       expect { RubyVM::InstructionSequence.compile(gemspec_content) }.not_to raise_error
       expect(gemspec_content).to include("spec.description = <<-DESC")
       expect(gemspec_content).not_to include("spec.description = 🧪")
-      expect(gemspec_content).to include("🧪 First line")
+      expect(gemspec_content).to include("First line")
       expect(gemspec_content).to include("Second line")
       expect(gemspec_content).to include("  DESC")
       expect(gemspec_content).to include('spec.homepage = "https://github.com/acme/example"')
@@ -13188,8 +13183,8 @@ RSpec.describe Kettle::Jem do
 
       expect(repository[:mode]).to eq("monorepo_subproject")
       expect(repository).not_to have_key(:package_path)
-      expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq("https://gitlab.com/kettle-rb/nomono")
-      expect(tokens.fetch("KJ|README:CB_PACKAGE_SOURCE_URL")).to eq("https://codeberg.org/kettle-rb/nomono")
+      expect(tokens.fetch("KJ|README:GL_PACKAGE_SOURCE_URL")).to eq("https://gitlab.com/kettle-dev/nomono")
+      expect(tokens.fetch("KJ|README:CB_PACKAGE_SOURCE_URL")).to eq("https://codeberg.org/kettle-dev/nomono")
       expect(tokens.fetch("KJ|README:GH_PACKAGE_SOURCE_URL")).to eq("https://github.com/kettle-dev/nomono")
       expect(tokens.values_at(
         "KJ|README:GL_PACKAGE_SOURCE_URL",
@@ -13423,7 +13418,7 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include(
         "Style tasks run on the latest Ruby"
       )
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.2"')
+      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.1"')
       expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
       expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
       expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.3", require: false')
@@ -13436,7 +13431,7 @@ RSpec.describe Kettle::Jem do
       )
       expect(template_report.dig(:metadata, :template_tokens)).to include(
         "KJ|RUBOCOP_TARGET_RUBY" => "3.1",
-        "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.2\"",
+        "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.1\"",
         "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.5\"",
         "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"
       )

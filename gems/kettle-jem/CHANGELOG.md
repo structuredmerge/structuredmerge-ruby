@@ -119,6 +119,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated CI workflow synchronization now emits valid YAML for matrix and
+  setup-ruby sections instead of misindenting multi-line template fragments.
+- Open Collective badge/funding detection now respects disabled funding policy
+  without falling back to the default organization.
 - Version-gem RBS consolidation now migrates all legacy nested
   `sig/<entrypoint>/**/*.rbs` content into the package-level signature and
   removes the nested files, including when the package-level signature is

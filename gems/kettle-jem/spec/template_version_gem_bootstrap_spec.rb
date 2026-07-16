@@ -269,7 +269,7 @@ RSpec.describe Kettle::Jem do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("lib/nomono.rb", "lib/nomono/version.rb", "sig/nomono/version.rbs", "spec/nomono/version_spec.rb")
+          changed_files: include("lib/nomono.rb", "lib/nomono/version.rb", "sig/nomono.rbs", "spec/nomono/version_spec.rb")
         )
       )
       entrypoint = File.read(File.join(root, "lib/nomono.rb"))
