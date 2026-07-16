@@ -3408,10 +3408,10 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "migrates legacy nested version RBS into the package-level signature" do
+  it "migrates all legacy nested RBS files into the package-level signature" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
-    Dir.mktmpdir("kettle-jem-version-gem-rbs-consolidation", tmp_root) do |root|
+    Dir.mktmpdir("kettle-jem-rbs-consolidation", tmp_root) do |root|
       write_tree(root, {
         "example-gem.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
@@ -3421,7 +3421,7 @@ RSpec.describe Kettle::Jem do
             spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
           end
         RUBY
-        "sig/example/gem/version.rbs" => <<~RBS
+        "sig/example/gem/version.rbs" => <<~RBS,
           module Example
             module Gem
               module Version
@@ -3429,6 +3429,24 @@ RSpec.describe Kettle::Jem do
               end
 
               VERSION: String
+            end
+          end
+        RBS
+        "sig/example/gem/client.rbs" => <<~RBS,
+          module Example
+            module Gem
+              class Client
+              end
+            end
+          end
+        RBS
+        "sig/example/gem/nested/tool.rbs" => <<~RBS
+          module Example
+            module Gem
+              module Nested
+                class Tool
+                end
+              end
             end
           end
         RBS
@@ -3444,15 +3462,88 @@ RSpec.describe Kettle::Jem do
         }
       )
 
-      expect(step.fetch(:changed_files)).to include("sig/example/gem.rbs", "sig/example/gem/version.rbs")
+      expect(step.fetch(:changed_files)).to include(
+        "sig/example/gem.rbs",
+        "sig/example/gem/client.rbs",
+        "sig/example/gem/nested/tool.rbs",
+        "sig/example/gem/version.rbs"
+      )
       expect(step.fetch(:signature_path)).to eq("sig/example/gem.rbs")
       expect(File).to exist(File.join(root, "sig", "example", "gem.rbs"))
       expect(File).not_to exist(File.join(root, "sig", "example", "gem", "version.rbs"))
+      expect(File).not_to exist(File.join(root, "sig", "example", "gem", "client.rbs"))
+      expect(File).not_to exist(File.join(root, "sig", "example", "gem", "nested", "tool.rbs"))
       signature = File.read(File.join(root, "sig", "example", "gem.rbs"))
       expect(signature).to include("module Example")
       expect(signature).to include("module Gem")
       expect(signature).to include("module Version")
+      expect(signature).to include("class Client")
+      expect(signature).to include("module Nested")
+      expect(signature).to include("class Tool")
       expect(signature.scan("VERSION: String").size).to eq(2)
+    end
+  end
+
+  it "migrates all legacy nested RBS files when the package-level signature is templated" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-templated-rbs-consolidation", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.version = "1.2.3"
+            spec.summary = "Example gem"
+            spec.add_dependency "version_gem", "~> 1.1", ">= 1.1.14"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            entrypoint_require: "example/gem"
+            namespace: "Example::Gem"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: sig/example/gem.rbs
+        YAML
+        "template/sig/example/gem.rbs.example" => <<~RBS,
+          module Example
+            module Gem
+              VERSION: String
+            end
+          end
+        RBS
+        "sig/example/gem/version.rbs" => <<~RBS,
+          module Example
+            module Gem
+              module Version
+                BUILD: String
+              end
+            end
+          end
+        RBS
+        "sig/example/gem/client.rbs" => <<~RBS
+          module Example
+            module Gem
+              class Client
+              end
+            end
+          end
+        RBS
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+      post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "version_gem_bootstrap" }
+
+      expect(post_step.fetch(:changed_files)).to include("sig/example/gem.rbs", "sig/example/gem/client.rbs", "sig/example/gem/version.rbs")
+      expect(File).not_to exist(File.join(root, "sig", "example", "gem", "version.rbs"))
+      expect(File).not_to exist(File.join(root, "sig", "example", "gem", "client.rbs"))
+      signature = File.read(File.join(root, "sig", "example", "gem.rbs"))
+      expect(signature).to include("VERSION: String")
+      expect(signature).to include("module Version")
+      expect(signature).to include("BUILD: String")
+      expect(signature).to include("class Client")
     end
   end
 
