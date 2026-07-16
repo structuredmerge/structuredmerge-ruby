@@ -81,7 +81,7 @@ Please file a bug if you notice a violation of semantic versioning.
   it back into the default entrypoint.
 - Version-gem bootstrapping now updates existing generated version specs to
   require a dedicated `lib/<entrypoint>/version_gem.rb` entrypoint when present.
-- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.3.4.
+- Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.3.5.
 - Gem templates and generated root Gemfiles now require `kettle-test` >= 2.0.10.
 - Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.11.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
