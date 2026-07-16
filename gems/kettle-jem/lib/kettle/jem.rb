@@ -2737,7 +2737,7 @@ module Kettle
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
       detected_open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
-      detected_open_collective_org ||= fallback_opencollective_org
+      detected_open_collective_org ||= fallback_opencollective_org unless opencollective_disabled
       funding = compact_hash(
         urls: funding_urls(
           project_root,
@@ -2947,7 +2947,7 @@ module Kettle
       opencollective_policy = opencollective_policy(kettle_config, env)
       opencollective_disabled = opencollective_policy.fetch(:disabled)
       open_collective_org = opencollective_org(project_root, kettle_config, env, opencollective_disabled: opencollective_disabled)
-      open_collective_org ||= fallback_opencollective_org
+      open_collective_org ||= fallback_opencollective_org unless opencollective_disabled
       funding = compact_hash(
         urls: funding_urls(
           project_root,
@@ -8859,7 +8859,7 @@ module Kettle
     end
 
     def monorepo_root_file_strategy(entry)
-      if %w[CHANGELOG.md Gemfile].include?(entry.to_s)
+      if entry.to_s == "CHANGELOG.md"
         "keep_destination"
       else
         "accept_template"
@@ -9815,8 +9815,9 @@ module Kettle
       env_falsey = opencollective_falsey_env(env)
       return {disabled: true, source: "env.#{env_falsey.fetch(:key)}", value: env_falsey.fetch(:value).to_s} if env_falsey
 
-      if config.dig("templates", "profile").to_s == MONOREPO_SUBGEM_TEMPLATE_PROFILE
-        return {disabled: true, source: "config.templates.profile", value: MONOREPO_SUBGEM_TEMPLATE_PROFILE}
+      template_profile = config.dig("templates", "profile").to_s
+      if [MONOREPO_SUBGEM_TEMPLATE_PROFILE, "monorepo-subgem"].include?(template_profile)
+        return {disabled: true, source: "config.templates.profile", value: template_profile}
       end
 
       {disabled: false}
@@ -13738,133 +13739,127 @@ module Kettle
       package = facts.fetch(:package)
       ci = facts.fetch(:ci)
       ruby_versions = ci.fetch(:ruby_versions)
-      ruby_matrix = ruby_versions.map { |version| "          - \"#{version}\"" }.join("\n")
-      setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
-      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
-
-      <<~YAML
-                name: CI
-        
-                permissions:
-                  contents: read
-        
-                on:
-                  push:
-                    branches:
-        #{push_branches}
-                    tags:
-                      - "!*" # Do not execute on tags
-                  pull_request:
-                    branches:
-                      - "*"
-                  workflow_dispatch:
-        
-                concurrency:
-                  group: "${{ github.workflow }}-${{ github.ref }}"
-                  cancel-in-progress: true
-        
-                jobs:
-                  test:
-                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-                    name: Specs ${{ matrix.ruby }}
-                    runs-on: ubuntu-latest
-                    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
-                    strategy:
-                      fail-fast: false
-                      matrix:
-                        ruby:
-                #{ruby_matrix}
-                        rubygems:
-                          - default
-                        bundler:
-                          - default
-        
-                    steps:
-                      - name: Checkout #{package.fetch(:name)}
-                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        
-                #{setup_ruby}
-        
-                      - name: Tests
-                        run: bundle exec #{ci.fetch(:exec_cmd)}
-      YAML
+      lines = [
+        "name: CI",
+        "",
+        "permissions:",
+        "  contents: read",
+        "",
+        "on:",
+        "  push:",
+        "    branches:",
+        *github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch), indent: "      ").lines(chomp: true),
+        "    tags:",
+        "      - \"!*\" # Do not execute on tags",
+        "  pull_request:",
+        "    branches:",
+        "      - \"*\"",
+        "  workflow_dispatch:",
+        "",
+        "concurrency:",
+        "  group: \"${{ github.workflow }}-${{ github.ref }}\"",
+        "  cancel-in-progress: true",
+        "",
+        "jobs:",
+        "  test:",
+        "    if: \"!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')\"",
+        "    name: Specs ${{ matrix.ruby }}",
+        "    runs-on: ubuntu-latest",
+        "    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}",
+        "    strategy:",
+        "      fail-fast: false",
+        "      matrix:",
+        "        ruby:",
+        *ruby_versions.map { |version| "          - \"#{version}\"" },
+        "        rubygems:",
+        "          - default",
+        "        bundler:",
+        "          - default",
+        "",
+        "    steps:",
+        "      - name: Checkout #{package.fetch(:name)}",
+        "        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "",
+        *github_actions_setup_ruby_steps(indent: "      ").lines(chomp: true),
+        "",
+        "      - name: Tests",
+        "        run: bundle exec #{ci.fetch(:exec_cmd)}"
+      ]
+      "#{lines.join("\n")}\n"
     end
 
     def synchronize_github_actions_framework_ci(content, facts)
       ci = facts.fetch(:ci)
       framework_matrix = ci.fetch(:framework_matrix)
-      ruby_matrix = ci.fetch(:ruby_versions).map { |version| "          - \"#{version}\"" }.join("\n")
-      framework_axis = framework_matrix.fetch(:include).map do |entry|
+      dimension = framework_matrix.fetch(:dimension)
+      label = dimension.split(/[-_]/).map { |part| part[0].to_s.upcase + part[1..].to_s }.join(" ")
+      framework_axis = framework_matrix.fetch(:include).flat_map do |entry|
         [
           "          - framework_version: \"#{entry.fetch(:framework_version)}\"",
           "            appraisal: \"#{entry.fetch(:appraisal)}\""
-        ].join("\n")
-      end.join("\n")
-      dimension = framework_matrix.fetch(:dimension)
-      label = dimension.split(/[-_]/).map { |part| part[0].to_s.upcase + part[1..].to_s }.join(" ")
-      setup_ruby = github_actions_setup_ruby_steps(indent: "      ")
-      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
-
-      <<~YAML
-                name: #{label} CI
-        
-                permissions:
-                  contents: read
-        
-                on:
-                  push:
-                    branches:
-        #{push_branches}
-                    tags:
-                      - "!*" # Do not execute on tags
-                  pull_request:
-                    branches:
-                      - "*"
-                  workflow_dispatch:
-        
-                concurrency:
-                  group: "${{ github.workflow }}-${{ github.ref }}"
-                  cancel-in-progress: true
-        
-                jobs:
-                  test:
-                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-                    name: Specs ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
-                    runs-on: ubuntu-latest
-                    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}
-                    env:
-                      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
-                    strategy:
-                      fail-fast: false
-                      matrix:
-                        ruby:
-                #{ruby_matrix}
-                        rubygems:
-                          - default
-                        bundler:
-                          - default
-                        framework:
-                #{framework_axis}
-        
-                    steps:
-                      - name: Checkout
-                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        
-                #{setup_ruby}
-        
-                      - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
-                        id: bundleAppraisalAttempt1
-                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
-                        continue-on-error: true
-        
-                      - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}"
-                        id: bundleAppraisalAttempt2
-                        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
-                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install
-        
-                      - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}
-                        run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}
-      YAML
+        ]
+      end
+      lines = [
+        "name: #{label} CI",
+        "",
+        "permissions:",
+        "  contents: read",
+        "",
+        "on:",
+        "  push:",
+        "    branches:",
+        *github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch), indent: "      ").lines(chomp: true),
+        "    tags:",
+        "      - \"!*\" # Do not execute on tags",
+        "  pull_request:",
+        "    branches:",
+        "      - \"*\"",
+        "  workflow_dispatch:",
+        "",
+        "concurrency:",
+        "  group: \"${{ github.workflow }}-${{ github.ref }}\"",
+        "  cancel-in-progress: true",
+        "",
+        "jobs:",
+        "  test:",
+        "    if: \"!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')\"",
+        "    name: Specs ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}",
+        "    runs-on: ubuntu-latest",
+        "    continue-on-error: ${{ endsWith(matrix.ruby, 'head') }}",
+        "    env:",
+        "      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile",
+        "    strategy:",
+        "      fail-fast: false",
+        "      matrix:",
+        "        ruby:",
+        *ci.fetch(:ruby_versions).map { |version| "          - \"#{version}\"" },
+        "        rubygems:",
+        "          - default",
+        "        bundler:",
+        "          - default",
+        "        framework:",
+        *framework_axis,
+        "",
+        "    steps:",
+        "      - name: Checkout",
+        "        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "",
+        *github_actions_setup_ruby_steps(indent: "      ").lines(chomp: true),
+        "",
+        "      - name: \"[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}\"",
+        "        id: bundleAppraisalAttempt1",
+        "        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install",
+        "        continue-on-error: true",
+        "",
+        "      - name: \"[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}\"",
+        "        id: bundleAppraisalAttempt2",
+        "        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}",
+        "        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install",
+        "",
+        "      - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}",
+        "        run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}"
+      ]
+      "#{lines.join("\n")}\n"
     end
 
     def github_actions_setup_ruby_steps(indent:)
@@ -14010,9 +14005,9 @@ module Kettle
       update_github_actions_pins(updated)
     end
 
-    def github_actions_push_branches_yaml(content, default_branch:)
+    def github_actions_push_branches_yaml(content, default_branch:, indent: "              ")
       github_actions_push_branches(content, default_branch: default_branch).map do |branch|
-        "              - #{branch.inspect}"
+        "#{indent}- #{branch.inspect}"
       end.join("\n")
     end
 

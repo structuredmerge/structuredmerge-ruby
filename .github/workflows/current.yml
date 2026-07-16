@@ -123,6 +123,7 @@ jobs:
         working-directory: ${{ matrix.gem }}
         env:
           K_JEM_TEMPLATING: true
+          K_SOUP_COV_DO: false
           SMORG_RB_DEV: ${{ github.workspace }}/gems
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test

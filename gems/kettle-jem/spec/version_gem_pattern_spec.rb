@@ -25,16 +25,30 @@ RSpec.describe Kettle::Jem do
         expect(File).to exist(entrypoint_path)
 
         entrypoint_content = File.read(entrypoint_path)
-        version_require = %(require_relative "#{File.basename(version_dir)}/version")
+        non_default_version_gem_path = File.join(version_dir, "version_gem.rb")
+        version_require_pattern = /^\s*require_relative\s+["']#{Regexp.escape(File.basename(version_dir))}\/version["']/
         class_eval = "#{namespace}::Version.class_eval do"
-        expect(entrypoint_content).to include('require "version_gem"')
-        expect(entrypoint_content).to include(version_require)
-        expect(entrypoint_content.index(version_require)).to be < entrypoint_content.index(class_eval)
+        if File.exist?(non_default_version_gem_path)
+          expect(entrypoint_content).not_to match(/^\s*require\s+["']version_gem["']/)
+          expect(entrypoint_content).to match(version_require_pattern)
+          expect(entrypoint_content).not_to include(class_eval)
+          next
+        end
+
+        expect(entrypoint_content).to match(/^\s*require\s+["']version_gem["']/)
+        version_require_index = entrypoint_content =~ version_require_pattern
+        expect(version_require_index).not_to be_nil
+        expect(version_require_index).to be < entrypoint_content.index(class_eval)
         expect(entrypoint_content).to include(class_eval)
         expect(entrypoint_content).to include("extend VersionGem::Basic")
       end
 
-      expect(File.read(gemspec_path)).to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
+      gemspec_content = File.read(gemspec_path)
+      if Dir.glob(gem_root.join("lib", "**", "version_gem.rb")).any?
+        expect(gemspec_content).not_to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
+      else
+        expect(gemspec_content).to match(/spec\.add_dependency(?:\(| )["']version_gem["']/)
+      end
     end
   end
 end
