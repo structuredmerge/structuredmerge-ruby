@@ -20,9 +20,85 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
-    name: Check
+  detect:
+    name: Detect changed gems
     runs-on: ubuntu-latest
+    outputs:
+      count: ${{ steps.changed-gems.outputs.count }}
+      matrix: ${{ steps.changed-gems.outputs.matrix }}
+      summary: ${{ steps.changed-gems.outputs.summary }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+      - name: Detect changed gems
+        id: changed-gems
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+
+          base_sha="${BASE_SHA:-}"
+          if [[ -z "${base_sha}" || "${base_sha}" =~ ^0+$ ]]; then
+            base_sha="$(git rev-parse HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"
+          fi
+
+          changed_files="${RUNNER_TEMP}/changed-files.txt"
+          git diff --name-only "${base_sha}...HEAD" > "${changed_files}"
+
+          python3 - "${changed_files}" "${GITHUB_OUTPUT}" <<'PY'
+          import json
+          import pathlib
+          import sys
+
+          changed_files_path = pathlib.Path(sys.argv[1])
+          github_output = pathlib.Path(sys.argv[2])
+          changed = [line.strip() for line in changed_files_path.read_text().splitlines() if line.strip()]
+
+          all_gems = sorted(
+              str(path)
+              for path in pathlib.Path("gems").iterdir()
+              if path.is_dir() and any(path.glob("*.gemspec"))
+          )
+          gems = sorted(
+              {
+                  "/".join(path.split("/")[:2])
+                  for path in changed
+                  if path.startswith("gems/") and len(path.split("/")) > 2
+              }
+          )
+          gems = [gem for gem in gems if gem in all_gems]
+
+          root_bundle_changed = any(path in {"Gemfile", "Gemfile.lock"} for path in changed)
+          workflow_changed = any(path == ".github/workflows/current.yml" for path in changed)
+
+          if root_bundle_changed:
+              gems = all_gems
+          elif not gems and workflow_changed and "gems/kettle-jem" in all_gems:
+              gems = ["gems/kettle-jem"]
+
+          matrix = {"gem": gems}
+          summary = ", ".join(gems) if gems else "No changed gem suites selected"
+
+          with github_output.open("a", encoding="utf-8") as output:
+              output.write(f"count={len(gems)}\n")
+              output.write(f"matrix={json.dumps(matrix, separators=(',', ':'))}\n")
+              output.write(f"summary={summary}\n")
+
+          print(f"Changed files: {len(changed)}")
+          print(f"Selected gem suites: {summary}")
+          PY
+
+  gem-suite:
+    name: Gem suite (${{ matrix.gem }})
+    needs: detect
+    if: ${{ needs.detect.outputs.count != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.detect.outputs.matrix) }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -36,6 +112,34 @@ jobs:
         with:
           ruby-version: 4.0.2
           bundler-cache: true
-          cache-version: current-20260605
+          working-directory: ${{ matrix.gem }}
+          cache-version: current-${{ matrix.gem }}-20260716
       - name: Run checks
-        run: timeout 12m bundle exec rspec --format progress
+        working-directory: ${{ matrix.gem }}
+        run: timeout 12m bundle exec kettle-test
+
+  check:
+    name: Check
+    needs:
+      - detect
+      - gem-suite
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Summarize changed-gem checks
+        shell: bash
+        env:
+          SELECTED_GEMS: ${{ needs.detect.outputs.summary }}
+          GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
+        run: |
+          set -euo pipefail
+          echo "Selected gem suites: ${SELECTED_GEMS}"
+          echo "Gem suite result: ${GEM_SUITE_RESULT}"
+
+          case "${GEM_SUITE_RESULT}" in
+            success|skipped)
+              ;;
+            *)
+              exit 1
+              ;;
+          esac
