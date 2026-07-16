@@ -115,6 +115,8 @@ jobs:
       - name: Install dependencies
         working-directory: ${{ matrix.gem }}
         env:
+          K_JEM_TEMPLATING: true
+          SMORG_RB_DEV: ${{ github.workspace }}/gems
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           gem install nomono -v 1.0.8 --source https://gem.coop --source https://rubygems.org
@@ -124,6 +126,8 @@ jobs:
       - name: Run checks
         working-directory: ${{ matrix.gem }}
         env:
+          K_JEM_TEMPLATING: true
+          SMORG_RB_DEV: ${{ github.workspace }}/gems
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
 
