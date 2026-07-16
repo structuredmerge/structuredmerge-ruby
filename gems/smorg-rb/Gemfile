@@ -18,6 +18,23 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from smorg-rb.gemspec
 gemspec
 
+# Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
+tslp_dev = ENV.fetch('TSLP_DEV', nil)
+tslp_declared_by_templating =
+  ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
+unless tslp_declared_by_templating
+  if tslp_dev.to_s.empty?
+    gem(
+      'tree_sitter_language_pack',
+      git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
+      branch: 'fix/ruby-4-installs',
+      glob: 'packages/ruby/*.gemspec'
+    )
+  else
+    gem 'tree_sitter_language_pack', path: tslp_dev
+  end
+end
+
 # Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
 

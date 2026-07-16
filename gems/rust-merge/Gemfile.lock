@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
+  revision: cab417468ea3bb1c0fd2b91bd34806c665165930
+  branch: fix/ruby-4-installs
+  glob: packages/ruby/*.gemspec
+  specs:
+    tree_sitter_language_pack (1.12.5)
+      rb_sys (>= 0.9, < 0.9.128)
+      sorbet-runtime (~> 0.5)
+
 PATH
   remote: .
   specs:
@@ -155,6 +165,9 @@ GEM
     racc (1.8.1)
     rainbow (3.1.1)
     rake (13.4.2)
+    rake-compiler-dock (1.12.0)
+    rb_sys (0.9.127)
+      rake-compiler-dock (= 1.12.0)
     rbs (4.0.3)
       logger
       prism (>= 1.6.0)
@@ -314,14 +327,6 @@ GEM
       parslet (~> 2.0)
       tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
       version_gem (~> 1.1, >= 1.1.9)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-darwin)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
-      sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.1.9)
       parallel_tests (>= 3.3.0, < 6)
@@ -396,6 +401,7 @@ DEPENDENCIES
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
+  tree_sitter_language_pack!
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
   yard-fence (~> 0.9, >= 0.9.1)
@@ -469,6 +475,8 @@ CHECKSUMS
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+  rake-compiler-dock (1.12.0) sha256=f13205c2738f3d2053afcd03491a9e4541b22a59a0bfc53fc8bc883bd8188023
+  rb_sys (0.9.127) sha256=e9f90df3bb0577472d26d96127d5b5774b98f44de881e7d36aeefd28d6337847
   rbs (4.0.3) sha256=5a7bf70e2628549d9a1f44eae447b2cfe55968a9c60cfff52693a4bdcc020e14
   rdoc (6.17.0) sha256=0f50d4e568fc98195f9bb155a9e8dff6c7feabfb515fb22ef6df1d12ad5a02b7
   reek (6.5.0) sha256=d26d3a492773b2bbc228888067a21afe33ac07954a17dbd64cdeae42c4c69be1
@@ -523,10 +531,7 @@ CHECKSUMS
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
   token-resolver (2.0.4) sha256=33b926958f504525bba3ed511ab66fbcbf8ef30390815e931436b30f27ffcad0
   tree_haver (7.1.0)
-  tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux) sha256=c882f4039a1a84a8ed782ef5381a8556acdb53538055d0b9b30d0cd85a0f1b0a
-  tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin) sha256=b3dc68837a1a626afcbe1abb779cd987e9828a43c78e98cc70aa7e58957f3ef8
-  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-darwin) sha256=a080abc08ef14a91a2ed7cade765f122833d4f00601060cf27c4c3279c5aac71
-  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux) sha256=ad6743a373eeac954c1b659b17af3aff1c82918b3ce9c9dc572a7c70ff843cdd
+  tree_sitter_language_pack (1.12.5)
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.1.9) sha256=535e6f081de0821f6cb8a1a4ee1a106d0dc6fb817f4f9d4268776d8a94c4879f
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
