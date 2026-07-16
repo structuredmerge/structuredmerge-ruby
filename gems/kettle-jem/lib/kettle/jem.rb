@@ -87,6 +87,7 @@ module Kettle
       duplicate_check
     ].freeze
     PACKAGED_TEMPLATE_ROOT = File.expand_path("jem/templates", __dir__)
+    TRANSFER_CHANGELOG_TEMPLATE_PATH = "CHANGELOG.transfer.md"
     COPY_ONLY_WHEN_MISSING_TEMPLATE_PATHS = %w[REEK bin/setup].freeze
     MONOREPO_ROOT_TEMPLATE_PROFILE = "monorepo-root"
     MONOREPO_SUBGEM_PACKAGE_TEMPLATE_PROFILE = "monorepo-subgem-package"
@@ -327,6 +328,7 @@ module Kettle
       KJ|FUNDING:KOFI
       KJ|FUNDING:LIBERAPAY
       KJ|FUNDING:PAYPAL
+      KJ|GEMSPEC:PACKAGE_FILE_INCLUDES
       KJ|GH:USER
       KJ|GH_ORG
       KJ|GL:USER
@@ -3034,6 +3036,10 @@ module Kettle
         )
         facts[:readme_style] = readme_style unless readme_style.empty?
         facts[:ruby_style] = ruby_style_facts(project_root)
+        changelog_transfers = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+        facts[:changelog] = {transfer_entries: changelog_transfers} unless changelog_transfers.empty?
+        gemspec_facts = gemspec_template_facts(kettle_config)
+        facts[:gemspec] = gemspec_facts unless gemspec_facts.empty?
         template_tokens = template_tokens(facts, funding)
         template_facts[:tokens] = template_tokens unless template_tokens.empty?
       end
@@ -4026,19 +4032,32 @@ module Kettle
       "### Security"
     ].freeze
 
-    def merge_changelog_template_source(template_content, destination_content)
+    def merge_changelog_template_source(template_content, destination_content, facts: nil)
       destination = destination_content.to_s
-      return ensure_trailing_newline(template_content.to_s) if destination.strip.empty?
+      if destination.strip.empty?
+        return apply_changelog_transfer_entries(
+          ensure_trailing_newline(template_content.to_s),
+          facts.to_h.dig(:changelog, :transfer_entries)
+        )
+      end
 
       template_lines = markdown_source_lines(template_content)
       template_unreleased = changelog_unreleased_line_index(template_lines)
-      return ensure_trailing_newline(template_content.to_s) unless template_unreleased
+      unless template_unreleased
+        return apply_changelog_transfer_entries(
+          ensure_trailing_newline(template_content.to_s),
+          facts.to_h.dig(:changelog, :transfer_entries)
+        )
+      end
 
       destination_lines = markdown_source_lines(destination)
       destination_unreleased = changelog_unreleased_line_index(destination_lines)
       unless destination_unreleased
         header = changelog_template_header(template_lines, template_unreleased).join("\n")
-        return ensure_trailing_newline("#{header}\n\n#{destination}")
+        return apply_changelog_transfer_entries(
+          ensure_trailing_newline("#{header}\n\n#{destination}"),
+          facts.to_h.dig(:changelog, :transfer_entries)
+        )
       end
 
       destination_end = changelog_unreleased_end_index(destination_lines, destination_unreleased)
@@ -4052,7 +4071,10 @@ module Kettle
         (header.empty? ? [] : [""]) +
         canonical +
         destination_lines[destination_end..].to_a
-      ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+      apply_changelog_transfer_entries(
+        ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n")),
+        facts.to_h.dig(:changelog, :transfer_entries)
+      )
     end
 
     def markdown_source_lines(content)
@@ -4132,6 +4154,69 @@ module Kettle
       lines
     end
 
+    def changelog_transfer_entries(template_root)
+      path = File.join(template_root, TRANSFER_CHANGELOG_TEMPLATE_PATH)
+      return [] unless File.file?(path)
+
+      lines = markdown_source_lines(File.read(path))
+      entries = []
+      index = 0
+      while index < lines.length
+        line = lines.fetch(index)
+        unless changelog_bullet_line?(line)
+          index += 1
+          next
+        end
+
+        item_lines, index = collect_changelog_list_item(lines, index)
+        key = changelog_transfer_key(item_lines.first)
+        next unless key
+
+        entries << {key: key, lines: item_lines}
+      end
+      entries
+    end
+
+    def changelog_transfer_key(line)
+      key = line.to_s.lstrip.delete_prefix("- ").delete_prefix("* ").split(/\s+-\s+/, 2).first.to_s
+      key.match?(/\Akettle-jem-template-\d{8}-\d{3}\z/) ? key : nil
+    end
+
+    def apply_changelog_transfer_entries(content, entries)
+      transfer_entries = Array(entries).select do |entry|
+        entry.is_a?(Hash) && entry[:key].to_s != "" && Array(entry[:lines]).any?
+      end
+      return ensure_trailing_newline(content) if transfer_entries.empty?
+
+      normalized = normalize_changelog(content, {})
+      existing_keys = changelog_transfer_keys(normalized)
+      missing = transfer_entries.reject { |entry| existing_keys.include?(entry.fetch(:key)) }
+      return ensure_trailing_newline(normalized) if missing.empty?
+
+      lines = markdown_source_lines(normalized)
+      unreleased = changelog_unreleased_line_index(lines)
+      return ensure_trailing_newline(normalized) unless unreleased
+
+      destination_end = changelog_unreleased_end_index(lines, unreleased)
+      destination_body = lines[(unreleased + 1)...destination_end] || []
+      items = changelog_unreleased_items(destination_body)
+      items["### Changed"] ||= []
+      items["### Changed"].pop while items["### Changed"].any? && items["### Changed"].last.to_s.strip.empty?
+      items["### Changed"] << "" if items["### Changed"].any?
+      missing.each do |entry|
+        items["### Changed"].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+      end
+
+      merged_lines = lines[0...unreleased] +
+        build_changelog_unreleased_section(lines.fetch(unreleased), items) +
+        lines[destination_end..].to_a
+      ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def changelog_transfer_keys(content)
+      content.to_s.scan(/\bkettle-jem-template-\d{8}-\d{3}\b/).to_set
+    end
+
     def changelog_bullet_line?(line)
       stripped = line.to_s.lstrip
       stripped.start_with?("- ", "* ")
@@ -4190,7 +4275,10 @@ module Kettle
       when "readme_metadata"
         synchronize_readme(original, facts, project_root: project_root)
       when "changelog_unreleased"
-        normalize_changelog(original, facts)
+        apply_changelog_transfer_entries(
+          normalize_changelog(original, facts),
+          facts.to_h.dig(:changelog, :transfer_entries)
+        )
       when "generated_block_sync"
         synchronize_managed_block(original, facts)
       when "github_funding_yml"
@@ -5184,7 +5272,7 @@ module Kettle
       when :json, :jsonc
         merge_result = merge_json_template_source(template_content, destination_content, recipe, file_type)
       when :markdown
-        return merge_changelog_template_source(template_content, destination_content) if recipe.fetch(:target_path) == "CHANGELOG.md"
+        return merge_changelog_template_source(template_content, destination_content, facts: facts) if recipe.fetch(:target_path) == "CHANGELOG.md"
 
         return template_content
       when :dotenv
@@ -9860,6 +9948,8 @@ module Kettle
       ).merge(
         license_template_tokens(facts.fetch(:license, {}))
       ).merge(
+        gemspec_template_tokens(facts.fetch(:gemspec, {}))
+      ).merge(
         project_runtime_template_tokens(facts.fetch(:project_runtime, {}))
       ).merge(
         readme_url_template_tokens(facts.fetch(:repository, {}), package.fetch(:name).to_s, github_org)
@@ -11778,6 +11868,38 @@ module Kettle
       }
     end
 
+    def gemspec_template_facts(config)
+      includes = Array(config.dig("gemspec", "package_files", "include"))
+        .map { |path| path.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+      includes.empty? ? {} : {package_file_includes: includes}
+    end
+
+    def gemspec_template_tokens(gemspec)
+      {
+        "KJ|GEMSPEC:PACKAGE_FILE_INCLUDES" => gemspec_package_file_includes_token(gemspec)
+      }
+    end
+
+    def gemspec_package_file_includes_token(gemspec)
+      includes = Array(gemspec[:package_file_includes] || gemspec["package_file_includes"])
+        .map { |path| path.to_s.strip }
+        .reject(&:empty?)
+        .uniq
+      return "" if includes.empty?
+
+      lines = [
+        "",
+        "    # Extra package files configured by .structuredmerge/kettle-jem.yml"
+      ]
+      includes.each_with_index do |pattern, index|
+        comma = index < includes.length - 1 ? "," : ""
+        lines << %(    *Dir.glob(#{pattern.dump}, File::FNM_DOTMATCH).select { |path| File.file?(path) }#{comma})
+      end
+      ",#{lines.join("\n")}"
+    end
+
     def rubocop_target_ruby_token(min_ruby)
       token = minimum_ruby_token(min_ruby)
       return "0" if token == "0"
@@ -12678,6 +12800,7 @@ module Kettle
         next if logical_path.start_with?("readme/partials/")
         next if logical_path.start_with?("shim/") && !include_shim_templates
         next if logical_path == "gemfiles/modular/shunted.gemfile"
+        next if logical_path == TRANSFER_CHANGELOG_TEMPLATE_PATH
 
         logical_paths << logical_path unless logical_path.empty?
       end

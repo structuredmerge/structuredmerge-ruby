@@ -75,7 +75,7 @@ Gem::Specification.new do |spec|
     # Public certs for gem signing
     *enumerate_package_files.call("certs"),
     # Signatures
-    *enumerate_package_files.call("sig"){KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA}
+    *enumerate_package_files.call("sig"){KJ|GEMSPEC:PACKAGE_FILE_INCLUDES}{KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA}
   ]
 
   # Automatically included with gem package, no need to list again in files.

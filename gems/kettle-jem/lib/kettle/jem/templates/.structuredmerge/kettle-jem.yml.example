@@ -106,6 +106,16 @@ rubygems:
   # compatibility text. Omit this to derive the value from the gemspec.
   min_ruby: "{KJ|MIN_RUBY}"
 
+# RubyGems package manifest additions.
+# The generated gemspec owns the default package manifest. Add entries here only
+# for package/runtime files that are not covered by the template default.
+#
+# Example:
+# gemspec:
+#   package_files:
+#     include:
+#       - data/**/*.json
+
 # Repository URL topology.
 # This is independent from templates.profile. A gem may use the full template
 # while still living as a sub-project inside a monorepo.

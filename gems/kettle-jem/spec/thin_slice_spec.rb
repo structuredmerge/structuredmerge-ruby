@@ -1690,6 +1690,92 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "applies transferable changelog entries once while preserving project entries" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-changelog-transfer-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: false
+            entries:
+              - README.md
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN
+          # Changelog
+
+          ## [Unreleased]
+
+          ### Added
+
+          - Project-authored item.
+
+          ### Changed
+
+          - kettle-jem-template-20260716-001 - Shim gemspec manifests now include
+            `LICENSE.md` instead of nonexistent `LICENSE.txt`.
+
+          ### Fixed
+
+          - Existing fix.
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan[:recipe_reports].find { |candidate| candidate.fetch(:recipe_name) == "changelog_unreleased" }
+      changelog = report.fetch(:final_content)
+
+      expect(changelog.scan("kettle-jem-template-20260716-001").size).to eq(1)
+      expect(changelog).to include("- Project-authored item.")
+      expect(changelog).to include("- Existing fix.")
+    end
+  end
+
+  it "applies multiple missed transferable changelog entries without duplicating existing keys" do
+    changelog = <<~MARKDOWN
+      # Changelog
+
+      ## [Unreleased]
+
+      ### Changed
+
+      - kettle-jem-template-20260716-001 - Already applied.
+    MARKDOWN
+    entries = [
+      {
+        key: "kettle-jem-template-20260716-001",
+        lines: ["- kettle-jem-template-20260716-001 - Already applied."]
+      },
+      {
+        key: "kettle-jem-template-20260716-002",
+        lines: [
+          "- kettle-jem-template-20260716-002 - First missed transfer.",
+          "  Continued detail."
+        ]
+      },
+      {
+        key: "kettle-jem-template-20260716-003",
+        lines: ["- kettle-jem-template-20260716-003 - Second missed transfer."]
+      }
+    ]
+
+    result = described_class.send(:apply_changelog_transfer_entries, changelog, entries)
+
+    expect(result.scan("kettle-jem-template-20260716-001").size).to eq(1)
+    expect(result).to include("- kettle-jem-template-20260716-002 - First missed transfer.\n  Continued detail.")
+    expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
+  end
+
   it "keeps the real CHANGELOG template in canonical Unreleased form" do
     template = File.read(File.join(__dir__, "../lib/kettle/jem/templates/CHANGELOG.md.example"))
 
@@ -11754,6 +11840,46 @@ RSpec.describe Kettle::Jem do
       expect(gemspec).to include('"LICENSE.md"')
       expect(gemspec).to include('"MIT.md"')
       expect(gemspec.index('"MIT.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
+    end
+  end
+
+  it "renders configured extra package files in the generated gemspec" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-configured-package-files-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.licenses = ["MIT"]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          gemspec:
+            package_files:
+              include:
+                - data/**/*.json
+                - config/runtime.yml
+          tokens:
+            author:
+              orcid: "0000-0000-0000-0000"
+          templates:
+            root: packaged
+            apply: true
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec = File.read(File.join(root, "example.gemspec"))
+
+      expect(apply.dig(:facts, :gemspec, :package_file_includes)).to eq(["data/**/*.json", "config/runtime.yml"])
+      expect(gemspec).to include("# Extra package files configured by .structuredmerge/kettle-jem.yml")
+      expect(gemspec).to include('*Dir.glob("data/**/*.json", File::FNM_DOTMATCH).select { |path| File.file?(path) }')
+      expect(gemspec).to include('*Dir.glob("config/runtime.yml", File::FNM_DOTMATCH).select { |path| File.file?(path) }')
+      expect { RubyVM::InstructionSequence.compile(gemspec) }.not_to raise_error
     end
   end
 
