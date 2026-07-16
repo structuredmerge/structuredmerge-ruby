@@ -111,11 +111,19 @@ jobs:
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
           ruby-version: 4.0.2
-          bundler-cache: true
-          working-directory: ${{ matrix.gem }}
-          cache-version: current-${{ matrix.gem }}-20260716
+          bundler-cache: false
+      - name: Install dependencies
+        working-directory: ${{ matrix.gem }}
+        env:
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          bundle config set path vendor/bundle
+          bundle config set frozen false
+          bundle install --jobs 4
       - name: Run checks
         working-directory: ${{ matrix.gem }}
+        env:
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
 
   check:
