@@ -127,11 +127,47 @@ jobs:
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
 
+  rbs:
+    name: RBS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+        with:
+          ruby-version: 4.0.2
+          bundler-cache: false
+      - name: Validate RBS Environment
+        shell: bash
+        run: |
+          ruby -rrbs -rpathname -e '
+            failures = []
+            sig_dirs = Dir.glob("gems/*/sig").select { |path| File.directory?(path) }.sort
+            sig_dirs.each do |sig_dir|
+              gem_dir = File.dirname(sig_dir)
+              print "Validating #{gem_dir}... "
+              loader = RBS::EnvironmentLoader.new
+              loader.add(path: Pathname(sig_dir))
+              RBS::Environment.from_loader(loader).resolve_type_names
+              puts "OK"
+            rescue StandardError => error
+              puts "FAILED"
+              failures << [gem_dir, error]
+            end
+
+            failures.each do |gem_dir, error|
+              warn "#{gem_dir}: #{error.class}: #{error.message}"
+            end
+            abort "RBS validation failed for #{failures.length} gem(s)" unless failures.empty?
+          '
+
   check:
     name: Check
     needs:
       - detect
       - gem-suite
+      - rbs
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -141,13 +177,18 @@ jobs:
           SELECTED_GEMS: ${{ needs.detect.outputs.summary }}
           DETECT_RESULT: ${{ needs.detect.result }}
           GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
+          RBS_RESULT: ${{ needs.rbs.result }}
         run: |
           set -euo pipefail
           echo "Selected gem suites: ${SELECTED_GEMS}"
           echo "Detect result: ${DETECT_RESULT}"
           echo "Gem suite result: ${GEM_SUITE_RESULT}"
+          echo "RBS result: ${RBS_RESULT}"
 
           if [[ "${DETECT_RESULT}" != "success" ]]; then
+            exit 1
+          fi
+          if [[ "${RBS_RESULT}" != "success" ]]; then
             exit 1
           fi
 
