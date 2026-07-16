@@ -12,20 +12,9 @@ require "stringio"
 require "time"
 require "uri"
 require "addressable/uri"
-require "ruby/merge"
-require "prism/merge"
-require "bash/merge"
-require "json/merge"
-require "dotenv/merge"
-require "rbs"
-require "rbs/merge"
 require "token/resolver"
-require "citrus-toml-merge"
-require "psych-merge"
 require "yaml"
 require "ast/merge"
-require "ast/crispr/markdown/markly"
-require "ast/crispr/ruby/prism"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
 require_relative "jem/version"
@@ -2070,6 +2059,23 @@ module Kettle
 
     module_function
 
+    def ensure_runtime_dependencies!
+      return if defined?(@runtime_dependencies_loaded) && @runtime_dependencies_loaded
+
+      require "ruby/merge"
+      require "prism/merge"
+      require "bash/merge"
+      require "json/merge"
+      require "dotenv/merge"
+      require "rbs"
+      require "rbs/merge"
+      require "citrus-toml-merge"
+      require "psych-merge"
+      require "ast/crispr/markdown/markly"
+      require "ast/crispr/ruby/prism"
+      @runtime_dependencies_loaded = true
+    end
+
     def display_path(path)
       return path if path.nil?
 
@@ -3358,6 +3364,7 @@ module Kettle
     end
 
     def plan_project(project_root, env: ENV, run_options: {})
+      ensure_runtime_dependencies!
       preflight_project!(project_root)
       template_selection = template_selection_for(env, run_options)
       decision_policy = decision_policy_for(env, run_options)
