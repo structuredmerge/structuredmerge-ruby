@@ -63,33 +63,21 @@ Gem::Specification.new do |spec|
       File.file?(path) && ![".", ".."].include?(File.basename(path))
     end
   end
+  package_metadata_files = %w[
+    CHANGELOG.md
+    LICENSE.md
+    README.md
+    sig/{KJ|GEM_NAME_PATH}.rbs
+  ].select { |path| File.exist?(path) }
 
   # Specify which files are part of the released package.
   spec.files = [
-    # Root license files
-{KJ|GEMSPEC:ROOT_LICENSE_FILES}
+    # Root package metadata
+    *package_metadata_files,
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
     # Executables and executable support scripts
-    *enumerate_package_files.call("exe"),
-    # Public certs for gem signing
-    *enumerate_package_files.call("certs"),
-    # Signatures
-    *enumerate_package_files.call("sig"){KJ|GEMSPEC:PACKAGE_FILE_INCLUDES}{KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA}
-  ]
-
-  # Automatically included with gem package, no need to list again in files.
-  spec.extra_rdoc_files = Dir[
-    # Files (alphabetical)
-    "CHANGELOG.md",
-    "CITATION.cff",
-    "CODE_OF_CONDUCT.md",
-    "CONTRIBUTING.md",
-    "FUNDING.md",
-    "LICENSE.md",
-    "README.md",
-    "RUBOCOP.md",
-    "SECURITY.md"
+    *enumerate_package_files.call("exe"){KJ|GEMSPEC:PACKAGE_FILE_INCLUDES}{KJ|RUBY_STYLE:TRAILING_ARRAY_COMMA}
   ]
   spec.rdoc_options += [
     "--title",
