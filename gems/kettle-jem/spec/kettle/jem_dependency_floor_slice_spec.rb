@@ -38,8 +38,8 @@ RSpec.describe Kettle::Jem do
       },
       "kettle-test" => {
         declaration_names: ["kettle-test"],
-        requirement_args: %("~> 2.0", ">= 2.0.10"),
-        lock_version: "2.0.10",
+        requirement_args: %("~> 2.0", ">= 2.0.11"),
+        lock_version: "2.0.11",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"
