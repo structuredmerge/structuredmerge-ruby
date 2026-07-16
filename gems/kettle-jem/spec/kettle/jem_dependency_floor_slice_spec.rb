@@ -139,8 +139,8 @@ RSpec.describe Kettle::Jem do
       },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
-        requirement_args: %("~> 3.1", ">= 3.1.9"),
-        lock_version: "3.1.9",
+        requirement_args: %("~> 3.1", ">= 3.1.10"),
+        lock_version: "3.1.10",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"
