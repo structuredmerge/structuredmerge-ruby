@@ -6,7 +6,7 @@ RSpec.describe TreeHaver do
   end
 
   def read_json(path)
-    Ast::Merge.normalize_value(JSON.parse(path.read))
+    deep_symbolize(JSON.parse(path.read))
   end
 
   def manifest
@@ -14,14 +14,42 @@ RSpec.describe TreeHaver do
   end
 
   def diagnostics_fixture(role)
-    path = Ast::Merge.conformance_fixture_path(manifest, 'diagnostics', role)
+    path = conformance_fixture_path(manifest, 'diagnostics', role)
     raise "missing diagnostics fixture for #{role}" unless path
 
     read_json(fixtures_root.join(*path))
   end
 
   def json_ready(value)
-    Ast::Merge.json_ready(value)
+    case value
+    when Array
+      value.map { |item| json_ready(item) }
+    when Hash
+      value.each_with_object({}) do |(key, item), memo|
+        memo[key.to_s] = json_ready(item)
+      end
+    else
+      value
+    end
+  end
+
+  def deep_symbolize(value)
+    case value
+    when Array
+      value.map { |item| deep_symbolize(item) }
+    when Hash
+      value.each_with_object({}) do |(key, item), memo|
+        memo[key.to_sym] = deep_symbolize(item)
+      end
+    else
+      value
+    end
+  end
+
+  def conformance_fixture_path(manifest, family, role)
+    entries = manifest.fetch(:families, {}).fetch(family.to_sym, [])
+    entry = entries.find { |candidate| candidate.fetch(:role) == role }
+    entry&.fetch(:path)
   end
 
   it 'conforms to the slice-06 parser request fixture' do

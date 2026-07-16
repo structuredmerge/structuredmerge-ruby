@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'tree_haver/base/node'
+
 module Ast
   module Merge
     # Base class for synthetic AST nodes in the ast-merge framework.

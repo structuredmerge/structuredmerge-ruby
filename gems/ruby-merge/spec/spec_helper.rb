@@ -18,6 +18,8 @@ end
 require 'kettle/test/rspec'
 
 # This library
+require 'ast/merge'
+require 'ast/merge/rspec'
 require 'ruby/merge'
 
 RSpec.configure do |config|

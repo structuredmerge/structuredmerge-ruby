@@ -128,6 +128,8 @@ Gem::Specification.new do |spec|
   # Testing
   spec.add_development_dependency('appraisal2', '~> 3.0', '>= 3.0.6') # ruby >= 1.8.7, for testing against multiple versions of dependencies
   spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.9') # ruby >= 4.0.0
+  spec.add_development_dependency('toml', '~> 0.3') # ruby >= 0
+  spec.add_development_dependency('toml-rb', '~> 4.1') # ruby >= 3.2.0
 
   # Releasing
   spec.add_development_dependency('ruby-progressbar', '~> 1.13')                    # ruby >= 0

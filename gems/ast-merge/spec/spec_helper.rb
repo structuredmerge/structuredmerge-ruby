@@ -19,6 +19,7 @@ require 'kettle/test/rspec'
 
 # This library
 require 'ast/merge'
+require 'ast/merge/rspec'
 require_relative 'support/testable_node'
 
 RSpec.configure do |config|
