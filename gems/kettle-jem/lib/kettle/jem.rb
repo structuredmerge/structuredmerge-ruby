@@ -7075,6 +7075,7 @@ module Kettle
         template_content: template_content,
         template_receiver: template_receiver
       )
+      merged = remove_gemspec_assignment(merged, receiver: template_receiver, field: "extra_rdoc_files")
       merged = preserve_gemspec_dependency_lines(
         merged,
         destination_content,
@@ -7484,10 +7485,17 @@ module Kettle
 
       combined_groups = []
       seen = {}
+      destination_groups = destination_parts.fetch(:groups).reject do |group|
+        stale_generated_gemspec_files_group?(group) ||
+          generated_gemspec_metadata_file_group?(group, template_parts)
+      end
+      merged_groups = merged_parts.fetch(:groups).reject do |group|
+        generated_gemspec_metadata_file_group?(group, merged_parts)
+      end
 
       [
-        [destination_parts, destination_parts.fetch(:groups)],
-        [merged_parts, merged_parts.fetch(:groups)],
+        [destination_parts, destination_groups],
+        [merged_parts, merged_groups],
         [template_parts, template_parts.fetch(:groups)]
       ].each do |parts, groups|
         groups.each do |group|
@@ -7582,21 +7590,28 @@ module Kettle
       return unless %i[array concat].include?(destination_parts.fetch(:collection_kind))
 
       merged_keys = merged_parts.fetch(:groups).map { |group| group.fetch(:key) }.to_set
-      destination_only_nonliteral = destination_parts.fetch(:groups).any? do |group|
+      destination_groups = destination_parts.fetch(:groups).reject do |group|
+        stale_generated_gemspec_files_group?(group) ||
+          generated_gemspec_metadata_file_group?(group, merged_parts)
+      end
+      destination_only_nonliteral = destination_groups.any? do |group|
         !group.fetch(:node).is_a?(::Prism::StringNode) && !merged_keys.include?(group.fetch(:key))
       end
       return if destination_only_nonliteral
 
-      destination_groups = destination_parts.fetch(:groups).to_h do |group|
+      destination_groups_by_key = destination_groups.to_h do |group|
         [group.fetch(:key), group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, destination_parts))]
       end
       seen = Set.new
-      groups = merged_parts.fetch(:groups).map do |group|
+      merged_groups = merged_parts.fetch(:groups).reject do |group|
+        generated_gemspec_metadata_file_group?(group, merged_parts)
+      end
+      groups = merged_groups.map do |group|
         key = group.fetch(:key)
         seen << key
-        destination_groups.fetch(key, group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, merged_parts)))
+        destination_groups_by_key.fetch(key, group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, merged_parts)))
       end
-      destination_parts.fetch(:groups).each do |group|
+      destination_groups.each do |group|
         next if seen.include?(group.fetch(:key))
 
         groups << group.merge(source_collection_kind: gemspec_files_group_collection_kind(group, destination_parts))
@@ -7780,6 +7795,59 @@ module Kettle
       end
 
       node&.slice
+    end
+
+    def stale_generated_gemspec_files_group?(group)
+      node = group.fetch(:node)
+      if node.is_a?(::Prism::StringNode)
+        path = node.unescaped.to_s
+        basename = File.basename(path, ".md")
+        return true if %w[
+          CITATION.md
+          CITATION.cff
+          CODE_OF_CONDUCT.md
+          CONTRIBUTING.md
+          FUNDING.md
+          RUBOCOP.md
+          SECURITY.md
+        ].include?(path)
+        return true if path.end_with?(".md") && basename != "LICENSE" && known_license_template_basenames.include?(basename)
+
+        return false
+      end
+
+      key = group.fetch(:key)
+      return false unless key.is_a?(Array) && key.first == :splat
+
+      stale_generated_gemspec_splat_key?(key[1])
+    end
+
+    def stale_generated_gemspec_splat_key?(key)
+      return false unless key.is_a?(Array) && key.first == :call
+
+      receiver, method_name, arguments = key[1], key[2], Array(key[3])
+      return true if receiver == "enumerate_package_files" && method_name == :call && %w[certs sig].include?(arguments.first.to_s)
+      return true if receiver == "Dir" && method_name == :[] && arguments.first.to_s == "sig/**/*.rbs"
+
+      false
+    end
+
+    def generated_gemspec_metadata_file_group?(group, target_parts)
+      return false unless gemspec_files_collection_has_package_metadata_splat?(target_parts)
+
+      node = group.fetch(:node)
+      return false unless node.is_a?(::Prism::StringNode)
+
+      %w[CHANGELOG.md LICENSE.md README.md].include?(node.unescaped.to_s)
+    end
+
+    def gemspec_files_collection_has_package_metadata_splat?(parts)
+      parts.fetch(:groups).any? do |group|
+        key = group.fetch(:key)
+        key.is_a?(Array) &&
+          key.first == :splat &&
+          (key[1] == "package_metadata_files" || key[1] == [:call, nil, :package_metadata_files, []])
+      end
     end
 
     def gemspec_files_collection_has_nonliteral_entries?(parts)

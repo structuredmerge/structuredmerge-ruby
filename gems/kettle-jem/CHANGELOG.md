@@ -94,6 +94,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Version-gem templates now generate one package-level RBS file at
   `sig/<entrypoint>.rbs` and migrate legacy nested
   `sig/<entrypoint>/version.rbs` files into it.
+- Generated gemspec package manifests now omit repository-only governance docs,
+  signing certs, recursive signature directories, split license files, and
+  `spec.extra_rdoc_files` by default.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
   `token-resolver` 2.0.4.

@@ -11939,7 +11939,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "packages configured named license files in the generated gemspec" do
+  it "does not package configured named license files in the generated gemspec by default" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-configured-license-entry-slice", tmp_root) do |root|
@@ -11971,9 +11971,8 @@ RSpec.describe Kettle::Jem do
       expect(recipe_names).to include("template_source_application_example_gemspec")
       expect(apply[:changed_files]).to include("example.gemspec")
       gemspec = File.read(File.join(root, "example.gemspec"))
-      expect(gemspec).to include('"LICENSE.md"')
-      expect(gemspec).to include('"MIT.md"')
-      expect(gemspec.index('"MIT.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
+      expect(gemspec).to include("LICENSE.md")
+      expect(gemspec).not_to include("MIT.md")
     end
   end
 
@@ -12017,7 +12016,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "packages multiple configured named license files in the generated gemspec" do
+  it "does not package multiple configured named license files in the generated gemspec by default" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-configured-multi-license-entry-slice", tmp_root) do |root|
@@ -12050,11 +12049,9 @@ RSpec.describe Kettle::Jem do
       expect(recipe_names).to include("template_source_application_example_gemspec")
       expect(apply[:changed_files]).to include("example.gemspec")
       gemspec = File.read(File.join(root, "example.gemspec"))
-      expect(gemspec).to include('"LICENSE.md"')
-      expect(gemspec).to include('"AGPL-3.0-only.md"')
-      expect(gemspec).to include('"Big-Time-Public-License.md"')
-      expect(gemspec.index('"AGPL-3.0-only.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
-      expect(gemspec.index('"Big-Time-Public-License.md"')).to be < gemspec.index('*enumerate_package_files.call("lib")')
+      expect(gemspec).to include("LICENSE.md")
+      expect(gemspec).not_to include("AGPL-3.0-only.md")
+      expect(gemspec).not_to include("Big-Time-Public-License.md")
     end
   end
 
@@ -12682,6 +12679,97 @@ RSpec.describe Kettle::Jem do
       expect(final_content.index('"rubocop-lts/**/*.yml"')).to be < final_content.index("] + [")
       expect(final_content.index("] + [")).to be < final_content.index('*enumerate_package_files.call("lib")')
       expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(1)
+    end
+  end
+
+  it "replaces old broad generated gemspec manifests with the minimal package manifest" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemspec-files-minimal-package", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.licenses = ["MIT"]
+
+            enumerate_package_files = lambda do |root|
+              Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+                File.file?(path) && ![".", ".."].include?(File.basename(path))
+              end
+            end
+
+            # Specify which files are part of the released package.
+            spec.files = [
+              "LICENSE.md",
+              "MIT.md",
+              "CITATION.cff",
+              "CODE_OF_CONDUCT.md",
+              "CONTRIBUTING.md",
+              "FUNDING.md",
+              "README.md",
+              "RUBOCOP.md",
+              "SECURITY.md",
+              "config/runtime.yml",
+              *enumerate_package_files.call("lib"),
+              *enumerate_package_files.call("exe"),
+              *enumerate_package_files.call("certs"),
+              *enumerate_package_files.call("sig")
+            ]
+
+            spec.extra_rdoc_files = Dir[
+              "CHANGELOG.md",
+              "CITATION.cff",
+              "CODE_OF_CONDUCT.md",
+              "CONTRIBUTING.md",
+              "FUNDING.md",
+              "LICENSE.md",
+              "README.md",
+              "RUBOCOP.md",
+              "SECURITY.md"
+            ]
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          tokens:
+            author:
+              orcid: "0000-0000-0000-0000"
+          templates:
+            root: packaged
+            apply: true
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemspec = File.read(File.join(root, "example.gemspec"))
+      files_assignment = described_class.gemspec_assignment_records(gemspec, receiver: "spec").find do |record|
+        record.fetch(:field) == "files"
+      end.fetch(:source)
+
+      expect(apply[:changed_files]).to include("example.gemspec")
+      expect(Prism.parse(gemspec)).to be_success
+      expect(gemspec).to include("CHANGELOG.md")
+      expect(gemspec).to include("LICENSE.md")
+      expect(gemspec).to include("README.md")
+      expect(gemspec).to include("sig/example.rbs")
+      expect(files_assignment).to include("*package_metadata_files")
+      expect(files_assignment).to include('"config/runtime.yml"')
+      expect(files_assignment).to include('*enumerate_package_files.call("lib")')
+      expect(files_assignment).to include('*enumerate_package_files.call("exe")')
+      expect(files_assignment).not_to include('"LICENSE.md"')
+      expect(files_assignment).not_to include('"README.md"')
+      expect(files_assignment).not_to include("MIT.md")
+      expect(files_assignment).not_to include("CITATION.cff")
+      expect(files_assignment).not_to include("CODE_OF_CONDUCT.md")
+      expect(files_assignment).not_to include("CONTRIBUTING.md")
+      expect(files_assignment).not_to include("FUNDING.md")
+      expect(files_assignment).not_to include("RUBOCOP.md")
+      expect(files_assignment).not_to include("SECURITY.md")
+      expect(files_assignment).not_to include('*enumerate_package_files.call("certs")')
+      expect(files_assignment).not_to include('*enumerate_package_files.call("sig")')
+      expect(gemspec).not_to include("spec.extra_rdoc_files")
     end
   end
 
