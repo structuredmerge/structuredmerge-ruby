@@ -72,12 +72,8 @@ jobs:
           gems = [gem for gem in gems if gem in all_gems]
 
           root_bundle_changed = any(path in {"Gemfile", "Gemfile.lock"} for path in changed)
-          workflow_changed = any(path == ".github/workflows/current.yml" for path in changed)
-
           if root_bundle_changed:
               gems = all_gems
-          elif not gems and workflow_changed and "gems/kettle-jem" in all_gems:
-              gems = ["gems/kettle-jem"]
 
           matrix = {"gem": gems}
           summary = ", ".join(gems) if gems else "No changed gem suites selected"
