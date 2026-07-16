@@ -83,7 +83,7 @@ Please file a bug if you notice a violation of semantic versioning.
   require a dedicated `lib/<entrypoint>/version_gem.rb` entrypoint when present.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.3.5.
 - Gem templates and generated root Gemfiles now require `kettle-test` >= 2.0.10.
-- Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.11.
+- Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.12.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
