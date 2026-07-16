@@ -12977,9 +12977,11 @@ RSpec.describe Kettle::Jem do
     expect(merged.scan(/^\s*spec\.files\s*=/).size).to eq(1)
     expect(merged).to include('"LICENSE.md"')
     expect(merged).to include('"MIT.md"')
-    expect(merged.index('"MIT.md"')).to be < merged.index("*enumerate_package_files.call('lib')")
-    expect(merged).to include("*enumerate_package_files.call('sig')\n")
-    expect(merged).not_to include('*enumerate_package_files.call("lib")')
+    lib_splat_index = merged =~ /\*enumerate_package_files\.call\(["']lib["']\)/
+    expect(lib_splat_index).not_to be_nil
+    expect(merged.index('"MIT.md"')).to be < lib_splat_index
+    expect(merged).to match(/^\s*\*enumerate_package_files\.call\(["']sig["']\)\n/)
+    expect(merged.scan(/\*enumerate_package_files\.call\(["']lib["']\)/).size).to eq(1)
   end
 
   it "supports the generated Dir plus Array gemspec files assignment shape" do
