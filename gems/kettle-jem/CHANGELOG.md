@@ -91,6 +91,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `CHANGELOG.md` files using stable `kettle-jem-template-YYYYMMDD-NNN` IDs.
 - Generated gemspecs now support explicit extra package-file globs via
   `gemspec.package_files.include` in `.structuredmerge/kettle-jem.yml`.
+- Version-gem templates now generate one package-level RBS file at
+  `sig/<entrypoint>.rbs` and migrate legacy nested
+  `sig/<entrypoint>/version.rbs` files into it.
 - Generated templates now require the released floors for `kettle-dev` 2.3.0,
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
   `token-resolver` 2.0.4.

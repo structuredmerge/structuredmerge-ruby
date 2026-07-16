@@ -192,7 +192,7 @@ module Kettle
     ].freeze
     VERSION_GEM_TEMPLATE_SOURCES = [
       "lib/gem/version.rb",
-      "sig/gem/version.rbs"
+      "sig/gem.rbs"
     ].freeze
     KETTLE_CONFIG_ENV_SYNC_PATHS = {
       %w[project_emoji] => "KJ_PROJECT_EMOJI",
@@ -3682,7 +3682,7 @@ module Kettle
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
-      signature_path = File.join("sig", entrypoint_require, "version.rbs")
+      signature_path = File.join("sig", "#{entrypoint_require}.rbs")
       version_gem_bootstrap_step_for_paths(
         project_root,
         facts,
@@ -8912,8 +8912,8 @@ module Kettle
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
-      when "sig/gem/version.rbs"
-        File.join("sig", entrypoint_require, "version.rbs")
+      when "sig/gem.rbs"
+        File.join("sig", "#{entrypoint_require}.rbs")
       else
         source
       end
@@ -8927,8 +8927,8 @@ module Kettle
       case source
       when "lib/gem/version.rb"
         File.join("lib", entrypoint_require, "version.rb")
-      when "sig/gem/version.rbs"
-        File.join("sig", entrypoint_require, "version.rbs")
+      when "sig/gem.rbs"
+        File.join("sig", "#{entrypoint_require}.rbs")
       else
         source
       end
@@ -10889,8 +10889,8 @@ module Kettle
       version_path = File.join("lib", entrypoint_require, "version.rb")
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
-      signature_path = File.join("sig", entrypoint_require, "version.rbs")
-      root_signature_path = File.join("sig", "#{entrypoint_require}.rbs")
+      signature_path = File.join("sig", "#{entrypoint_require}.rbs")
+      legacy_signature_path = File.join("sig", entrypoint_require, "version.rbs")
       namespace = facts.dig(:rubygems, :namespace).to_s
       namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
       namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
@@ -10919,8 +10919,18 @@ module Kettle
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
       changes << normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require) if non_default_version_gem
-      changes << write_if_changed(project_root, signature_path, version_gem_signature_file_content(namespace: namespace)) if manage_signature_file
-      changes << remove_legacy_version_signature_alias(project_root, root_signature_path, namespace: namespace)
+      if manage_signature_file
+        changes.concat(
+          write_consolidated_version_signature(
+            project_root,
+            signature_path,
+            legacy_signature_path,
+            namespace: namespace
+          )
+        )
+      else
+        changes << delete_project_file(project_root, legacy_signature_path)
+      end
       changed_files = changes.compact
 
       {
@@ -10977,6 +10987,53 @@ module Kettle
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(lines.join))
     end
 
+    def write_consolidated_version_signature(project_root, signature_path, legacy_signature_path, namespace:)
+      template = version_gem_signature_file_content(namespace: namespace)
+      current = read_project_file(project_root, signature_path)
+      legacy = read_project_file(project_root, legacy_signature_path)
+      merged = current
+      merged = merge_rbs_signature_sources(legacy, merged) unless legacy.empty?
+      merged = merge_rbs_signature_sources(template, merged)
+
+      [
+        write_if_changed(project_root, signature_path, merged),
+        delete_project_file(project_root, legacy_signature_path)
+      ].compact
+    end
+
+    def merge_rbs_signature_sources(template_content, destination_content)
+      return ensure_trailing_newline(template_content) if destination_content.to_s.strip.empty?
+
+      result = merge_rbs_template_source(
+        ensure_trailing_newline(template_content),
+        ensure_trailing_newline(destination_content),
+        {template_preference: {preference: "destination"}}
+      )
+      result.fetch(:ok) ? result.fetch(:output) : ensure_trailing_newline(destination_content)
+    end
+
+    def delete_project_file(project_root, relative_path)
+      path = File.join(project_root, relative_path)
+      return unless File.file?(path)
+
+      File.delete(path)
+      prune_empty_parent_directories(project_root, File.dirname(relative_path))
+      relative_path
+    end
+
+    def prune_empty_parent_directories(project_root, relative_path)
+      current = relative_path.to_s
+      while !current.empty? && current != "."
+        path = File.join(project_root, current)
+        begin
+          Dir.rmdir(path)
+        rescue SystemCallError
+          break
+        end
+        current = File.dirname(current)
+      end
+    end
+
     def version_spec_require_insertion_index(content)
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "version_spec.rb")
       owners = context.structural_owners(owner_scope: :top_level_statements)
@@ -10984,54 +11041,6 @@ module Kettle
       return requires.last.location.end_line if requires.any?
 
       version_gem_require_insertion_index(content)
-    end
-
-    def remove_legacy_version_signature_alias(project_root, signature_path, namespace:)
-      current = read_project_file(project_root, signature_path)
-      return nil if current.empty?
-
-      cleaned = remove_rbs_version_constants(current, namespace: namespace)
-      return nil if cleaned == current
-
-      write_if_changed(project_root, signature_path, cleaned)
-    end
-
-    def remove_rbs_version_constants(content, namespace:)
-      namespace_segments = namespace.to_s.split("::").reject(&:empty?)
-      return content if namespace_segments.empty?
-
-      buffer = ::RBS::Buffer.new(name: "legacy_version_signature_alias.rbs", content: content.to_s)
-      _buffer, _directives, declarations = ::RBS::Parser.parse_signature(buffer)
-      ranges = rbs_version_constant_line_ranges(declarations, namespace_segments: namespace_segments)
-      return content if ranges.empty?
-
-      lines = content.lines
-      ranges.sort_by(&:first).reverse_each do |first_line, last_line|
-        lines[(first_line - 1)..(last_line - 1)] = []
-      end
-      lines.join
-    rescue ::RBS::ParsingError
-      content
-    end
-
-    def rbs_version_constant_line_ranges(declarations, namespace_segments:, current_segments: [])
-      declarations.flat_map do |declaration|
-        if declaration.is_a?(::RBS::AST::Declarations::Constant)
-          next [] unless current_segments == namespace_segments
-          next [] unless declaration.name.name == :VERSION
-
-          [[declaration.location.start_line, declaration.location.end_line]]
-        elsif declaration.respond_to?(:members) && declaration.respond_to?(:name)
-          child_segments = current_segments + [declaration.name.name.to_s]
-          rbs_version_constant_line_ranges(
-            declaration.members,
-            namespace_segments: namespace_segments,
-            current_segments: child_segments
-          )
-        else
-          []
-        end
-      end
     end
 
     def version_gem_version_file_content(existing_version:, namespace:, version:)
