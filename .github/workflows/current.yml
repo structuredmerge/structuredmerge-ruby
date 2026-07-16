@@ -143,11 +143,17 @@ jobs:
         shell: bash
         env:
           SELECTED_GEMS: ${{ needs.detect.outputs.summary }}
+          DETECT_RESULT: ${{ needs.detect.result }}
           GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
         run: |
           set -euo pipefail
           echo "Selected gem suites: ${SELECTED_GEMS}"
+          echo "Detect result: ${DETECT_RESULT}"
           echo "Gem suite result: ${GEM_SUITE_RESULT}"
+
+          if [[ "${DETECT_RESULT}" != "success" ]]; then
+            exit 1
+          fi
 
           case "${GEM_SUITE_RESULT}" in
             success|skipped)
