@@ -10890,7 +10890,7 @@ module Kettle
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
       version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
-      legacy_signature_path = File.join("sig", entrypoint_require, "version.rbs")
+      legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
       namespace = facts.dig(:rubygems, :namespace).to_s
       namespace = existing_entrypoint_version_namespace(project_root, entrypoint_path) if namespace.empty?
       namespace = existing_version_namespace(project_root, version_path) if namespace.empty?
@@ -10919,17 +10919,15 @@ module Kettle
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
       changes << normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require) if non_default_version_gem
-      if manage_signature_file
+      if manage_signature_file || !legacy_signature_paths.empty?
         changes.concat(
           write_consolidated_version_signature(
             project_root,
             signature_path,
-            legacy_signature_path,
+            legacy_signature_paths,
             namespace: namespace
           )
         )
-      else
-        changes << delete_project_file(project_root, legacy_signature_path)
       end
       changed_files = changes.compact
 
@@ -10987,18 +10985,29 @@ module Kettle
       write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(lines.join))
     end
 
-    def write_consolidated_version_signature(project_root, signature_path, legacy_signature_path, namespace:)
+    def legacy_rbs_signature_paths(project_root, entrypoint_require)
+      legacy_root = File.join(project_root, "sig", entrypoint_require.to_s)
+      return [] unless Dir.exist?(legacy_root)
+
+      Dir.glob(File.join(legacy_root, "**", "*.rbs")).sort.map do |path|
+        path.delete_prefix("#{project_root}/")
+      end
+    end
+
+    def write_consolidated_version_signature(project_root, signature_path, legacy_signature_paths, namespace:)
       template = version_gem_signature_file_content(namespace: namespace)
       current = read_project_file(project_root, signature_path)
-      legacy = read_project_file(project_root, legacy_signature_path)
       merged = current
-      merged = merge_rbs_signature_sources(legacy, merged) unless legacy.empty?
+      legacy_signature_paths.each do |legacy_signature_path|
+        legacy = read_project_file(project_root, legacy_signature_path)
+        merged = merge_rbs_signature_sources(legacy, merged) unless legacy.empty?
+      end
       merged = merge_rbs_signature_sources(template, merged)
 
       [
         write_if_changed(project_root, signature_path, merged),
-        delete_project_file(project_root, legacy_signature_path)
-      ].compact
+        legacy_signature_paths.map { |legacy_signature_path| delete_project_file(project_root, legacy_signature_path) }
+      ].flatten.compact
     end
 
     def merge_rbs_signature_sources(template_content, destination_content)

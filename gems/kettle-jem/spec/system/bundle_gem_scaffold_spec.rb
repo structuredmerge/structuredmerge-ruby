@@ -181,7 +181,8 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     expect(File).to exist(File.join(gem_root, ".github/workflows/style.yml"))
 
     root_signature = File.read(File.join(gem_root, "sig/dummy/gem.rbs"))
-    expect(root_signature).not_to include("VERSION:")
+    expect(root_signature).to include("module Version")
+    expect(root_signature).to include("VERSION: String")
     loader = RBS::EnvironmentLoader.new
     loader.add(path: Pathname(File.join(gem_root, "sig")))
     expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error

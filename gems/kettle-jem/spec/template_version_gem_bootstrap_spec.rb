@@ -52,7 +52,7 @@ RSpec.describe Kettle::Jem do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge.rbs", "sig/plain/merge/version.rbs")
+          changed_files: include("lib/plain/merge.rb", "lib/plain/merge/version.rb", "sig/plain/merge.rbs")
         )
       )
       entrypoint = File.read(File.join(root, "lib/plain/merge.rb"))
@@ -62,13 +62,12 @@ RSpec.describe Kettle::Jem do
       RUBY
       expect(entrypoint.index('require_relative "merge/version"')).to be < entrypoint.index("Plain::Merge::Version.class_eval do")
       expect(File.read(File.join(root, "lib/plain/merge/version.rb"))).to include('VERSION = "7.0.0"')
-      signature = File.read(File.join(root, "sig/plain/merge/version.rbs"))
+      expect(File).not_to exist(File.join(root, "sig/plain/merge/version.rbs"))
+      signature = File.read(File.join(root, "sig/plain/merge.rbs"))
       expect(signature).to include("module Plain")
       expect(signature).to include("module Merge")
       expect(signature).to include("module Version")
       expect(signature.scan("VERSION: String").length).to eq(2)
-      root_signature = File.read(File.join(root, "sig/plain/merge.rbs"))
-      expect(root_signature).not_to include("VERSION: String")
     end
   end
 
@@ -113,11 +112,12 @@ RSpec.describe Kettle::Jem do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("sig/dummy/gem.rbs", "sig/dummy/gem/version.rbs")
+          changed_files: include("sig/dummy/gem.rbs")
         )
       )
       root_signature = File.read(File.join(root, "sig/dummy/gem.rbs"))
-      expect(root_signature).not_to include("VERSION:")
+      expect(root_signature).to include("module Version")
+      expect(root_signature).to include("VERSION: String")
       expect(root_signature).to include("class Error < ::StandardError")
       loader = RBS::EnvironmentLoader.new
       loader.add(path: Pathname(File.join(root, "sig")))
@@ -189,11 +189,13 @@ RSpec.describe Kettle::Jem do
         include(
           name: "version_gem_bootstrap",
           status: "applied",
-          changed_files: include("sig/kettle/rb.rbs")
+          changed_files: include("sig/kettle/rb.rbs", "sig/kettle/rb/version.rbs")
         )
       )
+      expect(File).not_to exist(File.join(root, "sig/kettle/rb/version.rbs"))
       root_signature = File.read(File.join(root, "sig/kettle/rb.rbs"))
-      expect(root_signature).not_to include("VERSION:")
+      expect(root_signature).to include("module Version")
+      expect(root_signature.scan("VERSION: String").length).to eq(2)
       loader = RBS::EnvironmentLoader.new
       loader.add(path: Pathname(File.join(root, "sig")))
       expect { RBS::Environment.from_loader(loader).resolve_type_names }.not_to raise_error

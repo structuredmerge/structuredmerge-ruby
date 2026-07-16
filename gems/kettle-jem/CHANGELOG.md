@@ -119,6 +119,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Version-gem RBS consolidation now migrates all legacy nested
+  `sig/<entrypoint>/**/*.rbs` content into the package-level signature and
+  removes the nested files, including when the package-level signature is
+  managed by a template entry.
 - Generated dep-heads workflows now run current TruffleRuby directly from the
   generated `gemfiles/dep_heads.gemfile`, avoiding `Appraisal.root.gemfile`
   bootstrap failures with TruffleRuby's bundled RubyGems/Bundler and gem.coop.
