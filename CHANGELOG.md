@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Current CI now detects changed monorepo gems and runs each changed gem's own
+  `kettle-test` suite instead of installing the root aggregate bundle.
 - Retemplated generated project metadata, support documentation, CI workflows,
   binstubs, and development dependency floors across the StructuredMerge Ruby
   gem family with `kettle-jem` v7.0.0.
