@@ -19,7 +19,7 @@ RSpec.describe Kettle::Jem do
       "kettle-dev" => {
         declaration_names: ["kettle-dev", "{KJ|KETTLE_DEV_GEM}"],
         requirement_args: %("~> 2.3", ">= 2.3.4"),
-        lock_version: "2.3.4",
+        lock_version: "2.3.5",
         requirement_surfaces: [
           "kettle-jem.gemspec",
           "lib/kettle/jem.rb",
@@ -122,7 +122,6 @@ RSpec.describe Kettle::Jem do
         lock_version: "1.0.6",
         requirement_surfaces: [
           "kettle-jem.gemspec",
-          "gemfiles/modular/optional.gemfile",
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example",
           "lib/kettle/jem/templates/shim/gem.gemspec.example"
@@ -133,14 +132,13 @@ RSpec.describe Kettle::Jem do
         requirement_args: %("~> 1.1", ">= 1.1.14"),
         lock_version: "1.1.14",
         requirement_surfaces: [
-          "kettle-jem.gemspec",
           "lib/kettle/jem/templates/gem.gemspec.example"
         ]
       },
       "turbo_tests2" => {
         declaration_names: ["turbo_tests2"],
-        requirement_args: %("~> 3.1", ">= 3.1.10"),
-        lock_version: "3.1.10",
+        requirement_args: %("~> 3.1", ">= 3.1.11"),
+        lock_version: "3.1.11",
         requirement_surfaces: [
           "lib/kettle/jem.rb",
           "lib/kettle/jem/templates/gem.gemspec.example"
