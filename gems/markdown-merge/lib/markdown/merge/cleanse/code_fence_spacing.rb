@@ -192,7 +192,7 @@ module Markdown
 
             # Extract just the language (first word of info string)
             language = info.strip.split(/\s+/).first
-            language = nil if language&.empty?
+            language = nil if language && language.empty?
 
             @code_blocks << {
               indent: indent,
