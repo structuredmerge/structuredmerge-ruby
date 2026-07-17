@@ -41,6 +41,15 @@ RSpec.describe Ast::Merge do
     )
   end
 
+  def merge_ruby_fixture(template_content, destination_content)
+    Prism::Merge.merge_ruby(
+      template_content,
+      destination_content,
+      'ruby',
+      template_only_placement: :destination_tail
+    )
+  end
+
   def promotion_policy_entry_contract(entry)
     described_class::ProfilePromotionPolicyEntry.new(
       **entry.merge(
@@ -2488,10 +2497,9 @@ RSpec.describe Ast::Merge do
           'toml'
         )
       when 'ruby'
-        Ruby::Merge.merge_ruby(
+        merge_ruby_fixture(
           entry[:prepared_template_content] || entry['prepared_template_content'],
-          entry[:destination_content] || entry['destination_content'],
-          'ruby'
+          entry[:destination_content] || entry['destination_content']
         )
       else
         {
@@ -2539,10 +2547,9 @@ RSpec.describe Ast::Merge do
           'toml'
         )
       when 'ruby'
-        Ruby::Merge.merge_ruby(
+        merge_ruby_fixture(
           entry[:prepared_template_content] || entry['prepared_template_content'],
-          entry[:destination_content] || entry['destination_content'],
-          'ruby'
+          entry[:destination_content] || entry['destination_content']
         )
       else
         {
@@ -2577,7 +2584,7 @@ RSpec.describe Ast::Merge do
       when 'toml'
         Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
       when 'ruby'
-        Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+        merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
       else
         {
           ok: false,
@@ -2616,7 +2623,7 @@ RSpec.describe Ast::Merge do
         when 'toml'
           Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
         when 'ruby'
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+          merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
         else
           {
             ok: false,
@@ -2647,7 +2654,7 @@ RSpec.describe Ast::Merge do
         when 'toml'
           Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
         when 'ruby'
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+          merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
         else
           {
             ok: false,
@@ -2661,7 +2668,7 @@ RSpec.describe Ast::Merge do
         json_ready(fixture[:expected_second_report])
       )
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 
@@ -2691,7 +2698,7 @@ RSpec.describe Ast::Merge do
         when 'toml'
           Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
         when 'ruby'
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+          merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
         else
           {
             ok: false,
@@ -2719,7 +2726,7 @@ RSpec.describe Ast::Merge do
         when 'toml'
           Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
         when 'ruby'
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+          merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
         else
           {
             ok: false,
@@ -2733,7 +2740,7 @@ RSpec.describe Ast::Merge do
         json_ready(fixture[:expected_second_report])
       )
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 
@@ -2805,7 +2812,7 @@ RSpec.describe Ast::Merge do
         when 'toml'
           Toml::Merge.merge_toml(entry[:prepared_template_content], entry[:destination_content], 'toml')
         when 'ruby'
-          Ruby::Merge.merge_ruby(entry[:prepared_template_content], entry[:destination_content], 'ruby')
+          merge_ruby_fixture(entry[:prepared_template_content], entry[:destination_content])
         else
           {
             ok: false,
@@ -2819,7 +2826,7 @@ RSpec.describe Ast::Merge do
         json_ready(fixture.dig(:apply_run, :expected))
       )
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 

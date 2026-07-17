@@ -36,10 +36,12 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
     }
   end
 
+  merge_result_cache = {}
+
   shared_examples 'gem family section merge' do |backend|
     describe "with #{backend} backend" do
-      let(:merger) do
-        Markdown::Merge::PartialTemplateMerger.new(
+      let(:result) do
+        merge_result_cache[backend] ||= Markdown::Merge::PartialTemplateMerger.new(
           template: partial_template,
           destination: destination,
           anchor: anchor_config,
@@ -48,21 +50,18 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
           preference: :template,
           add_missing: true,
           replace_mode: true # Full replacement - template content replaces destination section
-        )
+        ).merge
       end
 
       it 'finds the injection point' do
-        result = merger.merge
         expect(result.section_found?).to be true
       end
 
       it 'produces changed content' do
-        result = merger.merge
         expect(result.changed).to be true
       end
 
       describe 'merged content structure' do
-        let(:result) { merger.merge }
         let(:merged_content) { result.content }
 
         it 'preserves content before the gem family section' do
@@ -129,7 +128,6 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
       end
 
       describe 'content integrity' do
-        let(:result) { merger.merge }
         let(:merged_content) { result.content }
 
         it 'does not duplicate the gem family heading' do
@@ -168,7 +166,6 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
       end
 
       describe 'comparison with expected result' do
-        let(:result) { merger.merge }
         let(:merged_content) { result.content }
 
         # This test compares against a known-good result file
@@ -205,8 +202,8 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
     # Link reference definitions are a known issue - some backends convert them to inline links
 
     shared_examples 'link reference preservation' do |backend|
-      let(:merger) do
-        Markdown::Merge::PartialTemplateMerger.new(
+      let(:result) do
+        merge_result_cache[backend] ||= Markdown::Merge::PartialTemplateMerger.new(
           template: partial_template,
           destination: destination,
           anchor: anchor_config,
@@ -215,11 +212,10 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
           preference: :template,
           add_missing: true,
           replace_mode: true # Full replacement - template content replaces destination section
-        )
+        ).merge
       end
 
       it "preserves link reference definition format for #{backend}" do
-        result = merger.merge
         merged_content = result.content
 
         # Check that link references are preserved as references, not converted to inline
@@ -260,8 +256,8 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
 
     shared_examples 'paragraph replacement' do |backend|
       context 'with replace_mode: true (recommended)' do
-        let(:merger) do
-          Markdown::Merge::PartialTemplateMerger.new(
+        let(:result) do
+          merge_result_cache[backend] ||= Markdown::Merge::PartialTemplateMerger.new(
             template: partial_template,
             destination: destination,
             anchor: anchor_config,
@@ -270,11 +266,10 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
             preference: :template,
             add_missing: true,
             replace_mode: true # Full replacement
-          )
+          ).merge
         end
 
         it "replaces destination intro with template intro for #{backend}" do
-          result = merger.merge
           merged_content = result.content
 
           section_start = merged_content.index('### The `*-merge` Gem Family')

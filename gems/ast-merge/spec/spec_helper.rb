@@ -22,7 +22,7 @@ require 'ast/merge'
 require 'ast/merge/rspec'
 require_relative 'support/testable_node'
 
-%w[markdown-merge markly-merge commonmarker-merge].each do |require_path|
+%w[markdown-merge markly-merge commonmarker-merge toml-merge prism-merge].each do |require_path|
   require require_path
 rescue LoadError
   # Dependency-tag filtering skips backend-specific examples when the adapter
