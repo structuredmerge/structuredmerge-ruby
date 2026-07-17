@@ -247,8 +247,8 @@ templates:
     - tmp/.gitignore
     - source: lib/gem/version.rb
       target: lib/plain/merge/version.rb
-    - source: sig/gem/version.rbs
-      target: sig/plain/merge/version.rbs
+    - source: sig/gem.rbs
+      target: sig/plain/merge.rbs
 
 # Optional kettle-jem plugins.
 # Each entry is a gem name. During bootstrap, kettle-jem ensures each plugin is

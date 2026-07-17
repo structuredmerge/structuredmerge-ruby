@@ -349,7 +349,7 @@ module Ast
 
         # Capture group 2 is the reason text
         reason_text = match[2]&.strip
-        reason_text&.empty? ? nil : reason_text
+        reason_text && reason_text.empty? ? nil : reason_text
       end
 
       # Returns the freeze block content
