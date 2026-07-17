@@ -19,6 +19,7 @@ require 'kettle/test/rspec'
 
 # This library
 require 'ast/crispr'
+require 'ast/crispr/rspec'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

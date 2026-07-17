@@ -2,6 +2,7 @@
 
 require 'version_gem'
 
+require 'find'
 require 'json'
 require 'token/resolver'
 require_relative 'merge/version'
@@ -2825,7 +2826,8 @@ module Ast
       return {} unless root.exist?
       raise ArgumentError, "#{root} is not a directory" unless root.directory?
 
-      root.find.each_with_object({}) do |path, files|
+      Find.find(root).each_with_object({}) do |path, files|
+        path = Pathname(path)
         next if path.directory?
 
         files[path.relative_path_from(root).to_s] = path.read

@@ -51,7 +51,7 @@ RSpec.describe Kettle::Jem do
       "lib/kettle/jem/rakelib/selftest.rake"
     )
     expect(files).to include("certs/pboling.pem")
-    expect(spec.extra_rdoc_files).to include("README.md")
+    expect(spec.extra_rdoc_files).to be_empty
   end
 
   it "builds an artifact that can run kettle-jem from unpacked package files" do

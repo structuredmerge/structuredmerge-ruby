@@ -106,7 +106,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
-          ruby-version: 4.0.2
+          ruby-version: ruby
           bundler-cache: false
       - name: Install dependencies
         working-directory: ${{ matrix.gem }}
@@ -137,7 +137,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
-          ruby-version: 4.0.2
+          ruby-version: ruby
           bundler-cache: false
       - name: Validate RBS Environment
         shell: bash

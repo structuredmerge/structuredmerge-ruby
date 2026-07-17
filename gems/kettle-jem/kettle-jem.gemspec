@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.description = "🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold."
   spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
   spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
-  spec.required_ruby_version = ">= 4.0.0"
+  spec.required_ruby_version = ">= 4.0.0" # rubocop:disable Gemspec/RequiredRubyVersion
 
   # Linux distros often package gems and securely certify them independent
   #   of the official RubyGem certification process. Allowed via ENV["SKIP_GEM_SIGNING"]
@@ -65,7 +65,9 @@ Gem::Specification.new do |spec|
     # Code / tasks / data (NOTE: exe/ is specified via spec.bindir and spec.executables below)
     *enumerate_package_files.call("lib"),
     # Executables and executable support scripts
-    *enumerate_package_files.call("exe")
+    *enumerate_package_files.call("exe"),
+    # Extra package files configured by .structuredmerge/kettle-jem.yml
+    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
   ]
   spec.rdoc_options += [
     "--title",
@@ -85,6 +87,8 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency("addressable", ">= 2.8", "< 3")                     # ruby >= 2.2.0
+  # StructuredMerge sibling gems are released in lockstep with this gem.
+  # rubocop:disable Gemspec/DependencyVersion
   spec.add_dependency("ast-crispr-markdown-markly", "= #{spec.version}")  # ruby >= 4.0.0
   spec.add_dependency("ast-crispr-ruby-prism", "= #{spec.version}")        # ruby >= 4.0.0
   spec.add_dependency("ast-merge", "= #{spec.version}")                  # ruby >= 4.0.0
@@ -108,6 +112,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
+  # rubocop:enable Gemspec/DependencyVersion
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
@@ -134,7 +139,7 @@ Gem::Specification.new do |spec|
   # Testing
   spec.add_development_dependency("appraisal2", "~> 3.1", ">= 3.1.4")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
   spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")            # ruby >= 4.0.0
-  spec.add_development_dependency("turbo_tests2", "~> 3.1", ">= 3.1.12")           # ruby >= 2.4.0, default kettle-test runner
+  spec.add_development_dependency("turbo_tests2", "~> 3.1", ">= 3.1.14")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0

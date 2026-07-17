@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # kettle-jem:freeze
-# To retain chunks of comments & code during tree_haver templating:
+# To retain chunks of comments & code during kettle-jem templating:
 # Wrap custom sections with freeze markers (e.g., as above and below this comment chunk).
-# tree_haver will then preserve content between those markers across template runs.
+# kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
 source 'https://gem.coop'
@@ -18,25 +18,18 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from tree_haver.gemspec
 gemspec
 
+# Local workspace dependency wiring for *_local.gemfile overrides
+nomono_requirements = ['~> 1.0', '>= 1.0.8']
+gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
 # Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
-unless tslp_declared_by_templating
-  if tslp_dev.to_s.empty?
-    gem(
-      'tree_sitter_language_pack',
-      git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
-      branch: 'fix/ruby-4-installs',
-      glob: 'packages/ruby/*.gemspec'
-    )
-  else
-    gem 'tree_sitter_language_pack', path: tslp_dev
-  end
+if !tslp_declared_by_templating && tslp_dev.to_s.empty?
 end
 
-# Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
-eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
+# Modular sibling dependencies (env-switched inside each modular Gemfile)
+eval_gemfile 'gemfiles/modular/templating.gemfile'
 
 # Debugging
 eval_gemfile 'gemfiles/modular/debug.gemfile'

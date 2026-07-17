@@ -22,6 +22,13 @@ require 'ast/merge'
 require 'ast/merge/rspec'
 require_relative 'support/testable_node'
 
+%w[markdown-merge markly-merge commonmarker-merge].each do |require_path|
+  require require_path
+rescue LoadError
+  # Dependency-tag filtering skips backend-specific examples when the adapter
+  # gem is not present in a particular bundle.
+end
+
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
   config.example_status_persistence_file_path = '.rspec_status'

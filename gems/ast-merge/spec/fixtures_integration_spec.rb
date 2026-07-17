@@ -1840,7 +1840,8 @@ RSpec.describe Ast::Merge do
 
   def read_relative_file_tree(root)
     root = root.expand_path
-    root.find.each_with_object({}) do |path, files|
+    Find.find(root).each_with_object({}) do |path, files|
+      path = Pathname(path)
       next if path.directory?
 
       rel = path.relative_path_from(root).to_s
@@ -1849,7 +1850,9 @@ RSpec.describe Ast::Merge do
   end
 
   def ruleset_fixture_paths
-    fixtures_root.join('rulesets').find.select { |path| path.file? && path.extname == '.smrules' }
+    Find.find(fixtures_root.join('rulesets')).map { |path| Pathname(path) }.select do |path|
+      path.file? && path.extname == '.smrules'
+    end
   end
 
   def repo_temp_dir

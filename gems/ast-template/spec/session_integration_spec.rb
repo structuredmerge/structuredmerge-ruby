@@ -157,7 +157,7 @@ RSpec.describe Ast::Template do
       ) { |entry| merge_callback(entry) }
       expect(json_ready(reapply_actual)).to eq(json_ready(reapply_run[:expected]))
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 
@@ -199,7 +199,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -229,7 +229,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -331,7 +331,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -378,7 +378,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -422,7 +422,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -525,7 +525,7 @@ RSpec.describe Ast::Template do
         )
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       ensure
-        temp_dir.rmtree if temp_dir.exist?
+        FileUtils.rm_rf(temp_dir) if temp_dir.exist?
       end
     end
   end
@@ -616,7 +616,7 @@ RSpec.describe Ast::Template do
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       end
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 
@@ -653,7 +653,7 @@ RSpec.describe Ast::Template do
         expect(json_ready(actual)).to eq(json_ready(fixture.dig(key, :expected)))
       end
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 
@@ -709,7 +709,7 @@ RSpec.describe Ast::Template do
         )
       ).to eq(json_ready(fixture.dig(:reapply_run, :expected)))
     ensure
-      temp_dir.rmtree if temp_dir.exist?
+      FileUtils.rm_rf(temp_dir) if temp_dir.exist?
     end
   end
 

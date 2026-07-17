@@ -18,6 +18,7 @@ end
 require 'kettle/test/rspec'
 
 # This library
+require 'ast/crispr/rspec'
 require 'ast/crispr/markdown/markly'
 
 RSpec.configure do |config|

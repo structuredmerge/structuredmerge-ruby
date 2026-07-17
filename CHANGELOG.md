@@ -20,8 +20,15 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- TreeHaver RSpec dependency tags now support parser capability checks, and
+  `ruby-merge` exposes TSLP Ruby capability tags for import records, top-level
+  call records, and namespace-form equivalence.
+
 ### Changed
 
+- `kettle-jem` RuboCop guidance now treats `.rubocop_gradual.lock` as a work
+  list rather than a baseline, and documents explicit config and inline
+  exceptions for intentional style deviations.
 - Current CI now detects changed monorepo gems and runs each changed gem's own
   `kettle-test` suite instead of installing the root aggregate bundle.
 - Retemplated generated project metadata, support documentation, CI workflows,
@@ -44,6 +51,15 @@ Please file a bug if you notice a violation of semantic versioning.
   generated family Rake tasks to `kettle-family`.
 
 ### Fixed
+
+- Changed-gem CI suites now pass in isolated gem bundles by loading required
+  adapter gems explicitly, avoiding Ruby 4 `Pathname#find` assumptions, and
+  keeping Prism merge tests on the local TreeHaver capability registry.
+- Ruby merges now fail closed for TSLP-backed namespace-form equivalence gaps
+  instead of duplicating alternate namespace declarations, while preserving
+  template-only direct methods during scoped intra-owner declaration merges.
+- TreeHaver now normalizes nested object fields from tree-sitter-language-pack
+  process results, including span objects, before building parser analysis.
 
 - Byte-offset rewrites in `kettle-jem` and `prism-merge` now splice source with
   byte-aware slicing so non-ASCII content before an edited AST node does not

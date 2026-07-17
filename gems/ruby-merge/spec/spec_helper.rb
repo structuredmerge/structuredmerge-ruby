@@ -21,6 +21,7 @@ require 'kettle/test/rspec'
 require 'ast/merge'
 require 'ast/merge/rspec'
 require 'ruby/merge'
+require 'tree_haver/rspec/dependency_tags'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

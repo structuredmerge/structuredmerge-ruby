@@ -63,6 +63,21 @@ module TreeHaver
 
   module_function
 
+  def register_standard_dependency_tags!
+    BackendRegistry.register_tag(:mri_backend, category: :backend, backend_name: :mri) do
+      Backends::MRI.available?
+    end
+    BackendRegistry.register_tag(:ffi_backend, category: :backend, backend_name: :ffi) do
+      Backends::FFI.available?
+    end
+    BackendRegistry.register_tag(:rust_backend, category: :backend, backend_name: :rust) do
+      Backends::Rust.available?
+    end
+    BackendRegistry.register_tag(:java_backend, category: :backend, backend_name: :java) do
+      Backends::Java.available?
+    end
+  end
+
   def default_backend_id
     DEFAULT_BACKEND_ID
   end
@@ -510,6 +525,8 @@ module TreeHaver
   end
   private_class_method :backend_protect_mutex
 end
+
+TreeHaver.register_standard_dependency_tags!
 
 TreeHaver::Version.class_eval do
   extend VersionGem::Basic

@@ -44,6 +44,13 @@ module Ruby
       [TREE_SITTER_BACKEND]
     end
 
+    def ruby_tslp_capability_profile
+      {
+        import_records: TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records),
+        top_level_call_records: TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records)
+      }
+    end
+
     def ruby_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
       unless requested == TREE_SITTER_BACKEND.id
@@ -177,6 +184,17 @@ module Ruby
       template_requires = template_context.fetch(:requires)
       destination_declarations = destination_context.fetch(:declarations)
       template_declarations = template_context.fetch(:declarations)
+      template_declarations_by_key = template_declarations.to_h { |entry| [entry[:merge_key], entry] }
+      intra_owner_merges = ruby_intra_owner_merge_plan(template_declarations, destination_declarations)
+      namespace_conflicts = ruby_namespace_form_conflicts(template_declarations, destination_declarations)
+      unless namespace_conflicts.empty? || TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_namespace_form_equivalence)
+        conflicts = namespace_conflicts.join(', ')
+        return unsupported_feature_result(
+          'ruby-merge cannot reconcile equivalent Ruby namespace declaration forms with the active TSLP records: ' \
+          "#{conflicts}. Use prism-merge for native Ruby merging, or report missing Ruby namespace ownership " \
+          'records to tree-sitter-language-pack.'
+        )
+      end
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
       preamble = collect_ruby_preamble(destination_context.fetch(:source))
@@ -191,7 +209,7 @@ module Ruby
       sections << require_block unless require_block.empty?
       sections.concat(
         destination_declarations.map do |entry|
-          entry[:text]
+          merge_ruby_declaration_entry(template_declarations_by_key[entry[:merge_key]], entry)[:text]
         end
       )
       sections.concat(
@@ -203,7 +221,10 @@ module Ruby
       sections << destination_footer unless destination_footer.empty?
 
       output = "#{sections.join("\n\n").strip}\n"
-      matching_reports = []
+      matching_reports = [ruby_method_move_detection(template_source, destination_source, dialect)]
+      moved_method_count = matching_reports.sum do |report|
+        Array(report[:matches]).count { |entry| entry[:moved] }
+      end
 
       {
         ok: true,
@@ -215,15 +236,15 @@ module Ruby
           method_move_policy: method_move_policy,
           method_move_detection: {
             matching_id: 'ruby-tslp-method-move-detection',
-            moved_method_count: 0,
+            moved_method_count: moved_method_count,
             preserves_destination_order: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
             suppresses_duplicate_moved_methods: method_move_policy == DEFAULT_METHOD_MOVE_POLICY,
             override_scope: 'per_file_recipe'
           },
           intra_owner_merges: {
-            strategy: 'destination_wins_tslp_owner_body',
-            merge_count: 0,
-            merges: []
+            strategy: 'destination_wins_scoped_owner_body',
+            merge_count: intra_owner_merges.length,
+            merges: intra_owner_merges
           }
         }
       }
@@ -1606,6 +1627,20 @@ module Ruby
       end
     end
 
+    def ruby_namespace_form_conflicts(template_entries, destination_entries)
+      destination_names = destination_entries.to_h do |entry|
+        ["#{entry[:kind]}:#{entry[:name]}", true]
+      end
+      template_entries.flat_map do |entry|
+        direct_body_declaration_entries(entry[:text]).filter_map do |nested_entry|
+          compact_key = "#{nested_entry[:kind]}:#{entry[:name]}::#{nested_entry[:name]}"
+          next unless destination_names[compact_key]
+
+          "#{entry[:name]}::#{nested_entry[:name]}"
+        end
+      end.uniq
+    end
+
     def source_owner_identity_entry(kind:, name:, parent_scope:, address:, content:)
       normalized_kind = kind.to_s
       normalized_name = name.to_s
@@ -2920,6 +2955,7 @@ module Ruby
     module_function(
       :ruby_feature_profile,
       :available_ruby_backends,
+      :ruby_tslp_capability_profile,
       :ruby_backend_feature_profile,
       :ruby_plan_context,
       :parse_ruby,
@@ -2940,6 +2976,39 @@ module Ruby
       :unsupported_feature_result
     )
   end
+end
+
+TreeHaver::BackendRegistry.register_tag(
+  :tslp_ruby_import_records,
+  category: :capability,
+  backend_name: :tslp_ruby_import_records
+) do
+  result = Ruby::Merge.parse_ruby("require \"json\"\n", 'ruby')
+  result[:ok] && Array(result.dig(:analysis, :owners)).any? do |owner|
+    owner[:owner_kind] == 'require' && owner[:match_key] == 'json'
+  end
+end
+
+TreeHaver::BackendRegistry.register_tag(
+  :tslp_ruby_top_level_call_records,
+  category: :capability,
+  backend_name: :tslp_ruby_top_level_call_records
+) do
+  result = Ruby::Merge.merge_ruby("task :default do\nend\n", "task :default do\nend\n", 'ruby')
+  result[:ok]
+end
+
+TreeHaver::BackendRegistry.register_tag(
+  :tslp_ruby_namespace_form_equivalence,
+  category: :capability,
+  backend_name: :tslp_ruby_namespace_form_equivalence
+) do
+  template = Ruby::Merge.parse_ruby("module Admin\n  class User\n  end\nend\n", 'ruby')
+  destination = Ruby::Merge.parse_ruby("class Admin::User\nend\n", 'ruby')
+  template[:ok] && destination[:ok] && Ruby::Merge.ruby_namespace_form_conflicts(
+    Ruby::Merge.send(:ruby_tslp_merge_context, template.fetch(:analysis), role: 'template').fetch(:declarations),
+    Ruby::Merge.send(:ruby_tslp_merge_context, destination.fetch(:analysis), role: 'destination').fetch(:declarations)
+  ).empty?
 end
 
 Ruby::Merge::Version.class_eval do

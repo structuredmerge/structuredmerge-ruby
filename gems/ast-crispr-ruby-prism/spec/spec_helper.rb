@@ -18,6 +18,7 @@ end
 require 'kettle/test/rspec'
 
 # This library
+require 'ast/crispr/rspec'
 require 'ast/crispr/ruby/prism'
 
 RSpec.configure do |config|
