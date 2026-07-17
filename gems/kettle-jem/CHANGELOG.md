@@ -64,6 +64,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated pull request engine workflows now keep JRuby and TruffleRuby
+  coverage available via branch opt-in prefixes: `jruby/*` runs JRuby
+  workflows, `truffleruby/*` runs TruffleRuby workflows, and `engines/*` runs
+  all engine workflows. Other pull request branches continue to run MRI checks
+  without the alternate engine jobs.
 - Template apply now restores executable bits on generated Git hook scripts.
 - `require "kettle/jem"` now defers parser-backed template runtime dependencies
   until template execution so Rake task installation does not load

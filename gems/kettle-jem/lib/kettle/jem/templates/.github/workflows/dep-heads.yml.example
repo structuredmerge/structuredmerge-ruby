@@ -65,13 +65,13 @@ jobs:
 
     steps:
       - name: Checkout
-        if: ${{ !env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) }}
+        if: ${{ (github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/')) }}
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
           persist-credentials: false
 
       - name: Setup Ruby & RubyGems
-        if: ${{ !env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) }}
+        if: ${{ (github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/')) }}
         uses: ruby/setup-ruby@8e41b362d2589a22a44c1cfa214b3c83052c195b # v1.318.0
         with:
           ruby-version: ${{ matrix.ruby }}
@@ -81,7 +81,7 @@ jobs:
 
       - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
         id: bundleAppraisalAttempt1
-        if: ${{ !matrix.direct_bundle && (!env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby'))) }}
+        if: ${{ !matrix.direct_bundle && ((github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/'))) }}
         run: bundle exec appraisal ${{ matrix.appraisal }} install
         # Continue to the next step on failure
         continue-on-error: true
@@ -90,13 +90,13 @@ jobs:
       - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
         id: bundleAppraisalAttempt2
         # If bundleAppraisalAttempt1 failed, try again here; Otherwise skip.
-        if: ${{ !matrix.direct_bundle && steps.bundleAppraisalAttempt1.outcome == 'failure' && (!env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby'))) }}
+        if: ${{ !matrix.direct_bundle && steps.bundleAppraisalAttempt1.outcome == 'failure' && ((github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/'))) }}
         run: bundle exec appraisal ${{ matrix.appraisal }} install
 
       - name: Tests for ${{ matrix.ruby }} via Appraisal and ${{ matrix.exec_cmd }}
-        if: ${{ !matrix.direct_bundle && (!env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby'))) }}
+        if: ${{ !matrix.direct_bundle && ((github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/'))) }}
         run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
 
       - name: Tests for ${{ matrix.ruby }} via ${{ matrix.exec_cmd }}
-        if: ${{ matrix.direct_bundle && (!env.ACT || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby'))) }}
+        if: ${{ matrix.direct_bundle && ((github.event_name != 'pull_request' && !env.ACT) || startsWith(github.head_ref, 'engines/') || (! startsWith(matrix.ruby, 'jruby') && !startsWith(matrix.ruby, 'truffleruby')) || (startsWith(matrix.ruby, 'jruby') && startsWith(github.head_ref, 'jruby/')) || (startsWith(matrix.ruby, 'truffleruby') && startsWith(github.head_ref, 'truffleruby/'))) }}
         run: bundle exec ${{ matrix.exec_cmd }}
