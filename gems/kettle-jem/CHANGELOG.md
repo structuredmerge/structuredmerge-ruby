@@ -119,6 +119,11 @@ Please file a bug if you notice a violation of semantic versioning.
   `yard-timekeeper` >= 0.2.3, and `yard-yaml` >= 0.2.3.
 - kettle-jem now requires `kettle-rb` >= 0.1.2.
 
+- kettle-jem-template-20260716-001 - Shim gemspec manifests now include
+  `LICENSE.md` instead of nonexistent `LICENSE.txt`.
+- kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer
+  repository-only files by default to reduce downstream distro packaging churn.
+
 ### Deprecated
 
 ### Removed

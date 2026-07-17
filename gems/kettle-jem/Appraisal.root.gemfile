@@ -15,19 +15,6 @@ source "https://gem.coop"
 
 gemspec
 
-# Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-if tslp_dev.to_s.empty?
-  gem(
-    "tree_sitter_language_pack",
-    git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
-    branch: "fix/ruby-4-installs",
-    glob: "packages/ruby/*.gemspec"
-  )
-else
-  gem "tree_sitter_language_pack", path: tslp_dev
-end
-
 if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new("3.2")
   if respond_to?(:generator_only)
     generator_only do

@@ -18,23 +18,6 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from kettle-jem.gemspec
 gemspec
 
-# Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-tslp_declared_by_templating =
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? && !tslp_dev.to_s.empty?
-unless tslp_declared_by_templating
-  if tslp_dev.to_s.empty?
-    gem(
-      "tree_sitter_language_pack",
-      git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
-      branch: "fix/ruby-4-installs",
-      glob: "packages/ruby/*.gemspec"
-    )
-  else
-    gem "tree_sitter_language_pack", path: tslp_dev
-  end
-end
-
 # Local workspace dependency wiring for *_local.gemfile overrides
 nomono_requirements = ["~> 1.0", ">= 1.0.8"]
 gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
