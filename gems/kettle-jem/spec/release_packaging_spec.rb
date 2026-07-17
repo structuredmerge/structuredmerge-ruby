@@ -16,6 +16,7 @@ RSpec.describe Kettle::Jem do
       env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
       env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
       %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
+      env["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"] if ENV["BUNDLE_GEMFILE"]
     end.merge(overrides)
   end
 
@@ -62,6 +63,7 @@ RSpec.describe Kettle::Jem do
     stdout, stderr, status = Open3.capture3(
       clean_subprocess_env("SKIP_GEM_SIGNING" => "1"),
       Gem.ruby,
+      "-rbundler/setup",
       "-S",
       "gem",
       "build",
@@ -90,6 +92,7 @@ RSpec.describe Kettle::Jem do
     version_stdout, version_stderr, version_status = Open3.capture3(
       clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "version"
     )
@@ -99,6 +102,7 @@ RSpec.describe Kettle::Jem do
     help_stdout, help_stderr, help_status = Open3.capture3(
       clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "--help"
     )
@@ -118,6 +122,7 @@ RSpec.describe Kettle::Jem do
     plan_stdout, plan_stderr, plan_status = Open3.capture3(
       clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "plan",
       project_root.to_s,

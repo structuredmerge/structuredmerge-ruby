@@ -9,6 +9,7 @@ RSpec.describe "kettle/jem require boundary" do
       env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
       env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
       %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
+      env["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"] if ENV["BUNDLE_GEMFILE"]
     end
   end
 
@@ -25,6 +26,7 @@ RSpec.describe "kettle/jem require boundary" do
     stdout, stderr, status = Open3.capture3(
       clean_subprocess_env,
       RbConfig.ruby,
+      "-rbundler/setup",
       "-I#{File.expand_path("../lib", __dir__)}",
       "-e",
       script,
@@ -49,6 +51,7 @@ RSpec.describe "kettle/jem require boundary" do
     stdout, stderr, status = Open3.capture3(
       clean_subprocess_env,
       RbConfig.ruby,
+      "-rbundler/setup",
       "-I#{File.expand_path("../lib", __dir__)}",
       "-e",
       script,
