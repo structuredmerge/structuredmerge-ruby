@@ -52,6 +52,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Changed-gem CI suites now pass in isolated gem bundles by loading required
+  adapter gems explicitly, avoiding Ruby 4 `Pathname#find` assumptions, and
+  keeping Prism merge tests on the local TreeHaver capability registry.
 - Ruby merges now fail closed for TSLP-backed namespace-form equivalence gaps
   instead of duplicating alternate namespace declarations, while preserving
   template-only direct methods during scoped intra-owner declaration merges.
