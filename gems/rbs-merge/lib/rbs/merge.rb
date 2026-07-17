@@ -90,6 +90,7 @@ module Rbs
 
     # Tracks whether backends were registered, without class instance variables.
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+    RBS_BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'rbs', family: 'rbs').freeze
 
     class << self
       # Register the current RBS parsing entrypoints with TreeHaver.
@@ -104,6 +105,7 @@ module Rbs
           return if BACKEND_REGISTRY.registered
 
           # Register the RBS gem backend (for MRI Ruby)
+          TreeHaver::BackendRegistry.register(RBS_BACKEND_REFERENCE)
           TreeHaver.register_language(
             :rbs,
             backend_module: Backends::RbsBackend,
@@ -119,6 +121,13 @@ module Rbs
               path: grammar_finder.find_library_path,
               symbol: grammar_finder.symbol_name
             )
+          end
+
+          TreeHaver::BackendRegistry.register_tag(:rbs_backend, category: :backend, backend_name: :rbs) do
+            Backends::RbsBackend.available?
+          end
+          TreeHaver::BackendRegistry.register_tag(:rbs_grammar, category: :grammar, backend_name: :rbs_grammar) do
+            TreeHaver::GrammarFinder.new(:rbs).available?
           end
 
           BACKEND_REGISTRY.registered = true

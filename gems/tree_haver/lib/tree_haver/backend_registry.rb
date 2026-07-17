@@ -2,7 +2,7 @@
 
 module TreeHaver
   module BackendRegistry
-    CATEGORIES = %i[backend gem parsing grammar engine other].freeze
+    CATEGORIES = %i[backend gem parsing grammar engine capability other].freeze
 
     module_function
 

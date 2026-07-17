@@ -132,18 +132,27 @@ module TreeHaver
     result = language_pack_object_methods.each_with_object({}) do |method_name, method_result|
       next unless object.respond_to?(method_name)
 
-      method_result[method_name.to_s] = object.public_send(method_name)
+      method_result[method_name.to_s] = language_pack_object_value(object.public_send(method_name))
     rescue StandardError
       next
-    end
-    if result.key?('children')
-      result['children'] = Array(result['children']).map do |child|
-        language_pack_object_hash(child)
-      end
     end
     result
   end
   private_class_method :language_pack_object_hash
+
+  def language_pack_object_value(value)
+    case value
+    when nil, true, false, Numeric, String, Symbol
+      value
+    when Array
+      value.map { |item| language_pack_object_value(item) }
+    when Hash
+      value.transform_values { |item| language_pack_object_value(item) }
+    else
+      language_pack_object_hash(value)
+    end
+  end
+  private_class_method :language_pack_object_value
 
   def language_pack_object_methods
     %i[

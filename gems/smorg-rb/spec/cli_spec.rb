@@ -86,6 +86,7 @@ RSpec.describe Smorg::RB do
     fixture = git_install_report_fixture
     stdout = StringIO.new
     stderr = StringIO.new
+    run_git(@dir, 'init')
 
     exit_code = described_class.run(['git', 'install', '--json'], stdout: stdout, stderr: stderr)
 
@@ -107,6 +108,7 @@ RSpec.describe Smorg::RB do
   it 'supports builtin Git diff driver install profile' do
     stdout = StringIO.new
     stderr = StringIO.new
+    run_git(@dir, 'init')
 
     exit_code = described_class.run(['git', 'install', '--profile', 'builtin-diff'], stdout: stdout, stderr: stderr)
 

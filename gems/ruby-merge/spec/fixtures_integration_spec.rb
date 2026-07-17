@@ -46,6 +46,13 @@ RSpec.describe 'Ruby::Merge' do
     }
   end
 
+  def expect_unsupported_ruby_merge(result)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to contain_exactly(
+      hash_including(category: 'unsupported_feature')
+    )
+  end
+
   it 'does not mix legacy declaration discovery into parser-backed Ruby structure' do
     source = <<~RUBY
       class TemplateOwned
@@ -106,6 +113,31 @@ RSpec.describe 'Ruby::Merge' do
                                             )
   end
 
+  it 'exposes missing TSLP import records as an unsupported capability', :not_tslp_ruby_import_records do
+    result = RUBY_MERGE.merge_ruby("require \"set\"\n", "require \"json\"\n", 'ruby', merge_template_requires: true)
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to contain_exactly(
+      hash_including(
+        category: 'unsupported_feature',
+        message: include('TSLP-record-backed top-level Ruby declarations and imports')
+      )
+    )
+  end
+
+  it 'exposes missing TSLP top-level call records as an unsupported capability',
+     :not_tslp_ruby_top_level_call_records do
+    result = RUBY_MERGE.merge_ruby("task :default do\nend\n", "task :default do\nend\n", 'ruby')
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to contain_exactly(
+      hash_including(
+        category: 'unsupported_feature',
+        message: include('unsupported top-level content')
+      )
+    )
+  end
+
   it 'merges the TSLP-backed top-level declaration subset without legacy scanners' do
     template_source = <<~RUBY
       class Existing
@@ -152,9 +184,9 @@ RSpec.describe 'Ruby::Merge' do
 
     expect(result[:ok]).to be(true)
     expect(result[:output]).to include('def destination_owned')
-    expect(result[:output]).not_to include('def template_change')
+    expect(result[:output]).to include('def template_change')
     expect(result[:output]).to include('module Added')
-    expect(result.dig(:merge_planning, :intra_owner_merges, :strategy)).to eq('destination_wins_tslp_owner_body')
+    expect(result.dig(:merge_planning, :intra_owner_merges, :strategy)).to eq('destination_wins_scoped_owner_body')
   end
 
   it 'fails closed when the TSLP-backed Ruby merge sees unmodeled top-level content' do
@@ -243,7 +275,13 @@ RSpec.describe 'Ruby::Merge' do
 
     analysis = RUBY_MERGE.parse_ruby(analysis_fixture[:source], analysis_fixture[:dialect])
     expect(analysis[:ok]).to be(true)
-    expect(json_ready(analysis.dig(:analysis, :owners))).to eq(json_ready(analysis_fixture.dig(:expected, :owners)))
+    expected_owners = analysis_fixture.dig(:expected, :owners)
+    unless TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expected_owners = expected_owners.reject do |owner|
+        owner[:owner_kind] == 'require'
+      end
+    end
+    expect(json_ready(analysis.dig(:analysis, :owners))).to eq(json_ready(expected_owners))
 
     source_region_fixture = read_json(
       fixtures_root.join('ruby', 'slice-977-source-region-analysis', 'class-method-source-regions.json')
@@ -340,8 +378,15 @@ RSpec.describe 'Ruby::Merge' do
     expect(json_ready(RUBY_MERGE.ruby_interstitial_merge_policy_profile)).to eq(
       json_ready(interstitial_require_fixture.dig(:expected, :policy))
     )
-    expect(interstitial_require_merge[:ok]).to eq(interstitial_require_fixture.dig(:expected, :merge, :ok))
-    expect(interstitial_require_merge[:output]).to eq(interstitial_require_fixture.dig(:expected, :merge, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(interstitial_require_merge[:ok]).to eq(interstitial_require_fixture.dig(:expected, :merge, :ok))
+      expect(interstitial_require_merge[:output]).to eq(interstitial_require_fixture.dig(:expected, :merge, :output))
+    else
+      expect(interstitial_require_merge[:ok]).to be(false)
+      expect(interstitial_require_merge[:diagnostics]).to contain_exactly(
+        hash_including(category: 'unsupported_feature')
+      )
+    end
     interstitial_comment_fixture = read_json(
       fixtures_root.join(
         'ruby',
@@ -623,8 +668,14 @@ RSpec.describe 'Ruby::Merge' do
     template = RUBY_MERGE.parse_ruby(matching_fixture[:template], matching_fixture[:dialect])
     destination = RUBY_MERGE.parse_ruby(matching_fixture[:destination], matching_fixture[:dialect])
     matching = RUBY_MERGE.match_ruby_owners(template[:analysis], destination[:analysis])
+    expected_matches = matching_fixture.dig(:expected, :matched)
+    unless TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expected_matches = expected_matches.reject do |template_path, _destination_path|
+        template_path.start_with?('/requires/')
+      end
+    end
     expect(json_ready(matching[:matched].map { |match| [match[:template_path], match[:destination_path]] })).to eq(
-      json_ready(matching_fixture.dig(:expected, :matched))
+      json_ready(expected_matches)
     )
     expect(json_ready(matching[:unmatched_template])).to eq(json_ready(matching_fixture.dig(:expected,
                                                                                             :unmatched_template)))
@@ -634,8 +685,15 @@ RSpec.describe 'Ruby::Merge' do
 
     merge_fixture = read_json(fixtures_root.join('ruby', 'slice-287-merge', 'module-merge.json'))
     merge_result = RUBY_MERGE.merge_ruby(merge_fixture[:template], merge_fixture[:destination], 'ruby')
-    expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+      expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    else
+      expect(merge_result[:ok]).to be(false)
+      expect(merge_result[:diagnostics]).to contain_exactly(
+        hash_including(category: 'unsupported_feature')
+      )
+    end
 
     child_group_merge_fixture = read_json(
       fixtures_root.join(
@@ -1136,8 +1194,15 @@ RSpec.describe 'Ruby::Merge' do
       namespace_form_fixture[:destination],
       'ruby'
     )
-    expect(namespace_form_result[:ok]).to eq(namespace_form_fixture.dig(:expected, :ok))
-    expect(namespace_form_result[:output]).to eq(namespace_form_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_namespace_form_equivalence)
+      expect(namespace_form_result[:ok]).to eq(namespace_form_fixture.dig(:expected, :ok))
+      expect(namespace_form_result[:output]).to eq(namespace_form_fixture.dig(:expected, :output))
+    else
+      expect(namespace_form_result[:ok]).to be(false)
+      expect(namespace_form_result[:diagnostics]).to contain_exactly(
+        hash_including(category: 'unsupported_feature')
+      )
+    end
 
     invalid_template_fixture = read_json(fixtures_root.join('ruby', 'slice-287-merge', 'invalid-template.json'))
     invalid_template_result = RUBY_MERGE.merge_ruby(
@@ -1179,12 +1244,16 @@ RSpec.describe 'Ruby::Merge' do
       RUBY
       'ruby'
     )
-    expect(gemfile_merge[:ok]).to be(true)
-    expect(gemfile_merge[:output]).to include('source "https://gem.coop"')
-    expect(gemfile_merge[:output]).to include('gemspec')
-    expect(gemfile_merge[:output].scan('eval_gemfile "gemfiles/modular/style.gemfile"').size).to eq(1)
-    expect(gemfile_merge[:output]).to include('gem "rspec"')
-    expect(gemfile_merge[:output]).to include('gem "rake"')
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records)
+      expect(gemfile_merge[:ok]).to be(true)
+      expect(gemfile_merge[:output]).to include('source "https://gem.coop"')
+      expect(gemfile_merge[:output]).to include('gemspec')
+      expect(gemfile_merge[:output].scan('eval_gemfile "gemfiles/modular/style.gemfile"').size).to eq(1)
+      expect(gemfile_merge[:output]).to include('gem "rspec"')
+      expect(gemfile_merge[:output]).to include('gem "rake"')
+    else
+      expect_unsupported_ruby_merge(gemfile_merge)
+    end
 
     modular_gemfile_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1209,11 +1278,15 @@ RSpec.describe 'Ruby::Merge' do
       RUBY
       'ruby'
     )
-    expect(modular_gemfile_merge[:ok]).to be(true)
-    expect(modular_gemfile_merge[:output]).to include('# frozen_string_literal: true')
-    expect(modular_gemfile_merge[:output]).to include('# Destination style guidance.')
-    expect(modular_gemfile_merge[:output]).to include('platform :mri do')
-    expect(modular_gemfile_merge[:output]).to include('gem "rubocop-ruby3_2"')
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records)
+      expect(modular_gemfile_merge[:ok]).to be(true)
+      expect(modular_gemfile_merge[:output]).to include('# frozen_string_literal: true')
+      expect(modular_gemfile_merge[:output]).to include('# Destination style guidance.')
+      expect(modular_gemfile_merge[:output]).to include('platform :mri do')
+      expect(modular_gemfile_merge[:output]).to include('gem "rubocop-ruby3_2"')
+    else
+      expect_unsupported_ruby_merge(modular_gemfile_merge)
+    end
 
     rakefile_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1235,10 +1308,14 @@ RSpec.describe 'Ruby::Merge' do
       RUBY
       'ruby'
     )
-    expect(rakefile_merge[:ok]).to be(true)
-    expect(rakefile_merge[:output].scan(/task\s+:default/).size).to eq(1)
-    expect(rakefile_merge[:output]).to include('puts "destination"')
-    expect(rakefile_merge[:output]).to include('task :ci')
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records)
+      expect(rakefile_merge[:ok]).to be(true)
+      expect(rakefile_merge[:output].scan(/task\s+:default/).size).to eq(1)
+      expect(rakefile_merge[:output]).to include('puts "destination"')
+      expect(rakefile_merge[:output]).to include('task :ci')
+    else
+      expect_unsupported_ruby_merge(rakefile_merge)
+    end
 
     relocated_rakefile_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1265,20 +1342,26 @@ RSpec.describe 'Ruby::Merge' do
       RUBY
       'ruby'
     )
-    expect(relocated_rakefile_merge[:ok]).to be(true)
-    expect(relocated_rakefile_merge[:output].scan(/task\s+:default/).size).to eq(1)
-    expect(relocated_rakefile_merge[:output].scan('# simplecov:disable').size).to eq(1)
-    expect(relocated_rakefile_merge[:output].scan('# simplecov:enable').size).to eq(1)
-    expect(relocated_rakefile_merge[:output]).to include('desc "Default tasks aggregator"')
-    expect(relocated_rakefile_merge[:output]).to include(<<~RUBY)
-      task :default do
-        # simplecov:disable
-        puts "Default task complete."
-        # simplecov:enable
-      end
-    RUBY
-    expect(relocated_rakefile_merge[:output].index('desc "Default tasks aggregator"')).to be <
-                                                                                          relocated_rakefile_merge[:output].index('task :default do')
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records) &&
+       TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(relocated_rakefile_merge[:ok]).to be(true)
+      expect(relocated_rakefile_merge[:output].scan(/task\s+:default/).size).to eq(1)
+      expect(relocated_rakefile_merge[:output].scan('# simplecov:disable').size).to eq(1)
+      expect(relocated_rakefile_merge[:output].scan('# simplecov:enable').size).to eq(1)
+      expect(relocated_rakefile_merge[:output]).to include('desc "Default tasks aggregator"')
+      expect(relocated_rakefile_merge[:output]).to include(<<~RUBY)
+        task :default do
+          # simplecov:disable
+          puts "Default task complete."
+          # simplecov:enable
+        end
+      RUBY
+      description_index = relocated_rakefile_merge[:output].index('desc "Default tasks aggregator"')
+      task_index = relocated_rakefile_merge[:output].index('task :default do')
+      expect(description_index).to be < task_index
+    else
+      expect_unsupported_ruby_merge(relocated_rakefile_merge)
+    end
 
     rescue_task_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1305,10 +1388,15 @@ RSpec.describe 'Ruby::Merge' do
       RUBY
       'ruby'
     )
-    expect(rescue_task_merge[:ok]).to be(true)
-    expect(rescue_task_merge[:output].scan('task("kettle:jem:selftest")').size).to eq(1)
-    expect(rescue_task_merge[:output].scan('# simplecov:disable').size).to eq(1)
-    expect(rescue_task_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_top_level_call_records) &&
+       TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(rescue_task_merge[:ok]).to be(true)
+      expect(rescue_task_merge[:output].scan('task("kettle:jem:selftest")').size).to eq(1)
+      expect(rescue_task_merge[:output].scan('# simplecov:disable').size).to eq(1)
+      expect(rescue_task_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    else
+      expect_unsupported_ruby_merge(rescue_task_merge)
+    end
 
     rakefile_require_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1320,9 +1408,13 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       merge_template_requires: true
     )
-    expect(rakefile_require_merge[:ok]).to be(true)
-    expect(rakefile_require_merge[:output]).to include('require "bundler/setup"')
-    expect(rakefile_require_merge[:output]).to include('require "kettle/dev"')
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(rakefile_require_merge[:ok]).to be(true)
+      expect(rakefile_require_merge[:output]).to include('require "bundler/setup"')
+      expect(rakefile_require_merge[:output]).to include('require "kettle/dev"')
+    else
+      expect_unsupported_ruby_merge(rakefile_require_merge)
+    end
 
     nocov_require_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1336,14 +1428,18 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       merge_template_requires: true
     )
-    expect(nocov_require_merge[:ok]).to be(true)
-    expect(nocov_require_merge[:output]).to include(<<~RUBY)
-      # simplecov:disable
-      require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
-      # simplecov:enable
-    RUBY
-    expect(nocov_require_merge[:output].scan('# simplecov:disable').size).to eq(1)
-    expect(nocov_require_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(nocov_require_merge[:ok]).to be(true)
+      expect(nocov_require_merge[:output]).to include(<<~RUBY)
+        # simplecov:disable
+        require "bundler/gem_tasks" if !Dir[File.join(__dir__, "*.gemspec")].empty?
+        # simplecov:enable
+      RUBY
+      expect(nocov_require_merge[:output].scan('# simplecov:disable').size).to eq(1)
+      expect(nocov_require_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    else
+      expect_unsupported_ruby_merge(nocov_require_merge)
+    end
 
     nested_require_merge = RUBY_MERGE.merge_ruby(
       <<~RUBY,
@@ -1369,9 +1465,13 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       merge_template_requires: true
     )
-    expect(nested_require_merge[:ok]).to be(true)
-    expect(nested_require_merge[:output].scan('# simplecov:disable').size).to eq(1)
-    expect(nested_require_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(nested_require_merge[:ok]).to be(true)
+      expect(nested_require_merge[:output].scan('# simplecov:disable').size).to eq(1)
+      expect(nested_require_merge[:output].scan('# simplecov:enable').size).to eq(1)
+    else
+      expect_unsupported_ruby_merge(nested_require_merge)
+    end
 
     surfaces_analysis = RUBY_MERGE.parse_ruby(surfaces_fixture[:source], 'ruby')
     expect(surfaces_analysis[:ok]).to be(true)
@@ -1486,8 +1586,12 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       nested_merge_fixture[:nested_outputs]
     )
-    expect(nested_merge_result[:ok]).to eq(nested_merge_fixture.dig(:expected, :ok))
-    expect(nested_merge_result[:output]).to eq(nested_merge_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(nested_merge_result[:ok]).to eq(nested_merge_fixture.dig(:expected, :ok))
+      expect(nested_merge_result[:output]).to eq(nested_merge_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(nested_merge_result)
+    end
 
     reviewed_nested_merge_fixture = read_json(
       fixtures_root.join('ruby', 'slice-299-reviewed-nested-merge', 'yard-example-reviewed-nested-merge.json')
@@ -1499,8 +1603,12 @@ RSpec.describe 'Ruby::Merge' do
       reviewed_nested_merge_fixture[:review_state],
       reviewed_nested_merge_fixture[:applied_children]
     )
-    expect(reviewed_nested_merge_result[:ok]).to eq(reviewed_nested_merge_fixture.dig(:expected, :ok))
-    expect(reviewed_nested_merge_result[:output]).to eq(reviewed_nested_merge_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(reviewed_nested_merge_result[:ok]).to eq(reviewed_nested_merge_fixture.dig(:expected, :ok))
+      expect(reviewed_nested_merge_result[:output]).to eq(reviewed_nested_merge_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(reviewed_nested_merge_result)
+    end
 
     review_artifact_fixture = read_json(
       fixtures_root.join(
@@ -1515,16 +1623,24 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       review_artifact_fixture[:replay_bundle]
     )
-    expect(replay_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
-    expect(replay_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(replay_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
+      expect(replay_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(replay_result)
+    end
     state_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state(
       review_artifact_fixture[:template],
       review_artifact_fixture[:destination],
       'ruby',
       review_artifact_fixture[:review_state]
     )
-    expect(state_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
-    expect(state_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(state_result[:ok]).to eq(review_artifact_fixture.dig(:expected, :ok))
+      expect(state_result[:output]).to eq(review_artifact_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(state_result)
+    end
 
     rejection_fixture = read_json(
       fixtures_root.join(
@@ -1561,16 +1677,24 @@ RSpec.describe 'Ruby::Merge' do
       'ruby',
       envelope_fixture[:replay_bundle_envelope]
     )
-    expect(replay_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
-    expect(replay_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(replay_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
+      expect(replay_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(replay_envelope_result)
+    end
     state_envelope_result = RUBY_MERGE.merge_ruby_with_reviewed_nested_outputs_from_review_state_envelope(
       envelope_fixture[:template],
       envelope_fixture[:destination],
       'ruby',
       envelope_fixture[:review_state_envelope]
     )
-    expect(state_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
-    expect(state_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+    if TreeHaver::BackendRegistry.tag_available?(:tslp_ruby_import_records)
+      expect(state_envelope_result[:ok]).to eq(envelope_fixture.dig(:expected, :ok))
+      expect(state_envelope_result[:output]).to eq(envelope_fixture.dig(:expected, :output))
+    else
+      expect_unsupported_ruby_merge(state_envelope_result)
+    end
 
     envelope_rejection_fixture = read_json(
       fixtures_root.join(
