@@ -262,7 +262,7 @@ module Dotenv
 
           marker_type = ::Regexp.last_match(1) # 'freeze' or 'unfreeze'
           reason = ::Regexp.last_match(2)&.strip
-          reason = nil if reason&.empty?
+          reason = nil if reason && reason.empty?
 
           markers << {
             type: marker_type.to_sym,
