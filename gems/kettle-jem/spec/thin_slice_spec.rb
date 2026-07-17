@@ -4546,7 +4546,13 @@ RSpec.describe Kettle::Jem do
         handoff_command
       )
       expect(command_names.index(autocorrect_command)).to be < command_names.index(handoff_command)
-      expect(commands).to all(include(chdir: root, env: {}, quiet: true))
+      expect(commands).to all(include(chdir: root, quiet: true))
+      expect(commands.map { |entry| entry.fetch(:env) }).to all(include(
+        "BUNDLE_GEMFILE" => nil,
+        "BUNDLE_LOCKFILE" => nil,
+        "RUBYLIB" => nil,
+        "RUBYOPT" => nil
+      ))
       expect(File).to exist(setup_path)
       expect(File.executable?(setup_path)).to be(true)
 
@@ -6819,7 +6825,12 @@ RSpec.describe Kettle::Jem do
       })
       command_runner = lambda do |_command, chdir:, env:, quiet:|
         expect(chdir).to eq(root)
-        expect(env).to eq("BUNDLE_GEMFILE" => File.join(root, "Gemfile"))
+        expect(env).to include(
+          "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+          "BUNDLE_LOCKFILE" => nil,
+          "RUBYLIB" => nil,
+          "RUBYOPT" => nil
+        )
         expect(quiet).to be(true)
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
       end

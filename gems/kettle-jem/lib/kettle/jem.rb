@@ -669,6 +669,7 @@ module Kettle
       ].freeze
 
       def process(content:, min_ruby:, engines: nil, workflow_paths: nil)
+        Kettle::Jem.ensure_runtime_dependencies!
         processed = content.to_s
         processed = remove_disabled_engine_content(processed, engines) if engines
         processed = remove_missing_workflow_badges(processed, workflow_paths) if workflow_paths
@@ -879,6 +880,7 @@ module Kettle
       end
 
       def markdown_link_definition_owners(content)
+        Kettle::Jem.ensure_runtime_dependencies!
         context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         context.structural_owners(owner_scope: :link_definitions)
       rescue Ast::Crispr::Error
@@ -886,6 +888,7 @@ module Kettle
       end
 
       def markdown_inline_reference_owners(content)
+        Kettle::Jem.ensure_runtime_dependencies!
         context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         context.structural_owners(owner_scope: :inline_references)
       rescue Ast::Crispr::Error
@@ -893,6 +896,7 @@ module Kettle
       end
 
       def markdown_table_row_owners(content)
+        Kettle::Jem.ensure_runtime_dependencies!
         context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         context.structural_owners(owner_scope: :table_rows)
       rescue Ast::Crispr::Error
@@ -905,6 +909,7 @@ module Kettle
       end
 
       def delete_markdown_link_definitions(content, labels)
+        Kettle::Jem.ensure_runtime_dependencies!
         labels.uniq.reduce(content.to_s) do |processed, label|
           Ast::Crispr::Delete.call(
             content: processed,
@@ -4976,6 +4981,7 @@ module Kettle
     end
 
     def remove_readme_badge_and_refs(content, badge_source, link_labels)
+      ensure_runtime_dependencies!
       processed = content.to_s.gsub(badge_source, "").lines.map(&:rstrip).join("\n")
       processed = "#{processed}\n" if content.to_s.end_with?("\n")
       Array(link_labels).reduce(processed) do |memo, label|
@@ -4987,6 +4993,7 @@ module Kettle
     end
 
     def apply_markdown_conditional_block(content, name, keep:)
+      ensure_runtime_dependencies!
       start_text = "KJ:#{name}:START"
       end_text = "KJ:#{name}:END"
       if keep
@@ -5023,6 +5030,7 @@ module Kettle
     end
 
     def apply_monorepo_subgem_thin_readme_projection(content, facts)
+      ensure_runtime_dependencies!
       return content unless monorepo_subgem_template_profile?(facts)
 
       context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "README.md")
@@ -5060,6 +5068,7 @@ module Kettle
     end
 
     def rewrite_markdown_reference_links(content, links)
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "README.md")
       context.structural_owners(owner_scope: :link_definitions).reduce(content.to_s) do |processed, owner|
         replacement = links[owner.url.to_s]
@@ -5074,6 +5083,7 @@ module Kettle
     end
 
     def append_missing_markdown_link_definitions(content, definitions)
+      ensure_runtime_dependencies!
       existing = Ast::Crispr::Markdown::Markly.document_context(
         content: content,
         source_label: "README.md"
@@ -5101,10 +5111,12 @@ module Kettle
     end
 
     def delete_markdown_with_ast_crispr(content, target)
+      ensure_runtime_dependencies!
       Ast::Crispr::Delete.call(content: content.to_s, target: target, source_label: "README.md").updated_content
     end
 
     def replace_markdown_with_ast_crispr(content, target, replacement)
+      ensure_runtime_dependencies!
       Ast::Crispr::Replace.call(
         content: content.to_s,
         target: target,
@@ -5162,6 +5174,7 @@ module Kettle
     end
 
     def markdown_heading_owners(content, source_label: "README.md")
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: source_label)
       context.structural_owners(owner_scope: :heading_sections)
     rescue Ast::Crispr::Error
@@ -5187,6 +5200,7 @@ module Kettle
     end
 
     def prune_readme_integration_badges(content, readme_style)
+      ensure_runtime_dependencies!
       integrations = Array(readme_style[:missing_integrations]) + Array(readme_style[:disabled_integrations])
       integrations.uniq.reduce(content.to_s) do |result, integration|
         pruned_badges = README_INTEGRATION_BADGE_PATTERNS.fetch(integration.to_s, []).reduce(result) do |memo, pattern|
@@ -5202,6 +5216,7 @@ module Kettle
     end
 
     def prune_missing_workflow_link_definitions(content, workflow_paths)
+      ensure_runtime_dependencies!
       existing = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
       Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         .structural_owners(owner_scope: :link_definitions)
@@ -6514,6 +6529,7 @@ module Kettle
     end
 
     def prism_parse_success(content)
+      ensure_runtime_dependencies!
       result = ::Prism.parse(content.to_s)
       result if result.success?
     end
@@ -7224,6 +7240,7 @@ module Kettle
     end
 
     def gemspec_top_level_gem_version_node(content)
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "gemspec")
       gemspec_call = context.structural_owners(owner_scope: :top_level_statements).find do |owner|
         owner.is_a?(::Prism::CallNode) && owner.name == :new && owner.receiver&.slice == "Gem::Specification"
@@ -11120,6 +11137,7 @@ module Kettle
     end
 
     def version_spec_require_insertion_index(content)
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "version_spec.rb")
       owners = context.structural_owners(owner_scope: :top_level_statements)
       requires = owners.select { |owner| owner.is_a?(::Prism::CallNode) && owner.name == :require }
@@ -11226,6 +11244,7 @@ module Kettle
     end
 
     def version_gem_require_insertion_index(content, after_version_gem: false)
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "entrypoint.rb")
       owners = context.structural_owners(owner_scope: :top_level_statements)
       if after_version_gem
@@ -11238,6 +11257,7 @@ module Kettle
     end
 
     def ruby_top_level_require?(content, method_name, argument)
+      ensure_runtime_dependencies!
       context = Ast::Crispr::Ruby::Prism.document_context(content: content.to_s, source_label: "entrypoint.rb")
       context.structural_owners(owner_scope: :top_level_statements).any? do |owner|
         ruby_require_call?(owner, method_name, argument)
@@ -12703,6 +12723,7 @@ module Kettle
     end
 
     def markdown_managed_block(content, marker)
+      ensure_runtime_dependencies!
       open = "<!-- #{marker}:start -->"
       close = "<!-- #{marker}:end -->"
       context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "managed markdown block")
@@ -14512,6 +14533,7 @@ module Kettle
     end
 
     def replace_markdown_managed_block_with_crispr(content, open_marker, close_marker, replacement)
+      ensure_runtime_dependencies!
       prepared_replacement = ensure_trailing_newline(replacement.to_s)
       actor = Ast::Crispr::Replace.call(
         content: content.to_s,
@@ -14531,6 +14553,7 @@ module Kettle
     end
 
     def replace_text_managed_block_with_crispr(content, open_marker, close_marker, replacement)
+      ensure_runtime_dependencies!
       prepared_replacement = ensure_trailing_newline(replacement.to_s)
       actor = Ast::Crispr::Replace.call(
         content: content.to_s,
@@ -14549,6 +14572,7 @@ module Kettle
     end
 
     def replace_ruby_managed_block_with_crispr(content, open_marker, close_marker, replacement)
+      ensure_runtime_dependencies!
       prepared_replacement = ensure_trailing_newline(replacement.to_s)
       actor = Ast::Crispr::Replace.call(
         content: content.to_s,

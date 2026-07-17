@@ -748,21 +748,18 @@ module Kettle
 
         def normal_lockfile_env(project_root, env)
           command_env = (env || {}).to_h.dup
+          strip_inherited_bundler_activation!(command_env)
           command_env["K_JEM_TEMPLATING"] = "false"
           %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV SMORG_RB_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
+          gemfile = File.join(project_root.to_s, "Gemfile")
+          command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
           apply_direct_sibling_lockfile_env!(project_root, command_env)
           %w[
-            BUNDLE_BIN_PATH
-            BUNDLE_LOCKFILE
-            BUNDLER_VERSION
-            BUNDLER_SETUP
             BUNDLE_PATH
             BUNDLE_WITH
             BUNDLE_WITHOUT
-            RUBYLIB
-            RUBYOPT
           ].each do |key|
             command_env[key] = nil
           end
@@ -998,10 +995,13 @@ module Kettle
 
         def setup_command_env(project_root, env)
           command_env = (env || {}).to_h.dup
-          gemfile = File.join(project_root.to_s, "Gemfile")
-          command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
-          apply_kettle_family_local_install_env!(command_env)
+          requested_gemfile = command_env["BUNDLE_GEMFILE"].to_s
           strip_inherited_bundler_activation!(command_env)
+          gemfile = File.join(project_root.to_s, "Gemfile")
+          if File.file?(gemfile) || (!requested_gemfile.empty? && same_path?(requested_gemfile, gemfile))
+            command_env["BUNDLE_GEMFILE"] = gemfile
+          end
+          apply_kettle_family_local_install_env!(command_env)
           command_env
         end
 
@@ -1042,16 +1042,9 @@ module Kettle
         end
 
         def strip_inherited_bundler_activation!(command_env)
-          %w[
-            BUNDLE_BIN_PATH
-            BUNDLE_LOCKFILE
-            BUNDLER_SETUP
-            BUNDLER_VERSION
-            RUBYLIB
-            RUBYOPT
-          ].each do |key|
-            command_env[key] = nil if command_env.key?(key)
-          end
+          (ENV.keys + command_env.keys).grep(/\ABUNDLE_/).each { |key| command_env[key] = nil }
+          (ENV.keys + command_env.keys).grep(/\ABUNDLER_/).each { |key| command_env[key] = nil }
+          %w[RUBYLIB RUBYOPT].each { |key| command_env[key] = nil }
         end
 
         def hook_templates_step(project_root, run_options)

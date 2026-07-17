@@ -58,7 +58,13 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
   end
 
   def scaffold_bundle_gem!
+    clean_env = ENV.to_h.tap do |env|
+      env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
+      env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
+      %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
+    end
     stdout, stderr, status = Open3.capture3(
+      clean_env,
       "bundle",
       "gem",
       "dummy-gem",
