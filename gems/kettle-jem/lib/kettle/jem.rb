@@ -12008,7 +12008,7 @@ module Kettle
         "    # Extra package files configured by .structuredmerge/kettle-jem.yml"
       ]
       includes.each_with_index do |pattern, index|
-        comma = index < includes.length - 1 ? "," : ""
+        comma = (index < includes.length - 1) ? "," : ""
         lines << %(    *Dir.glob(#{pattern.dump}, File::FNM_DOTMATCH).select { |path| File.file?(path) }#{comma})
       end
       ",#{lines.join("\n")}"
