@@ -86,7 +86,7 @@ Please file a bug if you notice a violation of semantic versioning.
   require a dedicated `lib/<entrypoint>/version_gem.rb` entrypoint when present.
 - Gem templates and generated root Gemfiles now require `kettle-dev` >= 2.3.5.
 - Gem templates and generated root Gemfiles now require `kettle-test` >= 2.0.11.
-- Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.12.
+- Gem templates and generated root Gemfiles now require `turbo_tests2` >= 3.1.14.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
 - Shim gemspec templates now include `LICENSE.md`, matching the generated
   license template filename, instead of the nonexistent `LICENSE.txt`.
@@ -130,6 +130,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- kettle-jem's own gemspec now includes public signing certs in packaged files.
 - Generated CI workflow synchronization now emits valid YAML for matrix and
   setup-ruby sections instead of misindenting multi-line template fragments.
 - Open Collective badge/funding detection now respects disabled funding policy

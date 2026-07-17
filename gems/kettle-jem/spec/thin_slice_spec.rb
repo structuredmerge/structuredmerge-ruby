@@ -3639,7 +3639,7 @@ RSpec.describe Kettle::Jem do
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.11"')
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.12"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.14"')
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
@@ -3694,7 +3694,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:changed_files)).to include("Gemfile")
       expect(gemfile).to include('gem "kettle-dev", "~> 2.3", ">= 2.3.5"')
       expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.11"')
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.12"')
+      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.14"')
     end
   end
 
