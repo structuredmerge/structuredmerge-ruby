@@ -247,8 +247,8 @@ templates:
     - tmp/.gitignore
     - source: lib/gem/version.rb
       target: lib/ast/crispr/version.rb
-    - source: sig/gem/version.rbs
-      target: sig/ast/crispr/version.rbs
+    - source: sig/gem.rbs
+      target: sig/ast/crispr.rbs
 
 # Optional kettle-jem plugins.
 # Each entry is a gem name. During bootstrap, kettle-jem ensures each plugin is

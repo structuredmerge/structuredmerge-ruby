@@ -3,7 +3,7 @@
 module Ast
   module Crispr
     module Version
-      VERSION = '7.1.0'
+      VERSION = "7.1.0"
     end
     VERSION = Version::VERSION # Traditional Constant Location
   end
