@@ -2065,6 +2065,7 @@ module Kettle
 
     module_function
 
+    # rubocop:disable ThreadSafety/ClassInstanceVariable
     def ensure_runtime_dependencies!
       return if defined?(@runtime_dependencies_loaded) && @runtime_dependencies_loaded
 
@@ -2081,6 +2082,7 @@ module Kettle
       require "ast/crispr/ruby/prism"
       @runtime_dependencies_loaded = true
     end
+    # rubocop:enable ThreadSafety/ClassInstanceVariable
 
     def display_path(path)
       return path if path.nil?

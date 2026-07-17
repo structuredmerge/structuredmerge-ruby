@@ -24,6 +24,7 @@ RSpec/ExpectInHook:
 
 RSpec/DescribeClass:
   Exclude:
+    - 'spec/require_boundary_spec.rb'
     - 'spec/examples/*'
     - 'spec/integration/*'
     - 'spec/system/*'
@@ -31,6 +32,7 @@ RSpec/DescribeClass:
 
 RSpec/SpecFilePathFormat:
   Exclude:
+    - 'spec/byte_offset_edit_spec.rb'
     - 'spec/cli_spec.rb'
     - 'spec/old_public_spec_audit_spec.rb'
     - 'spec/rake_tasks_spec.rb'
