@@ -26,6 +26,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `kettle-jem` RuboCop guidance now treats `.rubocop_gradual.lock` as a work
+  list rather than a baseline, and documents explicit config and inline
+  exceptions for intentional style deviations.
 - Current CI now detects changed monorepo gems and runs each changed gem's own
   `kettle-test` suite instead of installing the root aggregate bundle.
 - Retemplated generated project metadata, support documentation, CI workflows,
