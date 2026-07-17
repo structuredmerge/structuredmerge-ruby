@@ -66,8 +66,8 @@ Gem::Specification.new do |spec|
     *enumerate_package_files.call("lib"),
     # Executables and executable support scripts
     *enumerate_package_files.call("exe"),
-    # Public certs for gem signing
-    *enumerate_package_files.call("certs")
+    # Extra package files configured by .structuredmerge/kettle-jem.yml
+    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
   ]
   spec.rdoc_options += [
     "--title",

@@ -90,6 +90,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated gemspecs and optional Gemfiles now require `stone_checksums` >= 1.0.6.
 - Shim gemspec templates now include `LICENSE.md`, matching the generated
   license template filename, instead of the nonexistent `LICENSE.txt`.
+- Monorepo subgem package templating now includes the main `Gemfile` so existing
+  generated gems receive the `nomono` bootstrap required by local modular
+  Gemfiles during templating-mode CI.
 - Templating now applies transferable kettle-jem changelog entries to destination
   `CHANGELOG.md` files using stable `kettle-jem-template-YYYYMMDD-NNN` IDs.
 - Generated gemspecs now support explicit extra package-file globs via

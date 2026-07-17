@@ -3201,7 +3201,8 @@ RSpec.describe Kettle::Jem do
       expect(config_yaml.dig("templates", "entries")).to include(
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
-        "LICENSE.md"
+        "LICENSE.md",
+        "Gemfile"
       )
       expect(config).to include(
         "    - source: lib/gem/version.rb\n      " \
@@ -3223,9 +3224,10 @@ RSpec.describe Kettle::Jem do
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
       expect(apply.fetch(:changed_files)).to include("LICENSE.md")
       expect(apply.fetch(:changed_files)).to include("README.md")
+      expect(apply.fetch(:changed_files)).to include("Gemfile")
       expect(apply.fetch(:changed_files)).not_to include("tree_haver.gemspec")
       expect(File).not_to exist(File.join(root, ".github"))
-      expect(File).not_to exist(File.join(root, "Gemfile"))
+      expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono", *nomono_requirements, require: false')
       expect(File).not_to exist(File.join(root, "Rakefile"))
     end
   end
@@ -8788,6 +8790,45 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('gem "nomono", *nomono_requirements, require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "adds nomono bootstrap to existing main Gemfiles before templating local overrides" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-existing-nomono", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          gemspec
+
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(apply.fetch(:changed_files)).to include("Gemfile")
+      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
+      expect(gemfile).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(gemfile.index('gem "nomono"')).to be < gemfile.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
     end
   end
 

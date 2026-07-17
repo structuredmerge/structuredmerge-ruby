@@ -112,6 +112,7 @@ module Kettle
       "PolyForm-Noncommercial-1.0.0.md",
       "PolyForm-Small-Business-1.0.0.md",
       "Big-Time-Public-License.md",
+      "Gemfile",
       "certs/pboling.pem",
       "tmp/.gitignore"
     ].freeze
@@ -5337,6 +5338,7 @@ module Kettle
       if recipe.fetch(:target_path).to_s == "Gemfile"
         output = inject_main_gemfile_recording_eval(output, facts)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
+        output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
         output = normalize_main_gemfile_nomono_requirements(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
@@ -5403,6 +5405,50 @@ module Kettle
         output = replace_source_range_lines(output, record.fetch(:start_line), record.fetch(:end_line), guarded)
       end
       output
+    end
+
+    def ensure_main_gemfile_nomono_bootstrap(content, template_content)
+      return content if gemfile_declares_gem?(content, "nomono")
+
+      bootstrap_source = main_gemfile_nomono_bootstrap_source(template_content)
+      return content if bootstrap_source.empty?
+
+      lines = content.to_s.lines
+      insert_line = main_gemfile_templating_eval_line(content) ||
+        main_gemfile_first_eval_gemfile_line(content) ||
+        main_gemfile_after_gemspec_line(content) ||
+        (lines.length + 1)
+      lines.insert(insert_line - 1, bootstrap_source)
+      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+    end
+
+    def main_gemfile_nomono_bootstrap_source(template_content)
+      records = main_gemfile_nomono_requirement_records(template_content)
+      assignment = records.fetch(:assignments).first
+      call = records.fetch(:calls).first
+      return "" unless assignment && call
+
+      lines = template_content.to_s.lines
+      start_line = assignment.fetch(:start_line)
+      previous = lines[start_line - 2].to_s
+      start_line -= 1 if previous.strip.start_with?("# Local workspace dependency wiring")
+      lines[(start_line - 1)..(call.fetch(:end_line) - 1)].join.rstrip + "\n\n"
+    end
+
+    def main_gemfile_templating_eval_line(content)
+      ruby_call_records(content, :eval_gemfile).filter_map do |call|
+        next unless ruby_string_argument(call) == "gemfiles/modular/templating.gemfile"
+
+        call.location.start_line
+      end.min
+    end
+
+    def main_gemfile_first_eval_gemfile_line(content)
+      ruby_call_records(content, :eval_gemfile).map { |call| call.location.start_line }.min
+    end
+
+    def main_gemfile_after_gemspec_line(content)
+      ruby_call_records(content, :gemspec).map { |call| ruby_node_source_end_line(call) + 1 }.min
     end
 
     def normalize_main_gemfile_nomono_requirements(content)
