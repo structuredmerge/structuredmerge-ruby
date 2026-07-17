@@ -11,6 +11,7 @@ RSpec.describe Kettle::Jem do
           spec.add_dependency("demo_gem", ">= 1.0.0")
         end
       RUBY
+      described_class.ensure_runtime_dependencies!
       parse_result = Prism.parse(source)
       dependency = parse_result.value.breadth_first_search do |node|
         node.is_a?(Prism::CallNode) && node.name == :add_dependency

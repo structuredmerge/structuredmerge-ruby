@@ -11,6 +11,15 @@ RSpec.describe Kettle::Jem do
     Gem::Specification.load(gem_root.join("kettle-jem.gemspec").to_s)
   end
 
+  def clean_subprocess_env(overrides = {})
+    ENV.to_h.tap do |env|
+      env.keys.grep(/\ABUNDLE_/).each { |key| env[key] = nil }
+      env.keys.grep(/\ABUNDLER_/).each { |key| env[key] = nil }
+      %w[RUBYLIB RUBYOPT].each { |key| env[key] = nil }
+      env["BUNDLE_GEMFILE"] = ENV["BUNDLE_GEMFILE"] if ENV["BUNDLE_GEMFILE"]
+    end.merge(overrides)
+  end
+
   it "packages runtime template assets used by packaged template application" do
     spec = load_gemspec(gem_root)
     gemspec_source = File.read(gem_root.join("kettle-jem.gemspec"))
@@ -52,8 +61,9 @@ RSpec.describe Kettle::Jem do
     gem_path = tmp_root.join("kettle-jem.gem")
 
     stdout, stderr, status = Open3.capture3(
-      {"SKIP_GEM_SIGNING" => "1"},
+      clean_subprocess_env("SKIP_GEM_SIGNING" => "1"),
       Gem.ruby,
+      "-rbundler/setup",
       "-S",
       "gem",
       "build",
@@ -80,8 +90,9 @@ RSpec.describe Kettle::Jem do
     expect(File).to exist(unpack_root.join("lib/kettle/jem/rakelib/selftest.rake"))
 
     version_stdout, version_stderr, version_status = Open3.capture3(
-      {"RUBYLIB" => unpack_root.join("lib").to_s},
+      clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "version"
     )
@@ -89,8 +100,9 @@ RSpec.describe Kettle::Jem do
     expect(version_stdout).to eq("#{Kettle::Jem::Version::VERSION}\n")
 
     help_stdout, help_stderr, help_status = Open3.capture3(
-      {"RUBYLIB" => unpack_root.join("lib").to_s},
+      clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "--help"
     )
@@ -108,8 +120,9 @@ RSpec.describe Kettle::Jem do
       end
     RUBY
     plan_stdout, plan_stderr, plan_status = Open3.capture3(
-      {"RUBYLIB" => unpack_root.join("lib").to_s},
+      clean_subprocess_env("RUBYLIB" => unpack_root.join("lib").to_s),
       Gem.ruby,
+      "-rbundler/setup",
       exe.to_s,
       "plan",
       project_root.to_s,

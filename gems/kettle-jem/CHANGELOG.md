@@ -65,6 +65,9 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Changed
 
 - Template apply now restores executable bits on generated Git hook scripts.
+- `require "kettle/jem"` now defers parser-backed template runtime dependencies
+  until template execution so Rake task installation does not load
+  `tree_sitter_language_pack` before RuboCop loads `parser`.
 - `require "kettle/jem"` no longer directly loads `version_gem` by default;
   require `kettle/jem/version_gem` for the optional `VersionGem::Basic`
   extension.
