@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength -- conformance fixture specs intentionally group large executable fixtures.
 RSpec.describe Ast::Merge do
   def fixtures_root
     Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
@@ -2427,7 +2428,7 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(report_fixture[:expected]))
   end
 
-  it 'conforms to the mini template tree family merge callback fixture' do
+  it 'conforms to the mini template tree family merge callback fixture', :markdown_merge do
     fixture = diagnostics_fixture('mini_template_tree_family_merge_callback')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_family_merge_callback')
@@ -2465,7 +2466,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
   end
 
-  it 'conforms to the mini template tree multi-family merge callback fixture' do
+  it 'conforms to the mini template tree multi-family merge callback fixture',
+     :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_multi_family_merge_callback')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_multi_family_merge_callback')
@@ -2514,7 +2516,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(run_result)).to eq(json_ready(fixture[:expected]))
   end
 
-  it 'conforms to the mini template tree multi-family run report fixture' do
+  it 'conforms to the mini template tree multi-family run report fixture',
+     :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_multi_family_merge_callback')
     report_fixture = diagnostics_fixture('mini_template_tree_multi_family_run_report')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
@@ -2564,7 +2567,7 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(report_fixture[:expected]))
   end
 
-  it 'conforms to the mini template tree directory run report fixture' do
+  it 'conforms to the mini template tree directory run report fixture', :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_directory_run_report')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_directory_run_report')
@@ -2597,7 +2600,8 @@ RSpec.describe Ast::Merge do
     expect(json_ready(described_class.report_template_tree_run(run_result))).to eq(json_ready(fixture[:expected]))
   end
 
-  it 'conforms to the mini template tree directory apply convergence fixture' do
+  it 'conforms to the mini template tree directory apply convergence fixture',
+     :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_directory_apply_convergence')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_directory_apply_convergence')
@@ -2672,7 +2676,8 @@ RSpec.describe Ast::Merge do
     end
   end
 
-  it 'conforms to the mini template tree directory apply report fixture' do
+  it 'conforms to the mini template tree directory apply report fixture',
+     :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_directory_apply_report')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_directory_apply_report')
@@ -2764,7 +2769,8 @@ RSpec.describe Ast::Merge do
     )
   end
 
-  it 'conforms to the mini template tree directory runner report fixture' do
+  it 'conforms to the mini template tree directory runner report fixture',
+     :markdown_merge, :toml_merge, :prism_merge do
     fixture = diagnostics_fixture('mini_template_tree_directory_runner_report')
     fixture_path = described_class.conformance_fixture_path(manifest, 'diagnostics',
                                                             'mini_template_tree_directory_runner_report')
@@ -8447,3 +8453,4 @@ RSpec.describe Ast::Merge do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength

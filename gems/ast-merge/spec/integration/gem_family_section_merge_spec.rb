@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength -- integration specs keep related backend scenarios together.
 # Integration tests for the gem_family_section merge recipe.
 #
 # These tests validate the actual behavior of merging a partial template (GEM_FAMILY_SECTION.md)
@@ -15,7 +16,7 @@
 # 2. Template content may be incorrectly spread around the result
 # 3. Paragraph matching may fail causing duplicate content
 
-RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
+RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures, :markdown_merge do
   let(:fixtures_dir) { File.expand_path('../fixtures/markdown/01_gem_family_section', __dir__) }
   let(:partial_template) { File.read(File.join(fixtures_dir, 'partial_template.md')) }
   let(:destination) { File.read(File.join(fixtures_dir, 'destination.md')) }
@@ -298,3 +299,4 @@ RSpec.describe 'Gem Family Section Merge Integration', :aggregate_failures do
     end
   end
 end
+# rubocop:enable Metrics/BlockLength
