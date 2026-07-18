@@ -872,6 +872,7 @@ RSpec.describe Kettle::Jem do
     Dir.mktmpdir("kettle-jem-workflow-action-pin-preserve-slice", tmp_root) do |root|
       newer_checkout_sha = "1111111111111111111111111111111111111111"
       template_checkout_sha = "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0"
+      destination_setup_ruby_sha = "2222222222222222222222222222222222222222"
       write_tree(root, {
         "example.gemspec" => <<~RUBY,
           Gem::Specification.new do |spec|
@@ -896,7 +897,7 @@ RSpec.describe Kettle::Jem do
             test:
               steps:
                 - uses: actions/checkout@#{newer_checkout_sha} # v7.0.0
-                - uses: ruby/setup-ruby@d45b1a4e94b71acab930e56e79c6aa188764e7f9 # v1.316.0
+                - uses: ruby/setup-ruby@#{destination_setup_ruby_sha} # v1.0.0
         YAML
         "template/.github/workflows/current.yml.example" => <<~YAML
           name: Current
@@ -917,7 +918,8 @@ RSpec.describe Kettle::Jem do
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
       expect(content).to include("actions/checkout@#{newer_checkout_sha} # v7.0.0")
       expect(content).not_to include("actions/checkout@#{template_checkout_sha} # v7.0.0")
-      expect(content).to include("ruby/setup-ruby@8e41b362d2589a22a44c1cfa214b3c83052c195b # v1.318.0")
+      expect_pinned_action(content, "ruby/setup-ruby")
+      expect(content).not_to include("ruby/setup-ruby@v1")
       expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to contain_exactly(
         include(
           path: ".github/workflows/current.yml",
