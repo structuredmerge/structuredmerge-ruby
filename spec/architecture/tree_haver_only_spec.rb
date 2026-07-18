@@ -22,7 +22,6 @@ RSpec.describe 'TreeHaver-only merge architecture' do
       "gems/citrus-toml-merge/lib/citrus/toml/merge.rb:syntax_result = TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)",
       "gems/go-merge/lib/go/merge.rb:parsed = TreeHaver.parse_with_language_pack(TreeHaver::ParserRequest.new(source: source, language: 'go',",
       "gems/go-merge/lib/go/merge.rb:processed = TreeHaver.process_with_language_pack(TreeHaver::ProcessRequest.new(source: source, language: 'go'))",
-      "gems/json-merge/lib/json/merge.rb:backend_result = TreeHaver.parse_with_language_pack(json_parse_request(source, dialect))",
       "gems/json-merge/lib/json/merge.rb:parsed = JSON.parse(normalized_source)",
       "gems/markdown-merge/lib/markdown/merge.rb:syntax = TreeHaver.parse_with_language_pack(",
       "gems/parslet-toml-merge/lib/parslet/toml/merge.rb:syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)",

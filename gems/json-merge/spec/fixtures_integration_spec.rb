@@ -178,18 +178,7 @@ RSpec.describe Json::Merge do
     JSON
   end
 
-  it 'conforms to the language-pack adapter fixture and shared family feature profile fixture' do
-    adapter_fixture = json_fixture('tree_sitter_adapter')
-    adapter_fixture[:cases].each do |test_case|
-      result = described_class.parse_json_with_language_pack(test_case[:source], test_case[:dialect])
-      expect(result[:ok]).to eq(test_case.dig(:expected, :ok))
-      expect(
-        json_ready(Array(result[:diagnostics]).map { |diagnostic| diagnostic.slice(:severity, :category) })
-      ).to eq(json_ready(test_case.dig(:expected, :diagnostics).map { |diagnostic|
-             diagnostic.slice(:severity, :category)
-           }))
-    end
-
+  it 'conforms to the shared family feature profile fixture' do
     expect(json_ready(described_class.json_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
   end
 end

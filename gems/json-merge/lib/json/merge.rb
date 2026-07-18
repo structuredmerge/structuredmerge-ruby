@@ -66,19 +66,6 @@ module Json
       }
     end
 
-    def json_parse_request(source, dialect)
-      TreeHaver::ParserRequest.new(source: source, language: 'json', dialect: dialect)
-    end
-
-    def parse_json_with_language_pack(source, dialect)
-      return unsupported_jsonc_language_pack_result if dialect != 'json'
-
-      backend_result = TreeHaver.parse_with_language_pack(json_parse_request(source, dialect))
-      return { ok: false, diagnostics: backend_result[:diagnostics] } unless backend_result[:ok]
-
-      parse_json(source, dialect)
-    end
-
     def parse_json(source, dialect)
       normalized_source = dialect == 'jsonc' ? strip_json_comments(source) : source
       allows_comments = dialect == 'jsonc'
