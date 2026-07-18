@@ -64,6 +64,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- kettle-jem now requires `kettle-rb` >= 0.1.3.
 - Generated pull request engine workflows now keep JRuby and TruffleRuby
   coverage available via branch opt-in prefixes: `jruby/*` runs JRuby
   workflows, `truffleruby/*` runs TruffleRuby workflows, and `engines/*` runs
