@@ -150,6 +150,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Workflow template pin maintenance now compares and updates complete pinned
+  action strings in source files, so `bin/kettle-jem-workflow-pins --check`
+  fails when template files drift from `github_actions_step_pins` even if the
+  action name is already covered by the pin index.
 - kettle-jem's own gemspec now includes public signing certs in packaged files.
 - Generated CI workflow synchronization now emits valid YAML for matrix and
   setup-ruby sections instead of misindenting multi-line template fragments.

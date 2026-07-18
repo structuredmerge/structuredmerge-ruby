@@ -96,6 +96,44 @@ RSpec.describe KettleJemWorkflowPins do
     expect(File.read(workflow_path)).to include("uses: #{new_sub_pin}")
   end
 
+  it "fails check mode when template sources drift from the canonical pin index" do
+    stale_pin = "actions/checkout@#{old_sha} # v1.0.0"
+    canonical_pin = "actions/checkout@#{new_sha} # v1.0.1"
+
+    allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => canonical_pin})
+    File.write(pin_index_path, %(def github_actions_step_pins\n  {"actions/checkout" => "#{canonical_pin}"}\nend\n))
+    File.write(workflow_path, "steps:\n  - uses: #{stale_pin}\n")
+    allow(Open3).to receive(:capture3).and_return([
+      JSON.generate("planned_changes" => [], "outdated_pins" => []),
+      "",
+      instance_double(Process::Status, success?: true, exitstatus: 0)
+    ])
+
+    expect {
+      described_class.new(project_root: project_root, options: {check: true}).run
+    }.to raise_error(RuntimeError, /GitHub Actions pins are stale/)
+  end
+
+  it "updates template source pins that drift from the canonical pin index" do
+    stale_pin = "actions/checkout@#{old_sha} # v1.0.0"
+    canonical_pin = "actions/checkout@#{new_sha} # v1.0.1"
+
+    allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => canonical_pin})
+    File.write(pin_index_path, %(def github_actions_step_pins\n  {"actions/checkout" => "#{canonical_pin}"}\nend\n))
+    File.write(workflow_path, "steps:\n  - uses: #{stale_pin}\n")
+    allow(Open3).to receive(:capture3).and_return([
+      JSON.generate("planned_changes" => [], "outdated_pins" => []),
+      "",
+      instance_double(Process::Status, success?: true, exitstatus: 0)
+    ])
+
+    result = described_class.new(project_root: project_root, options: {write: true}).run
+
+    expect(result[:updated_actions]).to eq(["actions/checkout"])
+    expect(File.read(pin_index_path)).to include(canonical_pin)
+    expect(File.read(workflow_path)).to include("uses: #{canonical_pin}")
+  end
+
   it "includes stdout diagnostics when kettle-gha-sha-pins fails without stderr" do
     allow(Open3).to receive(:capture3).and_return([
       JSON.generate("errors" => [{"error" => "yaml_parse_error"}]),
