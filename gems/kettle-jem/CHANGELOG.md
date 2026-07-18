@@ -78,6 +78,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated workflow templates now evaluate skip-CI commit messages only for
   push events, and mixed head/dependency-head templates gate JRuby and
   TruffleRuby jobs before runner provisioning on pull requests.
+- Generated standalone JRuby and TruffleRuby workflow templates now group their
+  push skip checks before their pull request branch guards so ordinary pull
+  request branches do not run alternate engine jobs.
 - Template apply now restores executable bits on generated Git hook scripts.
 - `require "kettle/jem"` now defers parser-backed template runtime dependencies
   until template execution so Rake task installation does not load
