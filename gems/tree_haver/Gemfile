@@ -6,7 +6,7 @@
 # kettle-jem will then preserve content between those markers across template runs.
 # kettle-jem:unfreeze
 
-source "https://gem.coop"
+source 'https://gem.coop'
 
 git_source(:codeberg) { |repo_name| "https://codeberg.org/#{repo_name}" }
 git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
@@ -19,8 +19,8 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 gemspec
 
 # Local workspace dependency wiring for *_local.gemfile overrides
-nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+nomono_requirements = ['~> 1.0', '>= 1.0.8']
+gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
 # Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
 tslp_declared_by_templating =
@@ -29,25 +29,25 @@ if !tslp_declared_by_templating && tslp_dev.to_s.empty?
 end
 
 # Modular sibling dependencies (env-switched inside each modular Gemfile)
-eval_gemfile "gemfiles/modular/templating.gemfile"
+eval_gemfile 'gemfiles/modular/templating.gemfile'
 
 # Debugging
-eval_gemfile "gemfiles/modular/debug.gemfile"
+eval_gemfile 'gemfiles/modular/debug.gemfile'
 
 # Code Coverage (env-switched: KETTLE_DEV_DEV=true for local paths)
-eval_gemfile "gemfiles/modular/coverage.gemfile"
+eval_gemfile 'gemfiles/modular/coverage.gemfile'
 
 # Linting
-eval_gemfile "gemfiles/modular/style.gemfile"
+eval_gemfile 'gemfiles/modular/style.gemfile'
 
 # Documentation
-eval_gemfile "gemfiles/modular/documentation.gemfile"
+eval_gemfile 'gemfiles/modular/documentation.gemfile'
 
 # Optional
-eval_gemfile "gemfiles/modular/optional.gemfile"
+eval_gemfile 'gemfiles/modular/optional.gemfile'
 
 ### Std Lib Extracted Gems
-eval_gemfile "gemfiles/modular/x_std_libs.gemfile"
+eval_gemfile 'gemfiles/modular/x_std_libs.gemfile'
 
 # See unlocked_deps appraisal for more details on irb inclusion
-gem "irb", "~> 1.17" # ruby >= 2.7
+gem 'irb', '~> 1.17' # ruby >= 2.7
