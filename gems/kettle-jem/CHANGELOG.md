@@ -121,7 +121,7 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-drift` 1.0.5, `kettle-test` 2.0.9, `nomono` 1.0.8, and
   `token-resolver` 2.0.4.
 - Generated gemspecs now require `appraisal2` >= 3.1.4.
-- Generated style Gemfiles now require `appraisal2-rubocop` >= 0.2.3.
+- Generated style Gemfiles now require `appraisal2-rubocop` >= 1.0.0.
 
 - Generated optional Gemfiles no longer duplicate the gemspec's direct
   `stone_checksums` development dependency.
