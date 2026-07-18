@@ -64,7 +64,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- kettle-jem now requires `kettle-rb` >= 0.1.3.
+- kettle-jem now requires `kettle-rb` >= 0.1.4.
 - Refreshed generated GitHub Actions workflow pins for `ruby/setup-ruby` and
   CodeQL actions.
 - Gemfile and Appraisals template merge adapter failures now fail closed instead
