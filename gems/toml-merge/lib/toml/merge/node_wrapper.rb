@@ -203,7 +203,7 @@ module Toml
             return node_text(child)&.strip
           end
         end
-        nil
+        parslet_element_table_name
       end
 
       # Get the key name if this is a pair node
@@ -494,6 +494,16 @@ module Toml
         end && child_canonicals.include?(:value)
 
         :element
+      end
+
+      def parslet_element_table_name
+        return unless parslet_element_node?
+
+        name = node_text(@node)&.strip
+        return if name.nil? || name.empty?
+        return if name.include?('=')
+
+        name
       end
 
       def each_child(node)

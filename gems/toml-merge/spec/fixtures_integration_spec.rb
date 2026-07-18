@@ -82,7 +82,7 @@ RSpec.describe Toml::Merge do
       )
     )
 
-    expect(json_ready(described_class.toml_backend_feature_profile)).to include(
+    expect(json_ready(described_class.toml_backend_feature_profile(backend: 'kreuzberg-language-pack'))).to include(
       json_ready(fixture[:tree_sitter])
     )
   end
@@ -96,7 +96,9 @@ RSpec.describe Toml::Merge do
       )
     )
 
-    expect(json_ready(described_class.toml_plan_context)).to eq(json_ready(fixture[:tree_sitter]))
+    expect(json_ready(described_class.toml_plan_context(backend: 'kreuzberg-language-pack'))).to eq(
+      json_ready(fixture[:tree_sitter])
+    )
   end
 
   it 'conforms to the slice-137 TOML family manifest fixture' do
@@ -223,6 +225,84 @@ RSpec.describe Toml::Merge do
     owners = results.transform_values { |result| json_ready(result.dig(:analysis, :owners)) }
     expect(normalized.values.uniq).to eq([normalized.fetch(:core)])
     expect(owners.values.uniq).to eq([owners.fetch(:core)])
+  end
+
+  it 'projects arrays of tables across active TOML provider surfaces' do
+    source = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Semantic diff"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-rb"
+
+      [[profiles.semantic-diff.git_config]]
+      scope = "global"
+      key = "diff.smorg-rb.command"
+      value = "smorg-rb diff-driver"
+    TOML
+
+    results = {
+      core: described_class.parse_toml(source, 'toml'),
+      citrus: Citrus::Toml::Merge.parse_toml(source, 'toml'),
+      parslet: Parslet::Toml::Merge.parse_toml(source, 'toml')
+    }
+
+    expect(results.transform_values { |result| result.fetch(:ok) }).to eq(
+      core: true,
+      citrus: true,
+      parslet: true
+    )
+    normalized = results.transform_values { |result| result.dig(:analysis, :normalized_source) }
+    owners = results.transform_values { |result| json_ready(result.dig(:analysis, :owners)) }
+    expect(normalized.values.uniq).to eq([normalized.fetch(:core)])
+    expect(normalized.fetch(:core)).to include('[[profiles.semantic-diff.attributes]]')
+    expect(normalized.fetch(:core)).to include('[[profiles.semantic-diff.git_config]]')
+    expect(owners.values.uniq).to eq([owners.fetch(:core)])
+    expect(owners.fetch(:core)).to include(
+      include(path: '/profiles/semantic-diff/attributes', owner_kind: 'table_array', match_key: 'attributes'),
+      include(path: '/profiles/semantic-diff/git_config', owner_kind: 'table_array', match_key: 'git_config')
+    )
+  end
+
+  it 'merges comment-free TOML arrays of tables with destination preference' do
+    template = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Template driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-ruby"
+
+      [profiles.textconv-normalized]
+      description = "Template-only profile"
+
+      [[profiles.textconv-normalized.attributes]]
+      pattern = "*.json"
+      diff = "smorg-json-textconv"
+    TOML
+    destination = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Destination driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-rb"
+    TOML
+
+    result = described_class.merge_toml(template, destination, 'toml')
+
+    expect(result.fetch(:ok)).to be(true)
+    expect(result.fetch(:output)).to include('diff = "smorg-rb"')
+    expect(result.fetch(:output)).to include('description = "Destination driver"')
+    expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
+    expect(result.fetch(:output)).not_to include('smorg-ruby')
   end
 
   it 'exposes non-overlapping effective table ranges and source fragments across TOML providers' do

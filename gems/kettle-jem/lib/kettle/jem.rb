@@ -4857,50 +4857,6 @@ module Kettle
       content
     end
 
-    def merge_git_drivers_toml_template_source(template_content, destination_content)
-      require "toml-rb"
-
-      template = TomlRB.parse(template_content.to_s)
-      destination = TomlRB.parse(destination_content.to_s)
-      merged = merge_template_toml_defaults(template, destination)
-      {
-        ok: true,
-        diagnostics: [],
-        output: ensure_trailing_newline(TomlRB.dump(merged)),
-        policies: [{name: "kettle-jem-git-drivers-destination-wins"}]
-      }
-    rescue => error
-      {
-        ok: false,
-        diagnostics: [
-          {
-            severity: "error",
-            code: "merge_error",
-            message: error.message
-          }
-        ],
-        policies: []
-      }
-    end
-
-    def merge_template_toml_defaults(template, destination)
-      template.each_with_object({}) do |(key, template_value), merged|
-        destination_has_key = destination.key?(key)
-        destination_value = destination[key]
-        merged[key] = if destination_has_key && template_value.is_a?(Hash) && destination_value.is_a?(Hash)
-          merge_template_toml_defaults(template_value, destination_value)
-        elsif destination_has_key
-          destination_value
-        else
-          template_value
-        end
-      end.tap do |merged|
-        destination.each do |key, destination_value|
-          merged[key] = destination_value unless merged.key?(key)
-        end
-      end
-    end
-
     def prepare_github_workflow_template(content, recipe, facts)
       return content unless recipe.fetch(:target_path).to_s == ".github/workflows/framework-ci.yml"
       return content if facts.to_h.dig(:ci, :framework_matrix).to_h.empty?
@@ -5360,11 +5316,7 @@ module Kettle
           **yaml_merge_options(recipe)
         )
       when :toml
-        merge_result = if recipe.fetch(:target_path).to_s == ".structuredmerge/git-drivers.toml"
-          merge_git_drivers_toml_template_source(template_content, destination_content)
-        else
-          Toml::Merge.merge_toml(template_content, destination_content, "toml")
-        end
+        merge_result = Citrus::Toml::Merge.merge_toml(template_content, destination_content, "toml")
       when :json, :jsonc
         merge_result = merge_json_template_source(template_content, destination_content, recipe, file_type)
       when :markdown

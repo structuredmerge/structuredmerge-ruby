@@ -103,6 +103,44 @@ RSpec.describe Citrus::Toml::Merge do
     )
   end
 
+  it 'merges comment-free arrays of tables through the Citrus parser provider' do
+    template = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Template driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-ruby"
+
+      [profiles.textconv-normalized]
+      description = "Template-only profile"
+
+      [[profiles.textconv-normalized.attributes]]
+      pattern = "*.json"
+      diff = "smorg-json-textconv"
+    TOML
+    destination = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Destination driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-rb"
+    TOML
+
+    result = described_class.merge_toml(template, destination, 'toml')
+
+    expect(result.fetch(:ok)).to be(true)
+    expect(result.fetch(:output)).to include('diff = "smorg-rb"')
+    expect(result.fetch(:output)).to include('description = "Destination driver"')
+    expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
+    expect(result.fetch(:output)).not_to include('smorg-ruby')
+  end
+
   it 'conforms to the provider named-suite plan and manifest-report fixtures' do
     plans_fixture = read_json(
       fixtures_root.join(
