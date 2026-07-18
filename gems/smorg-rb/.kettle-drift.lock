@@ -1,4 +1,58 @@
 {
+  "eval_nomono_gems(\ngems: direct_sibling_gems,": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        65,
+        105
+      ]
+    }
+  ],
+  "if File.file?(nomono_lockfile)\nnomono_locked_spec = Bundler::LockfileParser": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        48,
+        92
+      ]
+    }
+  ],
+  "if direct_sibling_gems.any? &&\n(direct_sibling_local ||": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        40,
+        84
+      ]
+    }
+  ],
+  "if direct_sibling_templating && !direct_sibling_local\nif direct_sibling_dev_was_set": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        74,
+        114
+      ]
+    }
+  ],
+  "nomono_locked = nomono_locked_spec &&\nGem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        53,
+        97
+      ]
+    }
+  ],
+  "nomono_locked_spec = Bundler::LockfileParser\n.new(Bundler.read_file(nomono_lockfile))": [
+    {
+      "file": "Gemfile",
+      "lines": [
+        49,
+        93
+      ]
+    }
+  ],
   "vendored_gems_env: 'VENDORED_GEMS',\nvendor_gem_dir_env: 'VENDOR_GEM_DIR',": [
     {
       "file": "gemfiles/modular/templating_local.gemfile",

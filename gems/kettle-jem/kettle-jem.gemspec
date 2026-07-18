@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.description = "🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold."
   spec.homepage = "https://github.com/structuredmerge/structuredmerge-ruby"
   spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
-  spec.required_ruby_version = ">= 4.0.0" # rubocop:disable Gemspec/RequiredRubyVersion
+  spec.required_ruby_version = ">= 4.0.0"
 
   # Linux distros often package gems and securely certify them independent
   #   of the official RubyGem certification process. Allowed via ENV["SKIP_GEM_SIGNING"]
@@ -87,8 +87,6 @@ Gem::Specification.new do |spec|
 
   # Utilities
   spec.add_dependency("addressable", ">= 2.8", "< 3")                     # ruby >= 2.2.0
-  # StructuredMerge sibling gems are released in lockstep with this gem.
-  # rubocop:disable Gemspec/DependencyVersion
   spec.add_dependency("ast-crispr-markdown-markly", "= #{spec.version}")  # ruby >= 4.0.0
   spec.add_dependency("ast-crispr-ruby-prism", "= #{spec.version}")        # ruby >= 4.0.0
   spec.add_dependency("ast-merge", "= #{spec.version}")                  # ruby >= 4.0.0
@@ -112,7 +110,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency("toml-rb", "~> 4.2")                               # ruby >= 3.2.0
   spec.add_dependency("tree_haver", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("yaml-merge", "= #{spec.version}")                 # ruby >= 4.0.0
-  # rubocop:enable Gemspec/DependencyVersion
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
@@ -147,4 +144,5 @@ Gem::Specification.new do |spec|
 
   # spec.add_development_dependency("erb", ">= 2.2")                                  # ruby >= 2.3.0, not SemVer, old rubies get dropped in a patch.
   spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.4")            # ruby >= 2.4
+
 end
