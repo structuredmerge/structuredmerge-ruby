@@ -65,5 +65,15 @@ jobs:
           bundler: "${{ matrix.bundler }}"
           bundler-cache: true
 
+      - name: Restore RSpec status log
+        if: "${{!env.ACT}}"
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .rspec_status
+          key: rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}-${{github.run_id}}-${{github.run_attempt}}
+          restore-keys: |
+            rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}-
+            rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-
+
       - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework_version }}
         run: bundle exec {KJ|CI:EXEC_CMD}

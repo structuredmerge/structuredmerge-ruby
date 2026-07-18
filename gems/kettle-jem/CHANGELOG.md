@@ -20,6 +20,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Generated CI workflow templates now cache `.rspec_status` with explicit
+  per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
+  across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
+  matrix runs.
 - JRuby 9.2 workflow templates now use the legacy-engine bundle install path
   instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
   setup against gem servers without the full legacy index.

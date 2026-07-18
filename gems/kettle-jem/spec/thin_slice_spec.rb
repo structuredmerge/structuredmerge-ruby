@@ -8334,6 +8334,57 @@ RSpec.describe Kettle::Jem do
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 
+  it "serializes RSpec status cache steps in generated CI workflows" do
+    ci = {
+      default_branch: "main",
+      exec_cmd: "kettle-test",
+      ruby_versions: ["ruby", "jruby", "truffleruby-25.0"]
+    }
+    workflows = [
+      described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, "", {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      }),
+      described_class.send(:synchronize_github_actions_coverage_ci, "", {
+        ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+      })
+    ]
+
+    expect(workflows).to all(include("      - name: Restore RSpec status log"))
+    expect(workflows).to all(include("        uses: actions/cache@"))
+    expect(workflows).to all(include("          path: .rspec_status"))
+    expect(workflows).to all(include("${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}"))
+    expect(workflows).to all(include("${{github.run_id}}-${{github.run_attempt}}"))
+
+    current_workflow = File.read(File.join(
+      __dir__,
+      "../lib/kettle/jem/templates/.github/workflows/current.yml.example"
+    ))
+    jruby_workflow = File.read(File.join(__dir__, "../lib/kettle/jem/templates/.github/workflows/jruby.yml.example"))
+    truffleruby_workflow = File.read(File.join(
+      __dir__,
+      "../lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"
+    ))
+    framework_workflow = File.read(File.join(
+      __dir__,
+      "../lib/kettle/jem/templates/.github/workflows/framework-ci.yml.example"
+    ))
+
+    expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
+    expect(truffleruby_workflow).to include("rspec-status-truffleruby-25.0-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'truffleruby/')")
+    expect(framework_workflow).to include(
+      "rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-"
+    )
+  end
+
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
