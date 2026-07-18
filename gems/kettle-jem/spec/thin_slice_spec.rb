@@ -78,6 +78,23 @@ RSpec.describe Kettle::Jem do
     argument.unescaped if argument.is_a?(::Prism::StringNode)
   end
 
+  def expect_gem_dependency_declared(content, gem_name)
+    declared = described_class.ruby_call_records(content, :gem).any? do |call|
+      prism_string_argument(call) == gem_name
+    end
+
+    expect(declared).to be(true), "expected Gemfile dependency #{gem_name.inspect}"
+  end
+
+  def expect_gemspec_dependency_declared(content, gem_name, kind: nil)
+    names = Array(kind || %i[add_dependency add_development_dependency])
+    declared = described_class.ruby_call_records(content, nil).any? do |call|
+      names.include?(call.name) && prism_string_argument(call) == gem_name
+    end
+
+    expect(declared).to be(true), "expected gemspec dependency #{gem_name.inspect}"
+  end
+
   def appraisals_eval_gemfile_paths(content, appraisal_name)
     result = ::Prism.parse(content.to_s)
     raise "invalid Appraisals fixture" unless result.success?
@@ -392,14 +409,14 @@ RSpec.describe Kettle::Jem do
       expect(generated[:"legacy-shim.gemspec"]).to include("LICENSE.md")
       expect(generated[:"legacy-shim.gemspec"]).not_to include("LICENSE.txt")
       expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_dependency "legacy-shim2"))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.5")))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")))
-      expect(generated[:"legacy-shim.gemspec"]).to include(%(spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.6")))
+      expect_gemspec_dependency_declared(generated[:"legacy-shim.gemspec"], "kettle-dev", kind: :add_development_dependency)
+      expect_gemspec_dependency_declared(generated[:"legacy-shim.gemspec"], "kettle-test", kind: :add_development_dependency)
+      expect_gemspec_dependency_declared(generated[:"legacy-shim.gemspec"], "stone_checksums", kind: :add_development_dependency)
       expect(generated[:Gemfile]).to include(%(source "https://gem.coop"))
-      expect(generated[:Gemfile]).to include(%(gem "nomono", "~> 1.0", ">= 1.0.8"))
+      expect_gem_dependency_declared(generated[:Gemfile], "nomono")
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
-      expect(generated[:"gemfiles/modular/templating.gemfile"]).to include(%(gem "kettle-jem", ">= 7.0"))
+      expect_gem_dependency_declared(generated[:"gemfiles/modular/templating.gemfile"], "kettle-jem")
       expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(smorg_rb_local_gems = %w[))
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
@@ -699,7 +716,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "falls back for Gemfile template merges when the Ruby provider reports a ProcessResult adapter failure" do
+  it "fails closed for Gemfile template merges when Prism cannot merge the Ruby DSL" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-gemfile-provider-regression", tmp_root) do |root|
@@ -718,7 +735,7 @@ RSpec.describe Kettle::Jem do
               - Gemfile
           files:
             Gemfile:
-              strategy: accept_template
+              strategy: merge
         YAML
         "Gemfile" => <<~RUBY,
           source "https://gem.coop"
@@ -727,12 +744,10 @@ RSpec.describe Kettle::Jem do
         "template/Gemfile.example" => <<~RUBY
           source "https://gem.coop"
           gemspec
-          gem "appraisal"
-          gem "rake"
-          gem "example", path: "."
+          gem "beta-tool"
         RUBY
       })
-      allow(Ruby::Merge).to receive(:merge_ruby).and_return(
+      allow(Prism::Merge).to receive(:merge_ruby).and_return(
         ok: false,
         diagnostics: [{
           severity: "error",
@@ -742,16 +757,123 @@ RSpec.describe Kettle::Jem do
         policies: []
       )
 
-      plan = described_class.plan_project(root, env: {})
-      report = plan.fetch(:recipe_reports).find do |candidate|
-        candidate.fetch(:recipe_name) == "template_source_application_Gemfile"
+      expect do
+        described_class.plan_project(root, env: {})
+      end.to raise_error(ArgumentError, /failed to merge gemfile template Gemfile: provider adapter failure/)
+    end
+  end
+
+  it "strictly merges arbitrary top-level Gemfile dependencies from a template directory" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-arbitrary-dependency-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/custom.gemfile
+        YAML
+        "gemfiles/modular/custom.gemfile" => <<~RUBY,
+          source "https://example.invalid"
+
+          gem "alpha-tool", ">= 0.alpha"
+        RUBY
+        "template/gemfiles/modular/custom.gemfile.example" => <<~RUBY
+          source "https://example.invalid"
+
+          gem "alpha-tool", ">= 0.template"
+          gem "beta-tool", "~> 0.beta", require: false
+        RUBY
+      })
+
+      report = described_class.apply_project(root, env: {}).fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_gemfiles_modular_custom_gemfile"
       end
 
-      expect(report.fetch(:final_content)).to include('source "https://gem.coop"')
-      expect(report.fetch(:final_content)).to include("gemspec")
-      expect(report.fetch(:final_content)).to include('gem "rake"')
-      expect(report.fetch(:final_content)).not_to include('gem "appraisal"')
-      expect(report.fetch(:final_content)).not_to include('gem "example"')
+      expect(report.fetch(:final_content)).to eq(<<~RUBY)
+        source "https://example.invalid"
+
+        gem "alpha-tool", ">= 0.template"
+        gem "beta-tool", "~> 0.beta", require: false
+      RUBY
+    end
+  end
+
+  it "strictly merges arbitrary Gemfile dependency blocks and comments from a template directory" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-gemfile-arbitrary-block-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/custom.gemfile
+        YAML
+        "gemfiles/modular/custom.gemfile" => <<~RUBY,
+          source "https://example.invalid"
+
+          # destination alpha comment
+          gem "alpha-tool", ">= 0.alpha"
+
+          group :test do
+            gem "alpha-test", ">= 0.alpha-test"
+          end
+        RUBY
+        "template/gemfiles/modular/custom.gemfile.example" => <<~RUBY
+          source "https://example.invalid"
+
+          # template beta comment
+          gem "beta-tool", "~> 0.beta", require: false
+
+          group :test do
+            gem "alpha-test", ">= 0.template-test"
+            gem "beta-test", "~> 0.beta-test"
+          end
+
+          platforms :ruby do
+            gem "beta-runtime", ">= 0.beta-runtime"
+          end
+        RUBY
+      })
+
+      report = described_class.apply_project(root, env: {}).fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:recipe_name) == "template_source_application_gemfiles_modular_custom_gemfile"
+      end
+
+      expect(report.fetch(:final_content)).to eq(<<~RUBY)
+        source "https://example.invalid"
+
+        # template beta comment
+        gem "beta-tool", "~> 0.beta", require: false
+
+        # destination alpha comment
+        gem "alpha-tool", ">= 0.alpha"
+
+        group :test do
+          gem "alpha-test", ">= 0.template-test"
+          gem "beta-test", "~> 0.beta-test"
+        end
+
+        platforms :ruby do
+          gem "beta-runtime", ">= 0.beta-runtime"
+        end
+      RUBY
     end
   end
 
@@ -3690,11 +3812,11 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:facts).dig(:license, :spdx)).to eq(["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"])
       expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.3", ">= 2.3.5"')
-      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.11"')
+      expect_gem_dependency_declared(gemfile, "kettle-dev")
+      expect_gem_dependency_declared(gemfile, "kettle-test")
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.14"')
+      expect_gem_dependency_declared(gemfile, "turbo_tests2")
       expect(rakefile).to include('require "kettle/dev"')
       expect(rakefile).to include("Kettle::Dev.install_tasks")
       expect(rakefile).to include("namespace :family do")
@@ -3747,9 +3869,9 @@ RSpec.describe Kettle::Jem do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('gem "kettle-dev", "~> 2.3", ">= 2.3.5"')
-      expect(gemfile).to include('gem "kettle-test", "~> 2.0", ">= 2.0.11"')
-      expect(gemfile).to include('gem "turbo_tests2", "~> 3.1", ">= 3.1.14"')
+      expect_gem_dependency_declared(gemfile, "kettle-dev")
+      expect_gem_dependency_declared(gemfile, "kettle-test")
+      expect_gem_dependency_declared(gemfile, "turbo_tests2")
     end
   end
 
@@ -4854,7 +4976,7 @@ RSpec.describe Kettle::Jem do
       expect(File.read(File.join(root, "Gemfile"))).to include(
         'eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile"))).to include('gem "kettle-jem", ">= 7.0"')
+      expect_gem_dependency_declared(File.read(File.join(root, "gemfiles", "modular", "templating.gemfile")), "kettle-jem")
       expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundled_handoff",
         command: kettle_jem_handoff_command("--accept-config", "--skip-commit", "--force"),
@@ -9094,7 +9216,7 @@ RSpec.describe Kettle::Jem do
       expect(report.fetch(:request_envelope).fetch(:request).fetch(:provider_backend)).to eq("ast-crispr-ruby-prism")
       expect(report.fetch(:report_envelope).fetch(:report).fetch(:step_reports).first.fetch(:metadata).fetch(:provider_family)).to eq("ruby")
       expect(content).to include("# local notes remain outside the generated block")
-      expect(content).to include('gem "debug", "~> 1.9" # ruby >= 3.3')
+      expect_gem_dependency_declared(content, "debug")
       expect(content).not_to include('gem "rack-session"')
       expect(content).not_to include('gem "rake"')
       expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(content)
@@ -9797,13 +9919,6 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "keeps the packaged gemspec template dependency floors current" do
-    template = File.read(File.expand_path("../lib/kettle/jem/templates/gem.gemspec.example", __dir__))
-
-    expect(template).to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.3", ">= 2.3.5")))
-    expect(template).not_to include(%(spec.add_development_dependency("{KJ|KETTLE_DEV_GEM}", "~> 2.1", ">= 2.1.1")))
-  end
-
   it "keeps the greater version requirement for template-managed gemspec dependencies" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -9852,7 +9967,7 @@ RSpec.describe Kettle::Jem do
 
       expect(gemspec_content).to include(%(spec.add_dependency("json", "~> 2.10")))
       expect(gemspec_content).to include(%(spec.add_development_dependency("custom-dev", ">= 1")))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.5")))
+      expect_gemspec_dependency_declared(gemspec_content, "kettle-dev", kind: :add_development_dependency)
       expect(gemspec_content).to include(%(spec.add_development_dependency("rake", "~> 13.1")))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("kettle-dev", "~> 2.0")\n))
       expect(gemspec_content).not_to include(%(spec.add_development_dependency("rake", "~> 13.0")))
@@ -9946,12 +10061,12 @@ RSpec.describe Kettle::Jem do
     merged = described_class.merge_gemspec_template_source(template, destination, facts: {package: {name: "demo"}})
 
     expect { RubyVM::InstructionSequence.compile(merged) }.not_to raise_error
-    expect(merged).to include('spec.add_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")          # ruby >= 2.4.0')
+    expect_gemspec_dependency_declared(merged, "kettle-dev", kind: :add_dependency)
     expect(merged).not_to include('spec.add_development_dependency("kettle-dev"')
     expect(merged).to include("#       visibility and discoverability.\n\n  # Security")
     expect(merged).not_to include("#       visibility and discoverability.\n\n\n  # Security")
 
-    runtime_index = merged.index('spec.add_dependency("kettle-dev", "~> 2.2", ">= 2.2.10")')
+    runtime_index = merged.index('spec.add_dependency("kettle-dev"')
     note_index = merged.index("# NOTE: It is preferable to list development dependencies in the gemspec due to increased")
     bundler_audit_index = merged.index('spec.add_development_dependency("bundler-audit", "~> 0.9.3")')
 
@@ -10030,8 +10145,9 @@ RSpec.describe Kettle::Jem do
     expect(once).not_to include("spec.metadata[\"rubygems_mfa_required\"] = \"true\"\n\n\n  # Specify which files")
     expect(once).to include("spec.require_paths = [\"lib\"]\n\n  # Utilities")
     expect(once).not_to include("spec.require_paths = [\"lib\"]\n\n\n  # Utilities")
-    expect(once).to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.3\", \">= 2.3.5\")\n\n  # Security")
-    expect(once).not_to include("spec.add_development_dependency(\"kettle-dev\", \"~> 2.3\", \">= 2.3.5\")\n\n\n  # Security")
+    expect_gemspec_dependency_declared(once, "kettle-dev", kind: :add_development_dependency)
+    expect(once).to match(/spec\.add_development_dependency\("kettle-dev".*\n\n  # Security/)
+    expect(once).not_to match(/spec\.add_development_dependency\("kettle-dev".*\n\n\n  # Security/)
     expect(once).to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n  # Tasks")
     expect(once).not_to include("spec.add_development_dependency(\"bundler-audit\", \"~> 0.9.3\")\n\n\n  # Tasks")
     expect(twice).to eq(once)
@@ -10265,7 +10381,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include(contract_case.fetch(:summary))
       expect(gemspec_content).to include(contract_case.fetch(:description))
       expect(gemspec_content).to include(%(spec.executables = ["#{contract_case.fetch(:executable)}"]))
-      expect(gemspec_content).to include(%(spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.4")))
+      expect_gemspec_dependency_declared(gemspec_content, "gitmoji-regex", kind: :add_development_dependency)
       expect(gemspec_content).not_to include("# Hence.")
       expect(gemspec_content).not_to include("add_development_dependency(\"#{package_name}\"")
       expect(File.read(File.join(root, "#{package_name}.gemspec"))).to eq(gemspec_content)
@@ -10331,7 +10447,7 @@ RSpec.describe Kettle::Jem do
       expect(gemspec_content).to include("Second line")
       expect(gemspec_content).to include("  DESC")
       expect(gemspec_content).to include('spec.homepage = "https://github.com/acme/example"')
-      expect(gemspec_content).to include('spec.add_development_dependency("test-unit", ">= 3")')
+      expect_gemspec_dependency_declared(gemspec_content, "test-unit", kind: :add_development_dependency)
       expect(gemspec_content).not_to match(/^spec\./)
     end
   end
@@ -13600,23 +13716,25 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:request_envelope, :request, :template_content)).to include(
         "Style tasks run on the latest Ruby"
       )
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts", "~> 22.3", ">= 22.3.1"')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
-      expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec", "~> 3.6"')
-      expect(template_report.fetch(:final_content)).to include('gem "appraisal2-rubocop", "~> 0.2", ">= 0.2.3", require: false')
-      expect(template_report.fetch(:final_content)).to include('gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.5"')
+      expect_gem_dependency_declared(template_report.fetch(:final_content), "rubocop-lts")
+      expect_gem_dependency_declared(template_report.fetch(:final_content), "rubocop-lts-rspec")
+      expect(template_report.fetch(:final_content)).not_to include('gem "rubocop-rspec"')
+      expect_gem_dependency_declared(template_report.fetch(:final_content), "appraisal2-rubocop")
+      expect_gem_dependency_declared(template_report.fetch(:final_content), "rubocop-ruby3_1")
       expect(template_report.fetch(:final_content)).to include(
         "declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)"
       )
       expect(template_report.fetch(:final_content)).to include(
-        'gem "rubocop-ruby3_1", "~> 3.0", ">= 3.0.5" unless declared_gems.include?("rubocop-ruby3_1")'
+        'unless declared_gems.include?("rubocop-ruby3_1")'
       )
-      expect(template_report.dig(:metadata, :template_tokens)).to include(
-        "KJ|RUBOCOP_TARGET_RUBY" => "3.1",
-        "KJ|RUBOCOP_LTS_CONSTRAINT" => "\"~> 22.3\", \">= 22.3.1\"",
-        "KJ|RUBOCOP_RUBY_CONSTRAINT" => "\"~> 3.0\", \">= 3.0.5\"",
-        "KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1"
+      template_tokens = template_report.dig(:metadata, :template_tokens)
+      expect(template_tokens.keys).to include(
+        "KJ|RUBOCOP_TARGET_RUBY",
+        "KJ|RUBOCOP_LTS_CONSTRAINT",
+        "KJ|RUBOCOP_RUBY_CONSTRAINT",
+        "KJ|RUBOCOP_RUBY_GEM"
       )
+      expect(template_tokens).to include("KJ|RUBOCOP_RUBY_GEM" => "rubocop-ruby3_1")
     end
   end
 

@@ -5345,7 +5345,7 @@ module Kettle
         return output
       end
 
-      return fallback_adapter_failure_template_source(file_type, recipe, template_content, destination_content, facts) if process_result_adapter_failure?(merge_result)
+      raise adapter_failure_template_source_error(file_type, recipe) if process_result_adapter_failure?(merge_result)
       return template_content if github_workflow_template_recipe?(recipe)
 
       diagnostics = merge_result.fetch(:diagnostics, [])
@@ -6179,17 +6179,8 @@ module Kettle
       end
     end
 
-    def fallback_adapter_failure_template_source(file_type, recipe, template_content, destination_content, facts)
-      case file_type
-      when :gemfile
-        finalize_gemfile_template_source(recipe, template_content, destination_content, facts: facts, template_content: template_content)
-      when :appraisals
-        merge_appraisals_template_policy(template_content, facts: facts)
-      when :yaml
-        raise ArgumentError, "failed to merge yaml template #{recipe.fetch(:target_path)}: provider adapter failure"
-      else
-        template_content
-      end
+    def adapter_failure_template_source_error(file_type, recipe)
+      ArgumentError.new("failed to merge #{file_type} template #{recipe.fetch(:target_path)}: provider adapter failure")
     end
 
     def ruby_merge_options(recipe, merge_template_requires:)

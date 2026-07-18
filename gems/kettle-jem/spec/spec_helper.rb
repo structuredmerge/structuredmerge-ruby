@@ -23,6 +23,7 @@ require "kettle/test/rspec"
 
 # This library
 require "kettle/jem"
+Kettle::Jem.ensure_runtime_dependencies!
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

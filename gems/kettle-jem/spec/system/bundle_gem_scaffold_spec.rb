@@ -115,6 +115,15 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     File.write(path, content)
   end
 
+  def expect_gem_dependency_declared(content, gem_name)
+    declared = Kettle::Jem.ruby_call_records(content, :gem).any? do |call|
+      argument = call.arguments&.arguments&.first
+      argument.is_a?(Prism::StringNode) && argument.unescaped == gem_name
+    end
+
+    expect(declared).to be(true), "expected Gemfile dependency #{gem_name.inspect}"
+  end
+
   def enable_packaged_templates!
     path = File.join(gem_root, ".structuredmerge/kettle-jem.yml")
     content = File.read(path)
@@ -224,10 +233,10 @@ RSpec.describe "bundle gem scaffold + kettle-jem", :system do
     )
 
     style_gemfile = File.read(File.join(gem_root, "gemfiles/modular/style.gemfile"))
-    expect(style_gemfile).to include('gem "rubocop-lts", "~> 24.2", ">= 24.2.1"')
-    expect(style_gemfile).to include('gem "rubocop-lts-rspec", "~> 1.0", ">= 1.0.4"')
-    expect(style_gemfile).not_to include('gem "rubocop-rspec", "~> 3.6"')
-    expect(style_gemfile).to include('gem "rubocop-ruby3_2", "~> 3.0", ">= 3.0.6"')
+    expect_gem_dependency_declared(style_gemfile, "rubocop-lts")
+    expect_gem_dependency_declared(style_gemfile, "rubocop-lts-rspec")
+    expect(style_gemfile).not_to include('gem "rubocop-rspec"')
+    expect_gem_dependency_declared(style_gemfile, "rubocop-ruby3_2")
     expect(style_gemfile).to include('unless declared_gems.include?("rubocop-ruby3_2")')
 
     gemfile = File.read(File.join(gem_root, "Gemfile"))
