@@ -1100,10 +1100,10 @@ module Kettle
           {
             language: "ruby",
             pattern: "*.rb",
-            diff: "smorg-ruby",
-            merge: "smorg-ruby",
-            diff_command: "smorg-ruby diff-driver",
-            merge_command: "smorg-ruby merge-driver %O %A %B %P"
+            diff: "smorg-rb",
+            merge: "smorg-rb",
+            diff_command: "smorg-rb diff-driver",
+            merge_command: "smorg-rb merge-driver %O %A %B %P"
           },
           {
             language: "go",
@@ -1298,9 +1298,9 @@ module Kettle
         def git_driver_global_unset_commands
           DEFAULT_GIT_DRIVER_DEFINITIONS.flat_map do |definition|
             [
-              ["git", "config", "--global", "--unset", "diff.#{definition.fetch(:diff)}.command"],
-              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.driver"],
-              ["git", "config", "--global", "--unset", "merge.#{definition.fetch(:merge)}.name"]
+              ["git", "config", "--global", "--unset-all", "diff.#{definition.fetch(:diff)}.command"],
+              ["git", "config", "--global", "--unset-all", "merge.#{definition.fetch(:merge)}.driver"],
+              ["git", "config", "--global", "--unset-all", "merge.#{definition.fetch(:merge)}.name"]
             ]
           end
         end
