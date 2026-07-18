@@ -48,9 +48,6 @@ Please file a bug if you notice a violation of semantic versioning.
   integrations (`codecov`, `coveralls`, `qlty`) and the SkyWalking Eyes license
   check integration across README badges, upload/check workflow steps, packaged
   config/workflow templates, and cleanup of existing config files or workflows.
-- Added `rake spec:dependency_floors` as a fast validation slice for recurring
-  non-StructuredMerge dependency floor bumps.
-- The fast dependency floor slice now covers `appraisal2`.
 - kettle-jem's own `mise` environment now enables templating dependencies so
   templating-only floors are validated in the normal gem bundle.
 - Restored `kettle-jem prepare` as a pre-flight dependency bootstrap mode for
@@ -68,7 +65,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
-- Generated gemspec templates now require `kettle-dev` >= 2.3.6.
+- Generated gemspec templates now require `kettle-dev` >= 2.3.7.
 - kettle-jem now requires `kettle-rb` >= 0.1.4.
 - Refreshed generated GitHub Actions workflow pins for `ruby/setup-ruby` and
   CodeQL actions.
