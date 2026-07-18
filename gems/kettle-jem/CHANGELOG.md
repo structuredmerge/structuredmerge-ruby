@@ -79,6 +79,9 @@ Please file a bug if you notice a violation of semantic versioning.
   workflows, `truffleruby/*` runs TruffleRuby workflows, and `engines/*` runs
   all engine workflows. Other pull request branches continue to run MRI checks
   without the alternate engine jobs.
+- Generated CONTRIBUTING docs now explain the `jruby/*`, `truffleruby/*`, and
+  `engines/*` branch prefixes that opt pull requests into alternate Ruby engine
+  workflows.
 - Generated workflow templates now evaluate skip-CI commit messages only for
   push events, and mixed head/dependency-head templates gate JRuby and
   TruffleRuby jobs before runner provisioning on pull requests.
