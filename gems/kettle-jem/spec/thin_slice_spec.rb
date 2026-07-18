@@ -5367,11 +5367,11 @@ RSpec.describe Kettle::Jem do
     )
     expect(step.fetch(:attribute_updates)).to include(hash_including(
       pattern: "*.rb",
-      attributes: {"diff" => "smorg-ruby"}
+      attributes: {"diff" => "smorg-rb"}
     ))
     expect(step.fetch(:commands)).to include(
-      ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-      ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
+      ["git", "config", "--local", "diff.smorg-rb.command", "smorg-rb diff-driver"],
+      ["git", "config", "--local", "merge.smorg-rb.driver", "smorg-rb merge-driver %O %A %B %P"]
     )
   end
 
@@ -5616,14 +5616,14 @@ RSpec.describe Kettle::Jem do
       expect(File.read(File.join(root, ".gitattributes"))).to eq(<<~ATTRIBUTES)
         *.md diff=markdown
         # <<structuredmerge:git-drivers>> do not edit below this line
-        *.rb diff=smorg-ruby
+        *.rb diff=smorg-rb
         *.go diff=smorg-go
         *.rs diff=smorg-rs
         # <</structuredmerge:git-drivers>>
       ATTRIBUTES
       expect(commands).to include(
-        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-        ["git", "config", "--local", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
+        ["git", "config", "--local", "diff.smorg-rb.command", "smorg-rb diff-driver"],
+        ["git", "config", "--local", "merge.smorg-rb.driver", "smorg-rb merge-driver %O %A %B %P"]
       )
     end
   end
@@ -5674,10 +5674,28 @@ RSpec.describe Kettle::Jem do
       reason: "ready_for_global_git_drivers"
     )
     expect(step.fetch(:commands)).to include(
-      ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"],
-      ["git", "config", "--global", "merge.smorg-ruby.driver", "smorg-ruby merge-driver %O %A %B %P"]
+      ["git", "config", "--global", "diff.smorg-rb.command", "smorg-rb diff-driver"],
+      ["git", "config", "--global", "merge.smorg-rb.driver", "smorg-rb merge-driver %O %A %B %P"]
     )
     expect(step.fetch(:diagnostics)).to include(hash_including(key: "forge_ignores_external_diff_drivers"))
+  end
+
+  it "plans global Git driver command removal with unset-all when requested" do
+    step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "undo"})
+
+    expect(step).to include(
+      name: "git_drivers",
+      status: "ready",
+      mode: "undo",
+      profile: "all",
+      scope: "local",
+      reason: "ready_for_git_driver_undo"
+    )
+    expect(step.fetch(:commands)).to include(
+      ["git", "config", "--global", "--unset-all", "diff.smorg-rb.command"],
+      ["git", "config", "--global", "--unset-all", "merge.smorg-rb.driver"],
+      ["git", "config", "--global", "--unset-all", "merge.smorg-rb.name"]
+    )
   end
 
   it "writes include-file Git driver configuration when requested" do
@@ -5701,7 +5719,7 @@ RSpec.describe Kettle::Jem do
 
       expect(result).to include(status: "succeeded", changed_files: [".git/smorg/config"])
       expect(commands).to include(["git", "config", "--local", "include.path", ".git/smorg/config"])
-      expect(File.read(File.join(root, ".git", "smorg", "config"))).to include("[diff \"smorg-ruby\"]")
+      expect(File.read(File.join(root, ".git", "smorg", "config"))).to include("[diff \"smorg-rb\"]")
     end
   end
 
@@ -5719,12 +5737,12 @@ RSpec.describe Kettle::Jem do
 
           [[profiles.semantic-diff.attributes]]
           pattern = "*.rake"
-          diff = "smorg-ruby"
+          diff = "smorg-rb"
 
           [[profiles.semantic-diff.git_config]]
           scope = "global"
-          key = "diff.smorg-ruby.command"
-          value = "bundle exec smorg-ruby diff-driver"
+          key = "diff.smorg-rb.command"
+          value = "bundle exec smorg-rb diff-driver"
         TOML
       })
 
@@ -5732,11 +5750,28 @@ RSpec.describe Kettle::Jem do
       global = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {git_drivers: "global"})
 
       expect(local.fetch(:attribute_updates)).to eq([
-        {path: ".gitattributes", pattern: "*.rake", attributes: {"diff" => "smorg-ruby"}}
+        {path: ".gitattributes", pattern: "*.rake", attributes: {"diff" => "smorg-rb"}}
       ])
       expect(global.fetch(:commands)).to eq([
-        ["git", "config", "--global", "diff.smorg-ruby.command", "bundle exec smorg-ruby diff-driver"]
+        ["git", "config", "--global", "diff.smorg-rb.command", "bundle exec smorg-rb diff-driver"]
       ])
+    end
+  end
+
+  it "keeps committed Git driver manifests on the smorg-rb executable name" do
+    repo_root = File.expand_path("../../..", __dir__)
+    manifest_paths = [
+      File.join(repo_root, ".structuredmerge", "git-drivers.toml"),
+      File.join(repo_root, "gems", "kettle-jem", ".structuredmerge", "git-drivers.toml")
+    ]
+
+    manifest_paths.each do |path|
+      content = File.read(path)
+
+      expect(content).to include('diff = "smorg-rb"')
+      expect(content).to include('key = "diff.smorg-rb.command"')
+      expect(content).to include('value = "smorg-rb diff-driver"')
+      expect(content).not_to include("smorg-ruby")
     end
   end
 
@@ -5752,8 +5787,8 @@ RSpec.describe Kettle::Jem do
 
           [[profiles.semantic-diff.git_config]]
           scope = "global"
-          key = "diff.smorg-ruby.command"
-          value = "smorg-ruby $(danger)"
+          key = "diff.smorg-rb.command"
+          value = "smorg-rb $(danger)"
         TOML
       })
 
@@ -5775,7 +5810,7 @@ RSpec.describe Kettle::Jem do
 
           [[profiles.semantic-diff.git_config]]
           scope = "global"
-          key = "diff.smorg-ruby.cachetextconv"
+          key = "diff.smorg-rb.cachetextconv"
           value = "true"
         TOML
       })
@@ -5798,8 +5833,8 @@ RSpec.describe Kettle::Jem do
 
           [[profiles.semantic-diff.git_config]]
           scope = "global"
-          key = "diff.smorg-ruby.command"
-          value = "smorg-ruby diff-driver"
+          key = "diff.smorg-rb.command"
+          value = "smorg-rb diff-driver"
 
           [profiles.textconv-normalized]
 
@@ -5821,10 +5856,10 @@ RSpec.describe Kettle::Jem do
       textconv_commands = Kettle::Jem::Tasks::InstallTask.git_driver_global_commands(manifest, "textconv-normalized")
 
       expect(semantic_commands).to eq([
-        ["git", "config", "--global", "diff.smorg-ruby.command", "smorg-ruby diff-driver"]
+        ["git", "config", "--global", "diff.smorg-rb.command", "smorg-rb diff-driver"]
       ])
       expect(semantic_local_commands).to eq([
-        ["git", "config", "--local", "diff.smorg-ruby.command", "smorg-ruby diff-driver"]
+        ["git", "config", "--local", "diff.smorg-rb.command", "smorg-rb diff-driver"]
       ])
       expect(textconv_commands).to contain_exactly(
         ["git", "config", "--global", "diff.smorg-json-textconv.textconv", "smorg-rb textconv --format json"],
