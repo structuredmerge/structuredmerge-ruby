@@ -18,7 +18,7 @@ module TreeHaver
   BackendRegistry.register(TSLP_BACKEND)
   BackendRegistry.register(KREUZBERG_LANGUAGE_PACK_BACKEND)
   BackendRegistry.register_availability_checker(:tslp) do
-    defined?(TreeSitterLanguagePack) && TreeSitterLanguagePack.respond_to?(:process)
+    Backends::Tslp.available?
   end
   BackendRegistry.register_availability_checker(:"kreuzberg-language-pack") do
     BackendRegistry.available?(:tslp)

@@ -32,6 +32,7 @@ require_relative 'tree_haver/backends/mri'
 require_relative 'tree_haver/backends/ffi'
 require_relative 'tree_haver/backends/rust'
 require_relative 'tree_haver/backends/java'
+require_relative 'tree_haver/backends/tslp'
 require_relative 'tree_haver/grammar_finder'
 require_relative 'tree_haver/citrus_grammar_finder'
 require_relative 'tree_haver/parslet_grammar_finder'
@@ -477,6 +478,8 @@ module TreeHaver
       Backends::FFI
     when :java
       Backends::Java
+    when :tslp, :"kreuzberg-language-pack"
+      Backends::Tslp
     when :citrus
       Backends::Citrus
     when :parslet
