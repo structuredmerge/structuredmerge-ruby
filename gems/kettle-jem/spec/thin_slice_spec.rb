@@ -3549,6 +3549,57 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "migrates legacy nested RBS files without requiring a version_gem dependency" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rbs-consolidation-without-version-gem", tmp_root) do |root|
+      write_tree(root, {
+        "kettle-family.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "kettle-family"
+            spec.version = "1.2.3"
+            spec.summary = "Kettle family"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          rubygems:
+            min_ruby: "2.1"
+            namespace: "Kettle::Family"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: sig/kettle/family.rbs
+        YAML
+        "template/sig/kettle/family.rbs.example" => <<~RBS,
+          module Kettle
+            module Family
+              VERSION: String
+            end
+          end
+        RBS
+        "sig/kettle/family/version.rbs" => <<~RBS
+          module Kettle
+            module Family
+              module Version
+                VERSION: String
+              end
+            end
+          end
+        RBS
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_commit: true, accept: true})
+      post_step = apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "legacy_rbs_consolidation" }
+
+      expect(post_step.fetch(:changed_files)).to include("sig/kettle/family.rbs", "sig/kettle/family/version.rbs")
+      expect(File).not_to exist(File.join(root, "sig", "kettle", "family", "version.rbs"))
+      signature = File.read(File.join(root, "sig", "kettle", "family.rbs"))
+      expect(signature).to include("module Version")
+      expect(signature.scan("VERSION: String").size).to eq(2)
+    end
+  end
+
   it "bootstraps a monorepo root template profile with shared documentation entries" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
