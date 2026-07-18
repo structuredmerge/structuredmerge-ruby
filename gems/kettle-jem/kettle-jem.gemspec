@@ -98,7 +98,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("dotenv-merge", "= #{spec.version}")              # ruby >= 4.0.0
   spec.add_dependency("json-merge", "= #{spec.version}")                 # ruby >= 4.0.0
   spec.add_dependency("kettle-dev", "~> 2.3", ">= 2.3.5")                # ruby >= 2.3.0
-  spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.2")                  # ruby >= 1.8.7
+  spec.add_dependency("kettle-rb", "~> 0.1", ">= 0.1.3")                  # ruby >= 1.8.7
   spec.add_dependency("kramdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markly-merge", "= #{spec.version}")               # ruby >= 4.0.0

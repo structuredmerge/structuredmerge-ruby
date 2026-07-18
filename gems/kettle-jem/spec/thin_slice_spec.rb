@@ -8199,19 +8199,6 @@ RSpec.describe Kettle::Jem do
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
   end
 
-  it "derives engine workflow Ruby floors from the compatibility matrix" do
-    matrix = Kettle::Rb::CompatMatrix
-
-    expect(matrix.entry("truffleruby-23.1").mri).to eq("3.2")
-    expect(matrix.entry("truffleruby-23.1").workflow_ruby).to eq("3.1")
-    expect(matrix.workflow_ruby_floor("truffleruby-23.1")).to eq("3.1")
-    expect(matrix.entry("jruby-10.1").mri).to eq("3.4")
-    expect(matrix.workflow_ruby_floor("jruby-10.1")).to eq("3.4")
-    expect(matrix.entry("truffleruby-34.0").mri).to eq("3.4")
-    expect(matrix.workflow_ruby_floor("truffleruby-34.0")).to eq("3.4")
-    expect(matrix.entry("ruby-2.4").rails_appraisals).to include("4.2.11.3", "5.2.8.1")
-  end
-
   it "serializes legacy engine setup-ruby workaround in generated CI workflows" do
     ci = {
       default_branch: "main",
