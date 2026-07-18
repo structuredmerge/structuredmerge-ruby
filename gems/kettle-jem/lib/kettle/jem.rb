@@ -3690,11 +3690,14 @@ module Kettle
 
     def template_version_gem_bootstrap_step(project_root, report)
       facts = report.fetch(:facts)
-      return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
-      return unless project_gemspec_declares_version_gem?(project_root)
-
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
+      unless project_gemspec_declares_version_gem?(project_root)
+        return legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+      end
+
+      return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
+
       templated_paths = report.fetch(:recipe_reports, []).map { |recipe_report| recipe_report.fetch(:relative_path, "") }
       version_path = File.join("lib", entrypoint_require, "version.rb")
       signature_path = File.join("sig", "#{entrypoint_require}.rbs")
@@ -3704,6 +3707,26 @@ module Kettle
         manage_version_file: !templated_paths.include?(version_path),
         manage_signature_file: !templated_paths.include?(signature_path)
       )
+    end
+
+    def legacy_rbs_consolidation_step(project_root, facts, entrypoint_require:)
+      legacy_signature_paths = legacy_rbs_signature_paths(project_root, entrypoint_require)
+      return if legacy_signature_paths.empty?
+
+      namespace = facts.dig(:rubygems, :namespace).to_s
+      signature_path = File.join("sig", "#{entrypoint_require}.rbs")
+      changes = write_consolidated_version_signature(
+        project_root,
+        signature_path,
+        legacy_signature_paths,
+        namespace: namespace
+      ).compact
+      {
+        name: "legacy_rbs_consolidation",
+        status: changes.empty? ? "already_current" : "applied",
+        changed_files: changes,
+        signature_path: signature_path
+      }
     end
 
     def version_gem_cleanup_step(project_root, facts)
