@@ -47,7 +47,7 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
-  it 'analyzes devcontainer-style JSONC with comments and trailing commas through the synthetic fallback' do
+  it 'fails closed for JSONC analysis when no TreeHaver JSON backend is available' do
     source = <<~JSON
       {
         // devcontainer files commonly use JSONC comments.
@@ -62,8 +62,9 @@ RSpec.describe Json::Merge do
 
     analysis = described_class::FileAnalysis.new(source)
 
-    expect(analysis).to be_valid
-    expect(analysis.root_object).not_to be_nil
+    expect(analysis).not_to be_valid
+    expect(analysis.root_object).to be_nil
+    expect(analysis.errors).not_to be_empty
   end
 
   it 'conforms to the structure fixtures' do

@@ -22,7 +22,7 @@ module Json
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
         @signature_generator = signature_generator
-        @parser_path = parser_path || self.class.find_parser_path
+        @parser_path = parser_path
         @errors = []
 
         @comment_tracker = CommentTracker.new(source)
@@ -202,25 +202,20 @@ module Json
       def parse_json
         # TreeHaver handles backend selection against the grammar Json::Merge
         # has already registered during bootstrap.
-        parser = TreeHaver.parser_for(:json, library_path: @parser_path)
+        parser = if @parser_path
+                   TreeHaver.parser_for(:json, library_path: @parser_path)
+                 else
+                   TreeHaver.parser_for(:json)
+                 end
 
         @ast = parser.parse(@source)
 
         collect_parse_errors(@ast.root_node) if @ast&.root_node
-        parse_synthetic_json(@errors.dup) unless @errors.empty?
       rescue TreeHaver::Error => e
-        parse_synthetic_json(e)
+        @errors << e
+        @ast = nil
       rescue StandardError => e
-        parse_synthetic_json(e)
-      end
-
-      def parse_synthetic_json(original_error)
-        normalized = Json::Merge.send(:strip_json_comments, @source)
-        JSON.parse(Json::Merge.send(:strip_trailing_commas, normalized))
-        @errors = []
-        @ast = SyntheticParser.new(@source).parse
-      rescue StandardError
-        @errors.concat(Array(original_error))
+        @errors << e
         @ast = nil
       end
 

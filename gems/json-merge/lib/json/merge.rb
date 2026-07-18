@@ -41,7 +41,6 @@ module Json
     autoload :NodeWrapper, 'json/merge/node_wrapper'
     autoload :ConflictResolver, 'json/merge/conflict_resolver'
     autoload :SmartMerger, 'json/merge/smart_merger'
-    autoload :SyntheticParser, 'json/merge/synthetic_parser'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
 
     class << self
