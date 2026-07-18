@@ -64,6 +64,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated gemspec templates now require `kettle-dev` >= 2.3.6.
 - kettle-jem now requires `kettle-rb` >= 0.1.4.
 - Refreshed generated GitHub Actions workflow pins for `ruby/setup-ruby` and
   CodeQL actions.
