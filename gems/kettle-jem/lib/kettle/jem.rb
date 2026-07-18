@@ -1699,7 +1699,7 @@ module Kettle
       end
 
       def default_workspace_root
-        env_root = ENV["KETTLE_RB_DEV"].to_s.strip
+        env_root = ENV["KETTLE_DEV_DEV"].to_s.strip
         return if env_root.casecmp("false").zero?
 
         repo_root = File.expand_path("../../..", __dir__)
@@ -1852,7 +1852,7 @@ module Kettle
 
         [
           "WARNING: #{warning}",
-          "Hint: set KETTLE_RB_DEV=true (or configure it in .env.local) to use sibling workspace gems."
+          "Hint: set KETTLE_DEV_DEV=true (or configure it in .env.local) to use sibling workspace gems."
         ]
       end
 
@@ -1862,7 +1862,7 @@ module Kettle
 
           #{warning}
 
-          Set `KETTLE_RB_DEV=true` (or configure it in `.env.local`) to use sibling workspace gems instead of the installed release.
+          Set `KETTLE_DEV_DEV=true` (or configure it in `.env.local`) to use sibling workspace gems instead of the installed release.
         MARKDOWN
       end
 
@@ -1883,9 +1883,9 @@ module Kettle
         checkout_path = canonical_path(local_checkout)
         return if loaded_path == checkout_path
 
-        env_value = ENV.fetch("KETTLE_RB_DEV", "<unset>")
+        env_value = ENV.fetch("KETTLE_DEV_DEV", "<unset>")
         "Detected sibling workspace checkout at `#{Kettle::Jem.display_path(local_checkout)}`, but this run is using installed `kettle-jem` " \
-          "(KETTLE_RB_DEV=#{env_value.inspect})."
+          "(KETTLE_DEV_DEV=#{env_value.inspect})."
       end
 
       def sibling_workspace_root(project_root)
@@ -10679,7 +10679,7 @@ module Kettle
         template_run_date: run_timestamp.strftime("%Y-%m-%d"),
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
-        kettle_rb_local_gems: kettle_rb_local_gems(config),
+        kettle_dev_local_gems: kettle_dev_local_gems(config),
         package_name: package_name.to_s,
         yard_host: yard_host,
         homepage_uri: project_homepage_uri(config, env, yard_host: yard_host, gemspec_homepage_uri: metadata_value(gemspec_metadata, :homepage_uri)),
@@ -11000,7 +11000,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_DATE" => project_runtime[:template_run_date].to_s,
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
-        "KJ|KETTLE_RB_LOCAL_GEMS" => project_runtime[:kettle_rb_local_gems].to_s,
+        "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,
         "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
@@ -11015,7 +11015,7 @@ module Kettle
       preferred_template_token_value(derived, project_runtime_config_value(config, "yard_host"), env, "KJ_YARD_HOST").to_s
     end
 
-    def kettle_rb_local_gems(config)
+    def kettle_dev_local_gems(config)
       gems = %w[kettle-dev kettle-test kettle-soup-cover]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })

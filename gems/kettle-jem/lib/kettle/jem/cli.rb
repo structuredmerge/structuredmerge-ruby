@@ -269,7 +269,7 @@ module Kettle
         err.puts("[kettle-jem] DEBUG: early environment snapshot")
         err.puts("  command=#{command.inspect}")
         err.puts("  project_root=#{project_root.inspect}")
-        %w[DEBUG KETTLE_JEM_DEBUG KETTLE_DEV_DEBUG KETTLE_RB_DEV BUNDLE_GEMFILE BUNDLE_PATH GEM_HOME GEM_PATH RUBYOPT RUBYLIB PWD].each do |key|
+        %w[DEBUG KETTLE_JEM_DEBUG KETTLE_DEV_DEBUG KETTLE_DEV_DEV BUNDLE_GEMFILE BUNDLE_PATH GEM_HOME GEM_PATH RUBYOPT RUBYLIB PWD].each do |key|
           err.puts("  #{key}=#{env_value(env, key).inspect}")
         end
       end

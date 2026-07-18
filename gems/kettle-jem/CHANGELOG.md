@@ -64,6 +64,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Generated local Kettle workspace dependency wiring now uses
+  `KETTLE_DEV_DEV` instead of the legacy `KETTLE_RB_DEV`.
 - Generated pull request engine workflows now keep JRuby and TruffleRuby
   coverage available via branch opt-in prefixes: `jruby/*` runs JRuby
   workflows, `truffleruby/*` runs TruffleRuby workflows, and `engines/*` runs
