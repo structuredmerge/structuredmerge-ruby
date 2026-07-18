@@ -4869,7 +4869,7 @@ module Kettle
         output: ensure_trailing_newline(TomlRB.dump(merged)),
         policies: [{name: "kettle-jem-git-drivers-destination-wins"}]
       }
-    rescue StandardError => error
+    rescue => error
       {
         ok: false,
         diagnostics: [
@@ -4888,12 +4888,12 @@ module Kettle
         destination_has_key = destination.key?(key)
         destination_value = destination[key]
         merged[key] = if destination_has_key && template_value.is_a?(Hash) && destination_value.is_a?(Hash)
-                        merge_template_toml_defaults(template_value, destination_value)
-                      elsif destination_has_key
-                        destination_value
-                      else
-                        template_value
-                      end
+          merge_template_toml_defaults(template_value, destination_value)
+        elsif destination_has_key
+          destination_value
+        else
+          template_value
+        end
       end.tap do |merged|
         destination.each do |key, destination_value|
           merged[key] = destination_value unless merged.key?(key)
@@ -5361,10 +5361,10 @@ module Kettle
         )
       when :toml
         merge_result = if recipe.fetch(:target_path).to_s == ".structuredmerge/git-drivers.toml"
-                         merge_git_drivers_toml_template_source(template_content, destination_content)
-                       else
-                         Toml::Merge.merge_toml(template_content, destination_content, "toml")
-                       end
+          merge_git_drivers_toml_template_source(template_content, destination_content)
+        else
+          Toml::Merge.merge_toml(template_content, destination_content, "toml")
+        end
       when :json, :jsonc
         merge_result = merge_json_template_source(template_content, destination_content, recipe, file_type)
       when :markdown
