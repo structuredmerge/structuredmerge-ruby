@@ -8140,10 +8140,10 @@ RSpec.describe Kettle::Jem do
   it "runs TruffleRuby dep-heads directly from the generated appraisal gemfile" do
     template = File.read(File.expand_path("../lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example", __dir__))
 
+    expect(template).to include("truffleruby:")
     expect(template).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.bundle_gemfile || 'Appraisal.root.gemfile' }}")
     expect(template).to include('bundle_gemfile: "gemfiles/dep_heads.gemfile"')
     expect(template).to include("direct_bundle: true")
-    expect(template).to include("if: ${{ !matrix.direct_bundle &&")
     expect(template).to include("run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}")
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
   end
