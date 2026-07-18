@@ -129,14 +129,13 @@ module TreeHaver
   def language_pack_object_hash(object)
     return object if object.is_a?(Hash)
 
-    result = language_pack_object_methods.each_with_object({}) do |method_name, method_result|
+    language_pack_object_methods.each_with_object({}) do |method_name, method_result|
       next unless object.respond_to?(method_name)
 
       method_result[method_name.to_s] = language_pack_object_value(object.public_send(method_name))
     rescue StandardError
       next
     end
-    result
   end
   private_class_method :language_pack_object_hash
 
