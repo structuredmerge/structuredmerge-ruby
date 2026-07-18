@@ -65,6 +65,30 @@ RSpec.describe KettleJemWorkflowPins do
     expect(File.read(workflow_path)).to include("uses: #{new_pin}")
   end
 
+  it "preserves Ruby source delimiters around pins when writing updates" do
+    File.write(pin_index_path, <<~RUBY)
+      def generated_workflow
+        [
+          "        uses: #{old_pin}",
+          ""
+        ]
+      end
+
+      def github_actions_step_pins
+        {
+          "actions/checkout" => "#{old_pin}"
+        }
+      end
+    RUBY
+
+    result = described_class.new(project_root: project_root, options: {write: true}).run
+    updated = File.read(pin_index_path)
+
+    expect(result[:updated_actions]).to eq(["actions/checkout"])
+    expect(updated).to include(%("        uses: #{new_pin}",))
+    expect(updated).to include(%("actions/checkout" => "#{new_pin}"))
+  end
+
   it "updates sub-action pins when kettle-gha-sha-pins reports the parent action repository" do
     sub_action = "github/codeql-action/init"
     old_sub_pin = "#{sub_action}@#{old_sha} # v4.36.0"
