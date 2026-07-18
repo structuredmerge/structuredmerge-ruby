@@ -245,6 +245,8 @@ module TreeHaver
     #
     # @return [Boolean] true if the library can be found AND tree-sitter runtime works
     def available?
+      return true if tree_sitter_language_pack_parser_available?
+
       path = find_library_path
       return false if path.nil?
 
@@ -316,6 +318,16 @@ module TreeHaver
     # @return [Boolean] true if registration succeeded
     # @raise [NotAvailable] if library not found and raise_on_missing is true
     def register!(raise_on_missing: false)
+      if tree_sitter_language_pack_parser_available?
+        TreeHaver.register_language(
+          @language_name,
+          backend_module: TreeHaver::Backends::Tslp,
+          backend_type: :tslp,
+          gem_name: 'tree_sitter_language_pack'
+        )
+        return true
+      end
+
       path = find_library_path
       unless path
         raise NotAvailable, not_found_message if raise_on_missing
@@ -410,6 +422,22 @@ module TreeHaver
       rescue StandardError => e
         @tree_sitter_language_pack_rejection_reason = e.message
         nil
+      end
+    end
+
+    def tree_sitter_language_pack_parser_available?
+      return @tree_sitter_language_pack_parser_available if defined?(@tree_sitter_language_pack_parser_available)
+
+      @tree_sitter_language_pack_parser_available = begin
+        require 'tree_sitter_language_pack'
+        TreeHaver::Backends::Tslp.available? &&
+          TreeSitterLanguagePack.respond_to?(:has_language) &&
+          TreeSitterLanguagePack.has_language(@language_name.to_s)
+      rescue LoadError
+        false
+      rescue StandardError => e
+        @tree_sitter_language_pack_rejection_reason = e.message
+        false
       end
     end
 
