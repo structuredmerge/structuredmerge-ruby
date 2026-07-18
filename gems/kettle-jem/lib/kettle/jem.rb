@@ -13940,6 +13940,12 @@ module Kettle
         "",
         *github_actions_setup_ruby_steps(indent: "      ").lines(chomp: true),
         "",
+        *github_actions_rspec_status_cache_step(
+          cache_scope: "ci",
+          key_parts: ["${{matrix.ruby}}"],
+          indent: "      "
+        ).lines(chomp: true),
+        "",
         "      - name: Tests",
         "        run: bundle exec #{ci.fetch(:exec_cmd)}"
       ]
@@ -14014,6 +14020,12 @@ module Kettle
         "        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}",
         "        run: bundle exec appraisal ${{ matrix.framework.appraisal }} install",
         "",
+        *github_actions_rspec_status_cache_step(
+          cache_scope: "framework-ci",
+          key_parts: ["${{matrix.ruby}}", "${{matrix.framework.appraisal}}"],
+          indent: "      "
+        ).lines(chomp: true),
+        "",
         "      - name: Tests for ${{ matrix.ruby }}@${{ matrix.framework.framework_version }}",
         "        run: bundle exec appraisal ${{ matrix.framework.appraisal }} bundle exec #{ci.fetch(:exec_cmd)}"
       ]
@@ -14035,6 +14047,22 @@ module Kettle
           run: |
             bundle config set --local path "${RUNNER_TEMP}/bundle"
             bundle install --jobs 1
+      YAML
+      yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip
+    end
+
+    def github_actions_rspec_status_cache_step(cache_scope:, key_parts:, indent:, if_condition: "${{!env.ACT}}")
+      cache_prefix = ["rspec-status", cache_scope, *key_parts].join("-")
+      yaml = <<~YAML
+        - name: Restore RSpec status log
+          if: #{if_condition}
+          uses: #{github_actions_step_pins.fetch("actions/cache")}
+          with:
+            path: .rspec_status
+            key: #{cache_prefix}-${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}-${{github.run_id}}-${{github.run_attempt}}
+            restore-keys: |
+              #{cache_prefix}-${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}-
+              #{cache_prefix}-
       YAML
       yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip
     end
@@ -14062,88 +14090,95 @@ module Kettle
     def synchronize_github_actions_coverage_ci(content, facts)
       ci = facts.fetch(:ci)
       coverage = ci.fetch(:coverage)
-      push_branches = github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch))
-      <<~YAML
-                name: Test Coverage
-        
-                permissions:
-                  contents: read
-                  pull-requests: write
-                  id-token: write
-        
-                env:
-                  K_SOUP_COV_MIN_BRANCH: 100
-                  K_SOUP_COV_MIN_LINE: 100
-                  K_SOUP_COV_MIN_HARD: true
-                  K_SOUP_COV_FORMATTERS: "xml,rcov,lcov,tty"
-                  K_SOUP_COV_DO: true
-                  K_SOUP_COV_MULTI_FORMATTERS: true
-                  K_SOUP_COV_COMMAND_NAME: "Test Coverage"
-        
-                on:
-                  push:
-                    branches:
-        #{push_branches}
-                    tags:
-                      - "!*" # Do not execute on tags
-                  pull_request:
-                    branches:
-                      - "*"
-                  workflow_dispatch:
-        
-                concurrency:
-                  group: "${{ github.workflow }}-${{ github.ref }}"
-                  cancel-in-progress: true
-        
-                jobs:
-                  coverage:
-                    if: "!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')"
-                    name: Code Coverage on ${{ matrix.ruby }}@current
-                    runs-on: ubuntu-latest
-                    continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
-                    env:
-                      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
-                    strategy:
-                      fail-fast: false
-                      matrix:
-                        include:
-                          - ruby: "ruby"
-                            appraisal: "#{coverage.fetch(:appraisal)}"
-                            exec_cmd: "#{coverage.fetch(:command)}"
-                            rubygems: latest
-                            bundler: latest
-        
-                    steps:
-                      - name: Checkout
-                        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        
-                      - name: Setup Ruby & RubyGems
-                        uses: ruby/setup-ruby@003a5c4d8d6321bd302e38f6f0ec593f77f06600 # v1.319.0
-                        with:
-                          ruby-version: "${{ matrix.ruby }}"
-                          rubygems: "${{ matrix.rubygems }}"
-                          bundler: "${{ matrix.bundler }}"
-                          bundler-cache: true
-        
-                      - name: "[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
-                        id: bundleAppraisalAttempt1
-                        run: bundle exec appraisal ${{ matrix.appraisal }} install
-                        continue-on-error: true
-        
-                      - name: "[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}"
-                        id: bundleAppraisalAttempt2
-                        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}
-                        run: bundle exec appraisal ${{ matrix.appraisal }} install
-        
-                      - name: Tests for ${{ matrix.ruby }}@current via ${{ matrix.exec_cmd }}
-                        run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
-        
-                      - name: Verify coverage reports
-                        run: |
-                          test -s coverage/lcov.info
-                          test -s coverage/coverage.xml
-                #{github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))}
-      YAML
+      coverage_steps = github_actions_coverage_steps(disabled_integrations: facts.dig(:integrations, :disabled))
+      lines = [
+        "name: Test Coverage",
+        "",
+        "permissions:",
+        "  contents: read",
+        "  pull-requests: write",
+        "  id-token: write",
+        "",
+        "env:",
+        "  K_SOUP_COV_MIN_BRANCH: 100",
+        "  K_SOUP_COV_MIN_LINE: 100",
+        "  K_SOUP_COV_MIN_HARD: true",
+        "  K_SOUP_COV_FORMATTERS: \"xml,rcov,lcov,tty\"",
+        "  K_SOUP_COV_DO: true",
+        "  K_SOUP_COV_MULTI_FORMATTERS: true",
+        "  K_SOUP_COV_COMMAND_NAME: \"Test Coverage\"",
+        "",
+        "on:",
+        "  push:",
+        "    branches:",
+        *github_actions_push_branches_yaml(content, default_branch: ci.fetch(:default_branch), indent: "      ").lines(chomp: true),
+        "    tags:",
+        "      - \"!*\" # Do not execute on tags",
+        "  pull_request:",
+        "    branches:",
+        "      - \"*\"",
+        "  workflow_dispatch:",
+        "",
+        "concurrency:",
+        "  group: \"${{ github.workflow }}-${{ github.ref }}\"",
+        "  cancel-in-progress: true",
+        "",
+        "jobs:",
+        "  coverage:",
+        "    if: \"!contains(github.event.commits[0].message, '[ci skip]') && !contains(github.event.commits[0].message, '[skip ci]')\"",
+        "    name: Code Coverage on ${{ matrix.ruby }}@current",
+        "    runs-on: ubuntu-latest",
+        "    continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}",
+        "    env:",
+        "      BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile",
+        "    strategy:",
+        "      fail-fast: false",
+        "      matrix:",
+        "        include:",
+        "          - ruby: \"ruby\"",
+        "            appraisal: \"#{coverage.fetch(:appraisal)}\"",
+        "            exec_cmd: \"#{coverage.fetch(:command)}\"",
+        "            rubygems: latest",
+        "            bundler: latest",
+        "",
+        "    steps:",
+        "      - name: Checkout",
+        "        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "",
+        "      - name: Setup Ruby & RubyGems",
+        "        uses: ruby/setup-ruby@003a5c4d8d6321bd302e38f6f0ec593f77f06600 # v1.319.0",
+        "        with:",
+        "          ruby-version: \"${{ matrix.ruby }}\"",
+        "          rubygems: \"${{ matrix.rubygems }}\"",
+        "          bundler: \"${{ matrix.bundler }}\"",
+        "          bundler-cache: true",
+        "",
+        "      - name: \"[Attempt 1] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}\"",
+        "        id: bundleAppraisalAttempt1",
+        "        run: bundle exec appraisal ${{ matrix.appraisal }} install",
+        "        continue-on-error: true",
+        "",
+        "      - name: \"[Attempt 2] Appraisal for ${{ matrix.ruby }}@${{ matrix.appraisal }}\"",
+        "        id: bundleAppraisalAttempt2",
+        "        if: ${{ steps.bundleAppraisalAttempt1.outcome == 'failure' }}",
+        "        run: bundle exec appraisal ${{ matrix.appraisal }} install",
+        "",
+        *github_actions_rspec_status_cache_step(
+          cache_scope: "coverage",
+          key_parts: ["${{matrix.ruby}}", "${{matrix.appraisal}}"],
+          indent: "      "
+        ).lines(chomp: true),
+        "",
+        "      - name: Tests for ${{ matrix.ruby }}@current via ${{ matrix.exec_cmd }}",
+        "        run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}",
+        "",
+        "      - name: Verify coverage reports",
+        "        run: |",
+        "          test -s coverage/lcov.info",
+        "          test -s coverage/coverage.xml",
+        *coverage_steps.lines(chomp: true).map { |line| line.empty? ? line : "      #{line}" }
+      ]
+      "#{lines.join("\n")}\n"
     end
 
     def synchronize_github_actions_workflow_snippets(content, facts: {})
@@ -14548,6 +14583,7 @@ module Kettle
     def github_actions_step_pins
       {
         "actions/checkout" => "actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0",
+        "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
         "ruby/setup-ruby" => "ruby/setup-ruby@003a5c4d8d6321bd302e38f6f0ec593f77f06600 # v1.319.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
