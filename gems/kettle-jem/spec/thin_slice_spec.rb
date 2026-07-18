@@ -7373,6 +7373,79 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "merges Git driver TOML manifests with destination driver values" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-toml-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .structuredmerge/git-drivers.toml
+        YAML
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+          driver_namespace = "smorg"
+
+          [profiles.semantic-diff]
+          description = "Destination driver"
+
+          [[profiles.semantic-diff.attributes]]
+          pattern = "*.rb"
+          diff = "smorg-rb"
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-rb.command"
+          value = "smorg-rb diff-driver"
+        TOML
+        "template/.structuredmerge/git-drivers.toml.example" => <<~TOML
+          version = 1
+          driver_namespace = "smorg"
+
+          [profiles.semantic-diff]
+          description = "Template driver"
+
+          [[profiles.semantic-diff.attributes]]
+          pattern = "*.rb"
+          diff = "smorg-ruby"
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.command"
+          value = "smorg-ruby diff-driver"
+
+          [profiles.textconv-normalized]
+          description = "Template-only profile"
+
+          [[profiles.textconv-normalized.attributes]]
+          pattern = "*.json"
+          diff = "smorg-json-textconv"
+        TOML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".structuredmerge/git-drivers.toml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('diff = "smorg-rb"')
+      expect(content).to include('key = "diff.smorg-rb.command"')
+      expect(content).to include('value = "smorg-rb diff-driver"')
+      expect(content).to include("[profiles.textconv-normalized]")
+      expect(content).not_to include("smorg-ruby")
+    end
+  end
+
   it "restores documentation comments from YAML templates when destination config stripped them" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
