@@ -106,10 +106,9 @@ module Markdown
         return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
       end
 
-      syntax = TreeHaver.parse_with_language_pack(
-        TreeHaver::ParserRequest.new(source: source, language: 'markdown', dialect: dialect)
-      )
-      return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
+      parser = TreeHaver.parser_for(:markdown)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
       normalized_source = normalize_source(source)
       {
@@ -124,12 +123,8 @@ module Markdown
         },
         policies: []
       }
-    rescue StandardError => e
-      {
-        ok: false,
-        diagnostics: [{ severity: 'error', category: 'parse_error', message: e.message }],
-        policies: []
-      }
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
 
     def match_markdown_owners(template, destination)
@@ -582,6 +577,19 @@ module Markdown
       backend.to_s.empty? ? 'kreuzberg-language-pack' : backend.to_s
     end
 
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'Markdown parse returned no root node' unless node
+      raise TreeHaver::NotAvailable, 'Markdown parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+    end
+
+    def parse_failure_result(error)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: []
+      }
+    end
+
     def unsupported_feature_result(message)
       {
         ok: false,
@@ -617,6 +625,8 @@ module Markdown
       :code_fence_family,
       :code_fence_dialect,
       :resolve_backend,
+      :collect_parse_errors,
+      :parse_failure_result,
       :unsupported_feature_result
     )
   end

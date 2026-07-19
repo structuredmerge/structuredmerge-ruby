@@ -20,7 +20,6 @@ RSpec.describe 'TreeHaver-only merge architecture' do
     [
       "gems/citrus-toml-merge/lib/citrus/toml/merge.rb:syntax_result = TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)",
       "gems/json-merge/lib/json/merge.rb:parsed = JSON.parse(normalized_source)",
-      "gems/markdown-merge/lib/markdown/merge.rb:syntax = TreeHaver.parse_with_language_pack(",
       "gems/parslet-toml-merge/lib/parslet/toml/merge.rb:syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)",
       "gems/psych-merge/lib/psych/merge.rb:parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)",
       "gems/toml-merge/lib/toml/merge.rb:grammar_class: TOML::Parslet,",

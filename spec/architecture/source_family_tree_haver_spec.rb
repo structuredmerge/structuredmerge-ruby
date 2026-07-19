@@ -4,6 +4,7 @@ require_relative '../../gems/go-merge/lib/go/merge'
 require_relative '../../gems/rust-merge/lib/rust/merge'
 require_relative '../../gems/typescript-merge/lib/typescript/merge'
 require_relative '../../gems/ruby-merge/lib/ruby/merge'
+require_relative '../../gems/markdown-merge/lib/markdown/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -49,6 +50,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for ruby'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when Markdown has no registered parser' do
+    result = Markdown::Merge.parse_markdown("# Example\n", 'markdown')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:markdown)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for markdown'))
     )
   end
 end
