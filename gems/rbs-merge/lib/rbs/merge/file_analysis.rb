@@ -321,7 +321,7 @@ module Rbs
         # Use TreeHaver to get the appropriate parser
         # TreeHaver handles backend selection automatically for the current
         # sibling-development environment and respects explicit backend overrides.
-        parser = rbs_parser
+        parser = TreeHaver.parser_for(:rbs)
         result = parser.parse(@source)
 
         # Determine which backend was used based on the result type
@@ -339,15 +339,6 @@ module Rbs
       rescue StandardError => e
         @errors << e.message
         @ast = nil
-      end
-
-      def rbs_parser
-        requested_backend = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
-        if requested_backend.to_s.empty? && Backends::RbsBackend.available?
-          return TreeHaver.with_backend(:rbs) { TreeHaver.parser_for(:rbs) }
-        end
-
-        TreeHaver.parser_for(:rbs)
       end
 
       # Process result from RBS gem backend
