@@ -2,7 +2,7 @@
   ".simplecov:3575099246": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "Gemfile:31081928": [
+  "Gemfile:100003151": [
     [28, 1, 59, "Lint/EmptyConditionalBody: Avoid `if` branches without a body.", 4279378582]
   ],
   "Rakefile:1868927885": [
@@ -76,32 +76,34 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "lib/tree_haver.rb:2762889207": [
+  "lib/tree_haver.rb:312280314": [
     [49, 1, 16, "Style/Documentation: Missing top-level documentation comment for `module TreeHaver`.", 3627168465],
-    [49, 1, 15892, "Metrics/ModuleLength: Module has too many lines. [421/100]", 2307494458],
+    [49, 1, 17806, "Metrics/ModuleLength: Module has too many lines. [462/100]", 765750911],
     [67, 3, 566, "Metrics/MethodLength: Method has too many lines. [12/10]", 1536513137],
     [124, 3, 272, "Metrics/MethodLength: Method has too many lines. [11/10]", 505877912],
     [156, 3, 543, "Metrics/MethodLength: Method has too many lines. [14/10]", 3733215372],
     [221, 3, 458, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module` is too high. [9/7]", 73937708],
     [221, 3, 458, "Metrics/MethodLength: Method has too many lines. [12/10]", 73937708],
     [221, 3, 458, "Metrics/PerceivedComplexity: Perceived complexity for `backend_module` is too high. [9/8]", 73937708],
-    [257, 3, 1024, "Metrics/AbcSize: Assignment Branch Condition size for `register_language` is too high. [<0, 20, 10> 22.36/17]", 53014028],
-    [257, 3, 1024, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `register_language` is too high. [11/7]", 53014028],
-    [257, 3, 1024, "Metrics/MethodLength: Method has too many lines. [12/10]", 53014028],
-    [257, 3, 1024, "Metrics/PerceivedComplexity: Perceived complexity for `register_language` is too high. [11/8]", 53014028],
-    [257, 24, 150, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 893242366],
-    [282, 3, 1521, "Metrics/AbcSize: Assignment Branch Condition size for `parser_for` is too high. [<12, 27, 14> 32.7/17]", 498764853],
-    [282, 3, 1521, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parser_for` is too high. [15/7]", 498764853],
-    [282, 3, 1521, "Metrics/MethodLength: Method has too many lines. [30/10]", 498764853],
-    [282, 3, 1521, "Metrics/PerceivedComplexity: Perceived complexity for `parser_for` is too high. [15/8]", 498764853],
-    [325, 3, 2089, "Metrics/MethodLength: Method has too many lines. [51/10]", 2791676388],
-    [379, 3, 704, "Metrics/AbcSize: Assignment Branch Condition size for `requested_backend_type` is too high. [<4, 17, 9> 19.65/17]", 3087691662],
-    [379, 3, 704, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `requested_backend_type` is too high. [8/7]", 3087691662],
-    [379, 3, 704, "Metrics/MethodLength: Method has too many lines. [14/10]", 3087691662],
-    [379, 3, 704, "Metrics/PerceivedComplexity: Perceived complexity for `requested_backend_type` is too high. [9/8]", 3087691662],
-    [409, 3, 696, "Metrics/MethodLength: Method has too many lines. [14/10]", 307274721],
-    [502, 3, 489, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module_for` is too high. [10/7]", 3448932255],
-    [502, 3, 489, "Metrics/MethodLength: Method has too many lines. [22/10]", 3448932255]
+    [257, 3, 1147, "Metrics/AbcSize: Assignment Branch Condition size for `register_language` is too high. [<0, 20, 10> 22.36/17]", 738075279],
+    [257, 3, 1147, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `register_language` is too high. [11/7]", 738075279],
+    [257, 3, 1147, "Metrics/MethodLength: Method has too many lines. [16/10]", 738075279],
+    [257, 3, 1147, "Metrics/PerceivedComplexity: Perceived complexity for `register_language` is too high. [11/8]", 738075279],
+    [257, 24, 165, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 2985413937],
+    [292, 3, 1969, "Metrics/AbcSize: Assignment Branch Condition size for `parser_for` is too high. [<14, 35, 18> 41.77/17]", 3351435495],
+    [292, 3, 1969, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parser_for` is too high. [19/7]", 3351435495],
+    [292, 3, 1969, "Metrics/MethodLength: Method has too many lines. [39/10]", 3351435495],
+    [292, 3, 1969, "Metrics/PerceivedComplexity: Perceived complexity for `parser_for` is too high. [19/8]", 3351435495],
+    [292, 17, 155, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 1417642817],
+    [347, 3, 2089, "Metrics/MethodLength: Method has too many lines. [51/10]", 2791676388],
+    [401, 3, 704, "Metrics/AbcSize: Assignment Branch Condition size for `requested_backend_type` is too high. [<4, 17, 9> 19.65/17]", 3087691662],
+    [401, 3, 704, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `requested_backend_type` is too high. [8/7]", 3087691662],
+    [401, 3, 704, "Metrics/MethodLength: Method has too many lines. [14/10]", 3087691662],
+    [401, 3, 704, "Metrics/PerceivedComplexity: Perceived complexity for `requested_backend_type` is too high. [9/8]", 3087691662],
+    [453, 3, 696, "Metrics/MethodLength: Method has too many lines. [14/10]", 307274721],
+    [484, 3, 422, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `registered_backend_type_available?` is too high. [8/7]", 1544952013],
+    [554, 3, 489, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `backend_module_for` is too high. [10/7]", 3448932255],
+    [554, 3, 489, "Metrics/MethodLength: Method has too many lines. [22/10]", 3448932255]
   ],
   "lib/tree_haver/backend_api.rb:3354059061": [
     [30, 3, 12181, "Metrics/ModuleLength: Module has too many lines. [243/100]", 205645546],
@@ -341,8 +343,10 @@
   "lib/tree_haver/language_pack.rb:3024861237": [
     [3, 1, 16, "Style/Documentation: Missing top-level documentation comment for `module TreeHaver`.", 3627168465]
   ],
-  "lib/tree_haver/language_registry.rb:3950096220": [
-    [83, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5861089]
+  "lib/tree_haver/language_registry.rb:3137013690": [
+    [83, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5861089],
+    [111, 5, 834, "Metrics/AbcSize: Assignment Branch Condition size for `with_registration` is too high. [<11, 22, 5> 25.1/17]", 1103319853],
+    [111, 5, 834, "Metrics/MethodLength: Method has too many lines. [25/10]", 1103319853]
   ],
   "lib/tree_haver/library_path_utils.rb:1552423902": [
     [32, 5, 861, "Metrics/MethodLength: Method has too many lines. [12/10]", 1638068630]
@@ -429,8 +433,8 @@
     [30, 3, 1477, "Metrics/BlockLength: Block has too many lines. [32/25]", 2492475187],
     [112, 3, 1352, "Metrics/BlockLength: Block has too many lines. [29/25]", 2972556266]
   ],
-  "spec/fixtures_integration_spec.rb:3457821347": [
-    [3, 1, 48556, "Metrics/BlockLength: Block has too many lines. [1006/25]", 2138474637],
+  "spec/fixtures_integration_spec.rb:1473080413": [
+    [3, 1, 52001, "Metrics/BlockLength: Block has too many lines. [1115/25]", 592858895],
     [108, 3, 1282, "Metrics/BlockLength: Block has too many lines. [29/25]", 505243730],
     [141, 3, 1840, "Metrics/BlockLength: Block has too many lines. [35/25]", 1365684528],
     [180, 3, 1365, "Metrics/BlockLength: Block has too many lines. [33/25]", 1597100003],
@@ -455,7 +459,21 @@
     [1069, 7, 134, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1166944291],
     [1075, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317],
     [1085, 7, 134, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1166944291],
-    [1091, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317]
+    [1091, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317],
+    [1115, 3, 1290, "Metrics/BlockLength: Block has too many lines. [41/25]", 3478080675],
+    [1121, 7, 157, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 2460330604],
+    [1127, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317],
+    [1137, 7, 154, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 3868502553],
+    [1143, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317],
+    [1167, 3, 1405, "Metrics/BlockLength: Block has too many lines. [44/25]", 2313436250],
+    [1173, 7, 134, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1166944291],
+    [1179, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317],
+    [1189, 7, 134, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1166944291],
+    [1195, 7, 60, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1411318317]
+  ],
+  "spec/grammar_finder_spec.rb:2436990663": [
+    [5, 1, 2019, "Metrics/BlockLength: Block has too many lines. [38/25]", 3070098609],
+    [18, 3, 1514, "Metrics/BlockLength: Block has too many lines. [27/25]", 3385688711]
   ],
   "tree_haver.gemspec:665267582": [
     [16, 121, 19, "Layout/LineLength: Line is too long. [139/120]", 1512975621],
