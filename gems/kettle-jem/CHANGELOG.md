@@ -22,6 +22,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Fixed the `kettle-jem` package manifest so runtime template assets are
   included even when the gemspec is loaded from the monorepo root.
+- Generated local templating Gemfiles no longer redeclare
+  `tree_sitter_language_pack` when a parent Gemfile already supplies the TSLP
+  source, avoiding Bundler source conflicts during templating bootstrap.
 
 ### Added
 

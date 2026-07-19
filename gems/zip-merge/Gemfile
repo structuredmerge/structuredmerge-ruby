@@ -433,6 +433,11 @@ end
 
 # Use the StructuredMerge TSLP branch until upstream ships Ruby 4-compatible gem metadata.
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
+if tslp_dev.to_s.empty? && ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0
+  structuredmerge_dev = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  inferred_tslp_dev = File.expand_path('../../vendor/tree-sitter-language-pack/packages/ruby', structuredmerge_dev)
+  tslp_dev = inferred_tslp_dev if Dir.exist?(inferred_tslp_dev)
+end
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
 unless tslp_declared_by_templating

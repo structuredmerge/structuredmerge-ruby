@@ -8733,7 +8733,8 @@ RSpec.describe Kettle::Jem do
             tslp_dev = inferred_tslp_dev if Dir.exist?(inferred_tslp_dev)
           end
 
-          unless tslp_dev.to_s.empty?
+          declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
+          unless tslp_dev.to_s.empty? || declared_gems.include?("tree_sitter_language_pack")
             gem "tree_sitter_language_pack", path: tslp_dev
           end
         RUBY
@@ -8755,6 +8756,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include("inferred_tslp_dev")
       expect(content).to include("STRUCTUREDMERGE_DEV")
       expect(content).to include('gem "tree_sitter_language_pack", path: tslp_dev')
+      expect(content).to include('declared_gems.include?("tree_sitter_language_pack")')
       expect(content).to include("vendor/tree-sitter-language-pack")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end
