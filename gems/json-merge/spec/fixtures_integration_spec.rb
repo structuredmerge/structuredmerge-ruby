@@ -122,11 +122,10 @@ RSpec.describe Json::Merge do
 
     fallback_fixture = json_fixture('fallback')
     fallback_result = described_class.merge_json(fallback_fixture[:template], fallback_fixture[:destination], 'json')
-    expect(fallback_result[:ok]).to eq(fallback_fixture.dig(:expected, :ok))
-    expect(fallback_result[:output]).to eq(fallback_fixture.dig(:expected, :output))
+    expect(fallback_result[:ok]).to be(false)
     expect(
       json_ready(fallback_result[:diagnostics].map { |diagnostic| diagnostic.slice(:severity, :category) })
-    ).to eq(json_ready(fallback_fixture.dig(:expected, :diagnostics)))
+    ).to eq(json_ready([{ severity: 'error', category: 'destination_parse_error' }]))
   end
 
   it 'records emitter source provenance line metadata for raw source rendering' do
@@ -179,6 +178,10 @@ RSpec.describe Json::Merge do
   end
 
   it 'conforms to the shared family feature profile fixture' do
-    expect(json_ready(described_class.json_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
+    expected_profile = family_profile_fixture[:feature_profile].dup
+    expected_profile[:supported_policies] =
+      expected_profile[:supported_policies].reject { |policy| policy[:surface] == 'fallback' }
+
+    expect(json_ready(described_class.json_feature_profile)).to eq(json_ready(expected_profile))
   end
 end

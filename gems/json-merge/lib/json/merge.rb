@@ -14,10 +14,6 @@ module Json
       surface: 'array',
       name: 'destination_wins_array'
     }.freeze
-    TRAILING_COMMA_FALLBACK_POLICY = {
-      surface: 'fallback',
-      name: 'trailing_comma_destination_fallback'
-    }.freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     class Error < Ast::Merge::Error; end
@@ -62,7 +58,7 @@ module Json
       {
         family: 'json',
         supported_dialects: %w[json jsonc],
-        supported_policies: [DESTINATION_WINS_ARRAY_POLICY, TRAILING_COMMA_FALLBACK_POLICY]
+        supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
 
@@ -72,14 +68,21 @@ module Json
         return parse_failure("Trailing commas are not supported for #{dialect}.")
       end
 
+      register_backend!
       analysis = FileAnalysis.new(normalized_source)
       unless analysis.valid?
         return parse_failure(analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', '))
       end
 
       {
-        ok: false,
-        diagnostics: [unsupported_feature('json-merge owner extraction must be rebuilt from TreeHaver AST nodes.')],
+        ok: true,
+        diagnostics: [],
+        analysis: {
+          dialect: dialect,
+          allows_comments: dialect == 'jsonc',
+          root_kind: json_analysis_root_kind(analysis),
+          owners: collect_file_analysis_owners(analysis)
+        },
         policies: []
       }
     rescue TreeHaver::Error, StandardError => e
@@ -131,16 +134,6 @@ module Json
     end
     private_class_method :parse_failure
 
-    def unsupported_jsonc_language_pack_result
-      {
-        ok: false,
-        diagnostics: [
-          unsupported_feature('tree-sitter-language-pack json parsing currently supports only the json dialect.')
-        ]
-      }
-    end
-    private_class_method :unsupported_jsonc_language_pack_result
-
     def parse_error(message)
       { severity: 'error', category: 'parse_error', message: message }
     end
@@ -151,57 +144,46 @@ module Json
     end
     private_class_method :unsupported_feature
 
-    def fallback_applied(message)
-      { severity: 'warning', category: 'fallback_applied', message: message }
-    end
-    private_class_method :fallback_applied
-
-    def json_root_kind(value)
-      return 'object' if value.is_a?(Hash)
-      return 'array' if value.is_a?(Array)
+    def json_analysis_root_kind(analysis)
+      root = analysis.root_object || analysis.root_node
+      return 'object' if root&.object?
+      return 'array' if root&.array?
 
       'scalar'
     end
-    private_class_method :json_root_kind
+    private_class_method :json_analysis_root_kind
 
-    def collect_json_owners(value, path = '')
-      if value.is_a?(Hash)
-        value.keys.sort.flat_map do |key|
-          next_path = "#{path}/#{key}"
-          [{ path: next_path, owner_kind: 'member', match_key: key }] + collect_json_owners(value[key], next_path)
+    def collect_file_analysis_owners(analysis)
+      root = analysis.root_object || analysis.root_node
+      return [] unless root
+
+      collect_json_node_owners(root, '')
+        .sort_by { |owner| owner.fetch(:path) }
+    end
+    private_class_method :collect_file_analysis_owners
+
+    def collect_json_node_owners(node, path)
+      if node.object?
+        node.pairs.flat_map do |pair|
+          key = pair.key_name
+          next [] unless key
+
+          owner_path = "#{path}/#{key}"
+          value = pair.value_node
+          [{ path: owner_path, owner_kind: 'member', match_key: key }] +
+            (value ? collect_json_node_owners(value, owner_path) : [])
         end
-      elsif value.is_a?(Array)
-        value.each_with_index.flat_map do |item, index|
-          next_path = "#{path}/#{index}"
-          [{ path: next_path, owner_kind: 'element' }] + collect_json_owners(item, next_path)
+      elsif node.array?
+        node.elements.each_with_index.flat_map do |element, index|
+          owner_path = "#{path}/#{index}"
+          [{ path: owner_path, owner_kind: 'element' }] +
+            collect_json_node_owners(element, owner_path)
         end
       else
         []
       end
     end
-    private_class_method :collect_json_owners
-
-    def merge_json_values(template, destination)
-      if template.is_a?(Hash) && destination.is_a?(Hash)
-        ordered_merge_keys(template, destination).each_with_object({}) do |key, merged|
-          merged[key] = if !template.key?(key)
-                          destination[key]
-                        elsif !destination.key?(key)
-                          template[key]
-                        else
-                          merge_json_values(template[key], destination[key])
-                        end
-        end
-      else
-        destination
-      end
-    end
-    private_class_method :merge_json_values
-
-    def ordered_merge_keys(template, destination)
-      template.keys + destination.keys.reject { |key| template.key?(key) }
-    end
-    private_class_method :ordered_merge_keys
+    private_class_method :collect_json_node_owners
 
     def detect_trailing_comma(source)
       state = scanner_state
@@ -287,77 +269,6 @@ module Json
       result
     end
     private_class_method :strip_json_comments
-
-    def try_destination_trailing_comma_fallback(source)
-      stripped = strip_trailing_commas(source)
-      return nil if stripped == source
-
-      stripped
-    end
-    private_class_method :try_destination_trailing_comma_fallback
-
-    def strip_trailing_commas(source)
-      result = +''
-      state = scanner_state
-      source.each_char.with_index do |char, index|
-        next_char = source[index + 1]
-
-        if state[:in_line_comment]
-          result << char
-          state[:in_line_comment] = false if char == "\n"
-          next
-        end
-
-        if state[:in_block_comment]
-          result << char
-          if char == '*' && next_char == '/'
-            result << next_char
-            state[:in_block_comment] = false
-          end
-          next
-        end
-
-        if state[:in_string]
-          result << char
-          if state[:escaped]
-            state[:escaped] = false
-          elsif char == '\\'
-            state[:escaped] = true
-          elsif char == '"'
-            state[:in_string] = false
-          end
-          next
-        end
-
-        if char == '"'
-          state[:in_string] = true
-          result << char
-          next
-        end
-
-        if char == '/' && next_char == '/'
-          state[:in_line_comment] = true
-          result << char
-          next
-        end
-
-        if char == '/' && next_char == '*'
-          state[:in_block_comment] = true
-          result << char
-          next
-        end
-
-        if char == ','
-          lookahead = source[(index + 1)..]
-          trimmed = lookahead&.lstrip
-          next if trimmed&.start_with?(']', '}')
-        end
-
-        result << char
-      end
-      result
-    end
-    private_class_method :strip_trailing_commas
 
     def scanner_state
       {

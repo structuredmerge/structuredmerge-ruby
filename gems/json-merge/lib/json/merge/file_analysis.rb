@@ -220,7 +220,9 @@ module Json
       end
 
       def collect_parse_errors(node, found_errors = [])
-        if node.type.to_s == 'ERROR' || (node.respond_to?(:missing?) && node.missing?)
+        if node.type.to_s == 'ERROR' ||
+           (node.respond_to?(:has_error?) && node.has_error?) ||
+           (node.respond_to?(:missing?) && node.missing?)
           found_errors << {
             type: node.type.to_s,
             start_point: node.respond_to?(:start_point) ? node.start_point : nil,
