@@ -72,6 +72,15 @@ module Ruby
                     .map(&:first)
       end
 
+      def rescue_clause_signature(exception_names)
+        normalized_exceptions = Array(exception_names).filter_map { |exception| normalize_exception_name(exception) }
+        if normalized_exceptions.empty? || normalized_exceptions == ['StandardError']
+          [:standard_error]
+        else
+          normalized_exceptions.sort
+        end
+      end
+
       def rescue_clause_type?(clause_type)
         clause_type.is_a?(Array) && clause_type.first == :rescue_clause
       end

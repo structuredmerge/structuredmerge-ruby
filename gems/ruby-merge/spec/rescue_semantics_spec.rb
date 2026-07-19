@@ -39,6 +39,17 @@ RSpec.describe Ruby::Merge::RescueSemantics do
     )
   end
 
+  it 'normalizes bare and explicit StandardError rescue signatures' do
+    expect(semantics.rescue_clause_signature([])).to eq([:standard_error])
+    expect(semantics.rescue_clause_signature(['::StandardError'])).to eq([:standard_error])
+  end
+
+  it 'sorts explicit rescue exception signatures' do
+    expect(semantics.rescue_clause_signature(['Timeout::Error', 'ArgumentError'])).to eq(
+      ['ArgumentError', 'Timeout::Error']
+    )
+  end
+
   context 'with source-defined exception classes' do
     let(:definitions) do
       [

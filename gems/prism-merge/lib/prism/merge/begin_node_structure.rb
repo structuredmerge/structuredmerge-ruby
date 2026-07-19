@@ -8,12 +8,7 @@ module Prism
           exceptions = Array(rescue_node.exceptions).map do |exception_node|
             exception_node.respond_to?(:slice) ? exception_node.slice : exception_node.to_s
           end
-          normalized_exceptions = exceptions.map { |exception| exception.to_s.sub(/\A::/, '') }
-          if normalized_exceptions.empty? || normalized_exceptions == ['StandardError']
-            [:standard_error]
-          else
-            normalized_exceptions.sort
-          end
+          Ruby::Merge::RescueSemantics.new.rescue_clause_signature(exceptions)
         end
       end
 
