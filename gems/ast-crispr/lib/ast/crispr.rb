@@ -665,7 +665,7 @@ module Ast
 
       private
 
-      def normalize_requirement(value, field_name)
+      def normalize_requirement(value, _field_name)
         value&.to_sym
       end
 

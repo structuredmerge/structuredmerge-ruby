@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'pathname'
 
 RSpec.describe Ast::Crispr do
   FakeLocation = Struct.new(:start_line, :end_line, keyword_init: true)

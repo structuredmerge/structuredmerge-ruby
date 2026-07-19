@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'pathname'
-
 RSpec.describe 'Ast::Crispr provider architecture' do
   let(:repo_root) { Pathname(__dir__).join('..', '..', '..').expand_path }
   let(:provider_lib_files) { repo_root.join('gems').glob('ast-crispr-*/lib/**/*.rb') }

@@ -1778,7 +1778,7 @@ module Ruby
       lines = normalize_source(destination_source).split("\n", -1)
       emitted = sections.reject { |section| section[:text].to_s.strip.empty? }
       previous = nil
-      output = +""
+      output = +''
 
       emitted.each do |section|
         output << ruby_top_level_section_separator(lines, previous, section) if previous

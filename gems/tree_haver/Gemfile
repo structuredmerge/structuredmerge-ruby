@@ -25,18 +25,12 @@ gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
 vendored_gems = ENV.fetch('VENDORED_GEMS', '').split(',').map(&:strip)
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? &&
-    vendored_gems.include?('tree_sitter_language_pack')
+  vendored_gems.include?('tree_sitter_language_pack')
 unless tslp_declared_by_templating
-  gem(
-    'tree_sitter_language_pack',
-    git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
-    branch: 'fix/ruby-parser-api-methods',
-    glob: 'packages/ruby/*.gemspec'
-  )
 end
 
-# Modular sibling dependencies (env-switched inside each modular Gemfile)
-eval_gemfile 'gemfiles/modular/templating.gemfile'
+# Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
 
 # Debugging
 eval_gemfile 'gemfiles/modular/debug.gemfile'
