@@ -93,8 +93,8 @@ merge gems.
 | Gem | Provides | Runtime notes |
 | --- | --- | --- |
 | [`psych-merge`][ruby-psych-merge] | YAML provider | Uses Ruby's [Psych][psych] parser and emitter. |
-| [`citrus-toml-merge`][ruby-citrus-toml-merge] | TOML provider | Uses a [Citrus][citrus] grammar and pure-Ruby parser path, commonly paired with [`toml-rb`][toml-rb] style TOML data handling. |
-| [`parslet-toml-merge`][ruby-parslet-toml-merge] | TOML provider | Uses [Parslet][parslet] and pure-Ruby parser path, commonly paired with [`toml`][toml] style TOML data handling. |
+| [`citrus-toml-merge`][ruby-citrus-toml-merge] | TOML provider | Registers a TreeHaver TOML backend backed by a [Citrus][citrus] grammar, commonly paired with [`toml-rb`][toml-rb] style TOML data handling. |
+| [`parslet-toml-merge`][ruby-parslet-toml-merge] | TOML provider | Registers a TreeHaver TOML backend backed by [Parslet][parslet], commonly paired with [`toml`][toml] style TOML data handling. |
 | [`commonmarker-merge`][ruby-commonmarker-merge] | Markdown provider | Uses [CommonMarker][commonmarker] for CommonMark-oriented Markdown parsing. |
 | [`kramdown-merge`][ruby-kramdown-merge] | Markdown provider | Uses [Kramdown][kramdown] for Ruby-native Markdown parsing. |
 | [`markly-merge`][ruby-markly-merge] | Markdown provider | Uses [Markly][markly] for cmark-gfm-backed Markdown parsing and README templating support. |
@@ -118,7 +118,7 @@ tags are capability names, not package preferences.
 | [Psych][psych] | `yaml-merge`, `psych-merge` | Ruby standard YAML parser/emitter path. |
 | [RBS][rbs] | `rbs-merge` | Ruby signature parser path. |
 | [CommonMarker][commonmarker], [Markly][markly], [Kramdown][kramdown] | `markdown-merge` providers | Markdown parser families with different CommonMark/GFM/Ruby-native tradeoffs. |
-| [Citrus][citrus], [Parslet][parslet] | `toml-merge` providers | Pure-Ruby TOML parser families used as provider-specific backend paths. |
+| [Citrus][citrus], [Parslet][parslet] | `toml-merge` providers | Pure-Ruby TOML parser families exposed as provider-specific TreeHaver backend paths. |
 | [Kaitai Struct][kaitai] | `binary-merge` | Schema-oriented binary parsing support for structured binary work. |
 
 #### Backend Platform Compatibility

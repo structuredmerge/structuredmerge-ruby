@@ -70,7 +70,7 @@ tree = parser.parse(source_code)
         - **Commonmarker Backend**: Fast Markdown parser ([Commonmarker][commonmarker], comrak Rust)
         - **Markly Backend**: GitHub Flavored Markdown ([Markly][markly], cmark-gfm C)
         - **RBS Backend**: Official RBS parser integration registered by `rbs-merge`
-    - **Pure Ruby Fallback**:
+    - **Pure Ruby Provider Backends**:
         - **Citrus Backend**: Pure Ruby PEG parsing via [`citrus`][citrus] (no native dependencies)
         - **Parslet Backend**: Pure Ruby PEG parsing via [`parslet`][parslet] (no native dependencies)
     - **Binary Schema Support**:
@@ -534,7 +534,7 @@ This is particularly useful for:
 
 - **Testing**: Test the same code with different backends
 - **Performance comparison**: Benchmark different backends
-- **Fallback scenarios**: Try one backend, fall back to another
+- **Backend-selection scenarios**: Exercise each registered backend explicitly
 - **Thread isolation**: Each thread can use a different backend safely
 
 ```ruby
@@ -1005,7 +1005,7 @@ TreeHaver does not ship a `TreeSitter::*` compatibility namespace. Use the `Tree
       language = TreeHaver::Language.toml
     rescue TreeHaver::NotAvailable => e
       warn("TOML grammar not available: #{e.message}")
-      # Fallback to another backend or fail gracefully
+      # Select another registered TreeHaver backend explicitly, or fail gracefully
     end
     ```
 
@@ -1037,7 +1037,7 @@ tree = parser.parse("#!/bin/bash\necho hello")
 # With explicit library path
 parser = TreeHaver.parser_for(:toml, library_path: "/custom/path/libtree-sitter-toml.so")
 
-# With explicit Citrus fallback configuration
+# With explicit Citrus provider configuration
 parser = TreeHaver.parser_for(
   :toml,
   citrus_config: {gem_name: "toml-rb", grammar_const: "TomlRB::Document"},
@@ -1580,23 +1580,15 @@ TreeHaver.with_backend(:rust) do
 end
 ```
 
-#### Fallback Pattern
+#### Explicit Backend Selection Pattern
 
-Try one backend, fall back to another on failure:
+Try registered TreeHaver backends explicitly when you want controlled provider
+selection. Structured merge gems should fail closed when no registered TreeHaver
+backend can parse the requested language.
 
 ```ruby
-def parse_with_fallback(source)
-  TreeHaver.with_backend(:mri) do
-    TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
-  end
-rescue TreeHaver::NotAvailable
-  # Fall back to Citrus if MRI backend unavailable
-  TreeHaver.with_backend(:citrus) do
-    TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
-  end
-rescue TreeHaver::NotAvailable
-  # Fall back to Parslet if Citrus backend unavailable
-  TreeHaver.with_backend(:parslet) do
+def parse_with_backend(source, backend_name)
+  TreeHaver.with_backend(backend_name) do
     TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
   end
 end
