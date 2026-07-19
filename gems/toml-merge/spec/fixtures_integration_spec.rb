@@ -62,6 +62,7 @@ RSpec.describe Toml::Merge do
     expect(merge_result[:output]).to include('release = true')
     expect(merge_result[:output]).not_to include('tags = ["template"]')
     expect(merge_result[:output]).not_to include('version = "0.1.0"')
+    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
   end
 
   it 'keeps the shared family feature fixture stable while exposing the substrate backend feature profile' do

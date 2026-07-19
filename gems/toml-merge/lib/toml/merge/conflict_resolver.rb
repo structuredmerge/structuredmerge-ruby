@@ -107,6 +107,10 @@ module Toml
         refined_matches = build_refined_matches(template_nodes, dest_nodes, template_by_sig, dest_by_sig)
         refined_dest_to_template = refined_matches.invert
 
+        if canonical_unmatched_pair_list?(template_nodes, dest_nodes, template_by_sig, dest_by_sig, refined_matches)
+          return merge_unmatched_pair_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis)
+        end
+
         # Track consumed individual node indices (not just signatures) so that
         # multiple nodes sharing the same signature are matched 1:1 in order
         # rather than collapsed into a single match.
@@ -171,9 +175,13 @@ module Toml
                 dest_analysis
               )
 
-              emit_gap_before_node(
+              emit_gap_before_matched_node(
                 selected_node,
                 selected_analysis,
+                template_node,
+                template_analysis,
+                dest_node,
+                dest_analysis,
                 prev_emitted_end_line,
                 prev_emitted_analysis,
                 skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
@@ -225,9 +233,13 @@ module Toml
             end
 
             # Merge matched nodes
-            emit_gap_before_node(
+            emit_gap_before_matched_node(
               selected_node,
               selected_analysis,
+              template_node,
+              template_analysis,
+              dest_node,
+              dest_analysis,
               prev_emitted_end_line,
               prev_emitted_analysis,
               skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
@@ -345,6 +357,29 @@ module Toml
 
       def redundant_destination_pair_duplicate?(node, signature, emitted_signatures)
         signature && node.respond_to?(:pair?) && node.pair? && emitted_signatures.include?(signature)
+      end
+
+      def canonical_unmatched_pair_list?(template_nodes, dest_nodes, template_by_sig, dest_by_sig, refined_matches)
+        return false unless @add_template_only_nodes
+        return false unless refined_matches.empty?
+        return false unless (template_by_sig.keys & dest_by_sig.keys).empty?
+        return false if template_nodes.empty? || dest_nodes.empty?
+
+        (template_nodes + dest_nodes).all? { |node| node.respond_to?(:pair?) && node.pair? }
+      end
+
+      def merge_unmatched_pair_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis)
+        entries = template_nodes.map { |node| [node, template_analysis] } +
+                  dest_nodes.map { |node| [node, dest_analysis] }
+        prev_emitted_end_line = nil
+        prev_emitted_analysis = nil
+
+        entries.sort_by { |node, _analysis| node.respond_to?(:key_name) ? node.key_name.to_s : node.type.to_s }.each do |node, analysis|
+          emit_gap_before_node(node, analysis, prev_emitted_end_line, prev_emitted_analysis)
+          emit_node(node, analysis)
+          prev_emitted_end_line = emitted_end_line_for(node)
+          prev_emitted_analysis = analysis
+        end
       end
 
       # Emit a single node to the emitter
@@ -988,6 +1023,27 @@ module Toml
         return if leading_region && (!leading_region.respond_to?(:empty?) || !leading_region.empty?)
 
         emit_interstitial_blank_lines(prev_end_line + 1, node.start_line - 1, analysis)
+      end
+
+      def emit_gap_before_matched_node(selected_node, selected_analysis, template_node, template_analysis, dest_node,
+                                       dest_analysis, prev_end_line, prev_analysis,
+                                       skip_for_borrowed_leading_region: false)
+        before_count = @emitter.lines.length
+        emit_gap_before_node(
+          selected_node,
+          selected_analysis,
+          prev_end_line,
+          prev_analysis,
+          skip_for_borrowed_leading_region: skip_for_borrowed_leading_region
+        )
+        return if @emitter.lines.length > before_count
+
+        alternate_node, alternate_analysis = if selected_node.equal?(dest_node)
+                                               [template_node, template_analysis]
+                                             else
+                                               [dest_node, dest_analysis]
+                                             end
+        emit_gap_before_node(alternate_node, alternate_analysis, prev_end_line, prev_analysis)
       end
 
       def leading_region_present?(node, analysis)
