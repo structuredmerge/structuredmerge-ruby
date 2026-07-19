@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'json'
+require 'pathname'
+
 RSpec.describe Ast::Crispr do
   FakeLocation = Struct.new(:start_line, :end_line, keyword_init: true)
   FakeCommentRegion = Struct.new(:location, :text, keyword_init: true)
@@ -54,6 +57,14 @@ RSpec.describe Ast::Crispr do
     }
   end
   let(:adapter) { FakeAdapter.new(owners: owners, comments: comments) }
+
+  def fixtures_root
+    Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
+  end
+
+  def read_json(path)
+    Ast::Merge.normalize_value(JSON.parse(path.read))
+  end
 
   it 'has a version number' do
     expect(Ast::Crispr::VERSION).not_to be_nil
@@ -331,6 +342,26 @@ RSpec.describe Ast::Crispr do
       it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
 
+    describe Ast::Crispr::MergeReplace do
+      let(:operation_profile) { described_class.operation_profile }
+      let(:expected_operation_kind) { :merge_replace }
+      let(:expected_operation_family) { :rewrite }
+      let(:expected_known_operation_kind) { true }
+      let(:expected_source_requirement) { :required }
+      let(:expected_destination_requirement) { :none }
+      let(:expected_replacement_source) { :merge_template_text }
+      let(:expected_captures_source_text) { true }
+      let(:expected_supports_if_missing) { false }
+      let(:expected_selects_source) { true }
+      let(:expected_requires_source) { true }
+      let(:expected_supports_destination) { false }
+      let(:expected_requires_destination) { false }
+      let(:expected_explicit_replacement) { false }
+      let(:expected_may_reuse_captured_text) { false }
+
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
+    end
+
     describe Ast::Crispr::Delete do
       let(:operation_profile) { described_class.operation_profile }
       let(:expected_operation_kind) { :delete }
@@ -412,6 +443,39 @@ RSpec.describe Ast::Crispr do
       expect(actor.failure?).to be(true)
       expect(actor.error).to include('matched 2 node(s); expected == 1')
       expect(actor.operation_profile.operation_kind).to eq(:replace)
+    end
+  end
+
+  describe described_class::MergeReplace do
+    it 'merges replacement text into the selected slice before splicing it back' do
+      fixture = read_json(fixtures_root.join('diagnostics', 'slice-1018-crispr-slice-merge',
+                                             'crispr-slice-merge.json'))
+      operation = fixture.fetch(:operation)
+      selector = operation.fetch(:selector)
+      merge = operation.fetch(:merge)
+      target = Ast::Crispr::Selectors.line_block(
+        start_line_text: selector.fetch(:start_line_text),
+        end_line_text: selector.fetch(:end_line_text),
+        limit: selector.fetch(:limit)
+      )
+
+      actor = described_class.call(
+        content: operation.fetch(:content),
+        target: target,
+        replacement: operation.fetch(:replacement),
+        merger_class: Ast::Merge::Text::SmartMerger,
+        merger_options: {
+          preference: merge.fetch(:preference).to_sym,
+          add_template_only_nodes: merge.fetch(:add_template_only_nodes)
+        }
+      )
+
+      expected = fixture.fetch(:expected)
+      expect(actor.changed).to eq(expected.fetch(:changed))
+      expect(actor.match_count).to eq(expected.fetch(:match_count))
+      expect(actor.captured_text).to include(expected.fetch(:captured_text_contains))
+      expect(actor.merge_results.first.fetch(:stats)).not_to be_empty
+      expect(actor.updated_content).to eq(expected.fetch(:output))
     end
   end
 

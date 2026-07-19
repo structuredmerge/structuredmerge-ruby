@@ -586,6 +586,10 @@ module Ast
           family: :rewrite,
           description: 'Replace selected content with explicit replacement text'
         },
+        merge_replace: {
+          family: :rewrite,
+          description: 'Replace selected content with the result of a merge-gem slice merge'
+        },
         delete: {
           family: :removal,
           description: 'Delete selected content without inserting replacement text'
@@ -600,7 +604,7 @@ module Ast
         }
       }.freeze
       KNOWN_REQUIREMENTS = %i[none optional required].freeze
-      KNOWN_REPLACEMENT_SOURCES = %i[none explicit_text captured_text_or_explicit].freeze
+      KNOWN_REPLACEMENT_SOURCES = %i[none explicit_text captured_text_or_explicit merge_template_text].freeze
 
       attr_reader :operation_kind, :source_requirement, :destination_requirement, :replacement_source, :metadata
 
@@ -1060,6 +1064,79 @@ module Ast
         Ast::Merge::StructuralEdit::PlanSet.new(source: source, plans: plans).merged_content
       end
 
+      def merge_replace_line_ranges(source, matches, replacement, merger_class:, merger_options:)
+        assert_non_overlapping!(matches)
+        merge_results = []
+        plans = matches.map do |match|
+          destination_slice = match.slice_from(source)
+          merge_result = merge_replacement_slice(
+            replacement.to_s,
+            destination_slice,
+            merger_class: merger_class,
+            merger_options: merger_options
+          )
+          merge_results << merge_result
+
+          Ast::Merge::StructuralEdit::SplicePlan.new(
+            source: source,
+            replace_start_line: match.start_line,
+            replace_end_line: match.end_line,
+            replacement: merge_result.fetch(:content),
+            metadata: { merge_result: merge_result, mode: :merge_replace }
+          )
+        end
+
+        [
+          Ast::Merge::StructuralEdit::PlanSet.new(source: source, plans: plans).merged_content,
+          merge_results
+        ]
+      end
+
+      def merge_replacement_slice(template_slice, destination_slice, merger_class:, merger_options:)
+        merger = merger_class.new(template_slice, destination_slice, **merger_options)
+        result = merger.respond_to?(:merge_result) ? merger.merge_result : merger.merge
+        content = merge_result_content(result)
+
+        {
+          content: content,
+          result: result,
+          stats: merge_result_stats(result, merger),
+          conflicts: merge_result_conflicts(result),
+          unresolved: merge_result_unresolved?(result)
+        }
+      end
+
+      def merge_result_content(result)
+        return result if result.is_a?(String)
+        return result.output if result.respond_to?(:output)
+        return result.content if result.respond_to?(:content) && result.content.is_a?(String)
+
+        result.to_s
+      end
+
+      def merge_result_stats(result, merger)
+        if result.respond_to?(:stats)
+          stats = result.stats
+          return stats unless stats.respond_to?(:empty?) && stats.empty?
+        end
+        return merger.stats if merger.respond_to?(:stats)
+
+        {}
+      end
+
+      def merge_result_conflicts(result)
+        return result.conflicts if result.respond_to?(:conflicts)
+
+        []
+      end
+
+      def merge_result_unresolved?(result)
+        return result.unresolved? if result.respond_to?(:unresolved?)
+        return result.review_required? if result.respond_to?(:review_required?)
+
+        false
+      end
+
       def assert_non_overlapping!(matches)
         ranges = matches.map(&:line_range).sort_by(&:begin)
         ranges.each_cons(2) do |left, right|
@@ -1212,6 +1289,59 @@ module Ast
           @operation_profile || raise(Error.new('CRISPR operation profile is not declared',
                                                 details: { operation_class: name }))
         end
+      end
+    end
+
+    class MergeReplace < Actor
+      include OperationSupport
+      include OperationProfilable
+
+      declare_operation_profile(
+        operation_kind: :merge_replace,
+        source_requirement: :required,
+        destination_requirement: :none,
+        replacement_source: :merge_template_text,
+        captures_source_text: true,
+        supports_if_missing: false
+      )
+
+      input :content, type: String
+      input :target, type: OwnerSelector
+      input :replacement, type: String
+      input :merger_class
+      input :merger_options, default: -> { {} }
+      input :source_label, type: String, default: 'source'
+
+      output :updated_content
+      output :matches, default: -> { [] }
+      output :match_count, type: Integer, default: 0
+      output :changed, default: false
+      output :captured_text, allow_nil: true, default: nil
+      output :merge_results, default: -> { [] }
+      output :operation_profile
+
+      def call
+        self.operation_profile = self.class.operation_profile
+        context = context_for(content: content, source_label: source_label, target: target)
+        self.matches = normalize_matches(target, context)
+        self.match_count = matches.size
+        self.captured_text = capture_text(content, matches)
+        if matches.empty?
+          self.updated_content = content
+          self.changed = false
+          return
+        end
+
+        self.updated_content, self.merge_results = merge_replace_line_ranges(
+          content,
+          matches,
+          replacement,
+          merger_class: merger_class,
+          merger_options: merger_options.to_h
+        )
+        self.changed = updated_content != content
+      rescue Error => e
+        crispr_fail!(e)
       end
     end
 
