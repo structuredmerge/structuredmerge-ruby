@@ -170,7 +170,7 @@ module Prism
       # (e.g. `|gem|`), assignment nodes such as `spec.name = "foo"` and `gem.name = "foo"`
       # would otherwise produce different signatures and never match.  We normalize both to
       # this placeholder so they match regardless of the variable name chosen by the author.
-      GEMSPEC_VAR_PLACEHOLDER = :__gemspec_var__
+      GEMSPEC_VAR_PLACEHOLDER = Ruby::Merge::GemspecSupport::GEMSPEC_VAR_PLACEHOLDER
 
       # @return [TreeHaver::Tree] The tree_haver parse tree (includes normalized comment objects)
       attr_reader :tree
@@ -1183,20 +1183,10 @@ module Prism
             # `gem.name = "foo"` and `spec.name = "foo"` produce the same signature.
             # Only applies when the receiver is a plain local variable (not a chained
             # call like `spec.metadata["key"]`) and it matches the detected block param.
-            effective_receiver = if @gemspec_block_var &&
-                                    receiver == @gemspec_block_var
-                                   # Normalise the gemspec block variable so `gem.name =` and `spec.name =`
-                                   # produce the same signature.  We rely on the slice comparison alone —
-                                   # the guard intentionally does NOT require Prism::LocalVariableReadNode
-                                   # because when body text is parsed standalone (no enclosing block), the
-                                   # parameter name (`gem`, `spec`, …) is parsed as a zero-arg CallNode by
-                                   # Prism, not as a LocalVariableReadNode.  The slice match is sufficient
-                                   # because chained receivers (e.g. `spec.metadata`) produce longer slices
-                                   # that will never equal the single-word block parameter name.
-                                   GEMSPEC_VAR_PLACEHOLDER
-                                 else
-                                   receiver
-                                 end
+            # The slice match intentionally does not require Prism::LocalVariableReadNode.
+            # When a gemspec body is parsed standalone, the block param can appear as a
+            # zero-arg CallNode; chained receivers still have longer slices and do not match.
+            effective_receiver = Ruby::Merge::GemspecSupport.effective_receiver(receiver, @gemspec_block_var)
             if node.block
               # simplecov:disable defensive - Ruby syntax doesn't allow blocks with assignment methods
               [:call_with_block, node.name, effective_receiver]
@@ -1224,11 +1214,7 @@ module Prism
         # === Operator-write calls (e.g. spec.rdoc_options += [...]) ===
         when :call_op_write
           receiver = node.receiver&.slice
-          effective_receiver = if @gemspec_block_var && receiver == @gemspec_block_var
-                                 GEMSPEC_VAR_PLACEHOLDER
-                               else
-                                 receiver
-                               end
+          effective_receiver = Ruby::Merge::GemspecSupport.effective_receiver(receiver, @gemspec_block_var)
           [:call_op_write, node.write_name, effective_receiver]
 
         # === Lambdas ===

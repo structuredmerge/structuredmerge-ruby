@@ -26,9 +26,8 @@ module Prism
         # Uses AST-directed byte-offset replacement — no regular expressions.
         template_var = merger.template_analysis.respond_to?(:gemspec_block_var) ? merger.template_analysis.gemspec_block_var : nil
         dest_var = merger.dest_analysis.respond_to?(:gemspec_block_var) ? merger.dest_analysis.gemspec_block_var : nil
-        preferred_var = nil
-        if template_var && dest_var && template_var != dest_var
-          preferred_var = template_var
+        preferred_var = Ruby::Merge::GemspecSupport.preferred_block_var(template_var, dest_var)
+        if preferred_var
           dest_body = GemspecVarRenamer.rename(dest_body, old_var: dest_var, new_var: preferred_var)
         end
 
@@ -50,8 +49,8 @@ module Prism
           # assignment signatures even when the Gem::Specification.new wrapper is absent
           # from the extracted body text (auto-detection cannot fire without the wrapper).
           # When renaming was applied above, both sides now use preferred_var.
-          template_gemspec_block_var: preferred_var || template_var,
-          dest_gemspec_block_var: preferred_var || dest_var
+          template_gemspec_block_var: Ruby::Merge::GemspecSupport.merged_block_var(template_var, preferred_var),
+          dest_gemspec_block_var: Ruby::Merge::GemspecSupport.merged_block_var(dest_var, preferred_var)
         )
         body_result = if template_body.empty? && dest_body.empty?
                         nil
@@ -139,9 +138,12 @@ module Prism
         opening_line = source_layout.opening_line_text
         # When the opening line comes from dest but the template var is canonical,
         # rename the block parameter in the opening line (e.g. |gem| → |spec|).
-        if preferred_var && dest_var && dest_var != preferred_var && node_preference == :destination
-          opening_line = opening_line.sub("|#{dest_var}|", "|#{preferred_var}|")
-        end
+        opening_line = Ruby::Merge::GemspecSupport.opening_line_with_preferred_block_var(
+          opening_line,
+          dest_var: dest_var,
+          preferred_var: preferred_var,
+          node_preference: node_preference
+        )
         if node_preference == :template &&
            template_inline_by_line[actual_template.location.start_line].empty? &&
            !source_layout.body_starts_on_opening_line?
