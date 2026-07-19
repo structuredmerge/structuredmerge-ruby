@@ -10332,6 +10332,8 @@ module Kettle
         "",
         "This gem is part of the StructuredMerge Ruby package family. The implementation inventory, layering model, and backend notes live in the [root package-family guide][sm-family-guide]. Shared behavior is defined by the [StructuredMerge fixtures][sm-family-fixtures] and implemented by the [Go][sm-family-go], [Ruby][sm-family-ruby], [Rust][sm-family-rust], and [TypeScript][sm-family-typescript] repositories.",
         "",
+        "Merge analysis must enter parsing through `tree_haver`. Parser-specific gems register concrete TreeHaver backends; substrate gems register grammar mappings and keep shared format or language merge behavior in one place. Missing backends fail closed instead of falling back to direct parser-library calls.",
+        "",
         "</details>",
         "",
         "[sm-family-guide]: https://github.com/structuredmerge/structuredmerge-ruby#package-family",

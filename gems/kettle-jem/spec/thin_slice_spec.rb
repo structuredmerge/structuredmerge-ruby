@@ -11703,6 +11703,9 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
         "StructuredMerge Ruby package family"
       )
+      expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
+        "Merge analysis must enter parsing through `tree_haver`"
+      )
     end
   end
 
