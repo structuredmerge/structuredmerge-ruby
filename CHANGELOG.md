@@ -47,6 +47,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - RBS, Bash, and dotenv removal-mode comment promotion now uses the shared
   `ast-merge` removed-owner preservation path for leading segments, trailing
   regions, and fallback layout gaps.
+- `ast-merge` now provides shared source-region report helpers for comment-block
+  attachment and blank interstitial ownership, and `ruby-merge` uses those
+  helpers for its Ruby fixture/report APIs instead of carrying local copies of
+  format-neutral ownership mechanics.
 - Gems that use `tree_sitter_language_pack` now resolve it through the
   StructuredMerge Ruby 4-compatible fork branch in their development Gemfiles
   until an upstream Ruby 4-compatible release is available.

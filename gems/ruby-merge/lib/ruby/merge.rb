@@ -20,6 +20,7 @@ require_relative 'merge/signature_support'
 module Ruby
   module Merge
     extend self
+    include Ast::Merge::SourceRegionReportSupport
 
     PACKAGE_NAME = 'ruby-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
@@ -851,42 +852,17 @@ module Ruby
     def ruby_interstitial_comment_attachment_report(source)
       lines = normalize_source(source).lines(chomp: true)
       owners = top_level_source_region_owners(lines)
-      comment_blocks = source_comment_blocks(lines)
-
-      {
-        comments: comment_blocks.map do |block|
-          previous_owner = owners.reverse.find { |owner| owner[:end_index] < block[:start_index] }
-          next_owner = owners.find do |owner|
-            owner.fetch(:declaration_start_index, owner[:start_index]) > block[:end_index]
-          end
-          next_owner_index = next_owner&.fetch(:declaration_start_index, next_owner&.fetch(:start_index))
-          attachment = if next_owner_index && block[:end_index] + 1 == next_owner_index
-                         'following_owner'
-                       elsif previous_owner && next_owner_index && (block[:end_index] + 1...next_owner_index).any? do |index|
-                         lines[index].to_s.strip.empty?
-                       end
-                         'preceding_owner'
-                       elsif previous_owner && next_owner.nil?
-                         'preceding_owner'
-                       else
-                         'standalone'
-                       end
-          compact_region(
-            attachment: attachment,
-            previous_owner: previous_owner&.fetch(:address),
-            next_owner: next_owner&.fetch(:address),
-            span: line_span(block[:start_index], block[:end_index]),
-            content: source_region_content(lines, block[:start_index], block[:end_index])
-          )
-        end
-      }
+      source_comment_block_attachment_report(
+        lines: lines,
+        owners: owners,
+        comment_line: method(:comment_line?)
+      )
     end
 
     def ruby_blank_line_ownership_report(source)
       regions = ruby_source_regions(source)[:regions]
-      blank_regions = collect_blank_line_regions(regions)
       {
-        blank_line_regions: blank_regions
+        blank_line_regions: source_blank_line_ownership_regions(regions: regions)
       }
     end
 
@@ -2395,45 +2371,6 @@ module Ruby
         span: line_span(start_index, end_index),
         content: source_region_content(lines, start_index, end_index)
       )
-    end
-
-    def source_comment_blocks(lines)
-      blocks = []
-      index = 0
-      while index < lines.length
-        unless comment_line?(lines[index])
-          index += 1
-          next
-        end
-
-        start_index = index
-        index += 1 while index < lines.length && comment_line?(lines[index])
-        blocks << { start_index: start_index, end_index: index - 1 }
-      end
-      blocks
-    end
-
-    def collect_blank_line_regions(regions)
-      regions.flat_map do |region|
-        child_regions = region[:child_regions] ? collect_blank_line_regions(region[:child_regions]) : []
-        current = if region[:region_kind] == 'interstitial' && region[:content].to_s.lines.all? do |line|
-          line.strip.empty?
-        end
-                    [
-                      compact_region(
-                        region_id: region[:region_id],
-                        position: region[:position],
-                        previous_owner: region[:previous_owner],
-                        next_owner: region[:next_owner],
-                        span: region[:span],
-                        ownership: 'declared_interstitial_region'
-                      )
-                    ]
-                  else
-                    []
-                  end
-        current + child_regions
-      end
     end
 
     def public_source_region(region)

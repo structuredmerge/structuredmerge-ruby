@@ -87,6 +87,7 @@ module Ast
     autoload :PartialTemplateMergerBase, 'ast/merge/partial_template_merger_base'
     autoload :SectionTyping, 'ast/merge/section_typing'
     autoload :SmartMergerBase, 'ast/merge/smart_merger_base'
+    autoload :SourceRegionReportSupport, 'ast/merge/source_region_report_support'
     autoload :StructuralEdit, 'ast/merge/structural_edit'
     autoload :StructuredEmitterProvenanceSupport, 'ast/merge/structured_emitter_provenance_support'
     autoload :StructuredReviewApplySupport, 'ast/merge/structured_review_apply_support'
