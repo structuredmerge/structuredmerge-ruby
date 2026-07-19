@@ -47,6 +47,37 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
+  it 'exposes JSON TreeHaver backend availability and plan context' do
+    expect(json_ready(described_class.available_json_backends.map(&:to_h))).to eq(
+      [{ 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }]
+    )
+
+    profile = described_class.json_backend_feature_profile
+    expect(profile[:backend]).to eq('kreuzberg-language-pack')
+    expect(json_ready(profile[:backend_ref])).to eq(
+      { 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }
+    )
+
+    expect(json_ready(described_class.json_plan_context.dig(:feature_profile))).to include(
+      'backend' => 'kreuzberg-language-pack',
+      'supports_dialects' => true
+    )
+  end
+
+  it 'parses through an explicit JSON TreeHaver backend and rejects unsupported backends' do
+    fixture = json_fixture('structure_json')
+    result = described_class.parse_json(
+      fixture[:source],
+      fixture[:dialect],
+      backend: 'kreuzberg-language-pack'
+    )
+    unsupported = described_class.parse_json(fixture[:source], fixture[:dialect], backend: :direct_json)
+
+    expect(result[:ok]).to be(true)
+    expect(unsupported[:ok]).to be(false)
+    expect(unsupported.dig(:diagnostics, 0, :category)).to eq('unsupported_feature')
+  end
+
   it 'rejects comments in strict JSON without rejecting comment-like string content' do
     strict_result = described_class.parse_json("{\n  // nope\n  \"name\": \"Ruby\"\n}\n", 'json')
     string_result = described_class.parse_json("{\"url\":\"https://example.test/path\"}\n", 'json')

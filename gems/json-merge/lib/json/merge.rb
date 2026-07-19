@@ -14,6 +14,7 @@ module Json
       surface: 'array',
       name: 'destination_wins_array'
     }.freeze
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     class Error < Ast::Merge::Error; end
@@ -44,6 +45,8 @@ module Json
         BACKEND_REGISTRY.mutex.synchronize do
           return if BACKEND_REGISTRY.registered
 
+          TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
           grammar_finder = TreeHaver::GrammarFinder.new(:json)
           grammar_finder.register! if grammar_finder.available?
 
@@ -62,14 +65,49 @@ module Json
       }
     end
 
-    def parse_json(source, dialect)
+    def available_json_backends
+      [TREE_SITTER_BACKEND]
+    end
+
+    def json_backend_feature_profile(backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
+      end
+
+      json_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h
+      )
+    end
+
+    def json_plan_context(backend: nil)
+      profile = json_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: json_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: true,
+          supported_policies: profile[:supported_policies]
+        }
+      }
+    end
+
+    def parse_json(source, dialect, backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
+      end
+
       return parse_failure("Trailing commas are not supported for #{dialect}.") if detect_trailing_comma(source)
       if dialect.to_s != 'jsonc' && detect_json_comments(source)
         return parse_failure("Comments are not supported for #{dialect}.")
       end
 
       register_backend!
-      analysis = FileAnalysis.new(source)
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
       unless analysis.valid?
         return parse_failure(analysis.errors.map do |error|
           error.respond_to?(:message) ? error.message : error.inspect
@@ -95,16 +133,21 @@ module Json
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
     end
 
-    def merge_json(template_source, destination_source, dialect)
-      template_result = parse_json(template_source, dialect)
+    def merge_json(template_source, destination_source, dialect, backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
+      end
+
+      template_result = parse_json(template_source, dialect, backend: requested)
       return { ok: false, diagnostics: template_result[:diagnostics] } unless template_result[:ok]
 
-      destination_result = parse_json(destination_source, dialect)
+      destination_result = parse_json(destination_source, dialect, backend: requested)
       if destination_result[:ok]
         return {
           ok: true,
           diagnostics: [],
-          output: merge_json_sources(template_source, destination_source),
+          output: TreeHaver.with_backend(requested) { merge_json_sources(template_source, destination_source) },
           policies: [DESTINATION_WINS_ARRAY_POLICY]
         }
       end
@@ -128,14 +171,19 @@ module Json
     end
     private_class_method :merge_json_sources
 
-    def json_value_for_source(source, dialect: 'json')
+    def json_value_for_source(source, dialect: 'json', backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        raise ParseError, "Unsupported JSON backend #{requested}."
+      end
+
       raise ParseError, "Trailing commas are not supported for #{dialect}." if detect_trailing_comma(source)
       if dialect.to_s != 'jsonc' && detect_json_comments(source)
         raise ParseError, "Comments are not supported for #{dialect}."
       end
 
       register_backend!
-      analysis = FileAnalysis.new(source)
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
       unless analysis.valid?
         message = analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', ')
         raise ParseError, message
@@ -207,6 +255,29 @@ module Json
     end
     private_class_method :parse_failure
 
+    def requested_json_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      current = TreeHaver.current_backend_id
+      return current if json_backend_available_for_analysis?(current)
+
+      available_json_backends.find do |backend_ref|
+        json_backend_available_for_analysis?(backend_ref.id)
+      end&.id || TREE_SITTER_BACKEND.id
+    end
+    private_class_method :requested_json_backend_id
+
+    def json_backend_available_for_analysis?(backend_id)
+      registrations = TreeHaver.registered_languages(:json)
+      case backend_id.to_s
+      when TREE_SITTER_BACKEND.id
+        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      else
+        false
+      end
+    end
+    private_class_method :json_backend_available_for_analysis?
+
     def parse_error(message)
       { severity: 'error', category: 'parse_error', message: message }
     end
@@ -216,6 +287,11 @@ module Json
       { severity: 'error', category: 'unsupported_feature', message: message }
     end
     private_class_method :unsupported_feature
+
+    def unsupported_feature_result(message)
+      { ok: false, diagnostics: [unsupported_feature(message)], policies: [] }
+    end
+    private_class_method :unsupported_feature_result
 
     def json_analysis_root_kind(analysis)
       root = analysis.root_object || analysis.root_node
