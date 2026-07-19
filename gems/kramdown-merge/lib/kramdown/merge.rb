@@ -53,7 +53,7 @@ module Kramdown
 
       return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == 'markdown'
 
-      ::Kramdown::Document.new(source)
+      TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:markdown).parse(source) }
       normalized = Markdown::Merge.normalize_source(source)
       {
         ok: true,
@@ -194,6 +194,8 @@ module Kramdown
     )
   end
 end
+
+require_relative 'merge/backend'
 
 Kramdown::Merge::Version.class_eval do
   extend VersionGem::Basic
