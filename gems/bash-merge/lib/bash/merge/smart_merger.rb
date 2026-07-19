@@ -225,6 +225,7 @@ module Bash
         dest_nodes = @dest_analysis.nodes
 
         emitter = Emitter.new
+        @emitted_preserved_line_numbers = Hash.new { |hash, key| hash[key] = [] }
 
         emit_root_boundary_to(emitter, :preamble)
 
@@ -500,6 +501,7 @@ module Bash
           if lines.any?
             start_line = emission_start_line_for(dest_node, @dest_analysis)
             emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(@dest_analysis, start_line))
+            mark_removed_destination_preserved_lines(dest_node, @dest_analysis)
           end
         else
           emit_node_to(emitter, dest_node, @dest_analysis)
@@ -531,6 +533,8 @@ module Bash
       end
 
       def root_boundary_owner_start_line_for(node, analysis)
+        return node.start_line unless region_present?(leading_region_for(node, analysis))
+
         emission_start_line_for(node, analysis)
       end
 
@@ -662,6 +666,12 @@ module Bash
         )
       end
 
+      def mark_removed_destination_preserved_lines(node, analysis)
+        @emitted_preserved_line_numbers[analysis.object_id].concat(
+          removed_owner_preserved_line_numbers_for(node, analysis, owners: analysis.nodes)
+        )
+      end
+
       # Determine preference for a matched pair, respecting per-type overrides.
       def preference_for_pair(template_node, dest_node)
         return @preference unless @preference.is_a?(Hash)
@@ -758,10 +768,13 @@ module Bash
       end
 
       def emit_leading_segment_to(emitter, node, analysis)
-        lines = leading_segment_lines_for(node, analysis, owners: analysis.nodes)
-        return if lines.empty?
+        line_numbers = leading_segment_line_numbers_for(node, analysis, owners: analysis.nodes)
+        emitted_line_numbers = @emitted_preserved_line_numbers[analysis.object_id]
+        line_numbers = line_numbers.reject { |line_number| emitted_line_numbers.include?(line_number) }
+        return if line_numbers.empty?
 
-        start_line = emission_start_line_for(node, analysis)
+        lines = line_numbers.filter_map { |line_number| analysis.line_at(line_number) }
+        start_line = line_numbers.first
         emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, start_line))
       end
     end

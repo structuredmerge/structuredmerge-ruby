@@ -46,10 +46,12 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
 
     public :blank_line_count_before,
            :leading_region_for,
+           :leading_segment_line_numbers_for,
            :leading_segment_lines_for,
            :leading_segment_start_for_output,
            :previous_owner_for,
            :previous_owner_trailing_region_matches?,
+           :removed_owner_preserved_line_numbers_for,
            :removed_owner_preserved_lines_for,
            :region_present?,
            :root_boundary_lines_for
@@ -121,6 +123,9 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     expect(
       harness.removed_owner_preserved_lines_for(owner, analysis, inline_lines: ['# inline'])
     ).to eq(['# docs', '', '# inline', '# trailing', ''])
+    expect(
+      harness.removed_owner_preserved_line_numbers_for(owner, analysis, inline_line_numbers: [3])
+    ).to eq([1, 2, 3, 4, 5])
   end
 
   it 'returns root preamble lines using root comment attachment regions' do

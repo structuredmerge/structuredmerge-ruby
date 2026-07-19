@@ -114,6 +114,12 @@ module Ast
       end
 
       def leading_segment_lines_for(owner, analysis, owners: nil)
+        leading_segment_line_numbers_for(owner, analysis, owners: owners).filter_map do |line_number|
+          source_line_at(analysis, line_number)
+        end
+      end
+
+      def leading_segment_line_numbers_for(owner, analysis, owners: nil)
         leading_region = leading_region_for(owner, analysis, owners: owners)
         region_start = leading_segment_anchor_line_for(owner, analysis, owners: owners, leading_region: leading_region)
         owner_start = owner_start_line(owner)
@@ -127,7 +133,7 @@ module Ast
           source_analysis: analysis,
           owners: owners
         )
-        (leading_start...owner_start).filter_map { |line_number| source_line_at(analysis, line_number) }
+        (leading_start...owner_start).to_a
       end
 
       def leading_segment_anchor_line_for(_owner, _analysis, owners: nil, leading_region: nil)
@@ -138,6 +144,10 @@ module Ast
 
       def trailing_region_lines_for(owner, analysis, owners: nil)
         region_lines_for(trailing_region_for(owner, analysis, owners: owners))
+      end
+
+      def trailing_region_line_numbers_for(owner, analysis, owners: nil)
+        region_line_numbers_for(trailing_region_for(owner, analysis, owners: owners))
       end
 
       def removed_owner_preserved_lines_for(owner, analysis, owners: nil, inline_lines: [])
@@ -152,6 +162,20 @@ module Ast
         end
 
         lines
+      end
+
+      def removed_owner_preserved_line_numbers_for(owner, analysis, owners: nil, inline_line_numbers: [])
+        attachment = analysis.comment_attachment_for(owner, owners: owners)
+        line_numbers = leading_segment_line_numbers_for(owner, analysis, owners: owners)
+        line_numbers.concat(Array(inline_line_numbers).compact)
+        line_numbers.concat(region_line_numbers_for(attachment&.trailing_region))
+
+        trailing_gap = attachment&.trailing_gap
+        if trailing_gap&.effective_controller_side(removed_owners: [owner]) == :after
+          line_numbers.concat((trailing_gap.start_line..trailing_gap.end_line).to_a)
+        end
+
+        line_numbers
       end
 
       def interstitial_trailing_region_lines_for(owner, analysis, owners: nil)
@@ -314,6 +338,16 @@ module Ast
             node.to_s
           end
         end
+      end
+
+      def region_line_numbers_for(region)
+        return [] unless region_present?(region)
+
+        start_line = region_start_line(region)
+        end_line = region_end_line(region)
+        return [] unless start_line && end_line
+
+        (start_line..end_line).to_a
       end
     end
   end
