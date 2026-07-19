@@ -6379,7 +6379,6 @@ RSpec.describe Kettle::Jem do
       })
       availability = Bash::Merge::Availability.new(
         grammar_path: nil,
-        language_pack_process: true,
         node_parser: false,
         diagnostics: [{kind: "bash_node_parser_unavailable", message: "missing node adapter"}]
       )
