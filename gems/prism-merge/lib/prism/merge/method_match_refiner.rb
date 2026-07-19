@@ -116,7 +116,6 @@ module Prism
 
         names.compact
       end
-
     end
   end
 end

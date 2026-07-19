@@ -27,9 +27,7 @@ module Prism
         template_var = merger.template_analysis.respond_to?(:gemspec_block_var) ? merger.template_analysis.gemspec_block_var : nil
         dest_var = merger.dest_analysis.respond_to?(:gemspec_block_var) ? merger.dest_analysis.gemspec_block_var : nil
         preferred_var = Ruby::Merge::GemspecSupport.preferred_block_var(template_var, dest_var)
-        if preferred_var
-          dest_body = GemspecVarRenamer.rename(dest_body, old_var: dest_var, new_var: preferred_var)
-        end
+        dest_body = GemspecVarRenamer.rename(dest_body, old_var: dest_var, new_var: preferred_var) if preferred_var
 
         body_merger = merger.class.new(
           template_body,

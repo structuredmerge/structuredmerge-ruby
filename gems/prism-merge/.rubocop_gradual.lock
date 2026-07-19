@@ -76,9 +76,9 @@
   "lib/prism-merge.rb:226590672": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`prism-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/prism/merge.rb:3873409785": [
+  "lib/prism/merge.rb:3389866865": [
     [12, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Prism::Merge`.", 2866359175],
-    [12, 3, 53263, "Metrics/ModuleLength: Module has too many lines. [1222/100]", 1955834049],
+    [12, 3, 52319, "Metrics/ModuleLength: Module has too many lines. [1195/100]", 1955834049],
     [13, 5, 11, "Style/ModuleFunction: Use `module_function` instead of `extend self`.", 1210897631],
     [24, 5, 16, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::ParseError`.", 362242086],
     [120, 5, 1996, "Metrics/MethodLength: Method has too many lines. [42/10]", 709892915],
@@ -92,12 +92,13 @@
     [304, 121, 5, "Layout/LineLength: Line is too long. [125/120]", 180584319],
     [323, 121, 25, "Layout/LineLength: Line is too long. [145/120]", 949635646],
     [361, 121, 42, "Layout/LineLength: Line is too long. [162/120]", 1330685294],
-    [445, 5, 811, "Metrics/MethodLength: Method has too many lines. [21/10]", 2894794051],
+    [445, 5, 893, "Metrics/AbcSize: Assignment Branch Condition size for `parse_ruby` is too high. [<3, 17, 7> 18.63/17]", 2894794051],
+    [445, 5, 893, "Metrics/MethodLength: Method has too many lines. [21/10]", 2894794051],
     [471, 5, 491, "Metrics/MethodLength: Method has too many lines. [12/10]", 3211170428],
-    [486, 5, 3212, "Metrics/AbcSize: Assignment Branch Condition size for `parse_ruby_normalized` is too high. [<20, 64, 28> 72.66/17]", 1170714005],
-    [486, 5, 3212, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_ruby_normalized` is too high. [23/7]", 1170714005],
-    [486, 5, 3212, "Metrics/MethodLength: Method has too many lines. [70/10]", 1170714005],
-    [486, 5, 3212, "Metrics/PerceivedComplexity: Perceived complexity for `parse_ruby_normalized` is too high. [23/8]", 1170714005],
+    [486, 5, 3294, "Metrics/AbcSize: Assignment Branch Condition size for `parse_ruby_normalized` is too high. [<20, 68, 28> 76.21/17]", 3878823268],
+    [486, 5, 3294, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `parse_ruby_normalized` is too high. [23/7]", 3878823268],
+    [486, 5, 3294, "Metrics/MethodLength: Method has too many lines. [70/10]", 3878823268],
+    [486, 5, 3294, "Metrics/PerceivedComplexity: Perceived complexity for `parse_ruby_normalized` is too high. [23/8]", 3878823268],
     [566, 5, 3671, "Metrics/AbcSize: Assignment Branch Condition size for `apply_edit_projection` is too high. [<14, 62, 19> 66.34/17]", 1859418783],
     [566, 5, 3671, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_edit_projection` is too high. [12/7]", 1859418783],
     [566, 5, 3671, "Metrics/MethodLength: Method has too many lines. [66/10]", 1859418783],
@@ -127,27 +128,24 @@
     [926, 5, 849, "Metrics/MethodLength: Method has too many lines. [23/10]", 2509812469],
     [957, 5, 1195, "Metrics/AbcSize: Assignment Branch Condition size for `prism_ruby_surfaces_for_owner` is too high. [<6, 19, 3> 20.15/17]", 1713430182],
     [957, 5, 1195, "Metrics/MethodLength: Method has too many lines. [20/10]", 1713430182],
-    [982, 5, 1563, "Metrics/AbcSize: Assignment Branch Condition size for `prism_ruby_example_surfaces` is too high. [<9, 26, 9> 28.95/17]", 2122389118],
-    [982, 5, 1563, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `prism_ruby_example_surfaces` is too high. [9/7]", 2122389118],
-    [982, 5, 1563, "Metrics/MethodLength: Method has too many lines. [28/10]", 2122389118],
-    [982, 5, 1563, "Metrics/PerceivedComplexity: Perceived complexity for `prism_ruby_example_surfaces` is too high. [9/8]", 2122389118],
-    [1042, 7, 3, "Layout/BlockAlignment: `end` at 1042, 6 is not aligned with `%w[coding encoding frozen_string_literal shareable_constant_value typed` at 1039, 22 or `warn_indent].any? do |prefix|` at 1040, 25.", 193405706],
-    [1088, 5, 421, "Metrics/MethodLength: Method has too many lines. [14/10]", 26440736],
-    [1119, 5, 827, "Metrics/MethodLength: Method has too many lines. [18/10]", 4288402374],
-    [1160, 5, 876, "Metrics/MethodLength: Method has too many lines. [23/10]", 3423854231],
-    [1198, 5, 1155, "Metrics/AbcSize: Assignment Branch Condition size for `prism_comment_node` is too high. [<1, 22, 0> 22.02/17]", 4287909739],
-    [1198, 5, 1155, "Metrics/MethodLength: Method has too many lines. [28/10]", 4287909739],
-    [1229, 5, 888, "Metrics/MethodLength: Method has too many lines. [27/10]", 3798554661],
-    [1282, 5, 920, "Metrics/MethodLength: Method has too many lines. [23/10]", 917985568]
+    [982, 5, 1216, "Metrics/AbcSize: Assignment Branch Condition size for `prism_ruby_example_surfaces` is too high. [<4, 20, 2> 20.49/17]", 2225356615],
+    [982, 5, 1216, "Metrics/MethodLength: Method has too many lines. [22/10]", 2225356615],
+    [1054, 5, 421, "Metrics/MethodLength: Method has too many lines. [14/10]", 26440736],
+    [1085, 5, 827, "Metrics/MethodLength: Method has too many lines. [18/10]", 4288402374],
+    [1126, 5, 876, "Metrics/MethodLength: Method has too many lines. [23/10]", 3423854231],
+    [1164, 5, 1155, "Metrics/AbcSize: Assignment Branch Condition size for `prism_comment_node` is too high. [<1, 22, 0> 22.02/17]", 4287909739],
+    [1164, 5, 1155, "Metrics/MethodLength: Method has too many lines. [28/10]", 4287909739],
+    [1195, 5, 888, "Metrics/MethodLength: Method has too many lines. [27/10]", 3798554661],
+    [1247, 5, 920, "Metrics/MethodLength: Method has too many lines. [23/10]", 917985568]
   ],
   "lib/prism/merge/begin_node_clause_body_merger.rb:1042804537": [
     [5, 5, 31, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::BeginNodeClauseBodyMerger`.", 1242162299],
     [19, 7, 1511, "Metrics/AbcSize: Assignment Branch Condition size for `merge` is too high. [<5, 37, 1> 37.35/17]", 3275719934],
     [19, 7, 1511, "Metrics/MethodLength: Method has too many lines. [32/10]", 3275719934]
   ],
-  "lib/prism/merge/begin_node_clause_body_support.rb:2935202369": [
+  "lib/prism/merge/begin_node_clause_body_support.rb:787370708": [
     [5, 5, 32, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::BeginNodeClauseBodySupport`.", 3341069278],
-    [5, 5, 7532, "Metrics/ClassLength: Class has too many lines. [143/100]", 1403116805],
+    [5, 5, 7504, "Metrics/ClassLength: Class has too many lines. [142/100]", 1403116805],
     [8, 21, 100, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 4145084810],
     [22, 7, 937, "Metrics/AbcSize: Assignment Branch Condition size for `clause_header_end_line` is too high. [<5, 29, 16> 33.5/17]", 2050282033],
     [22, 7, 937, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_header_end_line` is too high. [16/7]", 2050282033],
@@ -156,13 +154,13 @@
     [35, 63, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
     [55, 9, 23, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1178765246],
     [58, 7, 419, "Metrics/MethodLength: Method has too many lines. [11/10]", 3825428834],
-    [81, 7, 2424, "Metrics/AbcSize: Assignment Branch Condition size for `clause_body_components` is too high. [<12, 35, 16> 40.31/17]", 199420029],
-    [81, 7, 2424, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_body_components` is too high. [13/7]", 199420029],
-    [81, 7, 2424, "Metrics/MethodLength: Method has too many lines. [40/10]", 199420029],
-    [81, 7, 2424, "Metrics/PerceivedComplexity: Perceived complexity for `clause_body_components` is too high. [14/8]", 199420029],
-    [127, 30, 23, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1178765246],
-    [165, 7, 862, "Metrics/AbcSize: Assignment Branch Condition size for `clause_bodies_have_matching_statements?` is too high. [<3, 19, 2> 19.34/17]", 4182083840],
-    [165, 7, 862, "Metrics/MethodLength: Method has too many lines. [15/10]", 4182083840]
+    [81, 7, 2396, "Metrics/AbcSize: Assignment Branch Condition size for `clause_body_components` is too high. [<11, 30, 16> 35.74/17]", 199420029],
+    [81, 7, 2396, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_body_components` is too high. [13/7]", 199420029],
+    [81, 7, 2396, "Metrics/MethodLength: Method has too many lines. [39/10]", 199420029],
+    [81, 7, 2396, "Metrics/PerceivedComplexity: Perceived complexity for `clause_body_components` is too high. [14/8]", 199420029],
+    [126, 30, 23, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1178765246],
+    [164, 7, 862, "Metrics/AbcSize: Assignment Branch Condition size for `clause_bodies_have_matching_statements?` is too high. [<3, 19, 2> 19.34/17]", 4182083840],
+    [164, 7, 862, "Metrics/MethodLength: Method has too many lines. [15/10]", 4182083840]
   ],
   "lib/prism/merge/begin_node_clause_header_emitter.rb:2991300768": [
     [5, 5, 34, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::BeginNodeClauseHeaderEmitter`.", 217025096],
@@ -206,79 +204,53 @@
     [76, 7, 1308, "Metrics/PerceivedComplexity: Perceived complexity for `emit_copied_unmatched_clause` is too high. [10/8]", 1339054986],
     [76, 39, 146, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2474530127]
   ],
-  "lib/prism/merge/begin_node_rescue_semantics.rb:2074892203": [
+  "lib/prism/merge/begin_node_rescue_semantics.rb:2746062857": [
     [5, 5, 30, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::BeginNodeRescueSemantics`.", 4100560642],
-    [5, 5, 14314, "Metrics/ClassLength: Class has too many lines. [278/100]", 1353739428],
+    [5, 5, 9687, "Metrics/ClassLength: Class has too many lines. [194/100]", 4227917508],
     [13, 7, 1953, "Metrics/AbcSize: Assignment Branch Condition size for `normalized_clause_body_and_header_source` is too high. [<9, 13, 21> 26.29/17]", 1895019213],
     [13, 7, 1953, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `normalized_clause_body_and_header_source` is too high. [15/7]", 1895019213],
     [13, 7, 1953, "Metrics/MethodLength: Method has too many lines. [26/10]", 1895019213],
     [13, 7, 1953, "Metrics/PerceivedComplexity: Perceived complexity for `normalized_clause_body_and_header_source` is too high. [17/8]", 1895019213],
-    [48, 7, 812, "Metrics/AbcSize: Assignment Branch Condition size for `merge_ordered_clause_types` is too high. [<9, 17, 8> 20.83/17]", 391537814],
-    [48, 7, 812, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_ordered_clause_types` is too high. [8/7]", 391537814],
-    [48, 7, 812, "Metrics/MethodLength: Method has too many lines. [16/10]", 391537814],
-    [48, 7, 812, "Metrics/PerceivedComplexity: Perceived complexity for `merge_ordered_clause_types` is too high. [9/8]", 391537814],
-    [71, 7, 1470, "Metrics/AbcSize: Assignment Branch Condition size for `canonicalize_rescue_clause_order` is too high. [<18, 28, 14> 36.11/17]", 570708009],
-    [71, 7, 1470, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `canonicalize_rescue_clause_order` is too high. [14/7]", 570708009],
-    [71, 7, 1470, "Metrics/MethodLength: Method has too many lines. [24/10]", 570708009],
-    [71, 7, 1470, "Metrics/PerceivedComplexity: Perceived complexity for `canonicalize_rescue_clause_order` is too high. [14/8]", 570708009],
-    [125, 7, 530, "Metrics/AbcSize: Assignment Branch Condition size for `local_variable_read_names_in` is too high. [<1, 16, 9> 18.38/17]", 2555890222],
-    [125, 7, 530, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `local_variable_read_names_in` is too high. [8/7]", 2555890222],
-    [125, 7, 530, "Metrics/MethodLength: Method has too many lines. [12/10]", 2555890222],
-    [125, 7, 530, "Metrics/PerceivedComplexity: Perceived complexity for `local_variable_read_names_in` is too high. [9/8]", 2555890222],
-    [177, 7, 618, "Metrics/AbcSize: Assignment Branch Condition size for `rewrite_local_reference_in_source` is too high. [<6, 16, 9> 19.31/17]", 1195871443],
-    [177, 7, 618, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `rewrite_local_reference_in_source` is too high. [9/7]", 1195871443],
-    [177, 7, 618, "Metrics/PerceivedComplexity: Perceived complexity for `rewrite_local_reference_in_source` is too high. [9/8]", 1195871443],
-    [230, 7, 1342, "Metrics/AbcSize: Assignment Branch Condition size for `source_defined_exception_hierarchy` is too high. [<10, 30, 14> 34.58/17]", 1939854289],
-    [230, 7, 1342, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `source_defined_exception_hierarchy` is too high. [14/7]", 1939854289],
-    [230, 7, 1342, "Metrics/MethodLength: Method has too many lines. [19/10]", 1939854289],
-    [230, 7, 1342, "Metrics/PerceivedComplexity: Perceived complexity for `source_defined_exception_hierarchy` is too high. [15/8]", 1939854289],
-    [234, 85, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [248, 121, 19, "Layout/LineLength: Line is too long. [139/120]", 1806710570],
-    [256, 7, 1233, "Metrics/AbcSize: Assignment Branch Condition size for `collect_source_defined_exception_definitions` is too high. [<4, 22, 9> 24.1/17]", 1970916346],
-    [256, 7, 1233, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_source_defined_exception_definitions` is too high. [10/7]", 1970916346],
-    [256, 7, 1233, "Metrics/MethodLength: Method has too many lines. [24/10]", 1970916346]
+    [80, 7, 530, "Metrics/AbcSize: Assignment Branch Condition size for `local_variable_read_names_in` is too high. [<1, 16, 9> 18.38/17]", 2555890222],
+    [80, 7, 530, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `local_variable_read_names_in` is too high. [8/7]", 2555890222],
+    [80, 7, 530, "Metrics/MethodLength: Method has too many lines. [12/10]", 2555890222],
+    [80, 7, 530, "Metrics/PerceivedComplexity: Perceived complexity for `local_variable_read_names_in` is too high. [9/8]", 2555890222],
+    [132, 7, 618, "Metrics/AbcSize: Assignment Branch Condition size for `rewrite_local_reference_in_source` is too high. [<6, 16, 9> 19.31/17]", 1195871443],
+    [132, 7, 618, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `rewrite_local_reference_in_source` is too high. [9/7]", 1195871443],
+    [132, 7, 618, "Metrics/PerceivedComplexity: Perceived complexity for `rewrite_local_reference_in_source` is too high. [9/8]", 1195871443],
+    [178, 85, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [190, 7, 1233, "Metrics/AbcSize: Assignment Branch Condition size for `collect_source_defined_exception_definitions` is too high. [<4, 22, 9> 24.1/17]", 1970916346],
+    [190, 7, 1233, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_source_defined_exception_definitions` is too high. [10/7]", 1970916346],
+    [190, 7, 1233, "Metrics/MethodLength: Method has too many lines. [24/10]", 1970916346]
   ],
-  "lib/prism/merge/begin_node_structure.rb:1595718070": [
+  "lib/prism/merge/begin_node_structure.rb:1232724245": [
     [5, 5, 24, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::BeginNodeStructure`.", 3506219929],
-    [5, 5, 4283, "Metrics/ClassLength: Class has too many lines. [106/100]", 1740419888],
-    [26, 7, 375, "Metrics/AbcSize: Assignment Branch Condition size for `boundary_lines` is too high. [<0, 28, 7> 28.86/17]", 3399008793],
-    [26, 7, 375, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `boundary_lines` is too high. [8/7]", 3399008793],
-    [38, 7, 251, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_start_line` is too high. [8/7]", 1553904487],
-    [48, 7, 407, "Metrics/MethodLength: Method has too many lines. [12/10]", 3851339415],
-    [64, 7, 1089, "Metrics/AbcSize: Assignment Branch Condition size for `clause_regions` is too high. [<9, 38, 9> 40.07/17]", 1916795013],
-    [64, 7, 1089, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_regions` is too high. [10/7]", 1916795013],
-    [64, 7, 1089, "Metrics/MethodLength: Method has too many lines. [22/10]", 1916795013],
-    [64, 7, 1089, "Metrics/PerceivedComplexity: Perceived complexity for `clause_regions` is too high. [10/8]", 1916795013],
-    [91, 7, 613, "Metrics/AbcSize: Assignment Branch Condition size for `clause_nodes_by_type` is too high. [<9, 19, 4> 21.4/17]", 1693909219],
-    [91, 7, 613, "Metrics/MethodLength: Method has too many lines. [12/10]", 1693909219],
-    [107, 11, 19, "Naming/PredicatePrefix: Rename `has_clause_or_body?` to `clause_or_body?`.", 2163996991],
-    [111, 7, 598, "Metrics/AbcSize: Assignment Branch Condition size for `line_map_for` is too high. [<13, 15, 6> 20.74/17]", 191778789]
+    [5, 5, 4080, "Metrics/ClassLength: Class has too many lines. [101/100]", 1611393241],
+    [21, 7, 375, "Metrics/AbcSize: Assignment Branch Condition size for `boundary_lines` is too high. [<0, 28, 7> 28.86/17]", 3399008793],
+    [21, 7, 375, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `boundary_lines` is too high. [8/7]", 3399008793],
+    [33, 7, 251, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_start_line` is too high. [8/7]", 1553904487],
+    [43, 7, 407, "Metrics/MethodLength: Method has too many lines. [12/10]", 3851339415],
+    [59, 7, 1089, "Metrics/AbcSize: Assignment Branch Condition size for `clause_regions` is too high. [<9, 38, 9> 40.07/17]", 1916795013],
+    [59, 7, 1089, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `clause_regions` is too high. [10/7]", 1916795013],
+    [59, 7, 1089, "Metrics/MethodLength: Method has too many lines. [22/10]", 1916795013],
+    [59, 7, 1089, "Metrics/PerceivedComplexity: Perceived complexity for `clause_regions` is too high. [10/8]", 1916795013],
+    [86, 7, 613, "Metrics/AbcSize: Assignment Branch Condition size for `clause_nodes_by_type` is too high. [<9, 19, 4> 21.4/17]", 1693909219],
+    [86, 7, 613, "Metrics/MethodLength: Method has too many lines. [12/10]", 1693909219],
+    [102, 11, 19, "Naming/PredicatePrefix: Rename `has_clause_or_body?` to `clause_or_body?`.", 2163996991],
+    [106, 7, 598, "Metrics/AbcSize: Assignment Branch Condition size for `line_map_for` is too high. [<13, 15, 6> 20.74/17]", 191778789]
   ],
-  "lib/prism/merge/block_directive_detector.rb:14576901": [
-    [21, 5, 12462, "Metrics/ClassLength: Class has too many lines. [242/100]", 638189870],
-    [65, 7, 2365, "Metrics/AbcSize: Assignment Branch Condition size for `promote_spans_to_nodes` is too high. [<24, 42, 32> 58/17]", 2022543448],
-    [65, 7, 2365, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `promote_spans_to_nodes` is too high. [24/7]", 2022543448],
-    [65, 7, 2365, "Metrics/MethodLength: Method has too many lines. [36/10]", 2022543448],
-    [65, 7, 2365, "Metrics/PerceivedComplexity: Perceived complexity for `promote_spans_to_nodes` is too high. [25/8]", 2022543448],
-    [92, 11, 7, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 4045560504],
-    [125, 121, 4, "Layout/LineLength: Line is too long. [124/120]", 2087921317],
-    [139, 7, 1121, "Metrics/AbcSize: Assignment Branch Condition size for `detect_freeze_spans` is too high. [<10, 18, 7> 21.75/17]", 2014886705],
-    [139, 7, 1121, "Metrics/MethodLength: Method has too many lines. [28/10]", 2014886705],
-    [139, 7, 1121, "Metrics/PerceivedComplexity: Perceived complexity for `detect_freeze_spans` is too high. [9/8]", 2014886705],
-    [176, 7, 1496, "Metrics/AbcSize: Assignment Branch Condition size for `detect_nocov_spans` is too high. [<10, 25, 10> 28.72/17]", 284113190],
-    [176, 7, 1496, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `detect_nocov_spans` is too high. [9/7]", 284113190],
-    [176, 7, 1496, "Metrics/MethodLength: Method has too many lines. [40/10]", 284113190],
-    [176, 7, 1496, "Metrics/PerceivedComplexity: Perceived complexity for `detect_nocov_spans` is too high. [12/8]", 284113190],
-    [184, 9, 1163, "Metrics/BlockLength: Block has too many lines. [30/25]", 4100741046],
-    [227, 7, 966, "Metrics/AbcSize: Assignment Branch Condition size for `validate_no_crossing` is too high. [<8, 27, 19> 33.97/17]", 3041442390],
-    [227, 7, 966, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `validate_no_crossing` is too high. [13/7]", 3041442390],
-    [227, 7, 966, "Metrics/MethodLength: Method has too many lines. [20/10]", 3041442390],
-    [227, 7, 966, "Metrics/PerceivedComplexity: Perceived complexity for `validate_no_crossing` is too high. [13/8]", 3041442390],
-    [304, 7, 832, "Metrics/MethodLength: Method has too many lines. [23/10]", 3204610677],
-    [330, 7, 1136, "Metrics/AbcSize: Assignment Branch Condition size for `rebuild_statements` is too high. [<15, 17, 9> 24.39/17]", 1114825097],
-    [330, 7, 1136, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `rebuild_statements` is too high. [10/7]", 1114825097],
-    [330, 7, 1136, "Metrics/MethodLength: Method has too many lines. [15/10]", 1114825097],
-    [330, 7, 1136, "Metrics/PerceivedComplexity: Perceived complexity for `rebuild_statements` is too high. [10/8]", 1114825097]
+  "lib/prism/merge/block_directive_detector.rb:3698866715": [
+    [9, 5, 5028, "Metrics/ClassLength: Class has too many lines. [121/100]", 2587374670],
+    [10, 7, 1976, "Metrics/AbcSize: Assignment Branch Condition size for `promote_spans_to_nodes` is too high. [<23, 42, 32> 57.59/17]", 1038475655],
+    [10, 7, 1976, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `promote_spans_to_nodes` is too high. [24/7]", 1038475655],
+    [10, 7, 1976, "Metrics/MethodLength: Method has too many lines. [37/10]", 1038475655],
+    [10, 7, 1976, "Metrics/PerceivedComplexity: Perceived complexity for `promote_spans_to_nodes` is too high. [25/8]", 1038475655],
+    [35, 11, 7, "Style/MultilineBlockChain: Avoid multi-line chains of blocks.", 4045560504],
+    [108, 7, 832, "Metrics/MethodLength: Method has too many lines. [23/10]", 3204610677],
+    [134, 7, 722, "Metrics/AbcSize: Assignment Branch Condition size for `rebuild_statements` is too high. [<15, 17, 9> 24.39/17]", 3809085226],
+    [134, 7, 722, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `rebuild_statements` is too high. [10/7]", 3809085226],
+    [134, 7, 722, "Metrics/MethodLength: Method has too many lines. [15/10]", 3809085226],
+    [134, 7, 722, "Metrics/PerceivedComplexity: Perceived complexity for `rebuild_statements` is too high. [10/8]", 3809085226]
   ],
   "lib/prism/merge/comment/block.rb:3606937725": [
     [65, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 1573406415]
@@ -314,8 +286,8 @@
     [230, 7, 665, "Metrics/AbcSize: Assignment Branch Condition size for `emit_comment_only_prefix_lines` is too high. [<5, 21, 4> 21.95/17]", 1939505075],
     [243, 7, 942, "Metrics/MethodLength: Method has too many lines. [19/10]", 2012616838]
   ],
-  "lib/prism/merge/file_analysis.rb:738048557": [
-    [16, 5, 55295, "Metrics/ClassLength: Class has too many lines. [623/100]", 2951008665],
+  "lib/prism/merge/file_analysis.rb:4241124500": [
+    [16, 5, 55504, "Metrics/ClassLength: Class has too many lines. [614/100]", 2951008665],
     [19, 7, 28, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::FileAnalysis::NativeCommentAugmenter`.", 2321467727],
     [19, 7, 5712, "Metrics/ClassLength: Class has too many lines. [121/100]", 3225634005],
     [22, 9, 605, "Metrics/MethodLength: Method has too many lines. [16/10]", 3935631704],
@@ -345,17 +317,17 @@
     [828, 7, 2509, "Metrics/PerceivedComplexity: Perceived complexity for `extract_and_integrate_all_nodes` is too high. [16/8]", 1138957888],
     [897, 7, 1325, "Metrics/AbcSize: Assignment Branch Condition size for `extract_nodes_with_comments` is too high. [<3, 25, 7> 26.13/17]", 1498557944],
     [897, 7, 1325, "Metrics/MethodLength: Method has too many lines. [23/10]", 1498557944],
-    [1009, 7, 11719, "Metrics/AbcSize: Assignment Branch Condition size for `compute_node_signature` is too high. [<19, 139, 94> 168.9/17]", 2654183611],
-    [1009, 7, 11719, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `compute_node_signature` is too high. [82/7]", 2654183611],
-    [1009, 7, 11719, "Metrics/MethodLength: Method has too many lines. [141/10]", 2654183611],
-    [1009, 7, 11719, "Metrics/PerceivedComplexity: Perceived complexity for `compute_node_signature` is too high. [70/8]", 2654183611],
+    [1009, 7, 11892, "Metrics/AbcSize: Assignment Branch Condition size for `compute_node_signature` is too high. [<19, 176, 83> 195.5/17]", 2654183611],
+    [1009, 7, 11892, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `compute_node_signature` is too high. [75/7]", 2654183611],
+    [1009, 7, 11892, "Metrics/MethodLength: Method has too many lines. [132/10]", 2654183611],
+    [1009, 7, 11892, "Metrics/PerceivedComplexity: Perceived complexity for `compute_node_signature` is too high. [61/8]", 2654183611],
     [1070, 88, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
     [1074, 24, 300, "Metrics/BlockNesting: Avoid more than 3 levels of block nesting.", 2690302041],
     [1074, 55, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [1299, 7, 680, "Metrics/AbcSize: Assignment Branch Condition size for `detect_gemspec_block_var` is too high. [<3, 22, 15> 26.8/17]", 3676370299],
-    [1299, 7, 680, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `detect_gemspec_block_var` is too high. [14/7]", 3676370299],
-    [1299, 7, 680, "Metrics/MethodLength: Method has too many lines. [14/10]", 3676370299],
-    [1299, 7, 680, "Metrics/PerceivedComplexity: Perceived complexity for `detect_gemspec_block_var` is too high. [14/8]", 3676370299]
+    [1285, 7, 680, "Metrics/AbcSize: Assignment Branch Condition size for `detect_gemspec_block_var` is too high. [<3, 22, 15> 26.8/17]", 3676370299],
+    [1285, 7, 680, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `detect_gemspec_block_var` is too high. [14/7]", 3676370299],
+    [1285, 7, 680, "Metrics/MethodLength: Method has too many lines. [14/10]", 3676370299],
+    [1285, 7, 680, "Metrics/PerceivedComplexity: Perceived complexity for `detect_gemspec_block_var` is too high. [14/8]", 3676370299]
   ],
   "lib/prism/merge/freeze_node.rb:2471800311": [
     [67, 7, 577, "Metrics/MethodLength: Method has too many lines. [11/10]", 2189574632],
@@ -364,17 +336,6 @@
     [124, 7, 2888, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `validate_structure!` is too high. [24/7]", 3621186151],
     [124, 7, 2888, "Metrics/MethodLength: Method has too many lines. [38/10]", 3621186151],
     [124, 7, 2888, "Metrics/PerceivedComplexity: Perceived complexity for `validate_structure!` is too high. [25/8]", 3621186151]
-  ],
-  "lib/prism/merge/magic_comment_support.rb:1214861451": [
-    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177608],
-    [3, 5, 26, "Style/Documentation: Missing top-level documentation comment for `module Prism::Merge::MagicCommentSupport`.", 1989707586],
-    [16, 7, 1484, "Metrics/AbcSize: Assignment Branch Condition size for `comment_only_prefix_info` is too high. [<9, 38, 8> 39.86/17]", 1098666313],
-    [16, 7, 1484, "Metrics/MethodLength: Method has too many lines. [33/10]", 1098666313],
-    [59, 7, 693, "Metrics/AbcSize: Assignment Branch Condition size for `header_magic_comment_types_for_lines` is too high. [<10, 13, 9> 18.71/17]", 3693768719],
-    [59, 7, 693, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `header_magic_comment_types_for_lines` is too high. [8/7]", 3693768719],
-    [59, 7, 693, "Metrics/MethodLength: Method has too many lines. [16/10]", 3693768719],
-    [83, 7, 748, "Metrics/AbcSize: Assignment Branch Condition size for `prefix_comment_line_numbers_for_comments` is too high. [<10, 12, 7> 17.12/17]", 335042389],
-    [83, 7, 748, "Metrics/MethodLength: Method has too many lines. [19/10]", 335042389]
   ],
   "lib/prism/merge/merge_result.rb:1970522956": [
     [9, 5, 12561, "Metrics/ClassLength: Class has too many lines. [238/100]", 3020348188],
@@ -389,26 +350,20 @@
     [219, 7, 901, "Metrics/MethodLength: Method has too many lines. [25/10]", 2776830125],
     [296, 7, 903, "Metrics/MethodLength: Method has too many lines. [18/10]", 2752342414]
   ],
-  "lib/prism/merge/method_match_refiner.rb:3086922470": [
-    [98, 7, 678, "Metrics/AbcSize: Assignment Branch Condition size for `param_similarity` is too high. [<6, 21, 4> 22.2/17]", 2054244811],
-    [121, 7, 705, "Metrics/AbcSize: Assignment Branch Condition size for `extract_param_names` is too high. [<2, 37, 16> 40.36/17]", 3200522215],
-    [121, 7, 705, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_param_names` is too high. [17/7]", 3200522215],
-    [121, 7, 705, "Metrics/MethodLength: Method has too many lines. [11/10]", 3200522215],
-    [121, 7, 705, "Metrics/PerceivedComplexity: Perceived complexity for `extract_param_names` is too high. [17/8]", 3200522215],
-    [129, 49, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [132, 65, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [160, 7, 854, "Metrics/AbcSize: Assignment Branch Condition size for `levenshtein_distance` is too high. [<13, 29, 8> 32.77/17]", 2946547420],
-    [160, 7, 854, "Metrics/MethodLength: Method has too many lines. [20/10]", 2946547420]
+  "lib/prism/merge/method_match_refiner.rb:1593340636": [
+    [103, 7, 705, "Metrics/AbcSize: Assignment Branch Condition size for `extract_param_names` is too high. [<2, 37, 16> 40.36/17]", 3200522215],
+    [103, 7, 705, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_param_names` is too high. [17/7]", 3200522215],
+    [103, 7, 705, "Metrics/MethodLength: Method has too many lines. [11/10]", 3200522215],
+    [103, 7, 705, "Metrics/PerceivedComplexity: Perceived complexity for `extract_param_names` is too high. [17/8]", 3200522215],
+    [111, 49, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [114, 65, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765]
   ],
   "lib/prism/merge/nested_statement_walker.rb:3826169704": [
     [24, 7, 695, "Metrics/MethodLength: Method has too many lines. [16/10]", 3744912119],
     [45, 7, 518, "Metrics/MethodLength: Method has too many lines. [12/10]", 2978518157]
   ],
-  "lib/prism/merge/nocov_node.rb:3116182832": [
-    [59, 21, 84, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3439911158],
-    [90, 19, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [143, 7, 353, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `signature` is too high. [8/7]", 3442013923],
-    [143, 7, 353, "Metrics/PerceivedComplexity: Perceived complexity for `signature` is too high. [9/8]", 3442013923]
+  "lib/prism/merge/nocov_node.rb:2336029940": [
+    [52, 19, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765]
   ],
   "lib/prism/merge/node_body_layout.rb:1642074264": [
     [5, 5, 20, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::NodeBodyLayout`.", 1262407425],
@@ -505,16 +460,16 @@
     [12, 7, 1132, "Metrics/PerceivedComplexity: Perceived complexity for `should_merge?` is too high. [13/8]", 4123619949],
     [47, 7, 398, "Metrics/MethodLength: Method has too many lines. [18/10]", 385694759]
   ],
-  "lib/prism/merge/recursive_node_body_merger.rb:2523299035": [
+  "lib/prism/merge/recursive_node_body_merger.rb:1132596837": [
     [5, 5, 29, "Style/Documentation: Missing top-level documentation comment for `class Prism::Merge::RecursiveNodeBodyMerger`.", 3703318859],
-    [5, 5, 18406, "Metrics/ClassLength: Class has too many lines. [333/100]", 1740018190],
-    [12, 7, 12657, "Metrics/AbcSize: Assignment Branch Condition size for `merge` is too high. [<79, 259, 101> 289/17]", 1663029092],
-    [12, 7, 12657, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge` is too high. [78/7]", 1663029092],
-    [12, 7, 12657, "Metrics/MethodLength: Method has too many lines. [215/10]", 1663029092],
-    [12, 7, 12657, "Metrics/PerceivedComplexity: Perceived complexity for `merge` is too high. [83/8]", 1663029092],
+    [5, 5, 18505, "Metrics/ClassLength: Class has too many lines. [333/100]", 3196902308],
+    [12, 7, 12756, "Metrics/AbcSize: Assignment Branch Condition size for `merge` is too high. [<78, 262, 90> 287.8/17]", 1909933362],
+    [12, 7, 12756, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge` is too high. [70/7]", 1909933362],
+    [12, 7, 12756, "Metrics/MethodLength: Method has too many lines. [215/10]", 1909933362],
+    [12, 7, 12756, "Metrics/PerceivedComplexity: Perceived complexity for `merge` is too high. [75/8]", 1909933362],
     [27, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 929875726],
-    [65, 121, 12, "Layout/LineLength: Line is too long. [132/120]", 518709914],
-    [70, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 366676207],
+    [62, 121, 12, "Layout/LineLength: Line is too long. [132/120]", 518709914],
+    [67, 121, 10, "Layout/LineLength: Line is too long. [130/120]", 366676207],
     [266, 7, 1221, "Metrics/AbcSize: Assignment Branch Condition size for `remap_inner_unresolved_review_state!` is too high. [<8, 22, 6> 24.17/17]", 3210674006],
     [266, 7, 1221, "Metrics/MethodLength: Method has too many lines. [21/10]", 3210674006],
     [293, 7, 1121, "Metrics/AbcSize: Assignment Branch Condition size for `remap_inner_unresolved_case` is too high. [<6, 24, 0> 24.74/17]", 3468635549],
@@ -524,20 +479,19 @@
     [376, 7, 826, "Metrics/MethodLength: Method has too many lines. [17/10]", 2158299973],
     [376, 7, 826, "Metrics/PerceivedComplexity: Perceived complexity for `emit_trailing_layout_gap_lines` is too high. [9/8]", 2158299973]
   ],
-  "lib/prism/merge/ruby_doc_surface_analyzer.rb:2647486851": [
-    [7, 5, 8269, "Metrics/ClassLength: Class has too many lines. [192/100]", 2716524254],
-    [61, 7, 1408, "Metrics/AbcSize: Assignment Branch Condition size for `build_doc_comment_surface` is too high. [<10, 25, 5> 27.39/17]", 2414553577],
-    [61, 7, 1408, "Metrics/MethodLength: Method has too many lines. [28/10]", 2414553577],
-    [106, 7, 1513, "Metrics/AbcSize: Assignment Branch Condition size for `build_example_surface` is too high. [<6, 24, 6> 25.46/17]", 4167825853],
-    [106, 7, 1513, "Metrics/MethodLength: Method has too many lines. [29/10]", 4167825853],
-    [162, 7, 555, "Metrics/AbcSize: Assignment Branch Condition size for `doc_comment_entries` is too high. [<8, 18, 6> 20.59/17]", 358090808]
+  "lib/prism/merge/ruby_doc_surface_analyzer.rb:3389668357": [
+    [7, 5, 7100, "Metrics/ClassLength: Class has too many lines. [162/100]", 77379508],
+    [50, 7, 1408, "Metrics/AbcSize: Assignment Branch Condition size for `build_doc_comment_surface` is too high. [<10, 25, 5> 27.39/17]", 2414553577],
+    [50, 7, 1408, "Metrics/MethodLength: Method has too many lines. [28/10]", 2414553577],
+    [91, 7, 1256, "Metrics/AbcSize: Assignment Branch Condition size for `build_example_surface` is too high. [<4, 23, 2> 23.43/17]", 4074178203],
+    [91, 7, 1256, "Metrics/MethodLength: Method has too many lines. [25/10]", 4074178203],
+    [131, 7, 555, "Metrics/AbcSize: Assignment Branch Condition size for `doc_comment_entries` is too high. [<8, 18, 6> 20.59/17]", 358090808]
   ],
-  "lib/prism/merge/scaffold_chunk_remover.rb:2190237849": [
-    [15, 5, 5193, "Metrics/ClassLength: Class has too many lines. [123/100]", 3937701477],
-    [75, 7, 1856, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<21, 60, 22> 67.27/17]", 1601329428],
-    [75, 7, 1856, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `call` is too high. [21/7]", 1601329428],
-    [75, 7, 1856, "Metrics/MethodLength: Method has too many lines. [37/10]", 1601329428],
-    [75, 7, 1856, "Metrics/PerceivedComplexity: Perceived complexity for `call` is too high. [21/8]", 1601329428]
+  "lib/prism/merge/scaffold_chunk_remover.rb:174131146": [
+    [34, 7, 1958, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<21, 60, 22> 67.27/17]", 1919383090],
+    [34, 7, 1958, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `call` is too high. [21/7]", 1919383090],
+    [34, 7, 1958, "Metrics/MethodLength: Method has too many lines. [37/10]", 1919383090],
+    [34, 7, 1958, "Metrics/PerceivedComplexity: Perceived complexity for `call` is too high. [21/8]", 1919383090]
   ],
   "lib/prism/merge/smart_merger.rb:3814529034": [
     [48, 5, 42561, "Metrics/ClassLength: Class has too many lines. [603/100]", 3828655257],

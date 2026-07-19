@@ -36,7 +36,9 @@ module Prism
 
           inner_indices = inner_stmts.map(&:first)
           inner_nodes = inner_stmts.map(&:last)
-          nested = spans.select { |candidate| candidate != span && candidate.start_line >= span.start_line && candidate.end_line <= span.end_line }
+          nested = spans.select do |candidate|
+            candidate != span && candidate.start_line >= span.start_line && candidate.end_line <= span.end_line
+          end
           inner_nodes = promote_spans_to_nodes(inner_nodes, nested, analysis: analysis) unless nested.empty?
 
           insert_at = if inner_indices.any?
