@@ -1080,6 +1080,17 @@ module Prism
           end
         end
 
+        if dest_signature && duplicate_destination_node_already_matched?(
+          dest_node: dest_node,
+          dest_signature: dest_signature,
+          template_by_signature: template_by_signature,
+          consumed_template_indices: consumed_template_indices
+        )
+          prune_removed_owner_leading_gap(dest_node)
+          output_dest_line_ranges << node_range
+          return dest_node.location.end_line
+        end
+
         last_output_dest_line = merger.send(:emit_dest_gap_lines, merger.result, merger.dest_analysis,
                                             last_output_dest_line, dest_node)
         output_node = dest_node
@@ -1142,6 +1153,32 @@ module Prism
           advance_dest_output: advance_dest_output,
           preserve_trailing_blank_line_progress: emission&.fetch(:preserve_trailing_blank_line_progress, false)
         )
+      end
+
+      def duplicate_destination_node_already_matched?(dest_node:, dest_signature:, template_by_signature:,
+                                                     consumed_template_indices:)
+        candidates = template_by_signature[dest_signature]
+        return false unless candidates
+        return false if candidates.any? { |candidate| !consumed_template_indices.include?(candidate.fetch(:index)) }
+
+        dest_identity = normalized_node_identity(dest_node)
+        return false if dest_identity.empty?
+
+        candidates.any? do |candidate|
+          consumed_template_indices.include?(candidate.fetch(:index)) &&
+            normalized_node_identity(candidate.fetch(:node)) == dest_identity
+        end
+      end
+
+      def normalized_node_identity(node)
+        source = if node.respond_to?(:normalized_content)
+                   node.normalized_content
+                 elsif node.respond_to?(:slice)
+                   node.slice
+                 else
+                   node.to_s
+                 end
+        source.to_s.gsub(/\r\n?/, "\n").strip
       end
 
       def already_output?(node_range, output_dest_line_ranges)
