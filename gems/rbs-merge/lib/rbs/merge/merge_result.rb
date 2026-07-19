@@ -16,6 +16,8 @@ module Rbs
     #
     # @see Ast::Merge::MergeResultBase
     class MergeResult < Ast::Merge::MergeResultBase
+      include ::Ast::Merge::CommentLayoutEmissionSupport
+
       # Decision indicating content was preserved from a freeze block
       # @return [Symbol]
       DECISION_FREEZE_BLOCK = :freeze_block
@@ -192,7 +194,7 @@ module Rbs
 
           if region_start && source_start && region_start < source_start
             leading_start = leading_segment_start_for_output(
-              output_statement: statement,
+              output_owner: statement,
               output_analysis: analysis,
               source_region_start: region_start,
               source_region: leading_region,
@@ -222,13 +224,6 @@ module Rbs
         end
 
         [nil, analysis, statement]
-      end
-
-      def leading_region_for(statement, analysis)
-        return unless statement && analysis&.respond_to?(:comment_attachment_for)
-
-        attachment = analysis.comment_attachment_for(statement)
-        attachment.leading_region if attachment.respond_to?(:leading_region)
       end
 
       def trailing_lines_for(statement, analysis)
@@ -264,21 +259,6 @@ module Rbs
         return [] unless gap&.controls_output_for?(statement)
 
         gap.lines
-      end
-
-      def region_present?(region)
-        return false unless region
-        return !region.empty? if region.respond_to?(:empty?)
-        return region.nodes.any? if region.respond_to?(:nodes)
-
-        true
-      end
-
-      def region_start_line(region)
-        return region.start_line if region.respond_to?(:start_line) && region.start_line
-        return unless region.respond_to?(:nodes)
-
-        region.nodes.filter_map { |node| node.respond_to?(:line_number) ? node.line_number : nil }.min
       end
 
       def native_comment_fallback_applicable?(statement, analysis)
@@ -338,84 +318,6 @@ module Rbs
 
       def standalone_comment_line?(line)
         line.lstrip.start_with?('#')
-      end
-
-      def previous_statement_trailing_region_matches?(statement, analysis, source_region)
-        previous_statement = previous_statement_for(statement, analysis)
-        return false unless previous_statement
-
-        previous_trailing_region = analysis.comment_attachment_for(previous_statement)&.trailing_region
-        regions_equivalent?(previous_trailing_region, source_region)
-      end
-
-      def previous_statement_for(statement, analysis)
-        statements = Array(analysis&.statements).select { |entry| entry.respond_to?(:start_line) && entry.start_line }
-        index = statements.index(statement)
-        return unless index && index.positive?
-
-        statements[index - 1]
-      end
-
-      def regions_equivalent?(left, right)
-        return false unless left && right
-
-        left.respond_to?(:normalized_content) &&
-          right.respond_to?(:normalized_content) &&
-          left.normalized_content == right.normalized_content
-      end
-
-      def preceding_blank_line_start(region_start, analysis)
-        line_num = region_start
-        while line_num > 1
-          previous_line = analysis.line_at(line_num - 1)
-          break unless previous_line && previous_line.strip.empty?
-
-          line_num -= 1
-        end
-
-        line_num
-      end
-
-      def leading_segment_start_for_output(output_statement:, output_analysis:, source_region_start:, source_analysis:,
-                                           source_region: nil)
-        source_region_start - desired_blank_line_count_before_leading_region(
-          output_statement: output_statement,
-          output_analysis: output_analysis,
-          source_region_start: source_region_start,
-          source_region: source_region,
-          source_analysis: source_analysis
-        )
-      end
-
-      def desired_blank_line_count_before_leading_region(output_statement:, output_analysis:, source_region_start:, source_analysis:,
-                                                         source_region: nil)
-        target_region = leading_region_for(output_statement, output_analysis)
-        target_region_start = region_start_line(target_region)
-        output_start_line = get_start_line(output_statement)
-
-        if target_region_start && output_start_line && target_region_start < output_start_line
-          blank_line_count_before(target_region_start, output_analysis)
-        elsif source_region && previous_statement_trailing_region_matches?(output_statement, output_analysis,
-                                                                           source_region)
-          0
-        else
-          blank_line_count_before(source_region_start, source_analysis)
-        end
-      end
-
-      def blank_line_count_before(line_num, analysis)
-        count = 0
-        current = line_num - 1
-
-        while current >= 1
-          previous_line = analysis.line_at(current)
-          break unless previous_line && previous_line.strip.empty?
-
-          count += 1
-          current -= 1
-        end
-
-        count
       end
 
       # Get start line for a statement (works with both backends)

@@ -26,6 +26,7 @@ module Dotenv
     #     preference: { default: :destination, secret: :template })
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include Ast::Merge::TrailingGroups::DestIterate
+      include Ast::Merge::CommentLayoutEmissionSupport
 
       attr_reader :corruption_handling
 
@@ -362,48 +363,17 @@ module Dotenv
       end
 
       def root_boundary_lines_for(kind, analysis)
-        owners = Array(analysis.structural_owners).select do |owner|
-          owner.respond_to?(:start_line) && owner.respond_to?(:end_line) && owner.start_line && owner.end_line
-        end
-
-        if kind == :preamble && owners.empty? && analysis.respond_to?(:lines) && analysis.lines.any?
-          return analysis.lines.map(&:raw)
-        end
-        return [] if owners.empty?
-
-        case kind
-        when :preamble
-          first_owner = owners.min_by(&:start_line)
-          start_line = emission_start_line_for(first_owner, analysis)
-          return [] unless start_line && start_line > 1
-
-          (1...start_line).filter_map { |line_number| raw_line_at(analysis, line_number) }
-        when :postlude
-          last_line = owners.map(&:end_line).compact.max
-          return [] unless last_line && analysis.respond_to?(:lines)
-          return [] if last_line >= analysis.lines.length
-
-          ((last_line + 1)..analysis.lines.length).filter_map { |line_number| raw_line_at(analysis, line_number) }
-        else
-          []
-        end
+        super(kind, analysis, owners: analysis.structural_owners, fallback_to_owner_bounds: true)
       end
 
       def emission_start_line_for(node, analysis)
-        attachment = analysis.comment_attachment_for(node)
-        leading_region = attachment&.leading_region
-        start_line = if leading_region&.start_line
-                       leading_region.start_line
-                     elsif first_structural_owner?(node,
-                                                   analysis) && analysis.comment_augmenter.preamble_region&.start_line
-                       analysis.comment_augmenter.preamble_region.start_line
-                     else
-                       node.start_line
-                     end
+        region_start = region_start_line(leading_region_for(node, analysis))
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node, analysis)
+        preceding_blank_line_start(region_start || preamble_start || node.start_line, analysis)
+      end
 
-        start_line -= 1 while start_line > 1 && raw_line_at(analysis, start_line - 1).to_s.strip.empty?
-
-        start_line
+      def root_boundary_owner_start_line_for(node, analysis)
+        emission_start_line_for(node, analysis)
       end
 
       def first_structural_owner?(node, analysis)
@@ -568,6 +538,10 @@ module Dotenv
       def raw_line_at(analysis, line_number)
         line = analysis.line_at(line_number)
         line.respond_to?(:raw) ? line.raw : line
+      end
+
+      def source_line_at(analysis, line_number)
+        raw_line_at(analysis, line_number)
       end
     end
   end

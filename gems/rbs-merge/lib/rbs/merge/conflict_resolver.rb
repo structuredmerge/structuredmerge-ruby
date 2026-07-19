@@ -14,6 +14,8 @@ module Rbs
     #   )
     #   winner = resolver.resolve(template_decl, dest_decl)
     class ConflictResolver < ::Ast::Merge::ConflictResolverBase
+      include ::Ast::Merge::CommentLayoutEmissionSupport
+
       # Initialize a conflict resolver
       #
       # @param preference [Symbol, Hash] Which version wins on conflict (:template or :destination)
@@ -177,30 +179,8 @@ module Rbs
         lines.join("\n")
       end
 
-      def leading_region_for(decl, analysis)
-        return unless decl && analysis&.respond_to?(:comment_attachment_for)
-
-        attachment = analysis.comment_attachment_for(decl)
-        attachment.leading_region if attachment.respond_to?(:leading_region)
-      end
-
       def native_comment_fallback_applicable?(decl, _analysis)
         decl.respond_to?(:comment) && decl.comment
-      end
-
-      def region_present?(region)
-        return false unless region
-        return !region.empty? if region.respond_to?(:empty?)
-        return region.nodes.any? if region.respond_to?(:nodes)
-
-        true
-      end
-
-      def region_start_line(region)
-        return region.start_line if region.respond_to?(:start_line) && region.start_line
-        return unless region.respond_to?(:nodes)
-
-        region.nodes.filter_map { |node| node.respond_to?(:line_number) ? node.line_number : nil }.min
       end
 
       def leading_gap_line_count_for(decl, analysis)
@@ -213,22 +193,6 @@ module Rbs
 
         blank_line_count_before(region_start, analysis)
       end
-
-      def blank_line_count_before(line_num, analysis)
-        count = 0
-        current = line_num - 1
-
-        while current >= 1
-          previous_line = analysis.line_at(current)
-          break unless previous_line && previous_line.strip.empty?
-
-          count += 1
-          current -= 1
-        end
-
-        count
-      end
-
       # Get start line for a declaration (works with both backends)
       def get_decl_start_line(decl)
         if decl.respond_to?(:start_line)

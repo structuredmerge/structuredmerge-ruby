@@ -38,6 +38,7 @@ module Bash
       include ::Ast::Merge::TrailingGroups::DestIterate
       include ::Ast::Merge::Runtime::RootSessionSupport
       include ::Ast::Merge::StructuredEmitterProvenanceSupport
+      include ::Ast::Merge::CommentLayoutEmissionSupport
 
       # Creates a new SmartMerger for intelligent Bash script merging.
       #
@@ -518,49 +519,17 @@ module Bash
       end
 
       def root_boundary_lines_for(kind, analysis)
-        return [] unless analysis&.respond_to?(:statements)
-        if kind == :preamble && Array(analysis.statements).empty? && analysis.respond_to?(:lines) && analysis.lines.any?
-          return analysis.lines.dup
-        end
-
-        statements = Array(analysis.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.respond_to?(:end_line) && statement.start_line && statement.end_line
-        end
-        return [] if statements.empty?
-
-        case kind
-        when :preamble
-          first_statement = statements.min_by(&:start_line)
-          start_line = emission_start_line_for(first_statement, analysis)
-          return [] unless start_line && start_line > 1
-
-          (1...start_line).filter_map { |line_number| analysis.line_at(line_number) }
-        when :postlude
-          last_line = statements.map(&:end_line).compact.max
-          return [] unless last_line && analysis.respond_to?(:lines)
-          return [] if last_line >= analysis.lines.length
-
-          ((last_line + 1)..analysis.lines.length).filter_map { |line_number| analysis.line_at(line_number) }
-        else
-          []
-        end
+        super(kind, analysis, owners: analysis.nodes, fallback_to_owner_bounds: true)
       end
 
       def emission_start_line_for(node, analysis)
-        return unless node.respond_to?(:start_line) && node.start_line
+        region_start = region_start_line(leading_region_for(node, analysis))
+        comment_start = analysis.comment_tracker.leading_comments_before(node.start_line).first&.fetch(:line, nil)
+        preceding_blank_line_start(region_start || comment_start || node.start_line, analysis)
+      end
 
-        attachment = analysis.comment_attachment_for(node)
-        leading_region = attachment&.leading_region
-        start_line = if leading_region&.respond_to?(:start_line) && leading_region.start_line
-                       leading_region.start_line
-                     else
-                       leading_comments = analysis.comment_tracker.leading_comments_before(node.start_line)
-                       leading_comments.first&.fetch(:line, nil) || node.start_line
-                     end
-
-        start_line -= 1 while start_line > 1 && analysis.line_at(start_line - 1)&.strip == ''
-
-        start_line
+      def root_boundary_owner_start_line_for(node, analysis)
+        emission_start_line_for(node, analysis)
       end
 
       # Emit the preferred version of a matched node pair.

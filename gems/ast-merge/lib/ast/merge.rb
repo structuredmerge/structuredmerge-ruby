@@ -70,6 +70,7 @@ module Ast
     autoload :FileAnalyzable, 'ast/merge/file_analyzable'
     autoload :Freezable, 'ast/merge/freezable'
     autoload :FreezeNodeBase, 'ast/merge/freeze_node_base'
+    autoload :CommentLayoutEmissionSupport, 'ast/merge/comment_layout_emission_support'
     autoload :Healer, 'ast/merge/healer'
     autoload :JaccardSimilarity, 'ast/merge/jaccard_similarity'
     autoload :Layout, 'ast/merge/layout'

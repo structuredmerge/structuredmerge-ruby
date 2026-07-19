@@ -41,6 +41,8 @@ module Rbs
     # @see ConflictResolver
     # @see MergeResult
     class SmartMerger < ::Ast::Merge::SmartMergerBase
+      include ::Ast::Merge::CommentLayoutEmissionSupport
+
       attr_reader :corruption_handling
 
       # Creates a new SmartMerger for intelligent RBS file merging.
@@ -287,69 +289,8 @@ module Rbs
         true
       end
 
-      def root_boundary_lines_for(kind, analysis)
-        return [] unless analysis&.respond_to?(:comment_augmenter)
-
-        comment_only_lines = comment_only_boundary_lines_for(kind, analysis)
-        return comment_only_lines if comment_only_lines.any?
-
-        region = root_boundary_region(kind, analysis)
-        return [] unless region_present?(region)
-
-        start_line, end_line = root_boundary_range(kind, analysis, region)
-        return [] unless start_line && end_line
-        return [] if start_line > end_line
-
-        (start_line..end_line).filter_map { |line_number| analysis.line_at(line_number) }
-      end
-
-      def comment_only_boundary_lines_for(kind, analysis)
-        return [] unless kind == :preamble
-        return [] unless Array(analysis.statements).empty?
-        return [] unless analysis.respond_to?(:comment_nodes) && analysis.comment_nodes.any?
-
-        analysis.lines.dup
-      end
-
-      def root_boundary_region(kind, analysis)
-        augmenter = root_comment_augmenter_for(analysis)
-        return unless augmenter
-
-        kind == :preamble ? augmenter.preamble_region : augmenter.postlude_region
-      end
-
-      def root_comment_augmenter_for(analysis)
-        @root_comment_augmenters ||= {}
-        @root_comment_augmenters[analysis.object_id] ||= analysis.comment_augmenter(owners: analysis.statements)
-      end
-
-      def root_boundary_range(kind, analysis, region)
-        statements = Array(analysis.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.respond_to?(:end_line)
-        end
-
-        case kind
-        when :preamble
-          end_line = if statements.any?
-                       statements.map(&:start_line).compact.min.to_i - 1
-                     else
-                       analysis.lines.length
-                     end
-          [1, end_line]
-        when :postlude
-          start_line = if statements.any?
-                         statements.map(&:end_line).compact.max.to_i + 1
-                       else
-                         region.start_line || 1
-                       end
-          [start_line, analysis.lines.length]
-        end
-      end
-
       def first_statement_for(analysis)
-        Array(analysis&.statements)
-          .select { |statement| statement.respond_to?(:start_line) && statement.start_line }
-          .min_by(&:start_line)
+        first_owner_for(analysis)
       end
 
       def first_statement_has_leading_comments?(analysis)
@@ -930,105 +871,15 @@ module Rbs
         comments
       end
 
-      def leading_region_for(decl, analysis, owners: nil)
-        return unless decl && analysis&.respond_to?(:comment_attachment_for)
-
-        attachment = analysis.comment_attachment_for(decl, owners: owners)
-        attachment.leading_region if attachment.respond_to?(:leading_region)
-      end
-
-      def region_present?(region)
-        return false unless region
-        return !region.empty? if region.respond_to?(:empty?)
-        return region.nodes.any? if region.respond_to?(:nodes)
-
-        true
-      end
-
-      def region_start_line(region)
-        return region.start_line if region.respond_to?(:start_line) && region.start_line
-        return unless region.respond_to?(:nodes)
-
-        region.nodes.filter_map { |node| node.respond_to?(:line_number) ? node.line_number : nil }.min
-      end
-
-      def preceding_blank_line_start(region_start, analysis)
-        line_num = region_start
-        while line_num > 1
-          previous_line = analysis.line_at(line_num - 1)
-          break unless previous_line && previous_line.strip.empty?
-
-          line_num -= 1
-        end
-
-        line_num
-      end
-
       def leading_segment_start_for_output(output_decl:, output_analysis:, source_region_start:, source_analysis:,
                                            source_region: nil)
-        source_region_start - desired_blank_line_count_before_leading_region(
-          output_decl: output_decl,
+        super(
+          output_owner: output_decl,
           output_analysis: output_analysis,
           source_region_start: source_region_start,
           source_region: source_region,
           source_analysis: source_analysis
         )
-      end
-
-      def desired_blank_line_count_before_leading_region(output_decl:, output_analysis:, source_region_start:,
-                                                         source_analysis:, source_region: nil)
-        target_region = leading_region_for(output_decl, output_analysis)
-        target_region_start = region_start_line(target_region)
-        output_start_line = get_start_line(output_decl)
-
-        if target_region_start && output_start_line && target_region_start < output_start_line
-          blank_line_count_before(target_region_start, output_analysis)
-        elsif source_region && previous_statement_trailing_region_matches?(output_decl, output_analysis, source_region)
-          0
-        else
-          blank_line_count_before(source_region_start, source_analysis)
-        end
-      end
-
-      def blank_line_count_before(line_num, analysis)
-        count = 0
-        current = line_num - 1
-
-        while current >= 1
-          previous_line = analysis.line_at(current)
-          break unless previous_line && previous_line.strip.empty?
-
-          count += 1
-          current -= 1
-        end
-
-        count
-      end
-
-      def previous_statement_trailing_region_matches?(decl, analysis, source_region)
-        previous_decl = previous_statement_for(decl, analysis)
-        return false unless previous_decl
-
-        previous_trailing_region = analysis.comment_attachment_for(previous_decl)&.trailing_region
-        regions_equivalent?(previous_trailing_region, source_region)
-      end
-
-      def previous_statement_for(decl, analysis)
-        statements = Array(analysis&.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.start_line
-        end
-        index = statements.index(decl)
-        return unless index && index.positive?
-
-        statements[index - 1]
-      end
-
-      def regions_equivalent?(left, right)
-        return false unless left && right
-
-        left.respond_to?(:normalized_content) &&
-          right.respond_to?(:normalized_content) &&
-          left.normalized_content == right.normalized_content
       end
 
       STANDALONE_RBS_COMMENT_LINE_RE = /\A\s*#.*\z/
