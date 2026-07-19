@@ -74,6 +74,7 @@ module Ast
     autoload :Healer, 'ast/merge/healer'
     autoload :JaccardSimilarity, 'ast/merge/jaccard_similarity'
     autoload :Layout, 'ast/merge/layout'
+    autoload :LineRangeSupport, 'ast/merge/line_range_support'
     autoload :MatchRefinerBase, 'ast/merge/match_refiner_base'
     autoload :MatchScoreBase, 'ast/merge/match_score_base'
     autoload :MergeResultBase, 'ast/merge/merge_result_base'

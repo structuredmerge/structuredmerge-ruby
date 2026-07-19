@@ -10,6 +10,8 @@ module Ast
     # language-neutral mechanics for querying attachments and calculating the
     # source span that should be emitted for an owner.
     module CommentLayoutEmissionSupport
+      include LineRangeSupport
+
       private
 
       def leading_region_for(owner, analysis, owners: nil)
@@ -231,28 +233,11 @@ module Ast
       end
 
       def owner_start_line(owner)
-        if owner.respond_to?(:start_line)
-          owner.start_line
-        elsif owner.respond_to?(:location) && owner.location
-          owner.location.start_line
-        elsif owner.respond_to?(:start_point) && owner.start_point
-          owner.start_point.row + 1
-        end
+        object_start_line(owner)
       end
 
       def owner_end_line(owner)
-        if owner.respond_to?(:end_line)
-          owner.end_line
-        elsif owner.respond_to?(:location) && owner.location
-          owner.location.end_line
-        elsif owner.respond_to?(:end_point) && owner.end_point
-          owner.end_point.row + 1
-        end
-      end
-
-      def source_line_at(analysis, line_number)
-        line = analysis.line_at(line_number)
-        line.respond_to?(:raw) ? line.raw : line
+        object_end_line(owner)
       end
 
       def root_boundary_owner_start_line_for(owner, _analysis)
