@@ -12,6 +12,15 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       expect(context.adapter).to be_a(Ast::Crispr::Ruby::Prism::Adapter)
     end
 
+    it 'parses Ruby through the registered TreeHaver Prism backend' do
+      result = described_class::Utils.parse_with_comments("puts :ok\n")
+      tree = TreeHaver.with_backend('prism') { TreeHaver.parser_for(:ruby).parse("puts :ok\n") }
+
+      expect(TreeHaver::BackendRegistry.fetch('prism').to_h).to eq(id: 'prism', family: 'native')
+      expect(result).to be_success
+      expect(tree.parse_result).to be_a(::Prism::ParseResult)
+    end
+
     context 'with a structure profile' do
       let(:context) { described_class.document_context(content: "puts :ok\n", source_label: 'example.rb') }
       let(:profile) { context.structure_profile(owner_scope: :top_level_statements) }

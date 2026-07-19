@@ -2,6 +2,7 @@
 
 require 'ast/crispr'
 require 'prism'
+require 'tree_haver'
 require 'version_gem'
 require_relative 'prism/version'
 
@@ -10,12 +11,35 @@ module Ast
     module Ruby
       module Prism
         class Error < StandardError; end
+        BACKEND_REFERENCE = ::TreeHaver::BackendReference.new(id: 'prism', family: 'native').freeze
+        BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+        class << self
+          def register_backend!
+            BACKEND_REGISTRY.mutex.synchronize do
+              return if BACKEND_REGISTRY.registered
+
+              ::TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
+              ::TreeHaver.register_language(
+                :ruby,
+                backend_module: ::TreeHaver::Backends::Prism,
+                backend_type: :prism,
+                gem_name: 'prism'
+              )
+
+              BACKEND_REGISTRY.registered = true
+            end
+          end
+        end
 
         module Utils
           module_function
 
           def parse_with_comments(source)
-            ::Prism.parse(source)
+            Ast::Crispr::Ruby::Prism.register_backend!
+            ::TreeHaver.with_backend(Ast::Crispr::Ruby::Prism::BACKEND_REFERENCE.id) do
+              ::TreeHaver.parser_for(:ruby).parse(source).parse_result
+            end
           end
 
           def extract_statements(body_node)
