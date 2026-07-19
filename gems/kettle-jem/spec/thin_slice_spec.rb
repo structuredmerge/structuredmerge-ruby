@@ -8772,6 +8772,7 @@ RSpec.describe Kettle::Jem do
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
     expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
@@ -9021,6 +9022,35 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
       expect(content).to include('gem "nomono", *nomono_requirements, require: false')
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "does not generate a duplicate nomono dependency in nomono's own main Gemfile" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono-self", tmp_root) do |root|
+      write_tree(root, {
+        "nomono.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "nomono"
+            spec.summary = "Nomono"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      content = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
+
+      expect(content).not_to include('gem "nomono", *nomono_requirements')
+      expect(content).not_to include("nomono_requirements =")
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
   end

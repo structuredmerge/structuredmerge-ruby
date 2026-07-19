@@ -327,6 +327,7 @@ module Kettle
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK
+      KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
       KJ|MIN_RUBY
       KJ|OPENCOLLECTIVE_ORG
@@ -10688,6 +10689,7 @@ module Kettle
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
         kettle_dev_local_gems: kettle_dev_local_gems(config),
+        main_gemfile_nomono_bootstrap: main_gemfile_nomono_bootstrap(package_name),
         package_name: package_name.to_s,
         yard_host: yard_host,
         homepage_uri: project_homepage_uri(config, env, yard_host: yard_host, gemspec_homepage_uri: metadata_value(gemspec_metadata, :homepage_uri)),
@@ -11009,6 +11011,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,
+        "KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:main_gemfile_nomono_bootstrap].to_s,
         "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
         "KJ|YARD_HOST" => project_runtime[:yard_host].to_s,
@@ -11028,6 +11031,16 @@ module Kettle
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")
+    end
+
+    def main_gemfile_nomono_bootstrap(package_name)
+      return "" if package_name.to_s == "nomono"
+
+      <<~RUBY.rstrip
+        # Local workspace dependency wiring for *_local.gemfile overrides
+        nomono_requirements = ["~> 1.0", ">= 1.0.8"]
+        gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+      RUBY
     end
 
     def project_homepage_uri(config, env, yard_host:, gemspec_homepage_uri: nil)

@@ -18,9 +18,7 @@ git_source(:gitlab) { |repo_name| "https://gitlab.com/#{repo_name}" }
 # Include dependencies from {KJ|GEM_NAME}.gemspec
 gemspec
 
-# Local workspace dependency wiring for *_local.gemfile overrides
-nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+{KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP}
 
 {KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK}
 
