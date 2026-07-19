@@ -53,6 +53,10 @@ RSpec.describe Citrus::Toml::Merge do
     expect(json_ready(TreeHaver::BackendRegistry.fetch('citrus')&.to_h)).to eq(
       json_ready({ id: 'citrus', family: 'peg' })
     )
+    expect(TreeHaver.registered_languages(:toml)).to include(:citrus)
+    expect(
+      TreeHaver.with_backend('citrus') { TreeHaver.parser_for(:toml).parse('title = "x"').root_node.type }
+    ).to eq('document')
     expect(json_ready(described_class.toml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :citrus, :feature_profile))
     )

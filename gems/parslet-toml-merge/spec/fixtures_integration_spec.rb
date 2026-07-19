@@ -53,6 +53,10 @@ RSpec.describe Parslet::Toml::Merge do
     expect(json_ready(TreeHaver::BackendRegistry.fetch('parslet')&.to_h)).to eq(
       json_ready({ id: 'parslet', family: 'peg' })
     )
+    expect(TreeHaver.registered_languages(:toml)).to include(:parslet)
+    expect(
+      TreeHaver.with_backend('parslet') { TreeHaver.parser_for(:toml).parse("title = \"x\"\n").root_node.type }
+    ).to eq('document')
     expect(json_ready(described_class.toml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :parslet, :feature_profile))
     )
