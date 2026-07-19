@@ -340,14 +340,14 @@ RSpec.describe Kettle::Jem::CLI do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       allow(Kettle::Jem).to receive(:plan_project).and_raise(Kettle::Jem::Error, "debug failure")
 
-      status, out, err = run_cli(["plan", root, "--quiet"], env: {"DEBUG" => "true", "KETTLE_RB_DEV" => "true"})
+      status, out, err = run_cli(["plan", root, "--quiet"], env: {"DEBUG" => "true", "KETTLE_DEV_DEV" => "true"})
 
       expect(status).to eq(1)
       expect(out).to eq("")
       expect(err).to include("[kettle-jem] DEBUG: early environment snapshot")
       expect(err).to include("command=\"plan\"")
       expect(err).to include("DEBUG=\"true\"")
-      expect(err).to include("KETTLE_RB_DEV=\"true\"")
+      expect(err).to include("KETTLE_DEV_DEV=\"true\"")
       expect(err).to include("Kettle::Jem::Error: debug failure")
       expect(err).to include("kettle/jem/cli.rb")
     end

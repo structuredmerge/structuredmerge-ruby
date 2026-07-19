@@ -793,7 +793,7 @@ Please file a bug if you notice a violation of semantic versioning.
   `kettle-drift` binstubs when they already exist from local/plugin installs
   without requiring unreleased `kettle-drift` in every generated gemspec.
 - Added `kettle-drift` to generated templating Gemfiles, resolved remotely in
-  templating mode and via `KETTLE_RB_DEV` locally, separate from the
+  templating mode and via `KETTLE_DEV_DEV` locally, separate from the
   `STRUCTUREDMERGE_DEV` StructuredMerge local gem set.
 - Refreshed generated README metadata blocks after template README merging so
   version-derived gemspec metadata such as `source_code_uri` does not stay stale.

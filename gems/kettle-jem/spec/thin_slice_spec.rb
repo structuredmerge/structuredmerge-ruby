@@ -3739,13 +3739,13 @@ RSpec.describe Kettle::Jem do
         "Gemfile" => <<~RUBY
           source "https://gem.coop"
 
-          unless ENV.fetch("KETTLE_RB_DEV", "false").casecmp("false").zero?
+          unless ENV.fetch("KETTLE_DEV_DEV", "false").casecmp("false").zero?
             require "nomono/bundler"
 
             eval_nomono_gems(
               gems: %w[kettle-dev kettle-test],
-              prefix: "KETTLE_RB",
-              path_env: "KETTLE_RB_DEV",
+              prefix: "KETTLE_DEV",
+              path_env: "KETTLE_DEV_DEV",
               vendored_gems_env: "VENDORED_GEMS",
               vendor_gem_dir_env: "VENDOR_GEM_DIR",
               debug_env: "KETTLE_DEV_DEBUG",
@@ -5063,7 +5063,7 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "true",
         "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
-        "KETTLE_RB_DEV" => File.join(root, "kettle-dev")
+        "KETTLE_DEV_DEV" => File.join(root, "kettle-dev")
       )
     end
   end
@@ -5107,7 +5107,7 @@ RSpec.describe Kettle::Jem do
       env = {
         "KETTLE_JEM_SKIP_COMMIT" => "true",
         "K_JEM_TEMPLATING" => "true",
-        "KETTLE_RB_DEV" => "/workspace/my",
+        "KETTLE_DEV_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
         "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb"
       }
@@ -5140,7 +5140,7 @@ RSpec.describe Kettle::Jem do
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "false",
-        "KETTLE_RB_DEV" => "false",
+        "KETTLE_DEV_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
         "STRUCTUREDMERGE_DEV" => "false"
       )
@@ -5215,7 +5215,7 @@ RSpec.describe Kettle::Jem do
 
       env = {
         "K_JEM_TEMPLATING" => "true",
-        "KETTLE_RB_DEV" => "/workspace/my",
+        "KETTLE_DEV_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
         "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb",
         "RUBYOPT" => "-rbundler/setup",
@@ -5249,7 +5249,7 @@ RSpec.describe Kettle::Jem do
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "false",
-        "KETTLE_RB_DEV" => "false",
+        "KETTLE_DEV_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
         "STRUCTUREDMERGE_DEV" => "false"
       )
@@ -6100,7 +6100,7 @@ RSpec.describe Kettle::Jem do
         "mise.toml" => "[tools]\nruby = \"3.4.1\"\n",
         ".ruby-version" => "3.4.1\n",
         ".tool-versions" => "ruby 3.4.1\n",
-        ".env.local.example" => "KETTLE_RB_DEV=false\n",
+        ".env.local.example" => "KETTLE_DEV_DEV=false\n",
         ".gitignore" => "tmp/\n"
       })
       command_runner = lambda do |_command, **|
@@ -6190,12 +6190,12 @@ RSpec.describe Kettle::Jem do
         YAML
         "template/.env.local.example" => <<~ENV,
           # Shared development defaults
-          KETTLE_RB_DEV=false
+          KETTLE_DEV_DEV=false
           DEBUG=false # keep debugging disabled by default
         ENV
         ".env.local.example" => <<~ENV
           # Local documentation must survive
-          KETTLE_RB_DEV=true
+          KETTLE_DEV_DEV=true
         ENV
       })
 
@@ -6204,7 +6204,7 @@ RSpec.describe Kettle::Jem do
 
       expect(report.fetch(:final_content)).to eq(<<~ENV)
         # Local documentation must survive
-        KETTLE_RB_DEV=true
+        KETTLE_DEV_DEV=true
         DEBUG=false # keep debugging disabled by default
       ENV
     end
@@ -8760,7 +8760,7 @@ RSpec.describe Kettle::Jem do
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
-    expect(tokens.fetch("KJ|KETTLE_RB_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 

@@ -1,4 +1,4 @@
-kettle_rb_dev = ENV.fetch("KETTLE_RB_DEV", "false")
+kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 
 source "https://rubygems.org"
 
@@ -14,13 +14,13 @@ else
   gem "tree_sitter_language_pack", path: tslp_dev
 end
 
-unless kettle_rb_dev.casecmp("false").zero?
+unless kettle_dev_dev.casecmp("false").zero?
   require "nomono/bundler"
 
   eval_nomono_gems(
     gems: %w[kettle-dev kettle-family kettle-test],
-    prefix: "KETTLE_RB",
-    path_env: "KETTLE_RB_DEV",
+    prefix: "KETTLE_DEV",
+    path_env: "KETTLE_DEV_DEV",
     vendored_gems_env: "VENDORED_GEMS",
     vendor_gem_dir_env: "VENDOR_GEM_DIR",
     debug_env: "KETTLE_DEV_DEBUG",
@@ -79,7 +79,7 @@ gem "appraisal2", "~> 3.1", ">= 3.1.1"
 
 gem "bundler-audit", "~> 0.9.3"
 
-if kettle_rb_dev.casecmp("false").zero?
+if kettle_dev_dev.casecmp("false").zero?
   gem "kettle-dev", "~> 2.2", ">= 2.2.25"
 
   gem "kettle-family", ">= 1.0.0"

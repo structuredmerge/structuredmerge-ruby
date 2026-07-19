@@ -462,7 +462,7 @@ fill missing keys during config sync, and act as runtime overrides.
 
 | Variable | Description |
 |----------|-------------|
-| `KETTLE_RB_DEV` | Workspace root for local sibling gems. `true` = `~/src/my`; a path = that path; unset/`false` = released gems. |
+| `KETTLE_DEV_DEV` | Workspace root for local sibling gems. `true` = `~/src/my`; a path = that path; unset/`false` = released gems. |
 | `KETTLE_DEV_DEBUG` | Set to `true` for verbose debug output. |
 | `FUNDING_ORG` | OpenCollective organization handle for FUNDING.yml. Auto-derived from git remote if unset. |
 | `OPENCOLLECTIVE_HANDLE` | Alternative to `FUNDING_ORG` for personal OpenCollective pages. |
