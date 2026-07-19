@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "bundler"
+
 module Kettle
   module Jem
     module Tasks
