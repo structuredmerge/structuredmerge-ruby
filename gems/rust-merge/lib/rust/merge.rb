@@ -19,6 +19,8 @@ module Rust
       BACKEND_REGISTRY.mutex.synchronize do
         return if BACKEND_REGISTRY.registered
 
+        TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
         grammar_finder = TreeHaver::GrammarFinder.new(:rust)
         grammar_finder.register! if grammar_finder.available?
 
@@ -31,12 +33,12 @@ module Rust
     end
 
     def available_rust_backends
-      [TREE_SITTER_BACKEND]
+      rust_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def rust_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && rust_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Rust backend #{requested}.")
       end
 
@@ -62,10 +64,22 @@ module Rust
     end
 
     def parse_rust(source, dialect)
+      unless rust_backend_available_for_analysis?(TREE_SITTER_BACKEND.id)
+        return unsupported_feature_result("Unsupported Rust backend #{TREE_SITTER_BACKEND.id}.")
+      end
+
       return analyze_rust_module(source) if dialect == 'rust'
 
       { ok: false,
         diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: "Unsupported Rust dialect #{dialect}." }], policies: [] }
+    end
+
+    def rust_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+      registrations = TreeHaver.registered_languages(:rust)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
     end
 
     def match_rust_owners(template, destination)

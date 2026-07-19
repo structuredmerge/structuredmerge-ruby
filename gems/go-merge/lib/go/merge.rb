@@ -19,6 +19,8 @@ module Go
       BACKEND_REGISTRY.mutex.synchronize do
         return if BACKEND_REGISTRY.registered
 
+        TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
         grammar_finder = TreeHaver::GrammarFinder.new(:go)
         grammar_finder.register! if grammar_finder.available?
 
@@ -31,12 +33,12 @@ module Go
     end
 
     def available_go_backends
-      [TREE_SITTER_BACKEND]
+      go_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def go_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && go_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Go backend #{requested}.")
       end
 
@@ -63,13 +65,21 @@ module Go
 
     def parse_go(source, dialect)
       requested = TREE_SITTER_BACKEND.id
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && go_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Go backend #{requested}.")
       end
       return analyze_go_module(source) if dialect == 'go'
 
       { ok: false,
         diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: "Unsupported Go dialect #{dialect}." }], policies: [] }
+    end
+
+    def go_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+      registrations = TreeHaver.registered_languages(:go)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
     end
 
     def match_go_owners(template, destination)

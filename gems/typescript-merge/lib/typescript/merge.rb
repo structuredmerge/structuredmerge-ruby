@@ -19,6 +19,8 @@ module TypeScript
       BACKEND_REGISTRY.mutex.synchronize do
         return if BACKEND_REGISTRY.registered
 
+        TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
         grammar_finder = TreeHaver::GrammarFinder.new(:typescript)
         grammar_finder.register! if grammar_finder.available?
 
@@ -31,12 +33,12 @@ module TypeScript
     end
 
     def available_type_script_backends
-      [TREE_SITTER_BACKEND]
+      type_script_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def type_script_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
       end
 
@@ -63,13 +65,21 @@ module TypeScript
 
     def parse_type_script(source, dialect)
       requested = TREE_SITTER_BACKEND.id
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
       end
       return analyze_type_script_module(source) if dialect == 'typescript'
 
       { ok: false,
         diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: "Unsupported TypeScript dialect #{dialect}." }], policies: [] }
+    end
+
+    def type_script_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+      registrations = TreeHaver.registered_languages(:typescript)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
     end
 
     def match_type_script_owners(template, destination)

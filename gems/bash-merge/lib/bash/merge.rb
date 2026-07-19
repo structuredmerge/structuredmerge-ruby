@@ -138,7 +138,7 @@ module Bash
       end
 
       def available_bash_backends
-        [TREE_SITTER_BACKEND]
+        bash_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
       end
 
       def available?(source: "#!/usr/bin/env bash\necho hello\n")
@@ -178,6 +178,14 @@ module Bash
       rescue StandardError => e
         diagnostics << { kind: 'bash_node_parser_unavailable', message: e.message }
         false
+      end
+
+      def bash_backend_available_for_analysis?(backend_id)
+        register_backend!
+        return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+        registrations = TreeHaver.registered_languages(:bash)
+        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
       end
     end
   end
