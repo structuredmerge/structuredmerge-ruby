@@ -24,6 +24,9 @@ Please file a bug if you notice a violation of semantic versioning.
   per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
   across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
   matrix runs.
+- Generated dep-heads workflows now document why TruffleRuby runs directly from
+  `gemfiles/dep_heads.gemfile`, making that generated Appraisal file required
+  checked-in output for the workflow.
 - JRuby 9.2 workflow templates now use the legacy-engine bundle install path
   instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
   setup against gem servers without the full legacy index.
