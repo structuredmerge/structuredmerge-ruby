@@ -12,6 +12,7 @@ require_relative 'merge/gemspec_support'
 require_relative 'merge/magic_comment_support'
 require_relative 'merge/method_similarity'
 require_relative 'merge/rescue_semantics'
+require_relative 'merge/scaffold_chunk_support'
 
 module Ruby
   module Merge

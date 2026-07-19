@@ -13,53 +13,12 @@ module Prism
     #   specs = [ScaffoldChunkRemover::RSPEC_SPEC, ScaffoldChunkRemover::RUBOCOP_SPEC]
     #   clean = ScaffoldChunkRemover.remove(source, specs)
     class ScaffoldChunkRemover
-      ChunkSpec = Struct.new(
-        :anchor_type,        # :require_call or :task_call
-        :anchor_value,       # String — exact require path OR task name pattern
-        :satellite_patterns, # Array<String> — token patterns for satellite nodes
-        :jaccard_threshold,  # Float — min Jaccard score for satellite matching
-        :max_lookahead,      # Integer — nodes to scan after anchor
-        :max_lookbehind,     # Integer — nodes to scan before anchor
-        keyword_init: true
-      )
-
-      BUNDLER_GEM_TASKS_SPEC = ChunkSpec.new(
-        anchor_type: :require_call,
-        anchor_value: 'bundler/gem_tasks',
-        satellite_patterns: [],
-        jaccard_threshold: 0.35,
-        max_lookahead: 0,
-        max_lookbehind: 0
-      )
-
-      RSPEC_SPEC = ChunkSpec.new(
-        anchor_type: :require_call,
-        anchor_value: 'rspec/core/rake_task',
-        satellite_patterns: ['RSpec::Core::RakeTask.new'],
-        jaccard_threshold: 0.35,
-        max_lookahead: 5,
-        max_lookbehind: 2
-      )
-
-      RUBOCOP_SPEC = ChunkSpec.new(
-        anchor_type: :require_call,
-        anchor_value: 'rubocop/rake_task',
-        satellite_patterns: ['RuboCop::RakeTask.new'],
-        jaccard_threshold: 0.35,
-        max_lookahead: 5,
-        max_lookbehind: 2
-      )
-
-      DEFAULT_TASK_SPEC = ChunkSpec.new(
-        anchor_type: :task_call,
-        anchor_value: 'default',
-        satellite_patterns: [],
-        jaccard_threshold: 0.35,
-        max_lookahead: 0,
-        max_lookbehind: 0
-      )
-
-      ALL_SPECS = [BUNDLER_GEM_TASKS_SPEC, RSPEC_SPEC, RUBOCOP_SPEC, DEFAULT_TASK_SPEC].freeze
+      ChunkSpec = Ruby::Merge::ScaffoldChunkSupport::ChunkSpec
+      BUNDLER_GEM_TASKS_SPEC = Ruby::Merge::ScaffoldChunkSupport::BUNDLER_GEM_TASKS_SPEC
+      RSPEC_SPEC = Ruby::Merge::ScaffoldChunkSupport::RSPEC_SPEC
+      RUBOCOP_SPEC = Ruby::Merge::ScaffoldChunkSupport::RUBOCOP_SPEC
+      DEFAULT_TASK_SPEC = Ruby::Merge::ScaffoldChunkSupport::DEFAULT_TASK_SPEC
+      ALL_SPECS = Ruby::Merge::ScaffoldChunkSupport::ALL_SPECS
 
       class << self
         def remove(source, specs = ALL_SPECS)
@@ -92,13 +51,13 @@ module Prism
             end_idx = [statements.size - 1, anchor_idx + spec.max_lookahead].min
 
             spec.satellite_patterns.each do |pattern|
-              p_tokens = jaccard_tokens(pattern)
+              p_tokens = Ruby::Merge::ScaffoldChunkSupport.jaccard_tokens(pattern)
               (start_idx..end_idx).each do |i|
                 next if i == anchor_idx
 
                 candidate = statements[i]
-                c_tokens = jaccard_tokens(candidate.slice.to_s)
-                score = jaccard(p_tokens, c_tokens)
+                c_tokens = Ruby::Merge::ScaffoldChunkSupport.jaccard_tokens(candidate.slice.to_s)
+                score = Ruby::Merge::ScaffoldChunkSupport.jaccard(p_tokens, c_tokens)
                 nodes_to_remove << candidate if score >= spec.jaccard_threshold
               end
             end
@@ -156,19 +115,7 @@ module Prism
       def task_anchor_match?(node, anchor_value, threshold)
         return false unless node.name.to_s == 'task'
 
-        node_tokens = jaccard_tokens(node.slice.to_s)
-        pattern_tokens = jaccard_tokens("task #{anchor_value}")
-        jaccard(pattern_tokens, node_tokens) >= threshold
-      end
-
-      def jaccard_tokens(text)
-        text.scan(/[A-Za-z0-9_]+/).to_set
-      end
-
-      def jaccard(a_set, b_set)
-        return 0.0 if (a_set | b_set).empty?
-
-        (a_set & b_set).size.to_f / (a_set | b_set).size
+        Ruby::Merge::ScaffoldChunkSupport.task_anchor_match?(node.slice.to_s, anchor_value, threshold)
       end
     end
   end
