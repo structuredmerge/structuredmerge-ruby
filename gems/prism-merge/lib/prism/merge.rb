@@ -449,7 +449,7 @@ module Prism
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      result = ::Prism.parse(source)
+      result = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:ruby).parse(source).parse_result }
       unless result.success?
         return {
           ok: false,
@@ -490,7 +490,7 @@ module Prism
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      result = ::Prism.parse(source)
+      result = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:ruby).parse(source).parse_result }
       unless result.success?
         return TreeHaver::NormalizedParseResult.new(
           ok: false,
