@@ -99,9 +99,11 @@ module Parslet
           policies: [::Toml::Merge::DESTINATION_WINS_ARRAY_POLICY]
         }
       rescue ::Toml::Merge::TemplateParseError => e
-        { ok: false, diagnostics: [{ severity: 'error', category: 'template_parse_error', message: e.message }], policies: [] }
+        { ok: false, diagnostics: [{ severity: 'error', category: 'template_parse_error', message: e.message }],
+          policies: [] }
       rescue ::Toml::Merge::DestinationParseError => e
-        { ok: false, diagnostics: [{ severity: 'error', category: 'destination_parse_error', message: e.message }], policies: [] }
+        { ok: false, diagnostics: [{ severity: 'error', category: 'destination_parse_error', message: e.message }],
+          policies: [] }
       rescue StandardError => e
         { ok: false, diagnostics: [{ severity: 'error', category: 'merge_error', message: e.message }], policies: [] }
       end
