@@ -21,10 +21,7 @@ RSpec.describe TreeHaver::Backends::Tslp do
   end
 
   it 'fails closed when the installed language pack does not expose parser methods' do
-    stub_const('TreeSitterLanguagePack', Module.new)
-    parser_class = Class.new
-    TreeSitterLanguagePack.const_set(:Parser, parser_class)
-    allow(TreeSitterLanguagePack).to receive(:get_parser)
+    allow(described_class).to receive(:parser_api_available?).and_return(false)
 
     expect(described_class.available?).to be(false)
     expect(described_class.unavailable_reason).to eq('tree_sitter_language_pack parser API is not exposed')

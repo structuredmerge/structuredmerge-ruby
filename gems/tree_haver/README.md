@@ -909,7 +909,7 @@ Given just the language name, `GrammarFinder` automatically derives:
 1.  **Environment variable**: `TREE_SITTER_<LANG>_PATH` (highest priority)
 2.  **Existing TreeHaver registration**: previously-registered tree-sitter grammar path
 3.  **Extra paths**: explicit paths provided at initialization
-4.  **`tree_sitter_language_pack`**: cache lookup plus on-demand download when the gem is available
+4.  **`tree_sitter_language_pack`**: parser API availability through its on-demand grammar loader
 
 #### Usage in \*-merge Gems
 
@@ -917,14 +917,19 @@ The `GrammarFinder` pattern enables clean integration in language-specific
 merge gems:
 
 ```ruby
-# In toml-merge
+# In a substrate merge gem
 finder = TreeHaver::GrammarFinder.new(:toml)
 finder.register! if finder.available?
+```
 
-# Register non-tree-sitter backends in the merge gem as well
+Parser-specific gems should register their own TreeHaver backend wrappers:
+
+```ruby
+# In a TOML parser provider gem
 TreeHaver.register_language(
   :toml,
-  grammar_module: TomlRB::Document,
+  backend_module: Citrus::Toml::Merge::Backend,
+  backend_type: :citrus,
   gem_name: "toml-rb",
 )
 ```

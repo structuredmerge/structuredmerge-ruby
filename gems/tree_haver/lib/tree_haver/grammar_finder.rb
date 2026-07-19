@@ -10,7 +10,7 @@ module TreeHaver
   # 1. explicit environment override
   # 2. existing TreeHaver registration
   # 3. explicit extra paths
-  # 4. tree_sitter_language_pack cache/provisioning
+  # 4. tree_sitter_language_pack parser backend registration
   #
   # This class is designed to be used by language-specific merge gems
   # without requiring TreeHaver to own parser- or grammar-specific policy.
@@ -31,7 +31,7 @@ module TreeHaver
   # @example Basic usage
   #   finder = TreeHaver::GrammarFinder.new(:toml)
   #   path = finder.find_library_path
-  #   # => "/home/user/.cache/tree-sitter-language-pack/vX/libs/libtree_sitter_toml.so"
+  #   # => "/usr/local/lib/libtree_sitter_toml.so"
   #
   # @example Check availability
   #   finder = TreeHaver::GrammarFinder.new(:json)
@@ -114,7 +114,7 @@ module TreeHaver
 
     # Generate the full list of search paths for this language
     #
-    # Order: registered path, explicit extra paths, then tree_sitter_language_pack cache
+    # Order: registered path, then explicit extra paths.
     #
     # @return [Array<String>] all paths to search
     def search_paths
@@ -129,13 +129,6 @@ module TreeHaver
         end
       end
 
-      cache_dir = tree_sitter_language_pack_cache_dir
-      if cache_dir
-        library_filenames.each do |filename|
-          paths << File.join(cache_dir, filename)
-        end
-      end
-
       paths.uniq
     end
 
@@ -145,7 +138,9 @@ module TreeHaver
     # 1. Environment variable override (validated for safety)
     # 2. Existing TreeHaver tree-sitter registration
     # 3. Extra paths provided at initialization
-    # 4. tree_sitter_language_pack cache / on-demand download
+    # tree_sitter_language_pack is intentionally not exposed as a shared-library
+    # path fallback here. It is registered as a TreeHaver backend module when
+    # its parser API is available.
     #
     # @note Paths from ENV are validated using {PathValidator.safe_library_path?}
     #   to prevent path traversal and other attacks. Invalid ENV paths cause
@@ -200,7 +195,7 @@ module TreeHaver
       explicit_path = explicit_search_path
       return explicit_path if explicit_path
 
-      tree_sitter_language_pack_path
+      nil
     end
 
     # Validate an environment variable path and return reason if invalid
@@ -349,12 +344,13 @@ module TreeHaver
         env_var: env_var_name,
         env_value: ENV[env_var_name],
         env_rejection_reason: @env_rejection_reason,
+        tree_sitter_language_pack_parser_available: tree_sitter_language_pack_parser_available?,
         symbol: symbol_name,
         library_filename: library_filename,
         library_filenames: library_filenames,
         search_paths: search_paths,
         found_path: found,
-        available: !found.nil?
+        available: tree_sitter_language_pack_parser_available? || !found.nil?
       }
     end
 
@@ -375,7 +371,8 @@ module TreeHaver
                " Searched: #{search_paths.join(', ')}."
              end
 
-      msg + " Register the grammar, install tree_sitter_language_pack, or set #{env_var_name} to a valid path."
+      msg + " Register the grammar, install tree_sitter_language_pack with parser API support, " \
+            "or set #{env_var_name} to a valid path."
     end
 
     private
@@ -398,57 +395,19 @@ module TreeHaver
       search_paths.find { |path| File.exist?(path) }
     end
 
-    def tree_sitter_language_pack_path
-      return @tree_sitter_language_pack_path if defined?(@tree_sitter_language_pack_path)
-
-      @tree_sitter_language_pack_path = begin
-        require 'tree_sitter_language_pack'
-        language = @language_name.to_s
-        if TreeSitterLanguagePack.has_language(language)
-          TreeSitterLanguagePack.download([language])
-          cache_dir = TreeSitterLanguagePack.cache_dir
-          @tree_sitter_language_pack_cache_dir = cache_dir
-
-          library_filenames
-            .map { |filename| File.join(cache_dir, filename) }
-            .find { |path| File.exist?(path) }
-        else
-          @tree_sitter_language_pack_rejection_reason = 'language not published by tree_sitter_language_pack'
-          nil
-        end
-      rescue LoadError
-        @tree_sitter_language_pack_rejection_reason = 'tree_sitter_language_pack gem not available'
-        nil
-      rescue StandardError => e
-        @tree_sitter_language_pack_rejection_reason = e.message
-        nil
-      end
-    end
-
     def tree_sitter_language_pack_parser_available?
       return @tree_sitter_language_pack_parser_available if defined?(@tree_sitter_language_pack_parser_available)
 
       @tree_sitter_language_pack_parser_available = begin
-        require 'tree_sitter_language_pack'
+        require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
         TreeHaver::Backends::Tslp.available? &&
-          TreeSitterLanguagePack.respond_to?(:has_language) &&
-          TreeSitterLanguagePack.has_language(@language_name.to_s)
+          ::TreeSitterLanguagePack.respond_to?(:has_language) &&
+          ::TreeSitterLanguagePack.has_language(@language_name.to_s)
       rescue LoadError
         false
       rescue StandardError => e
         @tree_sitter_language_pack_rejection_reason = e.message
         false
-      end
-    end
-
-    def tree_sitter_language_pack_cache_dir
-      return @tree_sitter_language_pack_cache_dir if defined?(@tree_sitter_language_pack_cache_dir)
-
-      @tree_sitter_language_pack_cache_dir = begin
-        require 'tree_sitter_language_pack'
-        TreeSitterLanguagePack.cache_dir
-      rescue LoadError, StandardError
-        nil
       end
     end
 
