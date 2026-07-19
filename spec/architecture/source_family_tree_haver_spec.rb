@@ -5,6 +5,7 @@ require_relative '../../gems/rust-merge/lib/rust/merge'
 require_relative '../../gems/typescript-merge/lib/typescript/merge'
 require_relative '../../gems/ruby-merge/lib/ruby/merge'
 require_relative '../../gems/markdown-merge/lib/markdown/merge'
+require_relative '../../gems/yaml-merge/lib/yaml/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -60,6 +61,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for markdown'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when YAML has no registered parser' do
+    result = Yaml::Merge.parse_yaml("key: value\n", 'yaml')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:yaml)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for yaml'))
     )
   end
 end

@@ -26,10 +26,6 @@ RSpec.describe 'TreeHaver-only merge architecture' do
       "gems/toml-merge/lib/toml/merge.rb:grammar_module: TomlRB::Document,",
       "gems/toml-merge/lib/toml/merge.rb:return unless defined?(TOML::Parslet)",
       "gems/toml-merge/lib/toml/merge.rb:return unless defined?(TomlRB::Document)",
-      "gems/yaml-merge/lib/yaml/merge.rb:destination_document = YAML.safe_load(destination.dig(:analysis, :normalized_source), permitted_classes: [],",
-      "gems/yaml-merge/lib/yaml/merge.rb:parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)",
-      "gems/yaml-merge/lib/yaml/merge.rb:syntax_result = TreeHaver.parse_with_language_pack(",
-      "gems/yaml-merge/lib/yaml/merge.rb:template_document = YAML.safe_load(template.dig(:analysis, :normalized_source), permitted_classes: [],"
     ]
   ).freeze
 

@@ -64,14 +64,14 @@ module Yaml
         return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
-      syntax_result = TreeHaver.parse_with_language_pack(
-        TreeHaver::ParserRequest.new(source: source, language: 'yaml')
-      )
-      return { ok: false, diagnostics: syntax_result[:diagnostics], policies: [] } unless syntax_result[:ok]
+      parser = TreeHaver.parser_for(:yaml)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
-      parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)
-      analyze_yaml_document(parsed, dialect)
-    rescue StandardError => e
+      unsupported_feature_parse_result(
+        'yaml-merge document analysis must be rebuilt from TreeHaver AST nodes. Use psych-merge for the Psych TreeHaver backend.'
+      )
+    rescue TreeHaver::Error, StandardError => e
       parse_error_result(e.message)
     end
 
@@ -89,6 +89,7 @@ module Yaml
           kind: 'yaml',
           dialect: 'yaml',
           normalized_source: canonical_yaml(validated[:value]),
+          document: validated[:value],
           root_kind: 'mapping',
           owners: collect_yaml_owners(validated[:value])
         },
@@ -135,10 +136,8 @@ module Yaml
         }
       end
 
-      template_document = YAML.safe_load(template.dig(:analysis, :normalized_source), permitted_classes: [],
-                                                                                      aliases: false)
-      destination_document = YAML.safe_load(destination.dig(:analysis, :normalized_source), permitted_classes: [],
-                                                                                            aliases: false)
+      template_document = template.dig(:analysis, :document)
+      destination_document = destination.dig(:analysis, :document)
       unless template_document.is_a?(Hash) && destination_document.is_a?(Hash)
         return parse_error_merge_result('YAML documents must parse to a mapping root.')
       end
@@ -161,6 +160,12 @@ module Yaml
       backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
     end
     private_class_method :resolve_backend
+
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'YAML parse returned no root node' unless node
+      raise TreeHaver::NotAvailable, 'YAML parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+    end
+    private_class_method :collect_parse_errors
 
     def validate_yaml_node(value, path)
       if scalar?(value)
