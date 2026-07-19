@@ -75,6 +75,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Bash merges now preserve floating first-owner and removed-node comment gaps,
   and avoid duplicating a comment block that was already promoted from a removed
   destination-only node.
+- Markdown backend feature fixtures now account for optional provider backends
+  that are only available after their provider gems register concrete TreeHaver
+  integrations in the current process.
 - Ast-merge changed-gem CI no longer times out or fails when exercising
   isolated fixture integrations that require Prism-backed Ruby merging.
 - Changed-gem CI suites now pass in isolated gem bundles by loading required
