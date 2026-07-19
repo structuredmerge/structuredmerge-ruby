@@ -126,6 +126,79 @@ module Json
     end
     private_class_method :merge_json_sources
 
+    def json_value_for_source(source, dialect: 'json')
+      normalized_source = dialect.to_s == 'jsonc' ? strip_json_comments(source) : source
+      if detect_trailing_comma(normalized_source)
+        raise ParseError, "Trailing commas are not supported for #{dialect}."
+      end
+
+      register_backend!
+      analysis = FileAnalysis.new(normalized_source)
+      unless analysis.valid?
+        message = analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', ')
+        raise ParseError, message
+      end
+
+      json_value_for_node(analysis.root_node)
+    end
+
+    def json_value_for_node(node)
+      case node.type.to_s
+      when 'document'
+        child = node.semantic_children.first
+        child ? json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source)) : nil
+      when 'object'
+        node.pairs.each_with_object({}) do |pair, object|
+          key = pair.key_name
+          next unless key
+
+          object[key] = json_value_for_node(pair.value_node)
+        end
+      when 'array'
+        node.elements.map { |element| json_value_for_node(element) }
+      when 'string'
+        decode_json_string_literal(node.text)
+      when 'number'
+        parse_json_number(node.text)
+      when 'true'
+        true
+      when 'false'
+        false
+      when 'null'
+        nil
+      else
+        nil
+      end
+    end
+
+    def decode_json_string_literal(text)
+      literal = text.to_s
+      literal = literal[1...-1] if literal.start_with?('"') && literal.end_with?('"')
+      literal.gsub(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/) do |escape|
+        case escape
+        when '\\"' then '"'
+        when '\\\\' then '\\'
+        when '\\/' then '/'
+        when '\\b' then "\b"
+        when '\\f' then "\f"
+        when '\\n' then "\n"
+        when '\\r' then "\r"
+        when '\\t' then "\t"
+        else
+          [escape[2..].to_i(16)].pack('U')
+        end
+      end
+    end
+    private_class_method :decode_json_string_literal
+
+    def parse_json_number(text)
+      number = text.to_s
+      return number.to_f if number.match?(/[.eE]/)
+
+      number.to_i
+    end
+    private_class_method :parse_json_number
+
     def parse_failure(message)
       {
         ok: false,

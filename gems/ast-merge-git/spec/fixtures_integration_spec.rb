@@ -11,17 +11,42 @@ RSpec.describe Ast::Merge::Git do
     Ast::Merge.normalize_value(JSON.parse(path.read))
   end
 
-  it 'fails closed for the git merge3 contract fixture until JSON merge3 is TreeHaver-backed' do
+  it 'conforms to the git merge3 contract fixture' do
     fixture = read_json(fixtures_root.join('diagnostics', 'slice-950-git-merge3-contract', 'git-merge3-contract.json'))
     expect(fixture.dig(:contract, :package)).to eq('ast-merge-git')
     expect(fixture.dig(:contract, :operation)).to eq('merge3')
 
     fixture.fetch(:cases).each do |test_case|
       result = described_class.merge3(test_case.fetch(:request))
+      expected = test_case.fetch(:expected)
 
-      expect(result.fetch(:ok)).to be(false), test_case.fetch(:case_id)
-      expect(result.fetch(:diagnostics).first.fetch(:category)).to eq('unsupported_feature')
-      expect(result.fetch(:diagnostics).first.fetch(:message)).to include('Json::Merge and TreeHaver')
+      expect(result.fetch(:ok)).to eq(expected.fetch(:ok)), test_case.fetch(:case_id)
+      expect(result.fetch(:conflicts).length).to eq(expected.fetch(:conflict_count)), test_case.fetch(:case_id)
+      expect(result.fetch(:diagnostics).map { |diagnostic| diagnostic.fetch(:category) }).to eq(
+        expected.fetch(:diagnostic_categories)
+      ), test_case.fetch(:case_id)
+      expect(result.fetch(:change_classifications)).to eq(expected.fetch(:change_classifications)),
+                                                       test_case.fetch(:case_id)
+      expect(result.fetch(:reparse_after_render)).to eq(expected.fetch(:reparse_after_render)),
+                                                     test_case.fetch(:case_id)
+      expect(result.fetch(:render_report).fetch(:strategy)).to eq(expected.dig(:render_report, :strategy)),
+                                                          test_case.fetch(:case_id)
+      if expected[:merged_json]
+        expect(JSON.parse(result.fetch(:merged_source), symbolize_names: true)).to eq(expected.fetch(:merged_json)),
+                                                                        test_case.fetch(:case_id)
+      end
+      expected.fetch(:conflict_categories, []).each_with_index do |category, index|
+        expect(result.dig(:conflicts, index, :category)).to eq(category), test_case.fetch(:case_id)
+      end
+      expected.fetch(:conflict_paths, []).each_with_index do |path, index|
+        expect(result.dig(:conflicts, index, :path)).to eq(path), test_case.fetch(:case_id)
+      end
+      expected.fetch(:conflicted_source_contains, []).each do |needle|
+        expect(result.fetch(:conflicted_source)).to include(needle), test_case.fetch(:case_id)
+      end
+      expected.fetch(:conflicted_source_not_contains, []).each do |needle|
+        expect(result.fetch(:conflicted_source)).not_to include(needle), test_case.fetch(:case_id)
+      end
     end
   end
 

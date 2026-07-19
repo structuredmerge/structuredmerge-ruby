@@ -25,6 +25,8 @@ gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
 # Direct sibling dependencies (env-switched via STRUCTUREDMERGE_DEV)
 direct_sibling_gems = %w[
   ast-merge
+  json-merge
+  tree_haver
 ]
 direct_sibling_dev = ENV.fetch('STRUCTUREDMERGE_DEV', '')
 direct_sibling_local =
