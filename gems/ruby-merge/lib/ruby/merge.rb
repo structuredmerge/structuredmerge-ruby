@@ -1294,7 +1294,10 @@ module Ruby
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'Ruby parse returned no root node' unless node
-      raise TreeHaver::NotAvailable, 'Ruby parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'Ruby parse contains syntax errors'
     end
 
     def parse_failure_result(error)
@@ -1338,7 +1341,7 @@ module Ruby
       return unless %w[require require_relative].include?(name)
 
       string_node = ruby_first_descendant(node) do |child|
-        child.type == 'string_content' || child.type == 'simple_symbol'
+        %w[string_content simple_symbol].include?(child.type)
       end
       return unless string_node
 

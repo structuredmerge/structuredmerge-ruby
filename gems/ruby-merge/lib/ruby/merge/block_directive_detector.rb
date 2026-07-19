@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'set'
-
 module Ruby
   module Merge
     # Detects Ruby comment block directive pairs in source lines.

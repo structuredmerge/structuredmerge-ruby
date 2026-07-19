@@ -152,7 +152,10 @@ module Go
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'Go parse returned no root node' unless node
-      raise TreeHaver::NotAvailable, 'Go parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'Go parse contains syntax errors'
     end
     private_class_method :collect_parse_errors
 

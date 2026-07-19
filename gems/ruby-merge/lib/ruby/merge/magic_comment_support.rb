@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'set'
-
 module Ruby
   module Merge
     # Ruby magic comment detection and file-header prefix handling.
