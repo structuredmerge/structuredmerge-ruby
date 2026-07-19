@@ -88,6 +88,8 @@ Please file a bug if you notice a violation of semantic versioning.
   gaps for matched top-level keys and keys inside matched tables.
 - JSON template-preferred merges now preserve destination-owned retained blank
   gaps for matched top-level and nested object pairs.
+- Ruby merges now preserve destination-owned retained blank gaps between matched
+  top-level declarations when emitting TSLP-backed merge results.
 - YAML merges now preserve comments, blank lines, anchors, aliases,
   multi-document separators, and scalar spelling for the shared formatting
   preservation fixture while retaining destination-owned sequence values.

@@ -230,7 +230,7 @@ module Ruby
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
       preamble = destination_context.fetch(:preamble)
-      sections << preamble unless preamble.empty?
+      sections << { text: preamble } unless preamble.empty?
       requires = if merge_template_requires
                    merge_ruby_requires(destination_requires,
                                        template_requires)
@@ -238,21 +238,24 @@ module Ruby
                    destination_requires
                  end
       require_block = requires.map { |entry| entry[:text] }.join("\n").strip
-      sections << require_block unless require_block.empty?
+      sections << ruby_top_level_section(require_block, requires) unless require_block.empty?
       sections.concat(
         destination_declarations.map do |entry|
-          merge_ruby_declaration_entry(template_declarations_by_key[entry[:merge_key]], entry)[:text]
+          ruby_top_level_section(
+            merge_ruby_declaration_entry(template_declarations_by_key[entry[:merge_key]], entry)[:text],
+            [entry]
+          )
         end
       )
       sections.concat(
         template_declarations.reject do |entry|
           destination_paths[entry[:merge_key]]
-        end.map { |entry| entry[:text] }
+        end.map { |entry| { text: entry[:text] } }
       )
       destination_footer = destination_context.fetch(:footer)
-      sections << destination_footer unless destination_footer.empty?
+      sections << { text: destination_footer } unless destination_footer.empty?
 
-      output = "#{sections.join("\n\n").strip}\n"
+      output = emit_ruby_top_level_sections(destination_source, sections)
       matching_reports = [ruby_method_move_detection(template_source, destination_source, dialect)]
       moved_method_count = matching_reports.sum do |report|
         Array(report[:matches]).count { |entry| entry[:moved] }
@@ -1529,7 +1532,9 @@ module Ruby
         text = lines[item.span.start_row..item.span.end_row].to_a.join("\n").rstrip
         {
           path: "/requires/#{item.source}",
-          text: text
+          text: text,
+          start_index: item.span.start_row,
+          end_index: item.span.end_row
         }
       end
     end
@@ -1725,9 +1730,49 @@ module Ruby
           name: name,
           kind: kind,
           merge_key: "#{kind}:#{name}",
-          text: lines[start_index..finish_index].to_a.join("\n").strip
+          text: lines[start_index..finish_index].to_a.join("\n").strip,
+          start_index: start_index,
+          end_index: finish_index
         }
       end
+    end
+
+    def ruby_top_level_section(text, entries)
+      positioned_entries = entries.select do |entry|
+        entry[:start_index].is_a?(Integer) && entry[:end_index].is_a?(Integer)
+      end
+      return { text: text } if positioned_entries.empty?
+
+      {
+        text: text,
+        start_index: positioned_entries.map { |entry| entry[:start_index] }.min,
+        end_index: positioned_entries.map { |entry| entry[:end_index] }.max
+      }
+    end
+
+    def emit_ruby_top_level_sections(destination_source, sections)
+      lines = normalize_source(destination_source).split("\n", -1)
+      emitted = sections.reject { |section| section[:text].to_s.strip.empty? }
+      previous = nil
+      output = +""
+
+      emitted.each do |section|
+        output << ruby_top_level_section_separator(lines, previous, section) if previous
+        output << section.fetch(:text).strip
+        previous = section
+      end
+
+      "#{output.strip}\n"
+    end
+
+    def ruby_top_level_section_separator(lines, previous, current)
+      return "\n\n" unless previous[:end_index].is_a?(Integer) && current[:start_index].is_a?(Integer)
+      return "\n\n" unless current[:start_index] > previous[:end_index]
+
+      gap = lines[(previous[:end_index] + 1)...current[:start_index]].to_a
+      return "\n\n" if gap.empty?
+
+      "\n#{gap.join("\n")}\n"
     end
 
     def ruby_top_level_process_structure_items(process_analysis)
