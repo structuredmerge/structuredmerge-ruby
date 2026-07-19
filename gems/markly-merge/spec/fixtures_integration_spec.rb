@@ -45,6 +45,30 @@ RSpec.describe Markly::Merge do
     expect(json_ready(described_class.markdown_plan_context)).to eq(json_ready(plan_fixture.dig(:providers, :markly)))
   end
 
+  it 'inherits shared Markdown structured-edit owner projections' do
+    source = <<~MARKDOWN
+      # Title
+
+      ## Synopsis
+
+      [docs]: README.md
+
+      <!-- KJ:START -->
+      [Docs][docs] ![Build][build]
+
+      | Feature | Badge |
+      | --- | --- |
+      | Works | [Docs][docs] |
+    MARKDOWN
+    analysis = described_class::FileAnalysis.new(source)
+
+    expect(analysis.heading_section_owners.map(&:heading_text)).to include('Synopsis')
+    expect(analysis.link_definition_owners.map(&:label)).to include('docs')
+    expect(analysis.html_comment_owners.map(&:text)).to include('KJ:START')
+    expect(analysis.inline_reference_owners.map(&:label)).to include('docs', 'build')
+    expect(analysis.table_row_owners.map(&:source)).to include("| Works | [Docs][docs] |\n")
+  end
+
   it 'projects the structured-edit provider profile through Markly' do
     fixture = read_json(
       fixtures_root.join(
