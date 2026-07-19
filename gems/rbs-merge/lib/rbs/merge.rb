@@ -115,15 +115,12 @@ module Rbs
 
           # Also register the tree-sitter-rbs grammar when present.
           grammar_finder = TreeHaver::GrammarFinder.new(:rbs)
-          if grammar_finder.available?
-            TreeHaver.register_language(
-              :rbs,
-              path: grammar_finder.find_library_path,
-              symbol: grammar_finder.symbol_name
-            )
-          end
+          grammar_finder.register! if grammar_finder.available?
 
           TreeHaver::BackendRegistry.register_tag(:rbs_backend, category: :backend, backend_name: :rbs) do
+            Backends::RbsBackend.available?
+          end
+          TreeHaver::BackendRegistry.register_tag(:rbs_gem, category: :gem, backend_name: :rbs_gem) do
             Backends::RbsBackend.available?
           end
           TreeHaver::BackendRegistry.register_tag(:rbs_grammar, category: :grammar, backend_name: :rbs_grammar) do

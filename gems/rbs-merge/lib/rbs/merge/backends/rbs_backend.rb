@@ -509,18 +509,8 @@ module Rbs
           end
         end
 
-        # Register this backend with TreeHaver
-        ::TreeHaver.register_language(
-          :rbs,
-          backend_type: :rbs,
-          backend_module: self,
-          gem_name: 'rbs'
-        )
-
-        # Register the availability checker for RSpec dependency tags.
-        TreeHaver::BackendRegistry.register_availability_checker(:rbs_gem) do
-          available?
-        end
+        # Registration is centralized in Rbs::Merge.register_backend! so loading
+        # this adapter module does not mutate TreeHaver outside the owning gem.
       end
     end
   end
