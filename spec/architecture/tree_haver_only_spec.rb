@@ -11,7 +11,12 @@ RSpec.describe 'TreeHaver-only merge architecture' do
     Json::Merge::SyntheticParser |
     (?<!:)SyntheticParser |
     JSON\.parse\( |
-    YAML\.safe_load\(
+    YAML\.(?:safe_load|safe_load_file|load|load_file|parse)\( |
+    Psych\.(?:parse|parse_stream|safe_load|safe_load_file|load|load_file)\( |
+    Prism\.parse(?:_file)?\( |
+    RBS::Parser\.parse_signature\( |
+    TomlRB::Document\.parse\( |
+    TOML::(?:Parser|Parslet)\.parse\(
   /x
 
   KNOWN_PARSER_BYPASS_REFERENCES = Set.new(
@@ -23,6 +28,8 @@ RSpec.describe 'TreeHaver-only merge architecture' do
     Dir.glob(ROOT.join('gems', '{*-merge,*-merge-git}', 'lib', '**', '*.rb')).each_with_object(Set.new) do |path, matches|
       relative_path = Pathname.new(path).relative_path_from(ROOT).to_s
       next if relative_path.include?('/rspec/')
+      next if relative_path.include?('/backends/')
+      next if relative_path.start_with?('gems/ast-merge/lib/ast/merge/recipe/')
 
       File.foreach(path) do |line|
         stripped = line.strip
