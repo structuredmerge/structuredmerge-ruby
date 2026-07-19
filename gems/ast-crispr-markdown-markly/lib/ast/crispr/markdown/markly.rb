@@ -90,9 +90,6 @@ module Ast
               raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
-
-          private
-
         end
 
         module Selectors
