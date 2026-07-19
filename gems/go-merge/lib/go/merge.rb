@@ -108,7 +108,43 @@ module Go
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 
-      unsupported_feature_result('Go owner extraction must be rebuilt from TreeHaver AST nodes.')
+      imports = []
+      declarations = []
+      tree.root_node.children.each do |node|
+        case node.type
+        when 'import_declaration'
+          import_source = line_anchored_slice(source, node)
+          imports << {
+            path: "/imports/#{imports.length}",
+            owner_kind: 'import',
+            match_key: normalize_go_import_path(import_source),
+            text: import_text(source, node)
+          }
+        when 'function_declaration', 'method_declaration', 'type_declaration', 'const_declaration', 'var_declaration'
+          name = first_named_descendant_text(source, node, %w[identifier type_identifier field_identifier])
+          next unless name
+
+          declarations << {
+            path: "/declarations/#{name}",
+            owner_kind: 'declaration',
+            match_key: name,
+            text: declaration_text(source, node)
+          }
+        end
+      end
+
+      {
+        ok: true,
+        diagnostics: [],
+        analysis: {
+          kind: 'go',
+          dialect: 'go',
+          imports: imports,
+          declarations: declarations,
+          owners: owner_views(imports + declarations)
+        },
+        policies: []
+      }
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
@@ -132,6 +168,27 @@ module Go
       match ? match[1] : import_source.sub(/\Aimport\s+/, '').strip
     end
     private_class_method :normalize_go_import_path
+
+    def first_named_descendant_text(source, node, types)
+      return slice_span(source, node) if types.include?(node.type)
+
+      node.children.each do |child|
+        value = first_named_descendant_text(source, child, types)
+        return value if value && !value.empty?
+      end
+      nil
+    end
+    private_class_method :first_named_descendant_text
+
+    def owner_view(item)
+      item.slice(:path, :owner_kind, :match_key)
+    end
+    private_class_method :owner_view
+
+    def owner_views(items)
+      items.map { |item| owner_view(item) }
+    end
+    private_class_method :owner_views
 
     def import_text(source, span) = "#{slice_span(source, span)}\n"
     def declaration_text(source, span) = "#{line_anchored_slice(source, span)}\n"

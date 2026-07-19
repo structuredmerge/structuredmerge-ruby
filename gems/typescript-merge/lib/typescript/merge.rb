@@ -109,7 +109,44 @@ module TypeScript
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 
-      unsupported_feature_result('TypeScript owner extraction must be rebuilt from TreeHaver AST nodes.')
+      imports = []
+      declarations = []
+      tree.root_node.children.each do |node|
+        case node.type
+        when 'import_statement'
+          import_source = line_anchored_slice(source, node)
+          imports << {
+            path: "/imports/#{imports.length}",
+            owner_kind: 'import',
+            match_key: normalize_type_script_import_path(import_source),
+            text: import_text(source, node)
+          }
+        when 'export_statement', 'function_declaration', 'class_declaration', 'interface_declaration',
+             'lexical_declaration', 'variable_declaration'
+          name = first_named_descendant_text(source, node, %w[identifier type_identifier])
+          next unless name
+
+          declarations << {
+            path: "/declarations/#{name}",
+            owner_kind: 'declaration',
+            match_key: name,
+            text: declaration_text(source, node)
+          }
+        end
+      end
+
+      {
+        ok: true,
+        diagnostics: [],
+        analysis: {
+          kind: 'typescript',
+          dialect: 'typescript',
+          imports: imports,
+          declarations: declarations,
+          owners: owner_views(imports + declarations)
+        },
+        policies: []
+      }
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
@@ -127,6 +164,34 @@ module TypeScript
         policies: [] }
     end
     private_class_method :parse_failure_result
+
+    def normalize_type_script_import_path(import_source)
+      match = import_source.match(/from\s+['"]([^'"]+)['"]/) || import_source.match(/import\s+['"]([^'"]+)['"]/)
+      match ? match[1] : import_source.sub(/\Aimport\s+/, '').strip
+    end
+    private_class_method :normalize_type_script_import_path
+
+    def first_named_descendant_text(source, node, types)
+      return slice_span(source, node) if types.include?(node.type)
+
+      node.children.each do |child|
+        value = first_named_descendant_text(source, child, types)
+        return value if value && !value.empty?
+      end
+      nil
+    end
+    private_class_method :first_named_descendant_text
+
+    def owner_view(item)
+      item.slice(:path, :owner_kind, :match_key)
+    end
+    private_class_method :owner_view
+
+    def owner_views(items)
+      imports, declarations = items.partition { |item| item.fetch(:owner_kind) == 'import' }
+      (imports + declarations.sort_by { |item| item.fetch(:path) }).map { |item| owner_view(item) }
+    end
+    private_class_method :owner_views
 
     def import_text(source, span)
       "#{slice_span(source, span)}\n"

@@ -12,15 +12,21 @@ RSpec.describe Rust::Merge do
 
     analysis_fixture = read_json(fixtures_root.join('rust', 'slice-106-analysis', 'module-owners.json'))
     analysis = described_class.parse_rust(analysis_fixture[:source], analysis_fixture[:dialect])
-    expect(analysis[:ok]).to be(false)
-    expect(analysis.dig(:diagnostics, 0, :category)).to eq('unsupported_feature')
-    expect(analysis.dig(:diagnostics, 0, :message)).to include('TreeHaver AST nodes')
+    expect(analysis[:ok]).to be(true)
+    expect(json_ready(analysis.dig(:analysis, :owners))).to eq(json_ready(analysis_fixture.dig(:expected, :owners)))
+
+    matching_fixture = read_json(fixtures_root.join('rust', 'slice-107-matching', 'path-equality.json'))
+    template = described_class.parse_rust(matching_fixture[:template], 'rust')
+    destination = described_class.parse_rust(matching_fixture[:destination], 'rust')
+    matching = described_class.match_rust_owners(template[:analysis], destination[:analysis])
+    expect(json_ready(matching[:matched].map do |match|
+      [match[:template_path], match[:destination_path]]
+    end)).to eq(json_ready(matching_fixture.dig(:expected, :matched)))
 
     merge_fixture = read_json(fixtures_root.join('rust', 'slice-108-merge', 'module-merge.json'))
     merge = described_class.merge_rust(merge_fixture[:template], merge_fixture[:destination], 'rust')
-    expect(merge[:ok]).to be(false)
-    expect(merge.dig(:diagnostics, 0, :category)).to eq('unsupported_feature')
-    expect(merge.dig(:diagnostics, 0, :message)).to include('TreeHaver AST nodes')
+    expect(merge[:ok]).to eq(merge_fixture.dig(:expected, :ok))
+    expect(merge[:output]).to eq(merge_fixture.dig(:expected, :output))
 
     backend_profiles = read_json(fixtures_root.join('diagnostics', 'slice-122-source-family-backend-feature-profiles',
                                                     'rust-backend-feature-profiles.json'))
