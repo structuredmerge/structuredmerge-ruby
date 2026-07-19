@@ -3,6 +3,7 @@
 require_relative '../../gems/go-merge/lib/go/merge'
 require_relative '../../gems/rust-merge/lib/rust/merge'
 require_relative '../../gems/typescript-merge/lib/typescript/merge'
+require_relative '../../gems/ruby-merge/lib/ruby/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -38,6 +39,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for typescript'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when Ruby has no registered parser' do
+    result = Ruby::Merge.parse_ruby("class Example\nend\n", 'ruby')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:ruby)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for ruby'))
     )
   end
 end

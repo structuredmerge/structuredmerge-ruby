@@ -85,19 +85,15 @@ module Ruby
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      request = TreeHaver::ParserRequest.new(source: source, language: 'ruby', dialect: dialect)
-      syntax = TreeHaver.parse_with_language_pack(request)
-      return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
+      parser = TreeHaver.parser_for(:ruby)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
-      process = TreeHaver.process_with_language_pack(request)
-      return { ok: false, diagnostics: process[:diagnostics], policies: [] } unless process[:ok]
-
-      {
-        ok: true,
-        diagnostics: [],
-        analysis: analyze_ruby_document(source, process_analysis: process[:analysis]),
-        policies: []
-      }
+      unsupported_feature_result(
+        'ruby-merge owner extraction must be rebuilt from TreeHaver AST nodes. Use prism-merge for native Ruby merging.'
+      )
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
 
     def match_ruby_owners(template, destination)
@@ -1269,6 +1265,19 @@ module Ruby
       return '' if content.empty?
 
       content.lines.any? { |line| !line.strip.empty? && !comment_line?(line) } ? '' : content
+    end
+
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'Ruby parse returned no root node' unless node
+      raise TreeHaver::NotAvailable, 'Ruby parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+    end
+
+    def parse_failure_result(error)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: []
+      }
     end
 
     def ruby_fallback_scope_rank(scope)

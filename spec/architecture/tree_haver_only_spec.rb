@@ -23,8 +23,6 @@ RSpec.describe 'TreeHaver-only merge architecture' do
       "gems/markdown-merge/lib/markdown/merge.rb:syntax = TreeHaver.parse_with_language_pack(",
       "gems/parslet-toml-merge/lib/parslet/toml/merge.rb:syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)",
       "gems/psych-merge/lib/psych/merge.rb:parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)",
-      "gems/ruby-merge/lib/ruby/merge.rb:process = TreeHaver.process_with_language_pack(request)",
-      "gems/ruby-merge/lib/ruby/merge.rb:syntax = TreeHaver.parse_with_language_pack(request)",
       "gems/toml-merge/lib/toml/merge.rb:grammar_class: TOML::Parslet,",
       "gems/toml-merge/lib/toml/merge.rb:grammar_module: TomlRB::Document,",
       "gems/toml-merge/lib/toml/merge.rb:return unless defined?(TOML::Parslet)",
