@@ -123,6 +123,15 @@ module Rust
     end
     private_class_method :parse_failure_result
 
+    def unsupported_feature_result(message)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
+        policies: []
+      }
+    end
+    private_class_method :unsupported_feature_result
+
     def normalize_rust_import_path(import_source)
       import_source.sub(/\Ause\s+/, '').sub(/;\z/, '').strip
     end

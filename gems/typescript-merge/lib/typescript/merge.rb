@@ -151,7 +151,11 @@ module TypeScript
     private_class_method :line_anchored_slice
 
     def unsupported_feature_result(message)
-      Ast::Merge.unsupported_feature_result(message)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
+        policies: []
+      }
     end
     private_class_method :unsupported_feature_result
   end
