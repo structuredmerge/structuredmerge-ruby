@@ -158,8 +158,7 @@ module Psych
         end
         return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
-        tree = TreeHaver.parser_for(:yaml).parse(source)
-        parsed = yaml_document_value_from_tree(tree)
+        parsed = yaml_value_for_source(source)
         Yaml::Merge.analyze_yaml_document(parsed, dialect)
       rescue TreeHaver::Error, StandardError => e
         parse_error_result(e.message)
@@ -225,6 +224,11 @@ module Psych
 
           BACKEND_REGISTRY.registered = true
         end
+      end
+
+      def yaml_value_for_source(source)
+        tree = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:yaml).parse(source) }
+        yaml_document_value_from_tree(tree)
       end
 
       private
