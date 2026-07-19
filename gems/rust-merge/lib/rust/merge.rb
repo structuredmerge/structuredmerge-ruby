@@ -11,8 +11,20 @@ module Rust
     PACKAGE_NAME = 'rust-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     module_function
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:rust)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def rust_feature_profile
       { family: 'rust', supported_dialects: ['rust'], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
@@ -88,41 +100,28 @@ module Rust
     end
 
     def analyze_rust_module(source)
-      parsed = TreeHaver.parse_with_language_pack(TreeHaver::ParserRequest.new(source: source, language: 'rust',
-                                                                               dialect: 'rust'))
-      return { ok: false, diagnostics: parsed[:diagnostics], policies: [] } unless parsed[:ok]
+      parser = TreeHaver.parser_for(:rust)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
-      processed = TreeHaver.process_with_language_pack(TreeHaver::ProcessRequest.new(source: source, language: 'rust'))
-      return { ok: false, diagnostics: processed[:diagnostics], policies: [] } unless processed[:ok]
-
-      imports = processed[:analysis].imports.each_with_index.map do |item, index|
-        { path: "/imports/#{index}", match_key: normalize_rust_import_path(item.source),
-          text: import_text(source, item.span) }
-      end
-      declarations = processed[:analysis].structure
-                                         .select { |item| item.name }
-                                         .map do |item|
-        { path: "/declarations/#{item.name}", match_key: item.name,
-          text: declaration_text(source, item.span) }
-      end
-                                         .sort_by { |item| item[:path] }
-
-      {
-        ok: true,
-        diagnostics: [],
-        analysis: {
-          kind: 'rust',
-          dialect: 'rust',
-          source: source,
-          owners: imports.map { |item| { path: item[:path], owner_kind: 'import', match_key: item[:match_key] } } +
-            declarations.map { |item| { path: item[:path], owner_kind: 'declaration', match_key: item[:match_key] } },
-          imports: imports,
-          declarations: declarations
-        },
-        policies: []
-      }
+      unsupported_feature_result('Rust owner extraction must be rebuilt from TreeHaver AST nodes.')
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
     private_class_method :analyze_rust_module
+
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'Rust parse returned no root node' unless node
+      raise TreeHaver::NotAvailable, 'Rust parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+    end
+    private_class_method :collect_parse_errors
+
+    def parse_failure_result(error)
+      { ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: [] }
+    end
+    private_class_method :parse_failure_result
 
     def normalize_rust_import_path(import_source)
       import_source.sub(/\Ause\s+/, '').sub(/;\z/, '').strip
@@ -141,6 +140,8 @@ module Rust
     private_class_method :import_text, :declaration_text, :slice_span, :line_anchored_slice
   end
 end
+
+Rust::Merge.register_backend!
 
 Rust::Merge::Version.class_eval do
   extend VersionGem::Basic

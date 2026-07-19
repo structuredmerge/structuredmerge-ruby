@@ -13,6 +13,18 @@ module Go
     PACKAGE_NAME = 'go-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:go)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def go_feature_profile
       { family: 'go', supported_dialects: ['go'], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
@@ -92,45 +104,28 @@ module Go
     end
 
     def analyze_go_module(source)
-      parsed = TreeHaver.parse_with_language_pack(TreeHaver::ParserRequest.new(source: source, language: 'go',
-                                                                               dialect: 'go'))
-      return { ok: false, diagnostics: parsed[:diagnostics], policies: [] } unless parsed[:ok]
+      parser = TreeHaver.parser_for(:go)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
-      processed = TreeHaver.process_with_language_pack(TreeHaver::ProcessRequest.new(source: source, language: 'go'))
-      return { ok: false, diagnostics: processed[:diagnostics], policies: [] } unless processed[:ok]
-
-      deduped_imports = {}
-      processed[:analysis].imports.each do |item|
-        match_key = normalize_go_import_path(item.source)
-        candidate = { path: nil, match_key: match_key, text: import_text(source, item.span) }
-        current = deduped_imports[match_key]
-        deduped_imports[match_key] = candidate if current.nil? || candidate[:text].length > current[:text].length
-      end
-      imports = deduped_imports.values.each_with_index.map { |item, index| item.merge(path: "/imports/#{index}") }
-      declarations = processed[:analysis].structure
-                                         .select { |item| item.name }
-                                         .map do |item|
-        { path: "/declarations/#{item.name}", match_key: item.name,
-          text: declaration_text(source, item.span) }
-      end
-                                         .sort_by { |item| item[:path] }
-
-      {
-        ok: true,
-        diagnostics: [],
-        analysis: {
-          kind: 'go',
-          dialect: 'go',
-          source: source,
-          owners: imports.map { |item| { path: item[:path], owner_kind: 'import', match_key: item[:match_key] } } +
-            declarations.map { |item| { path: item[:path], owner_kind: 'declaration', match_key: item[:match_key] } },
-          imports: imports,
-          declarations: declarations
-        },
-        policies: []
-      }
+      unsupported_feature_result('Go owner extraction must be rebuilt from TreeHaver AST nodes.')
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
     private_class_method :analyze_go_module
+
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'Go parse returned no root node' unless node
+      raise TreeHaver::NotAvailable, 'Go parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+    end
+    private_class_method :collect_parse_errors
+
+    def parse_failure_result(error)
+      { ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: [] }
+    end
+    private_class_method :parse_failure_result
 
     def normalize_go_import_path(import_source)
       match = import_source.match(/"([^"]+)"/)
@@ -155,6 +150,8 @@ module Go
     private_class_method :unsupported_feature_result
   end
 end
+
+Go::Merge.register_backend!
 
 Go::Merge::Version.class_eval do
   extend VersionGem::Basic
