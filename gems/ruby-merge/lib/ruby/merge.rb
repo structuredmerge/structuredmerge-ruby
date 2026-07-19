@@ -467,7 +467,7 @@ module Ruby
         scopes: %w[node subtree owned_region whole_file],
         triggers: [
           { reason: 'binary_input', scope: 'whole_file' },
-          { reason: 'unsupported_parser_or_backend', scope: 'whole_file' },
+          { reason: 'unsupported_structural_merge_capability', scope: 'whole_file' },
           { reason: 'no_structural_owners', scope: 'whole_file' },
           { reason: 'both_branches_create_file', scope: 'whole_file' },
           { reason: 'excessive_duplicate_identities', scope: 'owned_region' },
