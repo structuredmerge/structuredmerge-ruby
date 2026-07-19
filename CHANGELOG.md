@@ -50,7 +50,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - `ast-merge` now provides shared source-region report helpers for comment-block
   attachment and blank interstitial ownership, and `ruby-merge` uses those
   helpers for its Ruby fixture/report APIs instead of carrying local copies of
-  format-neutral ownership mechanics.
+  format-neutral ownership mechanics. The shared helpers now also cover
+  interstitial region construction, public owner projection, source spans,
+  source content slices, and attached leading comment regions.
 - Root architecture specs now guard merge emission files against new ad hoc
   comment or blank-line ownership scans, keeping the remaining cleanup debt
   explicit while shared ast-merge attachment and layout helpers are adopted.

@@ -330,7 +330,7 @@ module Ruby
       owners = top_level_source_region_owners(lines)
 
       {
-        regions: interleave_source_regions(lines, owners),
+        regions: source_interleaved_regions_for_report(lines: lines, owners: owners),
         trailing_newline: normalize_source(source).end_with?("\n")
       }
     end
@@ -2236,8 +2236,8 @@ module Ruby
             match_key: require_path,
             start_index: index,
             end_index: index,
-            span: line_span(index, index),
-            content: source_region_content(lines, index, index)
+            span: source_report_line_span(index, index),
+            content: source_report_region_content(lines, index, index)
           }
           pending_comments = []
           index += 1
@@ -2258,13 +2258,17 @@ module Ruby
             start_index: start_index,
             declaration_start_index: index,
             end_index: finish_index,
-            span: line_span(start_index, finish_index),
-            declaration_span: line_span(index, finish_index),
-            content: source_region_content(lines, start_index, finish_index)
+            span: source_report_line_span(start_index, finish_index),
+            declaration_span: source_report_line_span(index, finish_index),
+            content: source_report_region_content(lines, start_index, finish_index)
           }
           owner[:child_regions] = container_child_source_regions(lines, declaration, index, finish_index) if %w[class
                                                                                                                 module].include?(declaration[:kind])
-          attached_comments = attached_comment_regions(lines, start_index, index)
+          attached_comments = source_attached_comment_regions_for_report(
+            lines: lines,
+            start_index: start_index,
+            declaration_index: index
+          )
           owner[:attached_comments] = attached_comments unless attached_comments.empty?
           owners << owner
           pending_comments = []
@@ -2325,125 +2329,28 @@ module Ruby
           match_key: method_name,
           start_index: start_index,
           end_index: method_finish_index,
-          span: line_span(start_index, method_finish_index),
-          content: source_region_content(lines, start_index, method_finish_index)
+          span: source_report_line_span(start_index, method_finish_index),
+          content: source_report_region_content(lines, start_index, method_finish_index)
         }
-        owner[:declaration_span] = line_span(index, method_finish_index) if start_index != index
-        attached_comments = attached_comment_regions(lines, start_index, index)
+        owner[:declaration_span] = source_report_line_span(index, method_finish_index) if start_index != index
+        attached_comments = source_attached_comment_regions_for_report(
+          lines: lines,
+          start_index: start_index,
+          declaration_index: index
+        )
         owner[:attached_comments] = attached_comments unless attached_comments.empty?
         owners << owner
         pending_comments = []
         index = method_finish_index + 1
       end
 
-      interleave_source_regions(
-        lines,
-        owners,
+      source_interleaved_regions_for_report(
+        lines: lines,
+        owners: owners,
         container_name: declaration[:name],
         container_start_index: declaration_index,
         container_end_index: finish_index
       )
-    end
-
-    def interleave_source_regions(lines, owners, container_name: nil, container_start_index: 0,
-                                  container_end_index: nil)
-      container_end_index ||= lines.length - 1
-      regions = []
-      cursor = container_start_index
-      previous_owner = nil
-
-      owners.each do |owner|
-        if cursor < owner[:start_index]
-          regions << source_interstitial_region(
-            lines,
-            cursor,
-            owner[:start_index] - 1,
-            previous_owner,
-            owner,
-            container_name: container_name
-          )
-        end
-
-        regions << public_source_region(owner)
-        previous_owner = owner
-        cursor = owner[:end_index] + 1
-      end
-
-      if cursor <= container_end_index
-        regions << source_interstitial_region(
-          lines,
-          cursor,
-          container_end_index,
-          previous_owner,
-          nil,
-          container_name: container_name
-        )
-      end
-
-      regions
-    end
-
-    def source_interstitial_region(lines, start_index, end_index, previous_owner, next_owner, container_name: nil)
-      position = if previous_owner.nil? && next_owner
-                   container_name ? 'container_header' : 'file_header'
-                 elsif previous_owner && next_owner
-                   'between'
-                 elsif container_name
-                   'container_footer'
-                 else
-                   'file_footer'
-                 end
-
-      region_id = case position
-                  when 'container_header'
-                    "class_header:#{container_name}"
-                  when 'container_footer'
-                    "class_footer:#{container_name}"
-                  when 'file_header'
-                    'file_header'
-                  when 'file_footer'
-                    'file_footer'
-                  else
-                    "between:#{previous_owner[:region_id]}:#{next_owner[:region_id]}"
-                  end
-
-      compact_region(
-        region_id: region_id,
-        region_kind: 'interstitial',
-        position: position,
-        previous_owner: previous_owner&.fetch(:address),
-        next_owner: next_owner&.fetch(:address),
-        span: line_span(start_index, end_index),
-        content: source_region_content(lines, start_index, end_index)
-      )
-    end
-
-    def public_source_region(region)
-      region.reject { |key, _value| %i[start_index declaration_start_index end_index].include?(key) }
-    end
-
-    def line_span(start_index, end_index)
-      {
-        start_line: start_index + 1,
-        end_line: end_index + 1
-      }
-    end
-
-    def source_region_content(lines, start_index, end_index)
-      "#{lines[start_index..end_index].join("\n")}\n"
-    end
-
-    def attached_comment_regions(lines, start_index, declaration_index)
-      return [] unless start_index < declaration_index
-
-      [
-        {
-          attachment: 'leading',
-          start_line: start_index + 1,
-          end_line: declaration_index,
-          content: source_region_content(lines, start_index, declaration_index - 1)
-        }
-      ]
     end
 
     def compact_region(region)
