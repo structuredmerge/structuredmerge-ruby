@@ -38,6 +38,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
   update the GitHub Actions SHA pin index used by generated workflow templates
   via `kettle-gha-sha-pins`.
+- Generated local Gemfile templates now document why `nomono` is explicitly
+  activated before requiring `nomono/bundler`.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
   `appraisal2` executable.
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA
