@@ -127,12 +127,12 @@ RSpec.describe Ast::Crispr::Markdown::Markly do
       context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: 'README.md')
       owners = context.structural_owners(owner_scope: :table_rows)
 
-      expect(owners.map { |owner| [owner.location.start_line, owner.text] }).to eq([
-                                                                                     [3,
-                                                                                      "| Works with MRI Ruby | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |\n"],
-                                                                                     [4,
-                                                                                      "| Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |\n"]
-                                                                                   ])
+      expect(owners.map { |owner| [owner.location.start_line, owner.source] }).to eq([
+                                                                                       [3,
+                                                                                        "| Works with MRI Ruby | [![Ruby][💎ruby-3.2i]][🚎ruby-3.2-wf] |\n"],
+                                                                                       [4,
+                                                                                        "| Works with JRuby | [![JRuby][💎jruby-9.4i]][🚎jruby-9.4-wf] |\n"]
+                                                                                     ])
       expect(owners.last.source).to include('Works with JRuby')
     end
 
