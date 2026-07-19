@@ -11,7 +11,8 @@ module Kettle
           "gemfiles/modular/templating_local.gemfile",
           "mise.toml"
         ].freeze
-        CRITICAL_TEMPLATING_GEMS = %w[nomono tree_sitter_language_pack].freeze
+        CRITICAL_TEMPLATING_GEMS = %w[nomono].freeze
+        LOCKED_TEMPLATING_GEMS = %w[tree_sitter_language_pack].freeze
 
         module_function
 
@@ -25,7 +26,7 @@ module Kettle
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
           update_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_update_templating_bootstrap",
-            bundle_update_templating_bootstrap_command,
+            bundle_update_templating_bootstrap_command(project_root),
             project_root: project_root,
             env: setup_env,
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
@@ -59,8 +60,16 @@ module Kettle
           )
         end
 
-        def bundle_update_templating_bootstrap_command
-          %w[bundle update] + CRITICAL_TEMPLATING_GEMS
+        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
+          %w[bundle update] + CRITICAL_TEMPLATING_GEMS + locked_templating_gems(project_root)
+        end
+
+        def locked_templating_gems(project_root)
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          return [] unless File.file?(lock_path)
+
+          locked_names = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
+          LOCKED_TEMPLATING_GEMS & locked_names
         end
       end
     end

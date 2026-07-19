@@ -165,6 +165,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated root Gemfiles no longer add a separate `gem "nomono"` bootstrap
   line when templating the `nomono` gem itself, avoiding duplicate dependency
   declarations against the package gemspec.
+- `kettle-jem prepare` no longer explicitly asks Bundler to update parser gems
+  before they exist in a member lockfile, allowing cold-start templating
+  bootstraps to introduce vendored parser path dependencies during
+  `bundle install`.
 - Workflow template pin maintenance now compares and updates complete pinned
   action strings in source files, so `bin/kettle-jem-workflow-pins --check`
   fails when template files drift from `github_actions_step_pins` even if the

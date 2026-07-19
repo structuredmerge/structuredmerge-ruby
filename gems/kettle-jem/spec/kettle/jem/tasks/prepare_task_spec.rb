@@ -34,7 +34,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
         .with(
           "bundle_update_templating_bootstrap",
-          %w[bundle update nomono tree_sitter_language_pack],
+          %w[bundle update nomono],
           project_root: root,
           env: setup_env,
           quiet: false,
@@ -79,8 +79,45 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   end
 
   it "updates lockfile-safe templating bootstrap gems before the full template run" do
-    expect(described_class.bundle_update_templating_bootstrap_command).to eq(
-      %w[bundle update nomono tree_sitter_language_pack]
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.0.8)
+            tree_sitter_language_pack (1.13.0)
+      LOCK
+
+      expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
+        %w[bundle update nomono tree_sitter_language_pack]
+      )
+    end
+  end
+
+  it "does not explicitly update parser gems before they are present in the lockfile" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      File.write(File.join(root, "Gemfile.lock"), <<~LOCK)
+        GEM
+          specs:
+            nomono (1.0.8)
+      LOCK
+
+      expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
+        %w[bundle update nomono]
+      )
+    end
+  end
+
+  it "keeps the cold-start update command minimal when no lockfile exists" do
+    Dir.mktmpdir("kettle-jem-prepare", tmp_root) do |root|
+      expect(described_class.bundle_update_templating_bootstrap_command(root)).to eq(
+        %w[bundle update nomono]
+      )
+    end
+  end
+
+  it "lists parser gems that need lock-aware update handling" do
+    expect(described_class::LOCKED_TEMPLATING_GEMS).to eq(
+      %w[tree_sitter_language_pack]
     )
   end
 end
