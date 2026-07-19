@@ -71,6 +71,12 @@ RSpec.describe Bash::Merge do
 
       expect(registrations).to be_a(Hash)
     end
+
+    it 'exposes the registered TreeHaver language-pack backend' do
+      expect(described_class.available_bash_backends.map(&:to_h)).to eq(
+        [{ id: 'kreuzberg-language-pack', family: 'tree-sitter' }]
+      )
+    end
   end
 
   describe '.availability' do

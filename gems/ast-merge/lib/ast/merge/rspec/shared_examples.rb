@@ -29,6 +29,7 @@
 # - "Ast::Merge::UnresolvedReviewStateTransportContract" - validates persisted unresolved review replay and JSON-safe transport
 # - "Ast::Merge::UnresolvedRuntimeDebugContract" - validates unresolved review state in debug payloads
 # - "Ast::Merge::UnresolvedRuntimeContract" - validates reviewable unresolved runtime payloads
+# - "Ast::Merge::TreeHaverBackendContract" - validates advertised backend refs have concrete TreeHaver parsers
 # - "a reproducible merge" - validates merge scenarios with fixtures and idempotency
 # - "a reproducible partial merge" - validates partial-merge scenarios with idempotency
 
@@ -55,3 +56,4 @@ require_relative 'shared_examples/unresolved_helper_contract'
 require_relative 'shared_examples/unresolved_review_state_transport_contract'
 require_relative 'shared_examples/unresolved_runtime_debug_contract'
 require_relative 'shared_examples/unresolved_runtime_contract'
+require_relative 'shared_examples/tree_haver_backend_contract'

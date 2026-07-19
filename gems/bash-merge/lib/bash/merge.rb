@@ -48,6 +48,7 @@ module Bash
   # @see SmartMerger Main entry point for merge operations
   # @see FileAnalysis Analyzes Bash structure
   module Merge
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     Availability = Struct.new(
       :grammar_path,
@@ -127,11 +128,17 @@ module Bash
         BACKEND_REGISTRY.mutex.synchronize do
           return if BACKEND_REGISTRY.registered
 
+          TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
           grammar_finder = TreeHaver::GrammarFinder.new(:bash)
           grammar_finder.register! if grammar_finder.available?
 
           BACKEND_REGISTRY.registered = true
         end
+      end
+
+      def available_bash_backends
+        [TREE_SITTER_BACKEND]
       end
 
       def available?(source: "#!/usr/bin/env bash\necho hello\n")

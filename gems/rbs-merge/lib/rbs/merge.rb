@@ -91,6 +91,7 @@ module Rbs
     # Tracks whether backends were registered, without class instance variables.
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     RBS_BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'rbs', family: 'rbs').freeze
+    TREE_SITTER_BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
 
     class << self
       # Register the current RBS parsing entrypoints with TreeHaver.
@@ -129,6 +130,13 @@ module Rbs
 
           BACKEND_REGISTRY.registered = true
         end
+      end
+
+      def available_rbs_backends
+        backends = [RBS_BACKEND_REFERENCE]
+        registrations = TreeHaver.registered_languages(:rbs)
+        backends << TREE_SITTER_BACKEND_REFERENCE if registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+        backends
       end
     end
   end
