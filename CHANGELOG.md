@@ -81,6 +81,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - RBS recursive member merges now use a shared retained blank-gap contract and
   preserve destination-owned nested member separators when template-preferred
   member bodies are emitted.
+- TOML template-preferred merges now preserve destination-owned retained blank
+  gaps for matched top-level keys and keys inside matched tables.
 - Markdown backend feature fixtures now account for optional provider backends
   that are only available after their provider gems register concrete TreeHaver
   integrations in the current process.

@@ -2,7 +2,7 @@
 
 RSpec.shared_examples('Ast::Merge::RetainedBlankGapCompliance') do
   def retained_blank_gap_source(*lines)
-    comment_matrix_source(*lines)
+    comment_matrix_source_builder.call(*lines)
   end
 
   it 'preserves destination blank gaps between retained matched owners' do

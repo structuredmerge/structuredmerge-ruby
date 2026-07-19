@@ -234,6 +234,21 @@ module Ast
         content
       end
 
+      # Check whether every provided line is blank.
+      #
+      # @param candidate_lines [Array<String>] Lines to classify
+      # @return [Boolean]
+      def blank_lines?(candidate_lines)
+        Array(candidate_lines).all? { |line| line.to_s.strip.empty? }
+      end
+
+      # Check whether the current emitter output ends with a blank line.
+      #
+      # @return [Boolean]
+      def ends_with_blank_line?
+        @lines.any? && blank_lines?([@lines.last])
+      end
+
       # Clear the emitter state
       def clear
         @lines = []
