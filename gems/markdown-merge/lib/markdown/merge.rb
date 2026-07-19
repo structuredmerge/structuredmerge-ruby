@@ -11,7 +11,9 @@ module Markdown
   module Merge
     PACKAGE_NAME = 'markdown-merge'
     BACKEND_REFERENCES = {
-      'kreuzberg-language-pack' => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
+      'kreuzberg-language-pack' => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND,
+      'commonmarker' => TreeHaver::BackendReference.new(id: 'commonmarker', family: 'native').freeze,
+      'markly' => TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze
     }.freeze
 
     class Error < Ast::Merge::Error; end
@@ -102,11 +104,11 @@ module Markdown
       return unsupported_feature_result("Unsupported Markdown dialect #{dialect}.") unless dialect == 'markdown'
 
       resolved_backend = resolve_backend(backend)
-      unless resolved_backend == 'kreuzberg-language-pack'
+      unless BACKEND_REFERENCES.key?(resolved_backend)
         return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
       end
 
-      parser = TreeHaver.parser_for(:markdown)
+      parser = TreeHaver.with_backend(resolved_backend) { TreeHaver.parser_for(:markdown) }
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 
@@ -574,7 +576,31 @@ module Markdown
     end
 
     def resolve_backend(backend)
-      backend.to_s.empty? ? 'kreuzberg-language-pack' : backend.to_s
+      return backend.to_s unless backend.to_s.empty?
+
+      current = TreeHaver.current_backend_id
+      return current if BACKEND_REFERENCES.key?(current.to_s) && markdown_backend_available_for_analysis?(current)
+
+      BACKEND_REFERENCES.keys.find { |backend_id| markdown_backend_available_for_analysis?(backend_id) } ||
+        'kreuzberg-language-pack'
+    end
+
+    def markdown_backend_available_for_analysis?(backend_id)
+      registrations = TreeHaver.registered_languages(:markdown)
+      case backend_id.to_s
+      when 'commonmarker'
+        registrations.dig(:commonmarker, :backend_module)&.then do |backend_module|
+          !backend_module.respond_to?(:available?) || backend_module.available?
+        end
+      when 'markly'
+        registrations.dig(:markly, :backend_module)&.then do |backend_module|
+          !backend_module.respond_to?(:available?) || backend_module.available?
+        end
+      when 'kreuzberg-language-pack'
+        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      else
+        false
+      end
     end
 
     def collect_parse_errors(node)
@@ -625,6 +651,7 @@ module Markdown
       :code_fence_family,
       :code_fence_dialect,
       :resolve_backend,
+      :markdown_backend_available_for_analysis?,
       :collect_parse_errors,
       :parse_failure_result,
       :unsupported_feature_result

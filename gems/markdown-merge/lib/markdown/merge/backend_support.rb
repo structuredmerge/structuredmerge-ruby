@@ -148,6 +148,10 @@ module Markdown
       private_class_method :install_tree_wrapper!
 
       def register_backend!(backend_module:, backend_name:, gem_name:, require_path:)
+        ::TreeHaver::BackendRegistry.register(
+          ::TreeHaver::BackendReference.new(id: backend_name.to_s, family: 'native')
+        )
+
         ::TreeHaver.register_language(
           :markdown,
           backend_type: backend_name,
