@@ -223,7 +223,9 @@ module Prism
         # (normalized, deduplicated, with attachment hints) rather than accessing raw
         # Prism::Comment objects via @parse_result.comments or node.location.leading_comments.
         @tree = DebugLogger.time('FileAnalysis#parse') do
-          TreeHaver.parser_for(:ruby).parse(source)
+          TreeHaver.with_backend(Prism::Merge::BACKEND_REFERENCE.id) do
+            TreeHaver.parser_for(:ruby, backend_type: :prism).parse(source)
+          end
         end
         @parse_result = @tree.parse_result
         @gemspec_block_var = detect_gemspec_block_var

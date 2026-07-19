@@ -227,7 +227,9 @@ module Psych
       end
 
       def yaml_value_for_source(source)
-        tree = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:yaml).parse(source) }
+        tree = TreeHaver.with_backend(BACKEND_REFERENCE.id) do
+          TreeHaver.parser_for(:yaml, backend_type: :psych).parse(source)
+        end
         yaml_document_value_from_tree(tree)
       end
 

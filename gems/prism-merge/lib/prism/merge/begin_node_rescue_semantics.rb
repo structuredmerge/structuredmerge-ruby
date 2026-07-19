@@ -96,7 +96,9 @@ module Prism
       def local_variable_read_names_in_source(source)
         return [] if source.to_s.strip.empty?
 
-        parse_result = TreeHaver.parser_for(:ruby).parse(source).parse_result
+        parse_result = TreeHaver.with_backend(Prism::Merge::BACKEND_REFERENCE.id) do
+          TreeHaver.parser_for(:ruby, backend_type: :prism).parse(source).parse_result
+        end
         return [] unless parse_result.success?
 
         local_variable_read_names_in(parse_result.value).uniq
@@ -132,7 +134,9 @@ module Prism
       def rewrite_local_reference_in_source(source, from:, to:)
         return source if from.nil? || to.nil? || from == to || source.to_s.empty?
 
-        parse_result = TreeHaver.parser_for(:ruby).parse(source).parse_result
+        parse_result = TreeHaver.with_backend(Prism::Merge::BACKEND_REFERENCE.id) do
+          TreeHaver.parser_for(:ruby, backend_type: :prism).parse(source).parse_result
+        end
         return source unless parse_result.success?
 
         offsets = local_reference_offsets_in(parse_result.value, from)

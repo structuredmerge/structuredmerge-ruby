@@ -42,7 +42,9 @@ module Prism
           return source if old_var == new_var
           return source if source.empty?
 
-          parse_result = TreeHaver.parser_for(:ruby).parse(source).parse_result
+          parse_result = TreeHaver.with_backend(Prism::Merge::BACKEND_REFERENCE.id) do
+            TreeHaver.parser_for(:ruby, backend_type: :prism).parse(source).parse_result
+          end
           offsets = collect_receiver_offsets(parse_result.value, old_var)
           return source if offsets.empty?
 
