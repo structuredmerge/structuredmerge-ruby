@@ -146,6 +146,36 @@ RSpec.describe Rbs::Merge::SmartMerger do
     end
   end
 
+  shared_examples 'retained declaration blank line preservation' do
+    context 'when destination-owned top-level declarations are separated by blank lines' do
+      let(:template_top_level) do
+        <<~RBS
+          class Foo
+          end
+
+          class Bar
+          end
+        RBS
+      end
+
+      let(:destination_top_level) do
+        <<~RBS
+          class Foo
+          end
+
+          class Bar
+          end
+        RBS
+      end
+
+      it 'preserves the destination-owned blank line between retained declarations' do
+        merger = described_class.new(template_top_level, destination_top_level)
+
+        expect(merger.merge).to eq(destination_top_level)
+      end
+    end
+  end
+
   shared_examples 'merge with freeze blocks' do
     context 'with freeze blocks' do
       let(:template_with_freeze) do
@@ -1130,6 +1160,48 @@ RSpec.describe Rbs::Merge::SmartMerger do
         RBS
       end
     end
+
+    context 'when destination-owned nested members are separated by blank lines' do
+      let(:template_members_with_gaps) do
+        <<~RBS
+          module Kettle
+            module Wash
+              VERSION: String
+              def self.delete_constants: (Module owner, String | Symbol | Array[String | Symbol] constants) -> nil
+              def self.reset_constants: (owner: Module, constants: String | Symbol | Array[String | Symbol], path: String) -> nil
+              class Error < StandardError
+              end
+            end
+          end
+        RBS
+      end
+
+      let(:destination_members_with_gaps) do
+        <<~RBS
+          module Kettle
+            module Wash
+              VERSION: String
+
+              def self.delete_constants: (Module owner, String | Symbol | Array[String | Symbol] constants) -> nil
+              def self.reset_constants: (owner: Module, constants: String | Symbol | Array[String | Symbol], path: String) -> nil
+
+              class Error < StandardError
+              end
+            end
+          end
+        RBS
+      end
+
+      it 'preserves destination-owned blank lines between retained nested members' do
+        merger = described_class.new(
+          template_members_with_gaps,
+          destination_members_with_gaps,
+          preference: :destination
+        )
+
+        expect(merger.merge).to eq(destination_members_with_gaps)
+      end
+    end
   end
 
   shared_examples 'recursive member comment preservation' do
@@ -1348,6 +1420,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'
@@ -1387,6 +1460,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'
@@ -1426,6 +1500,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'
@@ -1465,6 +1540,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'
@@ -1504,6 +1580,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'
@@ -1543,6 +1620,7 @@ RSpec.describe Rbs::Merge::SmartMerger do
     describe '#merge' do
       it_behaves_like 'merge with identical files'
       it_behaves_like 'merge with added declarations'
+      it_behaves_like 'retained declaration blank line preservation'
       it_behaves_like 'merge with freeze blocks'
       it_behaves_like 'template-preferred declaration-leading comment fallback'
       it_behaves_like 'removed destination declaration comment preservation'

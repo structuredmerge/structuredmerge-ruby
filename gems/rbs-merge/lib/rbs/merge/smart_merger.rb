@@ -552,14 +552,15 @@ module Rbs
           end
         end
 
-        recursive_body_lines_for_declaration(
+        body_lines = recursive_body_lines_for_declaration(
           template_decl,
           dest_decl,
           decl,
           analysis,
           start_line: start_line,
           end_line: end_line
-        ).join("\n") + "\n"
+        )
+        body_lines.join("\n") + "\n"
       end
 
       def recursive_body_lines_for_declaration(template_decl, dest_decl, selected_decl, selected_analysis,
@@ -579,16 +580,18 @@ module Rbs
 
         if selected_members.empty?
           return empty_container_header_lines(selected_analysis, start_line: start_line, end_line: end_line) +
-                 merge_member_lines(template_members, dest_members) +
+                 merge_member_lines(template_members, dest_members, template_owners: template_members,
+                                                                  dest_owners: dest_members) +
                  empty_container_footer_lines(selected_analysis, start_line: start_line, end_line: end_line)
         end
 
         container_header_lines(selected_decl, selected_analysis) +
-          merge_member_lines(template_members, dest_members) +
+          merge_member_lines(template_members, dest_members, template_owners: template_members,
+                                                              dest_owners: dest_members) +
           container_footer_lines(selected_decl, selected_analysis)
       end
 
-      def merge_member_lines(template_members, dest_members)
+      def merge_member_lines(template_members, dest_members, template_owners: nil, dest_owners: nil)
         align_member_lists(template_members, dest_members).each_with_object([]) do |entry, lines|
           case entry[:type]
           when :match
@@ -606,11 +609,19 @@ module Rbs
                   entry[:template_decl],
                   @template_analysis,
                   comment_source_statement: entry[:dest_decl],
-                  comment_source_analysis: @dest_analysis
+                  comment_source_analysis: @dest_analysis,
+                  owners: template_owners,
+                  comment_source_owners: dest_owners
                 )
               )
             when :destination
-              lines.concat(extract_statement_lines_with_leading_comments(entry[:dest_decl], @dest_analysis))
+              lines.concat(
+                extract_statement_lines_with_leading_comments(
+                  entry[:dest_decl],
+                  @dest_analysis,
+                  owners: dest_owners
+                )
+              )
             when :recursive
               lines.concat(
                 reconstruct_declaration_with_merged_members(
@@ -624,12 +635,24 @@ module Rbs
           when :template_only
             next unless @add_template_only_nodes
 
-            lines.concat(extract_statement_lines_with_leading_comments(entry[:template_decl], @template_analysis))
+            lines.concat(
+              extract_statement_lines_with_leading_comments(
+                entry[:template_decl],
+                @template_analysis,
+                owners: template_owners
+              )
+            )
           when :dest_only
             if @remove_template_missing_nodes
               lines.concat(removed_declaration_comment_lines(entry[:dest_decl], @dest_analysis))
             else
-              lines.concat(extract_statement_lines_with_leading_comments(entry[:dest_decl], @dest_analysis))
+              lines.concat(
+                extract_statement_lines_with_leading_comments(
+                  entry[:dest_decl],
+                  @dest_analysis,
+                  owners: dest_owners
+                )
+              )
             end
           end
         end
@@ -780,7 +803,8 @@ module Rbs
       end
 
       def extract_statement_lines_with_leading_comments(statement, analysis, comment_source_statement: nil,
-                                                        comment_source_analysis: nil)
+                                                        comment_source_analysis: nil, owners: nil,
+                                                        comment_source_owners: nil)
         start_line = get_start_line(statement)
         return [] unless start_line
 
@@ -788,7 +812,9 @@ module Rbs
           statement,
           analysis,
           comment_source_decl: comment_source_statement,
-          comment_source_analysis: comment_source_analysis
+          comment_source_analysis: comment_source_analysis,
+          owners: owners,
+          comment_source_owners: comment_source_owners
         )
 
         leading_lines = if leading_region && leading_statement
@@ -813,7 +839,19 @@ module Rbs
                           []
                         end
 
-        leading_lines + extract_raw_statement_lines(statement, analysis)
+        leading_gap_lines = leading_lines.empty? ? layout_gap_lines_for(statement, analysis, side: :leading, owners: owners) : []
+
+        leading_gap_lines + leading_lines + extract_raw_statement_lines(statement, analysis)
+      end
+
+      def layout_gap_lines_for(statement, analysis, side:, owners: nil)
+        return [] unless statement && analysis&.respond_to?(:comment_attachment_for)
+
+        attachment = analysis.comment_attachment_for(statement, owners: owners)
+        gap = side == :leading ? attachment.leading_gap : attachment.trailing_gap
+        return [] unless gap&.controls_output_for?(statement)
+
+        gap.lines
       end
 
       def empty_container_header_lines(analysis, start_line:, end_line:)
@@ -853,12 +891,13 @@ module Rbs
         (start_line..end_line).map { |ln| analysis.line_at(ln) }
       end
 
-      def preferred_leading_region(decl, analysis, comment_source_decl: nil, comment_source_analysis: nil)
-        primary_region = leading_region_for(decl, analysis)
+      def preferred_leading_region(decl, analysis, comment_source_decl: nil, comment_source_analysis: nil,
+                                   owners: nil, comment_source_owners: nil)
+        primary_region = leading_region_for(decl, analysis, owners: owners)
         return [primary_region, analysis, decl] if region_present?(primary_region)
 
         if comment_source_decl && comment_source_analysis
-          source_region = leading_region_for(comment_source_decl, comment_source_analysis)
+          source_region = leading_region_for(comment_source_decl, comment_source_analysis, owners: comment_source_owners)
           return [source_region, comment_source_analysis, comment_source_decl] if region_present?(source_region)
         end
 
@@ -891,10 +930,10 @@ module Rbs
         comments
       end
 
-      def leading_region_for(decl, analysis)
+      def leading_region_for(decl, analysis, owners: nil)
         return unless decl && analysis&.respond_to?(:comment_attachment_for)
 
-        attachment = analysis.comment_attachment_for(decl)
+        attachment = analysis.comment_attachment_for(decl, owners: owners)
         attachment.leading_region if attachment.respond_to?(:leading_region)
       end
 
