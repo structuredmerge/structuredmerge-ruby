@@ -12,13 +12,13 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       expect(context.adapter).to be_a(Ast::Crispr::Ruby::Prism::Adapter)
     end
 
-    it 'parses Ruby through the registered TreeHaver Prism backend' do
+    it 'uses prism-merge analysis for Ruby structure' do
+      analysis = described_class::Utils.parse_analysis("puts :ok\n", source_label: 'example.rb')
       result = described_class::Utils.parse_with_comments("puts :ok\n")
-      tree = TreeHaver.with_backend('prism') { TreeHaver.parser_for(:ruby).parse("puts :ok\n") }
 
-      expect(TreeHaver::BackendRegistry.fetch('prism').to_h).to eq(id: 'prism', family: 'native')
+      expect(analysis).to be_a(::Prism::Merge::FileAnalysis)
+      expect(analysis).to be_valid
       expect(result).to be_success
-      expect(tree.parse_result).to be_a(::Prism::ParseResult)
     end
 
     context 'with a structure profile' do

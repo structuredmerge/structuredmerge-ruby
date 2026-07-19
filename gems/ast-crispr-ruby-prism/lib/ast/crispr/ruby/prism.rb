@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 
 require 'ast/crispr'
-require 'prism'
-require 'tree_haver'
+require 'prism/merge'
 require 'version_gem'
 require_relative 'prism/version'
 
@@ -11,35 +10,16 @@ module Ast
     module Ruby
       module Prism
         class Error < StandardError; end
-        BACKEND_REFERENCE = ::TreeHaver::BackendReference.new(id: 'prism', family: 'native').freeze
-        BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
-
-        class << self
-          def register_backend!
-            BACKEND_REGISTRY.mutex.synchronize do
-              return if BACKEND_REGISTRY.registered
-
-              ::TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
-              ::TreeHaver.register_language(
-                :ruby,
-                backend_module: ::TreeHaver::Backends::Prism,
-                backend_type: :prism,
-                gem_name: 'prism'
-              )
-
-              BACKEND_REGISTRY.registered = true
-            end
-          end
-        end
 
         module Utils
           module_function
 
+          def parse_analysis(source, source_label: nil)
+            ::Prism::Merge::FileAnalysis.new(source, source_label: source_label)
+          end
+
           def parse_with_comments(source)
-            Ast::Crispr::Ruby::Prism.register_backend!
-            ::TreeHaver.with_backend(Ast::Crispr::Ruby::Prism::BACKEND_REFERENCE.id) do
-              ::TreeHaver.parser_for(:ruby).parse(source).parse_result
-            end
+            parse_analysis(source).parse_result
           end
 
           def extract_statements(body_node)
@@ -65,27 +45,28 @@ module Ast
 
         class Adapter
           def read_ast(document)
-            result = Utils.parse_with_comments(document.content)
-            return result if result.success?
+            analysis = Utils.parse_analysis(document.content, source_label: document.source_label)
+            return analysis if analysis.valid?
 
             raise Ast::Crispr::Error.new("Unable to read structural owners from #{document.source_label}",
                                          details: { source_label: document.source_label })
           end
 
           def structural_owners(document, owner_scope: :shared_default)
-            parse_result = document.ast
+            analysis = document.ast
             case owner_scope
             when :shared_default, :line_bound_statements, :top_level_statements
-              Utils.extract_statements(parse_result.value.statements)
+              analysis.statements
             when :ruby_comments
-              parse_result.comments
+              analysis.parse_result.comments
             else
               raise Ast::Crispr::Error.new('Unsupported CRISPR owner scope', details: { owner_scope: owner_scope })
             end
           end
 
           def comment_regions_for(document, owner, region: :leading, owner_scope: :shared_default)
-            parse_result = document.ast
+            analysis = document.ast
+            parse_result = analysis.parse_result
             owners = structural_owners(document, owner_scope: owner_scope)
             index = owners.index(owner)
             return [] unless index
