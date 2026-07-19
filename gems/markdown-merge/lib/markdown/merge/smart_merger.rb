@@ -59,7 +59,7 @@ module Markdown
     # @see FileAnalysis
     # @see SmartMergerBase
     class SmartMerger < SmartMergerBase
-      VALID_BACKENDS = %i[auto commonmarker markly].freeze
+      VALID_BACKENDS = %i[auto commonmarker markly kramdown].freeze
 
       class << self
         def default_backend

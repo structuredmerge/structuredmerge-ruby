@@ -169,7 +169,7 @@ module Markdown
       # @param backend [Symbol] The backend to validate
       # @raise [ArgumentError] If backend is not supported
       def validate_backend!(backend)
-        valid_backends = %i[auto markly commonmarker]
+        valid_backends = %i[auto markly commonmarker kramdown]
         return if valid_backends.include?(backend.to_sym)
 
         raise ArgumentError, "Unknown backend: #{backend}. Supported: #{valid_backends.join(', ')}"

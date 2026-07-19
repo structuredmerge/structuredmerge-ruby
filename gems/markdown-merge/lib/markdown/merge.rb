@@ -13,7 +13,8 @@ module Markdown
     BACKEND_REFERENCES = {
       'kreuzberg-language-pack' => TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND,
       'commonmarker' => TreeHaver::BackendReference.new(id: 'commonmarker', family: 'native').freeze,
-      'markly' => TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze
+      'markly' => TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze,
+      'kramdown' => TreeHaver::BackendReference.new(id: 'kramdown', family: 'native').freeze
     }.freeze
 
     class Error < Ast::Merge::Error; end
@@ -588,12 +589,8 @@ module Markdown
     def markdown_backend_available_for_analysis?(backend_id)
       registrations = TreeHaver.registered_languages(:markdown)
       case backend_id.to_s
-      when 'commonmarker'
-        registrations.dig(:commonmarker, :backend_module)&.then do |backend_module|
-          !backend_module.respond_to?(:available?) || backend_module.available?
-        end
-      when 'markly'
-        registrations.dig(:markly, :backend_module)&.then do |backend_module|
+      when 'commonmarker', 'markly', 'kramdown'
+        registrations.dig(backend_id.to_sym, :backend_module)&.then do |backend_module|
           !backend_module.respond_to?(:available?) || backend_module.available?
         end
       when 'kreuzberg-language-pack'

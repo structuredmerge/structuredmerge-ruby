@@ -85,7 +85,7 @@ module Kramdown
         return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
       end
 
-      Markdown::Merge.merge_markdown(template_source, destination_source, dialect)
+      Markdown::Merge.merge_markdown(template_source, destination_source, dialect, backend: BACKEND_REFERENCE.id)
     end
 
     def merge_markdown_with_reviewed_nested_outputs(template_source, destination_source, dialect, review_state,
@@ -100,7 +100,8 @@ module Kramdown
         destination_source,
         dialect,
         review_state,
-        applied_children
+        applied_children,
+        backend: BACKEND_REFERENCE.id
       )
     end
 
@@ -115,7 +116,8 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        replay_bundle
+        replay_bundle,
+        backend: BACKEND_REFERENCE.id
       )
     end
 
@@ -130,7 +132,8 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        envelope
+        envelope,
+        backend: BACKEND_REFERENCE.id
       )
     end
 
@@ -145,7 +148,8 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        review_state
+        review_state,
+        backend: BACKEND_REFERENCE.id
       )
     end
 
@@ -160,7 +164,8 @@ module Kramdown
         template_source,
         destination_source,
         dialect,
-        envelope
+        envelope,
+        backend: BACKEND_REFERENCE.id
       )
     end
 

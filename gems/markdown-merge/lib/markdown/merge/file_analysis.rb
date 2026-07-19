@@ -61,7 +61,7 @@ module Markdown
         end
       end
 
-      # @return [Symbol] The backend being used (:commonmarker, :markly)
+      # @return [Symbol] The backend being used (:commonmarker, :markly, :kramdown)
       attr_reader :backend
 
       # @return [Hash] Parser-specific options
@@ -70,7 +70,7 @@ module Markdown
       # Initialize file analysis with tree_haver backend.
       #
       # @param source [String] Markdown source code to analyze
-      # @param backend [Symbol] Backend to use (:commonmarker, :markly, :auto)
+      # @param backend [Symbol] Backend to use (:commonmarker, :markly, :kramdown, :auto)
       # @param freeze_token [String] Token for freeze block markers
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param parser_options [Hash] Backend-specific parser options
@@ -311,63 +311,66 @@ module Markdown
 
       # Resolve the backend to use.
       #
-      # For :auto, attempts commonmarker first, then markly.
-      # tree_haver handles the actual availability checking.
+      # For :auto, use the same backend selection as the Markdown substrate facade.
+      # tree_haver handles the final availability checking.
       #
       # @param backend [Symbol] Requested backend
-      # @return [Symbol] Resolved backend (:commonmarker or :markly)
+      # @return [Symbol] Resolved backend
       def resolve_backend(backend)
-        return backend unless backend == :auto
+        return Markdown::Merge.resolve_backend(nil).to_sym if backend.to_s.empty? || backend == :auto
 
-        # Try commonmarker first, then markly
-        if TreeHaver::BackendRegistry.available?(:commonmarker)
-          :commonmarker
-        elsif TreeHaver::BackendRegistry.available?(:markly)
-          :markly
-        else
-          # Let tree_haver raise the appropriate error
-          :commonmarker
-        end
+        backend.to_sym
       end
 
       # Create a parser for the resolved backend.
       #
       # @return [Object] tree_haver parser instance
       def create_parser
+        raise ArgumentError, "Unknown backend: #{@backend}" unless Markdown::Merge::BACKEND_REFERENCES.key?(@backend.to_s)
+
+        parser = TreeHaver.with_backend(@backend) { TreeHaver.parser_for(:markdown) }
+
         case @backend
         when :commonmarker
-          create_commonmarker_parser
+          parser.language = commonmarker_language
         when :markly
-          create_markly_parser
+          parser.language = markly_language
+        when :kramdown
+          parser.language = kramdown_language
         else
-          raise ArgumentError, "Unknown backend: #{@backend}"
+          return parser
         end
+
+        parser
       end
 
-      # Create a Commonmarker parser via commonmarker-merge backend.
+      # Create a Commonmarker language config for the TreeHaver parser.
       #
-      # @return [Commonmarker::Merge::Backend::Parser]
-      def create_commonmarker_parser
-        parser = Commonmarker::Merge::Backend::Parser.new
+      # @return [Commonmarker::Merge::Backend::Language]
+      def commonmarker_language
         # Default options enable table extension for GFM compatibility
         default_options = { extension: { table: true } }
         options = default_options.merge(@parser_options[:options] || {})
-        parser.language = Commonmarker::Merge::Backend::Language.markdown(options: options)
-        parser
+        Commonmarker::Merge::Backend::Language.markdown(options: options)
       end
 
-      # Create a Markly parser via markly-merge backend.
+      # Create a Markly language config for the TreeHaver parser.
       #
-      # @return [Markly::Merge::Backend::Parser]
-      def create_markly_parser
-        parser = Markly::Merge::Backend::Parser.new
+      # @return [Markly::Merge::Backend::Language]
+      def markly_language
         flags = @parser_options[:flags]
         extensions = @parser_options[:extensions] || [:table]
-        parser.language = Markly::Merge::Backend::Language.markdown(
+        Markly::Merge::Backend::Language.markdown(
           flags: flags,
           extensions: extensions
         )
-        parser
+      end
+
+      # Create a Kramdown language config for the TreeHaver parser.
+      #
+      # @return [Kramdown::Merge::Backend::Language]
+      def kramdown_language
+        Kramdown::Merge::Backend::Language.markdown(options: @parser_options[:options] || {})
       end
     end
   end
