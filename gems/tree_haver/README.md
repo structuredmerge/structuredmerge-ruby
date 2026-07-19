@@ -894,8 +894,8 @@ require "tree_haver"
 require "toml-merge"
 require "markdown-merge"
 
-TomlMerge.register_tree_haver_grammars!
-MarkdownMerge.register_tree_haver_grammars!
+Toml::Merge.register_backend!
+Markdown::Merge.register_backend!
 
 parser = TreeHaver.parser_for(:toml)
 ```
@@ -924,6 +924,30 @@ Given just the language name, `GrammarFinder` automatically derives:
 2.  **Existing TreeHaver registration**: previously-registered tree-sitter grammar path
 3.  **Extra paths**: explicit paths provided at initialization
 4.  **`tree_sitter_language_pack`**: parser API availability through its on-demand grammar loader
+
+#### TSLP Cold-Cache Troubleshooting
+
+`tree_sitter_language_pack` loads bundled grammars on demand. A cold install may
+not have a populated shared-library cache before the first parse, so
+`GrammarFinder` must not treat cache contents as the source of truth for TSLP
+availability.
+
+For TSLP-backed languages, check availability through the TSLP parser API and
+then register the language with the TreeHaver TSLP backend:
+
+```ruby
+finder = TreeHaver::GrammarFinder.new(:toml)
+finder.register! if finder.available?
+
+TreeHaver.with_backend("kreuzberg-language-pack") do
+  TreeHaver.parser_for(:toml).parse("title = \"example\"\n")
+end
+```
+
+If this fails from a cold start, inspect `finder.search_info` and confirm that
+the `tree-sitter-language-pack` gem is in the bundle being used. Do not add a
+merge-gem parser fallback to hide the failure; fix the TreeHaver registration
+or the TSLP grammar binding instead.
 
 #### Usage in \*-merge Gems
 
