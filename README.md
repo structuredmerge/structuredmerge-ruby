@@ -234,16 +234,22 @@ coverage.
 
 ## Gems
 
-Core:
+Core and transformation gems:
 
 - [`tree_haver`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/tree_haver) - parser substrate, byte ranges, backend adapters, and binary tree contracts.
 - [`ast-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge) - AST merge contracts, diagnostics, planning, review, replay, and nested-merge vocabulary.
 - [`ast-template`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-template) - template/session transport contracts.
+- [`ast-crispr`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr) - generic AST edit recipes for generated blocks and template-owned regions.
+- [`ast-crispr-ruby-prism`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-ruby-prism) - Prism-backed Ruby source edits.
+- [`ast-crispr-markdown-markly`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-crispr-markdown-markly) - Markly-backed Markdown source edits.
 
 Format libraries:
 
 - [`plain-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/plain-merge)
+- [`bash-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/bash-merge)
+- [`dotenv-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/dotenv-merge)
 - [`json-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/json-merge)
+- [`rbs-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/rbs-merge)
 - [`yaml-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/yaml-merge)
 - [`toml-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/toml-merge)
 - [`markdown-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markdown-merge)
@@ -256,6 +262,7 @@ Format libraries:
 
 Provider and recipe gems:
 
+- [`ast-merge-git`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/ast-merge-git)
 - [`psych-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/psych-merge)
 - [`citrus-toml-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/citrus-toml-merge)
 - [`parslet-toml-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/parslet-toml-merge)
@@ -264,6 +271,7 @@ Provider and recipe gems:
 - [`markly-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/markly-merge)
 - [`prism-merge`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/prism-merge)
 - [`kettle-jem`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/kettle-jem)
+- [`smorg-rb`](https://github.com/structuredmerge/structuredmerge-ruby/tree/main/gems/smorg-rb)
 
 ## Portability
 
@@ -274,11 +282,26 @@ shared spec/fixture tooling rather than in a static status document.
 
 ## Development
 
-Common checks:
+Use the family tooling from the monorepo root for broad checks:
 
-- `mise run check`
-- `bundle exec rake`
-- package-specific `bundle exec rspec` commands
+```sh
+bundle exec kettle-family install --execute
+bundle exec kettle-family lint --execute
+bundle exec kettle-family test --execute
+```
+
+For a single gem, run commands from that gem directory:
+
+```sh
+bundle exec kettle-test
+bin/rake rubocop_gradual:autocorrect
+```
+
+Prefer `kettle-test` over direct `rspec` so local verification exercises the
+same parallel runner, worker isolation, filtering, and formatter behavior used
+by CI. Use direct `rspec` only for narrow debugging when `kettle-test` cannot
+express the probe, then rerun `kettle-test` before treating the suite as
+verified.
 
 Bundler path gems are the default isolation mechanism inside this monorepo. When
 this repository needs to consume sibling workspace projects outside the monorepo
