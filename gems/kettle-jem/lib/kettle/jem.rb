@@ -5363,6 +5363,7 @@ module Kettle
       if recipe.fetch(:target_path).to_s == "Gemfile"
         output = inject_main_gemfile_recording_eval(output, facts)
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
+        output = deduplicate_main_gemfile_direct_sibling_blocks(output)
         output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
         output = normalize_main_gemfile_nomono_requirements(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
@@ -5380,6 +5381,20 @@ module Kettle
       return content if records.empty?
 
       records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
+    end
+
+    def deduplicate_main_gemfile_direct_sibling_blocks(content)
+      records = main_gemfile_direct_sibling_records(content)
+      return content if records.length <= 1
+
+      records[0...-1].sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
         replace_source_range_lines(
           output,
           record.fetch(:start_line),

@@ -14406,6 +14406,109 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "collapses repeated direct sibling runtime dependency wiring in the main Gemfile" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-dedupe", tmp_root) do |workspace|
+      root = File.join(workspace, "adapter")
+      sibling = File.join(workspace, "shared-core")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "shared-core.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "shared-core"
+            spec.version = "0.1.0"
+            spec.summary = "Shared core"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+            spec.homepage = "https://github.com/rubythems/adapter"
+            spec.metadata["source_code_uri"] = "https://github.com/rubythems/adapter"
+            spec.add_dependency "shared-core", "= 0.1.0"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
+          gem "nomono", *nomono_requirements, require: false
+
+          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+          direct_sibling_gems = %w[
+            stale-core
+          ]
+          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+          direct_sibling_local =
+            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          if direct_sibling_gems.any? &&
+              (direct_sibling_local ||
+                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+            require "nomono/bundler"
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "RUBYTHEMS",
+              path_env: "RUBYTHEMS_DEV",
+              root: ["src", "my", "rubythems"]
+            )
+          end
+
+          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+          direct_sibling_gems = %w[
+            shared-core
+          ]
+          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+          direct_sibling_local =
+            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          if direct_sibling_gems.any? &&
+              (direct_sibling_local ||
+                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+            require "nomono/bundler"
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "RUBYTHEMS",
+              path_env: "RUBYTHEMS_DEV",
+              root: ["src", "my", "rubythems"]
+            )
+          end
+
+          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile.scan("# Direct sibling dependencies").length).to eq(1)
+      expect(gemfile).to include("shared-core")
+      expect(gemfile).not_to include("stale-core")
+    end
+  end
+
   it "does not path-wire direct sibling dependencies when the sibling directory has a different gemspec name" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
