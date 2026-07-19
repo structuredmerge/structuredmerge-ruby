@@ -34,7 +34,7 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
       allow(Kettle::Jem::Tasks::InstallTask).to receive(:run_command_step)
         .with(
           "bundle_update_templating_bootstrap",
-          %w[bundle update nomono],
+          %w[bundle update nomono tree_sitter_language_pack],
           project_root: root,
           env: setup_env,
           quiet: false,
@@ -78,7 +78,9 @@ RSpec.describe Kettle::Jem::Tasks::PrepareTask do
     end
   end
 
-  it "updates only the lockfile-safe templating bootstrap gem" do
-    expect(described_class.bundle_update_templating_bootstrap_command).to eq(%w[bundle update nomono])
+  it "updates lockfile-safe templating bootstrap gems before the full template run" do
+    expect(described_class.bundle_update_templating_bootstrap_command).to eq(
+      %w[bundle update nomono tree_sitter_language_pack]
+    )
   end
 end

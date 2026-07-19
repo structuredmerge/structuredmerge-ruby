@@ -11,7 +11,7 @@ module Kettle
           "gemfiles/modular/templating_local.gemfile",
           "mise.toml"
         ].freeze
-        CRITICAL_TEMPLATING_GEMS = %w[nomono].freeze
+        CRITICAL_TEMPLATING_GEMS = %w[nomono tree_sitter_language_pack].freeze
 
         module_function
 
