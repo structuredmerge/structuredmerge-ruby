@@ -16,6 +16,7 @@ module Markdown
       'markly' => TreeHaver::BackendReference.new(id: 'markly', family: 'native').freeze,
       'kramdown' => TreeHaver::BackendReference.new(id: 'kramdown', family: 'native').freeze
     }.freeze
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     class Error < Ast::Merge::Error; end
 
@@ -63,6 +64,19 @@ module Markdown
     autoload :WhitespaceNormalizer, 'markdown/merge/whitespace_normalizer'
     autoload :WrapperSupport, 'markdown/merge/wrapper_support'
 
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        TreeHaver::BackendRegistry.register(BACKEND_REFERENCES.fetch('kreuzberg-language-pack'))
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:markdown)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
+
     def markdown_feature_profile
       {
         family: 'markdown',
@@ -109,6 +123,7 @@ module Markdown
         return unsupported_feature_result("Unsupported Markdown backend #{resolved_backend}.")
       end
 
+      register_backend!
       parser = TreeHaver.with_backend(resolved_backend) { TreeHaver.parser_for(:markdown) }
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
@@ -587,6 +602,7 @@ module Markdown
     end
 
     def markdown_backend_available_for_analysis?(backend_id)
+      register_backend!
       registrations = TreeHaver.registered_languages(:markdown)
       case backend_id.to_s
       when 'commonmarker', 'markly', 'kramdown'
@@ -625,6 +641,7 @@ module Markdown
     end
 
     module_function(
+      :register_backend!,
       :markdown_feature_profile,
       :available_markdown_backends,
       :markdown_backend_feature_profile,

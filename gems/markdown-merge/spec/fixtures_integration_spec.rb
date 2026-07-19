@@ -36,9 +36,7 @@ RSpec.describe Markdown::Merge do
     )
 
     expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(
-      json_ready([
-                   { id: 'kreuzberg-language-pack', family: 'tree-sitter' }
-                 ])
+      json_ready(fixture[:available_backends])
     )
     expect(json_ready(TreeHaver::BackendRegistry.fetch('kreuzberg-language-pack')&.to_h)).to eq(
       json_ready({ id: 'kreuzberg-language-pack', family: 'tree-sitter' })
