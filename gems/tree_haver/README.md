@@ -446,7 +446,14 @@ TreeHaver exposes a backend registry for parser facades, language-family provide
 |---------|-------------|-------------|-------------|
 | **Kaitai Struct** | Backend reference and feature profile for binary schema analysis | Varies | Universal once a schema adapter is supplied |
 
-**`TreeHaver::Parser` Auto-selection priority:** MRI/Rust/FFI on MRI; Java/FFI on JRuby; then Prism → Psych → Citrus → Parslet.
+**`TreeHaver::Parser` Auto-selection contract:** `:auto` never means
+unregistered parser discovery. It selects the first registered TreeHaver backend
+module whose availability check passes. Built-in tree-sitter facade priority is
+MRI/Rust/FFI on MRI and Java/FFI on JRuby, followed by registered provider
+modules such as Prism, Psych, Citrus, and Parslet when those providers have been
+registered for the requested language. Explicit backend requests fail closed if
+that backend is unavailable or has no parser registered for the requested
+language.
 
 **Known Issues:**
 
@@ -641,7 +648,8 @@ export TREE_SITTER_TOML_PATH=~/.local/share/mise/installs/lua/5.4.8/luarocks/lib
 
 ### Backend Selection
 
-TreeHaver automatically selects the best backend for your Ruby implementation, but you can override this behavior:
+TreeHaver can select an available registered backend for you, but you can
+override this behavior:
 
 ```ruby
 # Automatic backend selection (default)
@@ -661,7 +669,13 @@ TreeHaver.backend = :parslet # Use Parslet pure Ruby parser
                              # CAVEAT: few major language grammars, but many esoteric grammars
 ```
 
-**Auto-selection priority on MRI:** MRI → Rust → FFI → Citrus → Parslet
+**Auto-selection rule:** `:auto` uses the registered backend list and chooses
+the first backend module that is allowed by environment configuration and reports
+itself available. It does not call parser libraries directly, search for
+language-specific fallback parsers outside the registry, or hide an explicit
+backend failure by silently switching to a different backend.
+
+**Built-in facade priority on MRI:** MRI → Rust → FFI → Citrus → Parslet
 
 You can also set the backend via environment variable:
 
