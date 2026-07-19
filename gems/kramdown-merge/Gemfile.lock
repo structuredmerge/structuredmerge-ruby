@@ -16,14 +16,6 @@ PATH
       markdown-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
-PATH
-  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/markdown-merge
-  specs:
-    markdown-merge (7.1.0)
-      ast-merge (= 7.1.0)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
-
 GEM
   remote: https://gem.coop/
   specs:
@@ -139,6 +131,10 @@ GEM
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
+    markdown-merge (7.1.0)
+      ast-merge (= 7.1.0)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
     mutex_m (0.3.0)
     nokogiri (1.19.4-aarch64-linux-gnu)
       racc (~> 1.4)
@@ -394,7 +390,6 @@ DEPENDENCIES
   kramdown (~> 2.5, >= 2.5.1)
   kramdown-merge!
   kramdown-parser-gfm (~> 1.1)
-  markdown-merge!
   mutex_m (~> 0.2)
   nomono (~> 1.0, >= 1.0.8)
   rake (~> 13.0)
