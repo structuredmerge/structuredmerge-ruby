@@ -59,7 +59,7 @@ module Commonmarker
         return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
       end
 
-      ::Commonmarker.parse(source)
+      TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:markdown).parse(source) }
       normalized = Markdown::Merge.normalize_source(source)
       {
         ok: true,
