@@ -1127,6 +1127,58 @@ RSpec.describe TreeHaver do
     expect(parser.language).to eq(:rbs_language)
   end
 
+  it 'auto-selects an available registered backend module without explicit backend selection' do
+    unavailable_backend = Module.new do
+      def self.available?
+        false
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    available_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    described_class.register_language(
+      :auto_provider_markdown,
+      backend_module: unavailable_backend,
+      backend_type: :unavailable_markdown_provider,
+      gem_name: 'unavailable-markdown-provider'
+    )
+    described_class.register_language(
+      :auto_provider_markdown,
+      backend_module: available_backend,
+      backend_type: :available_markdown_provider,
+      gem_name: 'available-markdown-provider'
+    )
+
+    parser = described_class.parser_for(:auto_provider_markdown)
+
+    expect(parser).to be_a(available_backend::Parser)
+    expect(parser.language).to eq([:auto_provider_markdown, nil])
+  end
+
   it 'provides PEG framework parsing helpers' do
     require 'toml'
     require 'toml-rb'

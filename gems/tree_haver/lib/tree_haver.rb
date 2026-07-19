@@ -315,6 +315,10 @@ module TreeHaver
       return parser_for_tree_sitter(name, config[:path], config[:symbol])
     end
 
+    if (backend_type = first_available_registered_backend_type(registrations))
+      return parser_for_registered_backend(name, backend_type, registrations)
+    end
+
     raise NotAvailable, "No parser registered for #{name}"
   end
 
@@ -409,6 +413,21 @@ module TreeHaver
     end
   end
   private_class_method :parser_for_registered_backend
+
+  def first_available_registered_backend_type(registrations)
+    registrations.each do |backend_type, config|
+      next unless config[:backend_module]
+      next unless backend_allowed?(backend_type)
+
+      backend_module = config.fetch(:backend_module)
+      next if backend_module.respond_to?(:available?) && !backend_module.available?
+
+      return backend_type
+    end
+
+    nil
+  end
+  private_class_method :first_available_registered_backend_type
 
   def parser_for_backend_module(backend_module, name)
     parser = backend_module::Parser.new
