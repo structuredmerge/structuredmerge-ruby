@@ -3,7 +3,7 @@
 module Json
   module Merge
     module Version
-      VERSION = '7.1.0'
+      VERSION = "7.1.0"
     end
     VERSION = Version::VERSION # Traditional Constant Location
   end
