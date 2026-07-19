@@ -3,9 +3,9 @@
 module Yaml
   module Merge
     class SmartMerger < Ast::Merge::SmartMergerBase
-      def initialize(template_content, dest_content, merge_sequences: false, **options)
+      def initialize(template_content, dest_content, preference: :destination, merge_sequences: false, **options)
         @merge_sequences = merge_sequences
-        super(template_content, dest_content, preference: :destination, **options)
+        super(template_content, dest_content, preference: preference, **options)
       end
 
       protected
@@ -153,7 +153,19 @@ module Yaml
               dest_boundary_line: dest_boundary_line
             )
           else
-            emit_node_with_leading_gap(dest_node, dest_analysis, dest_owners, boundary_line: dest_boundary_line)
+            selected_node, selected_analysis, gap_node, gap_analysis, gap_owners, gap_boundary_line =
+              preferred_atomic_emit_sources(
+                template_node,
+                dest_node,
+                template_analysis,
+                dest_analysis,
+                template_owners: template_owners,
+                dest_owners: dest_owners,
+                template_boundary_line: template_boundary_line,
+                dest_boundary_line: dest_boundary_line
+              )
+            emit_node_leading_gap(gap_node, gap_analysis, gap_owners, boundary_line: gap_boundary_line)
+            emit_raw_node(selected_node, selected_analysis)
           end
         end
 
@@ -163,13 +175,37 @@ module Yaml
           dest_value = dest_node.value_node&.unwrap_value_node
 
           unless template_value&.mapping? && dest_value&.mapping?
-            return emit_node_with_leading_gap(dest_node, dest_analysis, dest_owners, boundary_line: dest_boundary_line)
+            selected_node, selected_analysis, gap_node, gap_analysis, gap_owners, gap_boundary_line =
+              preferred_atomic_emit_sources(
+                template_node,
+                dest_node,
+                template_analysis,
+                dest_analysis,
+                template_owners: template_owners,
+                dest_owners: dest_owners,
+                template_boundary_line: template_boundary_line,
+                dest_boundary_line: dest_boundary_line
+              )
+            emit_node_leading_gap(gap_node, gap_analysis, gap_owners, boundary_line: gap_boundary_line)
+            return emit_raw_node(selected_node, selected_analysis)
           end
 
-          emit_node_leading_gap(dest_node, dest_analysis, dest_owners, boundary_line: dest_boundary_line)
+          header_node, header_analysis, gap_node, gap_analysis, gap_owners, gap_boundary_line =
+            preferred_atomic_emit_sources(
+              template_node,
+              dest_node,
+              template_analysis,
+              dest_analysis,
+              template_owners: template_owners,
+              dest_owners: dest_owners,
+              template_boundary_line: template_boundary_line,
+              dest_boundary_line: dest_boundary_line
+            )
+
+          emit_node_leading_gap(gap_node, gap_analysis, gap_owners, boundary_line: gap_boundary_line)
           @emitter.emit_raw_lines(
-            dest_node.header_lines_before(dest_value),
-            metadata: emitter_block_metadata(dest_analysis, dest_node.start_line)
+            header_node.header_lines_before(header_node.equal?(dest_node) ? dest_value : template_value),
+            metadata: emitter_block_metadata(header_analysis, header_node.start_line)
           )
           merge_node_lists(
             template_value.mergeable_children,
@@ -180,6 +216,16 @@ module Yaml
             dest_boundary_line: dest_node.start_line
           )
           emit_container_tail(dest_value, dest_analysis)
+        end
+
+        def preferred_atomic_emit_sources(template_node, dest_node, template_analysis, dest_analysis,
+                                          template_owners: nil, dest_owners: nil, template_boundary_line: nil,
+                                          dest_boundary_line: nil)
+          if @preference == :template
+            [template_node, template_analysis, dest_node, dest_analysis, dest_owners, dest_boundary_line]
+          else
+            [dest_node, dest_analysis, dest_node, dest_analysis, dest_owners, dest_boundary_line]
+          end
         end
 
         def emit_destination_only_nodes_before(index, dest_nodes, dest_analysis, consumed_dest, boundary_line:)
