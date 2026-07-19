@@ -171,7 +171,10 @@ module Yaml
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'YAML parse returned no root node' unless node
-      raise TreeHaver::NotAvailable, 'YAML parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'YAML parse contains syntax errors'
     end
     private_class_method :collect_parse_errors
 
@@ -218,7 +221,7 @@ module Yaml
 
     def yaml_sequence_from_node(node, source)
       yaml_named_children(node).filter_map do |child|
-        next unless child.type == 'block_sequence_item' || child.type == 'flow_node'
+        next unless %w[block_sequence_item flow_node].include?(child.type)
 
         yaml_value_from_tree(child, source)
       end
@@ -240,7 +243,9 @@ module Yaml
       return stripped.to_i if stripped.match?(/\A[-+]?\d+\z/)
       return stripped.to_f if stripped.match?(/\A[-+]?(?:\d+\.\d*|\d*\.\d+)(?:[eE][-+]?\d+)?\z/)
 
-      return unescape_yaml_double_quoted_scalar(stripped[1...-1]) if stripped.start_with?('"') && stripped.end_with?('"')
+      if stripped.start_with?('"') && stripped.end_with?('"')
+        return unescape_yaml_double_quoted_scalar(stripped[1...-1])
+      end
       return stripped[1...-1].gsub("''", "'") if stripped.start_with?("'") && stripped.end_with?("'")
 
       stripped
@@ -248,7 +253,7 @@ module Yaml
     private_class_method :yaml_scalar_from_text
 
     def unescape_yaml_double_quoted_scalar(value)
-      value.gsub(/\\(["\\\/bfnrt])/) do
+      value.gsub(%r{\\(["\\/bfnrt])}) do
         {
           '"' => '"',
           '\\' => '\\',
