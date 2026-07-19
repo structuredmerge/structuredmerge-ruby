@@ -107,4 +107,37 @@ RSpec.describe TreeHaver::Backends::Tslp do
     expect(pair.start_line).to eq(2)
     expect(pair.end_line).to eq(2)
   end
+
+  it 'parses the source-family languages expected to use TSLP when available' do
+    begin
+      require 'tree_sitter_language_pack'
+    rescue LoadError
+      skip 'tree_sitter_language_pack is not installed'
+    end
+
+    described_class.reset!
+    skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable' unless described_class.available?
+
+    fixtures = {
+      json: ['{"a":1}', 'document'],
+      toml: ["title = \"demo\"\n[tool]\nname = \"x\"\n", 'document'],
+      bash: ["echo hi\n", 'program'],
+      go: ["package main\nfunc main() {}\n", 'source_file'],
+      rust: ["fn main() {}\n", 'source_file'],
+      typescript: ["export const x = 1;\n", 'program'],
+      ruby: ["class X\nend\n", 'program'],
+      yaml: ["name: demo\n", 'stream'],
+      markdown: ["# Heading\n\nBody\n", 'document']
+    }
+
+    fixtures.each do |language, (source, expected_root)|
+      skip "tree_sitter_language_pack does not publish #{language}" unless TreeSitterLanguagePack.has_language(language.to_s)
+
+      TreeHaver::GrammarFinder.new(language).register!(raise_on_missing: true)
+      tree = TreeHaver.with_backend('tslp') { TreeHaver.parser_for(language).parse(source) }
+
+      expect(tree.root_node.type).to eq(expected_root)
+      expect(tree.root_node).not_to have_error
+    end
+  end
 end
