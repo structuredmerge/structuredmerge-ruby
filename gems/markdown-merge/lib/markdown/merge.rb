@@ -86,7 +86,9 @@ module Markdown
     end
 
     def available_markdown_backends
-      BACKEND_REFERENCES.values
+      BACKEND_REFERENCES.filter_map do |backend_id, reference|
+        reference if markdown_backend_available_for_analysis?(backend_id)
+      end
     end
 
     def markdown_backend_feature_profile(backend: nil)
