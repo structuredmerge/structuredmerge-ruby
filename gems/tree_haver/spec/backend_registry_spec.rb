@@ -19,6 +19,22 @@ RSpec.describe TreeHaver::BackendRegistry do
     end
   end
 
+  it 'resolves registered backend-module aliases before falling back to tree-sitter paths' do
+    TreeHaver.register_language(
+      :alias_resolution_json,
+      backend_module: TreeHaver::Backends::Tslp,
+      backend_type: :tslp,
+      gem_name: 'tree_sitter_language_pack'
+    )
+
+    parser = TreeHaver.with_backend('kreuzberg-language-pack') do
+      TreeHaver.parser_for(:alias_resolution_json)
+    end
+
+    expect(parser).to be_a(TreeHaver::Backends::Tslp::Parser)
+    expect(parser.language.name).to eq(:alias_resolution_json)
+  end
+
   it 'loads MRI tree-sitter languages with a string language name' do
     stub_const('TreeSitter', Module.new)
     language_class = class_double('TreeSitter::Language')

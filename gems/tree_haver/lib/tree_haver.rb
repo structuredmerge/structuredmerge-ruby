@@ -383,6 +383,8 @@ module TreeHaver
     backend_ref = BackendRegistry.fetch(backend_id.to_s)
     type = if registrations.key?(backend_id.to_s.to_sym)
              backend_id.to_s.to_sym
+           elsif (registered_type = registered_backend_type_for_requested_backend(backend_id, registrations))
+             registered_type
            elsif backend_ref&.family == 'tree-sitter'
              :tree_sitter
            else
@@ -393,6 +395,16 @@ module TreeHaver
     raise NotAvailable, "No parser registered for backend #{backend_id}"
   end
   private_class_method :requested_backend_type
+
+  def registered_backend_type_for_requested_backend(backend_id, registrations)
+    requested_module = backend_module_for(backend_id)
+    return unless requested_module
+
+    registrations.find do |_backend_type, config|
+      config[:backend_module].equal?(requested_module)
+    end&.first
+  end
+  private_class_method :registered_backend_type_for_requested_backend
 
   def parser_for_registered_backend(name, backend_type, registrations)
     config = registrations.fetch(backend_type)

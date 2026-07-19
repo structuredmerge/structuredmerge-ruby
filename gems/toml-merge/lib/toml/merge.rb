@@ -303,7 +303,7 @@ module Toml
         registrations = TreeHaver.registered_languages(:toml)
         case backend_id.to_s
         when TREE_SITTER_BACKEND_REFERENCE.id
-          registrations.key?(:tree_sitter)
+          registrations.key?(:tree_sitter) || registrations.key?(:tslp)
         else
           false
         end
