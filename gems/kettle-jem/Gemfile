@@ -92,6 +92,18 @@ if direct_sibling_gems.any? &&
   end
 end
 
+tslp_dev = ENV.fetch("TSLP_DEV", nil)
+if tslp_dev.to_s.empty?
+  gem(
+    "tree_sitter_language_pack",
+    git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
+    branch: "fix/ruby-parser-api-methods",
+    glob: "packages/ruby/*.gemspec",
+  )
+else
+  gem "tree_sitter_language_pack", path: tslp_dev
+end
+
 # Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 
