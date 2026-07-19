@@ -121,7 +121,7 @@ module Toml
       end
 
       def available_toml_backends
-        [TREE_SITTER_BACKEND_REFERENCE]
+        toml_backend_available_for_analysis?(TREE_SITTER_BACKEND_REFERENCE.id) ? [TREE_SITTER_BACKEND_REFERENCE] : []
       end
 
       def toml_backend_feature_profile(backend: nil)
@@ -300,6 +300,7 @@ module Toml
       end
 
       def toml_backend_available_for_analysis?(backend_id)
+        register_backend!
         registrations = TreeHaver.registered_languages(:toml)
         case backend_id.to_s
         when TREE_SITTER_BACKEND_REFERENCE.id
