@@ -40,6 +40,8 @@ Please file a bug if you notice a violation of semantic versioning.
   via `kettle-gha-sha-pins`.
 - Generated local Gemfile templates now document why `nomono` is explicitly
   activated before requiring `nomono/bundler`.
+- Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
+  dependency-bearing kettle-jem templates and update their dependency floors.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
   `appraisal2` executable.
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA

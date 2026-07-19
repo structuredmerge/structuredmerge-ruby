@@ -39,9 +39,11 @@ RSpec.describe Kettle::Jem do
     expect(spec.metadata["homepage_uri"]).to eq("https://structuredmerge.org")
     expect(spec.executables).to eq(["kettle-jem"])
     expect(File.executable?(gem_root.join("exe/kettle-jem"))).to be(true)
+    expect(File.executable?(gem_root.join("bin/kettle-jem-deps-floor"))).to be(true)
     expect(File.executable?(gem_root.join("bin/kettle-jem-workflow-pins"))).to be(true)
     expect(expected_template_files).not_to be_empty
     expect(files).to include(*expected_template_files)
+    expect(files).not_to include("bin/kettle-jem-deps-floor")
     expect(files).not_to include("bin/kettle-jem-workflow-pins")
     expect(files).to include(
       "lib/kettle/jem/tasks.rb",

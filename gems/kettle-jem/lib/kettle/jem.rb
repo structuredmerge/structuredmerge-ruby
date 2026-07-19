@@ -3642,7 +3642,7 @@ module Kettle
 
     def monorepo_root_gemfile_dependency_lines
       [
-        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.1", ">= 3.1.4"\n)},
+        {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.0"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.3", ">= 2.3.7"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.5"\n)},
@@ -3651,7 +3651,7 @@ module Kettle
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.6"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.1", ">= 3.1.14"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.0"\n)}
       ].freeze
     end
 
