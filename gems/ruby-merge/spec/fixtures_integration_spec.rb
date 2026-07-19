@@ -100,6 +100,28 @@ RSpec.describe 'Ruby::Merge' do
     )
   end
 
+  it 'detects Ruby magic comment header prefixes through shared substrate support' do
+    lines = [
+      "#!/usr/bin/env ruby\n",
+      "# frozen_string_literal: true\n",
+      "# warn_indent: true\n",
+      "# warn_indent: false\n",
+      "\n",
+      "# body comment\n"
+    ]
+
+    prefix = Ruby::Merge::MagicCommentSupport.comment_only_prefix_info(lines)
+
+    expect(Ruby::Merge::MagicCommentSupport.magic_comment_type_for_text('# coding: UTF-8')).to eq(:encoding)
+    expect(prefix[:header_magic_comment_types]).to eq(
+      2 => :frozen_string_literal,
+      3 => :warn_indent,
+      4 => :warn_indent
+    )
+    expect(prefix[:duplicate_magic_line_nums]).to contain_exactly(4)
+    expect(prefix[:suppressed_line_nums]).to include(1, 2, 3, 4, 5)
+  end
+
   it 'does not mix legacy declaration discovery into parser-backed Ruby structure' do
     source = <<~RUBY
       class TemplateOwned

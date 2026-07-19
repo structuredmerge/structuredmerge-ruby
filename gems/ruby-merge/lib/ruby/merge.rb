@@ -8,6 +8,7 @@ require 'tree_haver'
 require 'ast/merge'
 require_relative 'merge/block_directive_detector'
 require_relative 'merge/doc_comment_support'
+require_relative 'merge/magic_comment_support'
 
 module Ruby
   module Merge
