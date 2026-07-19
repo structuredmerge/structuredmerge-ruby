@@ -602,7 +602,10 @@ module Markdown
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'Markdown parse returned no root node' unless node
-      raise TreeHaver::NotAvailable, 'Markdown parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'Markdown parse contains syntax errors'
     end
 
     def parse_failure_result(error)

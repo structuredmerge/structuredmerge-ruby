@@ -326,7 +326,9 @@ module Markdown
       #
       # @return [Object] tree_haver parser instance
       def create_parser
-        raise ArgumentError, "Unknown backend: #{@backend}" unless Markdown::Merge::BACKEND_REFERENCES.key?(@backend.to_s)
+        unless Markdown::Merge::BACKEND_REFERENCES.key?(@backend.to_s)
+          raise ArgumentError, "Unknown backend: #{@backend}"
+        end
 
         parser = TreeHaver.with_backend(@backend) { TreeHaver.parser_for(:markdown) }
 
