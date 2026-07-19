@@ -83,6 +83,8 @@ Please file a bug if you notice a violation of semantic versioning.
   member bodies are emitted.
 - TOML template-preferred merges now preserve destination-owned retained blank
   gaps for matched top-level keys and keys inside matched tables.
+- JSON template-preferred merges now preserve destination-owned retained blank
+  gaps for matched top-level and nested object pairs.
 - Markdown backend feature fixtures now account for optional provider backends
   that are only available after their provider gems register concrete TreeHaver
   integrations in the current process.
