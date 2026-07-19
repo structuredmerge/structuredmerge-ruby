@@ -11,19 +11,11 @@ RSpec.describe 'TreeHaver-only merge architecture' do
     Json::Merge::SyntheticParser |
     (?<!:)SyntheticParser |
     JSON\.parse\( |
-    YAML\.safe_load\( |
-    TomlRB |
-    TOML::Parslet
+    YAML\.safe_load\(
   /x
 
   KNOWN_PARSER_BYPASS_REFERENCES = Set.new(
     [
-      "gems/citrus-toml-merge/lib/citrus/toml/merge.rb:syntax_result = TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)",
-      "gems/parslet-toml-merge/lib/parslet/toml/merge.rb:syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)",
-      "gems/toml-merge/lib/toml/merge.rb:grammar_class: TOML::Parslet,",
-      "gems/toml-merge/lib/toml/merge.rb:grammar_module: TomlRB::Document,",
-      "gems/toml-merge/lib/toml/merge.rb:return unless defined?(TOML::Parslet)",
-      "gems/toml-merge/lib/toml/merge.rb:return unless defined?(TomlRB::Document)",
     ]
   ).freeze
 

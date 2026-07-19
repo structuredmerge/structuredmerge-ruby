@@ -8,6 +8,7 @@ require_relative '../../gems/markdown-merge/lib/markdown/merge'
 require_relative '../../gems/yaml-merge/lib/yaml/merge'
 require_relative '../../gems/json-merge/lib/json/merge'
 require_relative '../../gems/psych-merge/lib/psych/merge'
+require_relative '../../gems/toml-merge/lib/toml/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -93,6 +94,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for yaml'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when TOML has no registered parser' do
+    result = Toml::Merge.parse_toml("key = \"value\"\n", 'toml')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:toml)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for toml'))
     )
   end
 end

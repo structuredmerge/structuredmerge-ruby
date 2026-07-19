@@ -44,8 +44,6 @@ module Toml
     }.freeze
     TREE_SITTER_BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'kreuzberg-language-pack',
                                                                     family: 'tree-sitter').freeze
-    CITRUS_BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'citrus', family: 'peg').freeze
-    PARSLET_BACKEND_REFERENCE = TreeHaver::BackendReference.new(id: 'parslet', family: 'peg').freeze
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     # Base error class for Toml::Merge
@@ -123,7 +121,7 @@ module Toml
       end
 
       def available_toml_backends
-        [TREE_SITTER_BACKEND_REFERENCE, CITRUS_BACKEND_REFERENCE, PARSLET_BACKEND_REFERENCE]
+        [TREE_SITTER_BACKEND_REFERENCE]
       end
 
       def toml_backend_feature_profile(backend: nil)
@@ -257,12 +255,8 @@ module Toml
           return if BACKEND_REGISTRY.registered
 
           TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND_REFERENCE)
-          TreeHaver::BackendRegistry.register(CITRUS_BACKEND_REFERENCE)
-          TreeHaver::BackendRegistry.register(PARSLET_BACKEND_REFERENCE)
 
           register_tree_sitter_backend!
-          register_citrus_backend!
-          register_parslet_backend!
 
           BACKEND_REGISTRY.registered = true
         end
@@ -273,32 +267,6 @@ module Toml
       def register_tree_sitter_backend!
         grammar_finder = TreeHaver::GrammarFinder.new(:toml)
         grammar_finder.register! if grammar_finder.available?
-      end
-
-      def register_citrus_backend!
-        require 'toml-rb'
-        return unless defined?(TomlRB::Document)
-
-        TreeHaver.register_language(
-          :toml,
-          grammar_module: TomlRB::Document,
-          gem_name: 'toml-rb'
-        )
-      rescue LoadError, NameError
-        nil
-      end
-
-      def register_parslet_backend!
-        require 'toml'
-        return unless defined?(TOML::Parslet)
-
-        TreeHaver.register_language(
-          :toml,
-          grammar_class: TOML::Parslet,
-          gem_name: 'toml'
-        )
-      rescue LoadError, NameError
-        nil
       end
 
       def requested_toml_backend_id(backend)
@@ -334,10 +302,6 @@ module Toml
       def toml_backend_available_for_analysis?(backend_id)
         registrations = TreeHaver.registered_languages(:toml)
         case backend_id.to_s
-        when 'citrus'
-          registrations.key?(:citrus)
-        when 'parslet'
-          registrations.key?(:parslet)
         when TREE_SITTER_BACKEND_REFERENCE.id
           registrations.key?(:tree_sitter)
         else

@@ -13,6 +13,21 @@ module Parslet
 
       PACKAGE_NAME = 'parslet-toml-merge'
       BACKEND = TreeHaver::PARSLET_BACKEND
+      BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+      def register_backend!
+        BACKEND_REGISTRY.mutex.synchronize do
+          return if BACKEND_REGISTRY.registered
+
+          TreeHaver.register_language(
+            :toml,
+            grammar_class: TOML::Parslet,
+            gem_name: 'toml'
+          )
+
+          BACKEND_REGISTRY.registered = true
+        end
+      end
 
       def toml_feature_profile
         ::Toml::Merge.toml_feature_profile
@@ -50,9 +65,6 @@ module Parslet
         requested = backend.to_s.empty? ? BACKEND.id : backend.to_s
         return unsupported_feature_result("Unsupported TOML backend #{requested}.") unless requested == BACKEND.id
         return unsupported_feature_result("Unsupported TOML dialect #{dialect}.") unless dialect == 'toml'
-
-        syntax_result = TreeHaver.parse_with_parslet(source, grammar_class: TOML::Parslet)
-        return { ok: false, diagnostics: syntax_result[:diagnostics], policies: [] } unless syntax_result[:ok]
 
         TreeHaver.with_backend(BACKEND.id) { ::Toml::Merge.analyze_toml_source(source, dialect) }
       end
@@ -111,6 +123,7 @@ module Parslet
 
       module_function(
         :toml_feature_profile,
+        :register_backend!,
         :available_toml_backends,
         :toml_backend_feature_profile,
         :toml_plan_context,
@@ -133,6 +146,8 @@ module Parslet
     end
   end
 end
+
+Parslet::Toml::Merge.register_backend!
 
 Parslet::Toml::Merge::Version.class_eval do
   extend VersionGem::Basic
