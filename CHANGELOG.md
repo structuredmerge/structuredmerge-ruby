@@ -51,6 +51,9 @@ Please file a bug if you notice a violation of semantic versioning.
   attachment and blank interstitial ownership, and `ruby-merge` uses those
   helpers for its Ruby fixture/report APIs instead of carrying local copies of
   format-neutral ownership mechanics.
+- Root architecture specs now guard merge emission files against new ad hoc
+  comment or blank-line ownership scans, keeping the remaining cleanup debt
+  explicit while shared ast-merge attachment and layout helpers are adopted.
 - Gems that use `tree_sitter_language_pack` now resolve it through the
   StructuredMerge Ruby 4-compatible fork branch in their development Gemfiles
   until an upstream Ruby 4-compatible release is available.
