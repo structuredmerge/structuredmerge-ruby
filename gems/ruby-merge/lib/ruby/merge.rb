@@ -77,8 +77,8 @@ module Ruby
     end
 
     def ruby_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
+      requested = requested_tree_sitter_backend_id(backend)
+      unless ruby_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
@@ -105,20 +105,27 @@ module Ruby
 
     def ruby_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-      registrations = TreeHaver.registered_languages(:ruby)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:ruby, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:ruby, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
 
     def parse_ruby(source, dialect, backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
+      requested = backend.to_s.empty? ? nil : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
-      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
-        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+
+      unless ruby_backend_available_for_analysis?(requested)
+        diagnostic_backend = requested || TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_result("Unsupported Ruby backend #{diagnostic_backend}.")
       end
 
-      tree = TreeHaver.with_backend(requested) { TreeHaver.parser_for(:ruby).parse(source) }
+      tree = parse_tree_sitter_source(:ruby, source, backend: requested)
       collect_parse_errors(tree.root_node)
 
       process_analysis = ruby_process_analysis_from_tree(source, tree.root_node)
@@ -131,6 +138,23 @@ module Ruby
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
+
+    def parse_tree_sitter_source(language, source, backend: nil)
+      if backend
+        TreeHaver.with_backend(backend) { TreeHaver.parser_for(language, backend_type: :tree_sitter).parse(source) }
+      else
+        TreeHaver.parser_for(language, backend_type: :tree_sitter).parse(source)
+      end
+    end
+    private_class_method :parse_tree_sitter_source
+
+    def requested_tree_sitter_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+    end
+    private_class_method :requested_tree_sitter_backend_id
 
     def match_ruby_owners(template, destination)
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
@@ -2367,7 +2391,7 @@ module Ruby
       end
 
       def call
-        tree = TreeHaver.parser_for(:ruby).parse(source)
+        tree = TreeHaver.parser_for(:ruby, backend_type: :tree_sitter).parse(source)
         root = if tree.respond_to?(:parse_result)
                  tree.parse_result.value
                else

@@ -68,11 +68,7 @@ module Yaml
       end
 
       def parse_yaml
-        parser = if @parser_path
-                   TreeHaver.parser_for(:yaml, library_path: @parser_path)
-                 else
-                   TreeHaver.parser_for(:yaml)
-                 end
+        parser = TreeHaver.parser_for(:yaml, backend_type: :tree_sitter)
         @ast = parser.parse(@source)
         collect_parse_errors(@ast.root_node) if @ast&.root_node
       rescue TreeHaver::Error, StandardError => e

@@ -86,7 +86,7 @@ RSpec.describe Go::Merge do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to eq(
       [{ severity: 'error', category: 'unsupported_feature',
-         message: 'Unsupported Go backend kreuzberg-language-pack.' }]
+         message: 'Unsupported Go backend tree-sitter.' }]
     )
   end
 end
