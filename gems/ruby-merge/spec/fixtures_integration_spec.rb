@@ -113,16 +113,12 @@ RSpec.describe 'Ruby::Merge' do
                                             )
   end
 
-  it 'exposes missing TSLP import records as an unsupported capability', :not_tslp_ruby_import_records do
+  it 'derives require imports from the TreeHaver Ruby parse tree', :tslp_ruby_import_records do
     result = RUBY_MERGE.merge_ruby("require \"set\"\n", "require \"json\"\n", 'ruby', merge_template_requires: true)
 
-    expect(result[:ok]).to be(false)
-    expect(result[:diagnostics]).to contain_exactly(
-      hash_including(
-        category: 'unsupported_feature',
-        message: include('TSLP-record-backed top-level Ruby declarations and imports')
-      )
-    )
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include("require \"json\"")
+    expect(result[:output]).to include("require \"set\"")
   end
 
   it 'exposes missing TSLP top-level call records as an unsupported capability',

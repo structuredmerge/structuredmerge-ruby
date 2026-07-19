@@ -50,6 +50,18 @@ Ast::Merge builds on tree\_haver to provide:
 - **Region Detection**: `RegionDetectorBase`, `FencedCodeBlockDetector` for text-based analysis
 - **RSpec Shared Examples**: Test helpers for implementing new merge gems
 
+### Merge Gem Backend Patterns
+
+Every merge gem in this family must enter parsing through `tree_haver`. Do not add direct parser fallbacks in merge gems. If a requested backend or grammar is unavailable, fail closed with an unsupported feature or parse diagnostic instead of switching to another parser outside `tree_haver`.
+
+The current merge gems fit three backend patterns:
+
+- **Provider-only merge gems** register a concrete TreeHaver backend and use that backend exclusively. Use this for gems whose purpose is to expose a specific parser provider, such as `prism-merge`, `psych-merge`, `citrus-toml-merge`, and `parslet-toml-merge`.
+- **Hybrid provider plus TSLP merge gems** register their provider backend, and may also register a TSLP/tree-sitter grammar mapping for the same language when both surfaces are intended and tested. `rbs-merge` is the model for this category.
+- **Substrate mapping merge gems** do not own a parser. They register the format grammar with `TreeHaver::GrammarFinder` and use the normal `TreeHaver.parser_for(:format)` API for analysis and merge behavior. `json-merge`, `toml-merge`, `yaml-merge`, and `ruby-merge` follow this pattern.
+
+Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
+
 ### Creating a New Merge Gem
 
 ```ruby

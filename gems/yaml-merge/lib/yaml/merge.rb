@@ -4,7 +4,6 @@ require 'version_gem'
 require_relative 'merge/version'
 
 require 'json'
-require 'yaml'
 require 'tree_haver'
 
 module Yaml
@@ -15,8 +14,20 @@ module Yaml
       name: 'destination_wins_array'
     }.freeze
     BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     module_function
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:yaml)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def yaml_feature_profile
       {
@@ -64,13 +75,10 @@ module Yaml
         return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
-      parser = TreeHaver.parser_for(:yaml)
-      tree = parser.parse(source)
+      tree = TreeHaver.with_backend(resolved_backend) { TreeHaver.parser_for(:yaml).parse(source) }
       collect_parse_errors(tree.root_node)
 
-      unsupported_feature_parse_result(
-        'yaml-merge document analysis must be rebuilt from TreeHaver AST nodes. Use psych-merge for the Psych TreeHaver backend.'
-      )
+      analyze_yaml_document(yaml_value_from_tree(tree.root_node, source), dialect)
     rescue TreeHaver::Error, StandardError => e
       parse_error_result(e.message)
     end
@@ -166,6 +174,94 @@ module Yaml
       raise TreeHaver::NotAvailable, 'YAML parse contains syntax errors' if node.respond_to?(:has_error?) && node.has_error?
     end
     private_class_method :collect_parse_errors
+
+    def yaml_value_from_tree(node, source)
+      named = yaml_named_children(node)
+      case node.type
+      when 'stream', 'document', 'block_node', 'flow_node'
+        return nil if named.empty?
+
+        yaml_value_from_tree(named.first, source)
+      when 'block_mapping', 'flow_mapping'
+        yaml_mapping_from_node(node, source)
+      when 'block_sequence', 'flow_sequence'
+        yaml_sequence_from_node(node, source)
+      when 'block_sequence_item'
+        value_node = named.first
+        value_node ? yaml_value_from_tree(value_node, source) : nil
+      when 'plain_scalar', 'string_scalar', 'double_quote_scalar', 'single_quote_scalar'
+        yaml_scalar_from_text(source[node.start_byte...node.end_byte])
+      else
+        if named.length == 1
+          yaml_value_from_tree(named.first, source)
+        else
+          yaml_scalar_from_text(source[node.start_byte...node.end_byte])
+        end
+      end
+    end
+    private_class_method :yaml_value_from_tree
+
+    def yaml_mapping_from_node(node, source)
+      yaml_named_children(node).each_with_object({}) do |child, mapping|
+        next unless child.type.end_with?('mapping_pair')
+
+        pair_children = yaml_named_children(child)
+        key_node = pair_children.first
+        next unless key_node
+
+        value_node = pair_children[1]
+        mapping[yaml_value_from_tree(key_node, source).to_s] =
+          value_node ? yaml_value_from_tree(value_node, source) : nil
+      end
+    end
+    private_class_method :yaml_mapping_from_node
+
+    def yaml_sequence_from_node(node, source)
+      yaml_named_children(node).filter_map do |child|
+        next unless child.type == 'block_sequence_item' || child.type == 'flow_node'
+
+        yaml_value_from_tree(child, source)
+      end
+    end
+    private_class_method :yaml_sequence_from_node
+
+    def yaml_named_children(node)
+      node.children.select do |child|
+        (!child.respond_to?(:named?) || child.named?) && child.type != 'comment'
+      end
+    end
+    private_class_method :yaml_named_children
+
+    def yaml_scalar_from_text(text)
+      stripped = text.to_s.strip
+      return nil if stripped.empty? || stripped == '~' || stripped.casecmp('null').zero?
+      return true if stripped.casecmp('true').zero?
+      return false if stripped.casecmp('false').zero?
+      return stripped.to_i if stripped.match?(/\A[-+]?\d+\z/)
+      return stripped.to_f if stripped.match?(/\A[-+]?(?:\d+\.\d*|\d*\.\d+)(?:[eE][-+]?\d+)?\z/)
+
+      return unescape_yaml_double_quoted_scalar(stripped[1...-1]) if stripped.start_with?('"') && stripped.end_with?('"')
+      return stripped[1...-1].gsub("''", "'") if stripped.start_with?("'") && stripped.end_with?("'")
+
+      stripped
+    end
+    private_class_method :yaml_scalar_from_text
+
+    def unescape_yaml_double_quoted_scalar(value)
+      value.gsub(/\\(["\\\/bfnrt])/) do
+        {
+          '"' => '"',
+          '\\' => '\\',
+          '/' => '/',
+          'b' => "\b",
+          'f' => "\f",
+          'n' => "\n",
+          'r' => "\r",
+          't' => "\t"
+        }.fetch(Regexp.last_match(1))
+      end
+    end
+    private_class_method :unescape_yaml_double_quoted_scalar
 
     def validate_yaml_node(value, path)
       if scalar?(value)
@@ -323,6 +419,8 @@ module Yaml
     private_class_method :unsupported_feature_result
   end
 end
+
+Yaml::Merge.register_backend!
 
 Yaml::Merge::Version.class_eval do
   extend VersionGem::Basic

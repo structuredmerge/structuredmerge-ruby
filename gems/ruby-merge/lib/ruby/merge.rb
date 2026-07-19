@@ -15,6 +15,11 @@ module Ruby
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
     DEFAULT_METHOD_MOVE_POLICY = 'destination_order'
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+    TslpSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
+    TslpStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
+    TslpImportItem = Struct.new(:source, :span, keyword_init: true)
+    TslpProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
     PERCENT_ARRAY_DELIMITER_PAIRS = {
       '[' => ']',
       '(' => ')',
@@ -31,6 +36,17 @@ module Ruby
     CONSTANT_HASH_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=\s*\{/
     EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
     TAG_PREFIX = /\A@[a-z_]+\b/
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:ruby)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def ruby_feature_profile
       {
@@ -85,13 +101,16 @@ module Ruby
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      parser = TreeHaver.parser_for(:ruby)
-      tree = parser.parse(source)
+      tree = TreeHaver.with_backend(requested) { TreeHaver.parser_for(:ruby).parse(source) }
       collect_parse_errors(tree.root_node)
 
-      unsupported_feature_result(
-        'ruby-merge owner extraction must be rebuilt from TreeHaver AST nodes. Use prism-merge for native Ruby merging.'
-      )
+      process_analysis = ruby_process_analysis_from_tree(source, tree.root_node)
+      {
+        ok: true,
+        diagnostics: [],
+        analysis: analyze_ruby_document(source, process_analysis: process_analysis),
+        policies: []
+      }
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
@@ -193,7 +212,7 @@ module Ruby
       end
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
-      preamble = collect_ruby_preamble(destination_context.fetch(:source))
+      preamble = destination_context.fetch(:preamble)
       sections << preamble unless preamble.empty?
       requires = if merge_template_requires
                    merge_ruby_requires(destination_requires,
@@ -1280,6 +1299,164 @@ module Ruby
       }
     end
 
+    def ruby_process_analysis_from_tree(source, root_node)
+      structure = []
+      imports = []
+
+      ruby_named_children(root_node).each do |node|
+        case node.type
+        when 'call'
+          import = ruby_import_item_from_node(source, node)
+          imports << import if import
+        when 'if_modifier'
+          import = ruby_import_item_from_modifier_node(source, node)
+          imports << import if import
+        when 'begin'
+          import = ruby_import_item_from_begin_node(source, node)
+          imports << import if import
+        when 'class', 'module', 'method', 'singleton_method'
+          item = ruby_structure_item_from_node(source, node)
+          structure << item if item
+        end
+      end
+
+      TslpProcessAnalysis.new(structure: structure, imports: imports)
+    end
+
+    def ruby_import_item_from_node(source, node)
+      children = ruby_named_children(node)
+      callee = children.first
+      return unless callee && %w[identifier method_identifier].include?(callee.type)
+
+      name = ruby_node_text(source, callee)
+      return unless %w[require require_relative].include?(name)
+
+      string_node = ruby_first_descendant(node) do |child|
+        child.type == 'string_content' || child.type == 'simple_symbol'
+      end
+      return unless string_node
+
+      TslpImportItem.new(source: ruby_node_text(source, string_node), span: ruby_import_span_for(source, node))
+    end
+
+    def ruby_import_item_from_modifier_node(source, node)
+      call_node = ruby_named_children(node).first
+      return unless call_node&.type == 'call'
+
+      import = ruby_import_item_from_node(source, call_node)
+      return unless import
+
+      TslpImportItem.new(source: import.source, span: ruby_import_span_for(source, node))
+    end
+
+    def ruby_import_item_from_begin_node(source, node)
+      children = ruby_named_children(node)
+      call_imports = children.filter_map do |child|
+        ruby_import_item_from_node(source, child) if child.type == 'call'
+      end
+      return if call_imports.empty?
+
+      unsupported = children.any? do |child|
+        child.type != 'call' && !ruby_load_error_rescue_node?(source, child)
+      end
+      return if unsupported
+
+      TslpImportItem.new(source: call_imports.map(&:source).join(','), span: ruby_span_for(node))
+    end
+
+    def ruby_load_error_rescue_node?(source, node)
+      return false unless node.type == 'rescue'
+      return false unless ruby_named_children(node).all? { |child| child.type == 'exceptions' }
+
+      ruby_node_text(source, node).match?(/\Arescue\s+LoadError\b/)
+    end
+
+    def ruby_structure_item_from_node(source, node)
+      kind = case node.type
+             when 'class'
+               'class'
+             when 'module'
+               'module'
+             when 'method', 'singleton_method'
+               'method'
+             end
+      return unless kind
+
+      name_node = ruby_declaration_name_node(node)
+      return unless name_node
+
+      TslpStructureItem.new(kind: kind, name: ruby_node_text(source, name_node), span: ruby_span_for(node))
+    end
+
+    def ruby_declaration_name_node(node)
+      case node.type
+      when 'class', 'module'
+        ruby_named_children(node).find do |child|
+          %w[constant scope_resolution].include?(child.type)
+        end
+      when 'method'
+        ruby_named_children(node).find do |child|
+          %w[identifier method_identifier operator].include?(child.type)
+        end
+      when 'singleton_method'
+        children = ruby_named_children(node)
+        children.reverse.find do |child|
+          %w[identifier method_identifier operator].include?(child.type)
+        end
+      end
+    end
+
+    def ruby_first_descendant(node, &block)
+      ruby_named_children(node).each do |child|
+        return child if yield(child)
+
+        descendant = ruby_first_descendant(child, &block)
+        return descendant if descendant
+      end
+      nil
+    end
+
+    def ruby_named_children(node)
+      node.children.select { |child| !child.respond_to?(:named?) || child.named? }
+    end
+
+    def ruby_span_for(node)
+      start_point = node.start_point
+      end_point = node.end_point
+      TslpSpan.new(
+        start_row: start_point.fetch(:row),
+        start_col: start_point.fetch(:column),
+        end_row: end_point.fetch(:row),
+        end_col: end_point.fetch(:column)
+      )
+    end
+
+    def ruby_import_span_for(source, node)
+      span = ruby_span_for(node)
+      lines = normalize_source(source).split("\n")
+      start_row = span.start_row
+      end_row = span.end_row
+
+      start_row -= 1 while start_row.positive? && coverage_directive_comment_line?(lines[start_row - 1])
+      end_row += 1 while end_row < lines.length - 1 && coverage_directive_comment_line?(lines[end_row + 1])
+
+      TslpSpan.new(
+        start_row: start_row,
+        start_col: start_row == span.start_row ? span.start_col : 0,
+        end_row: end_row,
+        end_col: end_row == span.end_row ? span.end_col : lines[end_row].to_s.length
+      )
+    end
+
+    def coverage_directive_comment_line?(line)
+      content = normalize_comment_content(line)
+      content == ':nocov:' || content.start_with?('simplecov:')
+    end
+
+    def ruby_node_text(source, node)
+      source[node.start_byte...node.end_byte].to_s
+    end
+
     def ruby_fallback_scope_rank(scope)
       ruby_fallback_policy_profile.fetch(:scopes).index(scope.to_s) || Float::INFINITY
     end
@@ -1320,6 +1497,7 @@ module Ruby
       {
         ok: true,
         source: source,
+        preamble: ruby_tslp_file_preamble_text(source, process_analysis),
         requires: ruby_process_import_entries(source, process_analysis),
         declarations: collect_ruby_declaration_entries(source, process_analysis: process_analysis),
         footer: ruby_tslp_file_footer_text(source, process_analysis)
@@ -1418,6 +1596,19 @@ module Ruby
         footer_indexes.unshift(index)
       end
       lines.values_at(*footer_indexes).join("\n").strip
+    end
+
+    def ruby_tslp_file_preamble_text(source, process_analysis)
+      lines = normalize_source(source).split("\n")
+      claimed = ruby_tslp_claimed_line_indexes(lines, process_analysis)
+      preamble_indexes = []
+      lines.each_index do |index|
+        break if claimed.include?(index)
+        break unless lines[index].strip.empty? || comment_line?(lines[index])
+
+        preamble_indexes << index
+      end
+      lines.values_at(*preamble_indexes).join("\n").strip
     end
 
     def collect_ruby_declaration_entries(source, process_analysis: nil)
@@ -2986,6 +3177,8 @@ module Ruby
     )
   end
 end
+
+Ruby::Merge.register_backend!
 
 TreeHaver::BackendRegistry.register_tag(
   :tslp_ruby_import_records,
