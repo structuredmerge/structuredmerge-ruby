@@ -1987,8 +1987,8 @@ module Ruby
         template_block = template_blocks[destination_block[:constant]]
         next unless template_block
 
-        template_hash = RubyHashLiteralParser.new(template_block[:hash_source]).parse
-        destination_hash = RubyHashLiteralParser.new(destination_block[:hash_source]).parse
+        template_hash = RubyHashLiteralProjector.new(template_block[:hash_source]).call
+        destination_hash = RubyHashLiteralProjector.new(destination_block[:hash_source]).call
         merged_hash = merge_ruby_hash_literals(template_hash, destination_hash)
         rendered = "#{destination_block[:prefix]}#{render_ruby_hash_literal(merged_hash,
                                                                             destination_block[:base_indent])}"
@@ -2457,130 +2457,183 @@ module Ruby
     RubyHashPair = Struct.new(:key, :key_source, :delimiter, :value, keyword_init: true)
     RubyScalarNode = Struct.new(:source, keyword_init: true)
 
-    class RubyHashLiteralParser
+    class RubyHashLiteralProjector
       def initialize(source)
         @source = source.to_s
-        @index = 0
       end
 
-      def parse
-        parse_hash.tap do
-          skip_whitespace
-          raise ArgumentError, 'unexpected trailing hash literal content' unless eof?
-        end
+      def call
+        tree = TreeHaver.parser_for(:ruby).parse(source)
+        root = if tree.respond_to?(:parse_result)
+                 tree.parse_result.value
+               else
+                 tree.root_node
+               end
+        hash_node = root_hash_node(root)
+        raise ArgumentError, 'expected Ruby hash literal' unless hash_node?(hash_node)
+
+        project_hash_node(hash_node)
       end
 
       private
 
       attr_reader :source
 
-      def parse_hash
-        start_index = @index
-        consume('{')
-        pairs = []
-        trailing_comma = false
-        loop do
-          skip_whitespace
-          break if peek == '}'
+      def root_hash_node(root)
+        return root if hash_node?(root)
+        return root.statements&.body&.first if root.respond_to?(:statements)
 
-          key = parse_hash_key
-          skip_whitespace
-          value = parse_value
-          pairs << RubyHashPair.new(
+        child_nodes(root).find { |child| hash_node?(child) }
+      end
+
+      def hash_node?(node)
+        %w[hash hash_node].include?(node&.type.to_s)
+      end
+
+      def project_hash_node(node)
+        pairs = hash_pair_nodes(node).map do |assoc|
+          key_node, value_node = hash_pair_key_value_nodes(assoc)
+          key = project_hash_key(key_node, hash_pair_operator(assoc))
+          RubyHashPair.new(
             key: key.fetch(:key),
             key_source: key.fetch(:key_source),
             delimiter: key.fetch(:delimiter),
-            value: value
+            value: project_hash_value(value_node)
           )
-          skip_whitespace
-          break if peek == '}'
-
-          consume(',')
-          skip_whitespace
-          if peek == '}'
-            trailing_comma = true
-            break
-          end
         end
-        consume('}')
-        RubyHashNode.new(pairs: pairs, inline: !source[start_index...@index].include?("\n"),
-                         trailing_comma: trailing_comma)
+        RubyHashNode.new(
+          pairs: pairs,
+          inline: !node_source(node).include?("\n"),
+          trailing_comma: trailing_comma?(node)
+        )
       end
 
-      def parse_value
-        skip_whitespace
-        return parse_hash if peek == '{'
+      def project_hash_value(node)
+        return project_hash_node(node) if hash_node?(node)
 
-        RubyScalarNode.new(source: parse_scalar_source)
+        RubyScalarNode.new(source: node_source(node).rstrip)
       end
 
-      def parse_hash_key
-        remaining = source[@index..].to_s
-        if (match = remaining.match(/\A([a-zA-Z_]\w*[!?]?):/))
-          @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: ':' }
+      def project_hash_key(key_node, operator)
+        delimiter = operator.to_s == '=>' ? '=>' : ':'
+        if delimiter == ':'
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node).delete_suffix(':'),
+            delimiter: delimiter
+          }
+        elsif %w[symbol_node simple_symbol].include?(key_node.type.to_s) && node_source(key_node).start_with?(':')
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        elsif %w[string_node string].include?(key_node.type.to_s)
+          {
+            key: node_source(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        else
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        end
+      end
+
+      def hash_pair_nodes(node)
+        return Array(node.elements) if node.respond_to?(:elements)
+
+        child_nodes(node).select { |child| child.type.to_s == 'pair' }
+      end
+
+      def hash_pair_key_value_nodes(pair)
+        return [pair.key, pair.value] if pair.respond_to?(:key) && pair.respond_to?(:value)
+
+        named = child_nodes(pair).reject { |child| punctuation_node?(child) }
+        [named.first, named.last]
+      end
+
+      def hash_pair_operator(pair)
+        return pair.operator if pair.respond_to?(:operator)
+
+        all_child_nodes(pair).find { |child| %w[: =>].include?(child.type.to_s) }&.type
+      end
+
+      def hash_key_value(node)
+        return node.unescaped.to_s if node.respond_to?(:unescaped)
+
+        text = node_source(node)
+        return text.delete_prefix(':') if text.start_with?(':')
+        return text[1...-1] if node.type.to_s == 'string' && text.match?(/\A(["']).*\1\z/m)
+
+        text
+      end
+
+      def trailing_comma?(node)
+        if node.respond_to?(:elements) && node.respond_to?(:closing_loc)
+          return trailing_comma_between?(last_child_end: Array(node.elements).last.location.end_offset,
+                                         closing_start: node.closing_loc.start_offset)
         end
 
-        if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2):/))
-          @index += match[0].length
-          return { key: match[1][1...-1], key_source: match[1], delimiter: ':' }
+        last_pair = hash_pair_nodes(node).last
+        closing = all_child_nodes(node).reverse.find { |child| child.type.to_s == '}' }
+        return false unless last_pair && closing
+
+        trailing_comma_between?(last_child_end: node_end_offset(last_pair), closing_start: node_start_offset(closing))
+      end
+
+      def trailing_comma_between?(last_child_end:, closing_start:)
+        source.byteslice(last_child_end...closing_start).to_s.include?(',')
+      end
+
+      def child_nodes(node)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes
+        elsif node.respond_to?(:named_children)
+          node.named_children
+        elsif node.respond_to?(:children)
+          node.children
+        else
+          []
         end
+      end
 
-        if (match = remaining.match(/\A(:[a-zA-Z_]\w*[!?]?)\s*=>/))
-          @index += match[0].length
-          return { key: match[1].delete_prefix(':'), key_source: match[1], delimiter: '=>' }
+      def all_child_nodes(node)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes
+        elsif node.respond_to?(:children)
+          node.children
+        else
+          child_nodes(node)
         end
-
-        if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2)\s*=>/))
-          @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: '=>' }
-        end
-
-        raise ArgumentError, 'expected hash key'
       end
 
-      def parse_scalar_source
-        start_index = @index
-        string_quote = nil
-        escape = false
-        while @index < source.length
-          char = source[@index]
-          if string_quote
-            if escape
-              escape = false
-            elsif char == '\\'
-              escape = true
-            elsif char == string_quote
-              string_quote = nil
-            end
-            @index += 1
-            next
-          end
-
-          break if [',', '}'].include?(char)
-
-          string_quote = char if ['"', "'"].include?(char)
-          @index += 1
-        end
-        source[start_index...@index].rstrip
+      def punctuation_node?(node)
+        %w[{ } : => ,].include?(node.type.to_s)
       end
 
-      def skip_whitespace
-        @index += 1 while @index < source.length && source[@index].match?(/\s/)
+      def node_source(node)
+        return node.slice.to_s if node.respond_to?(:slice)
+        return node.text.to_s if node.respond_to?(:text)
+
+        source.byteslice(node_start_offset(node)...node_end_offset(node)).to_s
       end
 
-      def consume(expected)
-        raise ArgumentError, "expected #{expected}" unless peek == expected
+      def node_start_offset(node)
+        return node.location.start_offset if node.respond_to?(:location)
+        return node.start_byte if node.respond_to?(:start_byte)
 
-        @index += 1
+        raise ArgumentError, 'Ruby hash node does not expose a start offset'
       end
 
-      def peek
-        source[@index]
-      end
+      def node_end_offset(node)
+        return node.location.end_offset if node.respond_to?(:location)
+        return node.end_byte if node.respond_to?(:end_byte)
 
-      def eof?
-        @index >= source.length
+        raise ArgumentError, 'Ruby hash node does not expose an end offset'
       end
     end
 
