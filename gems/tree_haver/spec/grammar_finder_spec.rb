@@ -31,5 +31,23 @@ RSpec.describe TreeHaver::GrammarFinder do
         )
       )
     end
+
+    it 'does not require shared-library cache discovery for TSLP registration' do
+      stub_const('TreeSitterLanguagePack', Module.new)
+      allow(TreeSitterLanguagePack).to receive(:has_language).with('cold_cache_markdown').and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:available?).and_return(true)
+
+      finder = described_class.new(:cold_cache_markdown)
+      allow(finder).to receive(:find_library_path).and_raise(
+        TreeHaver::NotAvailable,
+        'shared-library cache is intentionally empty'
+      )
+
+      expect(finder.register!(raise_on_missing: true)).to be(true)
+      parser = TreeHaver.with_backend('tslp') { TreeHaver.parser_for(:cold_cache_markdown) }
+
+      expect(parser).to be_a(TreeHaver::Backends::Tslp::Parser)
+      expect(finder).not_to have_received(:find_library_path)
+    end
   end
 end
