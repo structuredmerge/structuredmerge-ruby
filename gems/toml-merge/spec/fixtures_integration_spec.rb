@@ -146,26 +146,25 @@ RSpec.describe Toml::Merge do
   end
 
   it 'preserves destination TOML comments and blank lines while adding template-only keys' do
-    template = <<~TOML
-      # project configuration
-      name = "kettle-jem"
-      generated = true
-    TOML
-    destination = <<~TOML
-      # project configuration
-      name = "kettle-jem"
+    fixture = read_json(
+      fixtures_root.join(
+        'toml',
+        'slice-721-formatting-preservation',
+        'dotted-inline-comments-arrays.json'
+      )
+    )
 
-      # local operator notes
-      local = true
-    TOML
+    result = described_class.merge_toml(fixture[:template], fixture[:destination], fixture[:dialect])
 
-    result = described_class.merge_toml(template, destination, 'toml')
-
-    expect(result[:ok]).to be(true)
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
     expect(result[:output]).to include('# project configuration')
     expect(result[:output]).to include("\n\n# local operator notes\n")
     expect(result[:output]).to include('local = true')
-    expect(result[:output]).to include('generated = true')
+    expect(result[:output]).to include('_.file = { path = ".env.local", redact = true }')
+    expect(result[:output]).to include('_.path = ["exe", "bin"]')
+    expect(result[:output]).to include('[[profiles.semantic-diff.attributes]]')
+    expect(result[:output]).to include('diff = "smorg-rb"')
+    expect(result[:output]).to eq(fixture.dig(:expected, :output))
   end
 
   it 'records emitter source provenance line metadata for raw source rendering' do
