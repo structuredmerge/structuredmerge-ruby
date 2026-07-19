@@ -73,6 +73,30 @@ RSpec.describe Commonmarker::Merge do
     expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
   end
 
+  it 'conforms to the slice-721 Markdown provider parity fixture' do
+    fixture = read_json(
+      fixtures_root.join(
+        'markdown',
+        'slice-721-provider-parity',
+        'headings-lists-tables-fences-links-frontmatter-comments.json'
+      )
+    )
+
+    result = described_class.parse_markdown(fixture[:source], fixture[:dialect])
+    owners = result.dig(:analysis, :owners)
+    expect(owners.map { |owner| owner[:owner_kind] }).to eq(fixture.dig(:expected, :parse_owner_kinds))
+    expect(owners.map { |owner| owner[:match_key] }).to eq(fixture.dig(:expected, :parse_owner_match_keys))
+
+    analysis = TreeHaver.with_backend(described_class::BACKEND_REFERENCE.id) do
+      Markdown::Merge::FileAnalysis.new(fixture[:source])
+    end
+    common = fixture.dig(:expected, :structured_owner_common)
+    expect(analysis.link_definition_owners.map(&:label)).to eq(common[:link_definitions])
+    expect(analysis.html_comment_owners.map(&:text)).to eq(common[:html_comments])
+    expect(analysis.inline_reference_owners.map(&:label)).to eq(common[:inline_references])
+    expect(analysis.table_row_owners.map(&:source)).to include(*common[:table_rows_include])
+  end
+
   it 'conforms to the slice-208 embedded-family fixture' do
     fixture = read_json(fixtures_root.join('markdown', 'slice-208-embedded-families', 'code-fence-families.json'))
     analysis = described_class.parse_markdown(fixture[:source], 'markdown')

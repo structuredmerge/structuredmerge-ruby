@@ -366,7 +366,7 @@ module Markdown
             TableRowOwner.new(
               location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
               source: source_range(position[:start_line], position[:end_line]),
-              text: child.to_plaintext.to_s
+              text: extract_text_content(child)
             )
           end
         end
