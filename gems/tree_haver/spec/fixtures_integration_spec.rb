@@ -1112,6 +1112,112 @@ RSpec.describe TreeHaver do
     expect(parser.language).to eq([:auto_provider_markdown, nil])
   end
 
+  it 'constrains parser selection by backend type' do
+    tree_sitter_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol, :tree_sitter_contract]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    provider_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol, :provider_contract]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    described_class.register_language(
+      :contract_ruby,
+      backend_module: tree_sitter_backend,
+      backend_type: :tslp,
+      gem_name: 'tree_sitter_language_pack'
+    )
+    described_class.register_language(
+      :contract_ruby,
+      backend_module: provider_backend,
+      backend_type: :prism,
+      gem_name: 'prism'
+    )
+
+    constrained = described_class.parser_for(:contract_ruby, backend_type: :tree_sitter)
+
+    expect(constrained).to be_a(tree_sitter_backend::Parser)
+    expect(constrained.language).to eq([:contract_ruby, nil, :tree_sitter_contract])
+  end
+
+  it 'fails closed when explicit backend context violates parser constraints' do
+    tree_sitter_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    provider_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    TreeHaver::BackendRegistry.register(TreeHaver::BackendReference.new(id: 'prism', family: 'native'))
+    described_class.register_language(
+      :contract_reject_prism,
+      backend_module: tree_sitter_backend,
+      backend_type: :tslp,
+      gem_name: 'tree_sitter_language_pack'
+    )
+    described_class.register_language(
+      :contract_reject_prism,
+      backend_module: provider_backend,
+      backend_type: :prism,
+      gem_name: 'prism'
+    )
+
+    expect do
+      described_class.with_backend(:prism) do
+        described_class.parser_for(:contract_reject_prism, backend_type: :tree_sitter)
+      end
+    end.to raise_error(TreeHaver::NotAvailable, /No parser registered for backend prism/)
+  end
+
   it 'provides PEG framework parsing helpers' do
     require 'toml'
     require 'toml-rb'

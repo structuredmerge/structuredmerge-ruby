@@ -255,16 +255,20 @@ module TreeHaver
   end
 
   def register_language(name, path: nil, symbol: nil, grammar_module: nil, grammar_class: nil, backend_module: nil,
-                        backend_type: nil, gem_name: nil)
-    LanguageRegistry.register(name, :tree_sitter, path: path, symbol: symbol) if path
+                        backend_type: nil, gem_name: nil, contract: nil)
+    LanguageRegistry.register(name, :tree_sitter, path: path, symbol: symbol, contract: contract) if path
 
-    LanguageRegistry.register(name, :citrus, grammar_module: grammar_module, gem_name: gem_name) if grammar_module
+    if grammar_module
+      LanguageRegistry.register(name, :citrus, grammar_module: grammar_module, gem_name: gem_name, contract: contract)
+    end
 
-    LanguageRegistry.register(name, :parslet, grammar_class: grammar_class, gem_name: gem_name) if grammar_class
+    if grammar_class
+      LanguageRegistry.register(name, :parslet, grammar_class: grammar_class, gem_name: gem_name, contract: contract)
+    end
 
     if backend_module
       LanguageRegistry.register(name, backend_type || backend_module.name.split('::').last.downcase.to_sym,
-                                backend_module: backend_module, gem_name: gem_name)
+                                backend_module: backend_module, gem_name: gem_name, contract: contract)
       register_backend(backend_type || backend_module.name.split('::').last.downcase.to_sym, backend_module)
     end
 
@@ -279,14 +283,26 @@ module TreeHaver
     LanguageRegistry.registered(name) || {}
   end
 
-  def parser_for(language_name, library_path: nil, symbol: nil, citrus_config: nil, parslet_config: nil)
+  def parser_for(language_name, library_path: nil, symbol: nil, citrus_config: nil, parslet_config: nil,
+                 backend_type: nil, contract: nil, preferred: nil)
     name = language_name.to_sym
 
     return parser_for_tree_sitter(name, library_path, symbol) if library_path
 
-    registrations = LanguageRegistry.registered(name) || {}
+    registrations = filter_language_registrations(
+      LanguageRegistry.registered(name) || {},
+      contract || backend_type
+    )
     if (backend_type = requested_backend_type(registrations))
       return parser_for_registered_backend(name, backend_type, registrations)
+    end
+
+    Array(preferred).each do |preferred_backend_type|
+      type = preferred_backend_type.to_sym
+      next unless registrations.key?(type)
+      next unless registered_backend_type_available?(type, registrations.fetch(type))
+
+      return parser_for_registered_backend(name, type, registrations)
     end
 
     if (config = registrations[:psych])
@@ -396,6 +412,28 @@ module TreeHaver
   end
   private_class_method :requested_backend_type
 
+  def filter_language_registrations(registrations, contract_filter)
+    contracts = Array(contract_filter).map { |contract| contract.to_s.tr('-', '_').to_sym }
+    return registrations if contracts.empty?
+
+    registrations.select do |backend_type, config|
+      contracts.include?(registration_contract(backend_type, config))
+    end
+  end
+  private_class_method :filter_language_registrations
+
+  def registration_contract(backend_type, config)
+    explicit = config[:contract]
+    return explicit.to_s.tr('-', '_').to_sym if explicit
+    return :tree_sitter if backend_type.to_sym == :tree_sitter
+
+    backend_ref = BackendRegistry.fetch(backend_type.to_s)
+    return :tree_sitter if backend_ref&.family == 'tree-sitter'
+
+    backend_type.to_sym
+  end
+  private_class_method :registration_contract
+
   def registered_backend_type_for_requested_backend(backend_id, registrations)
     requested_module = backend_module_for(backend_id)
     return unless requested_module
@@ -428,11 +466,7 @@ module TreeHaver
 
   def first_available_registered_backend_type(registrations)
     registrations.each do |backend_type, config|
-      next unless config[:backend_module]
-      next unless backend_allowed?(backend_type)
-
-      backend_module = config.fetch(:backend_module)
-      next if backend_module.respond_to?(:available?) && !backend_module.available?
+      next unless registered_backend_type_available?(backend_type, config)
 
       return backend_type
     end
@@ -440,6 +474,18 @@ module TreeHaver
     nil
   end
   private_class_method :first_available_registered_backend_type
+
+  def registered_backend_type_available?(backend_type, config)
+    return true if backend_type.to_sym == :tree_sitter && (config[:path] || config[:backend_module])
+    return false unless config[:backend_module]
+    return false unless backend_allowed?(backend_type)
+
+    backend_module = config.fetch(:backend_module)
+    return false if backend_module.respond_to?(:available?) && !backend_module.available?
+
+    true
+  end
+  private_class_method :registered_backend_type_available?
 
   def parser_for_backend_module(backend_module, name)
     parser = backend_module::Parser.new
