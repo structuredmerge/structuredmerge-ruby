@@ -310,7 +310,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect_gem_dependency_declared(generated[:"gemfiles/modular/templating.gemfile"], "kettle-jem")
-      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(smorg_rb_local_gems = %w[))
+      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(structuredmerge_local_gems = %w[))
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
       expect(generated[:"lib/legacy/strategies/shim.rb"]).to include(%(require "legacy/shim"))
@@ -5062,7 +5062,7 @@ RSpec.describe Kettle::Jem do
       expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "true",
-        "SMORG_RB_DEV" => marker.fetch("members_root"),
+        "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
         "KETTLE_RB_DEV" => File.join(root, "kettle-dev")
       )
     end
@@ -5109,7 +5109,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "true",
         "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "SMORG_RB_DEV" => "/workspace/smorg-rb"
+        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb"
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|
@@ -5142,7 +5142,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false"
+        "STRUCTUREDMERGE_DEV" => "false"
       )
       expect(commands.map { |entry| entry.fetch(:command) }).not_to include(%w[git add -A])
     end
@@ -5217,7 +5217,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "true",
         "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "SMORG_RB_DEV" => "/workspace/smorg-rb",
+        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb",
         "RUBYOPT" => "-rbundler/setup",
         "RUBYLIB" => "/workspace/kettle-jem/lib",
         "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
@@ -5251,7 +5251,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false"
+        "STRUCTUREDMERGE_DEV" => "false"
       )
       expect(lock_command.fetch(:env)).to include(
         "RUBYOPT" => nil,
@@ -14463,7 +14463,7 @@ RSpec.describe Kettle::Jem do
             )
           end
 
-          # Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
           eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
         RUBY
         ".kettle-jem.yml" => <<~YAML

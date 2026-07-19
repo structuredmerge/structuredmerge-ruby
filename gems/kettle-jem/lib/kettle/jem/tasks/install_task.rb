@@ -750,7 +750,7 @@ module Kettle
           command_env = (env || {}).to_h.dup
           strip_inherited_bundler_activation!(command_env)
           command_env["K_JEM_TEMPLATING"] = "false"
-          %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV SMORG_RB_DEV].each do |key|
+          %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV STRUCTUREDMERGE_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
           gemfile = File.join(project_root.to_s, "Gemfile")
@@ -1012,8 +1012,8 @@ module Kettle
           return unless Array(marker["installed_members"]).include?("kettle-jem")
 
           members_root = marker["members_root"].to_s
-          if local_env_disabled?(command_env["SMORG_RB_DEV"]) && Dir.exist?(File.join(members_root, "kettle-jem"))
-            command_env["SMORG_RB_DEV"] = members_root
+          if local_env_disabled?(command_env["STRUCTUREDMERGE_DEV"]) && Dir.exist?(File.join(members_root, "kettle-jem"))
+            command_env["STRUCTUREDMERGE_DEV"] = members_root
           end
 
           kettle_root = kettle_family_dependency_root(marker)
