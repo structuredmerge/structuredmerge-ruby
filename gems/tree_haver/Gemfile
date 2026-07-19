@@ -25,7 +25,17 @@ gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
-if !tslp_declared_by_templating && tslp_dev.to_s.empty?
+unless tslp_declared_by_templating
+  if tslp_dev.to_s.empty?
+    gem(
+      'tree_sitter_language_pack',
+      git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
+      branch: 'fix/ruby-4-installs',
+      glob: 'packages/ruby/*.gemspec'
+    )
+  else
+    gem 'tree_sitter_language_pack', path: tslp_dev
+  end
 end
 
 # Modular sibling dependencies (env-switched inside each modular Gemfile)

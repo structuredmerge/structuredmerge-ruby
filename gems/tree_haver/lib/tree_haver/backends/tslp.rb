@@ -2,7 +2,7 @@
 
 module TreeHaver
   module Backends
-    # TSLP backend using tree_sitter_language_pack's parser API.
+    # TSLP backend using tree_sitter_language_pack's on-demand parser API.
     #
     # This backend intentionally requires the real parser API. The language-pack
     # process API is not a TreeHaver parser backend and must not be used as a
@@ -55,10 +55,10 @@ module TreeHaver
         private
 
         def parser_api_available?
+          return false unless ::TreeSitterLanguagePack.respond_to?(:get_parser)
           return false unless defined?(::TreeSitterLanguagePack::Parser)
 
-          parser = ::TreeSitterLanguagePack::Parser.new
-          parser.respond_to?(:set_language) && parser.respond_to?(:parse)
+          ::TreeSitterLanguagePack::Parser.instance_methods.include?(:parse)
         rescue StandardError => e
           @unavailable_reason = e.message
           false
@@ -82,8 +82,9 @@ module TreeHaver
           raise TreeHaver::NotAvailable, unavailable_message unless Tslp.available?
           raise TreeHaver::NotAvailable, 'TSLP language is not set' unless language
 
-          parser = ::TreeSitterLanguagePack::Parser.new
-          parser.set_language(language.name.to_s)
+          parser = ::TreeSitterLanguagePack.get_parser(language.name.to_s)
+          raise TreeHaver::NotAvailable, "TSLP did not return a parser for #{language.name}" unless parser
+
           raw_tree = parser.parse(source)
           raise TreeHaver::NotAvailable, "TSLP did not return a parse tree for #{language.name}" unless raw_tree
 
