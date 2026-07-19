@@ -1035,7 +1035,7 @@ module Prism
     def prism_ruby_doc_comment_content?(raw)
       content = prism_ruby_normalize_comment_content(raw)
       return false if content.empty?
-      return false if content.start_with?(':nocov:')
+      return false if Ruby::Merge::BlockDirectiveDetector.directive_content?(content)
       return false if %w[coding encoding frozen_string_literal shareable_constant_value typed
                          warn_indent].any? do |prefix|
         content.start_with?("#{prefix}:")
@@ -1257,8 +1257,7 @@ module Prism
     end
 
     def coverage_directive_comment?(comment_text)
-      stripped = comment_text.strip
-      stripped == '# :nocov:' || stripped.match?(/\A#\s*simplecov\s*:\s*(?:disable|enable)\b/i)
+      Ruby::Merge::BlockDirectiveDetector.coverage_directive_line?(comment_text)
     end
 
     def magic_comment_for(comment, magic_comments)

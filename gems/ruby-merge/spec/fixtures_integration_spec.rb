@@ -53,6 +53,30 @@ RSpec.describe 'Ruby::Merge' do
     )
   end
 
+  it 'detects Ruby coverage directive spans in the shared substrate detector' do
+    spans = Ruby::Merge::BlockDirectiveDetector.new(
+      [
+        "# simplecov:disable\n",
+        "puts 'hidden'\n",
+        "# simplecov:enable\n",
+        "# :nocov:\n",
+        "puts 'legacy hidden'\n",
+        "# :nocov:\n"
+      ]
+    ).detect_spans
+
+    expect(spans.map { |span| [span.kind, span.start_line, span.end_line] }).to eq(
+      [[:nocov, 1, 3], [:nocov, 4, 6]]
+    )
+  end
+
+  it 'filters Ruby directive comments through the shared substrate detector' do
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('simplecov:disable')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?(':nocov:')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('kettle-jem:freeze')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('@param name [String]')).to be(false)
+  end
+
   it 'does not mix legacy declaration discovery into parser-backed Ruby structure' do
     source = <<~RUBY
       class TemplateOwned

@@ -9,7 +9,6 @@ module Prism
       DEFAULT_EXAMPLE_LANGUAGE = :ruby
       TAG_PREFIX = /\A@[a-z_]+\b/
       EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
-      DIRECTIVE_LINE = /\A(?::nocov:|[\w-]+:(?:freeze|unfreeze))\z/
       MAGIC_COMMENT_PREFIXES = %w[
         coding
         encoding
@@ -192,7 +191,7 @@ module Prism
       end
 
       def directive_line?(content)
-        DIRECTIVE_LINE.match?(content)
+        Ruby::Merge::BlockDirectiveDetector.directive_content?(content)
       end
 
       def magic_comment_line?(entry, content)

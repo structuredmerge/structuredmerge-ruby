@@ -6,6 +6,7 @@ require_relative 'merge/version'
 require 'digest'
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/block_directive_detector'
 
 module Ruby
   module Merge
@@ -26,7 +27,6 @@ module Ruby
       '{' => '}',
       '<' => '>'
     }.freeze
-    DIRECTIVE_LINE = /\A(?::nocov:|[\w-]+:(?:freeze|unfreeze))\z/
     MAGIC_COMMENT_PREFIXES = %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].freeze
     REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/
     CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/
@@ -1449,8 +1449,7 @@ module Ruby
     end
 
     def coverage_directive_comment_line?(line)
-      content = normalize_comment_content(line)
-      content == ':nocov:' || content.start_with?('simplecov:')
+      BlockDirectiveDetector.coverage_directive_line?(line)
     end
 
     def ruby_node_text(source, node)
@@ -3134,7 +3133,7 @@ module Ruby
     def doc_comment_content?(raw)
       content = normalize_comment_content(raw)
       return false if content.empty?
-      return false if DIRECTIVE_LINE.match?(content)
+      return false if BlockDirectiveDetector.directive_content?(content)
       return false if MAGIC_COMMENT_PREFIXES.any? { |prefix| content.start_with?("#{prefix}:") }
 
       true
