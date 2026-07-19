@@ -7,23 +7,13 @@ module Prism
     class RubyDocSurfaceAnalyzer
       DEFAULT_DOC_LANGUAGE = :yard
       DEFAULT_EXAMPLE_LANGUAGE = :ruby
-      TAG_PREFIX = /\A@[a-z_]+\b/
-      EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
-      MAGIC_COMMENT_PREFIXES = %w[
-        coding
-        encoding
-        frozen_string_literal
-        shareable_constant_value
-        typed
-        warn_indent
-      ].freeze
 
       attr_reader :analysis
 
       def initialize(analysis, doc_language: DEFAULT_DOC_LANGUAGE, default_example_language: DEFAULT_EXAMPLE_LANGUAGE)
         @analysis = analysis
-        @doc_language = normalize_language(doc_language)
-        @default_example_language = normalize_language(default_example_language)
+        @doc_language = normalize_language(doc_language).to_sym
+        @default_example_language = normalize_language(default_example_language).to_sym
       end
 
       def discover_doc_comment_surfaces(owners: analysis.statements)
@@ -93,25 +83,15 @@ module Prism
         doc_entries = comment_entries_for(surface)
         return [] if doc_entries.empty?
 
-        normalized_lines = doc_entries.map { |entry| normalize_comment_content(entry[:raw]) }
-        normalized_lines.each_with_index.filter_map do |content, index|
-          match = EXAMPLE_TAG.match(content)
-          next unless match
-
-          build_example_surface(surface, doc_entries, normalized_lines, index, match)
+        Ruby::Merge::DocCommentSupport.example_blocks(doc_entries).map do |block|
+          build_example_surface(surface, block)
         end
       end
 
-      def build_example_surface(surface, doc_entries, normalized_lines, tag_index, match)
-        body_start_index = tag_index + 1
-        body_end_index = next_tag_index(normalized_lines, body_start_index) || normalized_lines.length
-        return if body_start_index >= body_end_index
-
-        body_entries = doc_entries[body_start_index...body_end_index]
-        return if body_entries.nil? || body_entries.empty?
-
-        declared_language = declared_example_language(match[:rest])
-        tag_line = doc_entries[tag_index][:line]
+      def build_example_surface(surface, block)
+        body_entries = block.fetch(:body_entries)
+        declared_language = normalize_language(block[:declared_language])&.to_sym
+        tag_index = block.fetch(:tag_index)
         body_span = body_entries.first[:line]..body_entries.last[:line]
 
         Ast::Merge::Runtime::Surface.new(
@@ -126,25 +106,15 @@ module Prism
             tag_kind: :example,
             tag_index: tag_index,
             tag_relative_line: tag_index + 1,
-            tag_line: tag_line,
-            tag_text: normalized_lines[tag_index],
-            body_relative_span: (body_start_index + 1)..body_end_index,
+            tag_line: block.fetch(:tag_line),
+            tag_text: block.fetch(:tag_text),
+            body_relative_span: (block.fetch(:body_start_index) + 1)..block.fetch(:body_end_index),
             comment_prefix: surface.metadata[:comment_prefix],
             preserved_boundaries: {
-              tag_header: doc_entries[tag_index][:raw]
+              tag_header: comment_entries_for(surface)[tag_index][:raw]
             }
           }
         )
-      end
-
-      def next_tag_index(normalized_lines, start_index)
-        normalized_lines.each_with_index do |content, index|
-          next if index < start_index
-
-          return index if TAG_PREFIX.match?(content)
-        end
-
-        nil
       end
 
       def comment_entries_for(surface)
@@ -183,11 +153,10 @@ module Prism
 
       def doc_comment_content?(entry)
         content = normalize_comment_content(entry[:raw])
-        return false if content.empty?
-        return false if directive_line?(content)
-        return false if magic_comment_line?(entry, content)
-
-        true
+        Ruby::Merge::DocCommentSupport.doc_comment_content?(
+          entry[:raw],
+          magic_comment: magic_comment_line?(entry, content)
+        )
       end
 
       def directive_line?(content)
@@ -198,16 +167,11 @@ module Prism
         node = entry[:node]
         return true if node.respond_to?(:magic_comment_type) && !node.magic_comment_type.nil?
 
-        MAGIC_COMMENT_PREFIXES.any? { |prefix| content.start_with?("#{prefix}:") }
+        Ruby::Merge::DocCommentSupport.magic_comment_content?(content)
       end
 
       def normalize_comment_content(raw)
-        raw.to_s.sub(/\A\s*#\s?/, '').strip
-      end
-
-      def declared_example_language(rest)
-        match = rest.to_s.strip.match(/\A\[(?<language>[^\]]+)\]/)
-        normalize_language(match && match[:language])
+        Ruby::Merge::DocCommentSupport.normalize_comment_content(raw)
       end
 
       def owner_reference_for(owner, owner_signature)
@@ -234,9 +198,7 @@ module Prism
       end
 
       def normalize_language(language)
-        return if language.nil?
-
-        language.to_s.strip.downcase.tr('-', '_').to_sym
+        Ruby::Merge::DocCommentSupport.normalize_language(language)
       end
     end
   end

@@ -77,6 +77,29 @@ RSpec.describe 'Ruby::Merge' do
     expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('@param name [String]')).to be(false)
   end
 
+  it 'parses Ruby doc-comment example blocks through shared substrate support' do
+    entries = [
+      { line: 10, raw: '# Performs work.' },
+      { line: 11, raw: '# @example [Ruby]' },
+      { line: 12, raw: '#   worker.call' },
+      { line: 13, raw: '# @param worker [Worker]' }
+    ]
+
+    expect(Ruby::Merge::DocCommentSupport.doc_comment_content?('# frozen_string_literal: true')).to be(false)
+    expect(Ruby::Merge::DocCommentSupport.doc_comment_content?('# simplecov:disable')).to be(false)
+    expect(Ruby::Merge::DocCommentSupport.example_blocks(entries)).to contain_exactly(
+      hash_including(
+        tag_index: 1,
+        tag_line: 11,
+        tag_text: '@example [Ruby]',
+        body_start_index: 2,
+        body_end_index: 3,
+        body_entries: [{ line: 12, raw: '#   worker.call' }],
+        declared_language: 'ruby'
+      )
+    )
+  end
+
   it 'does not mix legacy declaration discovery into parser-backed Ruby structure' do
     source = <<~RUBY
       class TemplateOwned

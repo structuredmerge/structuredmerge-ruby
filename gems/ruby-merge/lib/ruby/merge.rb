@@ -7,6 +7,7 @@ require 'digest'
 require 'tree_haver'
 require 'ast/merge'
 require_relative 'merge/block_directive_detector'
+require_relative 'merge/doc_comment_support'
 
 module Ruby
   module Merge
@@ -27,15 +28,12 @@ module Ruby
       '{' => '}',
       '<' => '>'
     }.freeze
-    MAGIC_COMMENT_PREFIXES = %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].freeze
     REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/
     CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/
     MODULE_PATTERN = /^\s*module\s+([A-Z]\w*(?:::\w+)*)/
     DEF_PATTERN = %r{^\s*def\s+((?:self\.)?)([a-zA-Z_]\w*[!?=]?|\[\]=?|\+@|-@|\*\*|<<|>>|<=>|===|==|=~|!~|!=|[+\-*/%&|^<>]=?|[!~`])}
     CONSTANT_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=/
     CONSTANT_HASH_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=\s*\{/
-    EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
-    TAG_PREFIX = /\A@[a-z_]+\b/
 
     def register_backend!
       BACKEND_REGISTRY.mutex.synchronize do
@@ -3081,33 +3079,22 @@ module Ruby
 
     def example_surfaces_for(surface)
       entries = Array(surface.dig(:metadata, :entries))
-      normalized = entries.map { |entry| normalize_comment_content(entry[:raw]) }
-
-      normalized.each_with_index.filter_map do |content, tag_index|
-        match = EXAMPLE_TAG.match(content)
-        next unless match
-
-        body_start = tag_index + 1
-        body_end = next_tag_index(normalized, body_start) || normalized.length
-        next if body_start >= body_end
-
-        body_entries = entries[body_start...body_end]
-        next if body_entries.nil? || body_entries.empty?
-
-        declared_language = declared_example_language(match[:rest]) || 'ruby'
+      DocCommentSupport.example_blocks(entries).map do |block|
+        body_entries = block.fetch(:body_entries)
+        declared_language = block.fetch(:declared_language) || 'ruby'
         Ast::Merge.discovered_surface(
           surface_kind: 'yard_example_block',
           declared_language: declared_language,
           effective_language: declared_language,
-          address: "#{surface[:address]} > yard_example[#{tag_index}]",
+          address: "#{surface[:address]} > yard_example[#{block.fetch(:tag_index)}]",
           parent_address: surface[:address],
           owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: surface[:address]),
           span: Ast::Merge.surface_span(start_line: body_entries.first[:line], end_line: body_entries.last[:line]),
           reconstruction_strategy: 'rewrite_with_prefix_preservation',
           metadata: {
             tag_kind: 'example',
-            tag_index: tag_index,
-            tag_text: normalized[tag_index],
+            tag_index: block.fetch(:tag_index),
+            tag_text: block.fetch(:tag_text),
             comment_prefix: surface.dig(:metadata, :comment_prefix)
           }
         )
@@ -3115,11 +3102,7 @@ module Ruby
     end
 
     def next_tag_index(normalized_lines, start_index)
-      normalized_lines.each_with_index do |content, index|
-        next if index < start_index
-        return index if TAG_PREFIX.match?(content)
-      end
-      nil
+      DocCommentSupport.next_tag_index(normalized_lines, start_index)
     end
 
     def normalize_source(source)
@@ -3127,28 +3110,19 @@ module Ruby
     end
 
     def normalize_comment_content(raw)
-      raw.to_s.sub(/\A\s*#\s?/, '').strip
+      DocCommentSupport.normalize_comment_content(raw)
     end
 
     def doc_comment_content?(raw)
-      content = normalize_comment_content(raw)
-      return false if content.empty?
-      return false if BlockDirectiveDetector.directive_content?(content)
-      return false if MAGIC_COMMENT_PREFIXES.any? { |prefix| content.start_with?("#{prefix}:") }
-
-      true
+      DocCommentSupport.doc_comment_content?(raw)
     end
 
     def comment_prefix_for(raw)
-      raw.to_s[/\A\s*#\s*/] || '# '
+      DocCommentSupport.comment_prefix_for(raw)
     end
 
     def declared_example_language(rest)
-      match = rest.to_s.strip.match(/\A\[(?<language>[^\]]+)\]/)
-      language = match && match[:language]
-      return if language.nil? || language.empty?
-
-      language.downcase.tr('-', '_')
+      DocCommentSupport.declared_example_language(rest)
     end
 
     module_function(
