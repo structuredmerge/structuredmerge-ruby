@@ -1,19 +1,25 @@
-GIT
-  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
-  revision: 85cac7836bb2f8cfcd3041a191b7bd11bf10924a
-  branch: fix/ruby-parser-api-methods
-  glob: packages/ruby/*.gemspec
-  specs:
-    tree_sitter_language_pack (1.12.5)
-      rb_sys (>= 0.9, < 0.9.128)
-      sorbet-runtime (~> 0.5)
-
 PATH
   remote: .
   specs:
     ast-template (7.1.0)
       ast-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
+  specs:
+    ast-merge (7.1.0)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/vendor/tree-sitter-language-pack/packages/ruby
+  specs:
+    tree_sitter_language_pack (1.12.5)
+      rb_sys (>= 0.9, < 0.9.128)
+      sorbet-runtime (~> 0.5)
 
 GEM
   remote: https://gem.coop/
@@ -26,11 +32,6 @@ GEM
       rake (>= 10)
       thor (>= 0.14)
     ast (2.4.3)
-    ast-merge (7.1.0)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.4)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -372,6 +373,7 @@ PLATFORMS
 DEPENDENCIES
   addressable (>= 2.8, < 3)
   appraisal2 (~> 3.0, >= 3.0.6)
+  ast-merge!
   ast-template!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
