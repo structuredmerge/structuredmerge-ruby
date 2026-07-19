@@ -290,24 +290,15 @@ module Ast
       private
 
       def normalize_start_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_START_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR match start boundary', details: { start_boundary: value.inspect })
+        value&.to_sym
       end
 
       def normalize_end_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_END_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR match end boundary', details: { end_boundary: value.inspect })
+        value&.to_sym
       end
 
       def normalize_payload_kind(value)
-        kind = value&.to_sym
-        return kind if KNOWN_PAYLOAD_KINDS.include?(kind)
-
-        raise Error.new('Unsupported CRISPR match payload kind', details: { payload_kind: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -435,25 +426,15 @@ module Ast
       private
 
       def normalize_resolution_kind(value)
-        kind = value&.to_sym
-        return kind if KNOWN_RESOLUTION_KINDS.include?(kind)
-
-        raise Error.new('Unsupported CRISPR destination resolution kind', details: { resolution_kind: value.inspect })
+        value&.to_sym
       end
 
       def normalize_resolution_source(value)
-        source = value&.to_sym
-        return source if KNOWN_RESOLUTION_SOURCES.include?(source)
-
-        raise Error.new('Unsupported CRISPR destination resolution source',
-                        details: { resolution_source: value.inspect })
+        value&.to_sym
       end
 
       def normalize_anchor_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_ANCHOR_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR destination anchor boundary', details: { anchor_boundary: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -528,14 +509,19 @@ module Ast
       attr_reader :owner_scope, :selector_kind, :selection_intent, :comment_region, :include_trailing_gap,
                   :structure_profile, :metadata
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile:, comment_region: nil,
+      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil,
+                     comment_region: nil,
                      include_trailing_gap: false, metadata: {}, **options)
         @owner_scope = owner_scope&.to_sym
         @selector_kind = selector_kind&.to_sym
         @selection_intent = selection_intent&.to_sym
         @comment_region = comment_region&.to_sym
         @include_trailing_gap = include_trailing_gap ? true : false
-        @structure_profile = structure_profile
+        @structure_profile = structure_profile || StructureProfile.new(
+          owner_scope: owner_scope,
+          owner_selector: owner_selector || :line_bound_statements,
+          supported_comment_regions: [comment_region].compact
+        )
         @metadata = metadata.merge(options).freeze
       end
 
@@ -680,18 +666,11 @@ module Ast
       private
 
       def normalize_requirement(value, field_name)
-        requirement = value&.to_sym
-        return requirement if KNOWN_REQUIREMENTS.include?(requirement)
-
-        raise Error.new('Unsupported CRISPR operation requirement',
-                        details: { field: field_name, value: value.inspect })
+        value&.to_sym
       end
 
       def normalize_replacement_source(value)
-        replacement = value&.to_sym
-        return replacement if KNOWN_REPLACEMENT_SOURCES.include?(replacement)
-
-        raise Error.new('Unsupported CRISPR replacement source', details: { replacement_source: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -1557,18 +1536,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_start_boundary(value)
-        value&.to_sym
-      end
-
-      def normalize_end_boundary(value)
-        value&.to_sym
-      end
-
-      def normalize_payload_kind(value)
-        value&.to_sym
-      end
     end
 
     class SelectionProfile
@@ -1593,21 +1560,6 @@ module Ast
         section_heading: :section
       }.freeze
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil,
-                     comment_region: nil, include_trailing_gap: false, metadata: {}, **options)
-        @owner_scope = owner_scope&.to_sym
-        @selector_kind = selector_kind&.to_sym
-        @selection_intent = selection_intent&.to_sym
-        @comment_region = comment_region&.to_sym
-        @include_trailing_gap = include_trailing_gap ? true : false
-        @structure_profile = structure_profile || StructureProfile.new(
-          owner_scope: owner_scope,
-          owner_selector: owner_selector || :line_bound_statements,
-          supported_comment_regions: [comment_region].compact
-        )
-        @metadata = metadata.merge(options).freeze
-      end
-
       def report
         data = to_h
         selector_kind_family = KNOWN_SELECTOR_KINDS[selector_kind]&.fetch(:family, nil)
@@ -1627,24 +1579,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_owner_selector(value)
-        value&.to_sym
-      end
-
-      def normalize_selector_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_selection_intent(value)
-        value&.to_sym
-      end
-
-      def normalize_comment_region(value)
-        return nil if value.nil?
-
-        value&.to_sym
-      end
     end
 
     class DestinationProfile
@@ -1659,18 +1593,6 @@ module Ast
           anchor_boundary_family: anchor_boundary_family || :unknown
         )
         stringified_report(data)
-      end
-
-      def normalize_resolution_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_resolution_source(value)
-        value&.to_sym
-      end
-
-      def normalize_anchor_boundary(value)
-        value&.to_sym
       end
     end
 
@@ -1692,18 +1614,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_operation_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_requirement(value, *)
-        value&.to_sym
-      end
-
-      def normalize_replacement_source(value)
-        value&.to_sym
-      end
     end
 
     class StructureProfile
@@ -1711,14 +1621,6 @@ module Ast
 
       def report
         stringified_report(to_h)
-      end
-
-      def normalize_owner_selector(value)
-        value&.to_sym
-      end
-
-      def normalize_comment_region(value)
-        value&.to_sym
       end
     end
 
