@@ -18,7 +18,6 @@ RSpec.describe 'TreeHaver-only merge architecture' do
 
   KNOWN_PARSER_BYPASS_REFERENCES = Set.new(
     [
-      "gems/bash-merge/lib/bash/merge.rb:result = TreeHaver.process_with_language_pack(",
       "gems/citrus-toml-merge/lib/citrus/toml/merge.rb:syntax_result = TreeHaver.parse_with_citrus(source, grammar_module: TomlRB::Document)",
       "gems/json-merge/lib/json/merge.rb:parsed = JSON.parse(normalized_source)",
       "gems/markdown-merge/lib/markdown/merge.rb:syntax = TreeHaver.parse_with_language_pack(",

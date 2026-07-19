@@ -51,7 +51,6 @@ module Bash
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     Availability = Struct.new(
       :grammar_path,
-      :language_pack_process,
       :node_parser,
       :diagnostics,
       keyword_init: true
@@ -139,16 +138,11 @@ module Bash
         availability(source: source).available?
       end
 
-      def language_pack_process_available?(source: "#!/usr/bin/env bash\necho hello\n")
-        availability(source: source).language_pack_process == true
-      end
-
       def availability(source: "#!/usr/bin/env bash\necho hello\n")
         diagnostics = []
         grammar_path = bash_grammar_path(diagnostics)
         Availability.new(
           grammar_path: grammar_path,
-          language_pack_process: language_pack_process_available_for?(source, diagnostics),
           node_parser: node_parser_available_for?(source, grammar_path, diagnostics),
           diagnostics: diagnostics
         )
@@ -163,20 +157,12 @@ module Bash
         nil
       end
 
-      def language_pack_process_available_for?(source, diagnostics)
-        result = TreeHaver.process_with_language_pack(
-          TreeHaver::ProcessRequest.new(source: source, language: 'bash')
-        )
-        ok = result[:ok] == true
-        diagnostics.concat(Array(result[:diagnostics])) unless ok
-        ok
-      rescue StandardError => e
-        diagnostics << { kind: 'bash_language_pack_unavailable', message: e.message }
-        false
-      end
-
       def node_parser_available_for?(source, grammar_path, diagnostics)
-        parser = TreeHaver.parser_for(:bash, library_path: grammar_path)
+        parser = if grammar_path
+                   TreeHaver.parser_for(:bash, library_path: grammar_path)
+                 else
+                   TreeHaver.parser_for(:bash)
+                 end
         tree = parser.parse(source)
         !tree.nil? && !tree.root_node.nil?
       rescue TreeHaver::Error => e

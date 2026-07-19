@@ -74,10 +74,9 @@ RSpec.describe Bash::Merge do
   end
 
   describe '.availability' do
-    it 'reports language-pack processing separately from node parser availability' do
+    it 'reports TreeHaver node parser availability' do
       availability = described_class.availability
 
-      expect(availability.language_pack_process).to eq(described_class.language_pack_process_available?)
       expect(availability.node_parser).to eq(described_class.available?)
       expect(availability.diagnostics).to be_an(Array)
     end
