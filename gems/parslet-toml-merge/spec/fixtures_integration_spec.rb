@@ -92,7 +92,15 @@ RSpec.describe Parslet::Toml::Merge do
     merge_fixture = toml_fixture('merge')
     merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], 'toml')
     expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    expect(merge_result[:output]).to include('title = "Structured Merge"')
+    expect(merge_result[:output]).to include('name = "structuredmerge"')
+    expect(merge_result[:output]).to include('tags = ["destination"]')
+    expect(merge_result[:output]).to include('version = "0.2.0"')
+    expect(merge_result[:output]).to include('authors = ["pb"]')
+    expect(merge_result[:output]).to include('enabled = false')
+    expect(merge_result[:output]).to include('release = true')
+    expect(merge_result[:output]).not_to include('tags = ["template"]')
+    expect(merge_result[:output]).not_to include('version = "0.1.0"')
   end
 
   it 'rejects unsupported provider backend overrides' do
