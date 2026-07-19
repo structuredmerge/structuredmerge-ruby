@@ -1,19 +1,25 @@
-GIT
-  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
-  revision: 85cac7836bb2f8cfcd3041a191b7bd11bf10924a
-  branch: fix/ruby-parser-api-methods
-  glob: packages/ruby/*.gemspec
-  specs:
-    tree_sitter_language_pack (1.12.5)
-      rb_sys (>= 0.9, < 0.9.128)
-      sorbet-runtime (~> 0.5)
-
 PATH
   remote: .
   specs:
     zip-merge (7.1.0)
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/tree_haver
+  specs:
+    tree_haver (7.1.0)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
+      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/vendor/tree-sitter-language-pack/packages/ruby
+  specs:
+    tree_sitter_language_pack (1.12.5)
+      rb_sys (>= 0.9, < 0.9.128)
+      sorbet-runtime (~> 0.5)
 
 GEM
   remote: https://gem.coop/
@@ -313,11 +319,6 @@ GEM
       delegate (~> 0.1)
       rspec (~> 3.0)
       timecop (>= 0.7, < 1)
-    tree_haver (7.1.0)
-      citrus (~> 3.0)
-      parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
-      version_gem (~> 1.1, >= 1.1.9)
     tsort (0.2.0)
     turbo_tests2 (3.2.0)
       parallel_tests (>= 3.3.0, < 6)
@@ -392,6 +393,7 @@ DEPENDENCIES
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
+  tree_haver!
   tree_sitter_language_pack!
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
