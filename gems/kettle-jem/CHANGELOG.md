@@ -18,6 +18,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed the `kettle-jem` package manifest so runtime template assets are
+  included even when the gemspec is loaded from the monorepo root.
+
 ### Added
 
 - Generated CI workflow templates now cache `.rspec_status` with explicit

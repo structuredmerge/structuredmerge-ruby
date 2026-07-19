@@ -4902,6 +4902,9 @@ RSpec.describe Kettle::Jem do
   end
 
   it "generates only curated documented binstubs" do
+    status = instance_double(Process::Status, success?: false)
+    allow(Open3).to receive(:capture3).and_return(["", "", status])
+
     expect(Kettle::Jem::Tasks::InstallTask.bundle_binstubs_command).to eq(
       %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )

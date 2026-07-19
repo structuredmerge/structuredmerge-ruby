@@ -47,8 +47,11 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
 
   enumerate_package_files = lambda do |root|
-    Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
-      File.file?(path) && ![".", ".."].include?(File.basename(path))
+    absolute_root = File.join(__dir__, root)
+    Dir.glob(File.join(absolute_root, "**", "*"), File::FNM_DOTMATCH).filter_map do |path|
+      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
+
+      path.delete_prefix("#{__dir__}/")
     end
   end
   package_metadata_files = %w[
@@ -67,7 +70,7 @@ Gem::Specification.new do |spec|
     # Executables and executable support scripts
     *enumerate_package_files.call("exe"),
     # Extra package files configured by .structuredmerge/kettle-jem.yml
-    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
+    *enumerate_package_files.call("certs")
   ]
   spec.rdoc_options += [
     "--title",
