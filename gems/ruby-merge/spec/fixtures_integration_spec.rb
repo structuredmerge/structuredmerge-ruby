@@ -186,8 +186,8 @@ RSpec.describe 'Ruby::Merge' do
     result = RUBY_MERGE.merge_ruby("require \"set\"\n", "require \"json\"\n", 'ruby', merge_template_requires: true)
 
     expect(result[:ok]).to be(true)
-    expect(result[:output]).to include("require \"json\"")
-    expect(result[:output]).to include("require \"set\"")
+    expect(result[:output]).to include('require "json"')
+    expect(result[:output]).to include('require "set"')
   end
 
   it 'exposes missing TSLP top-level call records as an unsupported capability',

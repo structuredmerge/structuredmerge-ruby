@@ -17,7 +17,7 @@ RSpec.describe Ruby::Merge::NocovNodeBase do
     expect(node.merge_policy).to be_nil
     expect(node.children).to eq([:method])
     expect(node.merge_type).to eq(:nocov_block)
-    expect(node.signature).to eq([:node, :method])
+    expect(node.signature).to eq(%i[node method])
     expect(node.slice).to eq("# :nocov:\ndef skipped\nend\n# :nocov:\n")
   end
 

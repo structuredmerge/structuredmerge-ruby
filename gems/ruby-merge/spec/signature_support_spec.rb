@@ -18,8 +18,8 @@ RSpec.describe Ruby::Merge::SignatureSupport do
   end
 
   it 'builds canonical Ruby control-flow signatures' do
-    expect(described_class.super_call(block: false)).to eq([:super, :no_block])
-    expect(described_class.forwarding_super_call(block: true)).to eq([:forwarding_super, :with_block])
+    expect(described_class.super_call(block: false)).to eq(%i[super no_block])
+    expect(described_class.forwarding_super_call(block: true)).to eq(%i[forwarding_super with_block])
     expect(described_class.begin_block('do_work')).to eq([:begin, 'do_work'])
   end
 
