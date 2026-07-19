@@ -9,6 +9,7 @@ require 'ast/merge'
 require_relative 'merge/block_directive_detector'
 require_relative 'merge/doc_comment_support'
 require_relative 'merge/magic_comment_support'
+require_relative 'merge/method_similarity'
 require_relative 'merge/rescue_semantics'
 
 module Ruby
