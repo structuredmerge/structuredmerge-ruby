@@ -119,6 +119,16 @@ module TreeHaver
           inner_node.end_byte
         end
 
+        def start_point
+          point = inner_node.start_position
+          { row: point.row, column: point.column }
+        end
+
+        def end_point
+          point = inner_node.end_position
+          { row: point.row, column: point.column }
+        end
+
         def children
           Array.new(inner_node.child_count) do |index|
             child = inner_node.child(index)

@@ -36,6 +36,8 @@ RSpec.describe TreeHaver::Backends::Tslp do
       kind: 'document',
       start_byte: 0,
       end_byte: 9,
+      start_position: instance_double('TreeSitterLanguagePack::Point', row: 0, column: 0),
+      end_position: instance_double('TreeSitterLanguagePack::Point', row: 0, column: 9),
       child_count: 0,
       is_named: true,
       has_error: false,
@@ -61,6 +63,8 @@ RSpec.describe TreeHaver::Backends::Tslp do
     expect(TreeSitterLanguagePack).to have_received(:get_parser).with('toml')
     expect(parser).to have_received(:parse).with("title = 1\n")
     expect(tree.root_node.type).to eq('document')
+    expect(tree.root_node.start_point).to eq({ row: 0, column: 0 })
+    expect(tree.root_node.end_point).to eq({ row: 0, column: 9 })
   end
 
   it 'can parse through a real TSLP language when the installed binding exposes parser methods' do
@@ -80,5 +84,27 @@ RSpec.describe TreeHaver::Backends::Tslp do
 
     expect(tree.root_node.type).to eq('document')
     expect(tree.root_node.children.map(&:type)).to include('object')
+  end
+
+  it 'exposes real TSLP point locations through TreeHaver nodes when available' do
+    begin
+      require 'tree_sitter_language_pack'
+    rescue LoadError
+      skip 'tree_sitter_language_pack is not installed'
+    end
+
+    described_class.reset!
+    skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable' unless described_class.available?
+    skip 'tree_sitter_language_pack does not publish json' unless TreeSitterLanguagePack.has_language('json')
+
+    tree_haver_parser = described_class::Parser.new
+    tree_haver_parser.language = described_class::Language.new(:json)
+    object = tree_haver_parser.parse("{\n  \"a\": 1\n}\n").root_node.children.find { |child| child.type == 'object' }
+    pair = object.children.find { |child| child.type == 'pair' }
+
+    expect(pair.start_point).to eq({ row: 1, column: 2 })
+    expect(pair.end_point).to eq({ row: 1, column: 8 })
+    expect(pair.start_line).to eq(2)
+    expect(pair.end_line).to eq(2)
   end
 end
