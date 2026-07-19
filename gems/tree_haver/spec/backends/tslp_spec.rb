@@ -72,7 +72,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     end
 
     described_class.reset!
-    skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable' unless described_class.available?
+    unless described_class.available?
+      skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable'
+    end
     skip 'tree_sitter_language_pack does not publish json' unless TreeSitterLanguagePack.has_language('json')
 
     tree_haver_parser = described_class::Parser.new
@@ -91,7 +93,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     end
 
     described_class.reset!
-    skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable' unless described_class.available?
+    unless described_class.available?
+      skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable'
+    end
     skip 'tree_sitter_language_pack does not publish json' unless TreeSitterLanguagePack.has_language('json')
 
     tree_haver_parser = described_class::Parser.new
@@ -113,7 +117,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     end
 
     described_class.reset!
-    skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable' unless described_class.available?
+    unless described_class.available?
+      skip described_class.unavailable_reason || 'tree_sitter_language_pack parser API is unavailable'
+    end
 
     fixtures = {
       json: ['{"a":1}', 'document'],
@@ -128,7 +134,9 @@ RSpec.describe TreeHaver::Backends::Tslp do
     }
 
     fixtures.each do |language, (source, expected_root)|
-      skip "tree_sitter_language_pack does not publish #{language}" unless TreeSitterLanguagePack.has_language(language.to_s)
+      unless TreeSitterLanguagePack.has_language(language.to_s)
+        skip "tree_sitter_language_pack does not publish #{language}"
+      end
 
       TreeHaver::GrammarFinder.new(language).register!(raise_on_missing: true)
       tree = TreeHaver.with_backend('tslp') { TreeHaver.parser_for(language).parse(source) }

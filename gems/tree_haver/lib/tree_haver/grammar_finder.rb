@@ -371,7 +371,7 @@ module TreeHaver
                " Searched: #{search_paths.join(', ')}."
              end
 
-      msg + " Register the grammar, install tree_sitter_language_pack with parser API support, " \
+      msg + ' Register the grammar, install tree_sitter_language_pack with parser API support, ' \
             "or set #{env_var_name} to a valid path."
     end
 
