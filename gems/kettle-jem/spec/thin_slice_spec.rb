@@ -5065,6 +5065,17 @@ RSpec.describe Kettle::Jem do
         "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
         "KETTLE_DEV_DEV" => File.join(root, "kettle-dev")
       )
+
+      disabled_env = env.merge(
+        "STRUCTUREDMERGE_DEV" => "false",
+        "KETTLE_DEV_DEV" => "false"
+      )
+      expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, disabled_env)).to include(
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "K_JEM_TEMPLATING" => "true",
+        "STRUCTUREDMERGE_DEV" => "false",
+        "KETTLE_DEV_DEV" => "false"
+      )
     end
   end
 

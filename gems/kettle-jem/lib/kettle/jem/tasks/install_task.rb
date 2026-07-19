@@ -1012,12 +1012,12 @@ module Kettle
           return unless Array(marker["installed_members"]).include?("kettle-jem")
 
           members_root = marker["members_root"].to_s
-          if local_env_disabled?(command_env["STRUCTUREDMERGE_DEV"]) && Dir.exist?(File.join(members_root, "kettle-jem"))
+          if !command_env.key?("STRUCTUREDMERGE_DEV") && Dir.exist?(File.join(members_root, "kettle-jem"))
             command_env["STRUCTUREDMERGE_DEV"] = members_root
           end
 
           kettle_root = kettle_family_dependency_root(marker)
-          command_env["KETTLE_DEV_DEV"] = kettle_root if kettle_root && local_env_disabled?(command_env["KETTLE_DEV_DEV"])
+          command_env["KETTLE_DEV_DEV"] = kettle_root if kettle_root && !command_env.key?("KETTLE_DEV_DEV")
         end
 
         def kettle_family_local_install_marker(command_env)
