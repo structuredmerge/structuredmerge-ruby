@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require 'json'
 require 'version_gem'
 
 require 'ast/merge'
+require 'json'
+require 'json/merge'
 require_relative 'git/version'
 
 module Ast
@@ -11,6 +12,7 @@ module Ast
     module Git
       PACKAGE_NAME = 'ast-merge-git'
       MERGE_CONFLICT_CATEGORY = 'merge_conflict'
+      MISSING = Object.new.freeze
 
       module_function
 
@@ -33,56 +35,223 @@ module Ast
       end
 
       def merge3_json(request)
-        base = parse_json_role('base', request.fetch(:base_source))
-        ours = parse_json_role('ours', request.fetch(:ours_source))
-        theirs = parse_json_role('theirs', request.fetch(:theirs_source))
-        conflicts = []
-        change_classifications = classify_json_changes(base, ours, theirs)
-        merged = merge_json_value(base, ours, theirs, '', conflicts)
-        if conflicts.any?
-          owned_regions = json_owned_regions_for_conflicts(request, conflicts)
-          render_strategy = owned_regions.empty? ? 'full_file_conflict_markers' : 'owned_region_conflict_markers'
+        parsed = parse_json_merge3_inputs(request)
+        return parsed unless parsed.is_a?(Hash) && parsed[:ok]
+
+        merge = merge_json_values(
+          parsed.fetch(:base),
+          parsed.fetch(:ours),
+          parsed.fetch(:theirs),
+          path: ''
+        )
+
+        if merge.fetch(:conflicts).empty?
+          merged_source = "#{JSON.pretty_generate(merge.fetch(:value))}\n"
           return response(
-            ok: false,
+            ok: true,
             request: request,
-            conflicted_source: render_json_owned_region_conflict_source(request,
-                                                                        owned_regions.first) || render_conflict_source(
-                                                                          request, conflicts
-                                                                        ),
-            conflicts: conflicts,
-            change_classifications: change_classifications,
-            owned_regions: owned_regions,
-            render_strategy: render_strategy,
-            diagnostics: [{
-              severity: 'error',
-              category: MERGE_CONFLICT_CATEGORY,
-              message: "merge3 found #{conflicts.length} unresolved conflict(s)."
-            }]
+            merged_source: merged_source,
+            change_classifications: merge.fetch(:change_classifications),
+            reparse_after_render: reparse_json_source(merged_source),
+            formatting_preservation: {
+              line_diff_score: 1.0,
+              character_diff_score: 1.0
+            }
           )
         end
 
-        output = JSON.generate(merged)
-        response(
+        render_conflicted_json(request, merge)
+      end
+
+      def parse_json_merge3_inputs(request)
+        dialect = request[:dialect].to_s.empty? ? 'json' : request[:dialect].to_s
+        {
           ok: true,
-          request: request,
-          merged_source: output,
-          change_classifications: change_classifications,
-          reparse_after_render: JSON.parse(output) && true,
-          formatting_preservation: {
-            line_diff_score: 1.0,
-            character_diff_score: 1.0
-          }
-        )
-      rescue JSON::ParserError => e
+          base: Json::Merge.json_value_for_source(request.fetch(:base_source), dialect: dialect),
+          ours: Json::Merge.json_value_for_source(request.fetch(:ours_source), dialect: dialect),
+          theirs: Json::Merge.json_value_for_source(request.fetch(:theirs_source), dialect: dialect)
+        }
+      rescue Json::Merge::ParseError => e
+        source_role = parse_error_role(request, dialect)
         response(
           ok: false,
           request: request,
           diagnostics: [{
             severity: 'error',
             category: 'parse_error',
-            message: e.message
+            message: "#{source_role} parse error: #{e.message}"
           }]
         )
+      end
+
+      def parse_error_role(request, dialect)
+        %i[base ours theirs].find do |role|
+          Json::Merge.json_value_for_source(request.fetch(:"#{role}_source"), dialect: dialect)
+          false
+        rescue Json::Merge::ParseError
+          true
+        end || :unknown
+      end
+
+      def merge_json_values(base, ours, theirs, path:)
+        if ours == theirs
+          return merge_success(ours)
+        elsif base == ours
+          return merge_success(theirs, change: classify_json_change(path, base, ours, theirs))
+        elsif base == theirs
+          return merge_success(ours, change: classify_json_change(path, base, ours, theirs))
+        end
+
+        if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
+          return merge_json_objects(base, ours, theirs, path: path)
+        end
+
+        conflict = json_conflict(path, base, ours, theirs)
+        {
+          value: ours.equal?(MISSING) ? theirs : ours,
+          conflicts: [conflict],
+          change_classifications: [conflict.fetch(:change_classification)]
+        }
+      end
+
+      def merge_json_objects(base, ours, theirs, path:)
+        merged = {}
+        conflicts = []
+        change_classifications = []
+        ordered_keys(base, ours, theirs).each do |key|
+          child_path = "#{path}/#{key}"
+          child = merge_json_values(
+            base.fetch(key, MISSING),
+            ours.fetch(key, MISSING),
+            theirs.fetch(key, MISSING),
+            path: child_path
+          )
+          merged[key] = child.fetch(:value) unless child.fetch(:value).equal?(MISSING)
+          conflicts.concat(child.fetch(:conflicts))
+          change_classifications.concat(child.fetch(:change_classifications))
+        end
+
+        {
+          value: merged,
+          conflicts: conflicts,
+          change_classifications: change_classifications
+        }
+      end
+
+      def ordered_keys(*objects)
+        objects.each_with_object([]) do |object, keys|
+          next unless object.is_a?(Hash)
+
+          object.each_key { |key| keys << key unless keys.include?(key) }
+        end
+      end
+
+      def merge_success(value, change: nil)
+        {
+          value: value,
+          conflicts: [],
+          change_classifications: change ? [change] : []
+        }
+      end
+
+      def classify_json_change(path, base, ours, theirs)
+        {
+          path: path,
+          ours: json_change_state(base, ours),
+          theirs: json_change_state(base, theirs)
+        }
+      end
+
+      def json_change_state(base, value)
+        return 'unchanged' if base == value
+        return 'added' if base.equal?(MISSING)
+        return 'deleted' if value.equal?(MISSING)
+
+        'edited'
+      end
+
+      def json_conflict(path, base, ours, theirs)
+        category =
+          if ours.equal?(MISSING) || theirs.equal?(MISSING)
+            'delete_edit'
+          else
+            'edit_edit'
+          end
+        {
+          conflict_id: "json-conflict-#{path.delete_prefix('/').tr('/', '-')}",
+          category: category,
+          path: path,
+          message: "JSON value changed incompatibly at #{path}",
+          base: base,
+          ours: ours,
+          theirs: theirs,
+          change_classification: classify_json_change(path, base, ours, theirs)
+        }
+      end
+
+      def render_conflicted_json(request, merge)
+        conflicts = merge.fetch(:conflicts)
+        full_file = conflicts.any? { |conflict| conflict.fetch(:category) == 'delete_edit' }
+        conflicted_source = if full_file
+                              render_conflict_source(request, conflicts)
+                            else
+                              render_owned_json_conflict_source(request, conflicts.first)
+                            end
+        response(
+          ok: false,
+          request: request,
+          conflicted_source: conflicted_source,
+          conflicts: conflicts.map { |conflict| conflict.slice(:conflict_id, :category, :path, :message) },
+          change_classifications: merge.fetch(:change_classifications),
+          diagnostics: [{
+            severity: 'error',
+            category: MERGE_CONFLICT_CATEGORY,
+            message: "#{conflicts.length} unresolved JSON merge conflict(s)."
+          }],
+          owned_regions: full_file ? [] : [owned_json_region(conflicts.first)],
+          reparse_after_render: nil,
+          render_strategy: full_file ? 'full_file_conflict_markers' : 'owned_region_conflict_markers'
+        )
+      end
+
+      def render_owned_json_conflict_source(request, conflict)
+        marker_size = request[:conflict_marker_size].to_i
+        marker_size = 7 unless marker_size.positive?
+        key = conflict.fetch(:path).split('/').last
+        [
+          '{',
+          "#{'<' * marker_size} ours",
+          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:ours))}",
+          "#{'|' * marker_size} base",
+          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:base))}",
+          '=' * marker_size,
+          "#{JSON.generate(key)}:#{JSON.generate(conflict.fetch(:theirs))}",
+          "#{'>' * marker_size} theirs",
+          '}',
+          ''
+        ].join("\n")
+      end
+
+      def owned_json_region(conflict)
+        {
+          owner_path: conflict.fetch(:path),
+          node_id: "json:key:#{conflict.fetch(:path).split('/').last}",
+          region_kind: 'node',
+          line_range: { start: 1, end: 1 },
+          attached_spans: [],
+          backend_id: 'tree-haver',
+          parser_identity: 'tree_sitter_language_pack',
+          can_replace: true,
+          can_line_merge: false,
+          requires_reparse: true
+        }
+      end
+
+      def reparse_json_source(source)
+        Json::Merge.json_value_for_source(source)
+        true
+      rescue Json::Merge::ParseError
+        false
       end
 
       def normalize_request(request)
@@ -202,7 +371,7 @@ module Ast
       def render_identity(request)
         case normalize_language(request)
         when 'json'
-          { backend_id: 'native-json', parser_identity: 'standard-json' }
+          { backend_id: 'tree-haver', parser_identity: 'tree_sitter_language_pack' }
         else
           {}
         end
@@ -225,188 +394,6 @@ module Ast
         ].join("\n")
       end
 
-      def render_json_owned_region_conflict_source(request, region)
-        return nil unless region && region.fetch(:region_kind) == 'node'
-
-        key = region.fetch(:owner_path).delete_prefix('/')
-        ours_region = json_member_source(request.fetch(:ours_source), key)
-        base_region = json_member_source(request.fetch(:base_source), key)
-        theirs_region = json_member_source(request.fetch(:theirs_source), key)
-        return nil unless ours_region && base_region && theirs_region
-
-        marker_size = request[:conflict_marker_size].to_i
-        marker_size = 7 unless marker_size.positive?
-        replacement = [
-          "#{'<' * marker_size} ours",
-          ours_region.fetch(:text),
-          "#{'|' * marker_size} base",
-          base_region.fetch(:text),
-          '=' * marker_size,
-          theirs_region.fetch(:text),
-          "#{'>' * marker_size} theirs"
-        ].join("\n")
-        range = ours_region.fetch(:byte_range)
-        source = request.fetch(:ours_source)
-        prefix = source.byteslice(0, range.fetch(:start)) || ''
-        suffix = source.byteslice(range.fetch(:end), source.bytesize - range.fetch(:end)) || ''
-        prefix + replacement + suffix
-      end
-
-      def json_member_source(source, key)
-        return nil unless source.include?("\"#{key}\"")
-
-        range = json_key_byte_range(source, key)
-        return nil if range.fetch(:end) <= range.fetch(:start)
-
-        {
-          byte_range: range,
-          text: source.byteslice(range.fetch(:start)...range.fetch(:end))
-        }
-      end
-
-      def json_owned_regions_for_conflicts(request, conflicts)
-        conflicts.filter_map do |conflict|
-          path = conflict.fetch(:path).to_s
-          next unless path.start_with?('/') && path.count('/') == 1
-
-          key = path.delete_prefix('/')
-          base_region = json_member_source(request.fetch(:base_source), key)
-          next unless base_region && json_member_source(request.fetch(:ours_source),
-                                                        key) && json_member_source(request.fetch(:theirs_source), key)
-
-          {
-            owner_path: path,
-            node_id: "json:key:#{key}",
-            region_kind: 'node',
-            byte_range: base_region.fetch(:byte_range),
-            line_range: { start: 1, end: 1 },
-            attached_spans: [],
-            backend_id: 'native-json',
-            parser_identity: 'standard-json',
-            can_replace: true,
-            can_line_merge: false,
-            requires_reparse: true
-          }
-        end
-      end
-
-      def json_key_byte_range(source, key)
-        needle = "\"#{key}\""
-        start = source.index(needle)
-        return { start: 0, end: source.bytesize } unless start
-
-        finish = start + needle.bytesize
-        finish += 1 while finish < source.bytesize && ![',', '}'].include?(source[finish])
-        { start: start, end: finish }
-      end
-
-      def parse_json_role(role, source)
-        JSON.parse(source)
-      rescue JSON::ParserError => e
-        raise JSON::ParserError, "#{role} parse error: #{e.message}"
-      end
-
-      def merge_json_value(base, ours, theirs, path, conflicts)
-        return ours if ours == theirs
-        return theirs if base == ours
-        return ours if base == theirs
-        if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
-          return merge_json_objects(base, ours, theirs, path,
-                                    conflicts)
-        end
-
-        add_conflict(conflicts, 'edit_edit', path, 'value changed differently in ours and theirs')
-        ours
-      end
-
-      def merge_json_objects(base, ours, theirs, path, conflicts)
-        base = base.transform_keys(&:to_s)
-        ours = ours.transform_keys(&:to_s)
-        theirs = theirs.transform_keys(&:to_s)
-        keys = (base.keys | ours.keys | theirs.keys).sort
-        keys.each_with_object({}) do |key, result|
-          merged, keep = merge_json_entry(
-            base.key?(key) ? base[key] : :__absent__,
-            ours.key?(key) ? ours[key] : :__absent__,
-            theirs.key?(key) ? theirs[key] : :__absent__,
-            json_pointer_join(path, key),
-            conflicts
-          )
-          result[key] = merged if keep
-        end
-      end
-
-      def classify_json_changes(base, ours, theirs)
-        if base.is_a?(Hash) && ours.is_a?(Hash) && theirs.is_a?(Hash)
-          base = base.transform_keys(&:to_s)
-          ours = ours.transform_keys(&:to_s)
-          theirs = theirs.transform_keys(&:to_s)
-          keys = (base.keys | ours.keys | theirs.keys).sort
-          return keys.filter_map do |key|
-            ours_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__,
-                                                     ours.key?(key) ? ours[key] : :__absent__)
-            theirs_change = classify_json_value_change(base.key?(key) ? base[key] : :__absent__,
-                                                       theirs.key?(key) ? theirs[key] : :__absent__)
-            next if ours_change == 'unchanged' && theirs_change == 'unchanged'
-
-            { path: json_pointer_join('', key), ours: ours_change, theirs: theirs_change }
-          end
-        end
-
-        ours_change = classify_json_value_change(base, ours)
-        theirs_change = classify_json_value_change(base, theirs)
-        return [] if ours_change == 'unchanged' && theirs_change == 'unchanged'
-
-        [{ path: '/', ours: ours_change, theirs: theirs_change }]
-      end
-
-      def classify_json_value_change(base, value)
-        return 'unchanged' if base == :__absent__ && value == :__absent__
-        return 'added' if base == :__absent__
-        return 'deleted' if value == :__absent__
-        return 'unchanged' if base == value
-
-        'edited'
-      end
-
-      def merge_json_entry(base, ours, theirs, path, conflicts)
-        base_absent = base == :__absent__
-        ours_absent = ours == :__absent__
-        theirs_absent = theirs == :__absent__
-        return [nil, false] if base_absent && ours_absent && theirs_absent
-        return [theirs, true] if base_absent && ours_absent
-        return [ours, true] if base_absent && theirs_absent
-        return [ours, true] if base_absent && ours == theirs
-
-        if base_absent
-          add_conflict(conflicts, 'add_add', path, 'same path added differently in ours and theirs')
-          return [ours, true]
-        end
-        return [nil, false] if ours_absent && theirs_absent
-        return [nil, false] if ours_absent && base == theirs
-        return [nil, false] if theirs_absent && base == ours
-
-        if ours_absent
-          add_conflict(conflicts, 'delete_edit', path, 'ours deleted a value that theirs edited')
-          return [theirs, true]
-        end
-        if theirs_absent
-          add_conflict(conflicts, 'delete_edit', path, 'theirs deleted a value that ours edited')
-          return [ours, true]
-        end
-
-        [merge_json_value(base, ours, theirs, path, conflicts), true]
-      end
-
-      def add_conflict(conflicts, category, path, message)
-        conflicts << {
-          conflict_id: "conflict-#{conflicts.length + 1}",
-          category: category,
-          path: path.empty? ? '/' : path,
-          message: message
-        }
-      end
-
       def comment_conflict(category, path, message)
         {
           conflict_id: 'comment-conflict-1',
@@ -414,11 +401,6 @@ module Ast
           path: path.to_s.empty? ? '/' : path,
           message: message
         }
-      end
-
-      def json_pointer_join(parent, token)
-        escaped = token.to_s.gsub('~', '~0').gsub('/', '~1')
-        parent.empty? ? "/#{escaped}" : "#{parent}/#{escaped}"
       end
 
       def normalize_language(request)

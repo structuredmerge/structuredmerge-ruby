@@ -14,7 +14,7 @@ class KettleJemWorkflowPins
   VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
   DEFAULT_UPGRADE_LEVEL = "major"
   DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
-  PIN_PATTERN = %r{(([-\w.]+/[-\w.]+(?:/[-\w.]+)*)@[0-9a-f]{40}\s*#\s*\S+)}
+  PIN_PATTERN = %r{(([-\w.]+/[-\w.]+(?:/[-\w.]+)*)@[0-9a-f]{40}[ \t]*#[ \t]*[^\s"',]+)}
 
   def initialize(project_root:, env: ENV, options: {})
     @project_root = File.expand_path(project_root)

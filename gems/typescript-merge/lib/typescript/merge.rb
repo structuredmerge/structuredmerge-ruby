@@ -13,18 +13,32 @@ module TypeScript
     PACKAGE_NAME = 'typescript-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:typescript)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def type_script_feature_profile
       { family: 'typescript', supported_dialects: ['typescript'], supported_policies: [DESTINATION_WINS_ARRAY_POLICY] }
     end
 
     def available_type_script_backends
-      [TREE_SITTER_BACKEND]
+      type_script_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def type_script_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
       end
 
@@ -51,13 +65,21 @@ module TypeScript
 
     def parse_type_script(source, dialect)
       requested = TREE_SITTER_BACKEND.id
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
       end
       return analyze_type_script_module(source) if dialect == 'typescript'
 
       { ok: false,
         diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: "Unsupported TypeScript dialect #{dialect}." }], policies: [] }
+    end
+
+    def type_script_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+      registrations = TreeHaver.registered_languages(:typescript)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
     end
 
     def match_type_script_owners(template, destination)
@@ -93,24 +115,35 @@ module TypeScript
     end
 
     def analyze_type_script_module(source)
-      parsed = TreeHaver.parse_with_language_pack(TreeHaver::ParserRequest.new(source: source, language: 'typescript',
-                                                                               dialect: 'typescript'))
-      return { ok: false, diagnostics: parsed[:diagnostics], policies: [] } unless parsed[:ok]
+      parser = TreeHaver.parser_for(:typescript)
+      tree = parser.parse(source)
+      collect_parse_errors(tree.root_node)
 
-      processed = TreeHaver.process_with_language_pack(TreeHaver::ProcessRequest.new(source: source,
-                                                                                     language: 'typescript'))
-      return { ok: false, diagnostics: processed[:diagnostics], policies: [] } unless processed[:ok]
+      imports = []
+      declarations = []
+      tree.root_node.children.each do |node|
+        case node.type
+        when 'import_statement'
+          import_source = line_anchored_slice(source, node)
+          imports << {
+            path: "/imports/#{imports.length}",
+            owner_kind: 'import',
+            match_key: normalize_type_script_import_path(import_source),
+            text: import_text(source, node)
+          }
+        when 'export_statement', 'function_declaration', 'class_declaration', 'interface_declaration',
+             'lexical_declaration', 'variable_declaration'
+          name = first_named_descendant_text(source, node, %w[identifier type_identifier])
+          next unless name
 
-      imports = processed[:analysis].imports.each_with_index.map do |item, index|
-        { path: "/imports/#{index}", match_key: item.source, text: import_text(source, item.span) }
+          declarations << {
+            path: "/declarations/#{name}",
+            owner_kind: 'declaration',
+            match_key: name,
+            text: declaration_text(source, node)
+          }
+        end
       end
-      declarations = processed[:analysis].structure
-                                         .select { |item| item.name }
-                                         .map do |item|
-        { path: "/declarations/#{item.name}", match_key: item.name,
-          text: declaration_text(source, item.span) }
-      end
-                                         .sort_by { |item| item[:path] }
 
       {
         ok: true,
@@ -118,16 +151,60 @@ module TypeScript
         analysis: {
           kind: 'typescript',
           dialect: 'typescript',
-          source: source,
-          owners: imports.map { |item| { path: item[:path], owner_kind: 'import', match_key: item[:match_key] } } +
-            declarations.map { |item| { path: item[:path], owner_kind: 'declaration', match_key: item[:match_key] } },
           imports: imports,
-          declarations: declarations
+          declarations: declarations,
+          owners: owner_views(imports + declarations)
         },
         policies: []
       }
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
     private_class_method :analyze_type_script_module
+
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'TypeScript parse returned no root node' unless node
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'TypeScript parse contains syntax errors'
+    end
+    private_class_method :collect_parse_errors
+
+    def parse_failure_result(error)
+      { ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: [] }
+    end
+    private_class_method :parse_failure_result
+
+    def normalize_type_script_import_path(import_source)
+      match = import_source.match(/from\s+['"]([^'"]+)['"]/) || import_source.match(/import\s+['"]([^'"]+)['"]/)
+      match ? match[1] : import_source.sub(/\Aimport\s+/, '').strip
+    end
+    private_class_method :normalize_type_script_import_path
+
+    def first_named_descendant_text(source, node, types)
+      return slice_span(source, node) if types.include?(node.type)
+
+      node.children.each do |child|
+        value = first_named_descendant_text(source, child, types)
+        return value if value && !value.empty?
+      end
+      nil
+    end
+    private_class_method :first_named_descendant_text
+
+    def owner_view(item)
+      item.slice(:path, :owner_kind, :match_key)
+    end
+    private_class_method :owner_view
+
+    def owner_views(items)
+      imports, declarations = items.partition { |item| item.fetch(:owner_kind) == 'import' }
+      (imports + declarations.sort_by { |item| item.fetch(:path) }).map { |item| owner_view(item) }
+    end
+    private_class_method :owner_views
 
     def import_text(source, span)
       "#{slice_span(source, span)}\n"
@@ -152,11 +229,17 @@ module TypeScript
     private_class_method :line_anchored_slice
 
     def unsupported_feature_result(message)
-      Ast::Merge.unsupported_feature_result(message)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'unsupported_feature', message: message }],
+        policies: []
+      }
     end
     private_class_method :unsupported_feature_result
   end
 end
+
+TypeScript::Merge.register_backend!
 
 TypeScript::Merge::Version.class_eval do
   extend VersionGem::Basic

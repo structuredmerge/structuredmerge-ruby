@@ -283,28 +283,6 @@ module TreeHaver
     end
   end
 
-  ProcessRequest = Struct.new(:source, :language, keyword_init: true) do
-    def to_h
-      {
-        source: source,
-        language: language
-      }
-    end
-  end
-
-  ProcessSpan = Struct.new(:start_byte, :end_byte, :start_row, :start_col, :end_row, :end_col, keyword_init: true) do
-    def to_h
-      {
-        start_byte: start_byte,
-        end_byte: end_byte,
-        start_row: start_row,
-        start_col: start_col,
-        end_row: end_row,
-        end_col: end_col
-      }
-    end
-  end
-
   ByteRange = Struct.new(:start_byte, :end_byte, keyword_init: true) do
     def valid?
       start_byte.to_i >= 0 && end_byte.to_i >= start_byte.to_i
@@ -998,76 +976,6 @@ module TreeHaver
     return source.to_s.bytesize if row == point.row.to_i && column == point.column.to_i
 
     raise RangeError, "source point (#{point.row}, #{point.column}) is outside source"
-  end
-
-  ProcessStructureItem = Struct.new(:kind, :name, :span, keyword_init: true) do
-    def to_h
-      {
-        kind: kind,
-        **(name ? { name: name } : {}),
-        span: span.to_h
-      }
-    end
-  end
-
-  ProcessImportInfo = Struct.new(:source, :items, :span, keyword_init: true) do
-    def to_h
-      {
-        source: source,
-        items: deep_dup(items || []),
-        span: span.to_h
-      }
-    end
-
-    private
-
-    def deep_dup(value)
-      Marshal.load(Marshal.dump(value))
-    end
-  end
-
-  ProcessDiagnostic = Struct.new(:message, :severity, keyword_init: true) do
-    def to_h
-      {
-        message: message,
-        severity: severity
-      }
-    end
-  end
-
-  LanguagePackAnalysis = Struct.new(:language, :dialect, :root_type, :has_error, :backend_ref, keyword_init: true) do
-    def kind
-      'tree-sitter'
-    end
-
-    def to_h
-      {
-        kind: kind,
-        language: language,
-        **(dialect ? { dialect: dialect } : {}),
-        root_type: root_type,
-        has_error: has_error,
-        backend_ref: backend_ref.to_h
-      }
-    end
-  end
-
-  LanguagePackProcessAnalysis = Struct.new(:language, :structure, :imports, :diagnostics, :backend_ref,
-                                           keyword_init: true) do
-    def kind
-      'tree-sitter-process'
-    end
-
-    def to_h
-      {
-        kind: kind,
-        language: language,
-        structure: (structure || []).map(&:to_h),
-        imports: (imports || []).map(&:to_h),
-        diagnostics: (diagnostics || []).map(&:to_h),
-        backend_ref: backend_ref.to_h
-      }
-    end
   end
 
   KaitaiByteSpan = Struct.new(:start_byte, :end_byte, keyword_init: true) do

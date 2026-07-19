@@ -40,7 +40,7 @@ module Json
       def key_name
         return unless pair?
 
-        key_node = find_child_by_field('key')
+        key_node = find_child_by_field('key') || semantic_children.first
         return unless key_node
 
         node_text(key_node)&.gsub(/\A"|"\z/, '')
@@ -49,7 +49,7 @@ module Json
       def value_node
         return unless pair?
 
-        value = find_child_by_field('value')
+        value = find_child_by_field('value') || semantic_children[1]
         return unless value
 
         NodeWrapper.new(value, lines: @lines, source: @source)
@@ -151,6 +151,17 @@ module Json
           return child if child.type.to_s == type_name
         end
         nil
+      end
+
+      def semantic_children
+        return [] unless @node.respond_to?(:each)
+
+        @node.each.filter_map do |child|
+          child_type = child.type.to_s
+          next if %w[comment , : { } [ ]].include?(child_type)
+
+          child
+        end
       end
 
       protected

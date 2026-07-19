@@ -112,7 +112,6 @@ jobs:
         working-directory: ${{ matrix.gem }}
         env:
           K_JEM_TEMPLATING: true
-          SMORG_RB_DEV: ${{ github.workspace }}/gems
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: |
           gem install nomono -v 1.0.8 --source https://gem.coop --source https://rubygems.org
@@ -124,7 +123,6 @@ jobs:
         env:
           K_JEM_TEMPLATING: true
           K_SOUP_COV_DO: false
-          SMORG_RB_DEV: ${{ github.workspace }}/gems
           STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
         run: timeout 12m bundle exec kettle-test
 
@@ -163,12 +161,46 @@ jobs:
             abort "RBS validation failed for #{failures.length} gem(s)" unless failures.empty?
           '
 
+  tslp-cold-cache:
+    name: TSLP cold cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
+        with:
+          ruby-version: ruby
+          bundler-cache: false
+      - name: Install dependencies
+        working-directory: gems/tree_haver
+        env:
+          K_JEM_TEMPLATING: true
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          gem install nomono -v 1.0.8 --source https://gem.coop --source https://rubygems.org
+          bundle config set path vendor/bundle
+          bundle config set frozen false
+          bundle install --jobs 4
+      - name: Run cold-cache TSLP checks
+        working-directory: gems/tree_haver
+        env:
+          K_JEM_TEMPLATING: true
+          K_SOUP_COV_DO: false
+          STRUCTUREDMERGE_DEV: ${{ github.workspace }}/gems
+        run: |
+          set -euo pipefail
+          export TREE_SITTER_LANGUAGE_PACK_CACHE_DIR
+          TREE_SITTER_LANGUAGE_PACK_CACHE_DIR="$(mktemp -d "${RUNNER_TEMP}/tslp-cold-cache.XXXXXX")"
+          bundle exec rspec spec/grammar_finder_spec.rb spec/backends/tslp_spec.rb --format progress
+
   check:
     name: Check
     needs:
       - detect
       - gem-suite
       - rbs
+      - tslp-cold-cache
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -179,17 +211,22 @@ jobs:
           DETECT_RESULT: ${{ needs.detect.result }}
           GEM_SUITE_RESULT: ${{ needs.gem-suite.result }}
           RBS_RESULT: ${{ needs.rbs.result }}
+          TSLP_COLD_CACHE_RESULT: ${{ needs.tslp-cold-cache.result }}
         run: |
           set -euo pipefail
           echo "Selected gem suites: ${SELECTED_GEMS}"
           echo "Detect result: ${DETECT_RESULT}"
           echo "Gem suite result: ${GEM_SUITE_RESULT}"
           echo "RBS result: ${RBS_RESULT}"
+          echo "TSLP cold cache result: ${TSLP_COLD_CACHE_RESULT}"
 
           if [[ "${DETECT_RESULT}" != "success" ]]; then
             exit 1
           fi
           if [[ "${RBS_RESULT}" != "success" ]]; then
+            exit 1
+          fi
+          if [[ "${TSLP_COLD_CACHE_RESULT}" != "success" ]]; then
             exit 1
           fi
 

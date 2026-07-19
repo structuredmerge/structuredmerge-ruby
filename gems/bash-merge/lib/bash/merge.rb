@@ -48,10 +48,10 @@ module Bash
   # @see SmartMerger Main entry point for merge operations
   # @see FileAnalysis Analyzes Bash structure
   module Merge
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
     Availability = Struct.new(
       :grammar_path,
-      :language_pack_process,
       :node_parser,
       :diagnostics,
       keyword_init: true
@@ -128,6 +128,8 @@ module Bash
         BACKEND_REGISTRY.mutex.synchronize do
           return if BACKEND_REGISTRY.registered
 
+          TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
           grammar_finder = TreeHaver::GrammarFinder.new(:bash)
           grammar_finder.register! if grammar_finder.available?
 
@@ -135,12 +137,12 @@ module Bash
         end
       end
 
-      def available?(source: "#!/usr/bin/env bash\necho hello\n")
-        availability(source: source).available?
+      def available_bash_backends
+        bash_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
       end
 
-      def language_pack_process_available?(source: "#!/usr/bin/env bash\necho hello\n")
-        availability(source: source).language_pack_process == true
+      def available?(source: "#!/usr/bin/env bash\necho hello\n")
+        availability(source: source).available?
       end
 
       def availability(source: "#!/usr/bin/env bash\necho hello\n")
@@ -148,7 +150,6 @@ module Bash
         grammar_path = bash_grammar_path(diagnostics)
         Availability.new(
           grammar_path: grammar_path,
-          language_pack_process: language_pack_process_available_for?(source, diagnostics),
           node_parser: node_parser_available_for?(source, grammar_path, diagnostics),
           diagnostics: diagnostics
         )
@@ -163,20 +164,12 @@ module Bash
         nil
       end
 
-      def language_pack_process_available_for?(source, diagnostics)
-        result = TreeHaver.process_with_language_pack(
-          TreeHaver::ProcessRequest.new(source: source, language: 'bash')
-        )
-        ok = result[:ok] == true
-        diagnostics.concat(Array(result[:diagnostics])) unless ok
-        ok
-      rescue StandardError => e
-        diagnostics << { kind: 'bash_language_pack_unavailable', message: e.message }
-        false
-      end
-
       def node_parser_available_for?(source, grammar_path, diagnostics)
-        parser = TreeHaver.parser_for(:bash, library_path: grammar_path)
+        parser = if grammar_path
+                   TreeHaver.parser_for(:bash, library_path: grammar_path)
+                 else
+                   TreeHaver.parser_for(:bash)
+                 end
         tree = parser.parse(source)
         !tree.nil? && !tree.root_node.nil?
       rescue TreeHaver::Error => e
@@ -185,6 +178,14 @@ module Bash
       rescue StandardError => e
         diagnostics << { kind: 'bash_node_parser_unavailable', message: e.message }
         false
+      end
+
+      def bash_backend_available_for_analysis?(backend_id)
+        register_backend!
+        return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+        registrations = TreeHaver.registered_languages(:bash)
+        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
       end
     end
   end

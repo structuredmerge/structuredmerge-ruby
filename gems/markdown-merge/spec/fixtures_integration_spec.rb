@@ -36,9 +36,7 @@ RSpec.describe Markdown::Merge do
     )
 
     expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(
-      json_ready([
-                   { id: 'kreuzberg-language-pack', family: 'tree-sitter' }
-                 ])
+      json_ready(fixture[:available_backends])
     )
     expect(json_ready(TreeHaver::BackendRegistry.fetch('kreuzberg-language-pack')&.to_h)).to eq(
       json_ready({ id: 'kreuzberg-language-pack', family: 'tree-sitter' })
@@ -100,6 +98,30 @@ RSpec.describe Markdown::Merge do
         end
       )
     )
+  end
+
+  it 'conforms to the slice-721 Markdown provider parity fixture for the TSLP backend' do
+    fixture = read_json(
+      fixtures_root.join(
+        'markdown',
+        'slice-721-provider-parity',
+        'headings-lists-tables-fences-links-frontmatter-comments.json'
+      )
+    )
+
+    result = markdown_merge.parse_markdown(fixture[:source], fixture[:dialect], backend: 'kreuzberg-language-pack')
+    owners = result.dig(:analysis, :owners)
+    expect(owners.map { |owner| owner[:owner_kind] }).to eq(fixture.dig(:expected, :parse_owner_kinds))
+    expect(owners.map { |owner| owner[:match_key] }).to eq(fixture.dig(:expected, :parse_owner_match_keys))
+
+    analysis = TreeHaver.with_backend('kreuzberg-language-pack') do
+      Markdown::Merge::FileAnalysis.new(fixture[:source])
+    end
+    common = fixture.dig(:expected, :structured_owner_common)
+    expect(analysis.link_definition_owners.map(&:label)).to eq(common[:link_definitions])
+    expect(analysis.html_comment_owners.map(&:text)).to eq(common[:html_comments])
+    expect(analysis.inline_reference_owners.map(&:label)).to eq(common[:inline_references])
+    expect(analysis.table_row_owners.map(&:source)).to include(*common[:table_rows_include])
   end
 
   it 'conforms to the slice-199 Markdown matching fixture' do

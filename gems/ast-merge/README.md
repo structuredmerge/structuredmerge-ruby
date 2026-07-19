@@ -50,13 +50,43 @@ Ast::Merge builds on tree\_haver to provide:
 - **Region Detection**: `RegionDetectorBase`, `FencedCodeBlockDetector` for text-based analysis
 - **RSpec Shared Examples**: Test helpers for implementing new merge gems
 
+### Merge Gem Backend Patterns
+
+Every merge gem in this family must enter parsing through `tree_haver`. Do not add direct parser fallbacks in merge gems. If a requested backend or grammar is unavailable, fail closed with an unsupported feature or parse diagnostic instead of switching to another parser outside `tree_haver`.
+
+The current merge gems fit three backend patterns:
+
+- **Provider-only merge gems** register a concrete TreeHaver backend and use that backend exclusively. Use this for gems whose purpose is to expose a specific parser provider, such as `prism-merge`, `psych-merge`, `citrus-toml-merge`, and `parslet-toml-merge`.
+- **Hybrid provider plus TSLP merge gems** register their provider backend, and may also register a TSLP/tree-sitter grammar mapping for the same language when both surfaces are intended and tested. `rbs-merge` is the model for this category.
+- **Substrate mapping merge gems** do not own a parser. They register the format grammar with `TreeHaver::GrammarFinder` and use the normal `TreeHaver.parser_for(:format)` API for analysis and merge behavior. `json-merge`, `toml-merge`, `yaml-merge`, and `ruby-merge` follow this pattern.
+
+Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
+
 ### Creating a New Merge Gem
 
+Pick the merge-gem shape before writing parser code:
+
+- Use a substrate mapping gem when the format can use an existing TreeHaver grammar/backend. Register the grammar, parse through `TreeHaver.parser_for`, and keep merge behavior in the substrate.
+- Use a provider-only gem when the gem exists to expose one concrete parser backend. Register that backend with `TreeHaver.register_language`, then delegate shared language or format behavior back to the substrate gem.
+- Use a hybrid provider gem only when both the native provider and TSLP/tree-sitter path are intentional, tested TreeHaver backends.
+
+Merge gems should not call parser libraries directly during merge analysis. Direct parser calls belong inside TreeHaver backend adapters.
+
 ```ruby
+require "tree_haver"
 require "ast/merge"
 
 module MyFormat
   module Merge
+    BACKEND_REFERENCE = TreeHaver::BackendReference.new(
+      id: "kreuzberg-language-pack",
+      family: "tree-sitter"
+    ).freeze
+
+    def self.register_backend!
+      TreeHaver::GrammarFinder.new(:my_format).register!
+    end
+
     # Inherit from base classes and pass **options for forward compatibility
 
     class SmartMerger < Ast::Merge::SmartMergerBase
@@ -90,7 +120,9 @@ module MyFormat
         @source = source
         @freeze_token = freeze_token
         @signature_generator = signature_generator
-        # Process source...
+        Merge.register_backend!
+        @tree = TreeHaver.parser_for(:my_format).parse(source)
+        # Project TreeHaver nodes into merge ownership records.
       end
 
       def compute_node_signature(node)

@@ -290,24 +290,15 @@ module Ast
       private
 
       def normalize_start_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_START_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR match start boundary', details: { start_boundary: value.inspect })
+        value&.to_sym
       end
 
       def normalize_end_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_END_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR match end boundary', details: { end_boundary: value.inspect })
+        value&.to_sym
       end
 
       def normalize_payload_kind(value)
-        kind = value&.to_sym
-        return kind if KNOWN_PAYLOAD_KINDS.include?(kind)
-
-        raise Error.new('Unsupported CRISPR match payload kind', details: { payload_kind: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -435,25 +426,15 @@ module Ast
       private
 
       def normalize_resolution_kind(value)
-        kind = value&.to_sym
-        return kind if KNOWN_RESOLUTION_KINDS.include?(kind)
-
-        raise Error.new('Unsupported CRISPR destination resolution kind', details: { resolution_kind: value.inspect })
+        value&.to_sym
       end
 
       def normalize_resolution_source(value)
-        source = value&.to_sym
-        return source if KNOWN_RESOLUTION_SOURCES.include?(source)
-
-        raise Error.new('Unsupported CRISPR destination resolution source',
-                        details: { resolution_source: value.inspect })
+        value&.to_sym
       end
 
       def normalize_anchor_boundary(value)
-        boundary = value&.to_sym
-        return boundary if KNOWN_ANCHOR_BOUNDARIES.include?(boundary)
-
-        raise Error.new('Unsupported CRISPR destination anchor boundary', details: { anchor_boundary: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -528,14 +509,19 @@ module Ast
       attr_reader :owner_scope, :selector_kind, :selection_intent, :comment_region, :include_trailing_gap,
                   :structure_profile, :metadata
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile:, comment_region: nil,
+      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil,
+                     comment_region: nil,
                      include_trailing_gap: false, metadata: {}, **options)
         @owner_scope = owner_scope&.to_sym
         @selector_kind = selector_kind&.to_sym
         @selection_intent = selection_intent&.to_sym
         @comment_region = comment_region&.to_sym
         @include_trailing_gap = include_trailing_gap ? true : false
-        @structure_profile = structure_profile
+        @structure_profile = structure_profile || StructureProfile.new(
+          owner_scope: owner_scope,
+          owner_selector: owner_selector || :line_bound_statements,
+          supported_comment_regions: [comment_region].compact
+        )
         @metadata = metadata.merge(options).freeze
       end
 
@@ -586,6 +572,10 @@ module Ast
           family: :rewrite,
           description: 'Replace selected content with explicit replacement text'
         },
+        merge_replace: {
+          family: :rewrite,
+          description: 'Replace selected content with the result of a merge-gem slice merge'
+        },
         delete: {
           family: :removal,
           description: 'Delete selected content without inserting replacement text'
@@ -600,7 +590,7 @@ module Ast
         }
       }.freeze
       KNOWN_REQUIREMENTS = %i[none optional required].freeze
-      KNOWN_REPLACEMENT_SOURCES = %i[none explicit_text captured_text_or_explicit].freeze
+      KNOWN_REPLACEMENT_SOURCES = %i[none explicit_text captured_text_or_explicit merge_template_text].freeze
 
       attr_reader :operation_kind, :source_requirement, :destination_requirement, :replacement_source, :metadata
 
@@ -676,18 +666,11 @@ module Ast
       private
 
       def normalize_requirement(value, field_name)
-        requirement = value&.to_sym
-        return requirement if KNOWN_REQUIREMENTS.include?(requirement)
-
-        raise Error.new('Unsupported CRISPR operation requirement',
-                        details: { field: field_name, value: value.inspect })
+        value&.to_sym
       end
 
       def normalize_replacement_source(value)
-        replacement = value&.to_sym
-        return replacement if KNOWN_REPLACEMENT_SOURCES.include?(replacement)
-
-        raise Error.new('Unsupported CRISPR replacement source', details: { replacement_source: value.inspect })
+        value&.to_sym
       end
     end
 
@@ -1060,6 +1043,79 @@ module Ast
         Ast::Merge::StructuralEdit::PlanSet.new(source: source, plans: plans).merged_content
       end
 
+      def merge_replace_line_ranges(source, matches, replacement, merger_class:, merger_options:)
+        assert_non_overlapping!(matches)
+        merge_results = []
+        plans = matches.map do |match|
+          destination_slice = match.slice_from(source)
+          merge_result = merge_replacement_slice(
+            replacement.to_s,
+            destination_slice,
+            merger_class: merger_class,
+            merger_options: merger_options
+          )
+          merge_results << merge_result
+
+          Ast::Merge::StructuralEdit::SplicePlan.new(
+            source: source,
+            replace_start_line: match.start_line,
+            replace_end_line: match.end_line,
+            replacement: merge_result.fetch(:content),
+            metadata: { merge_result: merge_result, mode: :merge_replace }
+          )
+        end
+
+        [
+          Ast::Merge::StructuralEdit::PlanSet.new(source: source, plans: plans).merged_content,
+          merge_results
+        ]
+      end
+
+      def merge_replacement_slice(template_slice, destination_slice, merger_class:, merger_options:)
+        merger = merger_class.new(template_slice, destination_slice, **merger_options)
+        result = merger.respond_to?(:merge_result) ? merger.merge_result : merger.merge
+        content = merge_result_content(result)
+
+        {
+          content: content,
+          result: result,
+          stats: merge_result_stats(result, merger),
+          conflicts: merge_result_conflicts(result),
+          unresolved: merge_result_unresolved?(result)
+        }
+      end
+
+      def merge_result_content(result)
+        return result if result.is_a?(String)
+        return result.output if result.respond_to?(:output)
+        return result.content if result.respond_to?(:content) && result.content.is_a?(String)
+
+        result.to_s
+      end
+
+      def merge_result_stats(result, merger)
+        if result.respond_to?(:stats)
+          stats = result.stats
+          return stats unless stats.respond_to?(:empty?) && stats.empty?
+        end
+        return merger.stats if merger.respond_to?(:stats)
+
+        {}
+      end
+
+      def merge_result_conflicts(result)
+        return result.conflicts if result.respond_to?(:conflicts)
+
+        []
+      end
+
+      def merge_result_unresolved?(result)
+        return result.unresolved? if result.respond_to?(:unresolved?)
+        return result.review_required? if result.respond_to?(:review_required?)
+
+        false
+      end
+
       def assert_non_overlapping!(matches)
         ranges = matches.map(&:line_range).sort_by(&:begin)
         ranges.each_cons(2) do |left, right|
@@ -1212,6 +1268,59 @@ module Ast
           @operation_profile || raise(Error.new('CRISPR operation profile is not declared',
                                                 details: { operation_class: name }))
         end
+      end
+    end
+
+    class MergeReplace < Actor
+      include OperationSupport
+      include OperationProfilable
+
+      declare_operation_profile(
+        operation_kind: :merge_replace,
+        source_requirement: :required,
+        destination_requirement: :none,
+        replacement_source: :merge_template_text,
+        captures_source_text: true,
+        supports_if_missing: false
+      )
+
+      input :content, type: String
+      input :target, type: OwnerSelector
+      input :replacement, type: String
+      input :merger_class
+      input :merger_options, default: -> { {} }
+      input :source_label, type: String, default: 'source'
+
+      output :updated_content
+      output :matches, default: -> { [] }
+      output :match_count, type: Integer, default: 0
+      output :changed, default: false
+      output :captured_text, allow_nil: true, default: nil
+      output :merge_results, default: -> { [] }
+      output :operation_profile
+
+      def call
+        self.operation_profile = self.class.operation_profile
+        context = context_for(content: content, source_label: source_label, target: target)
+        self.matches = normalize_matches(target, context)
+        self.match_count = matches.size
+        self.captured_text = capture_text(content, matches)
+        if matches.empty?
+          self.updated_content = content
+          self.changed = false
+          return
+        end
+
+        self.updated_content, self.merge_results = merge_replace_line_ranges(
+          content,
+          matches,
+          replacement,
+          merger_class: merger_class,
+          merger_options: merger_options.to_h
+        )
+        self.changed = updated_content != content
+      rescue Error => e
+        crispr_fail!(e)
       end
     end
 
@@ -1427,18 +1536,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_start_boundary(value)
-        value&.to_sym
-      end
-
-      def normalize_end_boundary(value)
-        value&.to_sym
-      end
-
-      def normalize_payload_kind(value)
-        value&.to_sym
-      end
     end
 
     class SelectionProfile
@@ -1463,21 +1560,6 @@ module Ast
         section_heading: :section
       }.freeze
 
-      def initialize(owner_scope:, selector_kind:, selection_intent:, structure_profile: nil, owner_selector: nil,
-                     comment_region: nil, include_trailing_gap: false, metadata: {}, **options)
-        @owner_scope = owner_scope&.to_sym
-        @selector_kind = selector_kind&.to_sym
-        @selection_intent = selection_intent&.to_sym
-        @comment_region = comment_region&.to_sym
-        @include_trailing_gap = include_trailing_gap ? true : false
-        @structure_profile = structure_profile || StructureProfile.new(
-          owner_scope: owner_scope,
-          owner_selector: owner_selector || :line_bound_statements,
-          supported_comment_regions: [comment_region].compact
-        )
-        @metadata = metadata.merge(options).freeze
-      end
-
       def report
         data = to_h
         selector_kind_family = KNOWN_SELECTOR_KINDS[selector_kind]&.fetch(:family, nil)
@@ -1497,24 +1579,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_owner_selector(value)
-        value&.to_sym
-      end
-
-      def normalize_selector_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_selection_intent(value)
-        value&.to_sym
-      end
-
-      def normalize_comment_region(value)
-        return nil if value.nil?
-
-        value&.to_sym
-      end
     end
 
     class DestinationProfile
@@ -1529,18 +1593,6 @@ module Ast
           anchor_boundary_family: anchor_boundary_family || :unknown
         )
         stringified_report(data)
-      end
-
-      def normalize_resolution_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_resolution_source(value)
-        value&.to_sym
-      end
-
-      def normalize_anchor_boundary(value)
-        value&.to_sym
       end
     end
 
@@ -1562,18 +1614,6 @@ module Ast
         )
         stringified_report(data)
       end
-
-      def normalize_operation_kind(value)
-        value&.to_sym
-      end
-
-      def normalize_requirement(value, *)
-        value&.to_sym
-      end
-
-      def normalize_replacement_source(value)
-        value&.to_sym
-      end
     end
 
     class StructureProfile
@@ -1581,14 +1621,6 @@ module Ast
 
       def report
         stringified_report(to_h)
-      end
-
-      def normalize_owner_selector(value)
-        value&.to_sym
-      end
-
-      def normalize_comment_region(value)
-        value&.to_sym
       end
     end
 

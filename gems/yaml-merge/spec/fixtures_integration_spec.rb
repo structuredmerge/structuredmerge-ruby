@@ -151,6 +151,27 @@ RSpec.describe Yaml::Merge do
     )
   end
 
+  it 'documents YAML formatting preservation fixture support for comments, anchors, aliases, documents, and sequences' do
+    fixture = read_json(
+      fixtures_root.join(
+        'yaml',
+        'slice-721-formatting-preservation',
+        'comments-anchors-documents-sequences.json'
+      )
+    )
+    apply_conformance_fixture_support!(fixture.dig(:implementation_support, :ruby_tslp))
+
+    result = described_class.merge_yaml(
+      fixture[:template],
+      fixture[:destination],
+      fixture[:dialect],
+      backend: 'kreuzberg-language-pack'
+    )
+
+    expect(result[:ok]).to eq(fixture.dig(:expected, :ok))
+    expect(result[:output]).to eq(fixture.dig(:expected, :output))
+  end
+
   it 'conforms to the slice-183 YAML polyglot backend feature profile fixtures' do
     fixture = read_json(
       fixtures_root.join(

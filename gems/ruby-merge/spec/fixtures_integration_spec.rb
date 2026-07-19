@@ -53,6 +53,75 @@ RSpec.describe 'Ruby::Merge' do
     )
   end
 
+  it 'detects Ruby coverage directive spans in the shared substrate detector' do
+    spans = Ruby::Merge::BlockDirectiveDetector.new(
+      [
+        "# simplecov:disable\n",
+        "puts 'hidden'\n",
+        "# simplecov:enable\n",
+        "# :nocov:\n",
+        "puts 'legacy hidden'\n",
+        "# :nocov:\n"
+      ]
+    ).detect_spans
+
+    expect(spans.map { |span| [span.kind, span.start_line, span.end_line] }).to eq(
+      [[:nocov, 1, 3], [:nocov, 4, 6]]
+    )
+  end
+
+  it 'filters Ruby directive comments through the shared substrate detector' do
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('simplecov:disable')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?(':nocov:')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('kettle-jem:freeze')).to be(true)
+    expect(Ruby::Merge::BlockDirectiveDetector.directive_content?('@param name [String]')).to be(false)
+  end
+
+  it 'parses Ruby doc-comment example blocks through shared substrate support' do
+    entries = [
+      { line: 10, raw: '# Performs work.' },
+      { line: 11, raw: '# @example [Ruby]' },
+      { line: 12, raw: '#   worker.call' },
+      { line: 13, raw: '# @param worker [Worker]' }
+    ]
+
+    expect(Ruby::Merge::DocCommentSupport.doc_comment_content?('# frozen_string_literal: true')).to be(false)
+    expect(Ruby::Merge::DocCommentSupport.doc_comment_content?('# simplecov:disable')).to be(false)
+    expect(Ruby::Merge::DocCommentSupport.example_blocks(entries)).to contain_exactly(
+      hash_including(
+        tag_index: 1,
+        tag_line: 11,
+        tag_text: '@example [Ruby]',
+        body_start_index: 2,
+        body_end_index: 3,
+        body_entries: [{ line: 12, raw: '#   worker.call' }],
+        declared_language: 'ruby'
+      )
+    )
+  end
+
+  it 'detects Ruby magic comment header prefixes through shared substrate support' do
+    lines = [
+      "#!/usr/bin/env ruby\n",
+      "# frozen_string_literal: true\n",
+      "# warn_indent: true\n",
+      "# warn_indent: false\n",
+      "\n",
+      "# body comment\n"
+    ]
+
+    prefix = Ruby::Merge::MagicCommentSupport.comment_only_prefix_info(lines)
+
+    expect(Ruby::Merge::MagicCommentSupport.magic_comment_type_for_text('# coding: UTF-8')).to eq(:encoding)
+    expect(prefix[:header_magic_comment_types]).to eq(
+      2 => :frozen_string_literal,
+      3 => :warn_indent,
+      4 => :warn_indent
+    )
+    expect(prefix[:duplicate_magic_line_nums]).to contain_exactly(4)
+    expect(prefix[:suppressed_line_nums]).to include(1, 2, 3, 4, 5)
+  end
+
   it 'does not mix legacy declaration discovery into parser-backed Ruby structure' do
     source = <<~RUBY
       class TemplateOwned
@@ -113,16 +182,12 @@ RSpec.describe 'Ruby::Merge' do
                                             )
   end
 
-  it 'exposes missing TSLP import records as an unsupported capability', :not_tslp_ruby_import_records do
+  it 'derives require imports from the TreeHaver Ruby parse tree', :tslp_ruby_import_records do
     result = RUBY_MERGE.merge_ruby("require \"set\"\n", "require \"json\"\n", 'ruby', merge_template_requires: true)
 
-    expect(result[:ok]).to be(false)
-    expect(result[:diagnostics]).to contain_exactly(
-      hash_including(
-        category: 'unsupported_feature',
-        message: include('TSLP-record-backed top-level Ruby declarations and imports')
-      )
-    )
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to include('require "json"')
+    expect(result[:output]).to include('require "set"')
   end
 
   it 'exposes missing TSLP top-level call records as an unsupported capability',

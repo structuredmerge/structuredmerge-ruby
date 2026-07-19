@@ -12,6 +12,15 @@ RSpec.describe Ast::Crispr::Ruby::Prism do
       expect(context.adapter).to be_a(Ast::Crispr::Ruby::Prism::Adapter)
     end
 
+    it 'uses prism-merge analysis for Ruby structure' do
+      analysis = described_class::Utils.parse_analysis("puts :ok\n", source_label: 'example.rb')
+      result = described_class::Utils.parse_with_comments("puts :ok\n")
+
+      expect(analysis).to be_a(::Prism::Merge::FileAnalysis)
+      expect(analysis).to be_valid
+      expect(result).to be_success
+    end
+
     context 'with a structure profile' do
       let(:context) { described_class.document_context(content: "puts :ok\n", source_label: 'example.rb') }
       let(:profile) { context.structure_profile(owner_scope: :top_level_statements) }

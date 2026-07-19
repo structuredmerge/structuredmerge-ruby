@@ -82,15 +82,19 @@
   "lib/citrus-toml-merge.rb:1706359962": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`citrus-toml-merge.rb`) should use snake_case.", 5381]
   ],
-  "lib/citrus/toml/merge.rb:4234713312": [
+  "lib/citrus/toml/merge.rb:4256403494": [
     [11, 5, 12, "Style/Documentation: Missing top-level documentation comment for `module Citrus::Toml::Merge`.", 2866359175],
+    [11, 5, 4979, "Metrics/ModuleLength: Module has too many lines. [104/100]", 3343629788],
     [12, 7, 11, "Style/ModuleFunction: Use `module_function` instead of `extend self`.", 1210897631],
-    [92, 7, 17, "Style/Documentation: Missing top-level documentation comment for `class Citrus::Toml::Merge::SmartMerger`.", 497427992]
+    [76, 7, 1663, "Metrics/AbcSize: Assignment Branch Condition size for `merge_toml` is too high. [<7, 21, 8> 23.54/17]", 3550313116],
+    [76, 7, 1663, "Metrics/MethodLength: Method has too many lines. [27/10]", 3550313116],
+    [139, 7, 17, "Style/Documentation: Missing top-level documentation comment for `class Citrus::Toml::Merge::SmartMerger`.", 497427992]
   ],
-  "spec/fixtures_integration_spec.rb:673344638": [
-    [3, 1, 5553, "Metrics/BlockLength: Block has too many lines. [122/25]", 3226186319],
+  "spec/fixtures_integration_spec.rb:239117620": [
+    [3, 1, 7226, "Metrics/BlockLength: Block has too many lines. [159/25]", 3966119837],
     [26, 3, 1318, "Metrics/BlockLength: Block has too many lines. [34/25]", 4255752267],
-    [64, 3, 1804, "Metrics/BlockLength: Block has too many lines. [28/25]", 1255882875],
-    [106, 3, 1419, "Metrics/BlockLength: Block has too many lines. [29/25]", 944475815]
+    [64, 3, 2344, "Metrics/BlockLength: Block has too many lines. [36/25]", 228336363],
+    [114, 3, 1129, "Metrics/BlockLength: Block has too many lines. [27/25]", 2358141919],
+    [152, 3, 1419, "Metrics/BlockLength: Block has too many lines. [29/25]", 944475815]
   ]
 }

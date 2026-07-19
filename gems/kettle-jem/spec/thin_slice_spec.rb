@@ -310,7 +310,7 @@ RSpec.describe Kettle::Jem do
       expect(generated[:Gemfile]).to include(%(eval_gemfile "gemfiles/modular/templating.gemfile"))
       expect(generated[:Gemfile]).not_to include("git:")
       expect_gem_dependency_declared(generated[:"gemfiles/modular/templating.gemfile"], "kettle-jem")
-      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(smorg_rb_local_gems = %w[))
+      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(structuredmerge_local_gems = %w[))
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
       expect(generated[:"lib/legacy/strategies/shim.rb"]).to include(%(require "legacy/shim"))
@@ -5062,7 +5062,7 @@ RSpec.describe Kettle::Jem do
       expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "true",
-        "SMORG_RB_DEV" => marker.fetch("members_root"),
+        "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
         "KETTLE_RB_DEV" => File.join(root, "kettle-dev")
       )
     end
@@ -5109,7 +5109,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "true",
         "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "SMORG_RB_DEV" => "/workspace/smorg-rb"
+        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb"
       }
       commands = []
       command_runner = lambda do |command, chdir:, env:, quiet:|
@@ -5142,7 +5142,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false"
+        "STRUCTUREDMERGE_DEV" => "false"
       )
       expect(commands.map { |entry| entry.fetch(:command) }).not_to include(%w[git add -A])
     end
@@ -5217,7 +5217,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "true",
         "KETTLE_RB_DEV" => "/workspace/my",
         "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
-        "SMORG_RB_DEV" => "/workspace/smorg-rb",
+        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb",
         "RUBYOPT" => "-rbundler/setup",
         "RUBYLIB" => "/workspace/kettle-jem/lib",
         "BUNDLE_BIN_PATH" => "/workspace/kettle-jem/bin/bundle",
@@ -5251,7 +5251,7 @@ RSpec.describe Kettle::Jem do
         "K_JEM_TEMPLATING" => "false",
         "KETTLE_RB_DEV" => "false",
         "GALTZO_FLOSS_DEV" => "false",
-        "SMORG_RB_DEV" => "false"
+        "STRUCTUREDMERGE_DEV" => "false"
       )
       expect(lock_command.fetch(:env)).to include(
         "RUBYOPT" => nil,
@@ -6379,7 +6379,6 @@ RSpec.describe Kettle::Jem do
       })
       availability = Bash::Merge::Availability.new(
         grammar_path: nil,
-        language_pack_process: true,
         node_parser: false,
         diagnostics: [{kind: "bash_node_parser_unavailable", message: "missing node adapter"}]
       )
@@ -7370,6 +7369,79 @@ RSpec.describe Kettle::Jem do
         "template_only" => "added"
       )
       expect(explicit_report.dig(:metadata, :template_source_preference)).to include(file_type: "yaml")
+    end
+  end
+
+  it "merges Git driver TOML manifests with destination driver values" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-toml-merge", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .structuredmerge/git-drivers.toml
+        YAML
+        ".structuredmerge/git-drivers.toml" => <<~TOML,
+          version = 1
+          driver_namespace = "smorg"
+
+          [profiles.semantic-diff]
+          description = "Destination driver"
+
+          [[profiles.semantic-diff.attributes]]
+          pattern = "*.rb"
+          diff = "smorg-rb"
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-rb.command"
+          value = "smorg-rb diff-driver"
+        TOML
+        "template/.structuredmerge/git-drivers.toml.example" => <<~TOML
+          version = 1
+          driver_namespace = "smorg"
+
+          [profiles.semantic-diff]
+          description = "Template driver"
+
+          [[profiles.semantic-diff.attributes]]
+          pattern = "*.rb"
+          diff = "smorg-ruby"
+
+          [[profiles.semantic-diff.git_config]]
+          scope = "global"
+          key = "diff.smorg-ruby.command"
+          value = "smorg-ruby diff-driver"
+
+          [profiles.textconv-normalized]
+          description = "Template-only profile"
+
+          [[profiles.textconv-normalized.attributes]]
+          pattern = "*.json"
+          diff = "smorg-json-textconv"
+        TOML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".structuredmerge/git-drivers.toml"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('diff = "smorg-rb"')
+      expect(content).to include('key = "diff.smorg-rb.command"')
+      expect(content).to include('value = "smorg-rb diff-driver"')
+      expect(content).to include("[profiles.textconv-normalized]")
+      expect(content).not_to include("smorg-ruby")
     end
   end
 
@@ -11630,6 +11702,9 @@ RSpec.describe Kettle::Jem do
       expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
         "StructuredMerge Ruby package family"
       )
+      expect(template_report.dig(:metadata, :template_tokens, "KJ|README:FAMILY_INTRO_BACKEND_MATRIX")).to include(
+        "Merge analysis must enter parsing through `tree_haver`"
+      )
     end
   end
 
@@ -14333,6 +14408,109 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "collapses repeated direct sibling runtime dependency wiring in the main Gemfile" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-direct-sibling-dedupe", tmp_root) do |workspace|
+      root = File.join(workspace, "adapter")
+      sibling = File.join(workspace, "shared-core")
+      FileUtils.mkdir_p([root, sibling])
+      write_tree(sibling, {
+        "shared-core.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "shared-core"
+            spec.version = "0.1.0"
+            spec.summary = "Shared core"
+          end
+        RUBY
+      })
+      write_tree(root, {
+        "adapter.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "adapter"
+            spec.version = "0.1.0"
+            spec.summary = "Adapter"
+            spec.homepage = "https://github.com/rubythems/adapter"
+            spec.metadata["source_code_uri"] = "https://github.com/rubythems/adapter"
+            spec.add_dependency "shared-core", "= 0.1.0"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+
+          gemspec
+
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
+          gem "nomono", *nomono_requirements, require: false
+
+          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+          direct_sibling_gems = %w[
+            stale-core
+          ]
+          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+          direct_sibling_local =
+            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          if direct_sibling_gems.any? &&
+              (direct_sibling_local ||
+                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+            require "nomono/bundler"
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "RUBYTHEMS",
+              path_env: "RUBYTHEMS_DEV",
+              root: ["src", "my", "rubythems"]
+            )
+          end
+
+          # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
+          direct_sibling_gems = %w[
+            shared-core
+          ]
+          direct_sibling_dev = ENV.fetch("RUBYTHEMS_DEV", "")
+          direct_sibling_local =
+            !direct_sibling_dev.empty? && !%w[false 0 no off].include?(direct_sibling_dev.downcase)
+          direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+
+          if direct_sibling_gems.any? &&
+              (direct_sibling_local ||
+                ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
+            require "nomono/bundler"
+            eval_nomono_gems(
+              gems: direct_sibling_gems,
+              prefix: "RUBYTHEMS",
+              path_env: "RUBYTHEMS_DEV",
+              root: ["src", "my", "rubythems"]
+            )
+          end
+
+          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          project_emoji: "💎"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      described_class.apply_project(
+        root,
+        env: {},
+        run_options: {accept: true, force: true, skip_commit: true}
+      )
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(gemfile.scan("# Direct sibling dependencies").length).to eq(1)
+      expect(gemfile).to include("shared-core")
+      expect(gemfile).not_to include("stale-core")
+    end
+  end
+
   it "does not path-wire direct sibling dependencies when the sibling directory has a different gemspec name" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -14390,7 +14568,7 @@ RSpec.describe Kettle::Jem do
             )
           end
 
-          # Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+          # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
           eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
         RUBY
         ".kettle-jem.yml" => <<~YAML

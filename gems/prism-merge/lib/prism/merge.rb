@@ -449,7 +449,7 @@ module Prism
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      result = ::Prism.parse(source)
+      result = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:ruby).parse(source).parse_result }
       unless result.success?
         return {
           ok: false,
@@ -490,7 +490,7 @@ module Prism
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      result = ::Prism.parse(source)
+      result = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:ruby).parse(source).parse_result }
       unless result.success?
         return TreeHaver::NormalizedParseResult.new(
           ok: false,
@@ -981,23 +981,14 @@ module Prism
 
     def prism_ruby_example_surfaces(surface)
       entries = Array(surface.dig(:metadata, :entries))
-      normalized = entries.map { |entry| prism_ruby_normalize_comment_content(entry.fetch(:raw)) }
-      normalized.each_with_index.filter_map do |content, tag_index|
-        next unless content.start_with?('@example')
-
-        body_start = tag_index + 1
-        body_end = prism_ruby_next_yard_tag_index(normalized, body_start) || normalized.length
-        next if body_start >= body_end
-
-        body_entries = entries[body_start...body_end]
-        next if body_entries.nil? || body_entries.empty?
-
-        declared_language = prism_ruby_declared_example_language(content) || 'ruby'
+      Ruby::Merge::DocCommentSupport.example_blocks(entries).map do |block|
+        body_entries = block.fetch(:body_entries)
+        declared_language = block.fetch(:declared_language) || 'ruby'
         Ast::Merge.discovered_surface(
           surface_kind: 'yard_example_block',
           declared_language: declared_language,
           effective_language: declared_language,
-          address: "#{surface.fetch(:address)} > yard_example[#{tag_index}]",
+          address: "#{surface.fetch(:address)} > yard_example[#{block.fetch(:tag_index)}]",
           parent_address: surface.fetch(:address),
           owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: surface.fetch(:address)),
           span: Ast::Merge.surface_span(start_line: body_entries.first.fetch(:line),
@@ -1005,8 +996,8 @@ module Prism
           reconstruction_strategy: 'rewrite_with_prefix_preservation',
           metadata: {
             tag_kind: 'example',
-            tag_index: tag_index,
-            tag_text: content,
+            tag_index: block.fetch(:tag_index),
+            tag_text: block.fetch(:tag_text),
             comment_prefix: surface.dig(:metadata, :comment_prefix)
           }
         )
@@ -1033,48 +1024,23 @@ module Prism
     end
 
     def prism_ruby_doc_comment_content?(raw)
-      content = prism_ruby_normalize_comment_content(raw)
-      return false if content.empty?
-      return false if content.start_with?(':nocov:')
-      return false if %w[coding encoding frozen_string_literal shareable_constant_value typed
-                         warn_indent].any? do |prefix|
-        content.start_with?("#{prefix}:")
-      end
-
-      true
+      Ruby::Merge::DocCommentSupport.doc_comment_content?(raw)
     end
 
     def prism_ruby_normalize_comment_content(raw)
-      stripped = raw.to_s.lstrip
-      return stripped unless stripped.start_with?('#')
-
-      stripped.delete_prefix('#').delete_prefix(' ').strip
+      Ruby::Merge::DocCommentSupport.normalize_comment_content(raw)
     end
 
     def prism_ruby_comment_prefix(raw)
-      raw_text = raw.to_s
-      hash_index = raw_text.index('#')
-      return '# ' unless hash_index
-
-      raw_text[0..hash_index] + (raw_text[hash_index + 1] == ' ' ? ' ' : '')
+      Ruby::Merge::DocCommentSupport.comment_prefix_for(raw)
     end
 
     def prism_ruby_next_yard_tag_index(lines, start_index)
-      lines.each_with_index do |content, index|
-        next if index < start_index
-        return index if content.start_with?('@')
-      end
-      nil
+      Ruby::Merge::DocCommentSupport.next_tag_index(lines, start_index)
     end
 
     def prism_ruby_declared_example_language(content)
-      marker = '@example ['
-      return unless content.start_with?(marker)
-
-      closing_index = content.index(']', marker.length)
-      return unless closing_index
-
-      content[marker.length...closing_index]
+      Ruby::Merge::DocCommentSupport.declared_example_language_for_tag(content)
     end
 
     def prism_ruby_normalize_source(source)
@@ -1257,8 +1223,7 @@ module Prism
     end
 
     def coverage_directive_comment?(comment_text)
-      stripped = comment_text.strip
-      stripped == '# :nocov:' || stripped.match?(/\A#\s*simplecov\s*:\s*(?:disable|enable)\b/i)
+      Ruby::Merge::BlockDirectiveDetector.coverage_directive_line?(comment_text)
     end
 
     def magic_comment_for(comment, magic_comments)

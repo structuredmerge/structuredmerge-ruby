@@ -73,7 +73,7 @@ module Psych
       end
 
       def parse_content_value(content)
-        ::Psych.safe_load(content)
+        Psych::Merge.yaml_value_for_source(content)
       end
 
       def dump_content_value(value)

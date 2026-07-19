@@ -47,7 +47,47 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
-  it 'analyzes devcontainer-style JSONC with comments and trailing commas through the synthetic fallback' do
+  it 'exposes JSON TreeHaver backend availability and plan context' do
+    expect(json_ready(described_class.available_json_backends.map(&:to_h))).to eq(
+      [{ 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }]
+    )
+
+    profile = described_class.json_backend_feature_profile
+    expect(profile[:backend]).to eq('kreuzberg-language-pack')
+    expect(json_ready(profile[:backend_ref])).to eq(
+      { 'id' => 'kreuzberg-language-pack', 'family' => 'tree-sitter' }
+    )
+
+    expect(json_ready(described_class.json_plan_context.dig(:feature_profile))).to include(
+      'backend' => 'kreuzberg-language-pack',
+      'supports_dialects' => true
+    )
+  end
+
+  it 'parses through an explicit JSON TreeHaver backend and rejects unsupported backends' do
+    fixture = json_fixture('structure_json')
+    result = described_class.parse_json(
+      fixture[:source],
+      fixture[:dialect],
+      backend: 'kreuzberg-language-pack'
+    )
+    unsupported = described_class.parse_json(fixture[:source], fixture[:dialect], backend: :direct_json)
+
+    expect(result[:ok]).to be(true)
+    expect(unsupported[:ok]).to be(false)
+    expect(unsupported.dig(:diagnostics, 0, :category)).to eq('unsupported_feature')
+  end
+
+  it 'rejects comments in strict JSON without rejecting comment-like string content' do
+    strict_result = described_class.parse_json("{\n  // nope\n  \"name\": \"Ruby\"\n}\n", 'json')
+    string_result = described_class.parse_json("{\"url\":\"https://example.test/path\"}\n", 'json')
+
+    expect(strict_result[:ok]).to be(false)
+    expect(strict_result.dig(:diagnostics, 0, :message)).to eq('Comments are not supported for json.')
+    expect(string_result[:ok]).to be(true)
+  end
+
+  it 'fails closed for JSONC analysis when no TreeHaver JSON backend is available' do
     source = <<~JSON
       {
         // devcontainer files commonly use JSONC comments.
@@ -62,8 +102,9 @@ RSpec.describe Json::Merge do
 
     analysis = described_class::FileAnalysis.new(source)
 
-    expect(analysis).to be_valid
-    expect(analysis.root_object).not_to be_nil
+    expect(analysis).not_to be_valid
+    expect(analysis.root_object).to be_nil
+    expect(analysis.errors).not_to be_empty
   end
 
   it 'conforms to the structure fixtures' do
@@ -121,11 +162,10 @@ RSpec.describe Json::Merge do
 
     fallback_fixture = json_fixture('fallback')
     fallback_result = described_class.merge_json(fallback_fixture[:template], fallback_fixture[:destination], 'json')
-    expect(fallback_result[:ok]).to eq(fallback_fixture.dig(:expected, :ok))
-    expect(fallback_result[:output]).to eq(fallback_fixture.dig(:expected, :output))
+    expect(fallback_result[:ok]).to be(false)
     expect(
       json_ready(fallback_result[:diagnostics].map { |diagnostic| diagnostic.slice(:severity, :category) })
-    ).to eq(json_ready(fallback_fixture.dig(:expected, :diagnostics)))
+    ).to eq(json_ready([{ severity: 'error', category: 'destination_parse_error' }]))
   end
 
   it 'records emitter source provenance line metadata for raw source rendering' do
@@ -177,18 +217,11 @@ RSpec.describe Json::Merge do
     JSON
   end
 
-  it 'conforms to the language-pack adapter fixture and shared family feature profile fixture' do
-    adapter_fixture = json_fixture('tree_sitter_adapter')
-    adapter_fixture[:cases].each do |test_case|
-      result = described_class.parse_json_with_language_pack(test_case[:source], test_case[:dialect])
-      expect(result[:ok]).to eq(test_case.dig(:expected, :ok))
-      expect(
-        json_ready(Array(result[:diagnostics]).map { |diagnostic| diagnostic.slice(:severity, :category) })
-      ).to eq(json_ready(test_case.dig(:expected, :diagnostics).map { |diagnostic|
-             diagnostic.slice(:severity, :category)
-           }))
-    end
+  it 'conforms to the shared family feature profile fixture' do
+    expected_profile = family_profile_fixture[:feature_profile].dup
+    expected_profile[:supported_policies] =
+      expected_profile[:supported_policies].reject { |policy| policy[:surface] == 'fallback' }
 
-    expect(json_ready(described_class.json_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
+    expect(json_ready(described_class.json_feature_profile)).to eq(json_ready(expected_profile))
   end
 end

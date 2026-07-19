@@ -60,8 +60,7 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     merged = File.read(current)
-    expect(merged).to include('"current":true')
-    expect(merged).to include('"other":true')
+    expect(JSON.parse(merged)).to include('current' => true, 'other' => true)
     expect(stdout.string).to eq('')
   end
 
@@ -78,8 +77,7 @@ RSpec.describe Smorg::RB do
 
     expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
     merged = File.read(current)
-    expect(merged).to include('"current":true')
-    expect(merged).to include('"other":true')
+    expect(JSON.parse(merged)).to include('current' => true, 'other' => true)
   end
 
   it 'installs local Git diff driver attributes' do

@@ -158,9 +158,9 @@ module Psych
         end
         return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
-        parsed = YAML.safe_load(source, permitted_classes: [], aliases: false)
+        parsed = yaml_value_for_source(source)
         Yaml::Merge.analyze_yaml_document(parsed, dialect)
-      rescue StandardError => e
+      rescue TreeHaver::Error, StandardError => e
         parse_error_result(e.message)
       end
 
@@ -226,6 +226,11 @@ module Psych
         end
       end
 
+      def yaml_value_for_source(source)
+        tree = TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:yaml).parse(source) }
+        yaml_document_value_from_tree(tree)
+      end
+
       private
 
       def diagnostic(severity, category, message)
@@ -234,6 +239,55 @@ module Psych
 
       def parse_error_result(message)
         { ok: false, diagnostics: [diagnostic('error', 'parse_error', message)], policies: [] }
+      end
+
+      def yaml_document_value_from_tree(tree)
+        root = tree.root_node
+        raise TreeHaver::NotAvailable, 'YAML parse returned no root node' unless root
+
+        document = root.children.find { |child| child.type.to_s == 'document' }
+        yaml_value_from_node(document&.children&.first)
+      end
+
+      def yaml_value_from_node(node)
+        return nil unless node
+
+        case node.type.to_s
+        when 'mapping'
+          yaml_mapping_from_node(node)
+        when 'sequence'
+          node.children.map { |child| yaml_value_from_node(child) }
+        when 'scalar'
+          yaml_scalar_from_node(node)
+        else
+          raise TreeHaver::NotAvailable, "Unsupported YAML node #{node.type}"
+        end
+      end
+
+      def yaml_mapping_from_node(node)
+        children = node.children
+        children.each_slice(2).each_with_object({}) do |(key_node, value_node), mapping|
+          key = yaml_value_from_node(key_node)
+          mapping[key] = yaml_value_from_node(value_node)
+        end
+      end
+
+      def yaml_scalar_from_node(node)
+        value = node.value.to_s
+        case node.tag.to_s
+        when 'tag:yaml.org,2002:null'
+          nil
+        when 'tag:yaml.org,2002:bool'
+          value.downcase == 'true'
+        when 'tag:yaml.org,2002:int'
+          Integer(value.delete('_'), 0)
+        when 'tag:yaml.org,2002:float'
+          Float(value.delete('_'))
+        else
+          value
+        end
+      rescue ArgumentError
+        value
       end
 
       def unsupported_feature_parse_result(message)

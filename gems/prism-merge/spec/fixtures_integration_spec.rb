@@ -169,6 +169,33 @@ RSpec.describe 'Prism::Merge' do
     expect(result[:output]).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")
   end
 
+  it 'does not preserve duplicate destination top-level DSL blocks already matched by identical template content' do
+    fixture = read_json(
+      fixtures_root.join(
+        'ruby',
+        'slice-1002-duplicate-top-level-dsl-block',
+        'duplicate-top-level-dsl-block.json'
+      )
+    )
+    merge = fixture[:merge]
+
+    result = PRISM_MERGE.merge_ruby(
+      merge[:template],
+      merge[:destination],
+      merge[:dialect],
+      backend: merge[:backend],
+      preference: merge[:preference].to_sym,
+      add_template_only_nodes: merge[:add_template_only_nodes],
+      signature_generator: PRISM_MERGE.ruby_dsl_signature_generator
+    )
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to eq(merge[:expected])
+    expect(result[:output].scan('eval_nomono_gems(gems: direct_sibling_gems)').size).to eq(
+      fixture.dig(:expected, :block_occurrences)
+    )
+  end
+
   it 'projects the structured-edit provider profile through Prism' do
     fixture = read_json(
       fixtures_root.join(
@@ -300,6 +327,25 @@ RSpec.describe 'Prism::Merge' do
     expect(json_ready(selected_parent_links)).to eq(
       json_ready(fixture[:expected_parent_links])
     )
+  end
+
+  it 'projects leading comments for Ruby structured-edit owners' do
+    source = <<~RUBY
+      # first owner
+      task :one do
+        puts "one"
+      end
+
+      # second owner
+      task :two do
+        puts "two"
+      end
+    RUBY
+    analysis = PRISM_MERGE::FileAnalysis.new(source, source_label: 'Rakefile')
+    first_owner, second_owner = analysis.statements
+
+    expect(analysis.leading_comments_for_owner(first_owner).map(&:slice)).to eq(['# first owner'])
+    expect(analysis.leading_comments_for_owner(second_owner).map(&:slice)).to eq(['# second owner'])
   end
 
   it 'projects Prism parse errors into the normalized parse failure shape' do

@@ -994,73 +994,6 @@ RSpec.describe TreeHaver do
     expect(json_ready(result.to_h)).to eq(json_ready(expected.to_h))
   end
 
-  it 'conforms to the slice-100 process baseline fixture' do
-    fixture = diagnostics_fixture('process_baseline')
-    result = described_class.process_with_language_pack(
-      described_class::ProcessRequest.new(**fixture[:request])
-    )
-
-    if result[:ok]
-      analysis = result[:analysis]
-      expect(analysis.language).to eq(fixture.dig(:expected, :language))
-      expect(
-        json_ready(
-          analysis.structure.map do |item|
-            {
-              kind: item.kind,
-              **(item.name ? { name: item.name } : {})
-            }
-          end
-        )
-      ).to eq(json_ready(fixture.dig(:expected, :structure)))
-      expect(
-        json_ready(
-          analysis.imports.map do |item|
-            {
-              source: item.source,
-              items: item.items
-            }
-          end
-        )
-      ).to eq(json_ready(fixture.dig(:expected, :imports)))
-    else
-      expect(result[:diagnostics]).to contain_exactly(
-        include(
-          severity: 'error',
-          category: 'unsupported_feature',
-          message: include('Please report this to tree-sitter-language-pack')
-        )
-      )
-    end
-  end
-
-  it 'fails closed when the language-pack result object is unreadable' do
-    unreadable_result = Class.new do
-      def language
-        raise TypeError, 'binding accessor failed'
-      end
-    end.new
-
-    allow(TreeSitterLanguagePack).to receive(:has_language).and_return(true)
-    allow(TreeSitterLanguagePack).to receive(:process).and_return(unreadable_result)
-
-    result = described_class.process_with_language_pack(
-      described_class::ProcessRequest.new(
-        language: 'ruby',
-        source: "module A\nend\n"
-      )
-    )
-
-    expect(result[:ok]).to be(false)
-    expect(result[:diagnostics]).to contain_exactly(
-      include(
-        severity: 'error',
-        category: 'unsupported_feature',
-        message: include('Please report this to tree-sitter-language-pack')
-      )
-    )
-  end
-
   it 'supports temporary backend context selection' do
     expect(described_class.current_backend_id).to be_nil
 
@@ -1125,6 +1058,58 @@ RSpec.describe TreeHaver do
 
     expect(parser).to be_a(backend::Parser)
     expect(parser.language).to eq(:rbs_language)
+  end
+
+  it 'auto-selects an available registered backend module without explicit backend selection' do
+    unavailable_backend = Module.new do
+      def self.available?
+        false
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    available_backend = Module.new do
+      def self.available?
+        true
+      end
+
+      class self::Language
+        def self.from_library(_path = nil, symbol: nil, name: nil)
+          [name, symbol]
+        end
+      end
+
+      class self::Parser
+        attr_accessor :language
+      end
+    end
+
+    described_class.register_language(
+      :auto_provider_markdown,
+      backend_module: unavailable_backend,
+      backend_type: :unavailable_markdown_provider,
+      gem_name: 'unavailable-markdown-provider'
+    )
+    described_class.register_language(
+      :auto_provider_markdown,
+      backend_module: available_backend,
+      backend_type: :available_markdown_provider,
+      gem_name: 'available-markdown-provider'
+    )
+
+    parser = described_class.parser_for(:auto_provider_markdown)
+
+    expect(parser).to be_a(available_backend::Parser)
+    expect(parser.language).to eq([:auto_provider_markdown, nil])
   end
 
   it 'provides PEG framework parsing helpers' do

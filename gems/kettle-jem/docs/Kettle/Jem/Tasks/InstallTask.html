@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
   Module: Kettle::Jem::Tasks::InstallTask
-  
+
     &mdash; Documentation by YARD 0.9.44
-  
+
 </title>
 
   <link rel="stylesheet" href="../../../css/style.css" type="text/css">
@@ -37,16 +37,16 @@
     <div id="main" tabindex="-1">
       <div id="header">
         <div id="menu">
-  
+
     <a href="../../../_index.html">Index (I)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../../../Kettle.html" title="Kettle (module)">Kettle</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Jem.html" title="Kettle::Jem (module)">Jem</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Tasks.html" title="Kettle::Jem::Tasks (module)">Tasks</a></span></span>
-     &raquo; 
+     &raquo;
     <span class="title">InstallTask</span>
-  
+
 </div>
 
         <div id="search">
-  
+
     <a class="full_list_link" id="class_list_link"
         href="../../../class_list.html">
 
@@ -56,60 +56,60 @@
           <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
         </svg>
     </a>
-  
+
 </div>
         <div class="clear"></div>
       </div>
 
       <div id="content"><h1>Module: Kettle::Jem::Tasks::InstallTask
-  
-  
-  
+
+
+
 </h1>
 <div class="box_info">
-  
 
-  
-  
-  
-  
-  
 
-  
 
-  
+
+
+
+
+
+
+
+
   <dl>
     <dt>Defined in:</dt>
     <dd>lib/kettle/jem/tasks/install_task.rb
 </dd>
   </dl>
-  
+
 </div>
 
 
-  
+
     <h2>
       Constant Summary
       <small><a href="#" class="constants_summary_toggle">collapse</a></small>
     </h2>
 
     <dl class="constants">
-      
+
         <dt id="CURATED_BINSTUB_GEMS-constant" class="">CURATED_BINSTUB_GEMS =
-          
+
         </dt>
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='tstring_content'>appraisal2</span><span class='words_sep'> </span><span class='tstring_content'>rake</span><span class='words_sep'> </span><span class='tstring_content'>rbs</span><span class='words_sep'> </span><span class='tstring_content'>rspec-core</span><span class='words_sep'> </span><span class='tstring_content'>yard</span><span class='words_sep'> </span><span class='tstring_content'>kettle-dev</span><span class='words_sep'> </span><span class='tstring_content'>kettle-test</span><span class='words_sep'> </span><span class='tstring_content'>kettle-soup-cover</span><span class='words_sep'> </span><span class='tstring_content'>stone_checksums</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
-      
+
         <dt id="CURATED_BINSTUB_DISCRETE_EXECUTABLES-constant" class="">CURATED_BINSTUB_DISCRETE_EXECUTABLES =
-          
+
         </dt>
         <dd><pre class="code"><span class='qwords_beg'>%w[</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>kettle-drift</span><span class='words_sep'>
 </span><span class='words_sep'>  </span><span class='tstring_content'>yard</span><span class='words_sep'>
 </span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
-      
+
         <dt id="DEFAULT_GIT_DRIVER_DEFINITIONS-constant" class="">DEFAULT_GIT_DRIVER_DEFINITIONS =
-          
+
         </dt>
         <dd><pre class="code"><span class='lbracket'>[</span>
   <span class='lbrace'>{</span>
@@ -137,23 +137,22 @@
     <span class='label'>merge_command:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>smorg-rs merge-driver %O %A %B %P</span><span class='tstring_end'>&quot;</span></span>
   <span class='rbrace'>}</span>
 <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
-      
+
         <dt id="GIT_DRIVER_LANGUAGE_REGISTRY-constant" class="">GIT_DRIVER_LANGUAGE_REGISTRY =
-          
+
         </dt>
         <dd><pre class="code"><span class='const'><span class='object_link'><a href="#DEFAULT_GIT_DRIVER_DEFINITIONS-constant" title="Kettle::Jem::Tasks::InstallTask::DEFAULT_GIT_DRIVER_DEFINITIONS (constant)">DEFAULT_GIT_DRIVER_DEFINITIONS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_definition'>definition</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id identifier rubyid_definition'>definition</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='symbol'>:language</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_definition'>definition</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
-      
+
         <dt id="BUILTIN_GIT_DIFF_ATTRIBUTES-constant" class="">BUILTIN_GIT_DIFF_ATTRIBUTES =
-          
+
         </dt>
         <dd><pre class="code"><span class='lbracket'>[</span>
   <span class='lbrace'>{</span><span class='label'>path:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>pattern:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*.rb</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>attributes:</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>diff</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ruby</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='lbrace'>{</span><span class='label'>path:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>pattern:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*.go</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>attributes:</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>diff</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>golang</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='comma'>,</span>
   <span class='lbrace'>{</span><span class='label'>path:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>.gitattributes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>pattern:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>*.rs</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>attributes:</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>diff</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>rust</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span>
 <span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
-      
+
     </dl>
-  
 
 
 
@@ -161,2310 +160,2311 @@
 
 
 
-  
+
+
     <h2>
       Class Method Summary
       <small><a href="#" class="summary_toggle">collapse</a></small>
     </h2>
 
     <ul class="summary">
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bin_setup_command-class_method" title="bin_setup_command (class method)">.<strong>bin_setup_command</strong>(project_root, quiet:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#binstub_files-class_method" title="binstub_files (class method)">.<strong>binstub_files</strong>(bin_dir)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bootstrap_commit_step-class_method" title="bootstrap_commit_step (class method)">.<strong>bootstrap_commit_step</strong>(project_root, run_options:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bundle_binstubs_command-class_method" title="bundle_binstubs_command (class method)">.<strong>bundle_binstubs_command</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bundled_handoff_step-class_method" title="bundled_handoff_step (class method)">.<strong>bundled_handoff_step</strong>(project_root:, env:, run_options:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bundler_binstub_gem_name-class_method" title="bundler_binstub_gem_name (class method)">.<strong>bundler_binstub_gem_name</strong>(path)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#bundler_generated_binstub%3F-class_method" title="bundler_generated_binstub? (class method)">.<strong>bundler_generated_binstub?</strong>(path)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#cleanup_legacy_ruby_version_files-class_method" title="cleanup_legacy_ruby_version_files (class method)">.<strong>cleanup_legacy_ruby_version_files</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#config_bootstrap_changed%3F-class_method" title="config_bootstrap_changed? (class method)">.<strong>config_bootstrap_changed?</strong>(report)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#configured_project_grapheme-class_method" title="configured_project_grapheme (class method)">.<strong>configured_project_grapheme</strong>(project_root, env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#conflicting_git_attribute_diagnostics-class_method" title="conflicting_git_attribute_diagnostics (class method)">.<strong>conflicting_git_attribute_diagnostics</strong>(content, updates, managed_block:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#curated_binstub%3F-class_method" title="curated_binstub? (class method)">.<strong>curated_binstub?</strong>(path)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#decorative_grapheme%3F-class_method" title="decorative_grapheme? (class method)">.<strong>decorative_grapheme?</strong>(grapheme)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#default_git_driver_global_commands-class_method" title="default_git_driver_global_commands (class method)">.<strong>default_git_driver_global_commands</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#development_dependency_names-class_method" title="development_dependency_names (class method)">.<strong>development_dependency_names</strong>(content)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#dirty_git_attribute_managed_block%3F-class_method" title="dirty_git_attribute_managed_block? (class method)">.<strong>dirty_git_attribute_managed_block?</strong>(content, managed_block)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#ensure_bin_setup_executable-class_method" title="ensure_bin_setup_executable (class method)">.<strong>ensure_bin_setup_executable</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#ensure_curated_binstubs_executable-class_method" title="ensure_curated_binstubs_executable (class method)">.<strong>ensure_curated_binstubs_executable</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#ensure_env_local_gitignore-class_method" title="ensure_env_local_gitignore (class method)">.<strong>ensure_env_local_gitignore</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_git_drivers_check_step-class_method" title="execute_git_drivers_check_step (class method)">.<strong>execute_git_drivers_check_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_git_drivers_step-class_method" title="execute_git_drivers_step (class method)">.<strong>execute_git_drivers_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_hook_templates_step-class_method" title="execute_hook_templates_step (class method)">.<strong>execute_hook_templates_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_orchestration_steps-class_method" title="execute_orchestration_steps (class method)">.<strong>execute_orchestration_steps</strong>(install_steps, project_root:, env:, run_options:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_ready_command_step-class_method" title="execute_ready_command_step (class method)">.<strong>execute_ready_command_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#execute_ready_commands_step-class_method" title="execute_ready_commands_step (class method)">.<strong>execute_ready_commands_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#first_grapheme-class_method" title="first_grapheme (class method)">.<strong>first_grapheme</strong>(text)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#followup_apply_after_config_bootstrap-class_method" title="followup_apply_after_config_bootstrap (class method)">.<strong>followup_apply_after_config_bootstrap</strong>(project_root, env:, run_options:, report:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#gemspec_dependency_sync_step-class_method" title="gemspec_dependency_sync_step (class method)">.<strong>gemspec_dependency_sync_step</strong>(report)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#gemspec_grapheme_assignment_replacements-class_method" title="gemspec_grapheme_assignment_replacements (class method)">.<strong>gemspec_grapheme_assignment_replacements</strong>(content, grapheme)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#gemspec_name-class_method" title="gemspec_name (class method)">.<strong>gemspec_name</strong>(content, gemspec_path)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_attribute_block_end-class_method" title="git_attribute_block_end (class method)">.<strong>git_attribute_block_end</strong>(managed_block)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_attribute_block_start-class_method" title="git_attribute_block_start (class method)">.<strong>git_attribute_block_start</strong>(managed_block)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_attribute_line_conflicts%3F-class_method" title="git_attribute_line_conflicts? (class method)">.<strong>git_attribute_line_conflicts?</strong>(line, update)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_attribute_diagnostics-class_method" title="git_driver_attribute_diagnostics (class method)">.<strong>git_driver_attribute_diagnostics</strong>(project_root, updates, managed_block:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_attribute_reason-class_method" title="git_driver_attribute_reason (class method)">.<strong>git_driver_attribute_reason</strong>(diagnostics, dry_run:, ready:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_attribute_status-class_method" title="git_driver_attribute_status (class method)">.<strong>git_driver_attribute_status</strong>(diagnostics, dry_run:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_attribute_updates-class_method" title="git_driver_attribute_updates (class method)">.<strong>git_driver_attribute_updates</strong>(manifest, profile)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_forge_warning_diagnostic-class_method" title="git_driver_forge_warning_diagnostic (class method)">.<strong>git_driver_forge_warning_diagnostic</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_global_commands-class_method" title="git_driver_global_commands (class method)">.<strong>git_driver_global_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_global_config_checks-class_method" title="git_driver_global_config_checks (class method)">.<strong>git_driver_global_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_global_unset_commands-class_method" title="git_driver_global_unset_commands (class method)">.<strong>git_driver_global_unset_commands</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_local_commands-class_method" title="git_driver_local_commands (class method)">.<strong>git_driver_local_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_local_config_checks-class_method" title="git_driver_local_config_checks (class method)">.<strong>git_driver_local_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_manifest-class_method" title="git_driver_manifest (class method)">.<strong>git_driver_manifest</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_driver_manifest_profile-class_method" title="git_driver_manifest_profile (class method)">.<strong>git_driver_manifest_profile</strong>(manifest, profile)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_drivers_step-class_method" title="git_drivers_step (class method)">.<strong>git_drivers_step</strong>(project_root, run_options)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_output-class_method" title="git_output (class method)">.<strong>git_output</strong>(project_root, *args)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_success%3F-class_method" title="git_success? (class method)">.<strong>git_success?</strong>(project_root, *args)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#git_toplevel-class_method" title="git_toplevel (class method)">.<strong>git_toplevel</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#github_org_from_env-class_method" title="github_org_from_env (class method)">.<strong>github_org_from_env</strong>(env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#github_org_from_origin-class_method" title="github_org_from_origin (class method)">.<strong>github_org_from_origin</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#github_workflow_paths-class_method" title="github_workflow_paths (class method)">.<strong>github_workflow_paths</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#handoff_argv-class_method" title="handoff_argv (class method)">.<strong>handoff_argv</strong>(run_options)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#hook_templates_step-class_method" title="hook_templates_step (class method)">.<strong>hook_templates_step</strong>(project_root, run_options)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#install_phase_reports-class_method" title="install_phase_reports (class method)">.<strong>install_phase_reports</strong>(install_steps)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#install_run_options-class_method" title="install_run_options (class method)">.<strong>install_run_options</strong>(env, run_options)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#install_step_summary-class_method" title="install_step_summary (class method)">.<strong>install_step_summary</strong>(install_steps)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#kettle_config_migration_step-class_method" title="kettle_config_migration_step (class method)">.<strong>kettle_config_migration_step</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#list_arg-class_method" title="list_arg (class method)">.<strong>list_arg</strong>(flag, value)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#literal_github_homepage%3F-class_method" title="literal_github_homepage? (class method)">.<strong>literal_github_homepage?</strong>(assigned)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#lockfile_normalization_command-class_method" title="lockfile_normalization_command (class method)">.<strong>lockfile_normalization_command</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#merge_apply_reports-class_method" title="merge_apply_reports (class method)">.<strong>merge_apply_reports</strong>(initial, followup)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#mise_installed%3F-class_method" title="mise_installed? (class method)">.<strong>mise_installed?</strong>(env)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#mise_trust_step-class_method" title="mise_trust_step (class method)">.<strong>mise_trust_step</strong>(project_root, report, env:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normal_lockfile_env-class_method" title="normal_lockfile_env (class method)">.<strong>normal_lockfile_env</strong>(env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normalize_gemspec_grapheme-class_method" title="normalize_gemspec_grapheme (class method)">.<strong>normalize_gemspec_grapheme</strong>(content, grapheme)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normalize_git_drivers_mode-class_method" title="normalize_git_drivers_mode (class method)">.<strong>normalize_git_drivers_mode</strong>(value)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normalize_hook_templates_mode-class_method" title="normalize_hook_templates_mode (class method)">.<strong>normalize_hook_templates_mode</strong>(value)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normalize_lockfile_step-class_method" title="normalize_lockfile_step (class method)">.<strong>normalize_lockfile_step</strong>(project_root, env:, run_options: {})  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#normalize_readme_h1_grapheme-class_method" title="normalize_readme_h1_grapheme (class method)">.<strong>normalize_readme_h1_grapheme</strong>(content, grapheme)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#post_template_project_fix_steps-class_method" title="post_template_project_fix_steps (class method)">.<strong>post_template_project_fix_steps</strong>(project_root, report, env:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#prune_unwanted_bundler_binstubs-class_method" title="prune_unwanted_bundler_binstubs (class method)">.<strong>prune_unwanted_bundler_binstubs</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#readme_h1_grapheme-class_method" title="readme_h1_grapheme (class method)">.<strong>readme_h1_grapheme</strong>(content)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#relative_or_absolute_path-class_method" title="relative_or_absolute_path (class method)">.<strong>relative_or_absolute_path</strong>(path, project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#remove_git_attribute_managed_block-class_method" title="remove_git_attribute_managed_block (class method)">.<strong>remove_git_attribute_managed_block</strong>(content, managed_block:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#render_git_attribute_line-class_method" title="render_git_attribute_line (class method)">.<strong>render_git_attribute_line</strong>(update)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#render_git_attributes-class_method" title="render_git_attributes (class method)">.<strong>render_git_attributes</strong>(content, updates, managed_block:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#render_git_driver_include_config-class_method" title="render_git_driver_include_config (class method)">.<strong>render_git_driver_include_config</strong>(config_entries)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#repair_gemspec_homepage-class_method" title="repair_gemspec_homepage (class method)">.<strong>repair_gemspec_homepage</strong>(project_root, env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#replace_character_ranges-class_method" title="replace_character_ranges (class method)">.<strong>replace_character_ranges</strong>(content, replacements)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#rewrite_yard_binstub-class_method" title="rewrite_yard_binstub (class method)">.<strong>rewrite_yard_binstub</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#ruby_string_literal_content-class_method" title="ruby_string_literal_content (class method)">.<strong>ruby_string_literal_content</strong>(value, quote)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#run-class_method" title="run (class method)">.<strong>run</strong>(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#run_bundle_setup_commands-class_method" title="run_bundle_setup_commands (class method)">.<strong>run_bundle_setup_commands</strong>(project_root, env:, run_options:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#run_command_step-class_method" title="run_command_step (class method)">.<strong>run_command_step</strong>(name, command, project_root:, env:, quiet:, command_runner:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#run_system_command-class_method" title="run_system_command (class method)">.<strong>run_system_command</strong>(command, chdir:, env:, quiet:)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#semantic_git_driver_attribute_updates-class_method" title="semantic_git_driver_attribute_updates (class method)">.<strong>semantic_git_driver_attribute_updates</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#setup_command_env-class_method" title="setup_command_env (class method)">.<strong>setup_command_env</strong>(project_root, env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#strip_inherited_bundler_activation!-class_method" title="strip_inherited_bundler_activation! (class method)">.<strong>strip_inherited_bundler_activation!</strong>(command_env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#strip_leading_decorative_graphemes-class_method" title="strip_leading_decorative_graphemes (class method)">.<strong>strip_leading_decorative_graphemes</strong>(text)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#sync_readme_gemspec_grapheme-class_method" title="sync_readme_gemspec_grapheme (class method)">.<strong>sync_readme_gemspec_grapheme</strong>(project_root, env)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#trim_readme_compatibility_badges-class_method" title="trim_readme_compatibility_badges (class method)">.<strong>trim_readme_compatibility_badges</strong>(project_root, report)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#unsafe_git_driver_command_value%3F-class_method" title="unsafe_git_driver_command_value? (class method)">.<strong>unsafe_git_driver_command_value?</strong>(value)  &#x21d2; Boolean </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#validate_bundle_binstub_location-class_method" title="validate_bundle_binstub_location (class method)">.<strong>validate_bundle_binstub_location</strong>(project_root)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#validate_git_driver_manifest!-class_method" title="validate_git_driver_manifest! (class method)">.<strong>validate_git_driver_manifest!</strong>(manifest)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#validate_git_driver_profile!-class_method" title="validate_git_driver_profile! (class method)">.<strong>validate_git_driver_profile!</strong>(profile_name, profile)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#value_arg-class_method" title="value_arg (class method)">.<strong>value_arg</strong>(flag, value)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#version_gem_bootstrap_step-class_method" title="version_gem_bootstrap_step (class method)">.<strong>version_gem_bootstrap_step</strong>(project_root, report)  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
         <li class="public ">
   <span class="summary_signature">
-    
+
       <a href="#yard_binstub_rake_handoff_content-class_method" title="yard_binstub_rake_handoff_content (class method)">.<strong>yard_binstub_rake_handoff_content</strong>  &#x21d2; Object </a>
-    
 
-    
+
+
   </span>
-  
-  
-  
-  
-  
-  
-  
 
-  
+
+
+
+
+
+
+
+
     <span class="summary_desc"><div class='inline'>
 </div></span>
-  
+
 </li>
 
-      
+
     </ul>
-    
-  
+
+
 
 
 
   <div id="class_method_details" class="method_details_list">
     <h2>Class Method Details</h2>
 
-    
+
       <div class="method_details first">
   <h3 class="signature first" id="bin_setup_command-class_method">
-  
-    .<strong>bin_setup_command</strong>(project_root, quiet:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>bin_setup_command</strong>(project_root, quiet:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2489,16 +2489,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="binstub_files-class_method">
-  
-    .<strong>binstub_files</strong>(bin_dir)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>binstub_files</strong>(bin_dir)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2539,16 +2539,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="bootstrap_commit_step-class_method">
-  
-    .<strong>bootstrap_commit_step</strong>(project_root, run_options:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>bootstrap_commit_step</strong>(project_root, run_options:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2637,16 +2637,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="bundle_binstubs_command-class_method">
-  
-    .<strong>bundle_binstubs_command</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>bundle_binstubs_command</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2667,16 +2667,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="bundled_handoff_step-class_method">
-  
-    .<strong>bundled_handoff_step</strong>(project_root:, env:, run_options:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>bundled_handoff_step</strong>(project_root:, env:, run_options:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2743,16 +2743,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="bundler_binstub_gem_name-class_method">
-  
-    .<strong>bundler_binstub_gem_name</strong>(path)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>bundler_binstub_gem_name</strong>(path)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2797,37 +2797,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="bundler_generated_binstub?-class_method">
-  
-    .<strong>bundler_generated_binstub?</strong>(path)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>bundler_generated_binstub?</strong>(path)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -2854,16 +2854,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="cleanup_legacy_ruby_version_files-class_method">
-  
-    .<strong>cleanup_legacy_ruby_version_files</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>cleanup_legacy_ruby_version_files</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -2910,37 +2910,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="config_bootstrap_changed?-class_method">
-  
-    .<strong>config_bootstrap_changed?</strong>(report)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>config_bootstrap_changed?</strong>(report)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -2971,16 +2971,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="configured_project_grapheme-class_method">
-  
-    .<strong>configured_project_grapheme</strong>(project_root, env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>configured_project_grapheme</strong>(project_root, env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3021,16 +3021,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="conflicting_git_attribute_diagnostics-class_method">
-  
-    .<strong>conflicting_git_attribute_diagnostics</strong>(content, updates, managed_block:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>conflicting_git_attribute_diagnostics</strong>(content, updates, managed_block:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3077,37 +3077,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="curated_binstub?-class_method">
-  
-    .<strong>curated_binstub?</strong>(path)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>curated_binstub?</strong>(path)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -3138,37 +3138,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="decorative_grapheme?-class_method">
-  
-    .<strong>decorative_grapheme?</strong>(grapheme)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>decorative_grapheme?</strong>(grapheme)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -3197,16 +3197,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="default_git_driver_global_commands-class_method">
-  
-    .<strong>default_git_driver_global_commands</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>default_git_driver_global_commands</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3239,16 +3239,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="development_dependency_names-class_method">
-  
-    .<strong>development_dependency_names</strong>(content)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>development_dependency_names</strong>(content)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3275,37 +3275,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="dirty_git_attribute_managed_block?-class_method">
-  
-    .<strong>dirty_git_attribute_managed_block?</strong>(content, managed_block)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>dirty_git_attribute_managed_block?</strong>(content, managed_block)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -3334,16 +3334,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="ensure_bin_setup_executable-class_method">
-  
-    .<strong>ensure_bin_setup_executable</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>ensure_bin_setup_executable</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3384,16 +3384,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="ensure_curated_binstubs_executable-class_method">
-  
-    .<strong>ensure_curated_binstubs_executable</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>ensure_curated_binstubs_executable</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3444,16 +3444,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="ensure_env_local_gitignore-class_method">
-  
-    .<strong>ensure_env_local_gitignore</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>ensure_env_local_gitignore</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3522,37 +3522,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_git_drivers_check_step-class_method">
-  
-    .<strong>execute_git_drivers_check_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_git_drivers_check_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Raises:</p>
 <ul class="raise">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Kettle::Jem::Error</a></span></tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -3609,16 +3609,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_git_drivers_step-class_method">
-  
-    .<strong>execute_git_drivers_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_git_drivers_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3729,16 +3729,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_hook_templates_step-class_method">
-  
-    .<strong>execute_hook_templates_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_hook_templates_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3787,16 +3787,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_orchestration_steps-class_method">
-  
-    .<strong>execute_orchestration_steps</strong>(install_steps, project_root:, env:, run_options:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_orchestration_steps</strong>(install_steps, project_root:, env:, run_options:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3853,37 +3853,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_ready_command_step-class_method">
-  
-    .<strong>execute_ready_command_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_ready_command_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Raises:</p>
 <ul class="raise">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Kettle::Jem::Error</a></span></tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -3930,16 +3930,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="execute_ready_commands_step-class_method">
-  
-    .<strong>execute_ready_commands_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>execute_ready_commands_step</strong>(step, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -3994,16 +3994,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="first_grapheme-class_method">
-  
-    .<strong>first_grapheme</strong>(text)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>first_grapheme</strong>(text)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4024,16 +4024,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="followup_apply_after_config_bootstrap-class_method">
-  
-    .<strong>followup_apply_after_config_bootstrap</strong>(project_root, env:, run_options:, report:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>followup_apply_after_config_bootstrap</strong>(project_root, env:, run_options:, report:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4070,16 +4070,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="gemspec_dependency_sync_step-class_method">
-  
-    .<strong>gemspec_dependency_sync_step</strong>(report)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>gemspec_dependency_sync_step</strong>(report)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4132,16 +4132,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="gemspec_grapheme_assignment_replacements-class_method">
-  
-    .<strong>gemspec_grapheme_assignment_replacements</strong>(content, grapheme)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>gemspec_grapheme_assignment_replacements</strong>(content, grapheme)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4188,16 +4188,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="gemspec_name-class_method">
-  
-    .<strong>gemspec_name</strong>(content, gemspec_path)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>gemspec_name</strong>(content, gemspec_path)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4224,16 +4224,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_attribute_block_end-class_method">
-  
-    .<strong>git_attribute_block_end</strong>(managed_block)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_attribute_block_end</strong>(managed_block)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4254,16 +4254,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_attribute_block_start-class_method">
-  
-    .<strong>git_attribute_block_start</strong>(managed_block)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_attribute_block_start</strong>(managed_block)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4284,37 +4284,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_attribute_line_conflicts?-class_method">
-  
-    .<strong>git_attribute_line_conflicts?</strong>(line, update)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>git_attribute_line_conflicts?</strong>(line, update)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -4353,16 +4353,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_attribute_diagnostics-class_method">
-  
-    .<strong>git_driver_attribute_diagnostics</strong>(project_root, updates, managed_block:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_attribute_diagnostics</strong>(project_root, updates, managed_block:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4413,16 +4413,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_attribute_reason-class_method">
-  
-    .<strong>git_driver_attribute_reason</strong>(diagnostics, dry_run:, ready:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_attribute_reason</strong>(diagnostics, dry_run:, ready:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4449,16 +4449,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_attribute_status-class_method">
-  
-    .<strong>git_driver_attribute_status</strong>(diagnostics, dry_run:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_attribute_status</strong>(diagnostics, dry_run:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4483,16 +4483,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_attribute_updates-class_method">
-  
-    .<strong>git_driver_attribute_updates</strong>(manifest, profile)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_attribute_updates</strong>(manifest, profile)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4527,16 +4527,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_forge_warning_diagnostic-class_method">
-  
-    .<strong>git_driver_forge_warning_diagnostic</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_forge_warning_diagnostic</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4567,16 +4567,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_global_commands-class_method">
-  
-    .<strong>git_driver_global_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_global_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4607,16 +4607,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_global_config_checks-class_method">
-  
-    .<strong>git_driver_global_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_global_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4641,16 +4641,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_global_unset_commands-class_method">
-  
-    .<strong>git_driver_global_unset_commands</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_global_unset_commands</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4683,16 +4683,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_local_commands-class_method">
-  
-    .<strong>git_driver_local_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_local_commands</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4717,16 +4717,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_local_config_checks-class_method">
-  
-    .<strong>git_driver_local_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_local_config_checks</strong>(manifest = nil, profile = &quot;semantic-diff&quot;)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4751,16 +4751,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_manifest-class_method">
-  
-    .<strong>git_driver_manifest</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_manifest</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4795,16 +4795,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_driver_manifest_profile-class_method">
-  
-    .<strong>git_driver_manifest_profile</strong>(manifest, profile)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_driver_manifest_profile</strong>(manifest, profile)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -4829,16 +4829,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_drivers_step-class_method">
-  
-    .<strong>git_drivers_step</strong>(project_root, run_options)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_drivers_step</strong>(project_root, run_options)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5043,16 +5043,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_output-class_method">
-  
-    .<strong>git_output</strong>(project_root, *args)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_output</strong>(project_root, *args)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5075,37 +5075,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_success?-class_method">
-  
-    .<strong>git_success?</strong>(project_root, *args)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>git_success?</strong>(project_root, *args)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -5130,16 +5130,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="git_toplevel-class_method">
-  
-    .<strong>git_toplevel</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>git_toplevel</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5162,16 +5162,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="github_org_from_env-class_method">
-  
-    .<strong>github_org_from_env</strong>(env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>github_org_from_env</strong>(env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5200,16 +5200,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="github_org_from_origin-class_method">
-  
-    .<strong>github_org_from_origin</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>github_org_from_origin</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5258,16 +5258,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="github_workflow_paths-class_method">
-  
-    .<strong>github_workflow_paths</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>github_workflow_paths</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5298,16 +5298,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="handoff_argv-class_method">
-  
-    .<strong>handoff_argv</strong>(run_options)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>handoff_argv</strong>(run_options)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5360,16 +5360,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="hook_templates_step-class_method">
-  
-    .<strong>hook_templates_step</strong>(project_root, run_options)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>hook_templates_step</strong>(project_root, run_options)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5460,16 +5460,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="install_phase_reports-class_method">
-  
-    .<strong>install_phase_reports</strong>(install_steps)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>install_phase_reports</strong>(install_steps)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5550,16 +5550,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="install_run_options-class_method">
-  
-    .<strong>install_run_options</strong>(env, run_options)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>install_run_options</strong>(env, run_options)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5580,16 +5580,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="install_step_summary-class_method">
-  
-    .<strong>install_step_summary</strong>(install_steps)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>install_step_summary</strong>(install_steps)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5624,16 +5624,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="kettle_config_migration_step-class_method">
-  
-    .<strong>kettle_config_migration_step</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>kettle_config_migration_step</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5718,16 +5718,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="list_arg-class_method">
-  
-    .<strong>list_arg</strong>(flag, value)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>list_arg</strong>(flag, value)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5750,37 +5750,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="literal_github_homepage?-class_method">
-  
-    .<strong>literal_github_homepage?</strong>(assigned)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>literal_github_homepage?</strong>(assigned)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -5823,16 +5823,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="lockfile_normalization_command-class_method">
-  
-    .<strong>lockfile_normalization_command</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>lockfile_normalization_command</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5853,16 +5853,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="merge_apply_reports-class_method">
-  
-    .<strong>merge_apply_reports</strong>(initial, followup)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>merge_apply_reports</strong>(initial, followup)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -5897,37 +5897,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="mise_installed?-class_method">
-  
-    .<strong>mise_installed?</strong>(env)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>mise_installed?</strong>(env)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -5960,16 +5960,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="mise_trust_step-class_method">
-  
-    .<strong>mise_trust_step</strong>(project_root, report, env:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>mise_trust_step</strong>(project_root, report, env:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6036,16 +6036,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normal_lockfile_env-class_method">
-  
-    .<strong>normal_lockfile_env</strong>(env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normal_lockfile_env</strong>(env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6080,7 +6080,7 @@
 <span class='kw'>def</span> <span class='id identifier rubyid_normal_lockfile_env'>normal_lockfile_env</span><span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_command_env'>command_env</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_env'>env</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_h'>to_h</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
   <span class='id identifier rubyid_command_env'>command_env</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>K_JEM_TEMPLATING</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>false</span><span class='tstring_end'>&quot;</span></span>
-  <span class='qwords_beg'>%w[</span><span class='tstring_content'>KETTLE_RB_DEV</span><span class='words_sep'> </span><span class='tstring_content'>GALTZO_FLOSS_DEV</span><span class='words_sep'> </span><span class='tstring_content'>SMORG_RB_DEV</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span>
+  <span class='qwords_beg'>%w[</span><span class='tstring_content'>KETTLE_RB_DEV</span><span class='words_sep'> </span><span class='tstring_content'>GALTZO_FLOSS_DEV</span><span class='words_sep'> </span><span class='tstring_content'>STRUCTUREDMERGE_DEV</span><span class='tstring_end'>]</span></span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_key'>key</span><span class='op'>|</span>
     <span class='id identifier rubyid_command_env'>command_env</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>false</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='id identifier rubyid_command_env'>command_env</span><span class='period'>.</span><span class='id identifier rubyid_key?'>key?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
   <span class='qwords_beg'>%w[</span><span class='words_sep'>
@@ -6102,16 +6102,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normalize_gemspec_grapheme-class_method">
-  
-    .<strong>normalize_gemspec_grapheme</strong>(content, grapheme)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normalize_gemspec_grapheme</strong>(content, grapheme)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6134,16 +6134,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normalize_git_drivers_mode-class_method">
-  
-    .<strong>normalize_git_drivers_mode</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normalize_git_drivers_mode</strong>(value)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6184,16 +6184,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normalize_hook_templates_mode-class_method">
-  
-    .<strong>normalize_hook_templates_mode</strong>(value)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normalize_hook_templates_mode</strong>(value)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6226,16 +6226,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normalize_lockfile_step-class_method">
-  
-    .<strong>normalize_lockfile_step</strong>(project_root, env:, run_options: {})  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normalize_lockfile_step</strong>(project_root, env:, run_options: {})  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6300,16 +6300,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="normalize_readme_h1_grapheme-class_method">
-  
-    .<strong>normalize_readme_h1_grapheme</strong>(content, grapheme)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>normalize_readme_h1_grapheme</strong>(content, grapheme)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6344,16 +6344,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="post_template_project_fix_steps-class_method">
-  
-    .<strong>post_template_project_fix_steps</strong>(project_root, report, env:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>post_template_project_fix_steps</strong>(project_root, report, env:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6386,16 +6386,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="prune_unwanted_bundler_binstubs-class_method">
-  
-    .<strong>prune_unwanted_bundler_binstubs</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>prune_unwanted_bundler_binstubs</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6446,16 +6446,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="readme_h1_grapheme-class_method">
-  
-    .<strong>readme_h1_grapheme</strong>(content)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>readme_h1_grapheme</strong>(content)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6484,16 +6484,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="relative_or_absolute_path-class_method">
-  
-    .<strong>relative_or_absolute_path</strong>(path, project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>relative_or_absolute_path</strong>(path, project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6524,16 +6524,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="remove_git_attribute_managed_block-class_method">
-  
-    .<strong>remove_git_attribute_managed_block</strong>(content, managed_block:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>remove_git_attribute_managed_block</strong>(content, managed_block:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6588,16 +6588,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="render_git_attribute_line-class_method">
-  
-    .<strong>render_git_attribute_line</strong>(update)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>render_git_attribute_line</strong>(update)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6620,16 +6620,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="render_git_attributes-class_method">
-  
-    .<strong>render_git_attributes</strong>(content, updates, managed_block:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>render_git_attributes</strong>(content, updates, managed_block:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6660,16 +6660,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="render_git_driver_include_config-class_method">
-  
-    .<strong>render_git_driver_include_config</strong>(config_entries)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>render_git_driver_include_config</strong>(config_entries)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6704,16 +6704,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="repair_gemspec_homepage-class_method">
-  
-    .<strong>repair_gemspec_homepage</strong>(project_root, env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>repair_gemspec_homepage</strong>(project_root, env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6834,16 +6834,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="replace_character_ranges-class_method">
-  
-    .<strong>replace_character_ranges</strong>(content, replacements)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>replace_character_ranges</strong>(content, replacements)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6868,16 +6868,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="rewrite_yard_binstub-class_method">
-  
-    .<strong>rewrite_yard_binstub</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>rewrite_yard_binstub</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6954,16 +6954,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="ruby_string_literal_content-class_method">
-  
-    .<strong>ruby_string_literal_content</strong>(value, quote)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>ruby_string_literal_content</strong>(value, quote)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -6986,16 +6986,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="run-class_method">
-  
-    .<strong>run</strong>(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>run</strong>(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7080,16 +7080,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="run_bundle_setup_commands-class_method">
-  
-    .<strong>run_bundle_setup_commands</strong>(project_root, env:, run_options:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>run_bundle_setup_commands</strong>(project_root, env:, run_options:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7160,37 +7160,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="run_command_step-class_method">
-  
-    .<strong>run_command_step</strong>(name, command, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>run_command_step</strong>(name, command, project_root:, env:, quiet:, command_runner:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Raises:</p>
 <ul class="raise">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Kettle::Jem::Error</a></span></tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -7253,16 +7253,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="run_system_command-class_method">
-  
-    .<strong>run_system_command</strong>(command, chdir:, env:, quiet:)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>run_system_command</strong>(command, chdir:, env:, quiet:)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7299,16 +7299,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="semantic_git_driver_attribute_updates-class_method">
-  
-    .<strong>semantic_git_driver_attribute_updates</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>semantic_git_driver_attribute_updates</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7341,16 +7341,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="setup_command_env-class_method">
-  
-    .<strong>setup_command_env</strong>(project_root, env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>setup_command_env</strong>(project_root, env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7379,16 +7379,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="strip_inherited_bundler_activation!-class_method">
-  
-    .<strong>strip_inherited_bundler_activation!</strong>(command_env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>strip_inherited_bundler_activation!</strong>(command_env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7427,16 +7427,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="strip_leading_decorative_graphemes-class_method">
-  
-    .<strong>strip_leading_decorative_graphemes</strong>(text)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>strip_leading_decorative_graphemes</strong>(text)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7471,16 +7471,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="sync_readme_gemspec_grapheme-class_method">
-  
-    .<strong>sync_readme_gemspec_grapheme</strong>(project_root, env)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>sync_readme_gemspec_grapheme</strong>(project_root, env)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7561,16 +7561,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="trim_readme_compatibility_badges-class_method">
-  
-    .<strong>trim_readme_compatibility_badges</strong>(project_root, report)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>trim_readme_compatibility_badges</strong>(project_root, report)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7653,37 +7653,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="unsafe_git_driver_command_value?-class_method">
-  
-    .<strong>unsafe_git_driver_command_value?</strong>(value)  &#x21d2; <tt>Boolean</tt> 
-  
 
-  
+    .<strong>unsafe_git_driver_command_value?</strong>(value)  &#x21d2; <tt>Boolean</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Returns:</p>
 <ul class="return">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt>Boolean</tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -7706,16 +7706,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="validate_bundle_binstub_location-class_method">
-  
-    .<strong>validate_bundle_binstub_location</strong>(project_root)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>validate_bundle_binstub_location</strong>(project_root)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7788,37 +7788,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="validate_git_driver_manifest!-class_method">
-  
-    .<strong>validate_git_driver_manifest!</strong>(manifest)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>validate_git_driver_manifest!</strong>(manifest)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Raises:</p>
 <ul class="raise">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Kettle::Jem::Error</a></span></tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -7857,37 +7857,37 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="validate_git_driver_profile!-class_method">
-  
-    .<strong>validate_git_driver_profile!</strong>(profile_name, profile)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>validate_git_driver_profile!</strong>(profile_name, profile)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><div class="docstring">
   <div class="discussion">
-    
+
 
 
   </div>
 </div>
 <div class="tags">
-  
+
 <p class="tag_title">Raises:</p>
 <ul class="raise">
-  
+
     <li>
-      
-      
+
+
         <span class='type'>(<tt><span class='object_link'><a href="../Error.html" title="Kettle::Jem::Error (class)">Kettle::Jem::Error</a></span></tt>)</span>
-      
-      
-      
+
+
+
     </li>
-  
+
 </ul>
 
 </div><table class="source_code">
@@ -7938,16 +7938,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="value_arg-class_method">
-  
-    .<strong>value_arg</strong>(flag, value)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>value_arg</strong>(flag, value)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -7968,16 +7968,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="version_gem_bootstrap_step-class_method">
-  
-    .<strong>version_gem_bootstrap_step</strong>(project_root, report)  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>version_gem_bootstrap_step</strong>(project_root, report)  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -8000,16 +8000,16 @@
   </tr>
 </table>
 </div>
-    
+
       <div class="method_details ">
   <h3 class="signature " id="yard_binstub_rake_handoff_content-class_method">
-  
-    .<strong>yard_binstub_rake_handoff_content</strong>  &#x21d2; <tt>Object</tt> 
-  
 
-  
+    .<strong>yard_binstub_rake_handoff_content</strong>  &#x21d2; <tt>Object</tt>
 
-  
+
+
+
+
 </h3><table class="source_code">
   <tr>
     <td>
@@ -8062,7 +8062,7 @@
   </tr>
 </table>
 </div>
-    
+
   </div>
 
 </div>

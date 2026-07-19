@@ -1,86 +1,66 @@
-version = 1
 driver_namespace = "smorg"
-
+version = 1
 [profiles.builtin-diff]
 description = "Use Git built-in hunk and word-diff drivers where available."
-
 [[profiles.builtin-diff.attributes]]
-pattern = "*.rb"
 diff = "ruby"
-
+pattern = "*.rb"
 [profiles.semantic-diff]
 description = "Use StructuredMerge external diff drivers for local CLI diffs."
-
 [[profiles.semantic-diff.attributes]]
-pattern = "*.rb"
 diff = "smorg-rb"
-
+pattern = "*.rb"
 [[profiles.semantic-diff.git_config]]
-scope = "global"
 key = "diff.smorg-rb.command"
+scope = "global"
 value = "smorg-rb diff-driver"
-
 [profiles.textconv-normalized]
 description = "Use one-way normalized text projections for package/config review."
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-json-textconv"
 pattern = "*.json"
-diff = "smorg-json-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-json-textconv"
 pattern = "*.jsonc"
-diff = "smorg-json-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-yaml-textconv"
 pattern = "*.yml"
-diff = "smorg-yaml-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-yaml-textconv"
 pattern = "*.yaml"
-diff = "smorg-yaml-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-toml-textconv"
 pattern = "*.toml"
-diff = "smorg-toml-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-json-textconv"
 pattern = "package.json"
-diff = "smorg-json-textconv"
-
 [[profiles.textconv-normalized.attributes]]
+diff = "smorg-json-textconv"
 pattern = "package-lock.json"
-diff = "smorg-json-textconv"
-
 [[profiles.textconv-normalized.attributes]]
-pattern = "Cargo.toml"
 diff = "smorg-toml-textconv"
-
+pattern = "Cargo.toml"
 [[profiles.textconv-normalized.git_config]]
-scope = "global"
 key = "diff.smorg-json-textconv.textconv"
+scope = "global"
 value = "smorg-rb textconv --format json"
-
 [[profiles.textconv-normalized.git_config]]
-scope = "global"
 key = "diff.smorg-json-textconv.cachetextconv"
-value = "true"
-
-[[profiles.textconv-normalized.git_config]]
 scope = "global"
+value = "true"
+[[profiles.textconv-normalized.git_config]]
 key = "diff.smorg-yaml-textconv.textconv"
+scope = "global"
 value = "smorg-rb textconv --format yaml"
-
 [[profiles.textconv-normalized.git_config]]
-scope = "global"
 key = "diff.smorg-yaml-textconv.cachetextconv"
+scope = "global"
 value = "true"
-
 [[profiles.textconv-normalized.git_config]]
-scope = "global"
 key = "diff.smorg-toml-textconv.textconv"
-value = "smorg-rb textconv --format toml"
-
-[[profiles.textconv-normalized.git_config]]
 scope = "global"
+value = "smorg-rb textconv --format toml"
+[[profiles.textconv-normalized.git_config]]
 key = "diff.smorg-toml-textconv.cachetextconv"
+scope = "global"
 value = "true"

@@ -792,18 +792,18 @@
     [5, 5, 33, "Style/Documentation: Missing top-level documentation comment for `module Ast::Merge::EmitterLineMetadataSupport`.", 2926748997],
     [23, 7, 541, "Metrics/MethodLength: Method has too many lines. [12/10]", 2407359355]
   ],
-  "lib/ast/merge/file_aligner_base.rb:4032045257": [
-    [13, 5, 7473, "Metrics/ClassLength: Class has too many lines. [187/100]", 1391880441],
-    [27, 7, 2244, "Metrics/AbcSize: Assignment Branch Condition size for `align` is too high. [<19, 37, 12> 43.29/17]", 1243937217],
-    [27, 7, 2244, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `align` is too high. [12/7]", 1243937217],
-    [27, 7, 2244, "Metrics/MethodLength: Method has too many lines. [55/10]", 1243937217],
-    [27, 7, 2244, "Metrics/PerceivedComplexity: Perceived complexity for `align` is too high. [12/8]", 1243937217],
-    [148, 7, 655, "Metrics/MethodLength: Method has too many lines. [14/10]", 2468821688],
-    [180, 7, 455, "Metrics/MethodLength: Method has too many lines. [13/10]", 2361153066],
-    [199, 7, 1557, "Metrics/AbcSize: Assignment Branch Condition size for `apply_match_refiner!` is too high. [<10, 28, 12> 32.06/17]", 2386945712],
-    [199, 7, 1557, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_match_refiner!` is too high. [13/7]", 2386945712],
-    [199, 7, 1557, "Metrics/MethodLength: Method has too many lines. [31/10]", 2386945712],
-    [199, 7, 1557, "Metrics/PerceivedComplexity: Perceived complexity for `apply_match_refiner!` is too high. [13/8]", 2386945712]
+  "lib/ast/merge/file_aligner_base.rb:2160333224": [
+    [13, 5, 8206, "Metrics/ClassLength: Class has too many lines. [203/100]", 2982381587],
+    [27, 7, 2329, "Metrics/AbcSize: Assignment Branch Condition size for `align` is too high. [<19, 39, 14> 45.59/17]", 1243937217],
+    [27, 7, 2329, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `align` is too high. [14/7]", 1243937217],
+    [27, 7, 2329, "Metrics/MethodLength: Method has too many lines. [56/10]", 1243937217],
+    [27, 7, 2329, "Metrics/PerceivedComplexity: Perceived complexity for `align` is too high. [14/8]", 1243937217],
+    [167, 7, 655, "Metrics/MethodLength: Method has too many lines. [14/10]", 2468821688],
+    [199, 7, 455, "Metrics/MethodLength: Method has too many lines. [13/10]", 2361153066],
+    [218, 7, 1557, "Metrics/AbcSize: Assignment Branch Condition size for `apply_match_refiner!` is too high. [<10, 28, 12> 32.06/17]", 2386945712],
+    [218, 7, 1557, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_match_refiner!` is too high. [13/7]", 2386945712],
+    [218, 7, 1557, "Metrics/MethodLength: Method has too many lines. [31/10]", 2386945712],
+    [218, 7, 1557, "Metrics/PerceivedComplexity: Perceived complexity for `apply_match_refiner!` is too high. [13/8]", 2386945712]
   ],
   "lib/ast/merge/file_analyzable.rb:607555963": [
     [36, 5, 31229, "Metrics/ModuleLength: Module has too many lines. [316/100]", 1247752256],
@@ -1038,6 +1038,13 @@
     [65, 51, 6, "Lint/UnusedBlockArgument: Unused block argument - `inline`. If it's necessary, use `_` or `_inline` as an argument name to indicate that it won't be used.", 1605470060],
     [69, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 4226982364],
     [70, 121, 11, "Layout/LineLength: Line is too long. [131/120]", 1440420861]
+  ],
+  "lib/ast/merge/rspec/conformance_fixtures.rb:1295759615": [
+    [6, 7, 26, "Style/Documentation: Missing top-level documentation comment for `module Ast::Merge::RSpec::ConformanceFixtures`.", 90066768],
+    [9, 9, 1432, "Metrics/AbcSize: Assignment Branch Condition size for `normalize_conformance_fixture_support` is too high. [<10, 30, 33> 45.71/17]", 518714108],
+    [9, 9, 1432, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `normalize_conformance_fixture_support` is too high. [33/7]", 518714108],
+    [9, 9, 1432, "Metrics/MethodLength: Method has too many lines. [25/10]", 518714108],
+    [9, 9, 1432, "Metrics/PerceivedComplexity: Perceived complexity for `normalize_conformance_fixture_support` is too high. [31/8]", 518714108]
   ],
   "lib/ast/merge/rspec/dependency_tags_config.rb:3604516304": [
     [30, 1, 2102, "Metrics/BlockLength: Block has too many lines. [26/25]", 113766065]
@@ -1540,11 +1547,12 @@
     [58, 3, 1230, "Metrics/BlockLength: Block has too many lines. [34/25]", 990452676],
     [103, 3, 2668, "Metrics/BlockLength: Block has too many lines. [51/25]", 1755027956]
   ],
-  "spec/ast/merge/file_aligner_base_spec.rb:610089304": [
-    [5, 1, 7287, "Metrics/BlockLength: Block has too many lines. [164/25]", 597898988],
-    [6, 3, 1237, "Metrics/BlockLength: Block has too many lines. [37/25]", 1284505259],
-    [86, 3, 5087, "Metrics/BlockLength: Block has too many lines. [84/25]", 119873771],
-    [94, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 3749416415]
+  "spec/ast/merge/file_aligner_base_spec.rb:91275387": [
+    [5, 1, 9948, "Metrics/BlockLength: Block has too many lines. [217/25]", 3354563411],
+    [6, 3, 1490, "Metrics/BlockLength: Block has too many lines. [45/25]", 563330990],
+    [95, 3, 7495, "Metrics/BlockLength: Block has too many lines. [129/25]", 598770279],
+    [103, 121, 8, "Layout/LineLength: Line is too long. [128/120]", 3749416415],
+    [163, 5, 1489, "Metrics/BlockLength: Block has too many lines. [26/25]", 2910876949]
   ],
   "spec/ast/merge/file_analyzable_spec.rb:3816965829": [
     [3, 1, 12458, "Metrics/BlockLength: Block has too many lines. [272/25]", 216138965],
@@ -1949,6 +1957,10 @@
   ],
   "spec/ast/merge/unresolved_review_state_spec.rb:3186871217": [
     [3, 1, 1038, "Metrics/BlockLength: Block has too many lines. [31/25]", 1325553035]
+  ],
+  "spec/ast/merge_rspec_conformance_fixtures_spec.rb:251774004": [
+    [5, 1, 2119, "Metrics/BlockLength: Block has too many lines. [55/25]", 1724925683],
+    [6, 3, 1203, "Metrics/BlockLength: Block has too many lines. [29/25]", 3306863581]
   ],
   "spec/ast/merge_spec.rb:664670069": [
     [3, 1, 3113, "Metrics/BlockLength: Block has too many lines. [74/25]", 4034649501],

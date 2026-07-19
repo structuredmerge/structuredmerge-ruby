@@ -152,7 +152,247 @@ if direct_sibling_gems.any? &&
   end
 end
 
-# Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+if direct_sibling_gems.any? &&
+   (direct_sibling_local ||
+     ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)
+  direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')
+  direct_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)
+  begin
+    nomono_activation_requirements = nomono_requirements
+    nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)
+    if File.file?(nomono_lockfile)
+      nomono_locked_spec = Bundler::LockfileParser
+                           .new(Bundler.read_file(nomono_lockfile))
+                           .specs
+                           .find { |spec| spec.name == 'nomono' }
+      nomono_locked = nomono_locked_spec &&
+                      Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
+      nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+    end
+    Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+    require 'nomono/bundler'
+    ENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local
+
+    eval_nomono_gems(
+      gems: direct_sibling_gems,
+      prefix: 'STRUCTUREDMERGE',
+      path_env: 'STRUCTUREDMERGE_DEV',
+      root: %w[src my structuredmerge]
+    )
+  rescue LoadError
+    warn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'
+  ensure
+    if direct_sibling_templating && !direct_sibling_local
+      if direct_sibling_dev_was_set
+        ENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original
+      else
+        ENV.delete('STRUCTUREDMERGE_DEV')
+      end
+    end
+  end
+end
+
+# Use the StructuredMerge TSLP branch until upstream ships Ruby 4-compatible gem metadata.
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
@@ -161,7 +401,7 @@ unless tslp_declared_by_templating
     gem(
       'tree_sitter_language_pack',
       git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
-      branch: 'fix/ruby-4-installs',
+      branch: 'fix/ruby-parser-api-methods',
       glob: 'packages/ruby/*.gemspec'
     )
   else
@@ -169,7 +409,7 @@ unless tslp_declared_by_templating
   end
 end
 
-# Templating (env-switched: SMORG_RB_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+# Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
 
 # Debugging

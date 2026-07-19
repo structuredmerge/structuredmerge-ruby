@@ -70,7 +70,7 @@ tree = parser.parse(source_code)
         - **Commonmarker Backend**: Fast Markdown parser ([Commonmarker][commonmarker], comrak Rust)
         - **Markly Backend**: GitHub Flavored Markdown ([Markly][markly], cmark-gfm C)
         - **RBS Backend**: Official RBS parser integration registered by `rbs-merge`
-    - **Pure Ruby Fallback**:
+    - **Pure Ruby Provider Backends**:
         - **Citrus Backend**: Pure Ruby PEG parsing via [`citrus`][citrus] (no native dependencies)
         - **Parslet Backend**: Pure Ruby PEG parsing via [`parslet`][parslet] (no native dependencies)
     - **Binary Schema Support**:
@@ -446,7 +446,14 @@ TreeHaver exposes a backend registry for parser facades, language-family provide
 |---------|-------------|-------------|-------------|
 | **Kaitai Struct** | Backend reference and feature profile for binary schema analysis | Varies | Universal once a schema adapter is supplied |
 
-**`TreeHaver::Parser` Auto-selection priority:** MRI/Rust/FFI on MRI; Java/FFI on JRuby; then Prism → Psych → Citrus → Parslet.
+**`TreeHaver::Parser` Auto-selection contract:** `:auto` never means
+unregistered parser discovery. It selects the first registered TreeHaver backend
+module whose availability check passes. Built-in tree-sitter facade priority is
+MRI/Rust/FFI on MRI and Java/FFI on JRuby, followed by registered provider
+modules such as Prism, Psych, Citrus, and Parslet when those providers have been
+registered for the requested language. Explicit backend requests fail closed if
+that backend is unavailable or has no parser registered for the requested
+language.
 
 **Known Issues:**
 
@@ -534,7 +541,7 @@ This is particularly useful for:
 
 - **Testing**: Test the same code with different backends
 - **Performance comparison**: Benchmark different backends
-- **Fallback scenarios**: Try one backend, fall back to another
+- **Backend-selection scenarios**: Exercise each registered backend explicitly
 - **Thread isolation**: Each thread can use a different backend safely
 
 ```ruby
@@ -641,7 +648,8 @@ export TREE_SITTER_TOML_PATH=~/.local/share/mise/installs/lua/5.4.8/luarocks/lib
 
 ### Backend Selection
 
-TreeHaver automatically selects the best backend for your Ruby implementation, but you can override this behavior:
+TreeHaver can select an available registered backend for you, but you can
+override this behavior:
 
 ```ruby
 # Automatic backend selection (default)
@@ -661,7 +669,13 @@ TreeHaver.backend = :parslet # Use Parslet pure Ruby parser
                              # CAVEAT: few major language grammars, but many esoteric grammars
 ```
 
-**Auto-selection priority on MRI:** MRI → Rust → FFI → Citrus → Parslet
+**Auto-selection rule:** `:auto` uses the registered backend list and chooses
+the first backend module that is allowed by environment configuration and reports
+itself available. It does not call parser libraries directly, search for
+language-specific fallback parsers outside the registry, or hide an explicit
+backend failure by silently switching to a different backend.
+
+**Built-in facade priority on MRI:** MRI → Rust → FFI → Citrus → Parslet
 
 You can also set the backend via environment variable:
 
@@ -880,8 +894,8 @@ require "tree_haver"
 require "toml-merge"
 require "markdown-merge"
 
-TomlMerge.register_tree_haver_grammars!
-MarkdownMerge.register_tree_haver_grammars!
+Toml::Merge.register_backend!
+Markdown::Merge.register_backend!
 
 parser = TreeHaver.parser_for(:toml)
 ```
@@ -909,7 +923,31 @@ Given just the language name, `GrammarFinder` automatically derives:
 1.  **Environment variable**: `TREE_SITTER_<LANG>_PATH` (highest priority)
 2.  **Existing TreeHaver registration**: previously-registered tree-sitter grammar path
 3.  **Extra paths**: explicit paths provided at initialization
-4.  **`tree_sitter_language_pack`**: cache lookup plus on-demand download when the gem is available
+4.  **`tree_sitter_language_pack`**: parser API availability through its on-demand grammar loader
+
+#### TSLP Cold-Cache Troubleshooting
+
+`tree_sitter_language_pack` loads bundled grammars on demand. A cold install may
+not have a populated shared-library cache before the first parse, so
+`GrammarFinder` must not treat cache contents as the source of truth for TSLP
+availability.
+
+For TSLP-backed languages, check availability through the TSLP parser API and
+then register the language with the TreeHaver TSLP backend:
+
+```ruby
+finder = TreeHaver::GrammarFinder.new(:toml)
+finder.register! if finder.available?
+
+TreeHaver.with_backend("kreuzberg-language-pack") do
+  TreeHaver.parser_for(:toml).parse("title = \"example\"\n")
+end
+```
+
+If this fails from a cold start, inspect `finder.search_info` and confirm that
+the `tree-sitter-language-pack` gem is in the bundle being used. Do not add a
+merge-gem parser fallback to hide the failure; fix the TreeHaver registration
+or the TSLP grammar binding instead.
 
 #### Usage in \*-merge Gems
 
@@ -917,14 +955,19 @@ The `GrammarFinder` pattern enables clean integration in language-specific
 merge gems:
 
 ```ruby
-# In toml-merge
+# In a substrate merge gem
 finder = TreeHaver::GrammarFinder.new(:toml)
 finder.register! if finder.available?
+```
 
-# Register non-tree-sitter backends in the merge gem as well
+Parser-specific gems should register their own TreeHaver backend wrappers:
+
+```ruby
+# In a TOML parser provider gem
 TreeHaver.register_language(
   :toml,
-  grammar_module: TomlRB::Document,
+  backend_module: Citrus::Toml::Merge::Backend,
+  backend_type: :citrus,
   gem_name: "toml-rb",
 )
 ```
@@ -1000,7 +1043,7 @@ TreeHaver does not ship a `TreeSitter::*` compatibility namespace. Use the `Tree
       language = TreeHaver::Language.toml
     rescue TreeHaver::NotAvailable => e
       warn("TOML grammar not available: #{e.message}")
-      # Fallback to another backend or fail gracefully
+      # Select another registered TreeHaver backend explicitly, or fail gracefully
     end
     ```
 
@@ -1032,7 +1075,7 @@ tree = parser.parse("#!/bin/bash\necho hello")
 # With explicit library path
 parser = TreeHaver.parser_for(:toml, library_path: "/custom/path/libtree-sitter-toml.so")
 
-# With explicit Citrus fallback configuration
+# With explicit Citrus provider configuration
 parser = TreeHaver.parser_for(
   :toml,
   citrus_config: {gem_name: "toml-rb", grammar_const: "TomlRB::Document"},
@@ -1575,23 +1618,15 @@ TreeHaver.with_backend(:rust) do
 end
 ```
 
-#### Fallback Pattern
+#### Explicit Backend Selection Pattern
 
-Try one backend, fall back to another on failure:
+Try registered TreeHaver backends explicitly when you want controlled provider
+selection. Structured merge gems should fail closed when no registered TreeHaver
+backend can parse the requested language.
 
 ```ruby
-def parse_with_fallback(source)
-  TreeHaver.with_backend(:mri) do
-    TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
-  end
-rescue TreeHaver::NotAvailable
-  # Fall back to Citrus if MRI backend unavailable
-  TreeHaver.with_backend(:citrus) do
-    TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
-  end
-rescue TreeHaver::NotAvailable
-  # Fall back to Parslet if Citrus backend unavailable
-  TreeHaver.with_backend(:parslet) do
+def parse_with_backend(source, backend_name)
+  TreeHaver.with_backend(backend_name) do
     TreeHaver::Parser.new.tap { |p| p.language = load_language }.parse(source)
   end
 end

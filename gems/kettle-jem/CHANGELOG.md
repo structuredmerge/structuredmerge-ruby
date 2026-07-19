@@ -38,6 +38,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
   update the GitHub Actions SHA pin index used by generated workflow templates
   via `kettle-gha-sha-pins`.
+- Generated local Gemfile templates now document why `nomono` is explicitly
+  activated before requiring `nomono/bundler`.
+- Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
+  dependency-bearing kettle-jem templates and update their dependency floors.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the
   `appraisal2` executable.
 - Added a default-off `readme.badges.fossa` template option for managed FOSSA
@@ -231,7 +235,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated main Gemfiles now require `nomono` >= 1.0.6.
 - Generated templating local Gemfiles now only use `TSLP_DEV` for local
   `tree_sitter_language_pack` path overrides and no longer derive that path
-  from `SMORG_RB_DEV`.
+  from `STRUCTUREDMERGE_DEV`.
 - Generated gemspecs now require `version_gem` >= 1.1.14.
 - Generated gemspecs now require `gitmoji-regex` >= 2.0.4.
 - Generated documentation Gemfiles now require `yaml-converter` >= 0.2.3.
@@ -790,7 +794,7 @@ Please file a bug if you notice a violation of semantic versioning.
   without requiring unreleased `kettle-drift` in every generated gemspec.
 - Added `kettle-drift` to generated templating Gemfiles, resolved remotely in
   templating mode and via `KETTLE_RB_DEV` locally, separate from the
-  `SMORG_RB_DEV` StructuredMerge local gem set.
+  `STRUCTUREDMERGE_DEV` StructuredMerge local gem set.
 - Refreshed generated README metadata blocks after template README merging so
   version-derived gemspec metadata such as `source_code_uri` does not stay stale.
 - Added `yard-yaml` to generated local documentation Gemfiles so local

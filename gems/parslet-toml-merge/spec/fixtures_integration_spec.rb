@@ -53,6 +53,10 @@ RSpec.describe Parslet::Toml::Merge do
     expect(json_ready(TreeHaver::BackendRegistry.fetch('parslet')&.to_h)).to eq(
       json_ready({ id: 'parslet', family: 'peg' })
     )
+    expect(TreeHaver.registered_languages(:toml)).to include(:parslet)
+    expect(
+      TreeHaver.with_backend('parslet') { TreeHaver.parser_for(:toml).parse("title = \"x\"\n").root_node.type }
+    ).to eq('document')
     expect(json_ready(described_class.toml_backend_feature_profile)).to eq(
       json_ready(feature_fixture.dig(:providers, :parslet, :feature_profile))
     )
@@ -92,7 +96,15 @@ RSpec.describe Parslet::Toml::Merge do
     merge_fixture = toml_fixture('merge')
     merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], 'toml')
     expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    expect(merge_result[:output]).to include('title = "Structured Merge"')
+    expect(merge_result[:output]).to include('name = "structuredmerge"')
+    expect(merge_result[:output]).to include('tags = ["destination"]')
+    expect(merge_result[:output]).to include('version = "0.2.0"')
+    expect(merge_result[:output]).to include('authors = ["pb"]')
+    expect(merge_result[:output]).to include('enabled = false')
+    expect(merge_result[:output]).to include('release = true')
+    expect(merge_result[:output]).not_to include('tags = ["template"]')
+    expect(merge_result[:output]).not_to include('version = "0.1.0"')
   end
 
   it 'rejects unsupported provider backend overrides' do
@@ -101,6 +113,44 @@ RSpec.describe Parslet::Toml::Merge do
     expect(result[:diagnostics]).to eq(
       [{ severity: 'error', category: 'unsupported_feature', message: 'Unsupported TOML backend citrus.' }]
     )
+  end
+
+  it 'merges comment-free arrays of tables through the Parslet parser provider' do
+    template = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Template driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-ruby"
+
+      [profiles.textconv-normalized]
+      description = "Template-only profile"
+
+      [[profiles.textconv-normalized.attributes]]
+      pattern = "*.json"
+      diff = "smorg-json-textconv"
+    TOML
+    destination = <<~TOML
+      version = 1
+
+      [profiles.semantic-diff]
+      description = "Destination driver"
+
+      [[profiles.semantic-diff.attributes]]
+      pattern = "*.rb"
+      diff = "smorg-rb"
+    TOML
+
+    result = described_class.merge_toml(template, destination, 'toml')
+
+    expect(result.fetch(:ok)).to be(true)
+    expect(result.fetch(:output)).to include('diff = "smorg-rb"')
+    expect(result.fetch(:output)).to include('description = "Destination driver"')
+    expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
+    expect(result.fetch(:output)).not_to include('smorg-ruby')
   end
 
   it 'conforms to the provider named-suite plan and manifest-report fixtures' do

@@ -378,7 +378,7 @@ module Markly
         return unsupported_feature_result("Unsupported Markdown backend #{requested}.")
       end
 
-      ::Markly.parse(source, flags: ::Markly::DEFAULT, extensions: [:table])
+      TreeHaver.with_backend(BACKEND_REFERENCE.id) { TreeHaver.parser_for(:markdown).parse(source) }
       normalized = Markdown::Merge.normalize_source(source)
       {
         ok: true,

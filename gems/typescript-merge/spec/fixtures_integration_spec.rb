@@ -77,4 +77,17 @@ RSpec.describe TypeScript::Merge do
       %w[typescript slice-104-merge module-merge.json]
     )
   end
+
+  it 'fails closed when the TypeScript TreeHaver backend is unavailable' do
+    allow(described_class).to receive(:type_script_backend_available_for_analysis?).and_return(false)
+
+    expect(described_class.available_type_script_backends).to eq([])
+    result = described_class.parse_type_script("export function main() {}\n", 'typescript')
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to eq(
+      [{ severity: 'error', category: 'unsupported_feature',
+         message: 'Unsupported TypeScript backend kreuzberg-language-pack.' }]
+    )
+  end
 end

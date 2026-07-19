@@ -32,6 +32,7 @@ require_relative 'tree_haver/backends/mri'
 require_relative 'tree_haver/backends/ffi'
 require_relative 'tree_haver/backends/rust'
 require_relative 'tree_haver/backends/java'
+require_relative 'tree_haver/backends/tslp'
 require_relative 'tree_haver/grammar_finder'
 require_relative 'tree_haver/citrus_grammar_finder'
 require_relative 'tree_haver/parslet_grammar_finder'
@@ -314,6 +315,10 @@ module TreeHaver
       return parser_for_tree_sitter(name, config[:path], config[:symbol])
     end
 
+    if (backend_type = first_available_registered_backend_type(registrations))
+      return parser_for_registered_backend(name, backend_type, registrations)
+    end
+
     raise NotAvailable, "No parser registered for #{name}"
   end
 
@@ -378,6 +383,8 @@ module TreeHaver
     backend_ref = BackendRegistry.fetch(backend_id.to_s)
     type = if registrations.key?(backend_id.to_s.to_sym)
              backend_id.to_s.to_sym
+           elsif (registered_type = registered_backend_type_for_requested_backend(backend_id, registrations))
+             registered_type
            elsif backend_ref&.family == 'tree-sitter'
              :tree_sitter
            else
@@ -388,6 +395,16 @@ module TreeHaver
     raise NotAvailable, "No parser registered for backend #{backend_id}"
   end
   private_class_method :requested_backend_type
+
+  def registered_backend_type_for_requested_backend(backend_id, registrations)
+    requested_module = backend_module_for(backend_id)
+    return unless requested_module
+
+    registrations.find do |_backend_type, config|
+      config[:backend_module].equal?(requested_module)
+    end&.first
+  end
+  private_class_method :registered_backend_type_for_requested_backend
 
   def parser_for_registered_backend(name, backend_type, registrations)
     config = registrations.fetch(backend_type)
@@ -408,6 +425,21 @@ module TreeHaver
     end
   end
   private_class_method :parser_for_registered_backend
+
+  def first_available_registered_backend_type(registrations)
+    registrations.each do |backend_type, config|
+      next unless config[:backend_module]
+      next unless backend_allowed?(backend_type)
+
+      backend_module = config.fetch(:backend_module)
+      next if backend_module.respond_to?(:available?) && !backend_module.available?
+
+      return backend_type
+    end
+
+    nil
+  end
+  private_class_method :first_available_registered_backend_type
 
   def parser_for_backend_module(backend_module, name)
     parser = backend_module::Parser.new
@@ -477,6 +509,8 @@ module TreeHaver
       Backends::FFI
     when :java
       Backends::Java
+    when :tslp, :"kreuzberg-language-pack"
+      Backends::Tslp
     when :citrus
       Backends::Citrus
     when :parslet

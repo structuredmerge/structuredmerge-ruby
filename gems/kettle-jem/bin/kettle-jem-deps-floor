@@ -1,0 +1,350 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "json"
+require "optparse"
+require "pathname"
+
+require_relative "../lib/kettle/jem"
+
+# Repository-local maintenance tool for updating dependency floors owned by
+# kettle-jem templates.
+class KettleJemDepsFloor
+  VALID_UPGRADE_LEVELS = %w[major minor patch].freeze
+  DEFAULT_UPGRADE_LEVEL = "major"
+  DEFAULT_PROJECT_ROOT = File.expand_path("..", __dir__)
+
+  SOURCE_GLOBS = [
+    "lib/kettle/jem/templates/Appraisal.root.gemfile.example",
+    "lib/kettle/jem/templates/Appraisals.example",
+    "lib/kettle/jem/templates/Gemfile.example",
+    "lib/kettle/jem/templates/gem.gemspec.example",
+    "lib/kettle/jem/templates/gemfiles/**/*.gemfile.example",
+    "lib/kettle/jem/templates/shim/Gemfile.example",
+    "lib/kettle/jem/templates/shim/gem.gemspec.example"
+  ].freeze
+  EXTRA_SOURCE_FILES = [
+    "lib/kettle/jem.rb"
+  ].freeze
+
+  def initialize(project_root:, resolver: Kettle::Jem::RubyGemsResolver.new, options: {})
+    @project_root = File.expand_path(project_root)
+    @resolver = resolver
+    @options = {
+      write: false,
+      check: false,
+      json: false,
+      upgrade: DEFAULT_UPGRADE_LEVEL
+    }.merge(options.transform_keys(&:to_sym))
+  end
+
+  def self.run(argv = ARGV, out: $stdout, err: $stderr)
+    options = parse_options(argv)
+    result = new(project_root: options.delete(:project_root), options: options).run
+    if options[:json]
+      out.puts(JSON.pretty_generate(result))
+    else
+      out.puts("deps-floor: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
+      result.fetch(:planned_changes, []).each do |change|
+        out.puts(
+          "  #{change.fetch(:name)} #{change.fetch(:relative_path)} " \
+            "#{change.fetch(:current_pessimistic)}, >= #{change.fetch(:current_floor)} -> " \
+            "#{change.fetch(:new_pessimistic)}, >= #{change.fetch(:new_floor)}"
+        )
+      end
+    end
+    0
+  rescue OptionParser::ParseError, ArgumentError => error
+    err.puts(error.message)
+    err.puts(parser)
+    2
+  rescue => error
+    err.puts("#{error.class}: #{error.message}")
+    1
+  end
+
+  def self.parse_options(argv)
+    options = {
+      project_root: DEFAULT_PROJECT_ROOT,
+      write: false,
+      check: false,
+      json: false,
+      upgrade: DEFAULT_UPGRADE_LEVEL
+    }
+    parser.parse!(argv, into: options)
+    options[:project_root] = argv.shift || DEFAULT_PROJECT_ROOT
+    raise OptionParser::InvalidArgument, "Expected at most one PROJECT_ROOT" unless argv.empty?
+
+    options
+  end
+
+  def self.parser
+    OptionParser.new do |opts|
+      opts.banner = "Usage: bin/kettle-jem-deps-floor [PROJECT_ROOT] [--json] [--write] [--check] [--upgrade LEVEL]"
+      opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
+      opts.on("--check", "Fail when managed dependency floors are stale.") { |value| value }
+      opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
+      opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
+    end
+  end
+
+  def run
+    upgrade = @options.fetch(:upgrade, DEFAULT_UPGRADE_LEVEL).to_s
+    unless VALID_UPGRADE_LEVELS.include?(upgrade)
+      raise ArgumentError, "Invalid --upgrade value #{upgrade.inspect}; use one of: #{VALID_UPGRADE_LEVELS.join(", ")}"
+    end
+
+    records = dependency_records
+    planned_changes = planned_dependency_changes(records, upgrade)
+    apply_changes(planned_changes) if @options[:write] && planned_changes.any?
+
+    if @options[:check] && planned_changes.any?
+      raise "Managed dependency floors are stale; run bin/kettle-jem-deps-floor --write --upgrade #{upgrade}"
+    end
+
+    {
+      mode: @options[:write] ? "write" : "dry-run",
+      check: !!@options[:check],
+      upgrade: upgrade,
+      discovered_dependencies: records.map { |record| record.fetch(:name) }.uniq.sort,
+      updates: planned_changes.length,
+      updated_dependencies: planned_changes.map { |change| change.fetch(:name) }.uniq.sort,
+      planned_changes: planned_changes.map { |change| serializable_change(change) }
+    }
+  end
+
+  private
+
+  attr_reader :project_root, :resolver
+
+  def dependency_records
+    dedupe_records(dependency_source_paths.flat_map { |relative_path| dependency_records_for_path(relative_path) })
+  end
+
+  def dependency_source_paths
+    paths = self.class::SOURCE_GLOBS.flat_map do |pattern|
+      Dir.glob(File.join(project_root, pattern), File::FNM_DOTMATCH).select { |path| File.file?(path) }
+    end
+    paths.concat(self.class::EXTRA_SOURCE_FILES.map { |relative_path| File.join(project_root, relative_path) })
+    paths.uniq.sort.map { |path| Pathname(path).relative_path_from(Pathname(project_root)).to_s }
+  end
+
+  def dependency_records_for_path(relative_path)
+    path = File.join(project_root, relative_path)
+    content = File.read(path)
+    [
+      *ruby_dependency_records(content, relative_path),
+      *text_dependency_records(content, relative_path)
+    ]
+  end
+
+  def ruby_dependency_records(content, relative_path)
+    [
+      *ruby_call_dependency_records(content, relative_path),
+      *ruby_requirement_assignment_records(content, relative_path)
+    ]
+  end
+
+  def ruby_call_dependency_records(content, relative_path)
+    Kettle::Jem.ruby_call_records(content, nil).filter_map do |call|
+      next unless ruby_dependency_call?(call)
+
+      name = Kettle::Jem.ruby_string_argument(call)
+      next unless real_gem_name?(name)
+
+      requirement_arguments = Array(call.arguments&.arguments).drop(1).select do |argument|
+        argument.is_a?(::Prism::StringNode)
+      end
+      record_from_arguments(relative_path, name, requirement_arguments, source_kind: "ruby")
+    end
+  end
+
+  def ruby_dependency_call?(call)
+    return true if call.receiver.nil? && call.name == :gem
+    return true if %i[add_dependency add_runtime_dependency add_development_dependency].include?(call.name)
+
+    false
+  end
+
+  def ruby_requirement_assignment_records(content, relative_path)
+    result = Kettle::Jem.prism_parse_success(content)
+    return [] unless result
+
+    result.value.breadth_first_search_all do |node|
+      node.is_a?(::Prism::LocalVariableWriteNode) &&
+        %i[nomono_requirements nomono_activation_requirements].include?(node.name)
+    end.filter_map do |node|
+      values = Array(node.value&.elements).select { |element| element.is_a?(::Prism::StringNode) }
+      record_from_arguments(relative_path, "nomono", values, source_kind: "ruby")
+    end
+  end
+
+  def record_from_arguments(relative_path, name, arguments, source_kind:)
+    return unless real_gem_name?(name)
+
+    pessimistic = arguments.find { |argument| Kettle::Jem.ruby_static_string_value(argument).to_s.start_with?("~>") }
+    floor = arguments.find { |argument| Kettle::Jem.ruby_static_string_value(argument).to_s.start_with?(">=") }
+    return unless pessimistic && floor
+
+    {
+      relative_path: relative_path,
+      name: name,
+      source_kind: source_kind,
+      current_pessimistic: Kettle::Jem.ruby_static_string_value(pessimistic),
+      current_floor: Kettle::Jem.ruby_static_string_value(floor),
+      pessimistic_range: range_for(pessimistic),
+      floor_range: range_for(floor)
+    }
+  end
+
+  def range_for(node)
+    {
+      start_offset: node.location.start_offset,
+      end_offset: node.location.end_offset
+    }
+  end
+
+  def text_dependency_records(content, relative_path)
+    lines = content.lines
+    lines.each_with_index.filter_map do |line, index|
+      name = text_dependency_name(line)
+      next unless real_gem_name?(name)
+
+      current_pessimistic, pessimistic_range = text_requirement_record(content, lines, index, line, "~>")
+      current_floor, floor_range = text_requirement_record(content, lines, index, line, ">=")
+      next unless current_pessimistic && current_floor
+
+      {
+        relative_path: relative_path,
+        name: name,
+        source_kind: "text",
+        current_pessimistic: current_pessimistic,
+        current_floor: current_floor,
+        pessimistic_range: pessimistic_range,
+        floor_range: floor_range
+      }
+    end
+  end
+
+  def text_dependency_name(line)
+    stripped = line.lstrip
+    return if stripped.start_with?("#")
+    return "nomono" if stripped.start_with?("nomono_requirements =", "nomono_activation_requirements =")
+
+    match = stripped.match(/\A(?:gem|spec\.add_dependency|spec\.add_runtime_dependency|spec\.add_development_dependency)\(?\s*"([^"]+)"/)
+    return match[1] if match
+
+    match = stripped.match(/source:\s*%\(gem "([^"]+)"/)
+    match && match[1]
+  end
+
+  def real_gem_name?(name)
+    name.to_s.match?(/\A[a-zA-Z0-9_.-]+\z/)
+  end
+
+  def text_requirement_record(content, lines, index, line, operator)
+    match = line.match(/"#{Regexp.escape(operator)} [^"]+"/)
+    return unless match
+
+    line_start = lines.take(index).join.bytesize
+    value = match[0][1...-1]
+    [
+      value,
+      {
+        start_offset: line_start + match.begin(0),
+        end_offset: line_start + match.end(0)
+      }
+    ]
+  end
+
+  def dedupe_records(records)
+    seen = {}
+    records.select do |record|
+      key = [
+        record.fetch(:relative_path),
+        record.fetch(:name),
+        record.fetch(:pessimistic_range).fetch(:start_offset),
+        record.fetch(:floor_range).fetch(:start_offset)
+      ]
+      next false if seen.include?(key)
+
+      seen[key] = true
+      true
+    end
+  end
+
+  def planned_dependency_changes(records, upgrade)
+    records.filter_map do |record|
+      current_floor = floor_version(record.fetch(:current_floor))
+      latest = latest_version_for(record.fetch(:name), current_floor, upgrade)
+      next unless latest && latest > current_floor
+
+      {
+        **record,
+        current_floor_version: current_floor,
+        new_floor_version: latest,
+        new_pessimistic: pessimistic_requirement_for(latest)
+      }
+    end
+  end
+
+  def latest_version_for(name, current_floor, upgrade)
+    resolver.versions(name, requirements: requirement_for_upgrade(current_floor, upgrade)).map do |entry|
+      Gem::Version.new((entry[:number] || entry["number"]).to_s)
+    end.max
+  end
+
+  def requirement_for_upgrade(current_floor, upgrade)
+    major = current_floor.segments.fetch(0)
+    minor = current_floor.segments.fetch(1, 0)
+    case upgrade
+    when "patch"
+      [">= #{current_floor}", "~> #{major}.#{minor}.0"]
+    when "minor"
+      [">= #{current_floor}", "~> #{major}.0"]
+    else
+      [">= #{current_floor}"]
+    end
+  end
+
+  def floor_version(requirement)
+    parsed = Gem::Requirement.new(requirement).requirements.find { |operator, _version| operator == ">=" }
+    raise ArgumentError, "Expected >= requirement, got #{requirement.inspect}" unless parsed
+
+    parsed.last
+  end
+
+  def pessimistic_requirement_for(version)
+    segments = version.segments
+    "~> #{segments.fetch(0)}.#{segments.fetch(1, 0)}"
+  end
+
+  def apply_changes(changes)
+    changes.group_by { |change| change.fetch(:relative_path) }.each do |relative_path, path_changes|
+      path = File.join(project_root, relative_path)
+      replacements = path_changes.flat_map do |change|
+        [
+          change.fetch(:pessimistic_range).merge(replacement: JSON.generate(change.fetch(:new_pessimistic))),
+          change.fetch(:floor_range).merge(replacement: JSON.generate(">= #{change.fetch(:new_floor_version)}"))
+        ]
+      end
+      original = File.read(path)
+      updated = Kettle::Jem.replace_source_offsets(original, replacements)
+      File.write(path, updated) if updated != original
+    end
+  end
+
+  def serializable_change(change)
+    {
+      name: change.fetch(:name),
+      relative_path: change.fetch(:relative_path),
+      source_kind: change.fetch(:source_kind),
+      current_pessimistic: change.fetch(:current_pessimistic),
+      new_pessimistic: change.fetch(:new_pessimistic),
+      current_floor: change.fetch(:current_floor_version).to_s,
+      new_floor: change.fetch(:new_floor_version).to_s
+    }
+  end
+end
+
+exit(KettleJemDepsFloor.run(ARGV, out: $stdout, err: $stderr)) if $PROGRAM_NAME == __FILE__

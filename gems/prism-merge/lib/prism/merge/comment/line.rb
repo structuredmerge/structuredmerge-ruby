@@ -15,13 +15,7 @@ module Prism
       #   line.magic_comment_type #=> :frozen_string_literal
       #
       class Line < Ast::Merge::Comment::Line
-        # Ruby magic comment patterns
-        MAGIC_COMMENT_PATTERNS = {
-          frozen_string_literal: /^frozen_string_literal:\s*(true|false)$/i,
-          encoding: /^(encoding|coding):\s*\S+$/i,
-          warn_indent: /^warn_indent:\s*(true|false)$/i,
-          shareable_constant_value: /^shareable_constant_value:\s*\S+$/i
-        }.freeze
+        MAGIC_COMMENT_PATTERNS = Ruby::Merge::MagicCommentSupport::MAGIC_COMMENT_PATTERNS
 
         class << self
           def magic_comment_type_for(text)

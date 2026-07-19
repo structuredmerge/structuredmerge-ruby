@@ -6,6 +6,16 @@ require_relative 'merge/version'
 require 'digest'
 require 'tree_haver'
 require 'ast/merge'
+require_relative 'merge/block_directive_detector'
+require_relative 'merge/doc_comment_support'
+require_relative 'merge/gemspec_support'
+require_relative 'merge/magic_comment_support'
+require_relative 'merge/method_similarity'
+require_relative 'merge/nocov_node_base'
+require_relative 'merge/nocov_wrapper_base'
+require_relative 'merge/rescue_semantics'
+require_relative 'merge/scaffold_chunk_support'
+require_relative 'merge/signature_support'
 
 module Ruby
   module Merge
@@ -15,22 +25,36 @@ module Ruby
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     DESTINATION_WINS_ARRAY_POLICY = { surface: 'array', name: 'destination_wins_array' }.freeze
     DEFAULT_METHOD_MOVE_POLICY = 'destination_order'
+    BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+    TslpSpan = Struct.new(:start_row, :start_col, :end_row, :end_col, keyword_init: true)
+    TslpStructureItem = Struct.new(:kind, :name, :span, keyword_init: true)
+    TslpImportItem = Struct.new(:source, :span, keyword_init: true)
+    TslpProcessAnalysis = Struct.new(:structure, :imports, keyword_init: true)
     PERCENT_ARRAY_DELIMITER_PAIRS = {
       '[' => ']',
       '(' => ')',
       '{' => '}',
       '<' => '>'
     }.freeze
-    DIRECTIVE_LINE = /\A(?::nocov:|[\w-]+:(?:freeze|unfreeze))\z/
-    MAGIC_COMMENT_PREFIXES = %w[coding encoding frozen_string_literal shareable_constant_value typed warn_indent].freeze
     REQUIRE_PATTERN = /^\s*require(?:_relative)?\s+["']([^"']+)["']/
     CLASS_PATTERN = /^\s*class\s+([A-Z]\w*(?:::\w+)*)/
     MODULE_PATTERN = /^\s*module\s+([A-Z]\w*(?:::\w+)*)/
     DEF_PATTERN = %r{^\s*def\s+((?:self\.)?)([a-zA-Z_]\w*[!?=]?|\[\]=?|\+@|-@|\*\*|<<|>>|<=>|===|==|=~|!~|!=|[+\-*/%&|^<>]=?|[!~`])}
     CONSTANT_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=/
     CONSTANT_HASH_ASSIGNMENT_PATTERN = /^(\s*)([A-Z]\w*)\s*=\s*\{/
-    EXAMPLE_TAG = /\A@example\b(?<rest>.*)\z/
-    TAG_PREFIX = /\A@[a-z_]+\b/
+
+    def register_backend!
+      BACKEND_REGISTRY.mutex.synchronize do
+        return if BACKEND_REGISTRY.registered
+
+        TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
+
+        grammar_finder = TreeHaver::GrammarFinder.new(:ruby)
+        grammar_finder.register! if grammar_finder.available?
+
+        BACKEND_REGISTRY.registered = true
+      end
+    end
 
     def ruby_feature_profile
       {
@@ -41,7 +65,7 @@ module Ruby
     end
 
     def available_ruby_backends
-      [TREE_SITTER_BACKEND]
+      ruby_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def ruby_tslp_capability_profile
@@ -53,7 +77,7 @@ module Ruby
 
     def ruby_backend_feature_profile(backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
@@ -78,26 +102,33 @@ module Ruby
       }
     end
 
+    def ruby_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
+
+      registrations = TreeHaver.registered_languages(:ruby)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+    end
+
     def parse_ruby(source, dialect, backend: nil)
       requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
-      unless requested == TREE_SITTER_BACKEND.id
+      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
-      request = TreeHaver::ParserRequest.new(source: source, language: 'ruby', dialect: dialect)
-      syntax = TreeHaver.parse_with_language_pack(request)
-      return { ok: false, diagnostics: syntax[:diagnostics], policies: [] } unless syntax[:ok]
+      tree = TreeHaver.with_backend(requested) { TreeHaver.parser_for(:ruby).parse(source) }
+      collect_parse_errors(tree.root_node)
 
-      process = TreeHaver.process_with_language_pack(request)
-      return { ok: false, diagnostics: process[:diagnostics], policies: [] } unless process[:ok]
-
+      process_analysis = ruby_process_analysis_from_tree(source, tree.root_node)
       {
         ok: true,
         diagnostics: [],
-        analysis: analyze_ruby_document(source, process_analysis: process[:analysis]),
+        analysis: analyze_ruby_document(source, process_analysis: process_analysis),
         policies: []
       }
+    rescue TreeHaver::Error, StandardError => e
+      parse_failure_result(e)
     end
 
     def match_ruby_owners(template, destination)
@@ -197,7 +228,7 @@ module Ruby
       end
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
-      preamble = collect_ruby_preamble(destination_context.fetch(:source))
+      preamble = destination_context.fetch(:preamble)
       sections << preamble unless preamble.empty?
       requires = if merge_template_requires
                    merge_ruby_requires(destination_requires,
@@ -436,7 +467,7 @@ module Ruby
         scopes: %w[node subtree owned_region whole_file],
         triggers: [
           { reason: 'binary_input', scope: 'whole_file' },
-          { reason: 'unsupported_parser_or_backend', scope: 'whole_file' },
+          { reason: 'unsupported_structural_merge_capability', scope: 'whole_file' },
           { reason: 'no_structural_owners', scope: 'whole_file' },
           { reason: 'both_branches_create_file', scope: 'whole_file' },
           { reason: 'excessive_duplicate_identities', scope: 'owned_region' },
@@ -1271,6 +1302,179 @@ module Ruby
       content.lines.any? { |line| !line.strip.empty? && !comment_line?(line) } ? '' : content
     end
 
+    def collect_parse_errors(node)
+      raise TreeHaver::NotAvailable, 'Ruby parse returned no root node' unless node
+      return unless node.respond_to?(:has_error?) && node.has_error?
+
+      raise TreeHaver::NotAvailable,
+            'Ruby parse contains syntax errors'
+    end
+
+    def parse_failure_result(error)
+      {
+        ok: false,
+        diagnostics: [{ severity: 'error', category: 'parse_error', message: error.message }],
+        policies: []
+      }
+    end
+
+    def ruby_process_analysis_from_tree(source, root_node)
+      structure = []
+      imports = []
+
+      ruby_named_children(root_node).each do |node|
+        case node.type
+        when 'call'
+          import = ruby_import_item_from_node(source, node)
+          imports << import if import
+        when 'if_modifier'
+          import = ruby_import_item_from_modifier_node(source, node)
+          imports << import if import
+        when 'begin'
+          import = ruby_import_item_from_begin_node(source, node)
+          imports << import if import
+        when 'class', 'module', 'method', 'singleton_method'
+          item = ruby_structure_item_from_node(source, node)
+          structure << item if item
+        end
+      end
+
+      TslpProcessAnalysis.new(structure: structure, imports: imports)
+    end
+
+    def ruby_import_item_from_node(source, node)
+      children = ruby_named_children(node)
+      callee = children.first
+      return unless callee && %w[identifier method_identifier].include?(callee.type)
+
+      name = ruby_node_text(source, callee)
+      return unless %w[require require_relative].include?(name)
+
+      string_node = ruby_first_descendant(node) do |child|
+        %w[string_content simple_symbol].include?(child.type)
+      end
+      return unless string_node
+
+      TslpImportItem.new(source: ruby_node_text(source, string_node), span: ruby_import_span_for(source, node))
+    end
+
+    def ruby_import_item_from_modifier_node(source, node)
+      call_node = ruby_named_children(node).first
+      return unless call_node&.type == 'call'
+
+      import = ruby_import_item_from_node(source, call_node)
+      return unless import
+
+      TslpImportItem.new(source: import.source, span: ruby_import_span_for(source, node))
+    end
+
+    def ruby_import_item_from_begin_node(source, node)
+      children = ruby_named_children(node)
+      call_imports = children.filter_map do |child|
+        ruby_import_item_from_node(source, child) if child.type == 'call'
+      end
+      return if call_imports.empty?
+
+      unsupported = children.any? do |child|
+        child.type != 'call' && !ruby_load_error_rescue_node?(source, child)
+      end
+      return if unsupported
+
+      TslpImportItem.new(source: call_imports.map(&:source).join(','), span: ruby_span_for(node))
+    end
+
+    def ruby_load_error_rescue_node?(source, node)
+      return false unless node.type == 'rescue'
+      return false unless ruby_named_children(node).all? { |child| child.type == 'exceptions' }
+
+      ruby_node_text(source, node).match?(/\Arescue\s+LoadError\b/)
+    end
+
+    def ruby_structure_item_from_node(source, node)
+      kind = case node.type
+             when 'class'
+               'class'
+             when 'module'
+               'module'
+             when 'method', 'singleton_method'
+               'method'
+             end
+      return unless kind
+
+      name_node = ruby_declaration_name_node(node)
+      return unless name_node
+
+      TslpStructureItem.new(kind: kind, name: ruby_node_text(source, name_node), span: ruby_span_for(node))
+    end
+
+    def ruby_declaration_name_node(node)
+      case node.type
+      when 'class', 'module'
+        ruby_named_children(node).find do |child|
+          %w[constant scope_resolution].include?(child.type)
+        end
+      when 'method'
+        ruby_named_children(node).find do |child|
+          %w[identifier method_identifier operator].include?(child.type)
+        end
+      when 'singleton_method'
+        children = ruby_named_children(node)
+        children.reverse.find do |child|
+          %w[identifier method_identifier operator].include?(child.type)
+        end
+      end
+    end
+
+    def ruby_first_descendant(node, &block)
+      ruby_named_children(node).each do |child|
+        return child if yield(child)
+
+        descendant = ruby_first_descendant(child, &block)
+        return descendant if descendant
+      end
+      nil
+    end
+
+    def ruby_named_children(node)
+      node.children.select { |child| !child.respond_to?(:named?) || child.named? }
+    end
+
+    def ruby_span_for(node)
+      start_point = node.start_point
+      end_point = node.end_point
+      TslpSpan.new(
+        start_row: start_point.fetch(:row),
+        start_col: start_point.fetch(:column),
+        end_row: end_point.fetch(:row),
+        end_col: end_point.fetch(:column)
+      )
+    end
+
+    def ruby_import_span_for(source, node)
+      span = ruby_span_for(node)
+      lines = normalize_source(source).split("\n")
+      start_row = span.start_row
+      end_row = span.end_row
+
+      start_row -= 1 while start_row.positive? && coverage_directive_comment_line?(lines[start_row - 1])
+      end_row += 1 while end_row < lines.length - 1 && coverage_directive_comment_line?(lines[end_row + 1])
+
+      TslpSpan.new(
+        start_row: start_row,
+        start_col: start_row == span.start_row ? span.start_col : 0,
+        end_row: end_row,
+        end_col: end_row == span.end_row ? span.end_col : lines[end_row].to_s.length
+      )
+    end
+
+    def coverage_directive_comment_line?(line)
+      BlockDirectiveDetector.coverage_directive_line?(line)
+    end
+
+    def ruby_node_text(source, node)
+      source[node.start_byte...node.end_byte].to_s
+    end
+
     def ruby_fallback_scope_rank(scope)
       ruby_fallback_policy_profile.fetch(:scopes).index(scope.to_s) || Float::INFINITY
     end
@@ -1311,6 +1515,7 @@ module Ruby
       {
         ok: true,
         source: source,
+        preamble: ruby_tslp_file_preamble_text(source, process_analysis),
         requires: ruby_process_import_entries(source, process_analysis),
         declarations: collect_ruby_declaration_entries(source, process_analysis: process_analysis),
         footer: ruby_tslp_file_footer_text(source, process_analysis)
@@ -1409,6 +1614,19 @@ module Ruby
         footer_indexes.unshift(index)
       end
       lines.values_at(*footer_indexes).join("\n").strip
+    end
+
+    def ruby_tslp_file_preamble_text(source, process_analysis)
+      lines = normalize_source(source).split("\n")
+      claimed = ruby_tslp_claimed_line_indexes(lines, process_analysis)
+      preamble_indexes = []
+      lines.each_index do |index|
+        break if claimed.include?(index)
+        break unless lines[index].strip.empty? || comment_line?(lines[index])
+
+        preamble_indexes << index
+      end
+      lines.values_at(*preamble_indexes).join("\n").strip
     end
 
     def collect_ruby_declaration_entries(source, process_analysis: nil)
@@ -1784,8 +2002,8 @@ module Ruby
         template_block = template_blocks[destination_block[:constant]]
         next unless template_block
 
-        template_hash = RubyHashLiteralParser.new(template_block[:hash_source]).parse
-        destination_hash = RubyHashLiteralParser.new(destination_block[:hash_source]).parse
+        template_hash = RubyHashLiteralProjector.new(template_block[:hash_source]).call
+        destination_hash = RubyHashLiteralProjector.new(destination_block[:hash_source]).call
         merged_hash = merge_ruby_hash_literals(template_hash, destination_hash)
         rendered = "#{destination_block[:prefix]}#{render_ruby_hash_literal(merged_hash,
                                                                             destination_block[:base_indent])}"
@@ -2254,130 +2472,183 @@ module Ruby
     RubyHashPair = Struct.new(:key, :key_source, :delimiter, :value, keyword_init: true)
     RubyScalarNode = Struct.new(:source, keyword_init: true)
 
-    class RubyHashLiteralParser
+    class RubyHashLiteralProjector
       def initialize(source)
         @source = source.to_s
-        @index = 0
       end
 
-      def parse
-        parse_hash.tap do
-          skip_whitespace
-          raise ArgumentError, 'unexpected trailing hash literal content' unless eof?
-        end
+      def call
+        tree = TreeHaver.parser_for(:ruby).parse(source)
+        root = if tree.respond_to?(:parse_result)
+                 tree.parse_result.value
+               else
+                 tree.root_node
+               end
+        hash_node = root_hash_node(root)
+        raise ArgumentError, 'expected Ruby hash literal' unless hash_node?(hash_node)
+
+        project_hash_node(hash_node)
       end
 
       private
 
       attr_reader :source
 
-      def parse_hash
-        start_index = @index
-        consume('{')
-        pairs = []
-        trailing_comma = false
-        loop do
-          skip_whitespace
-          break if peek == '}'
+      def root_hash_node(root)
+        return root if hash_node?(root)
+        return root.statements&.body&.first if root.respond_to?(:statements)
 
-          key = parse_hash_key
-          skip_whitespace
-          value = parse_value
-          pairs << RubyHashPair.new(
+        child_nodes(root).find { |child| hash_node?(child) }
+      end
+
+      def hash_node?(node)
+        %w[hash hash_node].include?(node&.type.to_s)
+      end
+
+      def project_hash_node(node)
+        pairs = hash_pair_nodes(node).map do |assoc|
+          key_node, value_node = hash_pair_key_value_nodes(assoc)
+          key = project_hash_key(key_node, hash_pair_operator(assoc))
+          RubyHashPair.new(
             key: key.fetch(:key),
             key_source: key.fetch(:key_source),
             delimiter: key.fetch(:delimiter),
-            value: value
+            value: project_hash_value(value_node)
           )
-          skip_whitespace
-          break if peek == '}'
-
-          consume(',')
-          skip_whitespace
-          if peek == '}'
-            trailing_comma = true
-            break
-          end
         end
-        consume('}')
-        RubyHashNode.new(pairs: pairs, inline: !source[start_index...@index].include?("\n"),
-                         trailing_comma: trailing_comma)
+        RubyHashNode.new(
+          pairs: pairs,
+          inline: !node_source(node).include?("\n"),
+          trailing_comma: trailing_comma?(node)
+        )
       end
 
-      def parse_value
-        skip_whitespace
-        return parse_hash if peek == '{'
+      def project_hash_value(node)
+        return project_hash_node(node) if hash_node?(node)
 
-        RubyScalarNode.new(source: parse_scalar_source)
+        RubyScalarNode.new(source: node_source(node).rstrip)
       end
 
-      def parse_hash_key
-        remaining = source[@index..].to_s
-        if (match = remaining.match(/\A([a-zA-Z_]\w*[!?]?):/))
-          @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: ':' }
+      def project_hash_key(key_node, operator)
+        delimiter = operator.to_s == '=>' ? '=>' : ':'
+        if delimiter == ':'
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node).delete_suffix(':'),
+            delimiter: delimiter
+          }
+        elsif %w[symbol_node simple_symbol].include?(key_node.type.to_s) && node_source(key_node).start_with?(':')
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        elsif %w[string_node string].include?(key_node.type.to_s)
+          {
+            key: node_source(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        else
+          {
+            key: hash_key_value(key_node),
+            key_source: node_source(key_node),
+            delimiter: delimiter
+          }
+        end
+      end
+
+      def hash_pair_nodes(node)
+        return Array(node.elements) if node.respond_to?(:elements)
+
+        child_nodes(node).select { |child| child.type.to_s == 'pair' }
+      end
+
+      def hash_pair_key_value_nodes(pair)
+        return [pair.key, pair.value] if pair.respond_to?(:key) && pair.respond_to?(:value)
+
+        named = child_nodes(pair).reject { |child| punctuation_node?(child) }
+        [named.first, named.last]
+      end
+
+      def hash_pair_operator(pair)
+        return pair.operator if pair.respond_to?(:operator)
+
+        all_child_nodes(pair).find { |child| %w[: =>].include?(child.type.to_s) }&.type
+      end
+
+      def hash_key_value(node)
+        return node.unescaped.to_s if node.respond_to?(:unescaped)
+
+        text = node_source(node)
+        return text.delete_prefix(':') if text.start_with?(':')
+        return text[1...-1] if node.type.to_s == 'string' && text.match?(/\A(["']).*\1\z/m)
+
+        text
+      end
+
+      def trailing_comma?(node)
+        if node.respond_to?(:elements) && node.respond_to?(:closing_loc)
+          return trailing_comma_between?(last_child_end: Array(node.elements).last.location.end_offset,
+                                         closing_start: node.closing_loc.start_offset)
         end
 
-        if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2):/))
-          @index += match[0].length
-          return { key: match[1][1...-1], key_source: match[1], delimiter: ':' }
+        last_pair = hash_pair_nodes(node).last
+        closing = all_child_nodes(node).reverse.find { |child| child.type.to_s == '}' }
+        return false unless last_pair && closing
+
+        trailing_comma_between?(last_child_end: node_end_offset(last_pair), closing_start: node_start_offset(closing))
+      end
+
+      def trailing_comma_between?(last_child_end:, closing_start:)
+        source.byteslice(last_child_end...closing_start).to_s.include?(',')
+      end
+
+      def child_nodes(node)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes
+        elsif node.respond_to?(:named_children)
+          node.named_children
+        elsif node.respond_to?(:children)
+          node.children
+        else
+          []
         end
+      end
 
-        if (match = remaining.match(/\A(:[a-zA-Z_]\w*[!?]?)\s*=>/))
-          @index += match[0].length
-          return { key: match[1].delete_prefix(':'), key_source: match[1], delimiter: '=>' }
+      def all_child_nodes(node)
+        if node.respond_to?(:compact_child_nodes)
+          node.compact_child_nodes
+        elsif node.respond_to?(:children)
+          node.children
+        else
+          child_nodes(node)
         end
-
-        if (match = remaining.match(/\A((["'])(?:\\.|(?!\2).)*\2)\s*=>/))
-          @index += match[0].length
-          return { key: match[1], key_source: match[1], delimiter: '=>' }
-        end
-
-        raise ArgumentError, 'expected hash key'
       end
 
-      def parse_scalar_source
-        start_index = @index
-        string_quote = nil
-        escape = false
-        while @index < source.length
-          char = source[@index]
-          if string_quote
-            if escape
-              escape = false
-            elsif char == '\\'
-              escape = true
-            elsif char == string_quote
-              string_quote = nil
-            end
-            @index += 1
-            next
-          end
-
-          break if [',', '}'].include?(char)
-
-          string_quote = char if ['"', "'"].include?(char)
-          @index += 1
-        end
-        source[start_index...@index].rstrip
+      def punctuation_node?(node)
+        %w[{ } : => ,].include?(node.type.to_s)
       end
 
-      def skip_whitespace
-        @index += 1 while @index < source.length && source[@index].match?(/\s/)
+      def node_source(node)
+        return node.slice.to_s if node.respond_to?(:slice)
+        return node.text.to_s if node.respond_to?(:text)
+
+        source.byteslice(node_start_offset(node)...node_end_offset(node)).to_s
       end
 
-      def consume(expected)
-        raise ArgumentError, "expected #{expected}" unless peek == expected
+      def node_start_offset(node)
+        return node.location.start_offset if node.respond_to?(:location)
+        return node.start_byte if node.respond_to?(:start_byte)
 
-        @index += 1
+        raise ArgumentError, 'Ruby hash node does not expose a start offset'
       end
 
-      def peek
-        source[@index]
-      end
+      def node_end_offset(node)
+        return node.location.end_offset if node.respond_to?(:location)
+        return node.end_byte if node.respond_to?(:end_byte)
 
-      def eof?
-        @index >= source.length
+        raise ArgumentError, 'Ruby hash node does not expose an end offset'
       end
     end
 
@@ -2505,7 +2776,7 @@ module Ruby
         finish_index = ruby_block_finish_index(lines, index)
         entries << {
           name: match[2],
-          signature: "#{match[1]}#{match[2]}",
+          signature: SignatureSupport.textual_method_signature(match[1], match[2]),
           visibility: current_visibility,
           text: lines[start_index..finish_index].join("\n").rstrip,
           body_text: lines[(pending_comments.first || index)..finish_index].join("\n").rstrip
@@ -2818,7 +3089,7 @@ module Ruby
       elsif (match = MODULE_PATTERN.match(line))
         { kind: 'module', name: match[1] }
       elsif (match = DEF_PATTERN.match(line))
-        { kind: 'def', name: match[2], signature: "#{match[1]}#{match[2]}" }
+        { kind: 'def', name: match[2], signature: SignatureSupport.textual_method_signature(match[1], match[2]) }
       end
     end
 
@@ -2882,33 +3153,22 @@ module Ruby
 
     def example_surfaces_for(surface)
       entries = Array(surface.dig(:metadata, :entries))
-      normalized = entries.map { |entry| normalize_comment_content(entry[:raw]) }
-
-      normalized.each_with_index.filter_map do |content, tag_index|
-        match = EXAMPLE_TAG.match(content)
-        next unless match
-
-        body_start = tag_index + 1
-        body_end = next_tag_index(normalized, body_start) || normalized.length
-        next if body_start >= body_end
-
-        body_entries = entries[body_start...body_end]
-        next if body_entries.nil? || body_entries.empty?
-
-        declared_language = declared_example_language(match[:rest]) || 'ruby'
+      DocCommentSupport.example_blocks(entries).map do |block|
+        body_entries = block.fetch(:body_entries)
+        declared_language = block.fetch(:declared_language) || 'ruby'
         Ast::Merge.discovered_surface(
           surface_kind: 'yard_example_block',
           declared_language: declared_language,
           effective_language: declared_language,
-          address: "#{surface[:address]} > yard_example[#{tag_index}]",
+          address: "#{surface[:address]} > yard_example[#{block.fetch(:tag_index)}]",
           parent_address: surface[:address],
           owner: Ast::Merge.surface_owner_ref(kind: 'owned_region', address: surface[:address]),
           span: Ast::Merge.surface_span(start_line: body_entries.first[:line], end_line: body_entries.last[:line]),
           reconstruction_strategy: 'rewrite_with_prefix_preservation',
           metadata: {
             tag_kind: 'example',
-            tag_index: tag_index,
-            tag_text: normalized[tag_index],
+            tag_index: block.fetch(:tag_index),
+            tag_text: block.fetch(:tag_text),
             comment_prefix: surface.dig(:metadata, :comment_prefix)
           }
         )
@@ -2916,11 +3176,7 @@ module Ruby
     end
 
     def next_tag_index(normalized_lines, start_index)
-      normalized_lines.each_with_index do |content, index|
-        next if index < start_index
-        return index if TAG_PREFIX.match?(content)
-      end
-      nil
+      DocCommentSupport.next_tag_index(normalized_lines, start_index)
     end
 
     def normalize_source(source)
@@ -2928,28 +3184,19 @@ module Ruby
     end
 
     def normalize_comment_content(raw)
-      raw.to_s.sub(/\A\s*#\s?/, '').strip
+      DocCommentSupport.normalize_comment_content(raw)
     end
 
     def doc_comment_content?(raw)
-      content = normalize_comment_content(raw)
-      return false if content.empty?
-      return false if DIRECTIVE_LINE.match?(content)
-      return false if MAGIC_COMMENT_PREFIXES.any? { |prefix| content.start_with?("#{prefix}:") }
-
-      true
+      DocCommentSupport.doc_comment_content?(raw)
     end
 
     def comment_prefix_for(raw)
-      raw.to_s[/\A\s*#\s*/] || '# '
+      DocCommentSupport.comment_prefix_for(raw)
     end
 
     def declared_example_language(rest)
-      match = rest.to_s.strip.match(/\A\[(?<language>[^\]]+)\]/)
-      language = match && match[:language]
-      return if language.nil? || language.empty?
-
-      language.downcase.tr('-', '_')
+      DocCommentSupport.declared_example_language(rest)
     end
 
     module_function(
@@ -2977,6 +3224,8 @@ module Ruby
     )
   end
 end
+
+Ruby::Merge.register_backend!
 
 TreeHaver::BackendRegistry.register_tag(
   :tslp_ruby_import_records,

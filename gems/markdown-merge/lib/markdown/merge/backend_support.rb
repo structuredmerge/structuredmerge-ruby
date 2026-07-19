@@ -79,18 +79,28 @@ module Markdown
         end
       end
 
-      def configure_node_heading_and_code_block_helpers!(klass, heading_matcher:, code_block_matcher:)
+      def configure_node_heading_and_code_block_helpers!(klass, heading_matcher:, code_block_matcher:,
+                                                         heading_level_extractor: nil,
+                                                         code_block_info_extractor: nil)
         klass.class_eval do
           define_method(:header_level) do
             return unless Markdown::Merge::BackendSupport.send(:node_helper_match?, self, heading_matcher)
 
-            Markdown::Merge::BackendSupport.send(:safe_inner_node_call, inner_node, :header_level)
+            if heading_level_extractor.respond_to?(:call)
+              heading_level_extractor.call(inner_node)
+            else
+              Markdown::Merge::BackendSupport.send(:safe_inner_node_call, inner_node, :header_level)
+            end
           end
 
           define_method(:fence_info) do
             return unless Markdown::Merge::BackendSupport.send(:node_helper_match?, self, code_block_matcher)
 
-            Markdown::Merge::BackendSupport.send(:safe_inner_node_call, inner_node, :fence_info)
+            if code_block_info_extractor.respond_to?(:call)
+              code_block_info_extractor.call(inner_node)
+            else
+              Markdown::Merge::BackendSupport.send(:safe_inner_node_call, inner_node, :fence_info)
+            end
           end
         end
       end
@@ -148,6 +158,10 @@ module Markdown
       private_class_method :install_tree_wrapper!
 
       def register_backend!(backend_module:, backend_name:, gem_name:, require_path:)
+        ::TreeHaver::BackendRegistry.register(
+          ::TreeHaver::BackendReference.new(id: backend_name.to_s, family: 'native')
+        )
+
         ::TreeHaver.register_language(
           :markdown,
           backend_type: backend_name,

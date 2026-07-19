@@ -14,10 +14,7 @@ module Json
       surface: 'array',
       name: 'destination_wins_array'
     }.freeze
-    TRAILING_COMMA_FALLBACK_POLICY = {
-      surface: 'fallback',
-      name: 'trailing_comma_destination_fallback'
-    }.freeze
+    TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
 
     class Error < Ast::Merge::Error; end
@@ -41,13 +38,14 @@ module Json
     autoload :NodeWrapper, 'json/merge/node_wrapper'
     autoload :ConflictResolver, 'json/merge/conflict_resolver'
     autoload :SmartMerger, 'json/merge/smart_merger'
-    autoload :SyntheticParser, 'json/merge/synthetic_parser'
     autoload :ObjectMatchRefiner, 'json/merge/object_match_refiner'
 
     class << self
       def register_backend!
         BACKEND_REGISTRY.mutex.synchronize do
           return if BACKEND_REGISTRY.registered
+
+          TreeHaver::BackendRegistry.register(TREE_SITTER_BACKEND)
 
           grammar_finder = TreeHaver::GrammarFinder.new(:json)
           grammar_finder.register! if grammar_finder.available?
@@ -63,46 +61,71 @@ module Json
       {
         family: 'json',
         supported_dialects: %w[json jsonc],
-        supported_policies: [DESTINATION_WINS_ARRAY_POLICY, TRAILING_COMMA_FALLBACK_POLICY]
+        supported_policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     end
 
-    def json_parse_request(source, dialect)
-      TreeHaver::ParserRequest.new(source: source, language: 'json', dialect: dialect)
+    def available_json_backends
+      json_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
-    def parse_json_with_language_pack(source, dialect)
-      return unsupported_jsonc_language_pack_result if dialect != 'json'
-
-      backend_result = TreeHaver.parse_with_language_pack(json_parse_request(source, dialect))
-      return { ok: false, diagnostics: backend_result[:diagnostics] } unless backend_result[:ok]
-
-      parse_json(source, dialect)
-    end
-
-    def parse_json(source, dialect)
-      normalized_source = dialect == 'jsonc' ? strip_json_comments(source) : source
-      allows_comments = dialect == 'jsonc'
-      if detect_trailing_comma(normalized_source)
-        return parse_failure("Trailing commas are not supported for #{dialect}.")
+    def json_backend_feature_profile(backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
       end
 
-      parsed = JSON.parse(normalized_source)
-      canonical = JSON.generate(parsed)
-      analysis = {
-        kind: 'json',
-        dialect: dialect,
-        allows_comments: allows_comments,
-        normalized_source: canonical,
-        root_kind: json_root_kind(parsed),
-        owners: collect_json_owners(parsed)
+      json_feature_profile.merge(
+        backend: requested,
+        backend_ref: TREE_SITTER_BACKEND.to_h
+      )
+    end
+
+    def json_plan_context(backend: nil)
+      profile = json_backend_feature_profile(backend: backend)
+      return profile if profile[:ok] == false
+
+      {
+        family_profile: json_feature_profile,
+        feature_profile: {
+          backend: profile[:backend],
+          supports_dialects: true,
+          supported_policies: profile[:supported_policies]
+        }
       }
+    end
+
+    def parse_json(source, dialect, backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
+      end
+
+      return parse_failure("Trailing commas are not supported for #{dialect}.") if detect_trailing_comma(source)
+      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+        return parse_failure("Comments are not supported for #{dialect}.")
+      end
+
+      register_backend!
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
+      unless analysis.valid?
+        return parse_failure(analysis.errors.map do |error|
+          error.respond_to?(:message) ? error.message : error.inspect
+        end.join(', '))
+      end
+
       {
         ok: true,
         diagnostics: [],
-        analysis: analysis
+        analysis: {
+          dialect: dialect,
+          allows_comments: dialect == 'jsonc',
+          root_kind: json_analysis_root_kind(analysis),
+          owners: collect_file_analysis_owners(analysis)
+        },
+        policies: []
       }
-    rescue JSON::ParserError => e
+    rescue TreeHaver::Error, StandardError => e
       parse_failure(e.message)
     end
 
@@ -110,33 +133,23 @@ module Json
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
     end
 
-    def merge_json(template_source, destination_source, dialect)
-      template_result = parse_json(template_source, dialect)
+    def merge_json(template_source, destination_source, dialect, backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        return unsupported_feature_result("Unsupported JSON backend #{requested}.")
+      end
+
+      template_result = parse_json(template_source, dialect, backend: requested)
       return { ok: false, diagnostics: template_result[:diagnostics] } unless template_result[:ok]
 
-      destination_result = parse_json(destination_source, dialect)
+      destination_result = parse_json(destination_source, dialect, backend: requested)
       if destination_result[:ok]
         return {
           ok: true,
           diagnostics: [],
-          output: merge_json_sources(template_source, destination_source),
+          output: TreeHaver.with_backend(requested) { merge_json_sources(template_source, destination_source) },
           policies: [DESTINATION_WINS_ARRAY_POLICY]
         }
-      end
-
-      fallback_source = try_destination_trailing_comma_fallback(destination_source)
-      if fallback_source
-        retried = parse_json(fallback_source, dialect)
-        if retried[:ok]
-          return {
-            ok: true,
-            diagnostics: [
-              fallback_applied('stripped trailing commas from destination before retrying json merge.')
-            ],
-            output: merge_json_sources(template_source, fallback_source),
-            policies: [DESTINATION_WINS_ARRAY_POLICY, TRAILING_COMMA_FALLBACK_POLICY]
-          }
-        end
       end
 
       {
@@ -158,6 +171,82 @@ module Json
     end
     private_class_method :merge_json_sources
 
+    def json_value_for_source(source, dialect: 'json', backend: nil)
+      requested = requested_json_backend_id(backend)
+      unless available_json_backends.any? { |backend_ref| backend_ref.id == requested }
+        raise ParseError, "Unsupported JSON backend #{requested}."
+      end
+
+      raise ParseError, "Trailing commas are not supported for #{dialect}." if detect_trailing_comma(source)
+      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+        raise ParseError, "Comments are not supported for #{dialect}."
+      end
+
+      register_backend!
+      analysis = TreeHaver.with_backend(requested) { FileAnalysis.new(source) }
+      unless analysis.valid?
+        message = analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', ')
+        raise ParseError, message
+      end
+
+      json_value_for_node(analysis.root_node)
+    end
+
+    def json_value_for_node(node)
+      case node.type.to_s
+      when 'document'
+        child = node.semantic_children.first
+        child ? json_value_for_node(NodeWrapper.new(child, lines: node.lines, source: node.source)) : nil
+      when 'object'
+        node.pairs.each_with_object({}) do |pair, object|
+          key = pair.key_name
+          next unless key
+
+          object[key] = json_value_for_node(pair.value_node)
+        end
+      when 'array'
+        node.elements.map { |element| json_value_for_node(element) }
+      when 'string'
+        decode_json_string_literal(node.text)
+      when 'number'
+        parse_json_number(node.text)
+      when 'true'
+        true
+      when 'false'
+        false
+      when 'null'
+        nil
+      end
+    end
+
+    def decode_json_string_literal(text)
+      literal = text.to_s
+      literal = literal[1...-1] if literal.start_with?('"') && literal.end_with?('"')
+      literal.gsub(%r{\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4})}) do |escape|
+        case escape
+        when '\\"' then '"'
+        when '\\\\' then '\\'
+        when '\\/' then '/'
+        when '\\b' then "\b"
+        when '\\f' then "\f"
+        when '\\n' then "\n"
+        when '\\r' then "\r"
+        when '\\t' then "\t"
+        else
+          [escape[2..].to_i(16)].pack('U')
+        end
+      end
+    end
+    private_class_method :decode_json_string_literal
+
+    def parse_json_number(text)
+      number = text.to_s
+      return number.to_f if number.match?(/[.eE]/)
+
+      number.to_i
+    end
+    private_class_method :parse_json_number
+
     def parse_failure(message)
       {
         ok: false,
@@ -166,15 +255,29 @@ module Json
     end
     private_class_method :parse_failure
 
-    def unsupported_jsonc_language_pack_result
-      {
-        ok: false,
-        diagnostics: [
-          unsupported_feature('tree-sitter-language-pack json parsing currently supports only the json dialect.')
-        ]
-      }
+    def requested_json_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      current = TreeHaver.current_backend_id
+      return current if json_backend_available_for_analysis?(current)
+
+      available_json_backends.find do |backend_ref|
+        json_backend_available_for_analysis?(backend_ref.id)
+      end&.id || TREE_SITTER_BACKEND.id
     end
-    private_class_method :unsupported_jsonc_language_pack_result
+    private_class_method :requested_json_backend_id
+
+    def json_backend_available_for_analysis?(backend_id)
+      register_backend!
+      registrations = TreeHaver.registered_languages(:json)
+      case backend_id.to_s
+      when TREE_SITTER_BACKEND.id
+        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      else
+        false
+      end
+    end
+    private_class_method :json_backend_available_for_analysis?
 
     def parse_error(message)
       { severity: 'error', category: 'parse_error', message: message }
@@ -186,57 +289,51 @@ module Json
     end
     private_class_method :unsupported_feature
 
-    def fallback_applied(message)
-      { severity: 'warning', category: 'fallback_applied', message: message }
+    def unsupported_feature_result(message)
+      { ok: false, diagnostics: [unsupported_feature(message)], policies: [] }
     end
-    private_class_method :fallback_applied
+    private_class_method :unsupported_feature_result
 
-    def json_root_kind(value)
-      return 'object' if value.is_a?(Hash)
-      return 'array' if value.is_a?(Array)
+    def json_analysis_root_kind(analysis)
+      root = analysis.root_object || analysis.root_node
+      return 'object' if root&.object?
+      return 'array' if root&.array?
 
       'scalar'
     end
-    private_class_method :json_root_kind
+    private_class_method :json_analysis_root_kind
 
-    def collect_json_owners(value, path = '')
-      if value.is_a?(Hash)
-        value.keys.sort.flat_map do |key|
-          next_path = "#{path}/#{key}"
-          [{ path: next_path, owner_kind: 'member', match_key: key }] + collect_json_owners(value[key], next_path)
+    def collect_file_analysis_owners(analysis)
+      root = analysis.root_object || analysis.root_node
+      return [] unless root
+
+      collect_json_node_owners(root, '')
+        .sort_by { |owner| owner.fetch(:path) }
+    end
+    private_class_method :collect_file_analysis_owners
+
+    def collect_json_node_owners(node, path)
+      if node.object?
+        node.pairs.flat_map do |pair|
+          key = pair.key_name
+          next [] unless key
+
+          owner_path = "#{path}/#{key}"
+          value = pair.value_node
+          [{ path: owner_path, owner_kind: 'member', match_key: key }] +
+            (value ? collect_json_node_owners(value, owner_path) : [])
         end
-      elsif value.is_a?(Array)
-        value.each_with_index.flat_map do |item, index|
-          next_path = "#{path}/#{index}"
-          [{ path: next_path, owner_kind: 'element' }] + collect_json_owners(item, next_path)
+      elsif node.array?
+        node.elements.each_with_index.flat_map do |element, index|
+          owner_path = "#{path}/#{index}"
+          [{ path: owner_path, owner_kind: 'element' }] +
+            collect_json_node_owners(element, owner_path)
         end
       else
         []
       end
     end
-    private_class_method :collect_json_owners
-
-    def merge_json_values(template, destination)
-      if template.is_a?(Hash) && destination.is_a?(Hash)
-        ordered_merge_keys(template, destination).each_with_object({}) do |key, merged|
-          merged[key] = if !template.key?(key)
-                          destination[key]
-                        elsif !destination.key?(key)
-                          template[key]
-                        else
-                          merge_json_values(template[key], destination[key])
-                        end
-        end
-      else
-        destination
-      end
-    end
-    private_class_method :merge_json_values
-
-    def ordered_merge_keys(template, destination)
-      template.keys + destination.keys.reject { |key| template.key?(key) }
-    end
-    private_class_method :ordered_merge_keys
+    private_class_method :collect_json_node_owners
 
     def detect_trailing_comma(source)
       state = scanner_state
@@ -257,142 +354,17 @@ module Json
     end
     private_class_method :detect_trailing_comma
 
-    def strip_json_comments(source)
-      result = +''
-      state = scanner_state
-      index = 0
-      while index < source.length
-        char = source[index]
-        next_char = source[index + 1]
-
-        if state[:in_line_comment]
-          if char == "\n"
-            state[:in_line_comment] = false
-            result << "\n"
-          end
-          index += 1
-          next
-        end
-
-        if state[:in_block_comment]
-          if char == '*' && next_char == '/'
-            state[:in_block_comment] = false
-            index += 2
-            next
-          end
-          index += 1
-          next
-        end
-
-        if state[:in_string]
-          result << char
-          if state[:escaped]
-            state[:escaped] = false
-          elsif char == '\\'
-            state[:escaped] = true
-          elsif char == '"'
-            state[:in_string] = false
-          end
-          index += 1
-          next
-        end
-
-        if char == '"'
-          state[:in_string] = true
-          result << char
-          index += 1
-          next
-        end
-
-        if char == '/' && next_char == '/'
-          state[:in_line_comment] = true
-          index += 2
-          next
-        end
-
-        if char == '/' && next_char == '*'
-          state[:in_block_comment] = true
-          index += 2
-          next
-        end
-
-        result << char
-        index += 1
-      end
-      result
-    end
-    private_class_method :strip_json_comments
-
-    def try_destination_trailing_comma_fallback(source)
-      stripped = strip_trailing_commas(source)
-      return nil if stripped == source
-
-      stripped
-    end
-    private_class_method :try_destination_trailing_comma_fallback
-
-    def strip_trailing_commas(source)
-      result = +''
+    def detect_json_comments(source)
       state = scanner_state
       source.each_char.with_index do |char, index|
         next_char = source[index + 1]
+        return true if !state[:in_string] && char == '/' && %w[/ *].include?(next_char)
 
-        if state[:in_line_comment]
-          result << char
-          state[:in_line_comment] = false if char == "\n"
-          next
-        end
-
-        if state[:in_block_comment]
-          result << char
-          if char == '*' && next_char == '/'
-            result << next_char
-            state[:in_block_comment] = false
-          end
-          next
-        end
-
-        if state[:in_string]
-          result << char
-          if state[:escaped]
-            state[:escaped] = false
-          elsif char == '\\'
-            state[:escaped] = true
-          elsif char == '"'
-            state[:in_string] = false
-          end
-          next
-        end
-
-        if char == '"'
-          state[:in_string] = true
-          result << char
-          next
-        end
-
-        if char == '/' && next_char == '/'
-          state[:in_line_comment] = true
-          result << char
-          next
-        end
-
-        if char == '/' && next_char == '*'
-          state[:in_block_comment] = true
-          result << char
-          next
-        end
-
-        if char == ','
-          lookahead = source[(index + 1)..]
-          trimmed = lookahead&.lstrip
-          next if trimmed&.start_with?(']', '}')
-        end
-
-        result << char
+        advance_scanner_state(state, char, next_char)
       end
-      result
+      false
     end
-    private_class_method :strip_trailing_commas
+    private_class_method :detect_json_comments
 
     def scanner_state
       {

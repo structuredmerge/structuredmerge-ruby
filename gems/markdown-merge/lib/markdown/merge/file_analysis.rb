@@ -61,16 +61,33 @@ module Markdown
         end
       end
 
-      # @return [Symbol] The backend being used (:commonmarker, :markly)
+      # @return [Symbol] The backend being used (:commonmarker, :markly, :kramdown)
       attr_reader :backend
 
       # @return [Hash] Parser-specific options
       attr_reader :parser_options
 
+      Location = Struct.new(:start_line, :end_line, keyword_init: true)
+      HeadingSectionOwner = Struct.new(:location, :heading_text, :heading_source, :level, :base, keyword_init: true)
+      LinkDefinitionOwner = Struct.new(:location, :label, :url, :title, :source, keyword_init: true)
+      HtmlCommentOwner = Struct.new(:location, :text, :source, keyword_init: true)
+      InlineReferenceOwner = Struct.new(
+        :location,
+        :line,
+        :start_column,
+        :end_column,
+        :source,
+        :reference_kind,
+        :label,
+        :labels,
+        keyword_init: true
+      )
+      TableRowOwner = Struct.new(:location, :source, :text, keyword_init: true)
+
       # Initialize file analysis with tree_haver backend.
       #
       # @param source [String] Markdown source code to analyze
-      # @param backend [Symbol] Backend to use (:commonmarker, :markly, :auto)
+      # @param backend [Symbol] Backend to use (:commonmarker, :markly, :kramdown, :auto)
       # @param freeze_token [String] Token for freeze block markers
       # @param signature_generator [Proc, nil] Custom signature generator
       # @param parser_options [Hash] Backend-specific parser options
@@ -272,7 +289,259 @@ module Markdown
         nodes
       end
 
+      def heading_section_owners
+        headings = Array(statements).filter_map do |statement|
+          next unless heading_statement?(statement)
+
+          build_heading_owner(statement)
+        end
+
+        headings.each_with_index.map do |owner, index|
+          branch_end_line = branch_end_line(headings, index)
+          HeadingSectionOwner.new(
+            location: Location.new(start_line: owner.location.start_line, end_line: branch_end_line),
+            heading_text: owner.heading_text,
+            heading_source: owner.heading_source,
+            level: owner.level,
+            base: owner.base
+          )
+        end
+      end
+
+      def link_definition_owners
+        Array(statements).filter_map do |statement|
+          next unless statement.respond_to?(:merge_type) && statement.merge_type == :link_definition
+
+          position = statement.source_position
+          next unless position
+
+          LinkDefinitionOwner.new(
+            location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
+            label: statement.label,
+            url: statement.url,
+            title: statement.title,
+            source: if statement.respond_to?(:content)
+                      statement.content
+                    else
+                      source_range(position[:start_line], position[:end_line]).chomp
+                    end
+          )
+        end
+      end
+
+      def html_comment_owners
+        comment_tracker.comment_nodes.map do |comment|
+          HtmlCommentOwner.new(
+            location: Location.new(start_line: comment.location.start_line, end_line: comment.location.end_line),
+            text: comment.content,
+            source: comment.text
+          )
+        end
+      end
+
+      def inline_reference_owners
+        source.to_s.lines.each_with_index.flat_map do |line, index|
+          inline_references_for_line(line.chomp, index + 1)
+        end
+      end
+
+      def table_row_owners
+        ast_table_lines = {}
+        ast_rows = Array(statements).flat_map do |statement|
+          node = unwrap_markdown_statement(statement)
+          next [] unless node.respond_to?(:type) && node.type.to_s == 'table'
+
+          table_position = node.source_position
+          if table_position
+            (table_position[:start_line]..table_position[:end_line]).each do |line|
+              ast_table_lines[line] = true
+            end
+          end
+          Array(node.children).filter_map do |child|
+            next unless child.respond_to?(:type) && child.type.to_s == 'table_row'
+
+            position = child.source_position
+            next unless position
+
+            TableRowOwner.new(
+              location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
+              source: source_range(position[:start_line], position[:end_line]),
+              text: extract_text_content(child)
+            )
+          end
+        end
+        ast_lines = ast_rows.map { |owner| owner.location.start_line }.to_h { |line| [line, true] }
+        loose_rows = source.to_s.lines.each_with_index.filter_map do |line, index|
+          line_number = index + 1
+          next if ast_lines[line_number]
+          next if ast_table_lines[line_number]
+          next unless loose_table_row_line?(line)
+
+          TableRowOwner.new(
+            location: Location.new(start_line: line_number, end_line: line_number),
+            source: line,
+            text: line
+          )
+        end
+        ast_rows + loose_rows
+      end
+
       private
+
+      def loose_table_row_line?(line)
+        stripped = line.to_s.lstrip
+        return false unless stripped.start_with?('|')
+
+        stripped.include?(' |') || stripped.include?('| ')
+      end
+
+      def heading_statement?(statement)
+        merge_type = if statement.respond_to?(:merge_type)
+                       statement.merge_type
+                     else
+                       unwrap_markdown_statement(statement)&.type
+                     end
+
+        %w[heading header].include?(merge_type.to_s)
+      end
+
+      def build_heading_owner(statement)
+        node = unwrap_markdown_statement(statement)
+        position = node&.source_position
+        return unless node && position
+
+        heading_source = source_range(position[:start_line], position[:end_line]).sub(/\n\z/, '')
+        heading_text = node.to_plaintext.to_s.sub(/\n+\z/, '')
+        HeadingSectionOwner.new(
+          location: Location.new(start_line: position[:start_line], end_line: position[:end_line]),
+          heading_text: heading_text,
+          heading_source: heading_source,
+          level: node.header_level,
+          base: normalize_heading_base(heading_text)
+        )
+      rescue StandardError
+        nil
+      end
+
+      def branch_end_line(headings, index)
+        current = headings[index]
+        cursor = index + 1
+        while cursor < headings.length
+          return headings[cursor].location.start_line - 1 if headings[cursor].level <= current.level
+
+          cursor += 1
+        end
+
+        source.to_s.lines.length
+      end
+
+      def unwrap_markdown_statement(statement)
+        Ast::Merge::NodeTyping.unwrap(statement)
+      rescue StandardError
+        statement
+      end
+
+      def normalize_heading_base(text)
+        text.to_s.sub(/\A(?:\d\uFE0F?\u20E3|[^[:alnum:][:space:]])+[ \t]*/u, '').strip.downcase
+      end
+
+      def inline_references_for_line(line, line_number)
+        owners = []
+        index = 0
+        while index < line.length
+          image = inline_image_reference_at(line, index, line_number)
+          if image
+            owners << image
+            index = image.end_column
+            next
+          end
+
+          link = inline_link_reference_at(line, index, line_number)
+          if link
+            owners << link
+            index = link.end_column
+            next
+          end
+
+          index += 1
+        end
+        owners
+      end
+
+      def inline_image_reference_at(line, index, line_number)
+        return unless line[index] == '!' && line[index + 1] == '['
+
+        alt_end = closing_bracket_index(line, index + 1)
+        return unless alt_end && line[alt_end + 1] == '['
+
+        label_end = closing_bracket_index(line, alt_end + 1)
+        return unless label_end
+
+        label = line[(alt_end + 2)...label_end]
+        inline_reference_owner(
+          line: line,
+          line_number: line_number,
+          start_column: index,
+          end_column: label_end + 1,
+          reference_kind: :image_reference,
+          label: label,
+          labels: [label]
+        )
+      end
+
+      def inline_link_reference_at(line, index, line_number)
+        return unless line[index] == '['
+
+        text_end = closing_bracket_index(line, index)
+        return unless text_end && line[text_end + 1] == '['
+
+        label_end = closing_bracket_index(line, text_end + 1)
+        return unless label_end
+
+        text = line[(index + 1)...text_end]
+        label = line[(text_end + 2)...label_end]
+        image_owner = inline_image_reference_at(text, 0, line_number)
+        labels = [label]
+        labels.unshift(image_owner.label) if image_owner && image_owner.source == text
+        inline_reference_owner(
+          line: line,
+          line_number: line_number,
+          start_column: index,
+          end_column: label_end + 1,
+          reference_kind: labels.length > 1 ? :linked_image_reference : :link_reference,
+          label: label,
+          labels: labels
+        )
+      end
+
+      def inline_reference_owner(line:, line_number:, start_column:, end_column:, reference_kind:, label:, labels:)
+        InlineReferenceOwner.new(
+          location: Location.new(start_line: line_number, end_line: line_number),
+          line: line_number,
+          start_column: start_column,
+          end_column: end_column,
+          source: line[start_column...end_column],
+          reference_kind: reference_kind,
+          label: label,
+          labels: labels.compact.uniq
+        )
+      end
+
+      def closing_bracket_index(text, opening_index)
+        depth = 0
+        index = opening_index
+        while index < text.length
+          case text[index]
+          when '['
+            depth += 1
+          when ']'
+            depth -= 1
+            return index if depth.zero?
+          end
+          index += 1
+        end
+        nil
+      end
 
       # Recursively collect text content from a node and its descendants.
       #
@@ -311,63 +580,68 @@ module Markdown
 
       # Resolve the backend to use.
       #
-      # For :auto, attempts commonmarker first, then markly.
-      # tree_haver handles the actual availability checking.
+      # For :auto, use the same backend selection as the Markdown substrate facade.
+      # tree_haver handles the final availability checking.
       #
       # @param backend [Symbol] Requested backend
-      # @return [Symbol] Resolved backend (:commonmarker or :markly)
+      # @return [Symbol] Resolved backend
       def resolve_backend(backend)
-        return backend unless backend == :auto
+        return Markdown::Merge.resolve_backend(nil).to_sym if backend.to_s.empty? || backend == :auto
 
-        # Try commonmarker first, then markly
-        if TreeHaver::BackendRegistry.available?(:commonmarker)
-          :commonmarker
-        elsif TreeHaver::BackendRegistry.available?(:markly)
-          :markly
-        else
-          # Let tree_haver raise the appropriate error
-          :commonmarker
-        end
+        backend.to_sym
       end
 
       # Create a parser for the resolved backend.
       #
       # @return [Object] tree_haver parser instance
       def create_parser
-        case @backend
-        when :commonmarker
-          create_commonmarker_parser
-        when :markly
-          create_markly_parser
-        else
+        unless Markdown::Merge::BACKEND_REFERENCES.key?(@backend.to_s)
           raise ArgumentError, "Unknown backend: #{@backend}"
         end
+
+        parser = TreeHaver.with_backend(@backend) { TreeHaver.parser_for(:markdown) }
+
+        case @backend
+        when :commonmarker
+          parser.language = commonmarker_language
+        when :markly
+          parser.language = markly_language
+        when :kramdown
+          parser.language = kramdown_language
+        else
+          return parser
+        end
+
+        parser
       end
 
-      # Create a Commonmarker parser via commonmarker-merge backend.
+      # Create a Commonmarker language config for the TreeHaver parser.
       #
-      # @return [Commonmarker::Merge::Backend::Parser]
-      def create_commonmarker_parser
-        parser = Commonmarker::Merge::Backend::Parser.new
+      # @return [Commonmarker::Merge::Backend::Language]
+      def commonmarker_language
         # Default options enable table extension for GFM compatibility
         default_options = { extension: { table: true } }
         options = default_options.merge(@parser_options[:options] || {})
-        parser.language = Commonmarker::Merge::Backend::Language.markdown(options: options)
-        parser
+        Commonmarker::Merge::Backend::Language.markdown(options: options)
       end
 
-      # Create a Markly parser via markly-merge backend.
+      # Create a Markly language config for the TreeHaver parser.
       #
-      # @return [Markly::Merge::Backend::Parser]
-      def create_markly_parser
-        parser = Markly::Merge::Backend::Parser.new
+      # @return [Markly::Merge::Backend::Language]
+      def markly_language
         flags = @parser_options[:flags]
         extensions = @parser_options[:extensions] || [:table]
-        parser.language = Markly::Merge::Backend::Language.markdown(
+        Markly::Merge::Backend::Language.markdown(
           flags: flags,
           extensions: extensions
         )
-        parser
+      end
+
+      # Create a Kramdown language config for the TreeHaver parser.
+      #
+      # @return [Kramdown::Merge::Backend::Language]
+      def kramdown_language
+        Kramdown::Merge::Backend::Language.markdown(options: @parser_options[:options] || {})
       end
     end
   end
