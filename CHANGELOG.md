@@ -41,7 +41,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `ast-merge` now requires `token-resolver` 2.0.1 or newer.
 - `ast-merge` now provides shared comment/layout emission helpers for root
   boundary text, leading segments, retained blank lines, and equivalent-region
-  ownership checks, and RBS, Bash, and dotenv merges now use that common path.
+  ownership checks, and RBS, Bash, dotenv, and Psych merges now use that common
+  path where their semantics are format-neutral.
 - Gems that use `tree_sitter_language_pack` now resolve it through the
   StructuredMerge Ruby 4-compatible fork branch in their development Gemfiles
   until an upstream Ruby 4-compatible release is available.
