@@ -76,4 +76,17 @@ RSpec.describe Go::Merge do
       %w[go slice-112-merge module-merge.json]
     )
   end
+
+  it 'fails closed when the Go TreeHaver backend is unavailable' do
+    allow(described_class).to receive(:go_backend_available_for_analysis?).and_return(false)
+
+    expect(described_class.available_go_backends).to eq([])
+    result = described_class.parse_go("package main\n", 'go')
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to eq(
+      [{ severity: 'error', category: 'unsupported_feature',
+         message: 'Unsupported Go backend kreuzberg-language-pack.' }]
+    )
+  end
 end

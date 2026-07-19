@@ -68,4 +68,17 @@ RSpec.describe Rust::Merge do
       %w[rust slice-108-merge module-merge.json]
     )
   end
+
+  it 'fails closed when the Rust TreeHaver backend is unavailable' do
+    allow(described_class).to receive(:rust_backend_available_for_analysis?).and_return(false)
+
+    expect(described_class.available_rust_backends).to eq([])
+    result = described_class.parse_rust("fn main() {}\n", 'rust')
+
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to eq(
+      [{ severity: 'error', category: 'unsupported_feature',
+         message: 'Unsupported Rust backend kreuzberg-language-pack.' }]
+    )
+  end
 end
