@@ -47,6 +47,15 @@ RSpec.describe Json::Merge do
     expect(json_ready(result[:diagnostics])).to eq(json_ready(fixture.dig(:expected, :diagnostics)))
   end
 
+  it 'rejects comments in strict JSON without rejecting comment-like string content' do
+    strict_result = described_class.parse_json("{\n  // nope\n  \"name\": \"Ruby\"\n}\n", 'json')
+    string_result = described_class.parse_json("{\"url\":\"https://example.test/path\"}\n", 'json')
+
+    expect(strict_result[:ok]).to be(false)
+    expect(strict_result.dig(:diagnostics, 0, :message)).to eq('Comments are not supported for json.')
+    expect(string_result[:ok]).to be(true)
+  end
+
   it 'fails closed for JSONC analysis when no TreeHaver JSON backend is available' do
     source = <<~JSON
       {

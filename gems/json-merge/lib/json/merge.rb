@@ -63,13 +63,15 @@ module Json
     end
 
     def parse_json(source, dialect)
-      normalized_source = dialect == 'jsonc' ? strip_json_comments(source) : source
-      if detect_trailing_comma(normalized_source)
+      if detect_trailing_comma(source)
         return parse_failure("Trailing commas are not supported for #{dialect}.")
+      end
+      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+        return parse_failure("Comments are not supported for #{dialect}.")
       end
 
       register_backend!
-      analysis = FileAnalysis.new(normalized_source)
+      analysis = FileAnalysis.new(source)
       unless analysis.valid?
         return parse_failure(analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', '))
       end
@@ -127,13 +129,15 @@ module Json
     private_class_method :merge_json_sources
 
     def json_value_for_source(source, dialect: 'json')
-      normalized_source = dialect.to_s == 'jsonc' ? strip_json_comments(source) : source
-      if detect_trailing_comma(normalized_source)
+      if detect_trailing_comma(source)
         raise ParseError, "Trailing commas are not supported for #{dialect}."
+      end
+      if dialect.to_s != 'jsonc' && detect_json_comments(source)
+        raise ParseError, "Comments are not supported for #{dialect}."
       end
 
       register_backend!
-      analysis = FileAnalysis.new(normalized_source)
+      analysis = FileAnalysis.new(source)
       unless analysis.valid?
         message = analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', ')
         raise ParseError, message
@@ -277,71 +281,17 @@ module Json
     end
     private_class_method :detect_trailing_comma
 
-    def strip_json_comments(source)
-      result = +''
+    def detect_json_comments(source)
       state = scanner_state
-      index = 0
-      while index < source.length
-        char = source[index]
+      source.each_char.with_index do |char, index|
         next_char = source[index + 1]
+        return true if !state[:in_string] && char == '/' && %w[/ *].include?(next_char)
 
-        if state[:in_line_comment]
-          if char == "\n"
-            state[:in_line_comment] = false
-            result << "\n"
-          end
-          index += 1
-          next
-        end
-
-        if state[:in_block_comment]
-          if char == '*' && next_char == '/'
-            state[:in_block_comment] = false
-            index += 2
-            next
-          end
-          index += 1
-          next
-        end
-
-        if state[:in_string]
-          result << char
-          if state[:escaped]
-            state[:escaped] = false
-          elsif char == '\\'
-            state[:escaped] = true
-          elsif char == '"'
-            state[:in_string] = false
-          end
-          index += 1
-          next
-        end
-
-        if char == '"'
-          state[:in_string] = true
-          result << char
-          index += 1
-          next
-        end
-
-        if char == '/' && next_char == '/'
-          state[:in_line_comment] = true
-          index += 2
-          next
-        end
-
-        if char == '/' && next_char == '*'
-          state[:in_block_comment] = true
-          index += 2
-          next
-        end
-
-        result << char
-        index += 1
+        advance_scanner_state(state, char, next_char)
       end
-      result
+      false
     end
-    private_class_method :strip_json_comments
+    private_class_method :detect_json_comments
 
     def scanner_state
       {
