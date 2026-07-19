@@ -367,36 +367,11 @@ module Rbs
       end
 
       def removed_declaration_comment_lines(decl, analysis)
-        attachment = analysis.comment_attachment_for(decl)
-        leading_region = leading_region_for(decl, analysis)
-        start_line = get_start_line(decl)
-        trailing_lines = if (trailing_region = attachment&.trailing_region)
-                           trailing_region.nodes.filter_map do |node|
-                             if node.respond_to?(:slice)
-                               node.slice.to_s
-                             elsif node.respond_to?(:text)
-                               node.text.to_s
-                             else
-                               node.to_s
-                             end
-                           end
-                         else
-                           []
-                         end
+        lines = removed_owner_preserved_lines_for(decl, analysis)
+        return lines if lines.any?
 
-        if region_present?(leading_region)
-          region_start = region_start_line(leading_region)
-          if region_start && start_line && region_start < start_line
-            leading_start = preceding_blank_line_start(region_start, analysis)
-            lines = (leading_start...start_line).filter_map { |ln| analysis.line_at(ln) }
-            lines.concat(trailing_lines)
-            trailing_gap = attachment&.trailing_gap
-            if trailing_gap&.effective_controller_side(removed_owners: [decl]) == :after
-              lines.concat(trailing_gap.lines)
-            end
-            return lines
-          end
-        elsif decl.respond_to?(:comment) && decl.comment
+        if decl.respond_to?(:comment) && decl.comment
+          start_line = get_start_line(decl)
           comment_start = decl.comment.location&.start_line
           if comment_start && start_line && comment_start < start_line
             return (comment_start...start_line).filter_map do |ln|
@@ -404,8 +379,6 @@ module Rbs
             end
           end
         end
-
-        return trailing_lines if trailing_lines.any?
 
         []
       end
@@ -465,7 +438,7 @@ module Rbs
 
           if region_start && leading_end && region_start < leading_end
             leading_start = leading_segment_start_for_output(
-              output_decl: decl,
+              output_owner: decl,
               output_analysis: analysis,
               source_region_start: region_start,
               source_region: leading_region,
@@ -764,7 +737,7 @@ module Rbs
 
                           if region_start && leading_end && region_start < leading_end
                             leading_start = leading_segment_start_for_output(
-                              output_decl: statement,
+                              output_owner: statement,
                               output_analysis: analysis,
                               source_region_start: region_start,
                               source_region: leading_region,
@@ -860,7 +833,7 @@ module Rbs
         return [] unless region_start && statement_start && region_start < statement_start
 
         leading_start = leading_segment_start_for_output(
-          output_decl: statement,
+          output_owner: statement,
           output_analysis: analysis,
           source_region_start: region_start,
           source_region: leading_region,
@@ -869,17 +842,6 @@ module Rbs
         lines = (leading_start...statement_start).filter_map { |line_number| analysis.line_at(line_number) }
         comments, = leading_standalone_comment_run(lines.join("\n"))
         comments
-      end
-
-      def leading_segment_start_for_output(output_decl:, output_analysis:, source_region_start:, source_analysis:,
-                                           source_region: nil)
-        super(
-          output_owner: output_decl,
-          output_analysis: output_analysis,
-          source_region_start: source_region_start,
-          source_region: source_region,
-          source_analysis: source_analysis
-        )
       end
 
       STANDALONE_RBS_COMMENT_LINE_RE = /\A\s*#.*\z/

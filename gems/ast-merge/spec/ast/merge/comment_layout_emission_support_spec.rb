@@ -7,9 +7,13 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     def empty?
       false
     end
+
+    def text
+      normalized_content
+    end
   end
 
-  Attachment = Struct.new(:leading_region, :trailing_region, keyword_init: true)
+  Attachment = Struct.new(:leading_region, :trailing_region, :trailing_gap, keyword_init: true)
 
   class Analysis
     attr_reader :lines, :statements, :comment_nodes
@@ -42,9 +46,11 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
 
     public :blank_line_count_before,
            :leading_region_for,
+           :leading_segment_lines_for,
            :leading_segment_start_for_output,
            :previous_owner_for,
            :previous_owner_trailing_region_matches?,
+           :removed_owner_preserved_lines_for,
            :region_present?,
            :root_boundary_lines_for
   end
@@ -87,6 +93,34 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
         source_analysis: analysis
       )
     ).to eq(3)
+  end
+
+  it 'collects preserved removed-owner leading, inline, trailing, and fallback gap lines' do
+    owner = Statement.new(name: 'removed', start_line: 3, end_line: 3)
+    later_owner = Statement.new(name: 'later', start_line: 6, end_line: 6)
+    gap = Ast::Merge::Layout::Gap.new(
+      kind: :interstitial,
+      start_line: 5,
+      end_line: 5,
+      lines: [''],
+      before_owner: owner,
+      after_owner: later_owner
+    )
+    analysis = Analysis.new(
+      lines: ['# docs', '', 'removed', '# trailing', '', 'later'],
+      statements: [owner, later_owner],
+      attachments: {
+        owner => Attachment.new(
+          leading_region: Region.new(start_line: 1, end_line: 1, normalized_content: '# docs'),
+          trailing_region: Region.new(start_line: 4, end_line: 4, normalized_content: '# trailing'),
+          trailing_gap: gap
+        )
+      }
+    )
+
+    expect(
+      harness.removed_owner_preserved_lines_for(owner, analysis, inline_lines: ['# inline'])
+    ).to eq(['# docs', '', '# inline', '# trailing', ''])
   end
 
   it 'returns root preamble lines using root comment attachment regions' do

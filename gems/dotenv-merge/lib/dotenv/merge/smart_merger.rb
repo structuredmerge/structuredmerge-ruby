@@ -408,39 +408,22 @@ module Dotenv
       end
 
       def removed_destination_comment_lines_for(node)
-        lines = leading_segment_lines_for(node, @dest_analysis)
-        attachment = @dest_analysis.comment_attachment_for(node)
+        inline_lines = []
 
         if (inline_comment = destination_inline_comment_for(node))
-          lines << promoted_inline_comment_line_for(node, @dest_analysis, inline_comment)
+          inline_lines << promoted_inline_comment_line_for(node, @dest_analysis, inline_comment)
         end
 
-        if (trailing_region = attachment&.trailing_region)
-          lines.concat(trailing_region.text.split("\n"))
-        end
-
-        trailing_gap = attachment&.trailing_gap
-        if trailing_gap && trailing_gap.effective_controller_side(removed_owners: [node]) == :after
-          lines.concat(trailing_gap.lines)
-        end
-
-        lines.compact
-      end
-
-      def leading_segment_lines_for(node, analysis)
-        start_line = emission_start_line_for(node, analysis)
-        return [] unless start_line && start_line < node.start_line
-
-        (start_line...node.start_line).filter_map { |line_number| raw_line_at(analysis, line_number) }
+        removed_owner_preserved_lines_for(
+          node,
+          @dest_analysis,
+          owners: @dest_analysis.structural_owners,
+          inline_lines: inline_lines
+        )
       end
 
       def interstitial_trailing_segment_lines_for(node, analysis)
-        return [] unless next_structural_owner_for(node, analysis)
-
-        trailing_region = analysis.comment_attachment_for(node)&.trailing_region
-        return [] unless trailing_region
-
-        trailing_region.text.split("\n")
+        interstitial_trailing_region_lines_for(node, analysis, owners: analysis.structural_owners)
       end
 
       def next_structural_owner_for(node, analysis)
@@ -538,6 +521,12 @@ module Dotenv
       def raw_line_at(analysis, line_number)
         line = analysis.line_at(line_number)
         line.respond_to?(:raw) ? line.raw : line
+      end
+
+      def leading_segment_anchor_line_for(node, analysis, owners: nil, leading_region: nil)
+        region_start = super(node, analysis, owners: owners || analysis.structural_owners, leading_region: leading_region)
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node, analysis)
+        region_start || preamble_start
       end
 
       def source_line_at(analysis, line_number)

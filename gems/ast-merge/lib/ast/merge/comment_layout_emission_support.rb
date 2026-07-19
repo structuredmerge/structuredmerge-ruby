@@ -113,6 +113,53 @@ module Ast
         end
       end
 
+      def leading_segment_lines_for(owner, analysis, owners: nil)
+        leading_region = leading_region_for(owner, analysis, owners: owners)
+        region_start = leading_segment_anchor_line_for(owner, analysis, owners: owners, leading_region: leading_region)
+        owner_start = owner_start_line(owner)
+        return [] unless region_start && owner_start && region_start < owner_start
+
+        leading_start = leading_segment_start_for_output(
+          output_owner: owner,
+          output_analysis: analysis,
+          source_region_start: region_start,
+          source_region: leading_region,
+          source_analysis: analysis,
+          owners: owners
+        )
+        (leading_start...owner_start).filter_map { |line_number| source_line_at(analysis, line_number) }
+      end
+
+      def leading_segment_anchor_line_for(_owner, _analysis, owners: nil, leading_region: nil)
+        return unless region_present?(leading_region)
+
+        region_start_line(leading_region)
+      end
+
+      def trailing_region_lines_for(owner, analysis, owners: nil)
+        region_lines_for(trailing_region_for(owner, analysis, owners: owners))
+      end
+
+      def removed_owner_preserved_lines_for(owner, analysis, owners: nil, inline_lines: [])
+        attachment = analysis.comment_attachment_for(owner, owners: owners)
+        lines = leading_segment_lines_for(owner, analysis, owners: owners)
+        lines.concat(Array(inline_lines).compact)
+        lines.concat(region_lines_for(attachment&.trailing_region))
+
+        trailing_gap = attachment&.trailing_gap
+        if trailing_gap&.effective_controller_side(removed_owners: [owner]) == :after
+          lines.concat(trailing_gap.lines)
+        end
+
+        lines
+      end
+
+      def interstitial_trailing_region_lines_for(owner, analysis, owners: nil)
+        return [] unless next_owner_for(owner, analysis, owners: owners)
+
+        trailing_region_lines_for(owner, analysis, owners: owners)
+      end
+
       def previous_owner_trailing_region_matches?(owner, analysis, source_region, owners: nil)
         previous_owner = previous_owner_for(owner, analysis, owners: owners)
         return false unless previous_owner
@@ -129,6 +176,16 @@ module Ast
         return unless index && index.positive?
 
         owner_list[index - 1]
+      end
+
+      def next_owner_for(owner, analysis, owners: nil)
+        owner_list = Array(owners || analysis&.statements).select do |entry|
+          owner_start_line(entry)
+        end
+        index = owner_list.index(owner)
+        return unless index
+
+        owner_list[index + 1]
       end
 
       def regions_equivalent?(left, right)
@@ -242,6 +299,21 @@ module Ast
 
       def root_boundary_owner_start_line_for(owner, _analysis)
         owner_start_line(owner)
+      end
+
+      def region_lines_for(region)
+        return [] unless region_present?(region)
+        return region.text.split("\n") if region.respond_to?(:text)
+
+        Array(region.nodes).filter_map do |node|
+          if node.respond_to?(:slice)
+            node.slice.to_s
+          elsif node.respond_to?(:text)
+            node.text.to_s
+          else
+            node.to_s
+          end
+        end
       end
     end
   end

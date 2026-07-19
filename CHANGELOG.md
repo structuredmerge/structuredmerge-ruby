@@ -44,6 +44,9 @@ Please file a bug if you notice a violation of semantic versioning.
   ownership checks, and RBS, Bash, dotenv, and Psych merges now use that common
   path where their semantics are format-neutral. Those helpers reuse shared
   line-range normalization instead of duplicating owner location handling.
+- RBS, Bash, and dotenv removal-mode comment promotion now uses the shared
+  `ast-merge` removed-owner preservation path for leading segments, trailing
+  regions, and fallback layout gaps.
 - Gems that use `tree_sitter_language_pack` now resolve it through the
   StructuredMerge Ruby 4-compatible fork branch in their development Gemfiles
   until an upstream Ruby 4-compatible release is available.

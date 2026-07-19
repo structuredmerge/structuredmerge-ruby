@@ -496,9 +496,11 @@ module Bash
 
       def handle_destination_only_node(emitter, dest_node)
         if remove_template_missing_nodes
-          emit_leading_segment_to(emitter, dest_node, @dest_analysis)
-          emit_preserved_floating_gap_to(emitter, dest_node, @dest_analysis)
-          emit_promoted_inline_comment_to(emitter, dest_node, @dest_analysis)
+          lines = removed_destination_node_lines_for(dest_node, @dest_analysis)
+          if lines.any?
+            start_line = emission_start_line_for(dest_node, @dest_analysis)
+            emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(@dest_analysis, start_line))
+          end
         else
           emit_node_to(emitter, dest_node, @dest_analysis)
         end
@@ -636,23 +638,12 @@ module Bash
           (node.respond_to?(:variable_assignment?) && node.variable_assignment?)
       end
 
-      def emit_promoted_inline_comment_to(emitter, node, analysis)
+      def promoted_inline_comment_lines_for(node, analysis)
         inline_comment = inline_comment_for(node, analysis)
-        return unless inline_comment && single_line_node?(node) && safe_inline_comment_node?(node)
+        return [] unless inline_comment && single_line_node?(node) && safe_inline_comment_node?(node)
 
         line = promoted_inline_comment_line_for(node, analysis, inline_comment)
-        emitter.emit_raw_lines([line], metadata: emitter_line_metadata(analysis, line_number: node.start_line)) if line
-      end
-
-      def emit_preserved_floating_gap_to(emitter, node, analysis)
-        attachment = analysis.comment_attachment_for(node)
-        return unless attachment&.leading_region
-
-        trailing_gap = attachment.trailing_gap
-        return unless trailing_gap
-        return unless trailing_gap.effective_controller_side(removed_owners: [node]) == :after
-
-        emitter.emit_raw_lines(trailing_gap.lines, metadata: emitter_block_metadata(analysis, trailing_gap.start_line))
+        line ? [line] : []
       end
 
       def promoted_inline_comment_line_for(node, analysis, inline_comment)
@@ -660,6 +651,15 @@ module Bash
         return unless raw_line
 
         "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, '')}"
+      end
+
+      def removed_destination_node_lines_for(node, analysis)
+        removed_owner_preserved_lines_for(
+          node,
+          analysis,
+          owners: analysis.nodes,
+          inline_lines: promoted_inline_comment_lines_for(node, analysis)
+        )
       end
 
       # Determine preference for a matched pair, respecting per-type overrides.
@@ -758,12 +758,10 @@ module Bash
       end
 
       def emit_leading_segment_to(emitter, node, analysis)
-        return unless node.respond_to?(:start_line) && node.start_line
+        lines = leading_segment_lines_for(node, analysis, owners: analysis.nodes)
+        return if lines.empty?
 
         start_line = emission_start_line_for(node, analysis)
-        return unless start_line && start_line < node.start_line
-
-        lines = (start_line...node.start_line).filter_map { |line_number| analysis.line_at(line_number) }
         emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, start_line))
       end
     end
