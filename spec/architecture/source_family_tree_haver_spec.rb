@@ -6,6 +6,7 @@ require_relative '../../gems/typescript-merge/lib/typescript/merge'
 require_relative '../../gems/ruby-merge/lib/ruby/merge'
 require_relative '../../gems/markdown-merge/lib/markdown/merge'
 require_relative '../../gems/yaml-merge/lib/yaml/merge'
+require_relative '../../gems/json-merge/lib/json/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -71,6 +72,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for yaml'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when JSON has no registered parser' do
+    result = Json::Merge.parse_json("{\"key\":\"value\"}\n", 'json')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:json)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for json'))
     )
   end
 end

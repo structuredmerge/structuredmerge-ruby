@@ -68,27 +68,21 @@ module Json
 
     def parse_json(source, dialect)
       normalized_source = dialect == 'jsonc' ? strip_json_comments(source) : source
-      allows_comments = dialect == 'jsonc'
       if detect_trailing_comma(normalized_source)
         return parse_failure("Trailing commas are not supported for #{dialect}.")
       end
 
-      parsed = JSON.parse(normalized_source)
-      canonical = JSON.generate(parsed)
-      analysis = {
-        kind: 'json',
-        dialect: dialect,
-        allows_comments: allows_comments,
-        normalized_source: canonical,
-        root_kind: json_root_kind(parsed),
-        owners: collect_json_owners(parsed)
-      }
+      analysis = FileAnalysis.new(normalized_source)
+      unless analysis.valid?
+        return parse_failure(analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', '))
+      end
+
       {
-        ok: true,
-        diagnostics: [],
-        analysis: analysis
+        ok: false,
+        diagnostics: [unsupported_feature('json-merge owner extraction must be rebuilt from TreeHaver AST nodes.')],
+        policies: []
       }
-    rescue JSON::ParserError => e
+    rescue TreeHaver::Error, StandardError => e
       parse_failure(e.message)
     end
 
@@ -108,21 +102,6 @@ module Json
           output: merge_json_sources(template_source, destination_source),
           policies: [DESTINATION_WINS_ARRAY_POLICY]
         }
-      end
-
-      fallback_source = try_destination_trailing_comma_fallback(destination_source)
-      if fallback_source
-        retried = parse_json(fallback_source, dialect)
-        if retried[:ok]
-          return {
-            ok: true,
-            diagnostics: [
-              fallback_applied('stripped trailing commas from destination before retrying json merge.')
-            ],
-            output: merge_json_sources(template_source, fallback_source),
-            policies: [DESTINATION_WINS_ARRAY_POLICY, TRAILING_COMMA_FALLBACK_POLICY]
-          }
-        end
       end
 
       {
