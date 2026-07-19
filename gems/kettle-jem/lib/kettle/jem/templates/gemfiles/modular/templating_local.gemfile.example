@@ -77,7 +77,7 @@ end
 
 # export VENDORED_GEMS=
 platform :mri do
-  unless tslp_dev.to_s.empty? || declared_gems.include?("tree_sitter_language_pack")
+  unless tslp_dev.to_s.empty?
     gem "tree_sitter_language_pack", path: tslp_dev
   end
 

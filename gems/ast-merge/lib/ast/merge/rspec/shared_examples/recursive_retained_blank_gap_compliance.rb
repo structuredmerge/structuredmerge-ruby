@@ -21,9 +21,7 @@ RSpec.shared_examples('Ast::Merge::RecursiveRetainedBlankGapCompliance') do
   end
 
   it 'preserves retained blank gaps inside recursive owner scopes' do
-    if respond_to?(:unsupported_recursive_retained_blank_gap_reason)
-      skip unsupported_recursive_retained_blank_gap_reason
-    end
+    skip unsupported_recursive_retained_blank_gap_reason if respond_to?(:unsupported_recursive_retained_blank_gap_reason)
 
     example_case = recursive_retained_blank_gap_case
 
@@ -31,14 +29,11 @@ RSpec.shared_examples('Ast::Merge::RecursiveRetainedBlankGapCompliance') do
   end
 
   it 'preserves retained blank gaps inside recursive owner scopes idempotently' do
-    if respond_to?(:unsupported_recursive_retained_blank_gap_reason)
-      skip unsupported_recursive_retained_blank_gap_reason
-    end
+    skip unsupported_recursive_retained_blank_gap_reason if respond_to?(:unsupported_recursive_retained_blank_gap_reason)
 
     example_case = recursive_retained_blank_gap_case
     first_result = merge_recursive_retained_blank_gap_case(example_case)
 
-    expect(merge_recursive_retained_blank_gap_case(example_case,
-                                                   destination_override: first_result)).to(eq(first_result))
+    expect(merge_recursive_retained_blank_gap_case(example_case, destination_override: first_result)).to(eq(first_result))
   end
 end

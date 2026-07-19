@@ -157,7 +157,9 @@ module Ast
         lines.concat(region_lines_for(attachment&.trailing_region))
 
         trailing_gap = attachment&.trailing_gap
-        lines.concat(trailing_gap.lines) if trailing_gap&.effective_controller_side(removed_owners: [owner]) == :after
+        if trailing_gap&.effective_controller_side(removed_owners: [owner]) == :after
+          lines.concat(trailing_gap.lines)
+        end
 
         lines
       end
@@ -312,9 +314,7 @@ module Ast
         case kind
         when :preamble
           end_line = if owner_list.any?
-                       owner_list.filter_map do |owner|
-                         root_boundary_owner_start_line_for(owner, analysis)
-                       end.min.to_i - 1
+                       owner_list.filter_map { |owner| root_boundary_owner_start_line_for(owner, analysis) }.min.to_i - 1
                      else
                        analysis.lines.length
                      end

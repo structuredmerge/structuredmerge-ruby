@@ -3,11 +3,6 @@ kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 source "https://rubygems.org"
 
 tslp_dev = ENV.fetch("TSLP_DEV", nil)
-if tslp_dev.to_s.empty? && ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
-  structuredmerge_dev = ENV.fetch("STRUCTUREDMERGE_DEV", nil)
-  inferred_tslp_dev = File.expand_path("../../vendor/tree-sitter-language-pack/packages/ruby", structuredmerge_dev)
-  tslp_dev = inferred_tslp_dev if Dir.exist?(inferred_tslp_dev)
-end
 if tslp_dev.to_s.empty?
   gem(
     "tree_sitter_language_pack",
