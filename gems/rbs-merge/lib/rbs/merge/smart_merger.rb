@@ -516,6 +516,7 @@ module Rbs
       end
 
       def merge_member_lines(template_members, dest_members, template_owners: nil, dest_owners: nil)
+        emitted_preserved_destination_lines = Set.new
         align_member_lists(template_members, dest_members).each_with_object([]) do |entry, lines|
           case entry[:type]
           when :match
@@ -528,7 +529,13 @@ module Rbs
 
             case resolution[:source]
             when :template
-              lines.concat(retained_owner_leading_gap_lines_for(entry[:dest_decl], @dest_analysis, owners: dest_owners))
+              lines.concat(
+                retained_member_leading_gap_lines(
+                  entry[:dest_decl],
+                  dest_owners: dest_owners,
+                  emitted_preserved_destination_lines: emitted_preserved_destination_lines
+                )
+              )
               lines.concat(
                 extract_statement_lines_with_leading_comments(
                   entry[:template_decl],
@@ -548,7 +555,13 @@ module Rbs
                 )
               )
             when :recursive
-              lines.concat(retained_owner_leading_gap_lines_for(entry[:dest_decl], @dest_analysis, owners: dest_owners))
+              lines.concat(
+                retained_member_leading_gap_lines(
+                  entry[:dest_decl],
+                  dest_owners: dest_owners,
+                  emitted_preserved_destination_lines: emitted_preserved_destination_lines
+                )
+              )
               lines.concat(
                 reconstruct_declaration_with_merged_members(
                   resolution[:template_declaration],
@@ -570,7 +583,11 @@ module Rbs
             )
           when :dest_only
             if @remove_template_missing_nodes
-              lines.concat(removed_declaration_comment_lines(entry[:dest_decl], @dest_analysis))
+              preserved_lines = removed_declaration_comment_lines(entry[:dest_decl], @dest_analysis)
+              lines.concat(preserved_lines)
+              emitted_preserved_destination_lines.merge(
+                removed_owner_preserved_line_numbers_for(entry[:dest_decl], @dest_analysis, owners: dest_owners)
+              )
             else
               lines.concat(
                 extract_statement_lines_with_leading_comments(
@@ -581,6 +598,17 @@ module Rbs
               )
             end
           end
+        end
+      end
+
+      def retained_member_leading_gap_lines(decl, dest_owners:, emitted_preserved_destination_lines:)
+        gap = retained_owner_leading_gap_for(decl, @dest_analysis, owners: dest_owners)
+        return [] unless gap
+
+        (gap.start_line..gap.end_line).filter_map do |line_number|
+          next if emitted_preserved_destination_lines.include?(line_number)
+
+          @dest_analysis.line_at(line_number)
         end
       end
 

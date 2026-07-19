@@ -781,11 +781,17 @@ module Bash
       end
 
       def emit_retained_leading_gap_to(emitter, node, analysis)
-        lines = retained_owner_leading_gap_lines_for(node, analysis, owners: analysis.nodes)
-        return if lines.empty?
-
         gap = retained_owner_leading_gap_for(node, analysis)
-        emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, gap.start_line))
+        return unless gap
+
+        emitted_line_numbers = @emitted_preserved_line_numbers[analysis.object_id]
+        line_numbers = (gap.start_line..gap.end_line).reject do |line_number|
+          emitted_line_numbers.include?(line_number)
+        end
+        return if line_numbers.empty?
+
+        lines = line_numbers.filter_map { |line_number| analysis.line_at(line_number) }
+        emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, line_numbers.first))
       end
     end
   end

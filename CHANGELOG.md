@@ -80,6 +80,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Bash merges now preserve floating first-owner and removed-node comment gaps,
   and avoid duplicating a comment block that was already promoted from a removed
   destination-only node.
+- Bash and RBS removal-mode merges no longer duplicate a blank gap when a
+  removed destination-only owner preserves the same gap later seen as a retained
+  matched owner's leading gap.
 - Bash, dotenv, and RBS merges now share a retained blank-gap compliance
   contract and preserve destination-owned blank gaps between retained matched
   owners, including template-preferred matched output.
