@@ -21,26 +21,6 @@ module Ast
           def parse_with_comments(source)
             parse_analysis(source).parse_result
           end
-
-          def extract_statements(body_node)
-            return [] unless body_node
-
-            if body_node.is_a?(::Prism::StatementsNode)
-              body_node.body.compact
-            else
-              [body_node].compact
-            end
-          end
-
-          def find_leading_comments(parse_result, current_stmt, prev_stmt, body_node)
-            start_line = prev_stmt ? prev_stmt.location.end_line : body_node.location.start_line
-            end_line = current_stmt.location.start_line
-
-            parse_result.comments.select do |comment|
-              comment.location.start_line > start_line &&
-                comment.location.start_line < end_line
-            end
-          end
         end
 
         class Adapter
@@ -66,19 +46,11 @@ module Ast
 
           def comment_regions_for(document, owner, region: :leading, owner_scope: :shared_default)
             analysis = document.ast
-            parse_result = analysis.parse_result
             owners = structural_owners(document, owner_scope: owner_scope)
-            index = owners.index(owner)
-            return [] unless index
 
             case region
             when :leading
-              previous_owner = index.positive? ? owners[index - 1] : nil
-              if previous_owner
-                Utils.find_leading_comments(parse_result, owner, previous_owner, parse_result.value.statements)
-              else
-                parse_result.comments.select { |comment| comment.location.start_line < owner.location.start_line }
-              end
+              analysis.leading_comments_for_owner(owner, owners: owners)
             else
               raise Ast::Crispr::Error.new('Unsupported CRISPR comment region', details: { region: region })
             end

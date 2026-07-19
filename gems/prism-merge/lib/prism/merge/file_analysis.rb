@@ -337,6 +337,32 @@ module Prism
         build_comment_region(kind, entries, metadata: { range: range, full_line_only: full_line_only })
       end
 
+      # Return comments that lead +owner+ within the provided top-level owner set.
+      #
+      # CRISPR adapters use this as a parser-provider-owned projection: CRISPR
+      # selects and splices, while prism-merge owns Ruby comment attachment.
+      #
+      # @param owner [Object] owner node from this analysis
+      # @param owners [Array<Object>] ordered owner set containing +owner+
+      # @return [Array<Prism::Comment>]
+      def leading_comments_for_owner(owner, owners: statements)
+        ordered_owners = Array(owners)
+        index = ordered_owners.index(owner)
+        return [] unless index
+
+        previous_owner = index.positive? ? ordered_owners[index - 1] : nil
+        if previous_owner
+          start_line = previous_owner.location.end_line
+          end_line = owner.location.start_line
+          return parse_result.comments.select do |comment|
+            comment.location.start_line > start_line &&
+              comment.location.start_line < end_line
+          end
+        end
+
+        parse_result.comments.select { |comment| comment.location.start_line < owner.location.start_line }
+      end
+
       # Build a native shared comment attachment for an owner.
       #
       # @param owner [Object] Structural owner for the attachment

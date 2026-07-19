@@ -329,6 +329,25 @@ RSpec.describe 'Prism::Merge' do
     )
   end
 
+  it 'projects leading comments for Ruby structured-edit owners' do
+    source = <<~RUBY
+      # first owner
+      task :one do
+        puts "one"
+      end
+
+      # second owner
+      task :two do
+        puts "two"
+      end
+    RUBY
+    analysis = PRISM_MERGE::FileAnalysis.new(source, source_label: 'Rakefile')
+    first_owner, second_owner = analysis.statements
+
+    expect(analysis.leading_comments_for_owner(first_owner).map(&:slice)).to eq(['# first owner'])
+    expect(analysis.leading_comments_for_owner(second_owner).map(&:slice)).to eq(['# second owner'])
+  end
+
   it 'projects Prism parse errors into the normalized parse failure shape' do
     fixture = read_json(
       fixtures_root.join(
