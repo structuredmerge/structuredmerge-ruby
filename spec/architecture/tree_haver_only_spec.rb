@@ -20,7 +20,7 @@ RSpec.describe 'TreeHaver-only merge architecture' do
   ).freeze
 
   def current_parser_bypass_references
-    Dir.glob(ROOT.join('gems', '*-merge', 'lib', '**', '*.rb')).each_with_object(Set.new) do |path, matches|
+    Dir.glob(ROOT.join('gems', '{*-merge,*-merge-git}', 'lib', '**', '*.rb')).each_with_object(Set.new) do |path, matches|
       relative_path = Pathname.new(path).relative_path_from(ROOT).to_s
       next if relative_path.include?('/rspec/')
 
