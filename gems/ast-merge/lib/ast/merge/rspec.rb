@@ -31,5 +31,12 @@ require 'tree_haver/rspec/dependency_tags'
 # Load Ast::Merge dependency tags (provides merge gem tags like :markly_merge, :prism_merge, etc.)
 require_relative 'rspec/dependency_tags'
 
+# Load conformance fixture helpers for shared fixture harnesses
+require_relative 'rspec/conformance_fixtures'
+
 # Load Ast::Merge shared examples (for testing *-merge implementations)
 require_relative 'rspec/shared_examples'
+
+RSpec.configure do |config|
+  config.include Ast::Merge::RSpec::ConformanceFixtures
+end

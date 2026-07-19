@@ -16,6 +16,7 @@ That loads:
 
 - TreeHaver backend dependency tags
 - Ast::Merge merge-gem dependency tags
+- Shared conformance fixture helpers
 - Ast::Merge shared examples
 
 ### Split loading for `ast-merge` itself or registration-heavy suites
@@ -73,6 +74,27 @@ end
 ```
 
 TreeHaver backend tags are loaded alongside these helpers; see the TreeHaver RSpec docs for backend-specific tags.
+
+## Shared conformance fixtures
+
+`Ast::Merge::RSpec::ConformanceFixtures` is spec-harness support for merge gems that import shared fixtures from the sibling `fixtures` repository.
+
+Use it to document implementation gaps without hiding imported shared fixture cases:
+
+```ruby
+support = support_for_conformance_fixture(
+  "delegated_child_operations",
+  pending_roles: {
+    delegated_child_operations: {
+      reason: "parser-backed child delegation is not implemented yet",
+    },
+  },
+)
+
+apply_conformance_fixture_support!(support)
+```
+
+`pending` support calls RSpec `pending`, so the example fails as fixed once it unexpectedly passes. `unsupported` and `skipped` support call RSpec `skip`.
 
 ## MergeGemRegistry
 
