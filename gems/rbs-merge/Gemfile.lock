@@ -294,12 +294,7 @@ GEM
       thor (~> 1.0)
     citrus (3.0.2)
     cmdparse (3.0.7)
-    commonmarker (2.9.0-aarch64-linux)
-    commonmarker (2.9.0-aarch64-linux-musl)
-    commonmarker (2.9.0-arm64-darwin)
-    commonmarker (2.9.0-x86_64-darwin)
     commonmarker (2.9.0-x86_64-linux)
-    commonmarker (2.9.0-x86_64-linux-musl)
     concurrent-ruby (1.3.7)
     date (3.5.1)
     debug (1.11.1)
@@ -400,8 +395,6 @@ GEM
     nokogiri (1.19.4-aarch64-linux-musl)
       racc (~> 1.4)
     nokogiri (1.19.4-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.19.4-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
@@ -631,7 +624,7 @@ PLATFORMS
   aarch64-linux-gnu
   aarch64-linux-musl
   arm64-darwin
-  x86_64-darwin
+  x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
 
@@ -727,12 +720,7 @@ CHECKSUMS
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.1.0)
   cmdparse (3.0.7) sha256=f7c5cace10bec6abf853370ae095e4b97a84ed9d847b3fb38f41cc4fbc950739
-  commonmarker (2.9.0-aarch64-linux) sha256=e2b4aadb9a2cfa4e206582641ce3a49465549ac1ed4c289fdd63b78d8f24579c
-  commonmarker (2.9.0-aarch64-linux-musl) sha256=1cf4d2821f2a7e64945f1ed7c4eeced586fdb27ea7fe7337788802cf8f57cfca
-  commonmarker (2.9.0-arm64-darwin) sha256=1748dbfa4f5813b0d2a14bb4bbfa65a4ec293aa1c825016d60029ee0e132b046
-  commonmarker (2.9.0-x86_64-darwin) sha256=0a9914ccfd2f5d2a59c7bd0dda4fe90eb084cf513b477e499008e09ec9d6edd6
-  commonmarker (2.9.0-x86_64-linux) sha256=8cfe92970eef585a19ddf6613224b91cab64d6029834661bda801f877c9c7f43
-  commonmarker (2.9.0-x86_64-linux-musl) sha256=293921398b839f79ceaf55010e061357e34f053822c3b003cd0be6686176335e
+  commonmarker (2.9.0-x86_64-linux)
   commonmarker-merge (7.1.0)
   concurrent-ruby (1.3.7) sha256=4412caec3a5ea2e5fdc52076724c071a81f2c0593d83b2ac8cbb8ca63b3151b0
   date (3.5.1) sha256=750d06384d7b9c15d562c76291407d89e368dda4d4fff957eb94962d325a0dc0
@@ -761,7 +749,7 @@ CHECKSUMS
   json (2.21.1) sha256=13a43df75d95641443f5702dff350f237164a9d811ff0f2c2800d4d980220583
   json-merge (7.1.0)
   kettle-dev (2.3.7) sha256=eb370113cd030d03cbe2d33b31c99858951017e5ad21a17e9ed89dc3770028ee
-  kettle-drift (1.0.5) sha256=07094e80140a049164142820bdd327c30fcd855bb00697a0a430600a2b5144a2
+  kettle-drift (1.0.5)
   kettle-jem (7.1.0)
   kettle-rb (0.1.4) sha256=9cef7ce4f7021666b7222292f29051e51eaf042e8a5db11f3f4dd72f74243fc1
   kettle-soup-cover (1.1.3) sha256=a373827da22a7131d093afd32945e5b7d7a10a01ebfdded8fd2cb8230d69c8ad
@@ -773,13 +761,12 @@ CHECKSUMS
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
   markdown-merge (7.1.0)
-  markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
+  markly (0.16.0)
   markly-merge (7.1.0)
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
   nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
   nokogiri (1.19.4-aarch64-linux-musl) sha256=35c65b9ce72b3bb03207bdbe7067915019dc18c1b9b59139684bd6690fdd01af
   nokogiri (1.19.4-arm64-darwin) sha256=a46db9853286e6597b36ebc6953817d15acf3a299583eb3f89fdc6f91dd63527
-  nokogiri (1.19.4-x86_64-darwin) sha256=7fd17057d3e1f00e9954a74b3cd76595d3d4a5ef233b7ed9599047c204f70551
   nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
   nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
   nomono (1.0.8) sha256=bf4b9b426cbf216ab17b70db474f691b8ae1f1e29de8db4b0ecd405e6e7e1c80
@@ -837,7 +824,7 @@ CHECKSUMS
   ruby_engine (2.0.3) sha256=ca2ae7def8cfcdc2bfb6a186d36d5d59c8b403245dc0256c3802b767fa278aaa
   ruby_version (1.0.3) sha256=5930f9950746b7e6c973184398ee364ee7440b170fef7922b9f5cdf317f1ccb5
   rust-merge (7.1.0)
-  service_actor (3.9.4) sha256=e63b523630b9a7e62959b2a90113b08d2565b5de9c148557b281ef847c9539ce
+  service_actor (3.9.4)
   silent_stream (1.0.12) sha256=377c43aa10033fe90c33b39ea8cd97d79f2d1c4856df598efc56f3091f3ae782
   simplecov (0.22.0) sha256=fe2622c7834ff23b98066bb0a854284b2729a569ac659f82621fc22ef36213a5
   simplecov-cobertura (3.2.0) sha256=70d702658677fcb20e5aceb6915ccf8bc62ff2ccd38b62b3ad5c9db5c0888740
@@ -860,9 +847,9 @@ CHECKSUMS
   timecop (0.9.11) sha256=41284dc6e5041f2184f781ace766f942108c842f8d8c1386a26e6343decc7542
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
   token-resolver (2.0.4) sha256=33b926958f504525bba3ed511ab66fbcbf8ef30390815e931436b30f27ffcad0
-  toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9
+  toml (0.3.0)
   toml-merge (7.1.0)
-  toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
+  toml-rb (4.2.0)
   tree_haver (7.1.0)
   tree_sitter_language_pack (1.12.5)
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
