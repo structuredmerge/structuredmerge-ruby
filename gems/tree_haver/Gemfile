@@ -21,11 +21,18 @@ gemspec
 # Local workspace dependency wiring for *_local.gemfile overrides
 nomono_requirements = ['~> 1.0', '>= 1.0.8']
 gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
-# Use the StructuredMerge TSLP branch until upstream ships Ruby 4-compatible gem metadata.
-tslp_dev = ENV.fetch('TSLP_DEV', nil)
+# Use the StructuredMerge TSLP branch until upstream ships parser API bindings.
+vendored_gems = ENV.fetch('VENDORED_GEMS', '').split(',').map(&:strip)
 tslp_declared_by_templating =
-  ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
-if !tslp_declared_by_templating && tslp_dev.to_s.empty?
+  ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? &&
+    vendored_gems.include?('tree_sitter_language_pack')
+unless tslp_declared_by_templating
+  gem(
+    'tree_sitter_language_pack',
+    git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
+    branch: 'fix/ruby-parser-api-methods',
+    glob: 'packages/ruby/*.gemspec'
+  )
 end
 
 # Modular sibling dependencies (env-switched inside each modular Gemfile)

@@ -22,6 +22,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Fixed the `kettle-jem` package manifest so runtime template assets are
   included even when the gemspec is loaded from the monorepo root.
+- Generated local templating Gemfiles can now route
+  `tree_sitter_language_pack` through nomono's `VENDORED_GEMS` /
+  `VENDOR_GEM_DIR` support instead of using a one-off inferred local path.
 
 ### Added
 

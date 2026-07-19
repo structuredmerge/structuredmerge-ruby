@@ -29,6 +29,7 @@ Kernel.send(:gem, "nomono", *nomono_activation_requirements)
 require "nomono/bundler"
 
 structuredmerge_local_gems = %w[
+  tree_sitter_language_pack
   tree_haver
   ast-merge
   ast-merge-git
@@ -68,19 +69,9 @@ declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
 structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems
 kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[{KJ|PACKAGE_NAME}] - declared_gems
 
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-if tslp_dev.to_s.empty? && ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
-  structuredmerge_dev = ENV.fetch("STRUCTUREDMERGE_DEV", nil)
-  inferred_tslp_dev = File.expand_path("../../vendor/tree-sitter-language-pack/packages/ruby", structuredmerge_dev)
-  tslp_dev = inferred_tslp_dev if Dir.exist?(inferred_tslp_dev)
-end
-
-# export VENDORED_GEMS=
+# export VENDORED_GEMS=tree_sitter_language_pack
+# export VENDOR_GEM_DIR=/path/to/vendor # expects $VENDOR_GEM_DIR/tree_sitter_language_pack
 platform :mri do
-  unless tslp_dev.to_s.empty?
-    gem "tree_sitter_language_pack", path: tslp_dev
-  end
-
   if ENV.fetch("STRUCTUREDMERGE_DEV", "false").casecmp("false") != 0
     eval_nomono_gems(
       gems: structuredmerge_local_gems_to_eval,

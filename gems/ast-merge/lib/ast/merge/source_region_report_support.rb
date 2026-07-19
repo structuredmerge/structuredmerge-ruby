@@ -40,9 +40,13 @@ module Ast
         compact ||= ->(region) { region.reject { |_key, value| value.nil? } }
 
         regions.flat_map do |region|
-          child_regions = region[:child_regions] ? source_blank_line_ownership_regions(regions: region[:child_regions],
-                                                                                       blank_content: blank_content,
-                                                                                       compact: compact) : []
+          child_regions = if region[:child_regions]
+                            source_blank_line_ownership_regions(regions: region[:child_regions],
+                                                                blank_content: blank_content,
+                                                                compact: compact)
+                          else
+                            []
+                          end
           current = if region[:region_kind] == 'interstitial' && blank_content.call(region[:content])
                       [
                         compact.call(

@@ -2,16 +2,17 @@ kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 
 source "https://rubygems.org"
 
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-if tslp_dev.to_s.empty?
+vendored_gems = ENV.fetch("VENDORED_GEMS", "").split(",").map(&:strip)
+tslp_declared_by_templating =
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? &&
+    vendored_gems.include?("tree_sitter_language_pack")
+unless tslp_declared_by_templating
   gem(
     "tree_sitter_language_pack",
     git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
     branch: "fix/ruby-parser-api-methods",
     glob: "packages/ruby/*.gemspec",
   )
-else
-  gem "tree_sitter_language_pack", path: tslp_dev
 end
 
 unless kettle_dev_dev.casecmp("false").zero?
