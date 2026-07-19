@@ -184,6 +184,24 @@ module Ast
         trailing_region_lines_for(owner, analysis, owners: owners)
       end
 
+      def retained_owner_leading_gap_lines_for(owner, analysis, owners: nil)
+        gap = retained_owner_leading_gap_for(owner, analysis)
+        return [] unless gap
+        return [] if region_present?(leading_region_for(owner, analysis, owners: owners))
+
+        gap.lines
+      end
+
+      def retained_owner_leading_gap_for(owner, analysis)
+        return unless owner && analysis&.respond_to?(:layout_attachment_for)
+
+        attachment = analysis.layout_attachment_for(owner)
+        gap = attachment&.leading_gap
+        return unless gap&.kind == :interstitial
+
+        gap
+      end
+
       def previous_owner_trailing_region_matches?(owner, analysis, source_region, owners: nil)
         previous_owner = previous_owner_for(owner, analysis, owners: owners)
         return false unless previous_owner

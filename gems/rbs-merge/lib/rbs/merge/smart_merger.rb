@@ -316,6 +316,7 @@ module Rbs
           if entry[:template_decl].is_a?(FreezeNode)
             @result.add_freeze_block(entry[:template_decl])
           else
+            add_retained_leading_gap(entry[:dest_decl], @dest_analysis, decision: resolution[:decision])
             @result.add_from_template(
               entry[:template_index],
               decision: resolution[:decision],
@@ -327,6 +328,7 @@ module Rbs
           if entry[:dest_decl].is_a?(FreezeNode)
             @result.add_freeze_block(entry[:dest_decl])
           else
+            add_retained_leading_gap(entry[:dest_decl], @dest_analysis, decision: resolution[:decision])
             @result.add_from_destination(entry[:dest_index], decision: resolution[:decision])
           end
         when :recursive
@@ -381,6 +383,13 @@ module Rbs
         end
 
         []
+      end
+
+      def add_retained_leading_gap(decl, analysis, decision:)
+        lines = retained_owner_leading_gap_lines_for(decl, analysis)
+        return if lines.empty?
+
+        @result.add_raw(lines, decision: decision)
       end
 
       # Process recursive merge for container declarations

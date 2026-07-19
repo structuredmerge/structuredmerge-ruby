@@ -53,6 +53,7 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
            :previous_owner_trailing_region_matches?,
            :removed_owner_preserved_line_numbers_for,
            :removed_owner_preserved_lines_for,
+           :retained_owner_leading_gap_lines_for,
            :region_present?,
            :root_boundary_lines_for
   end
@@ -126,6 +127,51 @@ RSpec.describe Ast::Merge::CommentLayoutEmissionSupport do
     expect(
       harness.removed_owner_preserved_line_numbers_for(owner, analysis, inline_line_numbers: [3])
     ).to eq([1, 2, 3, 4, 5])
+  end
+
+  it 'returns retained owner leading layout gaps only when no leading comment region owns the prefix' do
+    first = Statement.new(name: 'first', start_line: 1, end_line: 1)
+    second = Statement.new(name: 'second', start_line: 3, end_line: 3)
+    gap = Ast::Merge::Layout::Gap.new(
+      kind: :interstitial,
+      start_line: 2,
+      end_line: 2,
+      lines: [''],
+      before_owner: first,
+      after_owner: second
+    )
+    analysis = Analysis.new(
+      lines: ['first', '', 'second'],
+      statements: [first, second],
+      attachments: {
+        second => Attachment.new
+      }
+    )
+
+    def analysis.layout_attachment_for(owner)
+      return Ast::Merge::Layout::Attachment.new(owner: owner, leading_gap: @gap) if owner.name == 'second'
+
+      Ast::Merge::Layout::Attachment.new(owner: owner)
+    end
+    analysis.instance_variable_set(:@gap, gap)
+
+    expect(harness.retained_owner_leading_gap_lines_for(second, analysis)).to eq([''])
+
+    analysis_with_comment = Analysis.new(
+      lines: ['first', '', '# docs', 'second'],
+      statements: [first, second],
+      attachments: {
+        second => Attachment.new(leading_region: Region.new(start_line: 3, end_line: 3, normalized_content: '# docs'))
+      }
+    )
+    def analysis_with_comment.layout_attachment_for(owner)
+      return Ast::Merge::Layout::Attachment.new(owner: owner, leading_gap: @gap) if owner.name == 'second'
+
+      Ast::Merge::Layout::Attachment.new(owner: owner)
+    end
+    analysis_with_comment.instance_variable_set(:@gap, gap)
+
+    expect(harness.retained_owner_leading_gap_lines_for(second, analysis_with_comment)).to eq([])
   end
 
   it 'returns root preamble lines using root comment attachment regions' do

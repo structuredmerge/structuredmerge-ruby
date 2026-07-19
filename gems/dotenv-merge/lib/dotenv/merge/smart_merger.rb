@@ -225,6 +225,7 @@ module Dotenv
         when :template
           emit_template_preferred_match(template_stmt, dest_stmt)
         else
+          add_retained_leading_gap(dest_stmt, @dest_analysis, decision: MergeResult::DECISION_DESTINATION)
           @result.add_raw(node_lines_for(dest_stmt, @dest_analysis), decision: MergeResult::DECISION_DESTINATION)
         end
       end
@@ -301,6 +302,7 @@ module Dotenv
       def emit_template_preferred_match(template_stmt, dest_stmt)
         comment_source_node, comment_source_analysis = preferred_comment_source_for(template_stmt, dest_stmt)
         inline_comment = preferred_inline_comment_for(template_stmt, dest_stmt)
+        add_retained_leading_gap(dest_stmt, @dest_analysis, decision: MergeResult::DECISION_DESTINATION)
         @result.add_raw(
           node_lines_for(
             template_stmt,
@@ -405,6 +407,13 @@ module Dotenv
                            []
                          end
         leading_lines + apply_inline_comment(node_lines, inline_comment) + trailing_lines
+      end
+
+      def add_retained_leading_gap(node, analysis, decision:)
+        lines = retained_owner_leading_gap_lines_for(node, analysis, owners: analysis.structural_owners)
+        return if lines.empty?
+
+        @result.add_raw(lines, decision: decision)
       end
 
       def removed_destination_comment_lines_for(node)

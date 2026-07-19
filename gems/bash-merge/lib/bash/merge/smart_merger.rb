@@ -543,10 +543,12 @@ module Bash
         pref = preference_for_pair(template_node, dest_node)
         record_unresolved_choice(template_node: template_node, dest_node: dest_node, provisional_winner: pref)
         if pref == :destination
+          emit_retained_leading_gap_to(emitter, dest_node, @dest_analysis)
           emit_node_to(emitter, dest_node, @dest_analysis)
         else
           comment_source_node, comment_source_analysis = preferred_comment_source_for(template_node, dest_node)
           inline_comment = preferred_inline_comment_for(template_node, dest_node)
+          emit_retained_leading_gap_to(emitter, dest_node, @dest_analysis)
           emit_node_to(
             emitter,
             template_node,
@@ -776,6 +778,14 @@ module Bash
         lines = line_numbers.filter_map { |line_number| analysis.line_at(line_number) }
         start_line = line_numbers.first
         emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, start_line))
+      end
+
+      def emit_retained_leading_gap_to(emitter, node, analysis)
+        lines = retained_owner_leading_gap_lines_for(node, analysis, owners: analysis.nodes)
+        return if lines.empty?
+
+        gap = retained_owner_leading_gap_for(node, analysis)
+        emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, gap.start_line))
       end
     end
   end
