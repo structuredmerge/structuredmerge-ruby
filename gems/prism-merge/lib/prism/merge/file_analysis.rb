@@ -1082,13 +1082,13 @@ module Prism
                    else
                      []
                    end
-          [:def, node.name, params]
+          Ruby::Merge::SignatureSupport.method_definition(node.name, params)
 
         # === Class/Module definitions ===
         when :class
-          [:class, node.constant_path.slice]
+          Ruby::Merge::SignatureSupport.class_definition(node.constant_path.slice)
         when :module
-          [:module, node.constant_path.slice]
+          Ruby::Merge::SignatureSupport.module_definition(node.constant_path.slice)
         when :singleton_class
           # class << self or class << expr
           expr = begin
@@ -1096,25 +1096,25 @@ module Prism
           rescue StandardError
             'self'
           end
-          [:singleton_class, expr]
+          Ruby::Merge::SignatureSupport.singleton_class(expr)
 
         # === Constants ===
         when :const
           if node.type.to_s == 'constant_write_node'
-            [:const, node.name]
+            Ruby::Merge::SignatureSupport.constant(node.name)
           else
-            [:const, node.target.slice]
+            Ruby::Merge::SignatureSupport.constant(node.target.slice)
           end
 
         # === Variable assignments ===
         when :local_var
-          [:local_var, node.name]
+          Ruby::Merge::SignatureSupport.variable_assignment(:local_var, node.name)
         when :ivar
-          [:ivar, node.name]
+          Ruby::Merge::SignatureSupport.variable_assignment(:ivar, node.name)
         when :cvar
-          [:cvar, node.name]
+          Ruby::Merge::SignatureSupport.variable_assignment(:cvar, node.name)
         when :gvar
-          [:gvar, node.name]
+          Ruby::Merge::SignatureSupport.variable_assignment(:gvar, node.name)
         when :multi_write
           # Multiple assignment: a, b = 1, 2
           targets = node.lefts.map do |target|
@@ -1131,41 +1131,41 @@ module Prism
               target.slice
             end
           end
-          [:multi_write, targets]
+          Ruby::Merge::SignatureSupport.multi_write(targets)
 
         # === Conditionals ===
         when :if, :unless
           # Conditionals match by their condition expression
           condition_source = node.predicate.slice
-          [node.type.to_s == 'if_node' ? :if : :unless, condition_source]
+          Ruby::Merge::SignatureSupport.conditional(node.type.to_s == 'if_node' ? :if : :unless, condition_source)
 
         # === Case/Switch statements ===
         when :case
           # case expr; when ... end - match by the expression being switched on
           predicate = node.predicate&.slice || ''
-          [:case, predicate]
+          Ruby::Merge::SignatureSupport.case_statement(predicate)
         when :case_match
           # case expr; in ... end (pattern matching) - match by the expression
           predicate = node.predicate&.slice || ''
-          [:case_match, predicate]
+          Ruby::Merge::SignatureSupport.case_match_statement(predicate)
 
         # === Loops ===
         when :while
-          [:while, node.predicate.slice]
+          Ruby::Merge::SignatureSupport.loop_statement(:while, node.predicate.slice)
         when :until
-          [:until, node.predicate.slice]
+          Ruby::Merge::SignatureSupport.loop_statement(:until, node.predicate.slice)
         when :for
           # for i in collection - match by index and collection
           index = node.index.slice
           collection = node.collection.slice
-          [:for, index, collection]
+          Ruby::Merge::SignatureSupport.loop_statement(:for, index, collection)
 
         # === Exception handling ===
         when :begin
           # begin/rescue/ensure blocks - unique by position within parent
           # Since these don't have a natural identifier, use first statement
           first_stmt = node.statements&.body&.first&.slice&.[](0, 30) || ''
-          [:begin, first_stmt]
+          Ruby::Merge::SignatureSupport.begin_block(first_stmt)
 
         # === Method calls ===
         when :call
@@ -1189,33 +1189,33 @@ module Prism
             effective_receiver = Ruby::Merge::GemspecSupport.effective_receiver(receiver, @gemspec_block_var)
             if node.block
               # simplecov:disable defensive - Ruby syntax doesn't allow blocks with assignment methods
-              [:call_with_block, node.name, effective_receiver]
+              Ruby::Merge::SignatureSupport.call(node.name, effective_receiver, block: true)
               # simplecov:enable
             else
-              [:call, node.name, effective_receiver]
+              Ruby::Merge::SignatureSupport.call(node.name, effective_receiver)
             end
           else
             # Regular method call: appraise "unlocked" do ... end
             # Match by method name and first argument (which identifies the call)
             first_arg = extract_first_argument_value(node)
             if node.block
-              [:call_with_block, node.name, first_arg]
+              Ruby::Merge::SignatureSupport.call(node.name, first_arg, block: true)
             else
-              [:call, node.name, first_arg]
+              Ruby::Merge::SignatureSupport.call(node.name, first_arg)
             end
           end
 
         # === Super calls ===
         when :super
-          [:super, node.block ? :with_block : :no_block]
+          Ruby::Merge::SignatureSupport.super_call(block: !!node.block)
         when :forwarding_super
-          [:forwarding_super, node.block ? :with_block : :no_block]
+          Ruby::Merge::SignatureSupport.forwarding_super_call(block: !!node.block)
 
         # === Operator-write calls (e.g. spec.rdoc_options += [...]) ===
         when :call_op_write
           receiver = node.receiver&.slice
           effective_receiver = Ruby::Merge::GemspecSupport.effective_receiver(receiver, @gemspec_block_var)
-          [:call_op_write, node.write_name, effective_receiver]
+          Ruby::Merge::SignatureSupport.call_operator_write(node.write_name, effective_receiver)
 
         # === Lambdas ===
         when :lambda
@@ -1225,30 +1225,30 @@ module Prism
                    else
                      ''
                    end
-          [:lambda, params]
+          Ruby::Merge::SignatureSupport.lambda_literal(params)
 
         # === Special blocks ===
         when :pre_execution
           # BEGIN { } blocks
-          [:pre_execution, node.location.start_line]
+          Ruby::Merge::SignatureSupport.execution_block(:pre_execution, node.location.start_line)
         when :post_execution
           # END { } blocks
-          [:post_execution, node.location.start_line]
+          Ruby::Merge::SignatureSupport.execution_block(:post_execution, node.location.start_line)
 
         # === Parenthesized expressions ===
         when :parens
           # Usually transparent, but if it appears at top level, identify by content
           first_expr = node.body&.body&.first&.slice&.[](0, 30) || ''
-          [:parens, first_expr]
+          Ruby::Merge::SignatureSupport.parenthesized(first_expr)
 
         # === Embedded statements (string interpolation) ===
         when :embedded
-          [:embedded, node.statements&.slice || '']
+          Ruby::Merge::SignatureSupport.embedded(node.statements&.slice)
 
         else
           # Fallback: use class name and line number
           # Nodes that reach here may not merge well across files
-          [:other, node.class.name, node.location.start_line]
+          Ruby::Merge::SignatureSupport.other(node.class.name, node.location.start_line)
         end
       end
 

@@ -13,6 +13,7 @@ require_relative 'merge/magic_comment_support'
 require_relative 'merge/method_similarity'
 require_relative 'merge/rescue_semantics'
 require_relative 'merge/scaffold_chunk_support'
+require_relative 'merge/signature_support'
 
 module Ruby
   module Merge
@@ -2707,7 +2708,7 @@ module Ruby
         finish_index = ruby_block_finish_index(lines, index)
         entries << {
           name: match[2],
-          signature: "#{match[1]}#{match[2]}",
+          signature: SignatureSupport.textual_method_signature(match[1], match[2]),
           visibility: current_visibility,
           text: lines[start_index..finish_index].join("\n").rstrip,
           body_text: lines[(pending_comments.first || index)..finish_index].join("\n").rstrip
@@ -3020,7 +3021,7 @@ module Ruby
       elsif (match = MODULE_PATTERN.match(line))
         { kind: 'module', name: match[1] }
       elsif (match = DEF_PATTERN.match(line))
-        { kind: 'def', name: match[2], signature: "#{match[1]}#{match[2]}" }
+        { kind: 'def', name: match[2], signature: SignatureSupport.textual_method_signature(match[1], match[2]) }
       end
     end
 
