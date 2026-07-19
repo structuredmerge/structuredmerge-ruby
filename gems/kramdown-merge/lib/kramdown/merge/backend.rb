@@ -55,7 +55,9 @@ module Kramdown
         Markdown::Merge::BackendSupport.configure_node_heading_and_code_block_helpers!(
           self,
           heading_matcher: ->(node) { node.raw_type == 'header' },
-          code_block_matcher: ->(node) { node.raw_type == 'codeblock' }
+          code_block_matcher: ->(node) { node.raw_type == 'codeblock' },
+          heading_level_extractor: ->(inner_node) { inner_node.options[:level] },
+          code_block_info_extractor: ->(inner_node) { inner_node.options[:lang] }
         )
 
         def type
@@ -77,18 +79,6 @@ module Kramdown
 
         def children
           Array(inner_node.children).map { |child| self.class.new(child, source: source, lines: lines) }
-        end
-
-        def header_level
-          return unless raw_type == 'header'
-
-          inner_node.options[:level]
-        end
-
-        def fence_info
-          return unless raw_type == 'codeblock'
-
-          inner_node.options[:lang]
         end
 
         def start_point
