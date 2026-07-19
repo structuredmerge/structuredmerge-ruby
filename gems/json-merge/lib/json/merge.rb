@@ -66,7 +66,7 @@ module Json
     end
 
     def available_json_backends
-      [TREE_SITTER_BACKEND]
+      json_backend_available_for_analysis?(TREE_SITTER_BACKEND.id) ? [TREE_SITTER_BACKEND] : []
     end
 
     def json_backend_feature_profile(backend: nil)
@@ -268,6 +268,7 @@ module Json
     private_class_method :requested_json_backend_id
 
     def json_backend_available_for_analysis?(backend_id)
+      register_backend!
       registrations = TreeHaver.registered_languages(:json)
       case backend_id.to_s
       when TREE_SITTER_BACKEND.id
