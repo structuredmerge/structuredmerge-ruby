@@ -51,9 +51,6 @@ GEM
       toml-rb (~> 4.1)
       version_gem (~> 1.1, >= 1.1.9)
     cmdparse (3.0.7)
-    commonmarker (2.9.0-aarch64-linux)
-    commonmarker (2.9.0-aarch64-linux-musl)
-    commonmarker (2.9.0-arm64-darwin)
     commonmarker (2.9.0-x86_64-linux)
     commonmarker (2.9.0-x86_64-linux-musl)
     commonmarker-merge (7.1.0)
@@ -200,12 +197,6 @@ GEM
       markly (~> 0.9)
       version_gem (~> 1.1, >= 1.1.9)
     mutex_m (0.3.0)
-    nokogiri (1.19.4-aarch64-linux-gnu)
-      racc (~> 1.4)
-    nokogiri (1.19.4-aarch64-linux-musl)
-      racc (~> 1.4)
-    nokogiri (1.19.4-arm64-darwin)
-      racc (~> 1.4)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.4-x86_64-linux-musl)
@@ -414,10 +405,6 @@ GEM
     toml-rb (4.2.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin)
-      sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
       sorbet-runtime (~> 0.5)
     tsort (0.2.0)
@@ -459,10 +446,6 @@ GEM
     zlib (3.2.3)
 
 PLATFORMS
-  aarch64-linux
-  aarch64-linux-gnu
-  aarch64-linux-musl
-  arm64-darwin
   x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
@@ -528,9 +511,6 @@ CHECKSUMS
   citrus (3.0.2) sha256=4ec2412fc389ad186735f4baee1460f7900a8e130ffe3f216b30d4f9c684f650
   citrus-toml-merge (7.1.0)
   cmdparse (3.0.7) sha256=f7c5cace10bec6abf853370ae095e4b97a84ed9d847b3fb38f41cc4fbc950739
-  commonmarker (2.9.0-aarch64-linux) sha256=e2b4aadb9a2cfa4e206582641ce3a49465549ac1ed4c289fdd63b78d8f24579c
-  commonmarker (2.9.0-aarch64-linux-musl) sha256=1cf4d2821f2a7e64945f1ed7c4eeced586fdb27ea7fe7337788802cf8f57cfca
-  commonmarker (2.9.0-arm64-darwin) sha256=1748dbfa4f5813b0d2a14bb4bbfa65a4ec293aa1c825016d60029ee0e132b046
   commonmarker (2.9.0-x86_64-linux) sha256=8cfe92970eef585a19ddf6613224b91cab64d6029834661bda801f877c9c7f43
   commonmarker (2.9.0-x86_64-linux-musl) sha256=293921398b839f79ceaf55010e061357e34f053822c3b003cd0be6686176335e
   commonmarker-merge (7.1.0)
@@ -575,9 +555,6 @@ CHECKSUMS
   markly (0.16.0) sha256=6f70d79e385b1efc9e171f74c81628826259039fe6c778e03c3924c71dac5511
   markly-merge (7.1.0)
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
-  nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
-  nokogiri (1.19.4-aarch64-linux-musl) sha256=35c65b9ce72b3bb03207bdbe7067915019dc18c1b9b59139684bd6690fdd01af
-  nokogiri (1.19.4-arm64-darwin) sha256=a46db9853286e6597b36ebc6953817d15acf3a299583eb3f89fdc6f91dd63527
   nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
   nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
   nomono (1.0.8) sha256=bf4b9b426cbf216ab17b70db474f691b8ae1f1e29de8db4b0ecd405e6e7e1c80
@@ -656,9 +633,7 @@ CHECKSUMS
   toml-merge (7.1.0)
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
   tree_haver (7.1.0)
-  tree_sitter_language_pack (1.9.0.pre.rc.40-aarch64-linux) sha256=c882f4039a1a84a8ed782ef5381a8556acdb53538055d0b9b30d0cd85a0f1b0a
-  tree_sitter_language_pack (1.9.0.pre.rc.40-arm64-darwin) sha256=b3dc68837a1a626afcbe1abb779cd987e9828a43c78e98cc70aa7e58957f3ef8
-  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux) sha256=ad6743a373eeac954c1b659b17af3aff1c82918b3ce9c9dc572a7c70ff843cdd
+  tree_sitter_language_pack (1.9.0.pre.rc.40-x86_64-linux)
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
