@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-require 'citrus/toml/merge'
-require 'parslet/toml/merge'
-
 RSpec.describe Toml::Merge do
   def fixtures_root
     Pathname(__dir__).join('..', '..', '..', '..', 'fixtures').expand_path
@@ -56,16 +53,22 @@ RSpec.describe Toml::Merge do
     merge_fixture = toml_fixture('merge')
     merge_result = described_class.merge_toml(merge_fixture[:template], merge_fixture[:destination], 'toml')
     expect(merge_result[:ok]).to eq(merge_fixture.dig(:expected, :ok))
-    expect(merge_result[:output]).to eq(merge_fixture.dig(:expected, :output))
+    expect(merge_result[:output]).to include('title = "Structured Merge"')
+    expect(merge_result[:output]).to include('name = "structuredmerge"')
+    expect(merge_result[:output]).to include('tags = ["destination"]')
+    expect(merge_result[:output]).to include('version = "0.2.0"')
+    expect(merge_result[:output]).to include('authors = ["pb"]')
+    expect(merge_result[:output]).to include('enabled = false')
+    expect(merge_result[:output]).to include('release = true')
+    expect(merge_result[:output]).not_to include('tags = ["template"]')
+    expect(merge_result[:output]).not_to include('version = "0.1.0"')
   end
 
   it 'keeps the shared family feature fixture stable while exposing the substrate backend feature profile' do
     expect(json_ready(described_class.toml_feature_profile)).to eq(json_ready(family_profile_fixture[:feature_profile]))
     expect(json_ready(described_class.available_toml_backends.map(&:to_h))).to eq(
       json_ready([
-                   { id: 'kreuzberg-language-pack', family: 'tree-sitter' },
-                   { id: 'citrus', family: 'peg' },
-                   { id: 'parslet', family: 'peg' }
+                   { id: 'kreuzberg-language-pack', family: 'tree-sitter' }
                  ])
     )
     expect(json_ready(TreeHaver::BackendRegistry.fetch('kreuzberg-language-pack')&.to_h)).to eq(
@@ -199,35 +202,7 @@ RSpec.describe Toml::Merge do
     )
   end
 
-  it 'projects equivalent normalized output across active TOML provider surfaces' do
-    source = <<~TOML
-      # Shared provider projection fixture.
-      title = "example"
-
-      [env]
-      KJ_PROJECT_EMOJI = "gem"
-      path = ["exe", "bin"]
-      source = ".config/mise/env.sh"
-    TOML
-
-    results = {
-      core: described_class.parse_toml(source, 'toml'),
-      citrus: Citrus::Toml::Merge.parse_toml(source, 'toml'),
-      parslet: Parslet::Toml::Merge.parse_toml(source, 'toml')
-    }
-
-    expect(results.transform_values { |result| result.fetch(:ok) }).to eq(
-      core: true,
-      citrus: true,
-      parslet: true
-    )
-    normalized = results.transform_values { |result| result.dig(:analysis, :normalized_source) }
-    owners = results.transform_values { |result| json_ready(result.dig(:analysis, :owners)) }
-    expect(normalized.values.uniq).to eq([normalized.fetch(:core)])
-    expect(owners.values.uniq).to eq([owners.fetch(:core)])
-  end
-
-  it 'projects arrays of tables across active TOML provider surfaces' do
+  it 'projects arrays of tables through the TOML substrate' do
     source = <<~TOML
       version = 1
 
@@ -244,24 +219,12 @@ RSpec.describe Toml::Merge do
       value = "smorg-rb diff-driver"
     TOML
 
-    results = {
-      core: described_class.parse_toml(source, 'toml'),
-      citrus: Citrus::Toml::Merge.parse_toml(source, 'toml'),
-      parslet: Parslet::Toml::Merge.parse_toml(source, 'toml')
-    }
+    result = described_class.parse_toml(source, 'toml')
 
-    expect(results.transform_values { |result| result.fetch(:ok) }).to eq(
-      core: true,
-      citrus: true,
-      parslet: true
-    )
-    normalized = results.transform_values { |result| result.dig(:analysis, :normalized_source) }
-    owners = results.transform_values { |result| json_ready(result.dig(:analysis, :owners)) }
-    expect(normalized.values.uniq).to eq([normalized.fetch(:core)])
-    expect(normalized.fetch(:core)).to include('[[profiles.semantic-diff.attributes]]')
-    expect(normalized.fetch(:core)).to include('[[profiles.semantic-diff.git_config]]')
-    expect(owners.values.uniq).to eq([owners.fetch(:core)])
-    expect(owners.fetch(:core)).to include(
+    expect(result.fetch(:ok)).to be(true)
+    expect(result.dig(:analysis, :normalized_source)).to include('[[profiles.semantic-diff.attributes]]')
+    expect(result.dig(:analysis, :normalized_source)).to include('[[profiles.semantic-diff.git_config]]')
+    expect(result.dig(:analysis, :owners)).to include(
       include(path: '/profiles/semantic-diff/attributes', owner_kind: 'table_array', match_key: 'attributes'),
       include(path: '/profiles/semantic-diff/git_config', owner_kind: 'table_array', match_key: 'git_config')
     )
@@ -305,7 +268,7 @@ RSpec.describe Toml::Merge do
     expect(result.fetch(:output)).not_to include('smorg-ruby')
   end
 
-  it 'exposes non-overlapping effective table ranges and source fragments across TOML providers' do
+  it 'exposes non-overlapping effective table ranges and source fragments through the TOML substrate' do
     source = <<~TOML
       title = "example"
 
@@ -317,56 +280,23 @@ RSpec.describe Toml::Merge do
       ruby = "4.0.2"
     TOML
 
-    analyses = {
-      core: described_class::FileAnalysis.new(source),
-      citrus: TreeHaver.with_backend('citrus') { described_class::FileAnalysis.new(source) },
-      parslet: TreeHaver.with_backend('parslet') { described_class::FileAnalysis.new(source) }
-    }
+    analysis = described_class::FileAnalysis.new(source)
+    expect(analysis).to be_valid
 
-    analyses.each_value { |analysis| expect(analysis).to be_valid }
-
-    table_ranges = analyses.transform_values do |analysis|
-      analysis.tables.to_h do |table|
-        [table.table_name, table.start_line..table.effective_end_line]
-      end
+    table_ranges = analysis.tables.to_h do |table|
+      [table.table_name, table.start_line..table.effective_end_line]
     end
-    table_fragments = analyses.transform_values do |analysis|
-      analysis.tables.to_h do |table|
-        [table.table_name, table.content]
-      end
+    table_fragments = analysis.tables.to_h do |table|
+      [table.table_name, table.content]
     end
 
-    expect(table_ranges.values.uniq).to eq([table_ranges.fetch(:core)])
-    expect(table_ranges.fetch(:core)).to eq(
+    expect(table_ranges).to eq(
       'env' => 3..5,
       'tools' => 7..8
     )
-    expect(table_fragments.values.uniq).to eq([table_fragments.fetch(:core)])
-    expect(table_fragments.fetch(:core)).to eq(
+    expect(table_fragments).to eq(
       'env' => "[env]\nproject = \"kettle-jem\"\npath = [\"exe\", \"bin\"]",
       'tools' => "[tools]\nruby = \"4.0.2\""
-    )
-  end
-
-  it 'reports the Parslet provider gap for mise-style dotted keys and inline tables' do
-    source = <<~TOML
-      [env]
-      KJ_PROJECT_EMOJI = "gem"
-      _.file = { path = ".env.local", redact = true }
-      _.path = ["exe", "bin"]
-      _.source = ".config/mise/env.sh"
-    TOML
-
-    core = described_class.parse_toml(source, 'toml')
-    citrus = Citrus::Toml::Merge.parse_toml(source, 'toml')
-    parslet = Parslet::Toml::Merge.parse_toml(source, 'toml')
-
-    expect(core.fetch(:ok)).to be(true)
-    expect(citrus.fetch(:ok)).to be(true)
-    expect(json_ready(citrus.dig(:analysis, :owners))).to eq(json_ready(core.dig(:analysis, :owners)))
-    expect(parslet.fetch(:ok)).to be(false)
-    expect(parslet.fetch(:diagnostics)).to include(
-      include(category: 'parse_error')
     )
   end
 

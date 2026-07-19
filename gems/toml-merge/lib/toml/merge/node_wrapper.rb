@@ -390,9 +390,11 @@ module Toml
       def effective_end_line
         return @end_line if !(table? || array_of_tables?) || @document_root.nil?
 
-        # Check if we have pairs as children (tree-sitter structure)
+        # Check if we have pairs as children (tree-sitter structure). Some
+        # backends expose table node spans that run through the next table
+        # boundary, so use the semantic child range when it is available.
         child_pairs = collect_child_pairs
-        return @end_line if child_pairs.any?
+        return child_pairs.map(&:end_line).compact.max || @start_line if child_pairs.any?
 
         # Citrus structure: find the last pair that belongs to us
         sibling_pairs = collect_sibling_pairs_for_table
