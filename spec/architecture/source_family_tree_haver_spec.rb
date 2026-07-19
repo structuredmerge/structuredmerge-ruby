@@ -7,6 +7,7 @@ require_relative '../../gems/ruby-merge/lib/ruby/merge'
 require_relative '../../gems/markdown-merge/lib/markdown/merge'
 require_relative '../../gems/yaml-merge/lib/yaml/merge'
 require_relative '../../gems/json-merge/lib/json/merge'
+require_relative '../../gems/psych-merge/lib/psych/merge'
 
 RSpec.describe 'source-family TreeHaver parsing' do
   before do
@@ -82,6 +83,16 @@ RSpec.describe 'source-family TreeHaver parsing' do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to include(
       include(severity: 'error', category: 'parse_error', message: include('No parser registered for json'))
+    )
+  end
+
+  it 'fails closed through TreeHaver when the Psych YAML provider has no registered parser' do
+    result = Psych::Merge.parse_yaml("key: value\n", 'yaml')
+
+    expect(TreeHaver).to have_received(:parser_for).with(:yaml)
+    expect(result[:ok]).to be(false)
+    expect(result[:diagnostics]).to include(
+      include(severity: 'error', category: 'parse_error', message: include('No parser registered for yaml'))
     )
   end
 end
