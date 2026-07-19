@@ -191,7 +191,7 @@ if direct_sibling_gems.any? &&
   end
 end
 
-# Use the StructuredMerge TLSP branch until upstream ships Ruby 4-compatible gem metadata.
+# Use the StructuredMerge TSLP branch until upstream ships Ruby 4-compatible gem metadata.
 tslp_dev = ENV.fetch('TSLP_DEV', nil)
 tslp_declared_by_templating =
   ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
@@ -200,7 +200,7 @@ unless tslp_declared_by_templating
     gem(
       'tree_sitter_language_pack',
       git: 'https://github.com/structuredmerge/tree-sitter-language-pack.git',
-      branch: 'fix/ruby-4-installs',
+      branch: 'fix/ruby-parser-api-methods',
       glob: 'packages/ruby/*.gemspec'
     )
   else
