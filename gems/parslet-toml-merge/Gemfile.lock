@@ -1,13 +1,3 @@
-GIT
-  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
-  revision: 85cac7836bb2f8cfcd3041a191b7bd11bf10924a
-  branch: fix/ruby-parser-api-methods
-  glob: packages/ruby/*.gemspec
-  specs:
-    tree_sitter_language_pack (1.12.5)
-      rb_sys (>= 0.9, < 0.9.128)
-      sorbet-runtime (~> 0.5)
-
 PATH
   remote: .
   specs:
@@ -15,6 +5,21 @@ PATH
       toml (~> 0.3)
       toml-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/toml-merge
+  specs:
+    toml-merge (7.1.0)
+      ast-merge (= 7.1.0)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/vendor/tree-sitter-language-pack/packages/ruby
+  specs:
+    tree_sitter_language_pack (1.12.5)
+      rb_sys (>= 0.9, < 0.9.128)
+      sorbet-runtime (~> 0.5)
 
 GEM
   remote: https://gem.coop/
@@ -324,10 +329,6 @@ GEM
       version_gem (~> 1.1, >= 1.1.13)
     toml (0.3.0)
       parslet (>= 1.8.0, < 3.0.0)
-    toml-merge (7.1.0)
-      ast-merge (= 7.1.0)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
     tree_haver (7.1.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
@@ -408,6 +409,7 @@ DEPENDENCIES
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
+  toml-merge!
   tree_sitter_language_pack!
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
