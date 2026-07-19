@@ -370,7 +370,8 @@ module Dotenv
 
       def emission_start_line_for(node, analysis)
         region_start = region_start_line(leading_region_for(node, analysis))
-        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node, analysis)
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node,
+                                                                                                           analysis)
         preceding_blank_line_start(region_start || preamble_start || node.start_line, analysis)
       end
 
@@ -534,7 +535,8 @@ module Dotenv
 
       def leading_segment_anchor_line_for(node, analysis, owners: nil, leading_region: nil)
         region_start = super(node, analysis, owners: owners || analysis.structural_owners, leading_region: leading_region)
-        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node, analysis)
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node,
+                                                                                                           analysis)
         region_start || preamble_start
       end
 
