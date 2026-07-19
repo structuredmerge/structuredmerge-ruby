@@ -5,6 +5,7 @@ require_relative 'merge/version'
 
 require 'json'
 require 'tree_haver'
+require 'ast/merge'
 
 module Yaml
   module Merge
@@ -15,6 +16,18 @@ module Yaml
     }.freeze
     BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+    class Error < Ast::Merge::Error; end
+    class ParseError < Ast::Merge::ParseError; end
+    class TemplateParseError < ParseError; end
+    class DestinationParseError < ParseError; end
+
+    autoload :DebugLogger, 'yaml/merge/debug_logger'
+    autoload :Emitter, 'yaml/merge/emitter'
+    autoload :FileAnalysis, 'yaml/merge/file_analysis'
+    autoload :MergeResult, 'yaml/merge/merge_result'
+    autoload :NodeWrapper, 'yaml/merge/node_wrapper'
+    autoload :SmartMerger, 'yaml/merge/smart_merger'
 
     module_function
 
@@ -126,12 +139,12 @@ module Yaml
         return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
-      merge_yaml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
+      merge_yaml_with_parser(template_source, destination_source, dialect, backend: resolved_backend) do |source, parse_dialect|
         parse_yaml(source, parse_dialect, backend: resolved_backend)
       end
     end
 
-    def merge_yaml_with_parser(template_source, destination_source, dialect)
+    def merge_yaml_with_parser(template_source, destination_source, dialect, backend: nil)
       template = yield(template_source, dialect)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
@@ -155,7 +168,14 @@ module Yaml
       {
         ok: true,
         diagnostics: [],
-        output: canonical_yaml(merge_yaml_mappings(template_document, destination_document)),
+        output: TreeHaver.with_backend(resolve_backend(backend)) do
+          SmartMerger.new(
+            template_source,
+            destination_source,
+            add_template_only_nodes: true,
+            merge_sequences: false
+          ).merge_result.to_yaml
+        end,
         policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     rescue StandardError => e

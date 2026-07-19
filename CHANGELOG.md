@@ -60,6 +60,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Structured merge gems now fail closed when no registered TreeHaver backend is
   available instead of falling back to direct parser-library paths outside the
   TreeHaver and ast-merge stack.
+- `yaml-merge` now routes merge emission through TreeHaver/TSLP-backed AST
+  owners and ast-merge result mechanics instead of canonicalizing merged YAML
+  through Ruby object rendering.
 
 ### Deprecated
 
@@ -85,6 +88,9 @@ Please file a bug if you notice a violation of semantic versioning.
   gaps for matched top-level keys and keys inside matched tables.
 - JSON template-preferred merges now preserve destination-owned retained blank
   gaps for matched top-level and nested object pairs.
+- YAML merges now preserve comments, blank lines, anchors, aliases,
+  multi-document separators, and scalar spelling for the shared formatting
+  preservation fixture while retaining destination-owned sequence values.
 - Markdown backend feature fixtures now account for optional provider backends
   that are only available after their provider gems register concrete TreeHaver
   integrations in the current process.
