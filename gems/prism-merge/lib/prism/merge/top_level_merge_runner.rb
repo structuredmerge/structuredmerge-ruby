@@ -1156,7 +1156,7 @@ module Prism
       end
 
       def duplicate_destination_node_already_matched?(dest_node:, dest_signature:, template_by_signature:,
-                                                     consumed_template_indices:)
+                                                      consumed_template_indices:)
         candidates = template_by_signature[dest_signature]
         return false unless candidates
         return false if candidates.any? { |candidate| !consumed_template_indices.include?(candidate.fetch(:index)) }
