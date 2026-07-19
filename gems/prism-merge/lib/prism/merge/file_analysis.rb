@@ -358,7 +358,7 @@ module Prism
           end_line = owner.location.start_line
           return parse_result.comments.select do |comment|
             comment.location.start_line > start_line &&
-              comment.location.start_line < end_line
+            comment.location.start_line < end_line
           end
         end
 
