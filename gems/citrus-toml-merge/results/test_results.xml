@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="rspec" tests="5" skipped="0" failures="0" errors="0" time="0.173430" timestamp="2026-07-19T02:17:10-06:00" hostname="aurora">
+<testsuite name="rspec1" tests="5" skipped="0" failures="0" errors="0" time="0.282860" timestamp="2026-07-19T03:10:16-06:00" hostname="aurora">
 <properties>
-<property name="seed" value="3537"/>
+<property name="seed" value="40432"/>
 </properties>
-<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge rejects unsupported provider backend overrides" file="./spec/fixtures_integration_spec.rb" time="0.001075"></testcase>
-<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge conforms to the provider named-suite plan and manifest-report fixtures" file="./spec/fixtures_integration_spec.rb" time="0.000836"></testcase>
-<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge exposes the TOML family through the Citrus provider backend" file="./spec/fixtures_integration_spec.rb" time="0.000370"></testcase>
-<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge conforms to the shared TOML analysis, matching, and merge fixtures" file="./spec/fixtures_integration_spec.rb" time="0.107662"></testcase>
-<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge merges comment-free arrays of tables through the Citrus parser provider" file="./spec/fixtures_integration_spec.rb" time="0.062469"></testcase>
+<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge exposes the TOML family through the Citrus provider backend" file="./spec/fixtures_integration_spec.rb" time="0.002994"></testcase>
+<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge conforms to the shared TOML analysis, matching, and merge fixtures" file="./spec/fixtures_integration_spec.rb" time="0.143493"></testcase>
+<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge rejects unsupported provider backend overrides" file="./spec/fixtures_integration_spec.rb" time="0.000772"></testcase>
+<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge conforms to the provider named-suite plan and manifest-report fixtures" file="./spec/fixtures_integration_spec.rb" time="0.001173"></testcase>
+<testcase classname="spec.fixtures_integration_spec" name="Citrus::Toml::Merge merges comment-free arrays of tables through the Citrus parser provider" file="./spec/fixtures_integration_spec.rb" time="0.132896"></testcase>
+</testsuite>
+cs on a matched array of tables behaves like a reproducible merge is idempotent (merging again produces same result)" file="./spec/reproducible_merge_spec.rb" time="0.013835"></testcase>
 </testsuite>

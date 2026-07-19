@@ -281,40 +281,59 @@ a {
 <div class="results">
 <div id="div_group_1" class="example_group passed">
   <dl style="margin-left: 0px;">
-  <dt id="example_group_1" class="passed">Toml::Merge</dt>
-    <script type="text/javascript">moveProgressBar('6.6');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-136 TOML plan-context fixtures</span><span class='duration'>0.00090s</span></dd>
+  <dt id="example_group_1" class="passed">TOML reproducible    <script type="text/javascript">moveProgressBar('6.6');</script>
+    <dd class="example passed"><span class="passed_spec_name">conforms to the TOML parse, structure, matching, and merge fixtures with the tree-sitter substrate</span><span class='duration'>0.04824s</span></dd>
     <script type="text/javascript">moveProgressBar('13.3');</script>
-    <dd class="example passed"><span class="passed_spec_name">preserves destination TOML comments and blank lines while adding template-only keys</span><span class='duration'>0.04355s</span></dd>
-    <script type="text/javascript">moveProgressBar('20.0');</script>
-    <dd class="example passed"><span class="passed_spec_name">parses mise-style dotted env keys and inline tables</span><span class='duration'>0.00090s</span></dd>
-    <script type="text/javascript">moveProgressBar('26.6');</script>
-    <dd class="example passed"><span class="passed_spec_name">merges comment-free TOML arrays of tables with destination preference</span><span class='duration'>0.01025s</span></dd>
+    <dd class="example passed"><span class="passed_spec_name">conforms to     <script type="text/javascript">moveProgressBar('16.6');</script>
+    <dd class="example passed"><span class="passed_spec_name">produces the expected result</span><span class='duration'>0.05502s</span></dd>
     <script type="text/javascript">moveProgressBar('33.3');</script>
-    <dd class="example passed"><span class="passed_spec_name">keeps the shared family feature fixture stable while exposing the substrate backend feature profile</span><span class='duration'>0.00032s</span></dd>
-    <script type="text/javascript">moveProgressBar('40.0');</script>
-    <dd class="example passed"><span class="passed_spec_name">resolves TOML paths through the canonical manifest</span><span class='duration'>0.00143s</span></dd>
-    <script type="text/javascript">moveProgressBar('46.6');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-139 family named-suite plan fixture</span><span class='duration'>0.00051s</span></dd>
-    <script type="text/javascript">moveProgressBar('53.3');</script>
-    <dd class="example passed"><span class="passed_spec_name">exposes non-overlapping effective table ranges and source fragments through the TOML substrate</span><span class='duration'>0.00148s</span></dd>
-    <script type="text/javascript">moveProgressBar('60.0');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the TOML parse, structure, matching, and merge fixtures with the tree-sitter substrate</span><span class='duration'>0.00975s</span></dd>
-    <script type="text/javascript">moveProgressBar('66.6');</script>
-    <dd class="example passed"><span class="passed_spec_name">records emitter source provenance line metadata for raw source rendering</span><span class='duration'>0.00013s</span></dd>
-    <script type="text/javascript">moveProgressBar('73.3');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-135 TOML backend feature profile fixtures</span><span class='duration'>0.00026s</span></dd>
-    <script type="text/javascript">moveProgressBar('80.0');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-137 TOML family manifest fixture</span><span class='duration'>0.00025s</span></dd>
-    <script type="text/javascript">moveProgressBar('86.6');</script>
-    <dd class="example passed"><span class="passed_spec_name">rejects unsupported provider backend overrides</span><span class='duration'>0.00038s</span></dd>
-    <script type="text/javascript">moveProgressBar('93.3');</script>
-    <dd class="example passed"><span class="passed_spec_name">projects arrays of tables through the TOML substrate</span><span class='duration'>0.00062s</span></dd>
-    <script type="text/javascript">moveProgressBar('100.0');</script>
-    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-140 family manifest report fixture</span><span class='duration'>0.00060s</span></dd>
+    <dd class="example passed"><span class="passed_spec_name">is idempotent (merging again produces same result)</span><span class='duration'>0.00579s</span></dd>
   </dl>
 </div>
-<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0.07304 seconds</strong>";</script>
+<div id="div_group_4" class="example_group passed">
+  <dl style="margin-left: 15px;">
+  <dt id="example_group_4" class="passed">when template preference keeps destination docs on a matched array of tables</dt>
+  </dl>
+</div>
+<div id="div_group_5" class="example_group passed">
+  <dl style="margin-left: 30px;">
+  <dt id="example_group_5" class="passed">behaves like a reproducible merge</dt>
+    <script type="text/javascript">moveProgressBar('50.0');</script>
+    <dd class="example passed"><span class="passed_spec_name">is idempotent (merging again produces same result)</span><span class='duration'>0.00287s</span></dd>
+    <script type="text/javascript">moveProgressBar('66.6');</script>
+    <dd class="example passed"><span class="passed_spec_name">produces the expected result</span><span class='duration'>0.00146s</span></dd>
+  </dl>
+</div>
+<div id="div_group_6" class="example_group passed">
+  <dl style="margin-left: 15px;">
+  <dt id="example_group_6" class="passed">when template preference keeps destination docs on an adjacent matched table</dt>
+  </dl>
+</div>
+<div id="div_group_7" class="example_group passed">
+  <dl style="margin-left: 30px;">
+  <dt id="example_group_7" class="passed">behaves like a reproducible merge</dt>
+    <script type="text/javascript">moveProgressBar('83.3');</script>
+    <dd class="example passed"><span class="passed_spec_name">is idempotent (merging again produces same result)</span><span class='duration'>0.00471s</span></dd>
+    <script type="text/javascript">moveProgressBar('100.0');</script>
+    <dd class="example passed"><span class="passed_spec_name">produces the expected result</span><span class='duration'>0.00250s</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0.07445 seconds</strong>";</script>
+<script type="text/javascript">document.getElementById('totals').innerHTML = "6 examples, 0 failures";</script>
+</div>
+</div>
+</body>
+</html>
+<dd class="example passed"><span class="passed_spec_name">conforms to the slice-139 family named-suite plan fixture</span><span class='duration'>0.00059s</span></dd>
+    <script type="text/javascript">moveProgressBar('86.6');</script>
+    <dd class="example passed"><span class="passed_spec_name">conforms to the slice-137 TOML family manifest fixture</span><span class='duration'>0.00034s</span></dd>
+    <script type="text/javascript">moveProgressBar('93.3');</script>
+    <dd class="example passed"><span class="passed_spec_name">parses mise-style dotted env keys and inline tables</span><span class='duration'>0.00068s</span></dd>
+    <script type="text/javascript">moveProgressBar('100.0');</script>
+    <dd class="example passed"><span class="passed_spec_name">projects arrays of tables through the TOML substrate</span><span class='duration'>0.00891s</span></dd>
+  </dl>
+</div>
+<script type="text/javascript">document.getElementById('duration').innerHTML = "Finished in <strong>0.08038 seconds</strong>";</script>
 <script type="text/javascript">document.getElementById('totals').innerHTML = "15 examples, 0 failures";</script>
 </div>
 </div>
