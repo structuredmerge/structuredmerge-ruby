@@ -42,6 +42,7 @@ module Ast
 
           template_indices.zip(dest_indices).each do |t_idx, d_idx|
             next unless t_idx && d_idx
+            next if matched_template.include?(t_idx) || matched_dest.include?(d_idx)
 
             alignment << build_match_entry(
               signature: sig,
@@ -128,10 +129,28 @@ module Ast
         statements.each_with_index do |statement, idx|
           signature = signature_for(analysis, idx)
           map[signature] << idx if signature
+          content_signature = content_identity_signature(statement)
+          map[content_signature] << idx if content_signature && content_signature != signature
           add_signature_aliases(map, statement, idx, analysis)
         end
 
         map
+      end
+
+      def content_identity_signature(statement)
+        content = statement_value(statement, :normalized_content) || statement_value(statement, 'normalized_content')
+        content = content.to_s
+        return if content.empty?
+
+        [:content_identity, content]
+      end
+
+      def statement_value(statement, key)
+        if statement.respond_to?(key)
+          statement.public_send(key)
+        elsif statement.respond_to?(:[])
+          statement[key]
+        end
       end
 
       def build_match_entry(signature:, template_index:, dest_index:, template_statement:, dest_statement:)

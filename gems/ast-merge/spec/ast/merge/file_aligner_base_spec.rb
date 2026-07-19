@@ -14,6 +14,15 @@ RSpec.describe Ast::Merge::FileAlignerBase do
         node[:signature]
       end
     end)
+    stub_const('FixtureAnalysis', Struct.new(:statements) do
+      def signature_at(index)
+        statements.fetch(index).fetch(:primary_signature)
+      end
+
+      def generate_signature(node)
+        node.fetch(:primary_signature)
+      end
+    end)
     stub_const('TestAligner', Class.new(described_class) do
       attr_reader :logged_alignment
 
@@ -129,6 +138,57 @@ RSpec.describe Ast::Merge::FileAlignerBase do
 
       expect(result.count { |entry| entry[:type] == :match }).to eq(1)
       expect(result.count { |entry| entry[:type] == :template_only }).to eq(1)
+    end
+
+    it 'does not duplicate matches through content aliases after primary signatures match' do
+      template_statement = { name: :template, normalized_content: 'same' }
+      dest_statement = { name: :dest, normalized_content: 'same' }
+      template_analysis = Analysis.new([template_statement], { 0 => [:primary] })
+      dest_analysis = Analysis.new([dest_statement], { 0 => [:primary] })
+
+      result = BaseAligner.new(template_analysis, dest_analysis).align
+
+      expect(result).to eq([
+                             {
+                               type: :match,
+                               template_index: 0,
+                               dest_index: 0,
+                               signature: [:primary],
+                               template_node: template_statement,
+                               dest_node: dest_statement
+                             }
+                           ])
+    end
+
+    it 'matches identical content when opaque primary signatures differ by source position' do
+      fixture_path = Pathname(__dir__).join(
+        '..',
+        '..',
+        '..',
+        '..',
+        '..',
+        '..',
+        'fixtures',
+        'diagnostics',
+        'slice-904-content-identity-positional-signature',
+        'content-identity-positional-signature.json'
+      ).expand_path
+      fixture = Ast::Merge.normalize_value(JSON.parse(fixture_path.read))
+      template_analysis = FixtureAnalysis.new(fixture.dig(:matching, :template_nodes))
+      dest_analysis = FixtureAnalysis.new(fixture.dig(:matching, :destination_nodes))
+
+      result = BaseAligner.new(template_analysis, dest_analysis).align
+
+      expect(result.count { |entry| entry[:type] == :match }).to eq(fixture.dig(:expected, :match_count))
+      expect(result.count { |entry| entry[:type] == :template_only }).to eq(
+        fixture.dig(:expected, :template_only_count)
+      )
+      expect(result.count { |entry| entry[:type] == :dest_only }).to eq(fixture.dig(:expected, :dest_only_count))
+      match = result.find { |entry| entry[:type] == :match }
+      expected_signature = fixture.dig(:expected, :first_match_signature)
+      expect(match[:signature]).to eq([expected_signature.first.to_sym, *expected_signature.drop(1)])
+      expect(match[:template_index]).to eq(fixture.dig(:expected, :first_template_index))
+      expect(match[:dest_index]).to eq(fixture.dig(:expected, :first_dest_index))
     end
 
     it 'supports optional fuzzy refinement for otherwise unmatched statements' do
