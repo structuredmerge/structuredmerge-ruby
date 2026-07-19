@@ -22,6 +22,8 @@ module Yaml
       BACKEND_REGISTRY.mutex.synchronize do
         return if BACKEND_REGISTRY.registered
 
+        TreeHaver::BackendRegistry.register(BACKEND_REFERENCE)
+
         grammar_finder = TreeHaver::GrammarFinder.new(:yaml)
         grammar_finder.register! if grammar_finder.available?
 
@@ -38,12 +40,12 @@ module Yaml
     end
 
     def available_yaml_backends
-      [BACKEND_REFERENCE]
+      yaml_backend_available_for_analysis?(BACKEND_REFERENCE.id) ? [BACKEND_REFERENCE] : []
     end
 
     def yaml_backend_feature_profile(backend: nil)
       resolved_backend = resolve_backend(backend)
-      unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id && yaml_backend_available_for_analysis?(resolved_backend)
         return unsupported_feature_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
@@ -71,7 +73,7 @@ module Yaml
       return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
       resolved_backend = resolve_backend(backend)
-      unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id && yaml_backend_available_for_analysis?(resolved_backend)
         return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
@@ -120,7 +122,7 @@ module Yaml
 
     def merge_yaml(template_source, destination_source, dialect, backend: nil)
       resolved_backend = resolve_backend(backend)
-      unless resolved_backend == BACKEND_REFERENCE.id
+      unless resolved_backend == BACKEND_REFERENCE.id && yaml_backend_available_for_analysis?(resolved_backend)
         return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.")
       end
 
@@ -168,6 +170,15 @@ module Yaml
       backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
     end
     private_class_method :resolve_backend
+
+    def yaml_backend_available_for_analysis?(backend_id)
+      register_backend!
+      return false unless backend_id.to_s == BACKEND_REFERENCE.id
+
+      registrations = TreeHaver.registered_languages(:yaml)
+      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+    end
+    private_class_method :yaml_backend_available_for_analysis?
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'YAML parse returned no root node' unless node
