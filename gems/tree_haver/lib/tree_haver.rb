@@ -279,6 +279,12 @@ module TreeHaver
     nil
   end
 
+  def with_language_registration(name, backend_type, **config, &block)
+    raise ArgumentError, 'Block required' unless block
+
+    LanguageRegistry.with_registration(name, backend_type, **config, &block)
+  end
+
   def registered_languages(name)
     LanguageRegistry.registered(name) || {}
   end

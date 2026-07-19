@@ -68,7 +68,7 @@ module Ast
     #
     # @example FileAnalysis error handling
     #   def parse_content
-    #     parser = TreeHaver.parser_for(:myformat, library_path: @parser_path)
+    #     parser = TreeHaver.parser_for(:myformat, backend_type: :tree_sitter)
     #     @ast = parser.parse(@source)
     #
     #     if @ast&.root_node&.has_error?

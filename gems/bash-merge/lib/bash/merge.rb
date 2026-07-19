@@ -165,10 +165,16 @@ module Bash
       end
 
       def node_parser_available_for?(source, grammar_path, diagnostics)
+        register_backend!
         parser = if grammar_path
-                   TreeHaver.parser_for(:bash, library_path: grammar_path)
+                   TreeHaver.with_language_registration(
+                     :bash,
+                     :tree_sitter,
+                     path: grammar_path,
+                     symbol: TreeHaver::GrammarFinder.new(:bash).symbol_name
+                   ) { TreeHaver.parser_for(:bash, backend_type: :tree_sitter) }
                  else
-                   TreeHaver.parser_for(:bash)
+                   TreeHaver.parser_for(:bash, backend_type: :tree_sitter)
                  end
         tree = parser.parse(source)
         !tree.nil? && !tree.root_node.nil?
@@ -182,10 +188,15 @@ module Bash
 
       def bash_backend_available_for_analysis?(backend_id)
         register_backend!
-        return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-        registrations = TreeHaver.registered_languages(:bash)
-        registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+        if backend_id.to_s.empty?
+          TreeHaver.parser_for(:bash, backend_type: :tree_sitter)
+        else
+          TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:bash, backend_type: :tree_sitter) }
+        end
+        true
+      rescue TreeHaver::Error, ArgumentError
+        false
       end
     end
   end

@@ -47,7 +47,7 @@ module Bash
         @lines = source.lines.map(&:chomp)
         @freeze_token = freeze_token
         @signature_generator = signature_generator
-        @parser_path = parser_path || self.class.find_parser_path
+        @parser_path = parser_path
         @errors = []
         # **options captures any additional parameters (e.g., node_typing) for forward compatibility
 
@@ -230,7 +230,16 @@ module Bash
         # TreeHaver handles backend selection against the grammars Bash::Merge
         # has already registered during bootstrap.
         # Set TREE_HAVER_BACKEND=ffi for bash (MRI/Rust have compatibility issues)
-        parser = TreeHaver.parser_for(:bash, library_path: @parser_path)
+        parser = if @parser_path
+                   TreeHaver.with_language_registration(
+                     :bash,
+                     :tree_sitter,
+                     path: @parser_path,
+                     symbol: TreeHaver::GrammarFinder.new(:bash).symbol_name
+                   ) { TreeHaver.parser_for(:bash, backend_type: :tree_sitter) }
+                 else
+                   TreeHaver.parser_for(:bash, backend_type: :tree_sitter)
+                 end
         @ast = parser.parse(@source)
 
         # Check for parse errors in the tree

@@ -1218,6 +1218,29 @@ RSpec.describe TreeHaver do
     end.to raise_error(TreeHaver::NotAvailable, /No parser registered for backend prism/)
   end
 
+  it 'restores language registrations after scoped overrides' do
+    described_class.register_language(
+      :scoped_registration_json,
+      path: '/workspace/original-json.so',
+      symbol: 'tree_sitter_json'
+    )
+
+    described_class.with_language_registration(
+      :scoped_registration_json,
+      :tree_sitter,
+      path: '/workspace/temporary-json.so',
+      symbol: 'tree_sitter_json'
+    ) do
+      expect(described_class.registered_languages(:scoped_registration_json).fetch(:tree_sitter)).to include(
+        path: '/workspace/temporary-json.so'
+      )
+    end
+
+    expect(described_class.registered_languages(:scoped_registration_json).fetch(:tree_sitter)).to include(
+      path: '/workspace/original-json.so'
+    )
+  end
+
   it 'provides PEG framework parsing helpers' do
     require 'toml'
     require 'toml-rb'

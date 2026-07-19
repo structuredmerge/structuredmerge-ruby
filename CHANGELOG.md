@@ -62,6 +62,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Structured merge gems now fail closed when no registered TreeHaver backend is
   available instead of falling back to direct parser-library paths outside the
   TreeHaver and ast-merge stack.
+- `TreeHaver.parser_for` now accepts backend-type and contract constraints so
+  substrate gems can request normalized tree-sitter semantics without being
+  hijacked by parser-specific provider gems registered for the same language.
 - `yaml-merge` now routes merge emission through TreeHaver/TSLP-backed AST
   owners and ast-merge result mechanics instead of canonicalizing merged YAML
   through Ruby object rendering.
@@ -111,6 +114,9 @@ Please file a bug if you notice a violation of semantic versioning.
   template-only direct methods during scoped intra-owner declaration merges.
 - TreeHaver now normalizes nested object fields from tree-sitter-language-pack
   process results, including span objects, before building parser analysis.
+- `bash-merge` now routes explicit `parser_path:` overrides through scoped
+  TreeHaver language registration instead of passing parser library paths
+  directly to parser construction.
 
 - Byte-offset rewrites in `kettle-jem` and `prism-merge` now splice source with
   byte-aware slicing so non-ASCII content before an edited AST node does not
