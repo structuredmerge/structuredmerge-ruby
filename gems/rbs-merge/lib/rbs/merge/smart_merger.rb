@@ -388,6 +388,7 @@ module Rbs
       def add_retained_leading_gap(decl, analysis, decision:)
         lines = retained_owner_leading_gap_lines_for(decl, analysis)
         return if lines.empty?
+        return if @result.blank_lines?(lines) && @result.ends_with_blank_line?
 
         @result.add_raw(lines, decision: decision)
       end
@@ -527,6 +528,7 @@ module Rbs
 
             case resolution[:source]
             when :template
+              lines.concat(retained_owner_leading_gap_lines_for(entry[:dest_decl], @dest_analysis, owners: dest_owners))
               lines.concat(
                 extract_statement_lines_with_leading_comments(
                   entry[:template_decl],
@@ -546,6 +548,7 @@ module Rbs
                 )
               )
             when :recursive
+              lines.concat(retained_owner_leading_gap_lines_for(entry[:dest_decl], @dest_analysis, owners: dest_owners))
               lines.concat(
                 reconstruct_declaration_with_merged_members(
                   resolution[:template_declaration],

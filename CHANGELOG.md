@@ -78,6 +78,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Bash, dotenv, and RBS merges now share a retained blank-gap compliance
   contract and preserve destination-owned blank gaps between retained matched
   owners, including template-preferred matched output.
+- RBS recursive member merges now use a shared retained blank-gap contract and
+  preserve destination-owned nested member separators when template-preferred
+  member bodies are emitted.
 - Markdown backend feature fixtures now account for optional provider backends
   that are only available after their provider gems register concrete TreeHaver
   integrations in the current process.

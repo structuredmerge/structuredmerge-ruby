@@ -185,17 +185,21 @@ module Ast
       end
 
       def retained_owner_leading_gap_lines_for(owner, analysis, owners: nil)
-        gap = retained_owner_leading_gap_for(owner, analysis)
+        gap = retained_owner_leading_gap_for(owner, analysis, owners: owners)
         return [] unless gap
         return [] if region_present?(leading_region_for(owner, analysis, owners: owners))
 
         gap.lines
       end
 
-      def retained_owner_leading_gap_for(owner, analysis)
+      def retained_owner_leading_gap_for(owner, analysis, owners: nil)
         return unless owner && analysis&.respond_to?(:layout_attachment_for)
 
-        attachment = analysis.layout_attachment_for(owner)
+        attachment = if owners.nil?
+                       analysis.layout_attachment_for(owner)
+                     else
+                       analysis.layout_attachment_for(owner, owners: owners)
+                     end
         gap = attachment&.leading_gap
         return unless gap&.kind == :interstitial
 

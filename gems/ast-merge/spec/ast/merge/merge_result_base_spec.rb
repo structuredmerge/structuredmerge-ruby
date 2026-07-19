@@ -238,6 +238,39 @@ RSpec.describe Ast::Merge::MergeResultBase do
     end
   end
 
+  describe '#blank_lines?' do
+    it 'returns true when every provided line is blank' do
+      result = described_class.new
+
+      expect(result.blank_lines?(['', " \t"])).to be(true)
+    end
+
+    it 'returns false when any provided line has content' do
+      result = described_class.new
+
+      expect(result.blank_lines?(['', 'content'])).to be(false)
+    end
+  end
+
+  describe '#ends_with_blank_line?' do
+    it 'returns true when the current result ends with a blank line' do
+      result = described_class.new
+      result.lines.concat(['content', ''])
+
+      expect(result.ends_with_blank_line?).to be(true)
+    end
+
+    it 'returns false when the current result is empty or ends with content' do
+      result = described_class.new
+
+      expect(result.ends_with_blank_line?).to be(false)
+
+      result.lines << 'content'
+
+      expect(result.ends_with_blank_line?).to be(false)
+    end
+  end
+
   describe '#line_count' do
     it 'returns 0 for empty result' do
       result = described_class.new

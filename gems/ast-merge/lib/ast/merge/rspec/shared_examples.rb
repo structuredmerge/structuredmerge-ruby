@@ -24,6 +24,7 @@
 # - "Ast::Merge::MergerConfig" - validates merger configuration
 # - "Ast::Merge::Recipe::PresetContract" - validates preset loading and companion-script resolution
 # - "Ast::Merge::RemovalModeCompliance" - validates generic remove_template_missing_nodes behavior
+# - "Ast::Merge::RecursiveRetainedBlankGapCompliance" - validates retained blank-gap preservation in recursive owner scopes
 # - "Ast::Merge::RetainedBlankGapCompliance" - validates retained matched owner blank-gap preservation
 # - "Ast::Merge::RuntimeDebugContract" - validates runtime-aware merge_with_debug payloads
 # - "Ast::Merge::UnresolvedHelperContract" - validates shared unresolved helper support
@@ -49,6 +50,7 @@ require_relative 'shared_examples/layout_augmenter'
 require_relative 'shared_examples/merge_result_base'
 require_relative 'shared_examples/merger_config'
 require_relative 'shared_examples/recipe_preset_contract'
+require_relative 'shared_examples/recursive_retained_blank_gap_compliance'
 require_relative 'shared_examples/removal_mode_compliance'
 require_relative 'shared_examples/retained_blank_gap_compliance'
 require_relative 'shared_examples/reproducible_merge'
