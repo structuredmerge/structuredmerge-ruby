@@ -30,10 +30,10 @@ RSpec.describe Ast::Merge::Git do
       expect(result.fetch(:reparse_after_render)).to eq(expected.fetch(:reparse_after_render)),
                                                      test_case.fetch(:case_id)
       expect(result.fetch(:render_report).fetch(:strategy)).to eq(expected.dig(:render_report, :strategy)),
-                                                          test_case.fetch(:case_id)
+                                                               test_case.fetch(:case_id)
       if expected[:merged_json]
         expect(JSON.parse(result.fetch(:merged_source), symbolize_names: true)).to eq(expected.fetch(:merged_json)),
-                                                                        test_case.fetch(:case_id)
+                                                                                   test_case.fetch(:case_id)
       end
       expected.fetch(:conflict_categories, []).each_with_index do |category, index|
         expect(result.dig(:conflicts, index, :category)).to eq(category), test_case.fetch(:case_id)

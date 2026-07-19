@@ -34,8 +34,6 @@ module Ast
             metadata[:reason] = reason if reason
             metadata[:category] = support[:category] || support['category'] if support[:category] || support['category']
             metadata
-          else
-            nil
           end
         end
 
@@ -56,7 +54,7 @@ module Ast
         def role_support(roles, role, default_status:)
           value =
             if roles.is_a?(Array)
-              roles.map(&:to_s).include?(role.to_s) ? true : nil
+              roles.map(&:to_s).include?(role.to_s) || nil
             elsif roles
               roles[role.to_sym] || roles[role.to_s]
             end

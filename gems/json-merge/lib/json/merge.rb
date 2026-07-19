@@ -63,9 +63,7 @@ module Json
     end
 
     def parse_json(source, dialect)
-      if detect_trailing_comma(source)
-        return parse_failure("Trailing commas are not supported for #{dialect}.")
-      end
+      return parse_failure("Trailing commas are not supported for #{dialect}.") if detect_trailing_comma(source)
       if dialect.to_s != 'jsonc' && detect_json_comments(source)
         return parse_failure("Comments are not supported for #{dialect}.")
       end
@@ -73,7 +71,9 @@ module Json
       register_backend!
       analysis = FileAnalysis.new(source)
       unless analysis.valid?
-        return parse_failure(analysis.errors.map { |error| error.respond_to?(:message) ? error.message : error.inspect }.join(', '))
+        return parse_failure(analysis.errors.map do |error|
+          error.respond_to?(:message) ? error.message : error.inspect
+        end.join(', '))
       end
 
       {
@@ -129,9 +129,7 @@ module Json
     private_class_method :merge_json_sources
 
     def json_value_for_source(source, dialect: 'json')
-      if detect_trailing_comma(source)
-        raise ParseError, "Trailing commas are not supported for #{dialect}."
-      end
+      raise ParseError, "Trailing commas are not supported for #{dialect}." if detect_trailing_comma(source)
       if dialect.to_s != 'jsonc' && detect_json_comments(source)
         raise ParseError, "Comments are not supported for #{dialect}."
       end
@@ -170,15 +168,13 @@ module Json
         false
       when 'null'
         nil
-      else
-        nil
       end
     end
 
     def decode_json_string_literal(text)
       literal = text.to_s
       literal = literal[1...-1] if literal.start_with?('"') && literal.end_with?('"')
-      literal.gsub(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/) do |escape|
+      literal.gsub(%r{\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4})}) do |escape|
         case escape
         when '\\"' then '"'
         when '\\\\' then '\\'
