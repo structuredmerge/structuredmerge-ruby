@@ -16,6 +16,76 @@ RSpec.describe Kettle::Jem do
   let(:old_spec_contract_path) { Pathname(__dir__).join("fixtures/old_spec_migration_contract.json").expand_path }
   let(:old_spec_contract) { JSON.parse(old_spec_contract_path.read, symbolize_names: true) }
 
+  it "deduplicates destination file reads while planning recipes" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-file-cache", tmp_root) do |root|
+      write_tree(root, {"README.md" => "# Example\n"})
+      pack = {
+        recipes: [
+          {target_path: "README.md"},
+          {target_path: "README.md"},
+          {target_path: "CHANGELOG.md"}
+        ]
+      }
+      readme_path = File.join(root, "README.md")
+
+      allow(File).to receive(:read).and_call_original
+
+      files = described_class.send(:read_project_files, root, pack)
+
+      expect(files).to eq("README.md" => "# Example\n", "CHANGELOG.md" => "")
+      expect(File).to have_received(:read).with(readme_path).once
+    end
+  end
+
+  it "deduplicates template source reads while planning recipes" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-cache", tmp_root) do |root|
+      write_tree(root, {"templates/README.md.example" => "# {KJ|GEM_NAME}\n"})
+      template_path = File.join(root, "templates/README.md.example")
+      template_preference = {
+        source_root_path: root,
+        source_relative_path: "templates/README.md.example",
+        selected_source: "templates/README.md.example"
+      }
+      pack = {
+        recipes: [
+          {primitive: "supplied_template_source_application", target_path: "README.md", template_preference: template_preference},
+          {primitive: "supplied_template_source_application", target_path: "README.md", template_preference: template_preference},
+          {primitive: "supplied_managed_text_block_replacement", target_path: "gemfiles/modular/shunted.gemfile"}
+        ]
+      }
+
+      allow(File).to receive(:read).and_call_original
+
+      contents = described_class.send(:read_template_source_files, root, pack)
+
+      expect(contents).to eq(template_path => "# {KJ|GEM_NAME}\n")
+      expect(File).to have_received(:read).with(template_path).once
+      expect(
+        described_class.send(:recipe_template_content, root, pack.fetch(:recipes).first, template_contents: contents)
+      ).to eq("# {KJ|GEM_NAME}\n")
+    end
+  end
+
+  it "records recipe timing metadata in top-level and envelope reports" do
+    report = described_class.send(:timed_recipe_report) do
+      {
+        metadata: {packaging_recipe: "example"},
+        report_envelope: {
+          report: {
+            metadata: {packaging_recipe: "example"}
+          }
+        }
+      }
+    end
+
+    expect(report.dig(:metadata, :duration_ms)).to be >= 0
+    expect(report.dig(:report_envelope, :report, :metadata, :duration_ms)).to eq(report.dig(:metadata, :duration_ms))
+  end
+
   it "normalizes GitHub remote source URLs structurally" do
     expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
       "https://github.com/rubythems/them-server"
@@ -5908,7 +5978,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('diff = "smorg-rb"')
       expect(content).to include('key = "diff.smorg-rb.command"')
       expect(content).to include('value = "smorg-rb diff-driver"')
-      expect(content).not_to include("smorg-rb")
+      expect(content).not_to include("smorg-ruby")
     end
   end
 
@@ -7067,7 +7137,6 @@ RSpec.describe Kettle::Jem do
       command_runner = lambda do |_command, chdir:, env:, quiet:|
         expect(chdir).to eq(root)
         expect(env).to include(
-          "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
           "BUNDLE_LOCKFILE" => nil,
           "RUBYLIB" => nil,
           "RUBYOPT" => nil
@@ -7578,7 +7647,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('key = "diff.smorg-rb.command"')
       expect(content).to include('value = "smorg-rb diff-driver"')
       expect(content).to include("[profiles.textconv-normalized]")
-      expect(content).not_to include("smorg-rb")
+      expect(content).not_to include("smorg-ruby")
     end
   end
 

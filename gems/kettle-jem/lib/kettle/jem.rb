@@ -8,7 +8,6 @@ require "json"
 require "net/http"
 require "open3"
 require "rbconfig"
-require "stringio"
 require "time"
 require "uri"
 require "addressable/uri"
@@ -184,7 +183,7 @@ module Kettle
       "lib/gem/version.rb",
       "sig/gem.rbs"
     ].freeze
-    KETTLE_CONFIG_ENV_SYNC_PATHS = {
+    KETTLE_CONFIG_ENV_SYNC_PATHS = Ractor.make_shareable({
       %w[project_emoji] => "KJ_PROJECT_EMOJI",
       %w[repository topology] => "KJ_REPOSITORY_TOPOLOGY",
       %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
@@ -213,10 +212,10 @@ module Kettle
       %w[tokens social bluesky] => "KJ_SOCIAL_BLUESKY",
       %w[tokens social linktree] => "KJ_SOCIAL_LINKTREE",
       %w[tokens social devto] => "KJ_SOCIAL_DEVTO"
-    }.freeze
-    KETTLE_CONFIG_INTERNAL_SYNC_PATHS = {
-      %w[kettle-jem version] => -> { VERSION }
-    }.freeze
+    })
+    KETTLE_CONFIG_INTERNAL_SYNC_PATHS = Ractor.make_shareable({
+      %w[kettle-jem version] => :version
+    })
     NON_LICENSE_MD_BASENAMES = %w[
       AGENTS
       CHANGELOG
@@ -242,7 +241,7 @@ module Kettle
       RUBOCOP.md
       SECURITY.md
     ].freeze
-    README_DEV_TEST_STACK_GEMS = [
+    README_DEV_TEST_STACK_GEMS = Ractor.make_shareable([
       {
         name: "appraisal2",
         repo: "https://github.com/appraisal-rb/appraisal2",
@@ -283,7 +282,7 @@ module Kettle
         repo: "https://github.com/galtzo-floss/turbo_tests2",
         role: "parallel test execution"
       }
-    ].freeze
+    ])
     MONOREPO_SUBGEM_THIN_README_KEEP_HEADINGS = [
       "synopsis",
       "info you can shake a stick at",
@@ -380,19 +379,19 @@ module Kettle
     README_TOP_LOGO_DEFAULTS = %w[org project].freeze
     README_H2_SYNOPSIS_LOGO_DEFAULTS = %w[related_org ruby].freeze
     README_TOP_LOGO_OPTIONS = %w[related_org ruby org project].freeze
-    README_TOP_LOGO_LEGACY_MODE_MAP = {
+    README_TOP_LOGO_LEGACY_MODE_MAP = Ractor.make_shareable({
       "org" => %w[related_org ruby org],
       "project" => %w[related_org ruby project],
       "org_and_project" => %w[related_org ruby org project]
-    }.freeze
-    KETTLE_CONFIG_LEGACY_KEY_PATHS = [
+    })
+    KETTLE_CONFIG_LEGACY_KEY_PATHS = Ractor.make_shareable([
       {
         path: %w[readme top_logo_mode],
         replacement_path: %w[readme top_logos],
         added_in: "7.0.0",
         prune_after: "8.0.0"
       }
-    ].freeze
+    ])
     README_TOP_LOGO_TYPES = %w[related_org ruby language org project affiliated_project].freeze
     APPRAISAL_NAME_PREFIX = "kja"
     APPRAISAL_GEM_ABBREVIATIONS = {
@@ -413,13 +412,13 @@ module Kettle
       "rom" => "rom",
       "rom-sql" => "rsql"
     }.freeze
-    APPRAISAL_WORKFLOW_LIFECYCLE_RANGES = {
+    APPRAISAL_WORKFLOW_LIFECYCLE_RANGES = Ractor.make_shareable({
       "current" => {min: Gem::Version.new("3.4"), max: Gem::Version.new("3.99")},
       "supported" => {min: Gem::Version.new("3.2"), max: Gem::Version.new("3.3")},
       "legacy" => {min: Gem::Version.new("3.0"), max: Gem::Version.new("3.1")},
       "unsupported" => {min: Gem::Version.new("2.6"), max: Gem::Version.new("2.7")},
       "ancient" => {min: Gem::Version.new("2.3"), max: Gem::Version.new("2.5")}
-    }.freeze
+    })
     APPRAISAL_ALWAYS_EXCLUDED_GEMS = %w[version_gem].freeze
     APPRAISAL_VERSION_SELECTION_MODES = %w[major minor patch minor-minmax semver].freeze
     DEFAULT_TEST_MINIMUM_RUBY = Gem::Version.new("2.4")
@@ -648,7 +647,7 @@ module Kettle
         }.freeze
       }.freeze
       COMPATIBILITY_REFERENCE_LABEL_RE = /\A(?:💎(?:ruby|jruby|truby)-|🚎)/
-      ENGINE_ROW_PATTERNS = {
+      ENGINE_ROW_PATTERNS = Ractor.make_shareable({
         "jruby" => {
           row_prefix: "| Works with JRuby",
           badge_prefixes: %w[💎jruby-],
@@ -659,7 +658,7 @@ module Kettle
           badge_prefixes: %w[💎truby-],
           ref_prefixes: [/\A🚎truby-/, /\A🚎\d+-t-/]
         }.freeze
-      }.freeze
+      })
       VERSIONED_ENGINE_COMPATIBILITY_BADGES = [
         {
           engine: "jruby",
@@ -1264,15 +1263,15 @@ module Kettle
     README_DISCOVERED_INTEGRATIONS = (README_INTEGRATIONS - [SKYWALKING_EYES_INTEGRATION]).freeze
     COVERAGE_INTEGRATIONS = %w[codecov coveralls qlty].freeze
     MANAGED_INTEGRATIONS = (COVERAGE_INTEGRATIONS + [SKYWALKING_EYES_INTEGRATION]).freeze
-    COVERAGE_INTEGRATION_CONFIG_PATHS = {
+    COVERAGE_INTEGRATION_CONFIG_PATHS = Ractor.make_shareable({
       "codecov" => %w[.github/.codecov.yml codecov.yml .codecov.yml],
       "coveralls" => %w[.coveralls.yml],
       "qlty" => %w[.qlty/qlty.toml .qlty.yml]
-    }.freeze
+    })
     INTEGRATION_TEMPLATE_PATHS = COVERAGE_INTEGRATION_CONFIG_PATHS.merge(
       SKYWALKING_EYES_INTEGRATION => %w[.licenserc.yaml .github/workflows/license-eye.yml .github/workflows/license-eye.yaml]
     ).freeze
-    README_INTEGRATION_BADGE_PATTERNS = {
+    README_INTEGRATION_BADGE_PATTERNS = Ractor.make_shareable({
       "codecov" => [
         /\s*\[!\[CodeCov Test Coverage\]\[[^\]]+\]\]\[[^\]]+\]/,
         /\n\[!\[Coverage Graph\]\[[^\]]+\]\]\[[^\]]+\]\n/
@@ -1290,7 +1289,7 @@ module Kettle
       "skywalking-eyes" => [
         /\s*\[!\[Apache SkyWalking Eyes License Compatibility Check\]\[[^\]]+\]\]\[[^\]]+\]/
       ]
-    }.freeze
+    })
     README_INTEGRATION_LINK_LABELS = {
       "codecov" => %w[🏀codecov 🏀codecovi 🏀codecov-g],
       "coveralls" => %w[🏀coveralls 🏀coveralls-img],
@@ -1332,7 +1331,7 @@ module Kettle
       "PolyForm-Small-Business-1.0.0" => :x,
       "LicenseRef-Big-Time-Public-License" => :x
     }.freeze
-    APACHE_LICENSE_COMPAT_BADGE_DATA = {
+    APACHE_LICENSE_COMPAT_BADGE_DATA = Ractor.make_shareable({
       a: {
         alt: "Apache license compatibility: Category A",
         label: "Apache_Compatible:_Category_A",
@@ -1361,7 +1360,7 @@ module Kettle
         color: "6C757D",
         ref: "https://www.apache.org/legal/resolved.html"
       }
-    }.freeze
+    })
 
     class PluginRegistry
       Hook = Struct.new(:plugin_name, :phase, :timing, :callback)
@@ -3410,10 +3409,21 @@ module Kettle
       pack = with_event_phase(events, "recipe_pack") { recipe_pack(facts) }
       pack = with_event_phase(events, "recipe_filter") { filter_recipe_pack(pack, template_selection) }
       files = with_event_phase(events, "read_project_files") { read_project_files(project_root, pack) }
+      template_contents = with_event_phase(events, "read_template_files") { read_template_source_files(project_root, pack) }
       recipes = pack.fetch(:recipes)
       recipe_reports = with_event_phase(events, "recipes", total: recipes.length) do
         recipes.each_with_index.map do |recipe, index|
-          report = execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
+          report = timed_recipe_report do
+            execute_recipe(
+              project_root: project_root,
+              recipe: recipe,
+              facts: facts,
+              files: files,
+              template_contents: template_contents,
+              decision_policy: decision_policy,
+              env: env
+            )
+          end
           emit_recipe_event(events, report, index: index, total: recipes.length)
           report
         end
@@ -3544,9 +3554,7 @@ module Kettle
     end
 
     def emit_recipe_event(events, report, index:, total:)
-      emit_event(
-        events,
-        "recipe",
+      payload = {
         phase: "template",
         index: index + 1,
         total: total,
@@ -3555,7 +3563,19 @@ module Kettle
         changed: report.fetch(:changed, false),
         status: "ok",
         mark: report.fetch(:changed, false) ? "*" : "."
-      )
+      }
+      duration_ms = report.dig(:metadata, :duration_ms)
+      payload[:duration_ms] = duration_ms if duration_ms
+      emit_event(events, "recipe", payload)
+    end
+
+    def timed_recipe_report
+      started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      report = yield
+      duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000).round(3)
+      report[:metadata] = report.fetch(:metadata, {}).merge(duration_ms: duration_ms)
+      report.dig(:report_envelope, :report, :metadata)&.[]=(:duration_ms, duration_ms)
+      report
     end
 
     def emit_step_events(events, event_type, steps, phase:)
@@ -4498,7 +4518,7 @@ module Kettle
       replace_ruby_managed_block(content.to_s, replacement)
     end
 
-    def execute_recipe(project_root:, recipe:, facts:, files:, decision_policy:, env: ENV)
+    def execute_recipe(project_root:, recipe:, facts:, files:, decision_policy:, env: ENV, template_contents: nil)
       relative_path = recipe.fetch(:target_path)
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
@@ -4538,11 +4558,11 @@ module Kettle
       when /\Agithub_actions_workflow_snippets_/
         synchronize_github_actions_workflow_snippets(original, facts: facts)
       when "kettle_config_bootstrap"
-        apply_kettle_config_bootstrap(project_root, recipe, env: env)
+        apply_kettle_config_bootstrap(project_root, recipe, env: env, template_contents: template_contents)
       when /\Atemplate_source_preference_/
         original
       when /\Atemplate_source_application_/
-        apply_template_source(project_root, recipe, original, facts: facts, env: env)
+        apply_template_source(project_root, recipe, original, facts: facts, env: env, template_contents: template_contents)
       when "rakefile_scaffold_cleanup"
         deletion.fetch(:content)
       else
@@ -4551,7 +4571,7 @@ module Kettle
       final = normalize_generated_rakefile(final) if relative_path == "Rakefile"
       final = ensure_trailing_newline(final) unless delete_file_recipe?(recipe)
 
-      template_content = recipe_template_content(project_root, recipe)
+      template_content = recipe_template_content(project_root, recipe, template_contents: template_contents)
       request = content_recipe_execution_request(
         recipe_name: recipe.fetch(:primitive),
         recipe_version: "1",
@@ -4854,26 +4874,39 @@ module Kettle
     end
 
     def read_project_files(project_root, pack)
-      pack.fetch(:recipes).to_h do |recipe|
-        relative_path = recipe.fetch(:target_path)
+      pack.fetch(:recipes).map { |recipe| recipe.fetch(:target_path) }.uniq.to_h do |relative_path|
         path = File.join(project_root, relative_path)
         [relative_path, File.exist?(path) ? File.read(path) : ""]
       end
     end
 
-    def recipe_template_content(project_root, recipe)
-      return "" unless %w[
+    def read_template_source_files(project_root, pack)
+      pack.fetch(:recipes).filter_map { |recipe| recipe_template_content_path(project_root, recipe) }.uniq.to_h do |path|
+        [path, File.read(path)]
+      end
+    end
+
+    def recipe_template_content(project_root, recipe, template_contents: nil)
+      path = recipe_template_content_path(project_root, recipe)
+      return "" unless path
+
+      return template_contents.fetch(path) if template_contents&.key?(path)
+
+      File.read(path)
+    end
+
+    def recipe_template_content_path(project_root, recipe)
+      return unless %w[
         supplied_kettle_config_bootstrap
         supplied_template_source_preference
         supplied_template_source_application
       ].include?(recipe.fetch(:primitive))
 
       preference = recipe.fetch(:template_preference)
-      path = File.join(
+      File.join(
         preference.fetch(:source_root_path, project_root),
         preference.fetch(:source_relative_path, preference.fetch(:selected_source))
       )
-      File.read(path)
     end
 
     def normalize_generated_rakefile(content)
@@ -4904,11 +4937,11 @@ module Kettle
       content.to_s.lines.each_with_index.reject { |_line, index| remove_indexes.include?(index) }.map(&:first).join
     end
 
-    def apply_template_source(project_root, recipe, original, facts: nil, env: ENV)
+    def apply_template_source(project_root, recipe, original, facts: nil, env: ENV, template_contents: nil)
       strategy = recipe.dig(:template_preference, :strategy).to_s
       return original if strategy == "keep_destination"
 
-      content = recipe_template_content(project_root, recipe)
+      content = recipe_template_content(project_root, recipe, template_contents: template_contents)
       return finalize_github_workflow_template(content, facts) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
       return finalize_template_source_content(recipe, content) if strategy == "raw_copy"
 
@@ -8840,8 +8873,8 @@ module Kettle
       :text
     end
 
-    def apply_kettle_config_bootstrap(project_root, recipe, env: ENV)
-      content = recipe_template_content(project_root, recipe)
+    def apply_kettle_config_bootstrap(project_root, recipe, env: ENV, template_contents: nil)
+      content = recipe_template_content(project_root, recipe, template_contents: template_contents)
       tokens = stringify_template_tokens(recipe.fetch(:template_tokens, {}))
       content = resolve_template_tokens(content, tokens, scan_unresolved: false)
       bootstrap_licenses = Array(recipe[:bootstrap_licenses]).map(&:to_s).reject(&:empty?)
@@ -8918,7 +8951,16 @@ module Kettle
 
     def sync_kettle_config_internal_values(content)
       KETTLE_CONFIG_INTERNAL_SYNC_PATHS.reduce(content.to_s) do |updated, (path, value_provider)|
-        replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(value_provider.call, path: path))
+        replace_yaml_scalar_path(updated, path, yaml_config_scalar_literal(kettle_config_internal_value(value_provider), path: path))
+      end
+    end
+
+    def kettle_config_internal_value(value_provider)
+      case value_provider
+      when :version
+        VERSION
+      else
+        raise ArgumentError, "Unsupported kettle-jem internal config value provider: #{value_provider.inspect}"
       end
     end
 
@@ -10793,8 +10835,8 @@ module Kettle
     end
 
     def git_capture(project_root, *args)
-      output = IO.popen(["git", "-C", project_root.to_s, *args], err: File::NULL, &:read)
-      raise ArgumentError, "git #{args.join(" ")} failed" unless $CHILD_STATUS&.success?
+      output, status = Open3.capture2("git", "-C", project_root.to_s, *args, err: File::NULL)
+      raise ArgumentError, "git #{args.join(" ")} failed" unless status.success?
 
       output.to_s
     end
@@ -11167,7 +11209,7 @@ module Kettle
     end
 
     def project_gemspec_metadata(project_root, gemspec_path, spec: nil)
-      metadata = quiet_gemspec_reader_load(project_root)
+      metadata = GemSpecReader.load(project_root)
       spec ||= load_project_gemspec(gemspec_path)
       metadata = {} unless metadata.is_a?(Hash)
       metadata = metadata.dup
@@ -11263,17 +11305,6 @@ module Kettle
       uri.host == "github.com" && segments[2] == "tree" && segments[3] == "v#{version}"
     rescue URI::InvalidURIError
       false
-    end
-
-    def quiet_gemspec_reader_load(project_root)
-      original_stderr = $stderr
-      original_stdout = $stdout
-      $stderr = StringIO.new
-      $stdout = StringIO.new
-      GemSpecReader.load(project_root)
-    ensure
-      $stderr = original_stderr
-      $stdout = original_stdout
     end
 
     def metadata_value(metadata, key)
@@ -15098,6 +15129,6 @@ module Kettle
   end
 end
 
-if File.basename($PROGRAM_NAME).match?(/\Arake(?:\z|\.)/) || defined?(Rake.application)
+if File.basename(Process.argv0).match?(/\Arake(?:\z|\.)/) || defined?(Rake.application)
   Kettle::Jem.install_tasks
 end

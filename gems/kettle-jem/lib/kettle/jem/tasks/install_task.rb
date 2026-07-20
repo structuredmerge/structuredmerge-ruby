@@ -1179,7 +1179,7 @@ module Kettle
           normalized
         end
 
-        DEFAULT_GIT_DRIVER_DEFINITIONS = [
+        DEFAULT_GIT_DRIVER_DEFINITIONS = Ractor.make_shareable([
           {
             language: "ruby",
             pattern: "*.rb",
@@ -1204,14 +1204,14 @@ module Kettle
             diff_command: "smorg-rs diff-driver",
             merge_command: "smorg-rs merge-driver %O %A %B %P"
           }
-        ].freeze
-        GIT_DRIVER_LANGUAGE_REGISTRY = DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] }.freeze
+        ])
+        GIT_DRIVER_LANGUAGE_REGISTRY = Ractor.make_shareable(DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] })
 
-        BUILTIN_GIT_DIFF_ATTRIBUTES = [
+        BUILTIN_GIT_DIFF_ATTRIBUTES = Ractor.make_shareable([
           {path: ".gitattributes", pattern: "*.rb", attributes: {"diff" => "ruby"}},
           {path: ".gitattributes", pattern: "*.go", attributes: {"diff" => "golang"}},
           {path: ".gitattributes", pattern: "*.rs", attributes: {"diff" => "rust"}}
-        ].freeze
+        ])
 
         def git_drivers_step(project_root, run_options)
           mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
