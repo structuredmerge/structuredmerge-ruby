@@ -3501,6 +3501,7 @@ module Kettle
       recipes = pack.fetch(:recipes)
       recipe_planning_strategy = with_event_phase(events, "recipe_planning_strategy") { recipe_planning_strategy_for(env, run_options) }
       recipe_planning_workers = with_event_phase(events, "recipe_planning_workers") { recipe_planning_workers_for(env, run_options) }
+      recipe_planning_execution = {}
       recipe_reports = with_event_phase(events, "recipes", total: recipes.length) do
         execute_recipe_reports(
           project_root: project_root,
@@ -3512,7 +3513,8 @@ module Kettle
           env: env,
           events: events,
           strategy: recipe_planning_strategy,
-          workers: recipe_planning_workers
+          workers: recipe_planning_workers,
+          stats: recipe_planning_execution
         )
       end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
@@ -3543,6 +3545,7 @@ module Kettle
           phase_reports: phase_reports,
           recipe_planning_strategy: recipe_planning_strategy,
           recipe_planning_workers: recipe_planning_workers,
+          recipe_planning_execution: recipe_planning_execution,
           decision_policy: decision_policy.to_h,
           template_selection: template_selection,
           git_preflight: git_preflight,
@@ -3613,9 +3616,18 @@ module Kettle
       raise ArgumentError, "KETTLE_JEM_RACTOR_FILE_WORKERS must be a non-negative integer"
     end
 
-    def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:, workers: 0)
+    def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:, workers: 0, stats: nil)
       case strategy.to_s
       when "sequential"
+        record_recipe_planning_execution_stats(
+          stats,
+          worker_safe: 0,
+          main_only: recipes.length,
+          worker_count: 0,
+          spawned: 0,
+          ractor_recipes: 0,
+          main_recipes: recipes.length
+        )
         execute_recipe_reports_sequential(
           project_root: project_root,
           recipes: recipes,
@@ -3636,7 +3648,8 @@ module Kettle
           decision_policy: decision_policy,
           env: env,
           events: events,
-          workers: workers
+          workers: workers,
+          stats: stats
         )
       else
         raise ArgumentError, "Unsupported kettle-jem recipe planning strategy #{strategy.inspect}"
@@ -3659,12 +3672,23 @@ module Kettle
       end
     end
 
-    def execute_recipe_reports_classified(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, workers: 0)
+    def execute_recipe_reports_classified(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, workers: 0, stats: nil)
       indexed_recipes = recipes.each_with_index.to_a
       reports_by_index = {}
       worker_safe, main_only = indexed_recipes.partition { |recipe, _index| worker_safe_recipe?(recipe) }
+      use_ractors = workers.to_i.positive? && worker_safe.any?
+      worker_count = use_ractors ? [workers.to_i, worker_safe.length].min : 0
+      record_recipe_planning_execution_stats(
+        stats,
+        worker_safe: worker_safe.length,
+        main_only: main_only.length,
+        worker_count: worker_count,
+        spawned: worker_count,
+        ractor_recipes: use_ractors ? worker_safe.length : 0,
+        main_recipes: main_only.length + (use_ractors ? 0 : worker_safe.length)
+      )
       reports_by_index.merge!(
-        if workers.to_i.positive? && worker_safe.any?
+        if use_ractors
           execute_worker_safe_recipe_reports_ractor(
             project_root: project_root,
             indexed_recipes: worker_safe,
@@ -3673,7 +3697,7 @@ module Kettle
             template_contents: template_contents,
             decision_policy: decision_policy,
             env: env,
-            workers: workers.to_i
+            workers: worker_count
           )
         else
           execute_indexed_recipe_reports(
@@ -3722,30 +3746,58 @@ module Kettle
       end
     end
 
+    def record_recipe_planning_execution_stats(stats, worker_safe:, main_only:, worker_count:, spawned:, ractor_recipes:, main_recipes:)
+      return unless stats
+
+      stats[:worker_safe_recipes] = worker_safe
+      stats[:main_only_recipes] = main_only
+      stats[:ractor_worker_count] = worker_count
+      stats[:ractor_spawn_count] = spawned
+      stats[:ractor_recipe_count] = ractor_recipes
+      stats[:main_recipe_count] = main_recipes
+    end
+
     def execute_worker_safe_recipe_reports_ractor(project_root:, indexed_recipes:, facts:, files:, template_contents:, decision_policy:, env:, workers:)
-      indexed_recipes.each_slice(workers).each_with_object({}) do |slice, reports|
-        slice.map do |recipe, index|
-          started_at = monotonic_time
-          payload = Ractor.make_shareable({
-            project_root: project_root,
-            recipe: recipe,
-            facts: facts,
-            files: files,
-            template_contents: template_contents,
-            decision_policy: decision_policy,
-            env: env
-          })
-          [
-            index,
-            started_at,
-            Ractor.new(payload) do |worker_payload|
-              Kettle::Jem.execute_recipe(**worker_payload)
+      context = Ractor.make_shareable({
+        project_root: project_root,
+        facts: facts,
+        files: files,
+        template_contents: template_contents,
+        decision_policy: decision_policy,
+        env: env
+      })
+      chunks = Array.new(workers) { [] }
+      indexed_recipes.each_with_index do |job, offset|
+        chunks.fetch(offset % chunks.length) << job
+      end
+      pool = chunks.reject(&:empty?).map do |chunk|
+        jobs = Ractor.make_shareable(chunk.map { |recipe, index| {index: index, recipe: recipe} })
+        started_at = monotonic_time
+        [
+          started_at,
+          Ractor.new(context, jobs) do |worker_context, worker_jobs|
+            ractor_id = Ractor.current.object_id
+            worker_jobs.map do |job|
+              report = Kettle::Jem.execute_recipe(**worker_context.merge(recipe: job.fetch(:recipe)))
+              [job.fetch(:index), report, ractor_id]
             end
-          ]
-        end.each do |index, started_at, worker|
-          reports[index] = report_with_duration(worker.value, duration_ms_since(started_at))
+          end
+        ]
+      end
+      reports = {}
+      pool.each do |started_at, worker|
+        worker_results = worker.value
+        duration_ms = duration_ms_since(started_at)
+        worker_results.each do |index, report, ractor_id|
+          report = report_with_duration(report, duration_ms)
+          report[:metadata][:executor] = "ractor"
+          report[:metadata][:ractor_id] = ractor_id
+          report.dig(:report_envelope, :report, :metadata)[:executor] = "ractor"
+          report.dig(:report_envelope, :report, :metadata)[:ractor_id] = ractor_id
+          reports[index] = report
         end
       end
+      reports
     end
 
     def execute_timed_recipe(project_root:, recipe:, facts:, files:, template_contents:, decision_policy:, env:)

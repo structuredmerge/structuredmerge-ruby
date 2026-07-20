@@ -35,6 +35,11 @@ The default `template` benchmark compares:
 - file-only Ractor workers via `KETTLE_JEM_RACTOR_FILE_WORKERS`
 - combined planning and file Ractor workers
 
+Benchmark summaries include planning execution counters from each report:
+worker-safe recipe count, Ractor spawn count, and recipe count actually executed
+by Ractors. These counters distinguish "workers were enabled" from "work
+actually ran in Ractors".
+
 For `plan`, file-worker variants are skipped because no filesystem apply phase
 runs. The default `template --accept-config` run exercises kettle-jem's
 supported one-shot flow: environment variables seed `.structuredmerge/kettle-jem.yml`,

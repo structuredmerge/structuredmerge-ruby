@@ -120,10 +120,15 @@ end
 
 def report_snapshot(path)
   report = JSON.parse(File.read(path))
+  planning_execution = report.fetch("recipe_planning_execution", {})
   {
     strategy: report["recipe_planning_strategy"],
     planning_workers: report["recipe_planning_workers"],
     file_workers: report.fetch("file_work_workers", 0),
+    worker_safe_recipes: planning_execution.fetch("worker_safe_recipes", 0),
+    main_only_recipes: planning_execution.fetch("main_only_recipes", 0),
+    ractor_spawns: planning_execution.fetch("ractor_spawn_count", 0),
+    ractor_recipes: planning_execution.fetch("ractor_recipe_count", 0),
     recipes: Array(report["recipe_reports"]).length,
     changed: Array(report["changed_files"]).length
   }
@@ -218,14 +223,14 @@ def build_results_readme(payload)
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
     "| Source reports | `#{payload.fetch("report_root")}` |",
     "",
-    "| Variant | Min | Median | Mean | Max | Plan workers | File workers | Recipes | Changed |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    "| Variant | Min | Median | Mean | Max | Plan workers | File workers | Safe recipes | Ractor spawns | Ractor recipes | Recipes | Changed |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   ]
   variants.each do |name, result|
     summary = result.fetch("summary")
     snapshot = result.fetch("snapshot")
     lines << format(
-      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<plan>d | %<file>d | %<recipes>d | %<changed>d |",
+      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<plan>d | %<file>d | %<safe>d | %<spawns>d | %<ractor_recipes>d | %<recipes>d | %<changed>d |",
       name: name,
       min: format_seconds(summary.fetch("min")),
       median: format_seconds(summary.fetch("median")),
@@ -233,6 +238,9 @@ def build_results_readme(payload)
       max: format_seconds(summary.fetch("max")),
       plan: snapshot.fetch("planning_workers"),
       file: snapshot.fetch("file_workers"),
+      safe: snapshot.fetch("worker_safe_recipes"),
+      spawns: snapshot.fetch("ractor_spawns"),
+      ractor_recipes: snapshot.fetch("ractor_recipes"),
       recipes: snapshot.fetch("recipes"),
       changed: snapshot.fetch("changed")
     )
@@ -283,7 +291,7 @@ puts "runs: #{RUNS}"
 puts "worker counts: #{WORKER_COUNTS.join(", ")}"
 puts
 puts format(
-  "%-28s %8s %8s %8s %8s %7s %7s %7s %7s",
+  "%-28s %8s %8s %8s %8s %7s %7s %7s %7s %7s %7s %7s",
   "variant",
   "min",
   "median",
@@ -291,6 +299,9 @@ puts format(
   "max",
   "plan_w",
   "file_w",
+  "safe",
+  "spawns",
+  "r_jobs",
   "recipes",
   "changed"
 )
@@ -298,7 +309,7 @@ results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)
   puts format(
-    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %7d %7d %7d %7d",
+    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %7d %7d %7d %7d %7d %7d %7d",
     name,
     summary.fetch(:min),
     summary.fetch(:median),
@@ -306,6 +317,9 @@ results.each do |name, result|
     summary.fetch(:max),
     snapshot.fetch(:planning_workers),
     snapshot.fetch(:file_workers),
+    snapshot.fetch(:worker_safe_recipes),
+    snapshot.fetch(:ractor_spawns),
+    snapshot.fetch(:ractor_recipes),
     snapshot.fetch(:recipes),
     snapshot.fetch(:changed)
   )

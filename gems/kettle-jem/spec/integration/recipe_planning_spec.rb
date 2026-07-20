@@ -232,12 +232,17 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       normalize = lambda do |reports|
         Marshal.load(Marshal.dump(reports)).each do |report|
           report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:metadata)&.delete(:executor)
+          report.dig(:metadata)&.delete(:ractor_id)
           report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:executor)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:ractor_id)
         end
       end
 
       main_ractor = described_class.send(:execute_recipe_reports, **common.merge(workers: 0))
-      workers = described_class.send(:execute_recipe_reports, **common.merge(workers: 2))
+      stats = {}
+      workers = described_class.send(:execute_recipe_reports, **common.merge(workers: 2, stats: stats))
 
       expect(normalize.call(workers)).to eq(normalize.call(main_ractor))
       expect(workers.map { |report| report.fetch(:recipe_name) }).to eq(%w[
@@ -245,6 +250,17 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         noop_main_only
         github_actions_obsolete_workflow_cleanup_stale
       ])
+      expect(stats).to include(
+        worker_safe_recipes: 2,
+        main_only_recipes: 1,
+        ractor_worker_count: 2,
+        ractor_spawn_count: 2,
+        ractor_recipe_count: 2,
+        main_recipe_count: 1
+      )
+      expect(workers.fetch(0).dig(:metadata, :executor)).to eq("ractor")
+      expect(workers.fetch(2).dig(:metadata, :executor)).to eq("ractor")
+      expect(workers.fetch(1).dig(:metadata, :executor)).to be_nil
     end
   end
 

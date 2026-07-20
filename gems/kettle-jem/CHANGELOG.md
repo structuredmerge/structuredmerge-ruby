@@ -23,6 +23,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating now reuses static, shareable regexes and small lookup lists in the
   recipe dispatch and template-policy paths instead of reallocating them during
   each recipe execution.
+- Opt-in recipe-planning Ractor mode now batches worker-safe recipes across a
+  bounded chunked worker pool instead of spawning one Ractor per recipe.
 
 ### Fixed
 
@@ -55,8 +57,9 @@ Please file a bug if you notice a violation of semantic versioning.
   planning deduplicates destination and template-source file reads, and runtime
   loading is reduced to explicit main-Ractor extension points. A disabled
   classified planning strategy now identifies worker-safe recipes, can opt into
-  experimental Ractor workers with `KETTLE_JEM_RACTOR_WORKERS`, and preserves
-  sequential report parity in preparation for Ractor-based recipe planning.
+  experimental Ractor workers with `KETTLE_JEM_RACTOR_WORKERS`, records
+  execution counters, and preserves sequential report parity in preparation for
+  Ractor-based recipe planning.
 - Added a `benchmarks/` harness that templates a reset Bundler gem skeleton and
   compares classified planning and phase-gated file work with and without
   opt-in Ractor workers. The harness now defaults `KJ_MIN_RUBY` to `1.8.7` so
