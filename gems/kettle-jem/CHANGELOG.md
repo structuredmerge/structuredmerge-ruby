@@ -45,6 +45,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Generated READMEs can now render template-managed corporate sponsor logos
+  from `readme.corporate_sponsors` config or family-provided sponsorship data.
 - `kettle-jem` now supports `--events` for newline-delimited JSON progress
   events, including named event type filters via comma-separated
   `--events=TYPE,...` values, phase events, per-recipe template progress,

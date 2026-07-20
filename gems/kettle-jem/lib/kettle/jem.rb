@@ -348,6 +348,7 @@ module Kettle
       KJ|MIN_RUBY
       KJ|OPENCOLLECTIVE_ORG
       KJ|README:COPYRIGHT_NOTICE
+      KJ|README:CORPORATE_SPONSORS
       KJ|README:FAMILY_INTRO_BACKEND_MATRIX
       KJ|README:LICENSE_BADGE
       KJ|README:LICENSE_COMPAT_BADGE
@@ -2801,6 +2802,8 @@ module Kettle
         repository: facts[:repository]
       )
       facts[:readme_logo] = readme_logo unless readme_logo.empty?
+      readme_sponsors = readme_corporate_sponsors_facts(kettle_config, env)
+      facts[:readme_sponsors] = readme_sponsors unless readme_sponsors.empty?
       disabled_integrations = disabled_integrations(kettle_config, license: license)
       facts[:integrations] = {disabled: disabled_integrations} unless disabled_integrations.empty?
       template_facts = {}
@@ -3058,6 +3061,8 @@ module Kettle
           repository: facts[:repository]
         )
         facts[:readme_logo] = readme_logo unless readme_logo.empty?
+        readme_sponsors = readme_corporate_sponsors_facts(kettle_config, env)
+        facts[:readme_sponsors] = readme_sponsors unless readme_sponsors.empty?
         readme_style = readme_style_facts(
           project_root,
           kettle_config,
@@ -4141,6 +4146,7 @@ module Kettle
         "KJ|GL:USER" => "",
         "KJ|PROJECT_EMOJI" => "💎",
         "KJ|README:COPYRIGHT_NOTICE" => "",
+        "KJ|README:CORPORATE_SPONSORS" => "",
         "KJ|README:LICENSE_BADGE" => "",
         "KJ|README:LICENSE_COMPAT_BADGE" => "",
         "KJ|README:DEV_TEST_STACK_TABLE" => "",
@@ -10405,6 +10411,8 @@ module Kettle
         readme_url_template_tokens(facts.fetch(:repository, {}), package.fetch(:name).to_s, github_org)
       ).merge(
         readme_logo_template_tokens(facts.fetch(:readme_logo, {}))
+      ).merge(
+        readme_corporate_sponsor_template_tokens(facts.fetch(:readme_sponsors, {}))
       )
       org = funding[:open_collective_org].to_s
       tokens["KJ|OPENCOLLECTIVE_ORG"] = org
@@ -12025,6 +12033,76 @@ module Kettle
       )
     end
 
+    def readme_corporate_sponsors_facts(config, env)
+      sponsors = readme_corporate_sponsors(config, env)
+      compact_hash(
+        entries: sponsors,
+        row: readme_corporate_sponsors_row(sponsors)
+      )
+    end
+
+    def readme_corporate_sponsors(config, env)
+      readme_config = readme_config_hash(config)
+      configured = normalize_readme_corporate_sponsors(
+        readme_config["corporate_sponsors"] || readme_config["sponsors"]
+      )
+      inherited = normalize_readme_corporate_sponsors_json(env["KETTLE_JEM_CORPORATE_SPONSORS_JSON"])
+      deduplicate_readme_corporate_sponsors(configured + inherited)
+    end
+
+    def normalize_readme_corporate_sponsors_json(value)
+      clean = value.to_s.strip
+      return [] if clean.empty?
+
+      parsed = JSON.parse(clean)
+      normalize_readme_corporate_sponsors(parsed)
+    rescue JSON::ParserError
+      raise ArgumentError, "invalid KETTLE_JEM_CORPORATE_SPONSORS_JSON"
+    end
+
+    def normalize_readme_corporate_sponsors(value)
+      Array(value).filter_map do |entry|
+        unless entry.is_a?(Hash)
+          raise ArgumentError, "corporate sponsor entries must be mappings with name, url, and img_src"
+        end
+
+        name = entry["name"].to_s.strip
+        url = entry["url"].to_s.strip
+        img_src = entry["img_src"].to_s.strip
+        if name.empty? || url.empty? || img_src.empty?
+          raise ArgumentError, "corporate sponsor entries require name, url, and img_src"
+        end
+
+        {
+          name: name,
+          url: url,
+          img_src: img_src
+        }
+      end
+    end
+
+    def deduplicate_readme_corporate_sponsors(sponsors)
+      sponsors
+        .group_by { |sponsor| [sponsor[:name], sponsor[:url], sponsor[:img_src]] }
+        .values
+        .map(&:first)
+    end
+
+    def readme_corporate_sponsors_row(sponsors)
+      return "" if sponsors.empty?
+
+      label = sponsors.one? ? "Corporate sponsor:" : "Corporate sponsors:"
+      logos = sponsors.map do |sponsor|
+        [
+          %(<a href="#{html_attribute_escape(sponsor.fetch(:url))}">),
+          %(<img alt="#{html_attribute_escape(sponsor.fetch(:name))}"),
+          %( src="#{html_attribute_escape(sponsor.fetch(:img_src))}" height="24"/>),
+          "</a>"
+        ].join
+      end.join(" ")
+      %(<p><sub>#{label} #{logos} <a href="#-floss-funding">Become a sponsor</a></sub></p>)
+    end
+
     def readme_top_logo_options(config)
       readme_logo_options_from_config(config, "top_logos", "top_logo_options", README_TOP_LOGO_DEFAULTS)
     end
@@ -12312,6 +12390,12 @@ module Kettle
         "KJ|README:H2_SYNOPSIS_LOGO_ROW" => readme_logo[:h2_synopsis_logo_row].to_s,
         "KJ|README:TOP_LOGO_ROW" => readme_logo[:top_logo_row].to_s,
         "KJ|README:TOP_LOGO_REFS" => readme_logo[:top_logo_refs].to_s
+      }
+    end
+
+    def readme_corporate_sponsor_template_tokens(readme_sponsors)
+      {
+        "KJ|README:CORPORATE_SPONSORS" => readme_sponsors[:row].to_s
       }
     end
 

@@ -212,6 +212,15 @@ workflows:
 readme:
   top_logos: org
   h2_synopsis_logos: related-org,ruby
+  # Optional corporate sponsor logos shown near the top of the generated README.
+  # These entries are template-managed and render a compact logo row that links
+  # down to the generated FLOSS Funding section. Configure project-specific
+  # sponsors here; configure family-wide sponsors in kettle-family's config.
+  #
+  # corporate_sponsors:
+  #   - name: Example Corp
+  #     url: https://example.com
+  #     img_src: https://example.com/logo.svg
   # Optional package-family README block.
   # Supported values: structuredmerge
   # Leave unset for standalone kettle-rb gems and most projects.

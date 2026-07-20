@@ -13556,6 +13556,106 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "renders configured corporate sponsor logos near the top of README" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-sponsor-token-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          readme:
+            corporate_sponsors:
+              - name: Example & Sons
+                url: https://example.com/sponsor?from=kettle&level=gold
+                img_src: https://example.com/logo.svg?badge=1&size=small
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => <<~MARKDOWN
+          Top funding row.
+          {KJ|README:CORPORATE_SPONSORS}
+
+          ## 🦷 FLOSS Funding
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+      final_content = template_report.fetch(:final_content)
+      expected_sponsor_row = [
+        %(<p><sub>Corporate sponsor: <a href="https://example.com/sponsor?from=kettle&amp;level=gold">),
+        %(<img alt="Example &amp; Sons" src="https://example.com/logo.svg?badge=1&amp;size=small" height="24"/>),
+        %(</a> <a href="#-floss-funding">Become a sponsor</a></sub></p>)
+      ].join
+
+      expect(final_content).to include(expected_sponsor_row)
+      expect(template_report.dig(:metadata, :template_tokens)).to include(
+        "KJ|README:CORPORATE_SPONSORS" => a_string_including("Corporate sponsor:")
+      )
+    end
+  end
+
+  it "renders corporate sponsors inherited from kettle-family environment" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-family-sponsor-token-slice", tmp_root) do |root|
+      sponsors_json = JSON.generate([
+        {
+          "name" => "Family Sponsor",
+          "url" => "https://family.example",
+          "img_src" => "https://family.example/logo.svg"
+        }
+      ])
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example-gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - README.md
+        YAML
+        "template/README.md.example" => "{KJ|README:CORPORATE_SPONSORS}\n"
+      })
+
+      plan = described_class.plan_project(
+        root,
+        env: {"KETTLE_JEM_CORPORATE_SPONSORS_JSON" => sponsors_json}
+      )
+      template_report = plan[:recipe_reports].find do |report|
+        report.fetch(:recipe_name) == "template_source_application_README_md"
+      end
+
+      expect(template_report.fetch(:final_content)).to include(
+        %(<img alt="Family Sponsor" src="https://family.example/logo.svg" height="24"/>)
+      )
+      expect(plan.dig(:facts, :readme_sponsors, :entries)).to eq([
+        {
+          name: "Family Sponsor",
+          url: "https://family.example",
+          img_src: "https://family.example/logo.svg"
+        }
+      ])
+    end
+  end
+
   it "keeps generated Synopsis H2 logo HTML when normalizing existing README headings and prunes stale logo refs" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
