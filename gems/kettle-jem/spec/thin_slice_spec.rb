@@ -253,6 +253,68 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "turns changed recipe reports into deterministic write intents" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-write-intents", tmp_root) do |root|
+      write_report = {
+        changed: true,
+        relative_path: "lib/example.rb",
+        recipe_name: "generated_lib_file",
+        final_content: "# generated\n",
+        metadata: {destination_existed: false}
+      }
+      delete_report = {
+        changed: true,
+        relative_path: ".github/workflows/old.yml",
+        recipe_name: "github_actions_obsolete_workflow_cleanup_old",
+        metadata: {delete_file: true}
+      }
+      unchanged_report = write_report.merge(changed: false)
+
+      write_intent = described_class.send(:write_intent_from_recipe_report, root, write_report)
+      delete_intent = described_class.send(:write_intent_from_recipe_report, root, delete_report)
+
+      expect(write_intent.action).to eq(:write)
+      expect(write_intent.relative_path).to eq("lib/example.rb")
+      expect(write_intent.absolute_path).to eq(File.join(root, "lib/example.rb"))
+      expect(write_intent.content).to eq("# generated\n")
+      expect(write_intent.recipe_name).to eq("generated_lib_file")
+      expect(write_intent.metadata).to eq(destination_existed: false)
+      expect(delete_intent.action).to eq(:delete)
+      expect(delete_intent.content).to be_nil
+      expect(described_class.send(:write_intent_from_recipe_report, root, unchanged_report)).to be_nil
+    end
+  end
+
+  it "commits write intents sequentially while preserving current apply behavior" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-write-intent-commit", tmp_root) do |root|
+      FileUtils.mkdir_p(File.join(root, "obsolete"))
+      File.write(File.join(root, "obsolete/file.txt"), "old\n")
+      write_intent = described_class::WriteIntent.new(
+        relative_path: "lib/example.rb",
+        absolute_path: File.join(root, "lib/example.rb"),
+        action: :write,
+        content: "# generated\n",
+        recipe_name: "generated_lib_file"
+      )
+      delete_intent = described_class::WriteIntent.new(
+        relative_path: "obsolete/file.txt",
+        absolute_path: File.join(root, "obsolete/file.txt"),
+        action: :delete,
+        recipe_name: "obsolete_file_cleanup"
+      )
+
+      described_class.send(:commit_write_intent, write_intent)
+      described_class.send(:commit_write_intent, delete_intent)
+
+      expect(File.read(File.join(root, "lib/example.rb"))).to eq("# generated\n")
+      expect(File).not_to exist(File.join(root, "obsolete/file.txt"))
+    end
+  end
+
   it "normalizes GitHub remote source URLs structurally" do
     expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
       "https://github.com/rubythems/them-server"

@@ -1600,6 +1600,27 @@ module Kettle
       end
     end
 
+    class WriteIntent
+      attr_reader :relative_path, :absolute_path, :action, :content, :recipe_name, :metadata
+
+      def initialize(relative_path:, absolute_path:, action:, content: nil, recipe_name: nil, metadata: {})
+        @relative_path = relative_path.to_s
+        @absolute_path = absolute_path.to_s
+        @action = action.to_sym
+        @content = content
+        @recipe_name = recipe_name
+        @metadata = metadata || {}
+      end
+
+      def delete?
+        action == :delete
+      end
+
+      def write?
+        action == :write
+      end
+    end
+
     module TemplateChecksums
       YAML_KEY = "kettle-jem"
       CHECKSUMS_SUBKEY = "checksums"
@@ -10373,8 +10394,8 @@ module Kettle
             phase_stats: phase_stats
           )
         end
-        reports_by_phase.fetch(phase, []).each do |recipe_report|
-          apply_recipe_report(project_root, recipe_report)
+        write_intents_for_phase(project_root, reports_by_phase.fetch(phase, [])).each do |write_intent|
+          commit_write_intent(write_intent)
         end
         unless plugin_registry.empty?
           plugin_registry.run(
@@ -10398,14 +10419,39 @@ module Kettle
     end
 
     def apply_recipe_report(project_root, recipe_report)
+      intent = write_intent_from_recipe_report(project_root, recipe_report)
+      commit_write_intent(intent) if intent
+    end
+
+    def write_intents_for_phase(project_root, recipe_reports)
+      recipe_reports.filter_map { |recipe_report| write_intent_from_recipe_report(project_root, recipe_report) }
+    end
+
+    def write_intent_from_recipe_report(project_root, recipe_report)
       return unless recipe_report[:changed]
 
-      path = File.join(project_root, recipe_report.fetch(:relative_path))
-      if recipe_report.dig(:metadata, :delete_file)
+      relative_path = recipe_report.fetch(:relative_path)
+      action = recipe_report.dig(:metadata, :delete_file) ? :delete : :write
+      content = action == :write ? recipe_report.fetch(:final_content) : nil
+      WriteIntent.new(
+        relative_path: relative_path,
+        absolute_path: File.join(project_root, relative_path),
+        action: action,
+        content: content,
+        recipe_name: recipe_report[:recipe_name],
+        metadata: recipe_report.fetch(:metadata, {})
+      )
+    end
+
+    def commit_write_intent(write_intent)
+      path = write_intent.absolute_path
+      if write_intent.delete?
         FileUtils.rm_f(path)
-      else
+      elsif write_intent.write?
         FileUtils.mkdir_p(File.dirname(path))
-        File.write(path, recipe_report.fetch(:final_content))
+        File.write(path, write_intent.content)
+      else
+        raise ArgumentError, "Unsupported write intent action #{write_intent.action.inspect}"
       end
     end
 

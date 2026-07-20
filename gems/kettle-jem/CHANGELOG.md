@@ -53,6 +53,9 @@ Please file a bug if you notice a violation of semantic versioning.
   sequential report parity in preparation for Ractor-based recipe planning.
 - Added a `benchmarks/` harness that templates a reset Bundler gem skeleton and
   compares classified planning with and without opt-in Ractor workers.
+- Apply now routes recipe report mutations through explicit write intents before
+  committing them sequentially, preparing the file-processing path for future
+  actor/Ractor execution without changing write order.
 - Generated README Support & Community rows now include a RubyForum help badge.
 - Generated READMEs can now render template-managed corporate sponsor logos
   from `readme.corporate_sponsors` config or family-provided sponsorship data.
