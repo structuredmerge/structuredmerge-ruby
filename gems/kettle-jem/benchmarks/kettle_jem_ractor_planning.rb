@@ -16,13 +16,17 @@ REPORT_ROOT = File.join(PROJECT_ROOT, "tmp", "benchmarks", "reports")
 KETTLE_JEM_EXE = File.join(PROJECT_ROOT, "exe", "kettle-jem")
 
 RUNS = Integer(ENV.fetch("KETTLE_JEM_BENCHMARK_RUNS", "3"))
-WORKERS = Integer(
-  ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].min.to_s)
-)
+WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].min.to_s)
+  .split(",")
+  .map { |value| Integer(value.strip) }
+  .uniq
 COMMAND = ENV.fetch("KETTLE_JEM_BENCHMARK_COMMAND", "apply")
 
 raise "KETTLE_JEM_BENCHMARK_RUNS must be positive" unless RUNS.positive?
-raise "KETTLE_JEM_BENCHMARK_WORKERS must be positive" unless WORKERS.positive?
+raise "KETTLE_JEM_BENCHMARK_WORKERS must include at least one value" if WORKER_COUNTS.empty?
+unless WORKER_COUNTS.all?(&:positive?)
+  raise "KETTLE_JEM_BENCHMARK_WORKERS values must be positive"
+end
 raise "Missing fixture skeleton at #{FIXTURE_ROOT}" unless Dir.exist?(FIXTURE_ROOT)
 unless %w[plan apply template].include?(COMMAND)
   raise "Unsupported benchmark command #{COMMAND.inspect}"
@@ -46,22 +50,48 @@ BASE_ENV = {
   "hook_templates" => "false"
 }.freeze
 
-VARIANTS = [
-  {
-    name: "classified-main-ractor",
-    env: {
-      "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
-      "KETTLE_JEM_RACTOR_WORKERS" => "0"
+def benchmark_variants
+  variants = [
+    {
+      name: "baseline-main",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0"
+      }
     }
-  },
-  {
-    name: "classified-ractor-#{WORKERS}",
-    env: {
-      "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
-      "KETTLE_JEM_RACTOR_WORKERS" => WORKERS.to_s
+  ]
+
+  WORKER_COUNTS.each do |workers|
+    variants << {
+      name: "planning-ractor-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0"
+      }
     }
-  }
-].freeze
+    next if COMMAND == "plan"
+
+    variants << {
+      name: "file-ractor-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s
+      }
+    }
+    variants << {
+      name: "combined-ractor-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s
+      }
+    }
+  end
+  variants
+end
 
 def reset_worktree
   FileUtils.rm_rf(WORKTREE)
@@ -87,7 +117,8 @@ def report_snapshot(path)
   report = JSON.parse(File.read(path))
   {
     strategy: report["recipe_planning_strategy"],
-    workers: report["recipe_planning_workers"],
+    planning_workers: report["recipe_planning_workers"],
+    file_workers: report.fetch("file_work_workers", 0),
     recipes: Array(report["recipe_reports"]).length,
     changed: Array(report["changed_files"]).length
   }
@@ -131,7 +162,8 @@ FileUtils.rm_rf(REPORT_ROOT)
 FileUtils.mkdir_p(REPORT_ROOT)
 reset_worktree
 
-results = VARIANTS.to_h do |variant|
+variants = benchmark_variants
+results = variants.to_h do |variant|
   times = []
   snapshots = []
   RUNS.times do |index|
@@ -146,14 +178,17 @@ puts "kettle-jem Ractor planning benchmark"
 puts "fixture: #{FIXTURE_ROOT}"
 puts "command: kettle-jem #{COMMAND}"
 puts "runs: #{RUNS}"
+puts "worker counts: #{WORKER_COUNTS.join(", ")}"
 puts
 puts format(
-  "%-26s %8s %8s %8s %8s %7s %7s",
+  "%-28s %8s %8s %8s %8s %7s %7s %7s %7s",
   "variant",
   "min",
   "median",
   "mean",
   "max",
+  "plan_w",
+  "file_w",
   "recipes",
   "changed"
 )
@@ -161,12 +196,14 @@ results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)
   puts format(
-    "%-26s %8.3fs %8.3fs %8.3fs %8.3fs %7d %7d",
+    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %7d %7d %7d %7d",
     name,
     summary.fetch(:min),
     summary.fetch(:median),
     summary.fetch(:mean),
     summary.fetch(:max),
+    snapshot.fetch(:planning_workers),
+    snapshot.fetch(:file_workers),
     snapshot.fetch(:recipes),
     snapshot.fetch(:changed)
   )

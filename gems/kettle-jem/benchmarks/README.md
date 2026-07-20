@@ -1,7 +1,8 @@
 # kettle-jem benchmarks
 
 This directory contains a repeatable benchmark harness for comparing
-`kettle-jem` recipe planning with and without opt-in Ractor workers.
+`kettle-jem` recipe planning and phase-gated file work with and without opt-in
+Ractor workers.
 
 The fixture at `fixtures/skeleton/` is generated from a standard
 `bundle gem skeleton --git` run, with the generated `.git/` directory removed
@@ -22,10 +23,16 @@ Useful environment variables:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `KETTLE_JEM_BENCHMARK_RUNS` | `3` | Number of measured runs for each variant. |
-| `KETTLE_JEM_BENCHMARK_WORKERS` | `min(2, Etc.nprocessors)` | Worker count for the Ractor variant. |
+| `KETTLE_JEM_BENCHMARK_WORKERS` | `min(2, Etc.nprocessors)` | Comma-separated worker counts for Ractor variants. |
 | `KETTLE_JEM_BENCHMARK_COMMAND` | `apply` | Public `kettle-jem` command to benchmark: `plan`, `apply`, or `template`. |
 
-The default benchmark compares the `classified` planning strategy with
-`KETTLE_JEM_RACTOR_WORKERS=0` against the same strategy with Ractor workers
-enabled. The harness sets the first-run `kettle-jem` config values through
+The default `apply` benchmark compares:
+
+- baseline classified planning with no Ractor workers
+- planning-only Ractor workers via `KETTLE_JEM_RACTOR_WORKERS`
+- file-only Ractor workers via `KETTLE_JEM_RACTOR_FILE_WORKERS`
+- combined planning and file Ractor workers
+
+For `plan`, file-worker variants are skipped because no filesystem apply phase
+runs. The harness sets the first-run `kettle-jem` config values through
 environment variables so the copied skeleton can be templated non-interactively.

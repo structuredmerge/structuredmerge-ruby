@@ -52,7 +52,8 @@ Please file a bug if you notice a violation of semantic versioning.
   experimental Ractor workers with `KETTLE_JEM_RACTOR_WORKERS`, and preserves
   sequential report parity in preparation for Ractor-based recipe planning.
 - Added a `benchmarks/` harness that templates a reset Bundler gem skeleton and
-  compares classified planning with and without opt-in Ractor workers.
+  compares classified planning and phase-gated file work with and without
+  opt-in Ractor workers.
 - Apply now routes recipe report mutations through explicit write intents and
   phase-gated per-file work units, preparing the file-processing path for
   opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates
