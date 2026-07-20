@@ -26,9 +26,12 @@ module Kettle
             project_root: project_root,
             env: setup_env,
             run_options: run_options,
-            command_runner: command_runner
+            command_runner: command_runner,
+            event_phase: "template"
           )
-          report.merge(template_steps: template_steps)
+          final_report = report.merge(mode: "template", template_steps: template_steps)
+          Kettle::Jem.emit_summary_event(Kettle::Jem.event_stream_from_options(run_options), final_report)
+          final_report
         end
 
         def env_run_options(env)

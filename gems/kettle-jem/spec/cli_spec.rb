@@ -156,8 +156,31 @@ RSpec.describe Kettle::Jem::CLI do
       expect(err).to eq("")
       events = out.lines.map { |line| JSON.parse(line) }
       expect(events.first).to include("event_version" => 1, "type" => "run_start", "mode" => "plan")
+      expect(events).to include(include("type" => "phase_start", "phase" => "recipes"))
+      expect(events).to include(include("type" => "phase_finish", "phase" => "recipes", "status" => "ok"))
       expect(events).to include(include("type" => "recipe", "path" => Kettle::Jem::KETTLE_CONFIG_PATH))
       expect(events.last).to include("type" => "summary", "mode" => "plan")
+    end
+  end
+
+  it "filters newline-delimited JSON events by type" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+      })
+
+      status, out, err = run_cli(["plan", root, "--accept", "--events=recipe,summary"])
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      events = out.lines.map { |line| JSON.parse(line) }
+      expect(events.map { |event| event.fetch("type") }.uniq).to contain_exactly("recipe", "summary")
     end
   end
 

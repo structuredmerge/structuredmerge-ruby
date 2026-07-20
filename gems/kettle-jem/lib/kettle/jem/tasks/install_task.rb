@@ -46,7 +46,7 @@ module Kettle
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
-          report.merge(
+          final_report = report.merge(
             mode: "install",
             installed: true,
             install_steps: install_steps,
@@ -57,6 +57,8 @@ module Kettle
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
           )
+          Kettle::Jem.emit_summary_event(Kettle::Jem.event_stream_from_options(effective_run_options), final_report)
+          final_report
         end
 
         def install_run_options(env, run_options)
@@ -967,10 +969,17 @@ module Kettle
           expanded_path
         end
 
-        def execute_orchestration_steps(install_steps, project_root:, env:, run_options:, command_runner:)
+        def execute_orchestration_steps(install_steps, project_root:, env:, run_options:, command_runner:, event_phase: "install")
           quiet = Kettle::Jem::DecisionPolicy.value_to_boolean(run_options[:quiet])
+          events = Kettle::Jem.event_stream_from_options(run_options)
           install_steps.map do |step|
-            case step.fetch(:name)
+            Kettle::Jem.emit_step_event(
+              events,
+              "command_step",
+              step.merge(status: "started"),
+              phase: event_phase
+            )
+            result = case step.fetch(:name)
             when "mise_trust"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundled_handoff"
@@ -990,6 +999,8 @@ module Kettle
             else
               step
             end
+            Kettle::Jem.emit_step_event(events, "command_step", result, phase: event_phase)
+            result
           end
         end
 

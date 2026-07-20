@@ -305,6 +305,22 @@ module Kettle
     DEFAULT_RUBY_METHOD_MOVE_POLICY = "destination_order"
     SUPPORTED_YAML_COMMENT_MERGE_POLICIES = %w[preserve_destination template_fallback_when_missing template_documentation].freeze
     DEFAULT_TEMPLATE_YAML_COMMENT_MERGE_POLICY = "template_fallback_when_missing"
+    EVENT_TYPES = %w[
+      run_start
+      phase_start
+      phase_finish
+      recipe
+      post_apply_step
+      command_step
+      diagnostic
+      summary
+    ].freeze
+    DEFAULT_EVENT_TYPES = EVENT_TYPES.freeze
+    EVENT_TYPE_ALIASES = {
+      "all" => EVENT_TYPES,
+      "default" => DEFAULT_EVENT_TYPES,
+      "progress" => %w[run_start phase_start phase_finish recipe post_apply_step command_step summary]
+    }.freeze
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
     RUBY_TEMPLATE_SUFFIXES = %w[.gemspec .gemfile].freeze
     RUBY_TEMPLATE_EXTENSIONS = %w[.rb .rake].freeze
@@ -3373,25 +3389,31 @@ module Kettle
     end
 
     def plan_project(project_root, env: ENV, run_options: {})
-      ensure_runtime_dependencies!
       events = event_stream_from_options(run_options)
       emit_event(events, "run_start", mode: "plan", project_root: project_root.to_s)
-      preflight_project!(project_root)
-      template_selection = template_selection_for(env, run_options)
-      decision_policy = decision_policy_for(env, run_options)
-      git_preflight = git_preflight_report(project_root, template_selection: template_selection)
-      enforce_git_preflight!(git_preflight, decision_policy: decision_policy, template_selection: template_selection)
-      facts = discover_facts(project_root, env: env, run_options: run_options)
-      pack = recipe_pack(facts)
-      pack = filter_recipe_pack(pack, template_selection)
-      files = read_project_files(project_root, pack)
-      recipes = pack.fetch(:recipes)
-      recipe_reports = recipes.each_with_index.map do |recipe, index|
-        report = execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
-        emit_recipe_event(events, report, index: index, total: recipes.length)
-        report
+      with_event_phase(events, "runtime_dependencies") { ensure_runtime_dependencies! }
+      with_event_phase(events, "preflight") { preflight_project!(project_root) }
+      template_selection = with_event_phase(events, "template_selection") { template_selection_for(env, run_options) }
+      decision_policy = with_event_phase(events, "decision_policy") { decision_policy_for(env, run_options) }
+      git_preflight = with_event_phase(events, "git_preflight") do
+        git_preflight_report(project_root, template_selection: template_selection)
       end
-      plugin_registry = plugin_registry_for_project(project_root)
+      with_event_phase(events, "git_preflight_enforcement") do
+        enforce_git_preflight!(git_preflight, decision_policy: decision_policy, template_selection: template_selection)
+      end
+      facts = with_event_phase(events, "facts") { discover_facts(project_root, env: env, run_options: run_options) }
+      pack = with_event_phase(events, "recipe_pack") { recipe_pack(facts) }
+      pack = with_event_phase(events, "recipe_filter") { filter_recipe_pack(pack, template_selection) }
+      files = with_event_phase(events, "read_project_files") { read_project_files(project_root, pack) }
+      recipes = pack.fetch(:recipes)
+      recipe_reports = with_event_phase(events, "recipes", total: recipes.length) do
+        recipes.each_with_index.map do |recipe, index|
+          report = execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
+          emit_recipe_event(events, report, index: index, total: recipes.length)
+          report
+        end
+      end
+      plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
       diagnostics = recipe_reports.flat_map { |report| report[:diagnostics] }
       phase_reports = phase_reports_for(recipe_reports)
@@ -3404,27 +3426,30 @@ module Kettle
           active_runner_phases: []
         )
       end
+      emit_diagnostic_events(events, diagnostics)
       run_stats = recipe_run_stats(recipe_reports, diagnostics: diagnostics)
       warnings = Array(facts[:warnings]).map(&:to_s).reject(&:empty?)
       warnings.concat(github_workflow_template_pin_warnings(recipe_reports))
 
-      report = {
-        mode: "plan",
-        ready: true,
-        facts: facts,
-        recipe_pack: pack,
-        recipe_reports: recipe_reports,
-        phase_reports: phase_reports,
-        decision_policy: decision_policy.to_h,
-        template_selection: template_selection,
-        git_preflight: git_preflight,
-        decision_evaluations: decision_evaluations,
-        prompt_requests: prompt_requests,
-        changed_files: changed_files,
-        warnings: warnings.uniq,
-        diagnostics: diagnostics,
-        run_stats: run_stats
-      }
+      report = with_event_phase(events, "report") do
+        {
+          mode: "plan",
+          ready: true,
+          facts: facts,
+          recipe_pack: pack,
+          recipe_reports: recipe_reports,
+          phase_reports: phase_reports,
+          decision_policy: decision_policy.to_h,
+          template_selection: template_selection,
+          git_preflight: git_preflight,
+          decision_evaluations: decision_evaluations,
+          prompt_requests: prompt_requests,
+          changed_files: changed_files,
+          warnings: warnings.uniq,
+          diagnostics: diagnostics,
+          run_stats: run_stats
+        }
+      end
       emit_summary_event(events, report)
       report
     end
@@ -3439,33 +3464,78 @@ module Kettle
     end
 
     def apply_project(project_root, env: ENV, run_options: {})
+      events = event_stream_from_options(run_options)
       report = plan_project(project_root, env: env, run_options: run_options).merge(mode: "apply")
-      before_apply_files = snapshot_changed_files(
-        project_root,
-        report.fetch(:recipe_reports).filter_map { |entry| entry[:relative_path] }
-      )
-      run_apply_phases(project_root, report)
-      report[:changed_files] = actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
-      report[:post_apply_steps] = post_apply_steps(project_root, report)
+      with_event_phase(events, "apply") do
+        before_apply_files = with_event_phase(events, "snapshot_changed_files") do
+          snapshot_changed_files(
+            project_root,
+            report.fetch(:recipe_reports).filter_map { |entry| entry[:relative_path] }
+          )
+        end
+        with_event_phase(events, "write_template_files") { run_apply_phases(project_root, report) }
+        report[:changed_files] = with_event_phase(events, "actual_changed_files") do
+          actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
+        end
+        report[:post_apply_steps] = with_event_phase(events, "post_apply_steps") { post_apply_steps(project_root, report) }
+        emit_step_events(events, "post_apply_step", report.fetch(:post_apply_steps), phase: "post_apply")
+      end
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
         step.fetch(:changed_files, [])
       end).uniq.sort
-      report[:duplicate_drift] = duplicate_drift_report(
-        project_root: project_root,
-        template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
-        run_options: run_options
-      )
-      emit_summary_event(event_stream_from_options(run_options), report)
+      report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
+        duplicate_drift_report(
+          project_root: project_root,
+          template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
+          run_options: run_options
+        )
+      end
+      emit_summary_event(events, report)
       report
     end
 
-    def event_stream(io)
-      EventStream.new(io)
+    def event_stream(io, types: nil)
+      EventStream.new(io, types: parse_event_types(types))
+    end
+
+    def parse_event_types(types)
+      tokens = Array(types).flat_map { |value| value.to_s.split(",") }.map(&:strip).reject(&:empty?)
+      tokens = ["default"] if tokens.empty?
+      expanded = tokens.flat_map do |token|
+        normalized = token.tr("-", "_")
+        EVENT_TYPE_ALIASES.fetch(normalized, normalized)
+      end.uniq
+      unknown = expanded - EVENT_TYPES
+      raise ArgumentError, "Unknown event type(s): #{unknown.join(", ")}. Supported event types: #{EVENT_TYPES.join(", ")}" unless unknown.empty?
+
+      expanded
     end
 
     def event_stream_from_options(run_options)
       stream = (run_options || {})[:event_stream] || (run_options || {})["event_stream"]
       stream if stream.respond_to?(:emit)
+    end
+
+    def with_event_phase(events, phase, payload = {})
+      emit_phase_event(events, phase, status: "started", **payload)
+      result = yield
+      emit_phase_event(events, phase, status: "ok", **payload)
+      result
+    rescue => error
+      emit_phase_event(
+        events,
+        phase,
+        status: "failed",
+        error_class: error.class.name,
+        error_message: error.message,
+        **payload
+      )
+      raise
+    end
+
+    def emit_phase_event(events, phase, status:, **payload)
+      event_type = status == "started" ? "phase_start" : "phase_finish"
+      emit_event(events, event_type, payload.merge(phase: phase.to_s, status: status))
     end
 
     def emit_recipe_event(events, report, index:, total:)
@@ -3481,6 +3551,58 @@ module Kettle
         status: "ok",
         mark: report.fetch(:changed, false) ? "*" : "."
       )
+    end
+
+    def emit_step_events(events, event_type, steps, phase:)
+      Array(steps).each_with_index do |step, index|
+        emit_step_event(events, event_type, step, phase: phase, index: index + 1, total: Array(steps).length)
+      end
+    end
+
+    def emit_step_event(events, event_type, step, phase:, index: nil, total: nil)
+      emit_event(
+        events,
+        event_type,
+        phase: phase.to_s,
+        index: index,
+        total: total,
+        name: event_payload_value(step, :name),
+        status: event_payload_value(step, :status),
+        reason: event_payload_value(step, :reason),
+        command: event_payload_value(step, :command),
+        path: event_payload_value(step, :path),
+        changed_files: Array(event_payload_value(step, :changed_files) || []),
+        changed_count: Array(event_payload_value(step, :changed_files) || []).length,
+        mark: step_event_mark(step)
+      )
+    end
+
+    def step_event_mark(step)
+      return ">" if event_payload_value(step, :status).to_s == "started"
+      return "F" if %w[failed blocked].include?(event_payload_value(step, :status).to_s)
+
+      Array(event_payload_value(step, :changed_files) || []).empty? ? "." : "*"
+    end
+
+    def emit_diagnostic_events(events, diagnostics)
+      Array(diagnostics).each_with_index do |diagnostic, index|
+        payload = diagnostic.respond_to?(:to_h) ? diagnostic.to_h : {message: diagnostic.to_s}
+        emit_event(
+          events,
+          "diagnostic",
+          index: index + 1,
+          total: Array(diagnostics).length,
+          kind: payload[:kind] || payload["kind"] || payload[:key] || payload["key"],
+          severity: payload[:severity] || payload["severity"],
+          path: payload[:path] || payload["path"],
+          message: payload[:message] || payload["message"] || diagnostic.to_s,
+          blocking: payload[:blocking] || payload["blocking"]
+        )
+      end
+    end
+
+    def event_payload_value(payload, key)
+      payload.fetch(key, payload.fetch(key.to_s, nil))
     end
 
     def emit_summary_event(events, report)
@@ -3503,11 +3625,14 @@ module Kettle
     end
 
     class EventStream
-      def initialize(io)
+      def initialize(io, types:)
         @io = io
+        @types = types
       end
 
       def emit(payload)
+        return unless @types.include?(payload.fetch(:type).to_s)
+
         @io.puts(JSON.generate(payload.compact))
         @io.flush if @io.respond_to?(:flush)
       end

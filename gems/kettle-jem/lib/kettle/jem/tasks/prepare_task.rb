@@ -26,6 +26,13 @@ module Kettle
           )
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          events = Kettle::Jem.event_stream_from_options(effective_run_options)
+          Kettle::Jem.emit_step_event(
+            events,
+            "command_step",
+            {name: "bundle_update_templating_bootstrap", status: "started", command: bundle_update_templating_bootstrap_command(project_root)},
+            phase: "prepare"
+          )
           update_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_update_templating_bootstrap",
             bundle_update_templating_bootstrap_command(project_root),
@@ -33,6 +40,13 @@ module Kettle
             env: setup_env,
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
             command_runner: command_runner
+          )
+          Kettle::Jem.emit_step_event(events, "command_step", update_step, phase: "prepare")
+          Kettle::Jem.emit_step_event(
+            events,
+            "command_step",
+            {name: "bundle_install", status: "started", command: %w[bundle install]},
+            phase: "prepare"
           )
           bundle_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_install",
@@ -42,8 +56,9 @@ module Kettle
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
             command_runner: command_runner
           )
+          Kettle::Jem.emit_step_event(events, "command_step", bundle_step, phase: "prepare")
 
-          report.merge(
+          final_report = report.merge(
             mode: "prepare",
             prepared: update_step.fetch(:status) == "succeeded" &&
               bundle_step.fetch(:status) == "succeeded",
@@ -60,6 +75,8 @@ module Kettle
                 "updated critical templating gems, and ran bundle install."
             }]
           )
+          Kettle::Jem.emit_summary_event(events, final_report)
+          final_report
         end
 
         def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)

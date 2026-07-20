@@ -11,11 +11,11 @@ module Kettle
         Usage:
           kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
           kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-          kettle-jem prepare [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force] [--quiet|--verbose]
-          kettle-jem plan [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem apply [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem template [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem install [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--quiet|--verbose]
+          kettle-jem plan [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem manifest [PROJECT_ROOT] [--json]
           kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
           kettle-jem version
@@ -76,7 +76,10 @@ module Kettle
         parser = OptionParser.new do |opts|
           opts.banner = USAGE
           opts.on("--json", "Print the full machine-readable result as JSON.") { options[:json] = true }
-          opts.on("--events", "Print newline-delimited JSON progress events.") { options[:events] = true }
+          opts.on("--events[=TYPES]", "Print newline-delimited JSON progress events. Optional comma-separated TYPES filter.") do |value|
+            options[:events] = true
+            options[:event_types] = value if value
+          end
           opts.on("--report PATH", "Write the full machine-readable result to PATH as JSON.") do |path|
             options[:report_path] = path
           end
@@ -172,7 +175,12 @@ module Kettle
 
       def execute(command, project_root:, env:, options:)
         run_options = options.fetch(:run_options)
-        run_options[:event_stream] = Kettle::Jem.event_stream(options.fetch(:event_io)) if options[:events]
+        if options[:events]
+          run_options[:event_stream] = Kettle::Jem.event_stream(
+            options.fetch(:event_io),
+            types: options[:event_types]
+          )
+        end
         case command
         when "setup"
           Kettle::Jem.setup_project(project_root, env: env, run_options: run_options)
