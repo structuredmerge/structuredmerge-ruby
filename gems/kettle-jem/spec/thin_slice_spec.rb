@@ -7507,12 +7507,12 @@ RSpec.describe Kettle::Jem do
 
           [[profiles.semantic-diff.attributes]]
           pattern = "*.rb"
-          diff = "smorg-ruby"
+          diff = "smorg-rb"
 
           [[profiles.semantic-diff.git_config]]
           scope = "global"
-          key = "diff.smorg-ruby.command"
-          value = "smorg-ruby diff-driver"
+          key = "diff.smorg-rb.command"
+          value = "smorg-rb diff-driver"
 
           [profiles.textconv-normalized]
           description = "Template-only profile"

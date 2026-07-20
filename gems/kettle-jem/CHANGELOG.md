@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated semantic diff Git driver configuration now consistently uses the
+  installed `smorg-rb` executable and Git diff driver name for Ruby diffs.
 - Generated multi-engine workflow files, including `heads.yml` and
   `dep-heads.yml`, now omit JRuby and TruffleRuby jobs when the project config
   declares an MRI-only `engines` list.
