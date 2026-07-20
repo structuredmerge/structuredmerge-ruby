@@ -40,6 +40,10 @@ worker-safe recipe count, Ractor spawn count, and recipe count actually executed
 by Ractors. These counters distinguish "workers were enabled" from "work
 actually ran in Ractors".
 
+Long runs print timestamped progress lines before and after each measured
+variant run, including elapsed seconds and recipe/change counts for completed
+runs.
+
 For `plan`, file-worker variants are skipped because no filesystem apply phase
 runs. The default `template --accept-config` run exercises kettle-jem's
 supported one-shot flow: environment variables seed `.structuredmerge/kettle-jem.yml`,

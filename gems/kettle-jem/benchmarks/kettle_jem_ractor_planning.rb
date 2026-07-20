@@ -18,6 +18,7 @@ SUMMARY_PATH = File.join(PROJECT_ROOT, "tmp", "benchmarks", "summary.json")
 RESULTS_README = File.join(BENCHMARK_ROOT, "results", "README.md")
 KETTLE_JEM_EXE = File.join(PROJECT_ROOT, "exe", "kettle-jem")
 SUMMARIZE_ONLY = ARGV.delete("--summarize-only")
+STDOUT.sync = true
 
 RUNS = Integer(ENV.fetch("KETTLE_JEM_BENCHMARK_RUNS", "3"))
 WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].min.to_s)
@@ -118,6 +119,10 @@ def summarize(times)
   }
 end
 
+def progress(message)
+  puts "[#{Time.now.iso8601}] #{message}"
+end
+
 def report_snapshot(path)
   report = JSON.parse(File.read(path))
   planning_execution = report.fetch("recipe_planning_execution", {})
@@ -139,6 +144,7 @@ def run_variant(variant, index)
   env = ENV.to_h.merge(BASE_ENV).merge(variant.fetch(:env))
   command = benchmark_command(report_path)
 
+  progress("starting #{variant.fetch(:name)} run #{index}/#{RUNS}")
   reset_worktree
   started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   stdout, stderr, status = Open3.capture3(env, *command, chdir: WORKTREE)
@@ -153,7 +159,20 @@ def run_variant(variant, index)
     #{stderr}
   MESSAGE
 
-  [elapsed, report_snapshot(report_path)]
+  snapshot = report_snapshot(report_path)
+  progress(
+    format(
+      "finished %<variant>s run %<index>d/%<runs>d in %<elapsed>.3fs (%<recipes>d recipes, %<changed>d changed, %<ractor_jobs>d ractor jobs)",
+      variant: variant.fetch(:name),
+      index: index,
+      runs: RUNS,
+      elapsed: elapsed,
+      recipes: snapshot.fetch(:recipes),
+      changed: snapshot.fetch(:changed),
+      ractor_jobs: snapshot.fetch(:ractor_recipes)
+    )
+  )
+  [elapsed, snapshot]
 ensure
   reset_worktree
 end
@@ -273,6 +292,13 @@ FileUtils.mkdir_p(REPORT_ROOT)
 reset_worktree
 
 variants = benchmark_variants
+puts "kettle-jem Ractor planning benchmark"
+puts "fixture: #{FIXTURE_ROOT}"
+puts "command: kettle-jem #{COMMAND}"
+puts "runs: #{RUNS}"
+puts "worker counts: #{WORKER_COUNTS.join(", ")}"
+puts "variants: #{variants.length}"
+puts
 results = variants.to_h do |variant|
   times = []
   snapshots = []
@@ -284,11 +310,8 @@ results = variants.to_h do |variant|
   [variant.fetch(:name), {times: times, summary: summarize(times), snapshot: snapshots.last}]
 end
 
-puts "kettle-jem Ractor planning benchmark"
-puts "fixture: #{FIXTURE_ROOT}"
-puts "command: kettle-jem #{COMMAND}"
-puts "runs: #{RUNS}"
-puts "worker counts: #{WORKER_COUNTS.join(", ")}"
+puts
+puts "summary"
 puts
 puts format(
   "%-28s %8s %8s %8s %8s %7s %7s %7s %7s %7s %7s %7s",
