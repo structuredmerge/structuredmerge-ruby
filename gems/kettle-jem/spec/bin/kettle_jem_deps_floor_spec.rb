@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
-
 load File.expand_path("../../bin/kettle-jem-deps-floor", __dir__)
 
 RSpec.describe KettleJemDepsFloor do

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
 require "rake"
 
 RSpec.describe Kettle::Jem do

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
-
 RSpec.describe Kettle::Jem::Tasks::SelfTestTask do
   def write_file(root, relative_path, content)
     path = File.join(root, relative_path)

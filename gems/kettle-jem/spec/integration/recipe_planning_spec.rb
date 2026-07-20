@@ -1,0 +1,328 @@
+# frozen_string_literal: true
+
+RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
+  include_context "with isolated kettle-jem environment"
+  include_context "with kettle-jem fixture contracts"
+
+  it "deduplicates destination file reads while planning recipes" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-file-cache", tmp_root) do |root|
+      write_tree(root, {"README.md" => "# Example\n"})
+      pack = {
+        recipes: [
+          {target_path: "README.md"},
+          {target_path: "README.md"},
+          {target_path: "CHANGELOG.md"}
+        ]
+      }
+      readme_path = File.join(root, "README.md")
+
+      allow(File).to receive(:read).and_call_original
+
+      files = described_class.send(:read_project_files, root, pack)
+
+      expect(files).to eq("README.md" => "# Example\n", "CHANGELOG.md" => "")
+      expect(File).to have_received(:read).with(readme_path).once
+    end
+  end
+
+
+  it "deduplicates template source reads while planning recipes" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-template-cache", tmp_root) do |root|
+      write_tree(root, {"templates/README.md.example" => "# {KJ|GEM_NAME}\n"})
+      template_path = File.join(root, "templates/README.md.example")
+      template_preference = {
+        source_root_path: root,
+        source_relative_path: "templates/README.md.example",
+        selected_source: "templates/README.md.example"
+      }
+      pack = {
+        recipes: [
+          {primitive: "supplied_template_source_application", target_path: "README.md", template_preference: template_preference},
+          {primitive: "supplied_template_source_application", target_path: "README.md", template_preference: template_preference},
+          {primitive: "supplied_managed_text_block_replacement", target_path: "gemfiles/modular/shunted.gemfile"}
+        ]
+      }
+
+      allow(File).to receive(:read).and_call_original
+
+      contents = described_class.send(:read_template_source_files, root, pack)
+
+      expect(contents).to eq(template_path => "# {KJ|GEM_NAME}\n")
+      expect(File).to have_received(:read).with(template_path).once
+      expect(
+        described_class.send(:recipe_template_content, root, pack.fetch(:recipes).first, template_contents: contents)
+      ).to eq("# {KJ|GEM_NAME}\n")
+    end
+  end
+
+
+  it "records recipe timing metadata in top-level and envelope reports" do
+    report = described_class.send(:timed_recipe_report) do
+      {
+        metadata: {packaging_recipe: "example"},
+        report_envelope: {
+          report: {
+            metadata: {packaging_recipe: "example"}
+          }
+        }
+      }
+    end
+
+    expect(report.dig(:metadata, :duration_ms)).to be >= 0
+    expect(report.dig(:report_envelope, :report, :metadata, :duration_ms)).to eq(report.dig(:metadata, :duration_ms))
+  end
+
+
+  it "parses recipe planning strategies from options and env" do
+    expect(described_class.send(:recipe_planning_strategy_for, {}, {})).to eq("sequential")
+    expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {})).to eq("classified")
+    expect(described_class.send(:recipe_planning_strategy_for, {}, {recipe_planning_strategy: "true"})).to eq("classified")
+    expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {recipe_planning_strategy: "sequential"})).to eq("sequential")
+
+    expect do
+      described_class.send(:recipe_planning_strategy_for, {}, {recipe_planning_strategy: "ractor"})
+    end.to raise_error(ArgumentError, /Unsupported kettle-jem recipe planning strategy/)
+  end
+
+
+  it "parses Ractor recipe planning workers from options and env" do
+    expect(described_class.send(:recipe_planning_workers_for, {}, {})).to eq(0)
+    expect(described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "2"}, {})).to eq(2)
+    expect(described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "2"}, {recipe_planning_workers: "1"})).to eq(1)
+    expect(described_class.send(:recipe_planning_workers_for, {}, {ractor_workers: "3"})).to eq(3)
+
+    expect do
+      described_class.send(:recipe_planning_workers_for, {}, {recipe_planning_workers: "-1"})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+    expect do
+      described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "many"}, {})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+  end
+
+
+  it "classifies only side-effect-free cleanup and generated recipes as worker-safe for now" do
+    safe_recipe = {
+      name: "github_actions_obsolete_workflow_cleanup_old",
+      target_path: ".github/workflows/old.yml",
+      provider_family: "file",
+      primitive: "supplied_obsolete_file_deletion",
+      facts: []
+    }
+    main_only_recipe = {
+      name: "template_source_application_readme",
+      target_path: "README.md",
+      provider_family: "markdown",
+      primitive: "supplied_template_source_application",
+      facts: []
+    }
+
+    expect(described_class.send(:worker_safe_recipe?, safe_recipe)).to be(true)
+    expect(described_class.send(:worker_safe_recipe?, main_only_recipe)).to be(false)
+  end
+
+
+  it "keeps classified recipe planning report output equivalent to sequential planning" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-classified-planning", tmp_root) do |root|
+      write_tree(root, {
+        ".github/workflows/old.yml" => "name: old\n",
+        "README.md" => "# Example\n"
+      })
+      recipes = [
+        {
+          name: "noop_main_only",
+          target_path: "README.md",
+          provider_family: "markdown",
+          primitive: "noop",
+          facts: []
+        },
+        {
+          name: "github_actions_obsolete_workflow_cleanup_old",
+          target_path: ".github/workflows/old.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        }
+      ]
+      files = {
+        "README.md" => "# Example\n",
+        ".github/workflows/old.yml" => "name: old\n"
+      }
+      policy = described_class::DecisionPolicy.from_env({"force" => "true"})
+      common = {
+        project_root: root,
+        recipes: recipes,
+        facts: {},
+        files: files,
+        template_contents: {},
+        decision_policy: policy,
+        env: {},
+        events: nil
+      }
+
+      sequential = described_class.send(:execute_recipe_reports, **common.merge(strategy: "sequential"))
+      classified = described_class.send(:execute_recipe_reports, **common.merge(strategy: "classified"))
+      normalize = lambda do |reports|
+        Marshal.load(Marshal.dump(reports)).each do |report|
+          report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+        end
+      end
+
+      expect(normalize.call(classified)).to eq(normalize.call(sequential))
+      expect(classified.map { |report| report.fetch(:recipe_name) }).to eq(%w[noop_main_only github_actions_obsolete_workflow_cleanup_old])
+    end
+  end
+
+
+  it "keeps Ractor-backed classified recipe planning equivalent to main-Ractor classified planning" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-ractor-planning", tmp_root) do |root|
+      write_tree(root, {
+        ".github/workflows/old.yml" => "name: old\n",
+        ".github/workflows/stale.yml" => "name: stale\n",
+        "README.md" => "# Example\n"
+      })
+      recipes = [
+        {
+          name: "github_actions_obsolete_workflow_cleanup_old",
+          target_path: ".github/workflows/old.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        },
+        {
+          name: "noop_main_only",
+          target_path: "README.md",
+          provider_family: "markdown",
+          primitive: "noop",
+          facts: []
+        },
+        {
+          name: "github_actions_obsolete_workflow_cleanup_stale",
+          target_path: ".github/workflows/stale.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        }
+      ]
+      files = {
+        ".github/workflows/old.yml" => "name: old\n",
+        ".github/workflows/stale.yml" => "name: stale\n",
+        "README.md" => "# Example\n"
+      }
+      policy = described_class::DecisionPolicy.from_env({"force" => "true"})
+      common = {
+        project_root: root,
+        recipes: recipes,
+        facts: {},
+        files: files,
+        template_contents: {},
+        decision_policy: policy,
+        env: {},
+        events: nil,
+        strategy: "classified"
+      }
+      normalize = lambda do |reports|
+        Marshal.load(Marshal.dump(reports)).each do |report|
+          report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+        end
+      end
+
+      main_ractor = described_class.send(:execute_recipe_reports, **common.merge(workers: 0))
+      workers = described_class.send(:execute_recipe_reports, **common.merge(workers: 2))
+
+      expect(normalize.call(workers)).to eq(normalize.call(main_ractor))
+      expect(workers.map { |report| report.fetch(:recipe_name) }).to eq(%w[
+        github_actions_obsolete_workflow_cleanup_old
+        noop_main_only
+        github_actions_obsolete_workflow_cleanup_stale
+      ])
+    end
+  end
+
+
+  it "turns changed recipe reports into deterministic write intents" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-write-intents", tmp_root) do |root|
+      write_report = {
+        changed: true,
+        relative_path: "lib/example.rb",
+        recipe_name: "generated_lib_file",
+        final_content: "# generated\n",
+        metadata: {destination_existed: false}
+      }
+      delete_report = {
+        changed: true,
+        relative_path: ".github/workflows/old.yml",
+        recipe_name: "github_actions_obsolete_workflow_cleanup_old",
+        metadata: {delete_file: true}
+      }
+      unchanged_report = write_report.merge(changed: false)
+
+      write_intent = described_class.send(:write_intent_from_recipe_report, root, write_report)
+      delete_intent = described_class.send(:write_intent_from_recipe_report, root, delete_report)
+
+      expect(write_intent.action).to eq(:write)
+      expect(write_intent.relative_path).to eq("lib/example.rb")
+      expect(write_intent.absolute_path).to eq(File.join(root, "lib/example.rb"))
+      expect(write_intent.content).to eq("# generated\n")
+      expect(write_intent.recipe_name).to eq("generated_lib_file")
+      expect(write_intent.metadata).to eq(destination_existed: false)
+      expect(delete_intent.action).to eq(:delete)
+      expect(delete_intent.content).to be_nil
+      expect(described_class.send(:write_intent_from_recipe_report, root, unchanged_report)).to be_nil
+    end
+  end
+
+
+  it "commits write intents sequentially while preserving current apply behavior" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-write-intent-commit", tmp_root) do |root|
+      FileUtils.mkdir_p(File.join(root, "obsolete"))
+      File.write(File.join(root, "obsolete/file.txt"), "old\n")
+      write_intent = described_class::WriteIntent.new(
+        relative_path: "lib/example.rb",
+        absolute_path: File.join(root, "lib/example.rb"),
+        action: :write,
+        content: "# generated\n",
+        recipe_name: "generated_lib_file"
+      )
+      delete_intent = described_class::WriteIntent.new(
+        relative_path: "obsolete/file.txt",
+        absolute_path: File.join(root, "obsolete/file.txt"),
+        action: :delete,
+        recipe_name: "obsolete_file_cleanup"
+      )
+
+      described_class.send(:commit_write_intent, write_intent)
+      described_class.send(:commit_write_intent, delete_intent)
+
+      expect(File.read(File.join(root, "lib/example.rb"))).to eq("# generated\n")
+      expect(File).not_to exist(File.join(root, "obsolete/file.txt"))
+    end
+  end
+
+
+  it "normalizes GitHub remote source URLs structurally" do
+    expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
+      "https://github.com/rubythems/them-server"
+    )
+    expect(described_class.normalize_git_source_url("https://github.com/rubythems/them-server.git")).to eq(
+      "https://github.com/rubythems/them-server"
+    )
+    expect(described_class.normalize_git_source_url("https://gitlab.com/rubythems/them-server.git")).to eq(
+      "https://gitlab.com/rubythems/them-server.git"
+    )
+  end
+
+end

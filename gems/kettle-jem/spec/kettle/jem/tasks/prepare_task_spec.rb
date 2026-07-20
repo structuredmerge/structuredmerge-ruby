@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../../../spec_helper"
-
 RSpec.describe Kettle::Jem::Tasks::PrepareTask do
   def tmp_root
     File.expand_path("../../../../tmp", __dir__).tap { |path| FileUtils.mkdir_p(path) }

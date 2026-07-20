@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
 require "pathname"
 require "rbs"
 
@@ -289,8 +288,6 @@ RSpec.describe Kettle::Jem do
       write_file(root, "spec/nomono/version_spec.rb", <<~RUBY)
         # frozen_string_literal: true
 
-        require "spec_helper"
-
         RSpec.describe Nomono::Version do
           it_behaves_like "a Version module", described_class
         end
@@ -314,12 +311,8 @@ RSpec.describe Kettle::Jem do
       expect(gemspec).not_to include("version_gem")
       expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
       version_spec = File.read(File.join(root, "spec/nomono/version_spec.rb"))
-      expect(version_spec).to include(<<~RUBY)
-        require "spec_helper"
-        require "nomono/version_gem"
-
-        RSpec.describe Nomono::Version do
-      RUBY
+      expect(version_spec).to include('require "nomono/version_gem"')
+      expect(version_spec).to include("RSpec.describe Nomono::Version do")
     end
   end
 end

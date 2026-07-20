@@ -56,6 +56,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Apply now routes recipe report mutations through explicit write intents before
   committing them sequentially, preparing the file-processing path for future
   actor/Ractor execution without changing write order.
+- The former monolithic thin-slice spec has been split into behavior-named
+  integration, system, and end-to-end specs so the project test harness can
+  parallelize templating coverage more effectively.
 - Generated README Support & Community rows now include a RubyForum help badge.
 - Generated READMEs can now render template-managed corporate sponsor logos
   from `readme.corporate_sponsors` config or family-provided sponsorship data.

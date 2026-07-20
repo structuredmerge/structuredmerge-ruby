@@ -116,3 +116,16 @@ RSpec.shared_context "with isolated kettle-jem environment" do
     isolate_kettle_jem_env { example.run }
   end
 end
+
+RSpec.shared_context "with kettle-jem fixture contracts" do
+  let(:spec_root) { Pathname(__dir__).join("..").expand_path }
+  let(:project_root) { spec_root.join("..").expand_path }
+  let(:fixture_path) { spec_root.join("fixtures/thin_slice.json") }
+  let(:fixture) { JSON.parse(fixture_path.read, symbolize_names: true) }
+  let(:contract_path) { spec_root.join("../../../../fixtures/packaging/thin-slice-contract.json").expand_path }
+  let(:contract) { JSON.parse(contract_path.read, symbolize_names: true) }
+  let(:bootstrap_contract_path) { spec_root.join("fixtures/bootstrap_contract.json").expand_path }
+  let(:bootstrap_contract) { JSON.parse(bootstrap_contract_path.read, symbolize_names: true) }
+  let(:old_spec_contract_path) { spec_root.join("fixtures/old_spec_migration_contract.json").expand_path }
+  let(:old_spec_contract) { JSON.parse(old_spec_contract_path.read, symbolize_names: true) }
+end

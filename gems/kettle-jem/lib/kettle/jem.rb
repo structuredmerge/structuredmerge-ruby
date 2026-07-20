@@ -14,17 +14,7 @@ require "addressable/uri"
 require "token/resolver"
 require "yaml"
 require "ast/merge"
-require "ruby/merge"
-require "prism/merge"
-require "bash/merge"
-require "json/merge"
-require "dotenv/merge"
 require "rbs"
-require "rbs/merge"
-require "citrus-toml-merge"
-require "psych-merge"
-require "ast/crispr/markdown/markly"
-require "ast/crispr/ruby/prism"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
 require_relative "jem/version"
@@ -2132,6 +2122,16 @@ module Kettle
     def ensure_runtime_dependencies!
       return if defined?(@runtime_dependencies_loaded) && @runtime_dependencies_loaded
 
+      require "ruby/merge"
+      require "prism/merge"
+      require "bash/merge"
+      require "json/merge"
+      require "dotenv/merge"
+      require "rbs/merge"
+      require "citrus-toml-merge"
+      require "psych-merge"
+      require "ast/crispr/markdown/markly"
+      require "ast/crispr/ruby/prism"
       @runtime_dependencies_loaded = true
     end
     # rubocop:enable ThreadSafety/ClassInstanceVariable
