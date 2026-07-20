@@ -63,7 +63,9 @@ def benchmark_variants
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
-        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0"
+        "KETTLE_JEM_THREAD_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => "0"
       }
     }
   ]
@@ -74,7 +76,19 @@ def benchmark_variants
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
-        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0"
+        "KETTLE_JEM_THREAD_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => "0"
+      }
+    }
+    variants << {
+      name: "planning-thread-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_WORKERS" => workers.to_s,
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => "0"
       }
     }
     next if COMMAND == "plan"
@@ -84,7 +98,19 @@ def benchmark_variants
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
-        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s
+        "KETTLE_JEM_THREAD_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s,
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => "0"
+      }
+    }
+    variants << {
+      name: "file-thread-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => workers.to_s
       }
     }
     variants << {
@@ -92,7 +118,19 @@ def benchmark_variants
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
-        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s
+        "KETTLE_JEM_THREAD_WORKERS" => "0",
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => workers.to_s,
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => "0"
+      }
+    }
+    variants << {
+      name: "combined-thread-#{workers}",
+      env: {
+        "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
+        "KETTLE_JEM_RACTOR_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_WORKERS" => workers.to_s,
+        "KETTLE_JEM_RACTOR_FILE_WORKERS" => "0",
+        "KETTLE_JEM_THREAD_FILE_WORKERS" => workers.to_s
       }
     }
   end
@@ -130,14 +168,20 @@ def report_snapshot(path)
   {
     strategy: report["recipe_planning_strategy"],
     planning_workers: report["recipe_planning_workers"],
+    planning_thread_workers: report.fetch("recipe_planning_thread_workers", 0),
     file_workers: report.fetch("file_work_workers", 0),
+    file_thread_workers: report.fetch("file_work_thread_workers", 0),
     worker_safe_recipes: planning_execution.fetch("worker_safe_recipes", 0),
     main_only_recipes: planning_execution.fetch("main_only_recipes", 0),
     ractor_spawns: planning_execution.fetch("ractor_spawn_count", 0),
     ractor_recipes: planning_execution.fetch("ractor_recipe_count", 0),
+    thread_spawns: planning_execution.fetch("thread_spawn_count", 0),
+    thread_recipes: planning_execution.fetch("thread_recipe_count", 0),
     file_work_units: file_execution.fetch("file_work_units", 0),
     file_ractor_spawns: file_execution.fetch("file_ractor_spawn_count", 0),
     file_ractor_units: file_execution.fetch("file_ractor_units", 0),
+    file_thread_spawns: file_execution.fetch("file_thread_spawn_count", 0),
+    file_thread_units: file_execution.fetch("file_thread_units", 0),
     recipes: Array(report["recipe_reports"]).length,
     changed: Array(report["changed_files"]).length
   }
@@ -166,7 +210,7 @@ def run_variant(variant, index)
   snapshot = report_snapshot(report_path)
   progress(
     format(
-      "finished %<variant>s run %<index>d/%<runs>d in %<elapsed>.3fs (%<recipes>d recipes, %<changed>d changed, %<plan_ractor>d planning ractor recipes, %<file_ractor>d file ractor units)",
+      "finished %<variant>s run %<index>d/%<runs>d in %<elapsed>.3fs (%<recipes>d recipes, %<changed>d changed, plan ractor/thread %<plan_ractor>d/%<plan_thread>d, file ractor/thread %<file_ractor>d/%<file_thread>d)",
       variant: variant.fetch(:name),
       index: index,
       runs: RUNS,
@@ -174,7 +218,9 @@ def run_variant(variant, index)
       recipes: snapshot.fetch(:recipes),
       changed: snapshot.fetch(:changed),
       plan_ractor: snapshot.fetch(:ractor_recipes),
-      file_ractor: snapshot.fetch(:file_ractor_units)
+      plan_thread: snapshot.fetch(:thread_recipes),
+      file_ractor: snapshot.fetch(:file_ractor_units),
+      file_thread: snapshot.fetch(:file_thread_units)
     )
   )
   [elapsed, snapshot]
@@ -233,6 +279,7 @@ end
 
 def build_results_readme(payload)
   variants = payload.fetch("variants")
+  snapshot_count = ->(snapshot, key) { snapshot.fetch(key, 0) }
   lines = [
     "# kettle-jem benchmark results",
     "",
@@ -247,29 +294,31 @@ def build_results_readme(payload)
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
     "| Source reports | `#{payload.fetch("report_root")}` |",
     "",
-    "| Variant | Min | Median | Mean | Max | Plan workers | File workers | Safe recipes | Plan spawns | Plan Ractor recipes | File units | File spawns | File Ractor units | Recipes | Changed |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    "| Variant | Min | Median | Mean | Max | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   ]
   variants.each do |name, result|
     summary = result.fetch("summary")
     snapshot = result.fetch("snapshot")
     lines << format(
-      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<plan>d | %<file>d | %<safe>d | %<plan_spawns>d | %<plan_ractor_recipes>d | %<file_units>d | %<file_spawns>d | %<file_ractor_units>d | %<recipes>d | %<changed>d |",
+      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<plan_ractors>d | %<plan_threads>d | %<file_ractors>d | %<file_threads>d | %<safe>d | %<plan_ractor_recipes>d | %<plan_thread_recipes>d | %<file_units>d | %<file_ractor_units>d | %<file_thread_units>d | %<recipes>d | %<changed>d |",
       name: name,
       min: format_seconds(summary.fetch("min")),
       median: format_seconds(summary.fetch("median")),
       mean: format_seconds(summary.fetch("mean")),
       max: format_seconds(summary.fetch("max")),
-      plan: snapshot.fetch("planning_workers"),
-      file: snapshot.fetch("file_workers"),
-      safe: snapshot.fetch("worker_safe_recipes"),
-      plan_spawns: snapshot.fetch("ractor_spawns"),
-      plan_ractor_recipes: snapshot.fetch("ractor_recipes"),
-      file_units: snapshot.fetch("file_work_units"),
-      file_spawns: snapshot.fetch("file_ractor_spawns"),
-      file_ractor_units: snapshot.fetch("file_ractor_units"),
-      recipes: snapshot.fetch("recipes"),
-      changed: snapshot.fetch("changed")
+      plan_ractors: snapshot_count.call(snapshot, "planning_workers"),
+      plan_threads: snapshot_count.call(snapshot, "planning_thread_workers"),
+      file_ractors: snapshot_count.call(snapshot, "file_workers"),
+      file_threads: snapshot_count.call(snapshot, "file_thread_workers"),
+      safe: snapshot_count.call(snapshot, "worker_safe_recipes"),
+      plan_ractor_recipes: snapshot_count.call(snapshot, "ractor_recipes"),
+      plan_thread_recipes: snapshot_count.call(snapshot, "thread_recipes"),
+      file_units: snapshot_count.call(snapshot, "file_work_units"),
+      file_ractor_units: snapshot_count.call(snapshot, "file_ractor_units"),
+      file_thread_units: snapshot_count.call(snapshot, "file_thread_units"),
+      recipes: snapshot_count.call(snapshot, "recipes"),
+      changed: snapshot_count.call(snapshot, "changed")
     )
   end
   lines << ""
@@ -322,20 +371,22 @@ puts
 puts "summary"
 puts
 puts format(
-  "%-28s %8s %8s %8s %8s %7s %7s %7s %7s %7s %7s %7s %7s %7s %7s",
+  "%-28s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
   "variant",
   "min",
   "median",
   "mean",
   "max",
-  "plan_w",
-  "file_w",
+  "pr",
+  "pt",
+  "fr",
+  "ft",
   "safe",
-  "p_spawn",
-  "p_jobs",
   "f_units",
-  "f_spawn",
-  "f_jobs",
+  "pr_job",
+  "pt_job",
+  "fr_job",
+  "ft_job",
   "recipes",
   "changed"
 )
@@ -343,20 +394,22 @@ results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)
   puts format(
-    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %7d %7d %7d %7d %7d %7d %7d %7d %7d %7d",
+    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %7d %7d",
     name,
     summary.fetch(:min),
     summary.fetch(:median),
     summary.fetch(:mean),
     summary.fetch(:max),
     snapshot.fetch(:planning_workers),
+    snapshot.fetch(:planning_thread_workers),
     snapshot.fetch(:file_workers),
+    snapshot.fetch(:file_thread_workers),
     snapshot.fetch(:worker_safe_recipes),
-    snapshot.fetch(:ractor_spawns),
-    snapshot.fetch(:ractor_recipes),
     snapshot.fetch(:file_work_units),
-    snapshot.fetch(:file_ractor_spawns),
+    snapshot.fetch(:ractor_recipes),
+    snapshot.fetch(:thread_recipes),
     snapshot.fetch(:file_ractor_units),
+    snapshot.fetch(:file_thread_units),
     snapshot.fetch(:recipes),
     snapshot.fetch(:changed)
   )

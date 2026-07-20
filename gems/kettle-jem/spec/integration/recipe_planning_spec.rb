@@ -104,6 +104,21 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
+  it "parses thread recipe planning workers from options and env" do
+    expect(described_class.send(:recipe_planning_thread_workers_for, {}, {})).to eq(0)
+    expect(described_class.send(:recipe_planning_thread_workers_for, {"KETTLE_JEM_THREAD_WORKERS" => "2"}, {})).to eq(2)
+    expect(described_class.send(:recipe_planning_thread_workers_for, {"KETTLE_JEM_THREAD_WORKERS" => "2"}, {recipe_planning_thread_workers: "1"})).to eq(1)
+    expect(described_class.send(:recipe_planning_thread_workers_for, {}, {thread_workers: "3"})).to eq(3)
+
+    expect do
+      described_class.send(:recipe_planning_thread_workers_for, {}, {recipe_planning_thread_workers: "-1"})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+    expect do
+      described_class.send(:recipe_planning_thread_workers_for, {"KETTLE_JEM_THREAD_WORKERS" => "many"}, {})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+  end
+
+
   it "classifies side-effect-free cleanup and template-source recipes as worker-safe" do
     safe_recipe = {
       name: "github_actions_obsolete_workflow_cleanup_old",
@@ -300,6 +315,75 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
+  it "keeps thread-backed classified recipe planning equivalent to main-Ractor classified planning" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-thread-planning", tmp_root) do |root|
+      write_tree(root, {
+        ".github/workflows/old.yml" => "name: old\n",
+        "README.md" => "# Example\n"
+      })
+      recipes = [
+        {
+          name: "github_actions_obsolete_workflow_cleanup_old",
+          target_path: ".github/workflows/old.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        },
+        {
+          name: "noop_main_only",
+          target_path: "README.md",
+          provider_family: "markdown",
+          primitive: "noop",
+          facts: []
+        }
+      ]
+      files = {
+        ".github/workflows/old.yml" => "name: old\n",
+        "README.md" => "# Example\n"
+      }
+      policy = described_class::DecisionPolicy.from_env({"force" => "true"})
+      common = {
+        project_root: root,
+        recipes: recipes,
+        facts: {},
+        files: files,
+        template_contents: {},
+        decision_policy: policy,
+        env: {},
+        events: nil,
+        strategy: "classified"
+      }
+      normalize = lambda do |reports|
+        Marshal.load(Marshal.dump(reports)).each do |report|
+          report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:metadata)&.delete(:executor)
+          report.dig(:metadata)&.delete(:thread_id)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:executor)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:thread_id)
+        end
+      end
+
+      main_thread = described_class.send(:execute_recipe_reports, **common.merge(workers: 0))
+      stats = {}
+      workers = described_class.send(:execute_recipe_reports, **common.merge(thread_workers: 2, stats: stats))
+
+      expect(normalize.call(workers)).to eq(normalize.call(main_thread))
+      expect(stats).to include(
+        worker_safe_recipes: 1,
+        main_only_recipes: 0,
+        thread_worker_count: 2,
+        thread_spawn_count: 2,
+        thread_recipe_count: 2,
+        main_recipe_count: 0
+      )
+      expect(workers.map { |report| report.dig(:metadata, :executor) }).to eq(%w[thread thread])
+    end
+  end
+
+
   it "turns changed recipe reports into deterministic write intents" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -342,6 +426,17 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
 
     expect do
       described_class.send(:file_work_workers_for, {"KETTLE_JEM_RACTOR_FILE_WORKERS" => "-1"}, {})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+  end
+
+
+  it "parses opt-in thread file worker counts" do
+    expect(described_class.send(:file_work_thread_workers_for, {}, {})).to eq(0)
+    expect(described_class.send(:file_work_thread_workers_for, {"KETTLE_JEM_THREAD_FILE_WORKERS" => "3"}, {})).to eq(3)
+    expect(described_class.send(:file_work_thread_workers_for, {}, {file_work_thread_workers: 2})).to eq(2)
+
+    expect do
+      described_class.send(:file_work_thread_workers_for, {"KETTLE_JEM_THREAD_FILE_WORKERS" => "-1"}, {})
     end.to raise_error(ArgumentError, /non-negative integer/)
   end
 
@@ -475,6 +570,54 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         file_operations: 3,
         file_ractor_units: 2,
         file_ractor_spawn_count: 2,
+        main_file_units: 0
+      )
+    end
+  end
+
+
+  it "can commit independent file work units through threads within a phase" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-thread-file-work-units", tmp_root) do |root|
+      first_path = File.join(root, "lib/first.rb")
+      second_path = File.join(root, "lib/second.rb")
+      first_work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/first.rb",
+        operations: [
+          described_class::WriteIntent.new(
+            relative_path: "lib/first.rb",
+            absolute_path: first_path,
+            action: :write,
+            content: "first\n",
+            recipe_name: "first_recipe"
+          )
+        ]
+      )
+      second_work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/second.rb",
+        operations: [
+          described_class::WriteIntent.new(
+            relative_path: "lib/second.rb",
+            absolute_path: second_path,
+            action: :write,
+            content: "second\n",
+            recipe_name: "second_recipe"
+          )
+        ]
+      )
+      stats = described_class.send(:file_work_execution_stats, 0, 2)
+
+      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit], thread_workers: 2, stats: stats)
+
+      expect(File.read(first_path)).to eq("first\n")
+      expect(File.read(second_path)).to eq("second\n")
+      expect(stats).to include(
+        file_thread_worker_count: 2,
+        file_work_units: 2,
+        file_operations: 2,
+        file_thread_units: 2,
+        file_thread_spawn_count: 2,
         main_file_units: 0
       )
     end

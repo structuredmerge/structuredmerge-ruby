@@ -27,6 +27,9 @@ Please file a bug if you notice a violation of semantic versioning.
   bounded chunked worker pool instead of spawning one Ractor per recipe, and it
   keeps parser/merge paths with known unshareable dependency state on the main
   Ractor.
+- Templating can now opt into thread-backed recipe planning and file work with
+  `KETTLE_JEM_THREAD_WORKERS` and `KETTLE_JEM_THREAD_FILE_WORKERS`, providing a
+  benchmarkable alternative to main-thread and Ractor execution.
 
 ### Fixed
 
@@ -68,8 +71,8 @@ Please file a bug if you notice a violation of semantic versioning.
   benchmark runs exercise legacy workflow and gemfile generation through the
   supported one-shot `template --accept-config` flow, prints progress while
   long benchmark matrices run, records planning and file-worker execution
-  counters, and records the latest benchmark outcome in a committed results
-  README.
+  counters for both Ractors and threads, and records the latest benchmark
+  outcome in a committed results README.
 - Apply now routes recipe report mutations through explicit write intents and
   phase-gated per-file work units, preparing the file-processing path for
   opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates

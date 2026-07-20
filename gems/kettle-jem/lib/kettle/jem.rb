@@ -3509,6 +3509,7 @@ module Kettle
       recipes = pack.fetch(:recipes)
       recipe_planning_strategy = with_event_phase(events, "recipe_planning_strategy") { recipe_planning_strategy_for(env, run_options) }
       recipe_planning_workers = with_event_phase(events, "recipe_planning_workers") { recipe_planning_workers_for(env, run_options) }
+      recipe_planning_thread_workers = with_event_phase(events, "recipe_planning_thread_workers") { recipe_planning_thread_workers_for(env, run_options) }
       recipe_planning_execution = {}
       recipe_reports = with_event_phase(events, "recipes", total: recipes.length) do
         execute_recipe_reports(
@@ -3522,6 +3523,7 @@ module Kettle
           events: events,
           strategy: recipe_planning_strategy,
           workers: recipe_planning_workers,
+          thread_workers: recipe_planning_thread_workers,
           stats: recipe_planning_execution
         )
       end
@@ -3553,6 +3555,7 @@ module Kettle
           phase_reports: phase_reports,
           recipe_planning_strategy: recipe_planning_strategy,
           recipe_planning_workers: recipe_planning_workers,
+          recipe_planning_thread_workers: recipe_planning_thread_workers,
           recipe_planning_execution: recipe_planning_execution,
           decision_policy: decision_policy.to_h,
           template_selection: template_selection,
@@ -3608,6 +3611,22 @@ module Kettle
       raise ArgumentError, "KETTLE_JEM_RACTOR_WORKERS must be a non-negative integer"
     end
 
+    def recipe_planning_thread_workers_for(env, run_options)
+      value = (run_options || {})[:thread_workers] ||
+        (run_options || {})["thread_workers"] ||
+        (run_options || {})[:recipe_planning_thread_workers] ||
+        (run_options || {})["recipe_planning_thread_workers"] ||
+        (env || {})["KETTLE_JEM_THREAD_WORKERS"]
+      return 0 if value.nil? || value.to_s.strip.empty?
+
+      workers = Integer(value)
+      raise ArgumentError, "KETTLE_JEM_THREAD_WORKERS must be >= 0" if workers.negative?
+
+      workers
+    rescue ArgumentError
+      raise ArgumentError, "KETTLE_JEM_THREAD_WORKERS must be a non-negative integer"
+    end
+
     def file_work_workers_for(env, run_options)
       value = (run_options || {})[:ractor_file_workers] ||
         (run_options || {})["ractor_file_workers"] ||
@@ -3624,7 +3643,23 @@ module Kettle
       raise ArgumentError, "KETTLE_JEM_RACTOR_FILE_WORKERS must be a non-negative integer"
     end
 
-    def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:, workers: 0, stats: nil)
+    def file_work_thread_workers_for(env, run_options)
+      value = (run_options || {})[:thread_file_workers] ||
+        (run_options || {})["thread_file_workers"] ||
+        (run_options || {})[:file_work_thread_workers] ||
+        (run_options || {})["file_work_thread_workers"] ||
+        (env || {})["KETTLE_JEM_THREAD_FILE_WORKERS"]
+      return 0 if value.nil? || value.to_s.strip.empty?
+
+      workers = Integer(value)
+      raise ArgumentError, "KETTLE_JEM_THREAD_FILE_WORKERS must be >= 0" if workers.negative?
+
+      workers
+    rescue ArgumentError
+      raise ArgumentError, "KETTLE_JEM_THREAD_FILE_WORKERS must be a non-negative integer"
+    end
+
+    def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:, workers: 0, thread_workers: 0, stats: nil)
       case strategy.to_s
       when "sequential"
         record_recipe_planning_execution_stats(
@@ -3634,6 +3669,9 @@ module Kettle
           worker_count: 0,
           spawned: 0,
           ractor_recipes: 0,
+          thread_worker_count: 0,
+          thread_spawns: 0,
+          thread_recipes: 0,
           main_recipes: recipes.length
         )
         execute_recipe_reports_sequential(
@@ -3657,6 +3695,7 @@ module Kettle
           env: env,
           events: events,
           workers: workers,
+          thread_workers: thread_workers,
           stats: stats
         )
       else
@@ -3680,23 +3719,44 @@ module Kettle
       end
     end
 
-    def execute_recipe_reports_classified(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, workers: 0, stats: nil)
+    def execute_recipe_reports_classified(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, workers: 0, thread_workers: 0, stats: nil)
       indexed_recipes = recipes.each_with_index.to_a
       reports_by_index = {}
       worker_safe, main_only = indexed_recipes.partition { |recipe, _index| worker_safe_recipe?(recipe) }
+      use_threads = thread_workers.to_i.positive?
       use_ractors = workers.to_i.positive? && worker_safe.any?
+      raise ArgumentError, "Use either KETTLE_JEM_RACTOR_WORKERS or KETTLE_JEM_THREAD_WORKERS, not both" if use_threads && workers.to_i.positive?
+
       worker_count = use_ractors ? [workers.to_i, worker_safe.length].min : 0
+      thread_worker_count = use_threads ? [thread_workers.to_i, indexed_recipes.length].min : 0
       record_recipe_planning_execution_stats(
         stats,
         worker_safe: worker_safe.length,
-        main_only: main_only.length,
+        main_only: use_threads ? 0 : main_only.length,
         worker_count: worker_count,
         spawned: worker_count,
         ractor_recipes: use_ractors ? worker_safe.length : 0,
-        main_recipes: main_only.length + (use_ractors ? 0 : worker_safe.length)
+        thread_worker_count: thread_worker_count,
+        thread_spawns: thread_worker_count,
+        thread_recipes: use_threads ? indexed_recipes.length : 0,
+        main_recipes: use_threads ? 0 : main_only.length + (use_ractors ? 0 : worker_safe.length)
       )
-      reports_by_index.merge!(
-        if use_ractors
+      if use_threads
+        reports_by_index.merge!(
+          execute_indexed_recipe_reports_thread(
+            project_root: project_root,
+            indexed_recipes: indexed_recipes,
+            facts: facts,
+            files: files,
+            template_contents: template_contents,
+            decision_policy: decision_policy,
+            env: env,
+            workers: thread_worker_count
+          )
+        )
+      else
+        reports_by_index.merge!(
+          if use_ractors
           execute_worker_safe_recipe_reports_ractor(
             project_root: project_root,
             indexed_recipes: worker_safe,
@@ -3707,7 +3767,7 @@ module Kettle
             env: env,
             workers: worker_count
           )
-        else
+          else
           execute_indexed_recipe_reports(
             project_root: project_root,
             indexed_recipes: worker_safe,
@@ -3717,19 +3777,20 @@ module Kettle
             decision_policy: decision_policy,
             env: env
           )
-        end
-      )
-      reports_by_index.merge!(
-        execute_indexed_recipe_reports(
-          project_root: project_root,
-          indexed_recipes: main_only,
-          facts: facts,
-          files: files,
-          template_contents: template_contents,
-          decision_policy: decision_policy,
-          env: env
+          end
         )
-      )
+        reports_by_index.merge!(
+          execute_indexed_recipe_reports(
+            project_root: project_root,
+            indexed_recipes: main_only,
+            facts: facts,
+            files: files,
+            template_contents: template_contents,
+            decision_policy: decision_policy,
+            env: env
+          )
+        )
+      end
       recipes.each_index.map do |index|
         report = reports_by_index.fetch(index)
         emit_recipe_event(events, report, index: index, total: recipes.length)
@@ -3754,7 +3815,7 @@ module Kettle
       end
     end
 
-    def record_recipe_planning_execution_stats(stats, worker_safe:, main_only:, worker_count:, spawned:, ractor_recipes:, main_recipes:)
+    def record_recipe_planning_execution_stats(stats, worker_safe:, main_only:, worker_count:, spawned:, ractor_recipes:, thread_worker_count:, thread_spawns:, thread_recipes:, main_recipes:)
       return unless stats
 
       stats[:worker_safe_recipes] = worker_safe
@@ -3762,7 +3823,40 @@ module Kettle
       stats[:ractor_worker_count] = worker_count
       stats[:ractor_spawn_count] = spawned
       stats[:ractor_recipe_count] = ractor_recipes
+      stats[:thread_worker_count] = thread_worker_count
+      stats[:thread_spawn_count] = thread_spawns
+      stats[:thread_recipe_count] = thread_recipes
       stats[:main_recipe_count] = main_recipes
+    end
+
+    def execute_indexed_recipe_reports_thread(project_root:, indexed_recipes:, facts:, files:, template_contents:, decision_policy:, env:, workers:)
+      chunks = Array.new(workers) { [] }
+      indexed_recipes.each_with_index do |job, offset|
+        chunks.fetch(offset % chunks.length) << job
+      end
+      chunks.reject(&:empty?).flat_map do |chunk|
+        Thread.new do
+          thread_id = Thread.current.object_id
+          started_at = monotonic_time
+          chunk.map do |recipe, index|
+            report = execute_recipe(
+              project_root: project_root,
+              recipe: recipe,
+              facts: facts,
+              files: files,
+              template_contents: template_contents,
+              decision_policy: decision_policy,
+              env: env
+            )
+            report = report_with_duration(report, duration_ms_since(started_at))
+            report[:metadata][:executor] = "thread"
+            report[:metadata][:thread_id] = thread_id
+            report.dig(:report_envelope, :report, :metadata)[:executor] = "thread"
+            report.dig(:report_envelope, :report, :metadata)[:thread_id] = thread_id
+            [index, report]
+          end
+        end
+      end.flat_map(&:value).to_h
     end
 
     def execute_worker_safe_recipe_reports_ractor(project_root:, indexed_recipes:, facts:, files:, template_contents:, decision_policy:, env:, workers:)
@@ -3865,8 +3959,10 @@ module Kettle
       events = event_stream_from_options(run_options)
       report = plan_project(project_root, env: env, run_options: run_options).merge(mode: "apply")
       file_work_workers = with_event_phase(events, "file_work_workers") { file_work_workers_for(env, run_options) }
+      file_work_thread_workers = with_event_phase(events, "file_work_thread_workers") { file_work_thread_workers_for(env, run_options) }
       report[:file_work_workers] = file_work_workers
-      report[:file_work_execution] = file_work_execution_stats(file_work_workers)
+      report[:file_work_thread_workers] = file_work_thread_workers
+      report[:file_work_execution] = file_work_execution_stats(file_work_workers, file_work_thread_workers)
       with_event_phase(events, "apply") do
         before_apply_files = with_event_phase(events, "snapshot_changed_files") do
           snapshot_changed_files(
@@ -3875,7 +3971,13 @@ module Kettle
           )
         end
         with_event_phase(events, "write_template_files") do
-          run_apply_phases(project_root, report, file_workers: file_work_workers, file_stats: report.fetch(:file_work_execution))
+          run_apply_phases(
+            project_root,
+            report,
+            file_workers: file_work_workers,
+            file_thread_workers: file_work_thread_workers,
+            file_stats: report.fetch(:file_work_execution)
+          )
         end
         report[:changed_files] = with_event_phase(events, "actual_changed_files") do
           actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
@@ -10527,7 +10629,7 @@ module Kettle
       }
     end
 
-    def run_apply_phases(project_root, report, file_workers: 0, file_stats: nil)
+    def run_apply_phases(project_root, report, file_workers: 0, file_thread_workers: 0, file_stats: nil)
       plugin_registry = plugin_registry_for_project(project_root)
       changed_files = report.fetch(:changed_files)
       diagnostics = report.fetch(:diagnostics)
@@ -10558,6 +10660,7 @@ module Kettle
         commit_file_work_units(
           file_work_units_for_phase(project_root, reports_by_phase.fetch(phase, [])),
           workers: file_workers,
+          thread_workers: file_thread_workers,
           stats: file_stats
         )
         unless plugin_registry.empty?
@@ -10581,13 +10684,16 @@ module Kettle
       report[:run_stats] = recipe_run_stats(report.fetch(:recipe_reports), diagnostics: diagnostics)
     end
 
-    def file_work_execution_stats(file_workers)
+    def file_work_execution_stats(file_workers, file_thread_workers = 0)
       {
         file_worker_count: file_workers.to_i,
+        file_thread_worker_count: file_thread_workers.to_i,
         file_work_units: 0,
         file_operations: 0,
         file_ractor_units: 0,
         file_ractor_spawn_count: 0,
+        file_thread_units: 0,
+        file_thread_spawn_count: 0,
         main_file_units: 0
       }
     end
@@ -10597,17 +10703,20 @@ module Kettle
       commit_file_outcome(intent) if intent
     end
 
-    def commit_file_work_units(file_work_units, workers: 0, stats: nil)
+    def commit_file_work_units(file_work_units, workers: 0, thread_workers: 0, stats: nil)
       units = Array(file_work_units)
       return if units.empty?
 
-      record_file_work_execution_stats(stats, units: units, workers: workers.to_i)
+      raise ArgumentError, "Use either KETTLE_JEM_RACTOR_FILE_WORKERS or KETTLE_JEM_THREAD_FILE_WORKERS, not both" if workers.to_i.positive? && thread_workers.to_i.positive?
+
+      record_file_work_execution_stats(stats, units: units, workers: workers.to_i, thread_workers: thread_workers.to_i)
+      return commit_file_work_units_thread(units, workers: thread_workers.to_i) if thread_workers.to_i.positive?
       return commit_file_work_units_ractor(units, workers: workers.to_i) if workers.to_i.positive?
 
       units.each { |file_work_unit| commit_file_work_unit(file_work_unit) }
     end
 
-    def record_file_work_execution_stats(stats, units:, workers:)
+    def record_file_work_execution_stats(stats, units:, workers:, thread_workers:)
       return unless stats
 
       stats[:file_work_units] += units.length
@@ -10615,9 +10724,22 @@ module Kettle
       if workers.positive?
         stats[:file_ractor_units] += units.length
         stats[:file_ractor_spawn_count] += units.length
+      elsif thread_workers.positive?
+        stats[:file_thread_units] += units.length
+        stats[:file_thread_spawn_count] += [thread_workers, units.length].min
       else
         stats[:main_file_units] += units.length
       end
+    end
+
+    def commit_file_work_units_thread(file_work_units, workers:)
+      chunks = Array.new([workers, file_work_units.length].min) { [] }
+      file_work_units.each_with_index do |file_work_unit, offset|
+        chunks.fetch(offset % chunks.length) << file_work_unit
+      end
+      chunks.map do |chunk|
+        Thread.new { chunk.each { |file_work_unit| commit_file_work_unit(file_work_unit) } }
+      end.each(&:join)
     end
 
     def commit_file_work_units_ractor(file_work_units, workers:)
