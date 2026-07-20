@@ -334,6 +334,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         commands << {command: command, chdir: chdir, env: env, quiet: quiet}
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
       end
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:bundle_includes_gem?).and_return(true)
 
       install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
@@ -641,6 +642,7 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         commands << {command: command, chdir: chdir, env: env, quiet: quiet}
         {success: true, exitstatus: 0, stdout: "", stderr: ""}
       end
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:bundle_includes_gem?).and_return(true)
 
       install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
@@ -673,6 +675,50 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         curated_binstubs,
         kettle_jem_handoff_command("--accept-config", "--skip-commit", "--force")
       )
+    end
+  end
+
+
+  it "uses KJ_MIN_RUBY during the accepted config one-shot followup apply" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-bootstrap-min-ruby", tmp_root) do |root|
+      write_tree(root, {
+        "Gemfile" => <<~RUBY,
+          source "https://gem.coop"
+          gemspec
+        RUBY
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "💎 Example gem"
+            spec.authors = ["Peter H. Boling"]
+            spec.email = ["floss@galtzo.com"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+      })
+
+      command_runner = lambda do |_command, chdir:, env:, quiet:|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {
+          "K_JEM_TEMPLATING" => "true",
+          "KJ_MIN_RUBY" => "1.8.7"
+        },
+        run_options: {accept_config: true, force: true, skip_commit: true},
+        command_runner: command_runner
+      )
+
+      expect(install.fetch(:bootstrap_followup_apply)).to eq(
+        status: "applied",
+        reason: "canonical_config_bootstrapped"
+      )
+      expect(install.dig(:facts, :rubygems, :min_ruby)).to eq("1.8.7")
+      expect(YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_CONFIG_PATH)).dig("rubygems", "min_ruby")).to eq("1.8.7")
     end
   end
 

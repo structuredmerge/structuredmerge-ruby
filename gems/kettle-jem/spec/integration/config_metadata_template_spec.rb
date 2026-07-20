@@ -153,6 +153,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           min_divergence_threshold: 5 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD
           yard_host: docs.config.test # ENV override: KJ_YARD_HOST
           homepage_uri: https://homepage.config.test # ENV override: KJ_HOMEPAGE_URI
+          rubygems:
+            min_ruby: "3.1" # ENV override: KJ_MIN_RUBY
           kettle-jem:
             version: "1.0.0"
           tokens:
@@ -172,6 +174,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           "KJ_MIN_DIVERGENCE_THRESHOLD" => "12",
           "KJ_YARD_HOST" => "docs.env.test",
           "KJ_HOMEPAGE_URI" => "https://homepage.env.test",
+          "KJ_MIN_RUBY" => "1.8.7",
           "KJ_GH_USER" => "env-user"
         },
         run_options: {skip_commit: true}
@@ -182,11 +185,13 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(config.fetch("min_divergence_threshold")).to eq(12)
       expect(config.fetch("yard_host")).to eq("docs.env.test")
       expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
+      expect(config.dig("rubygems", "min_ruby")).to eq("1.8.7")
       expect(config.dig("kettle-jem", "version")).to eq(Kettle::Jem::Version::VERSION)
       expect(config.dig("tokens", "forge", "gh_user")).to eq("env-user")
       expect(report.fetch(:final_content)).to include("min_divergence_threshold: 12 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD")
       expect(report.fetch(:final_content)).to include('yard_host: "docs.env.test" # ENV override: KJ_YARD_HOST')
       expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
+      expect(report.fetch(:final_content)).to include('min_ruby: "1.8.7" # ENV override: KJ_MIN_RUBY')
       expect(report.fetch(:final_content)).to include(%(version: "#{Kettle::Jem::Version::VERSION}"))
       expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to eq(report.fetch(:final_content))

@@ -24,9 +24,10 @@ Useful environment variables:
 | --- | --- | --- |
 | `KETTLE_JEM_BENCHMARK_RUNS` | `3` | Number of measured runs for each variant. |
 | `KETTLE_JEM_BENCHMARK_WORKERS` | `min(2, Etc.nprocessors)` | Comma-separated worker counts for Ractor variants. |
-| `KETTLE_JEM_BENCHMARK_COMMAND` | `apply` | Public `kettle-jem` command to benchmark: `plan`, `apply`, or `template`. |
+| `KETTLE_JEM_BENCHMARK_COMMAND` | `template` | Public `kettle-jem` command to benchmark: `plan`, `apply`, `template`, or `install`. |
+| `KETTLE_JEM_BENCHMARK_MIN_RUBY` | `1.8.7` | Minimum Ruby value passed through `KJ_MIN_RUBY` to broaden generated workflow/gemfile coverage. |
 
-The default `apply` benchmark compares:
+The default `template` benchmark compares:
 
 - baseline classified planning with no Ractor workers
 - planning-only Ractor workers via `KETTLE_JEM_RACTOR_WORKERS`
@@ -34,5 +35,7 @@ The default `apply` benchmark compares:
 - combined planning and file Ractor workers
 
 For `plan`, file-worker variants are skipped because no filesystem apply phase
-runs. The harness sets the first-run `kettle-jem` config values through
-environment variables so the copied skeleton can be templated non-interactively.
+runs. The default `template --accept-config` run exercises kettle-jem's
+supported one-shot flow: environment variables seed `.structuredmerge/kettle-jem.yml`,
+the config bootstrap is written, and the install/template task continues through
+the follow-up apply against that config.

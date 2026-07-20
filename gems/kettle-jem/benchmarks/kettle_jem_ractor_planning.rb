@@ -20,7 +20,7 @@ WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].m
   .split(",")
   .map { |value| Integer(value.strip) }
   .uniq
-COMMAND = ENV.fetch("KETTLE_JEM_BENCHMARK_COMMAND", "apply")
+COMMAND = ENV.fetch("KETTLE_JEM_BENCHMARK_COMMAND", "template")
 
 raise "KETTLE_JEM_BENCHMARK_RUNS must be positive" unless RUNS.positive?
 raise "KETTLE_JEM_BENCHMARK_WORKERS must include at least one value" if WORKER_COUNTS.empty?
@@ -28,7 +28,7 @@ unless WORKER_COUNTS.all?(&:positive?)
   raise "KETTLE_JEM_BENCHMARK_WORKERS values must be positive"
 end
 raise "Missing fixture skeleton at #{FIXTURE_ROOT}" unless Dir.exist?(FIXTURE_ROOT)
-unless %w[plan apply template].include?(COMMAND)
+unless %w[plan apply template install].include?(COMMAND)
   raise "Unsupported benchmark command #{COMMAND.inspect}"
 end
 
@@ -44,6 +44,7 @@ BASE_ENV = {
   "KJ_AUTHOR_DOMAIN" => "example.com",
   "KJ_GH_USER" => "benchmark",
   "KJ_HOMEPAGE_URI" => "https://example.com/skeleton",
+  "KJ_MIN_RUBY" => ENV.fetch("KETTLE_JEM_BENCHMARK_MIN_RUBY", "1.8.7"),
   "allowed" => "true",
   "force" => "true",
   "git_drivers" => "false",
@@ -127,17 +128,7 @@ end
 def run_variant(variant, index)
   report_path = File.join(REPORT_ROOT, "#{variant.fetch(:name)}-#{index}.json")
   env = ENV.to_h.merge(BASE_ENV).merge(variant.fetch(:env))
-  command = [
-    RbConfig.ruby,
-    KETTLE_JEM_EXE,
-    COMMAND,
-    "--force",
-    "--quiet",
-    "--accept-config",
-    "--skip-commit",
-    "--report",
-    report_path
-  ]
+  command = benchmark_command(report_path)
 
   reset_worktree
   started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -156,6 +147,21 @@ def run_variant(variant, index)
   [elapsed, report_snapshot(report_path)]
 ensure
   reset_worktree
+end
+
+def benchmark_command(report_path)
+  command = [
+    RbConfig.ruby,
+    KETTLE_JEM_EXE,
+    COMMAND,
+    "--force",
+    "--quiet",
+    "--accept-config",
+    "--skip-commit",
+    "--report",
+    report_path
+  ]
+  command
 end
 
 FileUtils.rm_rf(REPORT_ROOT)

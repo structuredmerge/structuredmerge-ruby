@@ -196,6 +196,7 @@ module Kettle
       %w[min_divergence_threshold] => "KJ_MIN_DIVERGENCE_THRESHOLD",
       %w[yard_host] => "KJ_YARD_HOST",
       %w[homepage_uri] => "KJ_HOMEPAGE_URI",
+      %w[rubygems min_ruby] => "KJ_MIN_RUBY",
       %w[templates profile] => "KETTLE_JEM_TEMPLATE_PROFILE",
       %w[shim replacement_gem] => "KETTLE_JEM_SHIMMED_GEM",
       %w[shim replacement_require] => "KETTLE_JEM_SHIMMED_REQUIRE",
@@ -2937,7 +2938,7 @@ module Kettle
       project_version = metadata_value(gemspec_metadata, :version)
       project_version = existing_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
       project_version = git_version_file_value(project_root, version_path) unless valid_gem_version?(project_version)
-      configured_min_ruby = rubygems_config["min_ruby"].to_s.strip
+      configured_min_ruby = preferred_template_token_value(nil, rubygems_config["min_ruby"], env, "KJ_MIN_RUBY").to_s.strip
       min_ruby = (configured_min_ruby.empty? ? nil : configured_min_ruby) ||
         metadata_value(gemspec_metadata, :required_ruby_version) ||
         metadata_value(gemspec_metadata, :min_ruby)
