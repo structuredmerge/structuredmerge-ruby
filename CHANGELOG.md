@@ -78,6 +78,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- RBS recursive member merges no longer duplicate destination-owned comments
+  before matched nested declarations across repeated templating runs.
 - RBS merges now preserve retained declaration and nested member blank-line
   gaps, preventing templating from compacting existing `.rbs` whitespace.
 - Bash merges now preserve floating first-owner and removed-node comment gaps,

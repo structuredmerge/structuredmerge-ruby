@@ -143,6 +143,36 @@ RSpec.describe 'RBS reproducible merge', :rbs_parsing do
         add_template_only_nodes: true
       }
     end
+
+    it 'does not duplicate destination member comments before recursively matched declarations' do
+      template = <<~RBS
+        module Kettle
+          module Family
+            module Version
+              VERSION: String
+            end
+            VERSION: String
+          end
+        end
+      RBS
+      destination = <<~RBS
+        module Kettle
+          module Family
+            # See the writing guide of rbs: https://github.com/ruby/rbs#guides
+            module Version
+              VERSION: String
+            end
+            VERSION: String
+          end
+        end
+      RBS
+
+      merged = merger_class.new(template, destination, preference: :destination).merge.to_s
+      merged_again = merger_class.new(template, merged, preference: :destination).merge.to_s
+
+      expect(merged.scan('See the writing guide of rbs:')).to contain_exactly('See the writing guide of rbs:')
+      expect(merged_again).to eq(merged)
+    end
   end
 
   context 'with explicit RBS backend', :rbs_backend do

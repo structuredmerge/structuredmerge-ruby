@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Gemspec templating now deletes empty generated development-dependency comment
+  sections through Prism-backed CRISPR structural edits, preventing blank-line
+  churn before the closing `Gem::Specification` `end`.
 - Fixed the `kettle-jem` package manifest so runtime template assets are
   included even when the gemspec is loaded from the monorepo root.
 - Generated local templating Gemfiles can now route

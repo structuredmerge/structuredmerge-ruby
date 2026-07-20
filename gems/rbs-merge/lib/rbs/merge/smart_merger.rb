@@ -556,13 +556,6 @@ module Rbs
               )
             when :recursive
               lines.concat(
-                retained_member_leading_gap_lines(
-                  entry[:dest_decl],
-                  dest_owners: dest_owners,
-                  emitted_preserved_destination_lines: emitted_preserved_destination_lines
-                )
-              )
-              lines.concat(
                 reconstruct_declaration_with_merged_members(
                   resolution[:template_declaration],
                   resolution[:dest_declaration],
@@ -828,6 +821,9 @@ module Rbs
 
         start_line = get_start_line(decl)
         end_line = get_start_line(first_member) - 1
+        leading_region = leading_region_for(first_member, analysis, owners: members)
+        leading_start = region_start_line(leading_region) if region_present?(leading_region)
+        end_line = leading_start - 1 if leading_start && leading_start <= end_line
         return [] unless start_line && end_line && start_line <= end_line
 
         (start_line..end_line).map { |ln| analysis.line_at(ln) }

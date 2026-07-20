@@ -11,6 +11,39 @@ RSpec.describe Kettle::Jem do
     File.write(path, content)
   end
 
+  it "removes an empty trailing gemspec development dependency section without leaving its separator" do
+    content = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo-gem"
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Testing
+        spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")
+
+        # HTTP recording for deterministic specs
+        # In Ruby 3.5 (HEAD) the CGI library has been pared down, so we also need to depend on gem "cgi" for ruby@head
+        # This is done in the "head" appraisal.
+        # See: https://github.com/vcr/vcr/issues/1057
+      end
+    RUBY
+
+    cleaned = described_class.remove_empty_gemspec_development_dependency_section_headings(content, receiver: "spec")
+
+    expect(cleaned).to eq(<<~RUBY)
+      Gem::Specification.new do |spec|
+        spec.name = "demo-gem"
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Testing
+        spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")
+      end
+    RUBY
+  end
+
   it "repairs the version_gem entrypoint shape during template apply" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

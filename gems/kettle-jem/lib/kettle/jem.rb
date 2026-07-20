@@ -8232,45 +8232,10 @@ module Kettle
     end
 
     def remove_empty_gemspec_development_dependency_section_headings(content, receiver:)
-      lines = content.to_s.lines
-      note_index = lines.find_index { |line| line.lstrip.start_with?("# NOTE: It is preferable to list development dependencies") }
-      return content unless note_index
-
-      dependency_line_indexes = gemspec_dependency_records(content, receiver: receiver).map { |record| record.fetch(:start_line) - 1 }.to_set
-      remove_indexes = Set.new
-      index = note_index + 1
-      while index < lines.length
-        stripped = lines[index].lstrip
-        unless gemspec_dependency_section_heading_comment?(stripped)
-          index += 1
-          next
-        end
-
-        remove_heading = true
-        cursor = index + 1
-        while cursor < lines.length
-          cursor_line = lines[cursor]
-          cursor_stripped = cursor_line.lstrip
-          break if cursor_line.strip == "end" || gemspec_dependency_section_heading_comment?(cursor_stripped)
-
-          if dependency_line_indexes.include?(cursor)
-            remove_heading = false
-            break
-          end
-
-          cursor += 1
-        end
-
-        if remove_heading
-          remove_indexes << index
-          remove_indexes << (index + 1) if lines[index + 1]&.strip == ""
-        end
-        index += 1
-      end
-
-      return content if remove_indexes.empty?
-
-      ensure_trailing_newline(lines.each_with_index.reject { |_line, line_index| remove_indexes.include?(line_index) }.map(&:first).join.gsub(/\n{3,}/, "\n\n"))
+      ensure_runtime_dependencies!
+      target = empty_gemspec_development_dependency_sections_target(receiver: receiver)
+      actor = Ast::Crispr::Delete.call(content: content.to_s, target: target, source_label: "gemspec")
+      actor.updated_content
     end
 
     # Prism does not expose comments as normal AST statements, so dependency-section
@@ -8279,6 +8244,78 @@ module Kettle
       stripped_line.start_with?("# ") &&
         !stripped_line.start_with?("# NOTE:") &&
         !stripped_line.start_with?("#       ")
+    end
+
+    def empty_gemspec_development_dependency_sections_target(receiver:)
+      Ast::Crispr::OwnerSelector.new(
+        id: "empty_gemspec_development_dependency_sections",
+        limit: {at_least: 0},
+        metadata: {
+          adapter: Ast::Crispr::Ruby::Prism.adapter,
+          owner_scope: :ruby_comments,
+          selector_kind: :owner_filter,
+          selection_intent: :section_branch,
+          include_trailing_gap: true
+        },
+        locate: lambda do |context|
+          lines = context.lines
+          note_index = lines.find_index do |line|
+            line.lstrip.start_with?("# NOTE: It is preferable to list development dependencies")
+          end
+          next [] unless note_index
+
+          dependency_line_indexes = gemspec_dependency_records(context.content, receiver: receiver)
+            .map { |record| record.fetch(:start_line) - 1 }
+            .to_set
+          comments = context.structural_owners(owner_scope: :ruby_comments)
+          heading_line_indexes = comments.filter_map do |comment|
+            line_index = comment.location.start_line - 1
+            next if line_index <= note_index
+            next unless gemspec_dependency_section_heading_comment?(lines.fetch(line_index).lstrip)
+
+            line_index
+          end.to_set
+
+          empty_gemspec_development_dependency_section_matches(
+            lines,
+            heading_line_indexes: heading_line_indexes,
+            dependency_line_indexes: dependency_line_indexes
+          )
+        end
+      )
+    end
+
+    def empty_gemspec_development_dependency_section_matches(lines, heading_line_indexes:, dependency_line_indexes:)
+      matches = []
+      sorted_headings = heading_line_indexes.to_a.sort
+      visited = Set.new
+      sorted_headings.each do |heading_start|
+        next if visited.include?(heading_start)
+
+        heading_end = heading_start
+        while heading_line_indexes.include?(heading_end)
+          visited << heading_end
+          heading_end += 1
+        end
+
+        cursor = heading_end
+        cursor += 1 while cursor < lines.length && lines[cursor].strip != "end" && !heading_line_indexes.include?(cursor)
+        next if (heading_end...cursor).any? { |line_index| dependency_line_indexes.include?(line_index) }
+
+        start_line_index = heading_start
+        start_line_index -= 1 if lines[heading_start - 1]&.strip == ""
+        end_line_index = heading_end - 1
+        matches << Ast::Crispr::Match.new(
+          start_line: start_line_index + 1,
+          end_line: end_line_index + 1,
+          metadata: {
+            start_boundary: :comment_region_start,
+            end_boundary: :owner_end_plus_trailing_gap,
+            payload_kind: :section_branch
+          }
+        )
+      end
+      matches
     end
 
     def append_missing_gemspec_dependency_lines(content, destination_dependencies, receiver:)
