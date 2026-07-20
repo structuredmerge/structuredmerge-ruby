@@ -5125,6 +5125,28 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "detects rake tasks using the same bundle environment as command execution" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-rake-task-env", tmp_root) do |root|
+      write_tree(root, {
+        "Rakefile" => "task default: []\n",
+        "bin/rake" => <<~RUBY
+          #!/usr/bin/env ruby
+          puts "rake rubocop_gradual:autocorrect" if ENV.fetch("K_JEM_TEMPLATING", "false") == "true"
+        RUBY
+      })
+      FileUtils.chmod("+x", File.join(root, "bin", "rake"))
+
+      expect(Kettle::Jem::Tasks::InstallTask.rake_task_available?(root, "rubocop_gradual:autocorrect", env: {"K_JEM_TEMPLATING" => "false"})).to be(false)
+      expect(Kettle::Jem::Tasks::InstallTask.rake_task_available?(root, "rubocop_gradual:autocorrect", env: {"K_JEM_TEMPLATING" => "true"})).to be(true)
+      expect(Kettle::Jem::Tasks::InstallTask.rubocop_gradual_autocorrect_step(root, env: {"K_JEM_TEMPLATING" => "true"})).to include(
+        name: "rubocop_gradual_autocorrect",
+        status: "ready"
+      )
+    end
+  end
+
   it "runs install follow-up templating whenever the canonical config changes" do
     report = {
       recipe_reports: [
@@ -5222,6 +5244,12 @@ RSpec.describe Kettle::Jem do
         reason: "skip_commit"
       )
       expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "bundle_install_requested_env",
+        command: %w[bundle install],
+        status: "succeeded",
+        reason: "executed"
+      ))
+      expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_lock_normalization",
         command: %w[bundle update],
         status: "succeeded",
@@ -5229,6 +5257,15 @@ RSpec.describe Kettle::Jem do
       ))
       lock_command = commands.find { |entry| entry.fetch(:command) == %w[bundle update] }
       expect(lock_command).not_to be_nil
+      requested_bundle_install = commands.find { |entry| entry.fetch(:command) == %w[bundle install] }
+      expect(requested_bundle_install).not_to be_nil
+      expect(requested_bundle_install.fetch(:env)).to include(
+        "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
+        "K_JEM_TEMPLATING" => "true",
+        "KETTLE_DEV_DEV" => "/workspace/my",
+        "GALTZO_FLOSS_DEV" => "/workspace/galtzo-floss",
+        "STRUCTUREDMERGE_DEV" => "/workspace/smorg-rb"
+      )
       expect(lock_command.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "false",

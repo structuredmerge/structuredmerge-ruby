@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Install orchestration now bundles each distinct Bundler environment it will
+  execute under, and probes RuboCop Gradual tasks with the same environment used
+  for the eventual command.
 - Generated semantic diff Git driver configuration now consistently uses the
   installed `smorg-rb` executable and Git diff driver name for Ruby diffs.
 - Generated multi-engine workflow files, including `heads.yml` and

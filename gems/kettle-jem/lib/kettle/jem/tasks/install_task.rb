@@ -40,7 +40,8 @@ module Kettle
           rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env, project_root: project_root)
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << rubocop_gradual_autocorrect_step(project_root)
+          install_steps << distinct_bundle_install_step(project_root, env: env, setup_env: setup_env)
+          install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
@@ -183,6 +184,7 @@ module Kettle
               bundle_binstub_pruning
               bundle_binstub_location_validation
               rubocop_lts_local_branch
+              bundle_install_requested_env
               rubocop_gradual_autocorrect
               bundle_lock_normalization
             ],
@@ -659,7 +661,26 @@ module Kettle
           %w[bundle update]
         end
 
-        def rubocop_gradual_autocorrect_step(project_root)
+        def distinct_bundle_install_step(project_root, env:, setup_env:)
+          bundle_env = bundler_command_env(project_root, env)
+          if same_bundle_env?(bundle_env, setup_env)
+            return {
+              name: "bundle_install_requested_env",
+              status: "skipped",
+              reason: "same_as_setup_bundle_env"
+            }
+          end
+
+          {
+            name: "bundle_install_requested_env",
+            command: %w[bundle install],
+            status: "ready",
+            env: bundle_env,
+            reason: "distinct_bundle_env"
+          }
+        end
+
+        def rubocop_gradual_autocorrect_step(project_root, env: nil)
           rakefile = File.join(project_root.to_s, "Rakefile")
           bin_rake = File.join(project_root.to_s, "bin", "rake")
           unless File.file?(rakefile) && File.file?(bin_rake)
@@ -669,7 +690,7 @@ module Kettle
               reason: "missing_rake_entrypoint"
             }
           end
-          unless rake_task_available?(project_root, "rubocop_gradual:autocorrect")
+          unless rake_task_available?(project_root, "rubocop_gradual:autocorrect", env: env)
             return {
               name: "rubocop_gradual_autocorrect",
               status: "skipped",
@@ -689,8 +710,8 @@ module Kettle
           ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
         end
 
-        def rake_task_available?(project_root, task_name)
-          stdout, _stderr, status = Open3.capture3("bin/rake", "--tasks", chdir: project_root.to_s)
+        def rake_task_available?(project_root, task_name, env: nil)
+          stdout, _stderr, status = Open3.capture3((env || {}).to_h, "bin/rake", "--tasks", chdir: project_root.to_s)
           status.success? && stdout.lines.any? { |line| line.include?(task_name.to_s) }
         rescue Errno::EACCES, Errno::ENOENT
           false
@@ -1000,6 +1021,8 @@ module Kettle
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_lts_local_branch"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "bundle_install_requested_env"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_gradual_autocorrect"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "hook_templates"
@@ -1027,6 +1050,28 @@ module Kettle
           command_env["K_JEM_TEMPLATING"] = "false"
           apply_kettle_family_local_install_env!(command_env)
           command_env
+        end
+
+        def bundler_command_env(project_root, env)
+          command_env = (env || {}).to_h.dup
+          strip_inherited_bundler_activation!(command_env)
+          gemfile = File.join(project_root.to_s, "Gemfile")
+          command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
+          command_env["K_JEM_TEMPLATING"] = "false" unless command_env.key?("K_JEM_TEMPLATING")
+          apply_kettle_family_local_install_env!(command_env)
+          command_env
+        end
+
+        def same_bundle_env?(left, right)
+          bundle_env_fingerprint(left) == bundle_env_fingerprint(right)
+        end
+
+        def bundle_env_fingerprint(env)
+          env.to_h.transform_values { |value| value.nil? ? nil : value.to_s }.reject { |key, _value| ignored_bundle_env_key?(key) }
+        end
+
+        def ignored_bundle_env_key?(key)
+          key.to_s.match?(/\A(?:BUNDLE_BIN_PATH|BUNDLE_LOCKFILE|BUNDLER_SETUP|BUNDLER_VERSION|RUBYLIB|RUBYOPT)\z/)
         end
 
         def apply_kettle_family_local_install_env!(command_env)
