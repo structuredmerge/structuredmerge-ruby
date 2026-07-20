@@ -45,6 +45,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Generated README Support & Community rows now include a RubyForum help badge.
 - Generated READMEs can now render template-managed corporate sponsor logos
   from `readme.corporate_sponsors` config or family-provided sponsorship data.
 - `kettle-jem` now supports `--events` for newline-delimited JSON progress

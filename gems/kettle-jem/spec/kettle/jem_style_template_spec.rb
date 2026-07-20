@@ -11,6 +11,17 @@ RSpec.describe Kettle::Jem do
     expect(File.read(File.join(template_root, "README.md.example"))).not_to include("### Secure Installation")
   end
 
+  it "includes RubyForum in the packaged README support row" do
+    template_root = described_class::PACKAGED_TEMPLATE_ROOT
+    readme_template = File.read(File.join(template_root, "README.md.example"))
+
+    expect(readme_template).to include("[![Get help from RubyForum][✉️ruby-forum-img]][✉️ruby-forum]")
+    expect(readme_template).to include("[✉️ruby-forum]: https://www.rubyforum.org/c/help/8")
+    expect(readme_template).to include(
+      "[✉️ruby-forum-img]: https://img.shields.io/badge/RubyForum-Help-CC342D"
+    )
+  end
+
   it "projects RuboCop LTS template tokens from minimum Ruby" do
     tmp_root = File.join(__dir__, "../tmp")
     FileUtils.mkdir_p(tmp_root)

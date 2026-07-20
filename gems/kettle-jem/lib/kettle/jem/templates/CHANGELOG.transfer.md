@@ -13,3 +13,5 @@
   config now uses the installed `smorg-rb` Ruby driver name.
 - kettle-jem-template-20260720-004 - Generated multi-engine workflow files now
   omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.
+- kettle-jem-template-20260720-005 - Generated README Support & Community rows
+  now include a RubyForum help badge.
