@@ -216,7 +216,10 @@ RSpec.describe Kettle::Jem::CLI do
         "Gemfile,Rakefile",
         "--include",
         "gemfiles/modular/**",
-        "--skip-commit"
+        "--skip-commit",
+        "--skip-drift-check",
+        "--skip-rubocop-gradual",
+        "--skip-binstubs"
       ])
 
       expect(status).to eq(0)
@@ -233,6 +236,9 @@ RSpec.describe Kettle::Jem::CLI do
         only: ["Gemfile", "Rakefile"],
         include: ["gemfiles/modular/**"],
         skip_commit: true,
+        skip_drift_check: true,
+        skip_rubocop_gradual: true,
+        skip_binstubs: true,
         accept_config: true,
         bootstrap_mode: true,
         template_profile: "",
@@ -318,7 +324,14 @@ RSpec.describe Kettle::Jem::CLI do
       )
       allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run)
 
-      status, out, err = run_cli(["template", root, "--skip-commit"], env: {"K_JEM_TEMPLATING" => "true"})
+      status, out, err = run_cli([
+        "template",
+        root,
+        "--skip-commit",
+        "--skip-drift-check",
+        "--skip-rubocop-gradual",
+        "--skip-binstubs"
+      ], env: {"K_JEM_TEMPLATING" => "true"})
 
       expect(status).to eq(0)
       expect(err).to eq("")
@@ -326,7 +339,12 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true)
+        run_options: include(
+          skip_commit: true,
+          skip_drift_check: true,
+          skip_rubocop_gradual: true,
+          skip_binstubs: true
+        )
       )
       expect(Kettle::Jem::Tasks::TemplateTask).not_to have_received(:run)
     end

@@ -41,7 +41,7 @@ module Kettle
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
           install_steps << run_distinct_bundle_install_step(project_root, env: env, setup_env: setup_env, run_options: effective_run_options, command_runner: command_runner)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env)
+          install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
@@ -593,8 +593,16 @@ module Kettle
               env: env,
               quiet: quiet,
               command_runner: command_runner
-            ),
-            run_command_step(
+            )
+          ]
+          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_binstubs])
+            steps << {
+              name: "bundle_binstubs",
+              status: "skipped",
+              reason: "skip_binstubs"
+            }
+          else
+            steps << run_command_step(
               "bundle_binstubs",
               bundle_binstubs_command(project_root, env: env),
               project_root: project_root,
@@ -602,7 +610,7 @@ module Kettle
               quiet: quiet,
               command_runner: command_runner
             )
-          ]
+          end
           if steps.any? { |step| step.fetch(:name) == "bundle_binstubs" && step.fetch(:status) == "succeeded" }
             steps << rewrite_yard_binstub(project_root)
             steps << prune_unwanted_bundler_binstubs(project_root)
@@ -693,7 +701,15 @@ module Kettle
           )
         end
 
-        def rubocop_gradual_autocorrect_step(project_root, env: nil)
+        def rubocop_gradual_autocorrect_step(project_root, env: nil, run_options: {})
+          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_rubocop_gradual])
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "skip_rubocop_gradual"
+            }
+          end
+
           rakefile = File.join(project_root.to_s, "Rakefile")
           bin_rake = File.join(project_root.to_s, "bin", "rake")
           unless File.file?(rakefile) && File.file?(bin_rake)
@@ -1607,6 +1623,9 @@ module Kettle
           argv = []
           argv << "--accept-config" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:accept_config])
           argv << "--skip-commit" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_commit])
+          argv << "--skip-drift-check" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_drift_check])
+          argv << "--skip-rubocop-gradual" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_rubocop_gradual])
+          argv << "--skip-binstubs" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_binstubs])
           argv << "--quiet" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:quiet])
           argv << "--verbose" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:verbose])
           argv << "--force" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:force])

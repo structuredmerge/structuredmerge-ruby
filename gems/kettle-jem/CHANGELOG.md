@@ -30,6 +30,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating can now opt into thread-backed recipe planning and file work with
   `KETTLE_JEM_THREAD_WORKERS` and `KETTLE_JEM_THREAD_FILE_WORKERS`, providing a
   benchmarkable alternative to main-thread and Ractor execution.
+- Templating now supports benchmark-oriented skip controls for external
+  post-template work: `--skip-drift-check`, `--skip-rubocop-gradual`, and
+  `--skip-binstubs`, with matching `KETTLE_JEM_SKIP_*` environment variables.
 
 ### Fixed
 

@@ -956,6 +956,17 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
   end
 
 
+  it "skips rubocop gradual autocorrect before probing rake tasks when requested" do
+    expect(Kettle::Jem::Tasks::InstallTask).not_to receive(:rake_task_available?)
+
+    expect(Kettle::Jem::Tasks::InstallTask.rubocop_gradual_autocorrect_step("/missing", run_options: {skip_rubocop_gradual: true})).to eq(
+      name: "rubocop_gradual_autocorrect",
+      status: "skipped",
+      reason: "skip_rubocop_gradual"
+    )
+  end
+
+
   it "runs install follow-up templating whenever the canonical config changes" do
     report = {
       recipe_reports: [
@@ -989,6 +1000,35 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         status: "skipped",
         reason: "missing_rubocop_gradual_task"
       )
+    end
+  end
+
+
+  it "skips curated binstub generation when requested" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-skip-binstubs", tmp_root) do |root|
+      write_tree(root, {"bin/setup" => "#!/usr/bin/env sh\n"})
+      FileUtils.chmod("+x", File.join(root, "bin", "setup"))
+      commands = []
+      command_runner = lambda do |command, chdir:, env:, quiet:|
+        commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      steps = Kettle::Jem::Tasks::InstallTask.run_bundle_setup_commands(
+        root,
+        env: {},
+        run_options: {skip_binstubs: true},
+        command_runner: command_runner
+      )
+
+      expect(steps).to include(
+        name: "bundle_binstubs",
+        status: "skipped",
+        reason: "skip_binstubs"
+      )
+      expect(commands.map { |entry| entry.fetch(:command) }).to eq([["bin/setup"]])
     end
   end
 

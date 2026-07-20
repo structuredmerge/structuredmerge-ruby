@@ -1522,6 +1522,33 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
   end
 
 
+  it "skips duplicate drift checks when requested" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-skip-duplicate-drift", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+          end
+        RUBY
+      })
+      runner = lambda do |project_root:, template_dir:|
+        raise "drift runner should not run for #{project_root} #{template_dir}"
+      end
+
+      apply = described_class.apply_project(root, env: {}, run_options: {skip_drift_check: true, duplicate_drift_runner: runner})
+
+      expect(apply.fetch(:duplicate_drift)).to eq(
+        available: false,
+        skipped: true,
+        reason: "skip_drift_check"
+      )
+    end
+  end
+
+
   it "exposes template root and manifest metadata for adjacent tools" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

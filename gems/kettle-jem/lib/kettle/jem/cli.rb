@@ -137,6 +137,18 @@ module Kettle
           opts.on("--skip-commit", "Skip bootstrap commit behavior.") do
             options[:run_options][:skip_commit] = true
           end
+          opts.on("--skip-drift-check", "Skip post-apply duplicate drift checking.") do
+            options[:run_options][:skip_drift_check] = true
+          end
+          opts.on("--skip-duplicate-drift", "Alias for --skip-drift-check.") do
+            options[:run_options][:skip_drift_check] = true
+          end
+          opts.on("--skip-rubocop-gradual", "Skip post-template RuboCop Gradual autocorrect.") do
+            options[:run_options][:skip_rubocop_gradual] = true
+          end
+          opts.on("--skip-binstubs", "Skip post-template curated Bundler binstub generation.") do
+            options[:run_options][:skip_binstubs] = true
+          end
           opts.on("--accept-config", "Accept first-run template config bootstrap.") do
             options[:run_options][:accept_config] = true
           end

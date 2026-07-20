@@ -3989,11 +3989,19 @@ module Kettle
         step.fetch(:changed_files, [])
       end).uniq.sort
       report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
-        duplicate_drift_report(
-          project_root: project_root,
-          template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
-          run_options: run_options
-        )
+        if DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
+          {
+            available: false,
+            skipped: true,
+            reason: "skip_drift_check"
+          }
+        else
+          duplicate_drift_report(
+            project_root: project_root,
+            template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
+            run_options: run_options
+          )
+        end
       end
       emit_summary_event(events, report)
       report
@@ -10091,6 +10099,9 @@ module Kettle
         shimmed_gem: option_hash.fetch(:shimmed_gem, env_hash["KETTLE_JEM_SHIMMED_GEM"]),
         shimmed_require: option_hash.fetch(:shimmed_require, env_hash["KETTLE_JEM_SHIMMED_REQUIRE"]),
         skip_commit: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_commit, env_hash["KETTLE_JEM_SKIP_COMMIT"])),
+        skip_drift_check: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_drift_check, env_hash["KETTLE_JEM_SKIP_DRIFT_CHECK"])),
+        skip_rubocop_gradual: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_rubocop_gradual, env_hash["KETTLE_JEM_SKIP_RUBOCOP_GRADUAL"])),
+        skip_binstubs: DecisionPolicy.value_to_boolean(option_hash.fetch(:skip_binstubs, env_hash["KETTLE_JEM_SKIP_BINSTUBS"])),
         dry_run: DecisionPolicy.value_to_boolean(option_hash.fetch(:dry_run, env_hash["KETTLE_JEM_DRY_RUN"])),
         accept_config: DecisionPolicy.value_to_boolean(option_hash.fetch(:accept_config, env_hash["KETTLE_JEM_ACCEPT_CONFIG"])),
         bootstrap_mode: DecisionPolicy.value_to_boolean(option_hash.fetch(:bootstrap_mode, env_hash["KETTLE_JEM_BOOTSTRAP_MODE"])),

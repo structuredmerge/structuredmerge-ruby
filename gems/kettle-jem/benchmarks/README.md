@@ -28,6 +28,11 @@ Useful environment variables:
 | `KETTLE_JEM_BENCHMARK_COMMAND` | `template` | Public `kettle-jem` command to benchmark: `plan`, `apply`, `template`, or `install`. |
 | `KETTLE_JEM_BENCHMARK_MIN_RUBY` | `1.8.7` | Minimum Ruby value passed through `KJ_MIN_RUBY` to broaden generated workflow/gemfile coverage. |
 
+Benchmark runs set `KETTLE_JEM_SKIP_DRIFT_CHECK=true`,
+`KETTLE_JEM_SKIP_RUBOCOP_GRADUAL=true`, `KETTLE_JEM_SKIP_BINSTUBS=true`, and
+`KETTLE_JEM_SKIP_LOCK_NORMALIZATION=true` so external drift/style/setup cleanup
+does not pad the template timing comparison.
+
 The default `template` benchmark compares:
 
 - baseline classified planning with no Ractor workers
