@@ -20,6 +20,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem`'s default development bundle now pins
+  `tree_sitter_language_pack` to the StructuredMerge fork branch that exposes
+  the Ruby parser API, while still allowing templating runs to override it with
+  `VENDORED_GEMS`.
 - Gemspec templating now deletes empty generated development-dependency comment
   sections through Prism-backed CRISPR structural edits, preventing blank-line
   churn before the closing `Gem::Specification` `end`.

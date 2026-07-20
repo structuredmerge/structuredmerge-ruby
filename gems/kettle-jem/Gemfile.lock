@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
+  revision: 85cac7836bb2f8cfcd3041a191b7bd11bf10924a
+  branch: fix/ruby-parser-api-methods
+  glob: packages/ruby/*.gemspec
+  specs:
+    tree_sitter_language_pack (1.12.5)
+      rb_sys (>= 0.9, < 0.9.128)
+      sorbet-runtime (~> 0.5)
+
 PATH
   remote: .
   specs:
@@ -321,6 +331,9 @@ GEM
     racc (1.8.1)
     rainbow (3.1.1)
     rake (13.4.2)
+    rake-compiler-dock (1.12.0)
+    rb_sys (0.9.127)
+      rake-compiler-dock (= 1.12.0)
     rbs (4.0.3)
       logger
       prism (>= 1.6.0)
@@ -510,8 +523,6 @@ GEM
     toml-rb (4.2.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.13.1-x86_64-linux)
-      sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.2.0)
       parallel_tests (>= 3.3.0, < 6)
@@ -601,6 +612,7 @@ DEPENDENCIES
   stringio (>= 3.0)
   toml-merge!
   tree_haver!
+  tree_sitter_language_pack!
   turbo_tests2 (~> 3.2, >= 3.2.0)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.3)
@@ -692,6 +704,8 @@ CHECKSUMS
   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+  rake-compiler-dock (1.12.0) sha256=f13205c2738f3d2053afcd03491a9e4541b22a59a0bfc53fc8bc883bd8188023
+  rb_sys (0.9.127) sha256=e9f90df3bb0577472d26d96127d5b5774b98f44de881e7d36aeefd28d6337847
   rbs (4.0.3) sha256=5a7bf70e2628549d9a1f44eae447b2cfe55968a9c60cfff52693a4bdcc020e14
   rbs-merge (7.1.0)
   rdoc (6.17.0) sha256=0f50d4e568fc98195f9bb155a9e8dff6c7feabfb515fb22ef6df1d12ad5a02b7
@@ -756,7 +770,7 @@ CHECKSUMS
   toml-merge (7.1.0)
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
   tree_haver (7.1.0)
-  tree_sitter_language_pack (1.13.1-x86_64-linux) sha256=f027e08568a7910e8f3bddf5117af70f115da2ff236f4a65d6d6db5f07645d52
+  tree_sitter_language_pack (1.12.5)
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42

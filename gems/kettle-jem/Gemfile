@@ -92,6 +92,20 @@ if direct_sibling_gems.any? &&
   end
 end
 
+# Use the StructuredMerge TSLP branch until upstream ships parser API bindings.
+vendored_gems = ENV.fetch("VENDORED_GEMS", "").split(",").map(&:strip)
+tslp_declared_by_templating =
+  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? &&
+    vendored_gems.include?("tree_sitter_language_pack")
+unless tslp_declared_by_templating
+  gem(
+    "tree_sitter_language_pack",
+    git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
+    branch: "fix/ruby-parser-api-methods",
+    glob: "packages/ruby/*.gemspec"
+  )
+end
+
 # Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
 eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
 

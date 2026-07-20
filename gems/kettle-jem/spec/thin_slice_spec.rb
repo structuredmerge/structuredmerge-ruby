@@ -14442,6 +14442,10 @@ RSpec.describe Kettle::Jem do
       expect(direct_block).to include('prefix: "RUBYTHEMS"')
       expect(direct_block).to include('path_env: "RUBYTHEMS_DEV"')
       expect(direct_block).to include('root: ["src", "my", "rubythems"]')
+      expect(gemfile).to include("Use the StructuredMerge TSLP branch")
+      expect(gemfile).to include("https://github.com/structuredmerge/tree-sitter-language-pack.git")
+      expect(gemfile).to include('branch: "fix/ruby-parser-api-methods"')
+      expect(gemfile).to include('glob: "packages/ruby/*.gemspec"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
     end
   end
