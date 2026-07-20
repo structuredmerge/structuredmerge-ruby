@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
+  HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
+  structural edit adapter.
 - TreeHaver RSpec dependency tags now support parser capability checks, and
   `ruby-merge` exposes TSLP Ruby capability tags for import records, top-level
   call records, and namespace-form equivalence.
@@ -156,6 +159,10 @@ Please file a bug if you notice a violation of semantic versioning.
   raising during recursive merge policy checks.
 - `kettle-jem` now normalizes GitHub Actions pins for all existing workflow
   files after templating, including workflows outside the active recipe set.
+- `kettle-jem install` now completes raw `bundle gem` skeleton bootstrap by
+  generating the modular Gemfiles required by the generated Gemfile before
+  running setup, and skips RuboCop Gradual autocorrect when the destination does
+  not define that task.
 
 ### Security
 

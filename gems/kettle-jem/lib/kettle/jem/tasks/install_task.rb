@@ -79,9 +79,7 @@ module Kettle
 
         def config_bootstrap_changed?(report)
           report.fetch(:recipe_reports, []).any? do |recipe_report|
-            recipe_report.fetch(:relative_path, nil) == Kettle::Jem::KETTLE_CONFIG_PATH &&
-              recipe_report.fetch(:recipe_name, nil) == "kettle_config_bootstrap" &&
-              recipe_report.fetch(:changed, false)
+            recipe_report.fetch(:relative_path, nil) == Kettle::Jem::KETTLE_CONFIG_PATH && recipe_report.fetch(:changed, false)
           end
         end
 
@@ -671,6 +669,13 @@ module Kettle
               reason: "missing_rake_entrypoint"
             }
           end
+          unless rake_task_available?(project_root, "rubocop_gradual:autocorrect")
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "missing_rubocop_gradual_task"
+            }
+          end
 
           {
             name: "rubocop_gradual_autocorrect",
@@ -682,6 +687,13 @@ module Kettle
 
         def rubocop_gradual_autocorrect_command
           ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+        end
+
+        def rake_task_available?(project_root, task_name)
+          stdout, _stderr, status = Open3.capture3("bin/rake", "--tasks", chdir: project_root.to_s)
+          status.success? && stdout.lines.any? { |line| line.include?(task_name.to_s) }
+        rescue Errno::EACCES, Errno::ENOENT
+          false
         end
 
         def rubocop_lts_local_branch_step(report, env:, project_root: nil)
@@ -1012,6 +1024,7 @@ module Kettle
           if File.file?(gemfile) || (!requested_gemfile.empty? && same_path?(requested_gemfile, gemfile))
             command_env["BUNDLE_GEMFILE"] = gemfile
           end
+          command_env["K_JEM_TEMPLATING"] = "false"
           apply_kettle_family_local_install_env!(command_env)
           command_env
         end

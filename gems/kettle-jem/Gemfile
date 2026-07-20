@@ -96,7 +96,7 @@ end
 vendored_gems = ENV.fetch("VENDORED_GEMS", "").split(",").map(&:strip)
 tslp_declared_by_templating =
   ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? &&
-    vendored_gems.include?("tree_sitter_language_pack")
+  vendored_gems.include?("tree_sitter_language_pack")
 unless tslp_declared_by_templating
   gem(
     "tree_sitter_language_pack",

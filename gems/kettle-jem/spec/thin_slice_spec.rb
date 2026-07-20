@@ -3186,7 +3186,7 @@ RSpec.describe Kettle::Jem do
     end
   end
 
-  it "bootstraps a monorepo subgem template profile with package-owned entries only" do
+  it "bootstraps a monorepo subgem template profile with package-owned entries and Gemfile support files" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-config-bootstrap-monorepo-subgem", tmp_root) do |root|
@@ -3219,7 +3219,15 @@ RSpec.describe Kettle::Jem do
         "README.md",
         {"source" => "gem.gemspec", "target" => "tree_haver.gemspec"},
         "LICENSE.md",
-        "Gemfile"
+        "Gemfile",
+        "gemfiles/modular/coverage.gemfile",
+        "gemfiles/modular/debug.gemfile",
+        "gemfiles/modular/documentation.gemfile",
+        "gemfiles/modular/optional.gemfile",
+        "gemfiles/modular/style.gemfile",
+        "gemfiles/modular/templating.gemfile",
+        "gemfiles/modular/templating_local.gemfile",
+        "gemfiles/modular/x_std_libs.gemfile"
       )
       expect(config).to include(
         "    - source: lib/gem/version.rb\n      " \
@@ -4570,10 +4578,8 @@ RSpec.describe Kettle::Jem do
       )
       expect(install.fetch(:install_steps)).to include(
         name: "rubocop_gradual_autocorrect",
-        command: ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"],
-        status: "succeeded",
-        exitstatus: 0,
-        reason: "executed"
+        status: "skipped",
+        reason: "missing_rubocop_gradual_task"
       )
       expect(install.fetch(:install_steps)).to include(
         name: "bundled_handoff",
@@ -4594,7 +4600,7 @@ RSpec.describe Kettle::Jem do
           "bin_setup_executable" => "updated",
           "bin_setup" => "succeeded",
           "bundle_binstubs" => "succeeded",
-          "rubocop_gradual_autocorrect" => "succeeded",
+          "rubocop_gradual_autocorrect" => "skipped",
           "bundle_binstub_pruning" => "already_current"
         )
       ))
@@ -4612,10 +4618,9 @@ RSpec.describe Kettle::Jem do
       expect(command_names).to include(
         ["bin/setup", "--quiet"],
         curated_binstubs,
-        autocorrect_command,
         handoff_command
       )
-      expect(command_names.index(autocorrect_command)).to be < command_names.index(handoff_command)
+      expect(command_names).not_to include(autocorrect_command)
       expect(commands).to all(include(chdir: root, quiet: true))
       expect(commands.map { |entry| entry.fetch(:env) }).to all(include(
         "BUNDLE_GEMFILE" => nil,
@@ -5064,9 +5069,7 @@ RSpec.describe Kettle::Jem do
 
       expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
-        "K_JEM_TEMPLATING" => "true",
-        "STRUCTUREDMERGE_DEV" => marker.fetch("members_root"),
-        "KETTLE_DEV_DEV" => File.join(root, "kettle-dev")
+        "K_JEM_TEMPLATING" => "false"
       )
 
       disabled_env = env.merge(
@@ -5075,9 +5078,44 @@ RSpec.describe Kettle::Jem do
       )
       expect(Kettle::Jem::Tasks::InstallTask.setup_command_env(root, disabled_env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
-        "K_JEM_TEMPLATING" => "true",
+        "K_JEM_TEMPLATING" => "false",
         "STRUCTUREDMERGE_DEV" => "false",
         "KETTLE_DEV_DEV" => "false"
+      )
+    end
+  end
+
+  it "runs install follow-up templating whenever the canonical config changes" do
+    report = {
+      recipe_reports: [
+        {
+          relative_path: Kettle::Jem::KETTLE_CONFIG_PATH,
+          recipe_name: "template_source_application_structuredmerge_kettle_jem_yml",
+          changed: true
+        }
+      ]
+    }
+
+    expect(Kettle::Jem::Tasks::InstallTask.config_bootstrap_changed?(report)).to be(true)
+  end
+
+  it "skips rubocop gradual autocorrect when the destination Rakefile does not define the task" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-missing-rubocop-gradual-task", tmp_root) do |root|
+      write_tree(root, {
+        "Rakefile" => "task default: []\n",
+        "bin/rake" => <<~SH
+          #!/usr/bin/env sh
+          echo "rake default"
+        SH
+      })
+      FileUtils.chmod("+x", File.join(root, "bin", "rake"))
+
+      expect(Kettle::Jem::Tasks::InstallTask.rubocop_gradual_autocorrect_step(root)).to eq(
+        name: "rubocop_gradual_autocorrect",
+        status: "skipped",
+        reason: "missing_rubocop_gradual_task"
       )
     end
   end

@@ -72,13 +72,40 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD">Unreleased</a></h2>
 
+<h3 id="fixed">Fixed</h3>
+
+<ul>
+  <li>
+<code>kettle-jem</code>’s default development bundle now pins<br>
+<code>tree_sitter_language_pack</code> to the StructuredMerge fork branch that exposes<br>
+the Ruby parser API, while still allowing templating runs to override it with<br>
+<code>VENDORED_GEMS</code>.</li>
+  <li>Gemspec templating now deletes empty generated development-dependency comment<br>
+sections through Prism-backed CRISPR structural edits, preventing blank-line<br>
+churn before the closing <code>Gem::Specification</code> <code>end</code>.</li>
+  <li>Fixed the <code>kettle-jem</code> package manifest so runtime template assets are<br>
+included even when the gemspec is loaded from the monorepo root.</li>
+  <li>Generated local templating Gemfiles can now route<br>
+<code>tree_sitter_language_pack</code> through nomono’s <code>VENDORED_GEMS</code> /<br>
+<code>VENDOR_GEM_DIR</code> support instead of using a one-off inferred local path.</li>
+</ul>
+
 <h3 id="added">Added</h3>
 
 <ul>
+  <li>
+<code>kettle-jem</code> now supports <code>--events</code> for newline-delimited JSON progress<br>
+events, including named event type filters via comma-separated<br>
+<code>--events=TYPE,...</code> values, phase events, per-recipe template progress,<br>
+post-apply and command-step events, diagnostics, and summary events for family<br>
+orchestration consumers.</li>
   <li>Generated CI workflow templates now cache <code>.rspec_status</code> with explicit<br>
 per-workflow keys so <code>kettle-test</code> / <code>turbo_tests2</code> can reuse timing data<br>
 across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework<br>
 matrix runs.</li>
+  <li>Generated dep-heads workflows now document why TruffleRuby runs directly from<br>
+<code>gemfiles/dep_heads.gemfile</code>, making that generated Appraisal file required<br>
+checked-in output for the workflow.</li>
   <li>JRuby 9.2 workflow templates now use the legacy-engine bundle install path<br>
 instead of <code>ruby/setup-ruby</code> bundler caching so old Bundler does not fail<br>
 setup against gem servers without the full legacy index.</li>
@@ -220,9 +247,21 @@ repository-only files by default to reduce downstream distro packaging churn.</l
 
 <h3 id="removed">Removed</h3>
 
-<h3 id="fixed">Fixed</h3>
+<h3 id="fixed-1">Fixed</h3>
 
 <ul>
+  <li>Templating setup now respects explicit <code>STRUCTUREDMERGE_DEV=false</code> and<br>
+<code>KETTLE_DEV_DEV=false</code> values when reading the kettle-family local install<br>
+marker, preventing prepare-mode bundle updates from re-enabling stale local<br>
+Gemfile wiring.</li>
+  <li>Generated root Gemfiles no longer add a separate <code>gem "nomono"</code> bootstrap<br>
+line when templating the <code>nomono</code> gem itself, avoiding duplicate dependency<br>
+declarations against the package gemspec.</li>
+  <li>
+<code>kettle-jem prepare</code> no longer explicitly asks Bundler to update parser gems<br>
+before they exist in a member lockfile, allowing cold-start templating<br>
+bootstraps to introduce vendored parser path dependencies during<br>
+<code>bundle install</code>.</li>
   <li>Workflow template pin maintenance now compares and updates complete pinned<br>
 action strings in source files, so <code>bin/kettle-jem-workflow-pins --check</code><br>
 fails when template files drift from <code>github_actions_step_pins</code> even if the<br>
@@ -944,7 +983,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jul 19 11:47:11 2026 by
+  Generated on Mon Jul 20 00:27:53 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

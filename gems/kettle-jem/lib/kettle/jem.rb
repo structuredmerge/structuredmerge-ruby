@@ -3534,7 +3534,7 @@ module Kettle
     end
 
     def emit_phase_event(events, phase, status:, **payload)
-      event_type = status == "started" ? "phase_start" : "phase_finish"
+      event_type = (status == "started") ? "phase_start" : "phase_finish"
       emit_event(events, event_type, payload.merge(phase: phase.to_s, status: status))
     end
 
@@ -9290,7 +9290,7 @@ module Kettle
         project_root = File.dirname(File.expand_path(gemspec_path.to_s))
         template_inventory_entries(project_root, PACKAGED_TEMPLATE_ROOT).dup
       else
-        MONOREPO_SUBGEM_TEMPLATE_ENTRIES.dup
+        (MONOREPO_SUBGEM_TEMPLATE_ENTRIES + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES).uniq
       end
     end
 
