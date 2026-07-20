@@ -81,6 +81,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `json-merge` file analysis now registers its TreeHaver JSON backend before
+  direct parsing, preventing templating from failing with `No parser registered
+  for json` when JSON smart merges instantiate file analysis directly.
 - RBS recursive member merges no longer duplicate destination-owned comments
   before matched nested declarations across repeated templating runs.
 - RBS merges now preserve retained declaration and nested member blank-line

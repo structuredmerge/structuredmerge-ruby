@@ -23,6 +23,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Install orchestration now bundles each distinct Bundler environment it will
   execute under, and probes RuboCop Gradual tasks with the same environment used
   for the eventual command.
+- Bundler child commands now strip inherited command-line Git configuration, so
+  parent `safe.bareRepository=explicit` settings do not break Bundler Git source
+  caches during templating.
 - Generated semantic diff Git driver configuration now consistently uses the
   installed `smorg-rb` executable and Git diff driver name for Ruby diffs.
 - Generated multi-engine workflow files, including `heads.yml` and

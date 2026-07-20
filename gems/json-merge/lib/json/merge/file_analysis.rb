@@ -200,8 +200,7 @@ module Json
       end
 
       def parse_json
-        # TreeHaver handles backend selection against the grammar Json::Merge
-        # has already registered during bootstrap.
+        Json::Merge.register_backend!
         parser = TreeHaver.parser_for(:json, backend_type: :tree_sitter)
 
         @ast = parser.parse(@source)

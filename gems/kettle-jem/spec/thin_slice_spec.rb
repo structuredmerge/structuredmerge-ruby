@@ -5054,6 +5054,9 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_LOCKFILE" => "/workspace/kettle-jem/Gemfile.lock",
         "BUNDLER_SETUP" => "/workspace/kettle-jem/bundler/setup",
         "BUNDLER_VERSION" => "4.0.12",
+        "GIT_CONFIG_COUNT" => "1",
+        "GIT_CONFIG_KEY_0" => "safe.bareRepository",
+        "GIT_CONFIG_VALUE_0" => "explicit",
         "RUBYLIB" => "/workspace/kettle-jem/lib",
         "RUBYOPT" => "-rbundler/setup"
       }
@@ -5079,6 +5082,9 @@ RSpec.describe Kettle::Jem do
         "BUNDLE_LOCKFILE" => nil,
         "BUNDLER_SETUP" => nil,
         "BUNDLER_VERSION" => nil,
+        "GIT_CONFIG_COUNT" => nil,
+        "GIT_CONFIG_KEY_0" => nil,
+        "GIT_CONFIG_VALUE_0" => nil,
         "RUBYLIB" => nil,
         "RUBYOPT" => nil
       ))
@@ -5259,6 +5265,8 @@ RSpec.describe Kettle::Jem do
       expect(lock_command).not_to be_nil
       requested_bundle_install = commands.find { |entry| entry.fetch(:command) == %w[bundle install] }
       expect(requested_bundle_install).not_to be_nil
+      command_names = commands.map { |entry| entry.fetch(:command) }
+      expect(command_names.index(%w[bundle install])).to be < command_names.index(["bin/setup"])
       expect(requested_bundle_install.fetch(:env)).to include(
         "BUNDLE_GEMFILE" => File.join(root, "Gemfile"),
         "K_JEM_TEMPLATING" => "true",
@@ -5273,7 +5281,7 @@ RSpec.describe Kettle::Jem do
         "GALTZO_FLOSS_DEV" => "false",
         "STRUCTUREDMERGE_DEV" => "false"
       )
-      expect(commands.map { |entry| entry.fetch(:command) }).not_to include(%w[git add -A])
+      expect(command_names).not_to include(%w[git add -A])
     end
   end
 

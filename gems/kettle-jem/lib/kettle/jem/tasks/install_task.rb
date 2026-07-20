@@ -39,8 +39,8 @@ module Kettle
           setup_env = setup_command_env(project_root, env)
           rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env, project_root: project_root)
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
+          install_steps << run_distinct_bundle_install_step(project_root, env: env, setup_env: setup_env, run_options: effective_run_options, command_runner: command_runner)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << distinct_bundle_install_step(project_root, env: env, setup_env: setup_env)
           install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
@@ -177,14 +177,14 @@ module Kettle
               env_local_gitignore
               hook_templates
               git_drivers
+              rubocop_lts_local_branch
+              bundle_install_requested_env
               bin_setup_executable
               bin_setup
               bundle_binstubs
               curated_binstubs_executable
               bundle_binstub_pruning
               bundle_binstub_location_validation
-              rubocop_lts_local_branch
-              bundle_install_requested_env
               rubocop_gradual_autocorrect
               bundle_lock_normalization
             ],
@@ -680,6 +680,19 @@ module Kettle
           }
         end
 
+        def run_distinct_bundle_install_step(project_root, env:, setup_env:, run_options:, command_runner:)
+          step = distinct_bundle_install_step(project_root, env: env, setup_env: setup_env)
+          return step unless step.fetch(:status) == "ready"
+
+          execute_ready_command_step(
+            step,
+            project_root: project_root,
+            env: setup_env,
+            quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(run_options[:quiet]),
+            command_runner: command_runner
+          )
+        end
+
         def rubocop_gradual_autocorrect_step(project_root, env: nil)
           rakefile = File.join(project_root.to_s, "Rakefile")
           bin_rake = File.join(project_root.to_s, "bin", "rake")
@@ -1113,6 +1126,7 @@ module Kettle
         def strip_inherited_bundler_activation!(command_env)
           (ENV.keys + command_env.keys).grep(/\ABUNDLE_/).each { |key| command_env[key] = nil }
           (ENV.keys + command_env.keys).grep(/\ABUNDLER_/).each { |key| command_env[key] = nil }
+          (ENV.keys + command_env.keys).grep(/\AGIT_CONFIG_(?:COUNT|KEY_\d+|VALUE_\d+)\z/).each { |key| command_env[key] = nil }
           %w[RUBYLIB RUBYOPT].each { |key| command_env[key] = nil }
         end
 
