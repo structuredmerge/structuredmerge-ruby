@@ -14,9 +14,26 @@ require "addressable/uri"
 require "token/resolver"
 require "yaml"
 require "ast/merge"
+require "ruby/merge"
+require "prism/merge"
+require "bash/merge"
+require "json/merge"
+require "dotenv/merge"
+require "rbs"
+require "rbs/merge"
+require "citrus-toml-merge"
+require "psych-merge"
+require "ast/crispr/markdown/markly"
+require "ast/crispr/ruby/prism"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
 require_relative "jem/version"
+
+begin
+  require "kettle/drift"
+rescue LoadError
+  # kettle-drift is optional; duplicate drift reports stay unavailable when absent.
+end
 
 module Kettle
   module Jem
@@ -1459,6 +1476,7 @@ module Kettle
       end
 
       def load_plugin!(plugin_name, registry:)
+        # Plugins are apply-time main-Ractor extensions; workers receive reports, not plugin callbacks.
         require(plugin_require_path(plugin_name))
         handle = plugin_handle(plugin_name)
         unless handle.respond_to?(REGISTRATION_METHOD)
@@ -2074,10 +2092,6 @@ module Kettle
     end
 
     module Tasks
-      autoload :InstallTask, "kettle/jem/tasks/install_task"
-      autoload :PrepareTask, "kettle/jem/tasks/prepare_task"
-      autoload :SelfTestTask, "kettle/jem/tasks/self_test_task"
-      autoload :TemplateTask, "kettle/jem/tasks/template_task"
     end
 
     module_function
@@ -2086,17 +2100,6 @@ module Kettle
     def ensure_runtime_dependencies!
       return if defined?(@runtime_dependencies_loaded) && @runtime_dependencies_loaded
 
-      require "ruby/merge"
-      require "prism/merge"
-      require "bash/merge"
-      require "json/merge"
-      require "dotenv/merge"
-      require "rbs"
-      require "rbs/merge"
-      require "citrus-toml-merge"
-      require "psych-merge"
-      require "ast/crispr/markdown/markly"
-      require "ast/crispr/ruby/prism"
       @runtime_dependencies_loaded = true
     end
     # rubocop:enable ThreadSafety/ClassInstanceVariable
@@ -2135,6 +2138,7 @@ module Kettle
     end
 
     def install_tasks
+      # Rake task files must be reloaded for each active Rake.application.
       require "rake"
       load(File.expand_path("jem/tasks.rb", __dir__))
     end
@@ -3985,10 +3989,9 @@ module Kettle
     def duplicate_drift_report(project_root:, template_root:, run_options: {})
       runner = run_options[:duplicate_drift_runner] || run_options["duplicate_drift_runner"]
       unless runner
-        begin
-          require "kettle/drift"
+        if defined?(Kettle::Drift)
           runner = Kettle::Drift
-        rescue LoadError
+        else
           return {
             available: false,
             reason: "kettle-drift is not available"
@@ -15128,6 +15131,11 @@ module Kettle
     end
   end
 end
+
+require_relative "jem/tasks/install_task"
+require_relative "jem/tasks/template_task"
+require_relative "jem/tasks/prepare_task"
+require_relative "jem/tasks/self_test_task"
 
 if File.basename(Process.argv0).match?(/\Arake(?:\z|\.)/) || defined?(Rake.application)
   Kettle::Jem.install_tasks
