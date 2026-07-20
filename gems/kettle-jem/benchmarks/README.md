@@ -37,12 +37,14 @@ The default `template` benchmark compares:
 
 Benchmark summaries include planning execution counters from each report:
 worker-safe recipe count, Ractor spawn count, and recipe count actually executed
-by Ractors. These counters distinguish "workers were enabled" from "work
-actually ran in Ractors".
+by planning Ractors. They also include file-work counters: file work units,
+file-worker Ractor spawns, and file work units committed in Ractors. These
+counters distinguish "workers were enabled" from "work actually ran in
+Ractors".
 
 Long runs print timestamped progress lines before and after each measured
-variant run, including elapsed seconds and recipe/change counts for completed
-runs.
+variant run, including elapsed seconds, recipe/change counts, planning Ractor
+recipe counts, and file Ractor unit counts for completed runs.
 
 For `plan`, file-worker variants are skipped because no filesystem apply phase
 runs. The default `template --accept-config` run exercises kettle-jem's

@@ -104,7 +104,7 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
-  it "classifies only side-effect-free cleanup and generated recipes as worker-safe for now" do
+  it "classifies side-effect-free cleanup and template-source recipes as worker-safe" do
     safe_recipe = {
       name: "github_actions_obsolete_workflow_cleanup_old",
       target_path: ".github/workflows/old.yml",
@@ -112,7 +112,15 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       primitive: "supplied_obsolete_file_deletion",
       facts: []
     }
-    main_only_recipe = {
+    template_recipe = {
+      name: "template_source_application_notes_txt",
+      target_path: "notes.txt",
+      provider_family: "text",
+      primitive: "supplied_template_source_application",
+      facts: [],
+      template_preference: {strategy: "raw_copy", selected_source: "templates/notes.txt.example"}
+    }
+    readme_recipe = {
       name: "template_source_application_readme",
       target_path: "README.md",
       provider_family: "markdown",
@@ -121,7 +129,16 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     }
 
     expect(described_class.send(:worker_safe_recipe?, safe_recipe)).to be(true)
-    expect(described_class.send(:worker_safe_recipe?, main_only_recipe)).to be(false)
+    expect(described_class.send(:worker_safe_recipe?, template_recipe)).to be(true)
+    expect(described_class.send(:worker_safe_recipe?, readme_recipe)).to be(false)
+    expect(described_class.send(:worker_safe_recipe?, template_recipe.merge(target_path: ".github/workflows/ci.yml"))).to be(false)
+    expect(described_class.send(:worker_safe_recipe?, template_recipe.merge(target_path: described_class::KETTLE_CONFIG_PATH))).to be(false)
+    expect(
+      described_class.send(
+        :worker_safe_recipe?,
+        template_recipe.merge(target_path: "Gemfile", template_preference: {strategy: "accept_template", selected_source: "Gemfile.example"})
+      )
+    ).to be(false)
   end
 
 
@@ -187,8 +204,10 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       write_tree(root, {
         ".github/workflows/old.yml" => "name: old\n",
         ".github/workflows/stale.yml" => "name: stale\n",
+        "templates/notes.txt.example" => "generated notes\n",
         "README.md" => "# Example\n"
       })
+      template_path = File.join(root, "templates/notes.txt.example")
       recipes = [
         {
           name: "github_actions_obsolete_workflow_cleanup_old",
@@ -205,6 +224,19 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
           facts: []
         },
         {
+          name: "template_source_application_notes_txt",
+          target_path: "notes.txt",
+          provider_family: "text",
+          primitive: "supplied_template_source_application",
+          facts: [],
+          template_preference: {
+            strategy: "raw_copy",
+            source_root_path: root,
+            source_relative_path: "templates/notes.txt.example",
+            selected_source: "templates/notes.txt.example"
+          }
+        },
+        {
           name: "github_actions_obsolete_workflow_cleanup_stale",
           target_path: ".github/workflows/stale.yml",
           provider_family: "file",
@@ -215,6 +247,7 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       files = {
         ".github/workflows/old.yml" => "name: old\n",
         ".github/workflows/stale.yml" => "name: stale\n",
+        "notes.txt" => "",
         "README.md" => "# Example\n"
       }
       policy = described_class::DecisionPolicy.from_env({"force" => "true"})
@@ -223,7 +256,7 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         recipes: recipes,
         facts: {},
         files: files,
-        template_contents: {},
+        template_contents: {template_path => "generated notes\n"},
         decision_policy: policy,
         env: {},
         events: nil,
@@ -248,18 +281,20 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       expect(workers.map { |report| report.fetch(:recipe_name) }).to eq(%w[
         github_actions_obsolete_workflow_cleanup_old
         noop_main_only
+        template_source_application_notes_txt
         github_actions_obsolete_workflow_cleanup_stale
       ])
       expect(stats).to include(
-        worker_safe_recipes: 2,
+        worker_safe_recipes: 3,
         main_only_recipes: 1,
         ractor_worker_count: 2,
         ractor_spawn_count: 2,
-        ractor_recipe_count: 2,
+        ractor_recipe_count: 3,
         main_recipe_count: 1
       )
       expect(workers.fetch(0).dig(:metadata, :executor)).to eq("ractor")
       expect(workers.fetch(2).dig(:metadata, :executor)).to eq("ractor")
+      expect(workers.fetch(3).dig(:metadata, :executor)).to eq("ractor")
       expect(workers.fetch(1).dig(:metadata, :executor)).to be_nil
     end
   end
@@ -428,10 +463,20 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         ]
       )
 
-      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit], workers: 2)
+      stats = described_class.send(:file_work_execution_stats, 2)
+
+      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit], workers: 2, stats: stats)
 
       expect(File.read(first_path)).to eq("first\n")
       expect(File).not_to exist(second_path)
+      expect(stats).to include(
+        file_worker_count: 2,
+        file_work_units: 2,
+        file_operations: 3,
+        file_ractor_units: 2,
+        file_ractor_spawn_count: 2,
+        main_file_units: 0
+      )
     end
   end
 

@@ -359,6 +359,14 @@ module Kettle
       supplied_template_source_preference
       supplied_template_source_application
     ].freeze
+    PROJECT_ROOT_SENSITIVE_TEMPLATE_PATHS = %w[
+      README.md
+      mise.toml
+    ].freeze
+    RACTOR_SAFE_ACCEPT_TEMPLATE_FILE_TYPES = %i[
+      rbs
+      ruby
+    ].freeze
     RAKEFILE_GUARDED_REQUIRE_NAMES = %w[kettle/dev kettle/jem stone_checksums].freeze
     COVERAGE_THRESHOLD_KEYS = %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].freeze
     GITHUB_WORKFLOW_ENGINE_JOB_KEYS = {
@@ -3771,7 +3779,12 @@ module Kettle
         chunks.fetch(offset % chunks.length) << job
       end
       pool = chunks.reject(&:empty?).map do |chunk|
-        jobs = Ractor.make_shareable(chunk.map { |recipe, index| {index: index, recipe: recipe} })
+        jobs = Ractor.make_shareable(chunk.map do |recipe, index|
+          {
+            index: index,
+            recipe: worker_safe_recipe_payload(recipe, project_root: project_root, template_contents: template_contents)
+          }
+        end)
         started_at = monotonic_time
         [
           started_at,
@@ -3800,6 +3813,20 @@ module Kettle
       reports
     end
 
+    def worker_safe_recipe_payload(recipe, project_root:, template_contents:)
+      return recipe unless recipe.fetch(:primitive).to_s == "supplied_template_source_application"
+      return recipe if recipe.dig(:template_preference, :strategy).to_s == "raw_copy"
+
+      content = recipe_template_content(project_root, recipe, template_contents: template_contents)
+      recipe.merge(
+        resolved_template_content: resolve_template_tokens(
+          content,
+          recipe.fetch(:template_tokens, {}),
+          scan_unresolved: unresolved_template_scan?(recipe)
+        )
+      )
+    end
+
     def execute_timed_recipe(project_root:, recipe:, facts:, files:, template_contents:, decision_policy:, env:)
       timed_recipe_report do
         execute_recipe(
@@ -3816,7 +3843,22 @@ module Kettle
 
     def worker_safe_recipe?(recipe)
       name = recipe.fetch(:name).to_s
-      WORKER_SAFE_RECIPE_NAME_PATTERNS.any? { |pattern| pattern.match?(name) }
+      return true if WORKER_SAFE_RECIPE_NAME_PATTERNS.any? { |pattern| pattern.match?(name) }
+
+      template_source_application_worker_safe?(recipe)
+    end
+
+    def template_source_application_worker_safe?(recipe)
+      return false unless recipe.fetch(:primitive).to_s == "supplied_template_source_application"
+
+      path = recipe.fetch(:target_path).to_s
+      return false if PROJECT_ROOT_SENSITIVE_TEMPLATE_PATHS.include?(path)
+      return false if path == KETTLE_CONFIG_PATH
+      return false if github_workflow_template_recipe?(recipe)
+      return true if recipe.dig(:template_preference, :strategy).to_s == "raw_copy"
+
+      recipe.dig(:template_preference, :strategy).to_s == "accept_template" &&
+        RACTOR_SAFE_ACCEPT_TEMPLATE_FILE_TYPES.include?(template_file_type(recipe))
     end
 
     def apply_project(project_root, env: ENV, run_options: {})
@@ -3824,6 +3866,7 @@ module Kettle
       report = plan_project(project_root, env: env, run_options: run_options).merge(mode: "apply")
       file_work_workers = with_event_phase(events, "file_work_workers") { file_work_workers_for(env, run_options) }
       report[:file_work_workers] = file_work_workers
+      report[:file_work_execution] = file_work_execution_stats(file_work_workers)
       with_event_phase(events, "apply") do
         before_apply_files = with_event_phase(events, "snapshot_changed_files") do
           snapshot_changed_files(
@@ -3832,7 +3875,7 @@ module Kettle
           )
         end
         with_event_phase(events, "write_template_files") do
-          run_apply_phases(project_root, report, file_workers: file_work_workers)
+          run_apply_phases(project_root, report, file_workers: file_work_workers, file_stats: report.fetch(:file_work_execution))
         end
         report[:changed_files] = with_event_phase(events, "actual_changed_files") do
           actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
@@ -5295,11 +5338,13 @@ module Kettle
       return finalize_github_workflow_template(content, facts) if strategy == "raw_copy" && github_workflow_template_recipe?(recipe)
       return finalize_template_source_content(recipe, content) if strategy == "raw_copy"
 
-      resolved = resolve_template_tokens(
-        content,
-        recipe.fetch(:template_tokens, {}),
-        scan_unresolved: unresolved_template_scan?(recipe)
-      )
+      resolved = recipe.fetch(:resolved_template_content) do
+        resolve_template_tokens(
+          content,
+          recipe.fetch(:template_tokens, {}),
+          scan_unresolved: unresolved_template_scan?(recipe)
+        )
+      end
     rescue ArgumentError => e
       raise ArgumentError, "#{recipe.fetch(:target_path)}: #{e.message}"
     else
@@ -10482,7 +10527,7 @@ module Kettle
       }
     end
 
-    def run_apply_phases(project_root, report, file_workers: 0)
+    def run_apply_phases(project_root, report, file_workers: 0, file_stats: nil)
       plugin_registry = plugin_registry_for_project(project_root)
       changed_files = report.fetch(:changed_files)
       diagnostics = report.fetch(:diagnostics)
@@ -10512,7 +10557,8 @@ module Kettle
         end
         commit_file_work_units(
           file_work_units_for_phase(project_root, reports_by_phase.fetch(phase, [])),
-          workers: file_workers
+          workers: file_workers,
+          stats: file_stats
         )
         unless plugin_registry.empty?
           plugin_registry.run(
@@ -10535,17 +10581,43 @@ module Kettle
       report[:run_stats] = recipe_run_stats(report.fetch(:recipe_reports), diagnostics: diagnostics)
     end
 
+    def file_work_execution_stats(file_workers)
+      {
+        file_worker_count: file_workers.to_i,
+        file_work_units: 0,
+        file_operations: 0,
+        file_ractor_units: 0,
+        file_ractor_spawn_count: 0,
+        main_file_units: 0
+      }
+    end
+
     def apply_recipe_report(project_root, recipe_report)
       intent = write_intent_from_recipe_report(project_root, recipe_report)
       commit_file_outcome(intent) if intent
     end
 
-    def commit_file_work_units(file_work_units, workers: 0)
+    def commit_file_work_units(file_work_units, workers: 0, stats: nil)
       units = Array(file_work_units)
       return if units.empty?
+
+      record_file_work_execution_stats(stats, units: units, workers: workers.to_i)
       return commit_file_work_units_ractor(units, workers: workers.to_i) if workers.to_i.positive?
 
       units.each { |file_work_unit| commit_file_work_unit(file_work_unit) }
+    end
+
+    def record_file_work_execution_stats(stats, units:, workers:)
+      return unless stats
+
+      stats[:file_work_units] += units.length
+      stats[:file_operations] += units.sum { |unit| unit.operations.length }
+      if workers.positive?
+        stats[:file_ractor_units] += units.length
+        stats[:file_ractor_spawn_count] += units.length
+      else
+        stats[:main_file_units] += units.length
+      end
     end
 
     def commit_file_work_units_ractor(file_work_units, workers:)
