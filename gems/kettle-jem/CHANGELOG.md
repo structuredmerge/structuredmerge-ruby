@@ -55,7 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
   compares classified planning and phase-gated file work with and without
   opt-in Ractor workers. The harness now defaults `KJ_MIN_RUBY` to `1.8.7` so
   benchmark runs exercise legacy workflow and gemfile generation through the
-  supported one-shot `template --accept-config` flow.
+  supported one-shot `template --accept-config` flow, and it records the latest
+  benchmark outcome in a committed results README.
 - Apply now routes recipe report mutations through explicit write intents and
   phase-gated per-file work units, preparing the file-processing path for
   opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates

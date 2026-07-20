@@ -9,8 +9,9 @@ The fixture at `fixtures/skeleton/` is generated from a standard
 so the skeleton can be committed as project data. Benchmark runs never mutate
 that fixture directly. Each measured run copies it into `tmp/benchmarks/work/`,
 runs one-shot templating from that copied gem root, writes reports under
-`tmp/benchmarks/reports/`, and resets the copied skeleton before and after the
-run.
+`tmp/benchmarks/reports/`, writes a machine-readable timing summary to
+`tmp/benchmarks/summary.json`, updates `results/README.md`, and resets the
+copied skeleton before and after the run.
 
 Run the benchmark from the `kettle-jem` project root:
 
@@ -39,3 +40,11 @@ runs. The default `template --accept-config` run exercises kettle-jem's
 supported one-shot flow: environment variables seed `.structuredmerge/kettle-jem.yml`,
 the config bootstrap is written, and the install/template task continues through
 the follow-up apply against that config.
+
+The latest committed benchmark summary lives at `results/README.md`. If the
+full benchmark has already run and `tmp/benchmarks/summary.json` still exists,
+regenerate only that committed summary without rerunning templating:
+
+```bash
+mise exec -C /path/to/kettle-jem -- ruby benchmarks/kettle_jem_ractor_planning.rb --summarize-only
+```
