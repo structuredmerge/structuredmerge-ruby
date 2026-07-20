@@ -47,8 +47,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Templating plan reports now include per-recipe duration metadata, template
   planning deduplicates destination and template-source file reads, and runtime
-  loading is reduced to explicit main-Ractor extension points in preparation for
-  Ractor-based recipe planning.
+  loading is reduced to explicit main-Ractor extension points. A disabled
+  classified planning strategy now identifies worker-safe recipes and preserves
+  sequential report parity in preparation for Ractor-based recipe planning.
 - Generated README Support & Community rows now include a RubyForum help badge.
 - Generated READMEs can now render template-managed corporate sponsor logos
   from `readme.corporate_sponsors` config or family-provided sponsorship data.

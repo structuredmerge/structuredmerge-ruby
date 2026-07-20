@@ -337,6 +337,17 @@ module Kettle
       "default" => DEFAULT_EVENT_TYPES,
       "progress" => %w[run_start phase_start phase_finish recipe post_apply_step command_step summary]
     }.freeze
+    RECIPE_PLANNING_STRATEGIES = %w[sequential classified].freeze
+    WORKER_SAFE_RECIPE_NAME_PATTERNS = [
+      /\Agithub_actions_framework_gemfile_/,
+      /\Agithub_actions_obsolete_workflow_cleanup_/,
+      /\Agithub_actions_opt_in_workflow_cleanup_/,
+      /\Agithub_actions_inactive_packaged_workflow_cleanup_/,
+      /\Aopencollective_disabled_file_cleanup_/,
+      /\Atemplate_legacy_destination_cleanup_/,
+      /\Atemplate_obsolete_license_cleanup_/,
+      /\Atemplate_shim_profile_cleanup_/
+    ].freeze
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
     RUBY_TEMPLATE_SUFFIXES = %w[.gemspec .gemfile].freeze
     RUBY_TEMPLATE_EXTENSIONS = %w[.rb .rake].freeze
@@ -3415,22 +3426,19 @@ module Kettle
       files = with_event_phase(events, "read_project_files") { read_project_files(project_root, pack) }
       template_contents = with_event_phase(events, "read_template_files") { read_template_source_files(project_root, pack) }
       recipes = pack.fetch(:recipes)
+      recipe_planning_strategy = with_event_phase(events, "recipe_planning_strategy") { recipe_planning_strategy_for(env, run_options) }
       recipe_reports = with_event_phase(events, "recipes", total: recipes.length) do
-        recipes.each_with_index.map do |recipe, index|
-          report = timed_recipe_report do
-            execute_recipe(
-              project_root: project_root,
-              recipe: recipe,
-              facts: facts,
-              files: files,
-              template_contents: template_contents,
-              decision_policy: decision_policy,
-              env: env
-            )
-          end
-          emit_recipe_event(events, report, index: index, total: recipes.length)
-          report
-        end
+        execute_recipe_reports(
+          project_root: project_root,
+          recipes: recipes,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env,
+          events: events,
+          strategy: recipe_planning_strategy
+        )
       end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
@@ -3458,6 +3466,7 @@ module Kettle
           recipe_pack: pack,
           recipe_reports: recipe_reports,
           phase_reports: phase_reports,
+          recipe_planning_strategy: recipe_planning_strategy,
           decision_policy: decision_policy.to_h,
           template_selection: template_selection,
           git_preflight: git_preflight,
@@ -3480,6 +3489,106 @@ module Kettle
         latest_by_path[path] = report if path
       end
       latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+    end
+
+    def recipe_planning_strategy_for(env, run_options)
+      value = (run_options || {})[:recipe_planning_strategy] ||
+        (run_options || {})["recipe_planning_strategy"] ||
+        (env || {})["KETTLE_JEM_RECIPE_PLANNING_STRATEGY"]
+      strategy = value.to_s.strip
+      strategy = "sequential" if strategy.empty?
+      strategy = strategy.tr("_", "-")
+      strategy = "sequential" if %w[0 false no off none sequential].include?(strategy)
+      strategy = "classified" if %w[1 true yes on classified classify].include?(strategy)
+      raise ArgumentError, "Unsupported kettle-jem recipe planning strategy #{value.inspect}" unless RECIPE_PLANNING_STRATEGIES.include?(strategy)
+
+      strategy
+    end
+
+    def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:)
+      case strategy.to_s
+      when "sequential"
+        execute_recipe_reports_sequential(
+          project_root: project_root,
+          recipes: recipes,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env,
+          events: events
+        )
+      when "classified"
+        execute_recipe_reports_classified(
+          project_root: project_root,
+          recipes: recipes,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env,
+          events: events
+        )
+      else
+        raise ArgumentError, "Unsupported kettle-jem recipe planning strategy #{strategy.inspect}"
+      end
+    end
+
+    def execute_recipe_reports_sequential(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:)
+      recipes.each_with_index.map do |recipe, index|
+        report = execute_timed_recipe(
+          project_root: project_root,
+          recipe: recipe,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env
+        )
+        emit_recipe_event(events, report, index: index, total: recipes.length)
+        report
+      end
+    end
+
+    def execute_recipe_reports_classified(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:)
+      indexed_recipes = recipes.each_with_index.to_a
+      reports_by_index = {}
+      worker_safe, main_only = indexed_recipes.partition { |recipe, _index| worker_safe_recipe?(recipe) }
+      (worker_safe + main_only).each do |recipe, index|
+        reports_by_index[index] = execute_timed_recipe(
+          project_root: project_root,
+          recipe: recipe,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env
+        )
+      end
+      recipes.each_index.map do |index|
+        report = reports_by_index.fetch(index)
+        emit_recipe_event(events, report, index: index, total: recipes.length)
+        report
+      end
+    end
+
+    def execute_timed_recipe(project_root:, recipe:, facts:, files:, template_contents:, decision_policy:, env:)
+      timed_recipe_report do
+        execute_recipe(
+          project_root: project_root,
+          recipe: recipe,
+          facts: facts,
+          files: files,
+          template_contents: template_contents,
+          decision_policy: decision_policy,
+          env: env
+        )
+      end
+    end
+
+    def worker_safe_recipe?(recipe)
+      name = recipe.fetch(:name).to_s
+      WORKER_SAFE_RECIPE_NAME_PATTERNS.any? { |pattern| pattern.match?(name) }
     end
 
     def apply_project(project_root, env: ENV, run_options: {})

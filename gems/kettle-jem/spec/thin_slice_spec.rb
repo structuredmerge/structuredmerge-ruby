@@ -86,6 +86,91 @@ RSpec.describe Kettle::Jem do
     expect(report.dig(:report_envelope, :report, :metadata, :duration_ms)).to eq(report.dig(:metadata, :duration_ms))
   end
 
+  it "parses recipe planning strategies from options and env" do
+    expect(described_class.send(:recipe_planning_strategy_for, {}, {})).to eq("sequential")
+    expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {})).to eq("classified")
+    expect(described_class.send(:recipe_planning_strategy_for, {}, {recipe_planning_strategy: "true"})).to eq("classified")
+    expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {recipe_planning_strategy: "sequential"})).to eq("sequential")
+
+    expect do
+      described_class.send(:recipe_planning_strategy_for, {}, {recipe_planning_strategy: "ractor"})
+    end.to raise_error(ArgumentError, /Unsupported kettle-jem recipe planning strategy/)
+  end
+
+  it "classifies only side-effect-free cleanup and generated recipes as worker-safe for now" do
+    safe_recipe = {
+      name: "github_actions_obsolete_workflow_cleanup_old",
+      target_path: ".github/workflows/old.yml",
+      provider_family: "file",
+      primitive: "supplied_obsolete_file_deletion",
+      facts: []
+    }
+    main_only_recipe = {
+      name: "template_source_application_readme",
+      target_path: "README.md",
+      provider_family: "markdown",
+      primitive: "supplied_template_source_application",
+      facts: []
+    }
+
+    expect(described_class.send(:worker_safe_recipe?, safe_recipe)).to be(true)
+    expect(described_class.send(:worker_safe_recipe?, main_only_recipe)).to be(false)
+  end
+
+  it "keeps classified recipe planning report output equivalent to sequential planning" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-classified-planning", tmp_root) do |root|
+      write_tree(root, {
+        ".github/workflows/old.yml" => "name: old\n",
+        "README.md" => "# Example\n"
+      })
+      recipes = [
+        {
+          name: "noop_main_only",
+          target_path: "README.md",
+          provider_family: "markdown",
+          primitive: "noop",
+          facts: []
+        },
+        {
+          name: "github_actions_obsolete_workflow_cleanup_old",
+          target_path: ".github/workflows/old.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        }
+      ]
+      files = {
+        "README.md" => "# Example\n",
+        ".github/workflows/old.yml" => "name: old\n"
+      }
+      policy = described_class::DecisionPolicy.from_env({"force" => "true"})
+      common = {
+        project_root: root,
+        recipes: recipes,
+        facts: {},
+        files: files,
+        template_contents: {},
+        decision_policy: policy,
+        env: {},
+        events: nil
+      }
+
+      sequential = described_class.send(:execute_recipe_reports, **common.merge(strategy: "sequential"))
+      classified = described_class.send(:execute_recipe_reports, **common.merge(strategy: "classified"))
+      normalize = lambda do |reports|
+        Marshal.load(Marshal.dump(reports)).each do |report|
+          report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+        end
+      end
+
+      expect(normalize.call(classified)).to eq(normalize.call(sequential))
+      expect(classified.map { |report| report.fetch(:recipe_name) }).to eq(%w[noop_main_only github_actions_obsolete_workflow_cleanup_old])
+    end
+  end
+
   it "normalizes GitHub remote source URLs structurally" do
     expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
       "https://github.com/rubythems/them-server"
