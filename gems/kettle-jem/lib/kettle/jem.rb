@@ -3374,6 +3374,8 @@ module Kettle
 
     def plan_project(project_root, env: ENV, run_options: {})
       ensure_runtime_dependencies!
+      events = event_stream_from_options(run_options)
+      emit_event(events, "run_start", mode: "plan", project_root: project_root.to_s)
       preflight_project!(project_root)
       template_selection = template_selection_for(env, run_options)
       decision_policy = decision_policy_for(env, run_options)
@@ -3383,8 +3385,11 @@ module Kettle
       pack = recipe_pack(facts)
       pack = filter_recipe_pack(pack, template_selection)
       files = read_project_files(project_root, pack)
-      recipe_reports = pack.fetch(:recipes).map do |recipe|
-        execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
+      recipes = pack.fetch(:recipes)
+      recipe_reports = recipes.each_with_index.map do |recipe, index|
+        report = execute_recipe(project_root: project_root, recipe: recipe, facts: facts, files: files, decision_policy: decision_policy, env: env)
+        emit_recipe_event(events, report, index: index, total: recipes.length)
+        report
       end
       plugin_registry = plugin_registry_for_project(project_root)
       changed_files = changed_files_from_recipe_reports(recipe_reports)
@@ -3403,7 +3408,7 @@ module Kettle
       warnings = Array(facts[:warnings]).map(&:to_s).reject(&:empty?)
       warnings.concat(github_workflow_template_pin_warnings(recipe_reports))
 
-      {
+      report = {
         mode: "plan",
         ready: true,
         facts: facts,
@@ -3420,6 +3425,8 @@ module Kettle
         diagnostics: diagnostics,
         run_stats: run_stats
       }
+      emit_summary_event(events, report)
+      report
     end
 
     def changed_files_from_recipe_reports(recipe_reports)
@@ -3448,7 +3455,62 @@ module Kettle
         template_root: template_root_path(project_root, config: kettle_jem_config(project_root)),
         run_options: run_options
       )
+      emit_summary_event(event_stream_from_options(run_options), report)
       report
+    end
+
+    def event_stream(io)
+      EventStream.new(io)
+    end
+
+    def event_stream_from_options(run_options)
+      stream = (run_options || {})[:event_stream] || (run_options || {})["event_stream"]
+      stream if stream.respond_to?(:emit)
+    end
+
+    def emit_recipe_event(events, report, index:, total:)
+      emit_event(
+        events,
+        "recipe",
+        phase: "template",
+        index: index + 1,
+        total: total,
+        path: report.fetch(:relative_path, nil),
+        recipe: report.fetch(:recipe_name, nil),
+        changed: report.fetch(:changed, false),
+        status: "ok",
+        mark: report.fetch(:changed, false) ? "*" : "."
+      )
+    end
+
+    def emit_summary_event(events, report)
+      emit_event(
+        events,
+        "summary",
+        mode: report.fetch(:mode, nil),
+        changed_files: Array(report.fetch(:changed_files, [])),
+        changed_count: Array(report.fetch(:changed_files, [])).length,
+        diagnostics_count: Array(report.fetch(:diagnostics, [])).length,
+        status: "ok",
+        mark: "."
+      )
+    end
+
+    def emit_event(events, type, payload = {})
+      return unless events
+
+      events.emit(payload.merge(type: type, event_version: 1))
+    end
+
+    class EventStream
+      def initialize(io)
+        @io = io
+      end
+
+      def emit(payload)
+        @io.puts(JSON.generate(payload.compact))
+        @io.flush if @io.respond_to?(:flush)
+      end
     end
 
     def snapshot_changed_files(project_root, changed_files)

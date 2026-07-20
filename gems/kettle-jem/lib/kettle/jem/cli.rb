@@ -11,11 +11,11 @@ module Kettle
         Usage:
           kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
           kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-          kettle-jem prepare [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force] [--quiet|--verbose]
-          kettle-jem plan [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem apply [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem template [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem install [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem prepare [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force] [--quiet|--verbose]
+          kettle-jem plan [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem apply [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem template [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem install [PROJECT_ROOT] [--json|--events] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem manifest [PROJECT_ROOT] [--json]
           kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
           kettle-jem version
@@ -32,6 +32,7 @@ module Kettle
         project_root = File.expand_path(options.fetch(:project_root) || Dir.pwd)
         ensure_not_running_from_own_context!(command, project_root)
         print_debug_snapshot(command, project_root: project_root, env: env, err: err) if debug_enabled?(env)
+        options[:event_io] = out
         result = execute(command, project_root: project_root, env: env, options: options)
         write_report(options[:report_path], result) if options[:report_path]
         print_result(command, result, options: options, out: out)
@@ -69,11 +70,13 @@ module Kettle
       def parse_options(args)
         options = {
           json: false,
+          events: false,
           run_options: {}
         }
         parser = OptionParser.new do |opts|
           opts.banner = USAGE
           opts.on("--json", "Print the full machine-readable result as JSON.") { options[:json] = true }
+          opts.on("--events", "Print newline-delimited JSON progress events.") { options[:events] = true }
           opts.on("--report PATH", "Write the full machine-readable result to PATH as JSON.") do |path|
             options[:report_path] = path
           end
@@ -161,30 +164,32 @@ module Kettle
         end
         remaining = parser.parse(args)
         raise ArgumentError, "Expected at most one PROJECT_ROOT" if remaining.length > 1
+        raise OptionParser::InvalidOption, "--events cannot be combined with --json" if options[:events] && options[:json]
 
         options[:project_root] = remaining.first
         options
       end
 
       def execute(command, project_root:, env:, options:)
+        run_options = options.fetch(:run_options)
+        run_options[:event_stream] = Kettle::Jem.event_stream(options.fetch(:event_io)) if options[:events]
         case command
         when "setup"
-          Kettle::Jem.setup_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.setup_project(project_root, env: env, run_options: run_options)
         when "prepare"
-          Kettle::Jem::Tasks::PrepareTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem::Tasks::PrepareTask.run(project_root: project_root, env: env, run_options: run_options)
         when "plan"
-          Kettle::Jem.plan_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.plan_project(project_root, env: env, run_options: run_options)
         when "apply"
-          Kettle::Jem.apply_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
         when "template"
-          run_options = options.fetch(:run_options)
           if scoped_template_run?(run_options)
             Kettle::Jem::Tasks::TemplateTask.run(project_root: project_root, env: env, run_options: run_options)
           else
             Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: run_options)
           end
         when "install"
-          Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: run_options)
         when "manifest"
           Kettle::Jem.template_manifest(project_root: project_root)
         when "selftest"
@@ -225,6 +230,7 @@ module Kettle
       end
 
       def print_result(command, result, options:, out:)
+        return if options[:events]
         return if options.fetch(:run_options, {})[:quiet] && !options[:json]
 
         if options[:json]

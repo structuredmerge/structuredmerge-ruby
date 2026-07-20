@@ -35,6 +35,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `kettle-jem` now supports `--events` for newline-delimited JSON progress
+  events, including per-recipe template progress and summary events for family
+  orchestration consumers.
 - Generated CI workflow templates now cache `.rspec_status` with explicit
   per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
   across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
