@@ -1611,6 +1611,26 @@ module Kettle
       end
     end
 
+    class FileWorkUnit
+      attr_reader :relative_path, :operations
+
+      def initialize(relative_path:, operations:)
+        @relative_path = relative_path.to_s
+        @operations = Array(operations)
+        raise ArgumentError, "File work unit requires at least one operation" if @operations.empty?
+
+        mismatched_paths = @operations.reject { |operation| operation.relative_path == @relative_path }
+        return if mismatched_paths.empty?
+
+        paths = mismatched_paths.map(&:relative_path).uniq.join(", ")
+        raise ArgumentError, "File work unit #{relative_path.inspect} cannot include operations for #{paths}"
+      end
+
+      def outcome
+        operations.last
+      end
+    end
+
     module TemplateChecksums
       YAML_KEY = "kettle-jem"
       CHECKSUMS_SUBKEY = "checksums"
@@ -10394,8 +10414,8 @@ module Kettle
             phase_stats: phase_stats
           )
         end
-        write_intents_for_phase(project_root, reports_by_phase.fetch(phase, [])).each do |write_intent|
-          commit_write_intent(write_intent)
+        file_work_units_for_phase(project_root, reports_by_phase.fetch(phase, [])).each do |file_work_unit|
+          commit_file_outcome(file_work_unit.outcome)
         end
         unless plugin_registry.empty?
           plugin_registry.run(
@@ -10420,11 +10440,26 @@ module Kettle
 
     def apply_recipe_report(project_root, recipe_report)
       intent = write_intent_from_recipe_report(project_root, recipe_report)
-      commit_write_intent(intent) if intent
+      commit_file_outcome(intent) if intent
+    end
+
+    def file_work_units_for_phase(project_root, recipe_reports)
+      file_work_units_from_write_intents(write_intents_for_phase(project_root, recipe_reports))
     end
 
     def write_intents_for_phase(project_root, recipe_reports)
       recipe_reports.filter_map { |recipe_report| write_intent_from_recipe_report(project_root, recipe_report) }
+    end
+
+    def file_work_units_from_write_intents(write_intents)
+      grouped_operations = {}
+      Array(write_intents).each do |write_intent|
+        grouped_operations[write_intent.relative_path] ||= []
+        grouped_operations[write_intent.relative_path] << write_intent
+      end
+      grouped_operations.map do |relative_path, operations|
+        FileWorkUnit.new(relative_path: relative_path, operations: operations)
+      end
     end
 
     def write_intent_from_recipe_report(project_root, recipe_report)
@@ -10444,14 +10479,22 @@ module Kettle
     end
 
     def commit_write_intent(write_intent)
-      path = write_intent.absolute_path
-      if write_intent.delete?
+      commit_file_outcome(write_intent)
+    end
+
+    def commit_file_outcome(file_outcome)
+      commit_filesystem_outcome(file_outcome)
+    end
+
+    def commit_filesystem_outcome(file_outcome)
+      path = file_outcome.absolute_path
+      if file_outcome.delete?
         FileUtils.rm_f(path)
-      elsif write_intent.write?
+      elsif file_outcome.write?
         FileUtils.mkdir_p(File.dirname(path))
-        File.write(path, write_intent.content)
+        File.write(path, file_outcome.content)
       else
-        raise ArgumentError, "Unsupported write intent action #{write_intent.action.inspect}"
+        raise ArgumentError, "Unsupported file outcome action #{file_outcome.action.inspect}"
       end
     end
 

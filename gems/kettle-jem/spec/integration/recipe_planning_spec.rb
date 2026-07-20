@@ -284,10 +284,57 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
-  it "commits write intents sequentially while preserving current apply behavior" do
+  it "reduces phase write intents into per-file work units" do
+    first_write = described_class::WriteIntent.new(
+      relative_path: "lib/example.rb",
+      absolute_path: "/project/lib/example.rb",
+      action: :write,
+      content: "first\n",
+      recipe_name: "first_recipe"
+    )
+    final_delete = described_class::WriteIntent.new(
+      relative_path: "lib/example.rb",
+      absolute_path: "/project/lib/example.rb",
+      action: :delete,
+      recipe_name: "cleanup_recipe"
+    )
+    other_write = described_class::WriteIntent.new(
+      relative_path: "README.md",
+      absolute_path: "/project/README.md",
+      action: :write,
+      content: "# README\n",
+      recipe_name: "readme_recipe"
+    )
+
+    work_units = described_class.send(:file_work_units_from_write_intents, [first_write, other_write, final_delete])
+
+    expect(work_units.map(&:relative_path)).to eq(["lib/example.rb", "README.md"])
+    expect(work_units.fetch(0).operations).to eq([first_write, final_delete])
+    expect(work_units.fetch(0).outcome).to eq(final_delete)
+    expect(work_units.fetch(1).operations).to eq([other_write])
+    expect(work_units.fetch(1).outcome).to eq(other_write)
+  end
+
+
+  it "rejects file work units that mix relative paths" do
+    write_intent = described_class::WriteIntent.new(
+      relative_path: "lib/example.rb",
+      absolute_path: "/project/lib/example.rb",
+      action: :write,
+      content: "# generated\n",
+      recipe_name: "generated_lib_file"
+    )
+
+    expect do
+      described_class::FileWorkUnit.new(relative_path: "README.md", operations: [write_intent])
+    end.to raise_error(ArgumentError, /cannot include operations/)
+  end
+
+
+  it "commits file outcomes while preserving current apply behavior" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
-    Dir.mktmpdir("kettle-jem-write-intent-commit", tmp_root) do |root|
+    Dir.mktmpdir("kettle-jem-file-outcome-commit", tmp_root) do |root|
       FileUtils.mkdir_p(File.join(root, "obsolete"))
       File.write(File.join(root, "obsolete/file.txt"), "old\n")
       write_intent = described_class::WriteIntent.new(
@@ -304,8 +351,8 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         recipe_name: "obsolete_file_cleanup"
       )
 
-      described_class.send(:commit_write_intent, write_intent)
-      described_class.send(:commit_write_intent, delete_intent)
+      described_class.send(:commit_file_outcome, write_intent)
+      described_class.send(:commit_file_outcome, delete_intent)
 
       expect(File.read(File.join(root, "lib/example.rb"))).to eq("# generated\n")
       expect(File).not_to exist(File.join(root, "obsolete/file.txt"))
