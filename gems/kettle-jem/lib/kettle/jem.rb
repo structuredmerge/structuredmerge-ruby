@@ -329,7 +329,9 @@ module Kettle
       "progress" => %w[run_start phase_start phase_finish recipe post_apply_step command_step summary]
     }.freeze
     RECIPE_PLANNING_STRATEGIES = %w[sequential classified].freeze
-    WORKER_SAFE_RECIPE_NAME_PATTERNS = [
+    DISABLED_RECIPE_PLANNING_STRATEGY_VALUES = %w[0 false no off none sequential].freeze
+    ENABLED_RECIPE_PLANNING_STRATEGY_VALUES = %w[1 true yes on classified classify].freeze
+    WORKER_SAFE_RECIPE_NAME_PATTERNS = Ractor.make_shareable([
       /\Agithub_actions_framework_gemfile_/,
       /\Agithub_actions_obsolete_workflow_cleanup_/,
       /\Agithub_actions_opt_in_workflow_cleanup_/,
@@ -338,7 +340,36 @@ module Kettle
       /\Atemplate_legacy_destination_cleanup_/,
       /\Atemplate_obsolete_license_cleanup_/,
       /\Atemplate_shim_profile_cleanup_/
+    ])
+    GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE = /\Agithub_actions_framework_gemfile_/.freeze
+    GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_obsolete_workflow_cleanup_/.freeze
+    GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_opt_in_workflow_cleanup_/.freeze
+    OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE = /\Aopencollective_disabled_file_cleanup_/.freeze
+    TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE = /\Atemplate_legacy_destination_cleanup_/.freeze
+    TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE = /\Atemplate_obsolete_license_cleanup_/.freeze
+    TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE = /\Atemplate_shim_profile_cleanup_/.freeze
+    GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE = /\Agithub_actions_workflow_snippets_/.freeze
+    TEMPLATE_SOURCE_PREFERENCE_RECIPE = /\Atemplate_source_preference_/.freeze
+    TEMPLATE_SOURCE_APPLICATION_RECIPE = /\Atemplate_source_application_/.freeze
+    DECISION_NO_WRITE_ACTIONS = %w[keep skip].freeze
+    RUBY_TEMPLATE_POLICY_FILE_TYPES = %i[gemfile gemspec appraisals].freeze
+    GEMFILE_POLICY_SELF_DEPENDENCIES = %w[appraisal].freeze
+    TEMPLATE_CONTENT_PRIMITIVES = %w[
+      supplied_kettle_config_bootstrap
+      supplied_template_source_preference
+      supplied_template_source_application
     ].freeze
+    RAKEFILE_GUARDED_REQUIRE_NAMES = %w[kettle/dev kettle/jem stone_checksums].freeze
+    COVERAGE_THRESHOLD_KEYS = %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].freeze
+    GITHUB_WORKFLOW_ENGINE_JOB_KEYS = {
+      "jruby" => "jruby",
+      "truffleruby" => "truffleruby"
+    }.freeze
+    CHANGELOG_TRANSFER_KEY_SEPARATOR = /\s+-\s+/.freeze
+    CHANGELOG_TRANSFER_KEY_PATTERN = /\Akettle-jem-template-\d{8}-\d{3}\z/.freeze
+    CHANGELOG_TRANSFER_KEY_SCAN_PATTERN = /\bkettle-jem-template-\d{8}-\d{3}\b/.freeze
+    README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/.freeze
+    CHANGELOG_COVERAGE_KLOC_PATTERN = /-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i.freeze
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
     RUBY_TEMPLATE_SUFFIXES = %w[.gemspec .gemfile].freeze
     RUBY_TEMPLATE_EXTENSIONS = %w[.rb .rake].freeze
@@ -3543,8 +3574,8 @@ module Kettle
       strategy = value.to_s.strip
       strategy = "sequential" if strategy.empty?
       strategy = strategy.tr("_", "-")
-      strategy = "sequential" if %w[0 false no off none sequential].include?(strategy)
-      strategy = "classified" if %w[1 true yes on classified classify].include?(strategy)
+      strategy = "sequential" if DISABLED_RECIPE_PLANNING_STRATEGY_VALUES.include?(strategy)
+      strategy = "classified" if ENABLED_RECIPE_PLANNING_STRATEGY_VALUES.include?(strategy)
       raise ArgumentError, "Unsupported kettle-jem recipe planning strategy #{value.inspect}" unless RECIPE_PLANNING_STRATEGIES.include?(strategy)
 
       strategy
@@ -4702,8 +4733,8 @@ module Kettle
     end
 
     def changelog_transfer_key(line)
-      key = line.to_s.lstrip.delete_prefix("- ").delete_prefix("* ").split(/\s+-\s+/, 2).first.to_s
-      key.match?(/\Akettle-jem-template-\d{8}-\d{3}\z/) ? key : nil
+      key = line.to_s.lstrip.delete_prefix("- ").delete_prefix("* ").split(CHANGELOG_TRANSFER_KEY_SEPARATOR, 2).first.to_s
+      key.match?(CHANGELOG_TRANSFER_KEY_PATTERN) ? key : nil
     end
 
     def apply_changelog_transfer_entries(content, entries)
@@ -4738,7 +4769,7 @@ module Kettle
     end
 
     def changelog_transfer_keys(content)
-      content.to_s.scan(/\bkettle-jem-template-\d{8}-\d{3}\b/).to_set
+      content.to_s.scan(CHANGELOG_TRANSFER_KEY_SCAN_PATTERN).to_set
     end
 
     def changelog_bullet_line?(line)
@@ -4811,29 +4842,29 @@ module Kettle
         synchronize_github_actions_ci(original, facts)
       when "github_actions_framework_ci"
         synchronize_github_actions_framework_ci(original, facts)
-      when /\Agithub_actions_framework_gemfile_/
+      when GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE
         synchronize_github_actions_framework_gemfile(recipe.fetch(:target_path), facts)
       when "github_actions_coverage_ci"
         synchronize_github_actions_coverage_ci(original, facts)
-      when /\Agithub_actions_obsolete_workflow_cleanup_/
+      when GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE
         ""
-      when /\Agithub_actions_opt_in_workflow_cleanup_/
+      when GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE
         ""
-      when /\Aopencollective_disabled_file_cleanup_/
+      when OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE
         ""
-      when /\Atemplate_legacy_destination_cleanup_/
+      when TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE
         ""
-      when /\Atemplate_obsolete_license_cleanup_/
+      when TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE
         ""
-      when /\Atemplate_shim_profile_cleanup_/
+      when TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE
         ""
-      when /\Agithub_actions_workflow_snippets_/
+      when GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE
         synchronize_github_actions_workflow_snippets(original, facts: facts)
       when "kettle_config_bootstrap"
         apply_kettle_config_bootstrap(project_root, recipe, env: env, template_contents: template_contents)
-      when /\Atemplate_source_preference_/
+      when TEMPLATE_SOURCE_PREFERENCE_RECIPE
         original
-      when /\Atemplate_source_application_/
+      when TEMPLATE_SOURCE_APPLICATION_RECIPE
         apply_template_source(project_root, recipe, original, facts: facts, env: env, template_contents: template_contents)
       when "rakefile_scaffold_cleanup"
         deletion.fetch(:content)
@@ -4864,7 +4895,7 @@ module Kettle
         changed: changed,
         destination_existed: destination_existed
       )
-      if %w[keep skip].include?(decision_evaluation.fetch(:selected_action))
+      if DECISION_NO_WRITE_ACTIONS.include?(decision_evaluation.fetch(:selected_action))
         final = original
         changed = false
         deletion = nil
@@ -4966,7 +4997,7 @@ module Kettle
       return {} unless recipe.fetch(:primitive) == "supplied_template_source_application"
 
       file_type = template_file_type(recipe)
-      return {} unless %i[gemfile gemspec appraisals].include?(file_type)
+      return {} unless RUBY_TEMPLATE_POLICY_FILE_TYPES.include?(file_type)
 
       template_content = request.fetch(:template_content, "")
       report = {
@@ -4988,7 +5019,7 @@ module Kettle
     def gemfile_policy_operations(template_content, original, final, request)
       package_name = runtime_context_value(request, :package, :name).to_s
       deleted = gemfile_dependency_names("#{template_content}\n#{original}") - gemfile_dependency_names(final)
-      expected = ["appraisal"]
+      expected = GEMFILE_POLICY_SELF_DEPENDENCIES.dup
       expected << package_name unless package_name.empty?
       [
         {
@@ -5168,11 +5199,7 @@ module Kettle
     end
 
     def recipe_template_content_path(project_root, recipe)
-      return unless %w[
-        supplied_kettle_config_bootstrap
-        supplied_template_source_preference
-        supplied_template_source_application
-      ].include?(recipe.fetch(:primitive))
+      return unless TEMPLATE_CONTENT_PRIMITIVES.include?(recipe.fetch(:primitive))
 
       preference = recipe.fetch(:template_preference)
       File.join(
@@ -5199,10 +5226,9 @@ module Kettle
     end
 
     def strip_orphaned_rake_task_requires(content)
-      guarded_requires = %w[kettle/dev kettle/jem stone_checksums]
       remove_indexes = Set.new
       ruby_top_level_require_records(content).each do |record|
-        next unless guarded_requires.include?(record.fetch(:name))
+        next unless RAKEFILE_GUARDED_REQUIRE_NAMES.include?(record.fetch(:name))
 
         (record.fetch(:start_line)..record.fetch(:end_line)).each { |line_number| remove_indexes << (line_number - 1) }
       end
@@ -5312,7 +5338,7 @@ module Kettle
     end
 
     def coverage_thresholds_from_mise(content)
-      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+      COVERAGE_THRESHOLD_KEYS.each_with_object({}) do |key, thresholds|
         value = toml_string_scalar_line_value(content, key)
         thresholds[key] = value if value
       end
@@ -5325,7 +5351,7 @@ module Kettle
       return {} unless File.file?(path)
 
       content = File.read(path)
-      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+      COVERAGE_THRESHOLD_KEYS.each_with_object({}) do |key, thresholds|
         value = yaml_scalar_line_value(content, key)
         thresholds[key] = value.to_s.delete_prefix("\"").delete_suffix("\"") if value
       end
@@ -5371,10 +5397,7 @@ module Kettle
       enabled = Array(engines).map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).to_set
       return content if enabled.empty?
 
-      disabled_job_keys = {
-        "jruby" => "jruby",
-        "truffleruby" => "truffleruby"
-      }.except(*enabled).values
+      disabled_job_keys = GITHUB_WORKFLOW_ENGINE_JOB_KEYS.except(*enabled).values
       return content if disabled_job_keys.empty?
 
       delete_yaml_top_level_mapping_entries(
@@ -5440,7 +5463,7 @@ module Kettle
     end
 
     def coverage_thresholds_from_yaml_workflow(content)
-      %w[K_SOUP_COV_MIN_BRANCH K_SOUP_COV_MIN_LINE].each_with_object({}) do |key, thresholds|
+      COVERAGE_THRESHOLD_KEYS.each_with_object({}) do |key, thresholds|
         value = yaml_scalar_line_value(content, key)
         thresholds[key] = value if value
       end
@@ -5488,7 +5511,7 @@ module Kettle
       return content if kloc.to_s.empty?
 
       content.to_s.gsub(
-        /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/,
+        README_KLOC_BADGE_PATTERN,
         "\\1#{kloc}\\3"
       )
     end
@@ -5526,7 +5549,7 @@ module Kettle
     def changelog_coverage_kloc(section)
       return if section.to_s.empty?
 
-      match = section.to_s.match(/-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i)
+      match = section.to_s.match(CHANGELOG_COVERAGE_KLOC_PATTERN)
       return unless match
 
       format("%.3f", match[1].to_i.to_f / 1000.0)

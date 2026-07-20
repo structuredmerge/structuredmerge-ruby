@@ -18,6 +18,12 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 
+### Changed
+
+- Templating now reuses static, shareable regexes and small lookup lists in the
+  recipe dispatch and template-policy paths instead of reallocating them during
+  each recipe execution.
+
 ### Fixed
 
 - Install orchestration now bundles each distinct Bundler environment it will
