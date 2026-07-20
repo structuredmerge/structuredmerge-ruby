@@ -1345,6 +1345,46 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "prunes disabled engine jobs from packaged multi-engine workflows" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-workflow-job-prune-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 4.0.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          engines:
+            - ruby
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - .github/workflows/heads.yml
+              - .github/workflows/dep-heads.yml
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      reports = plan.fetch(:recipe_reports).each_with_object({}) do |report, index|
+        index[report.fetch(:relative_path)] = report
+      end
+
+      %w[.github/workflows/heads.yml .github/workflows/dep-heads.yml].each do |path|
+        content = reports.fetch(path).fetch(:final_content)
+        workflow = YAML.safe_load(content, permitted_classes: [], aliases: true)
+
+        expect(workflow.fetch("jobs").keys).to eq(["ruby"])
+        expect(content).not_to include("  truffleruby:")
+        expect(content).not_to include("  jruby:")
+      end
+    end
+  end
+
   it "prunes versioned engine workflows below minimum Ruby compatibility" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)

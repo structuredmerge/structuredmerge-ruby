@@ -5046,10 +5046,65 @@ module Kettle
     end
 
     def prepare_github_workflow_template(content, recipe, facts)
-      return content unless recipe.fetch(:target_path).to_s == ".github/workflows/framework-ci.yml"
-      return content if facts.to_h.dig(:ci, :framework_matrix).to_h.empty?
+      processed = prune_disabled_github_workflow_engine_jobs(content, facts)
+      return processed unless recipe.fetch(:target_path).to_s == ".github/workflows/framework-ci.yml"
+      return processed if facts.to_h.dig(:ci, :framework_matrix).to_h.empty?
 
-      synchronize_github_actions_framework_ci(content, facts)
+      synchronize_github_actions_framework_ci(processed, facts)
+    end
+
+    def prune_disabled_github_workflow_engine_jobs(content, facts)
+      engines = facts.to_h.dig(:rubygems, :engines)
+      return content if engines.nil?
+
+      enabled = Array(engines).map { |engine| engine.to_s.strip.downcase }.reject(&:empty?).to_set
+      return content if enabled.empty?
+
+      disabled_job_keys = {
+        "jruby" => "jruby",
+        "truffleruby" => "truffleruby"
+      }.except(*enabled).values
+      return content if disabled_job_keys.empty?
+
+      delete_yaml_top_level_mapping_entries(
+        content,
+        parent_key: "jobs",
+        child_keys: disabled_job_keys
+      )
+    rescue Psych::Exception
+      content
+    end
+
+    def delete_yaml_top_level_mapping_entries(content, parent_key:, child_keys:)
+      document = Psych.parse(content.to_s)
+      root = document&.root
+      return content unless root.is_a?(Psych::Nodes::Mapping)
+
+      parent = yaml_mapping_value(root, parent_key)
+      return content unless parent.is_a?(Psych::Nodes::Mapping)
+
+      child_key_set = Array(child_keys).map(&:to_s).to_set
+      ranges = parent.children.each_slice(2).filter_map do |key_node, value_node|
+        next unless child_key_set.include?(key_node.value.to_s)
+
+        key_node.start_line..value_node.end_line
+      end
+      return content if ranges.empty?
+
+      remove_line_ranges(content, ranges)
+    end
+
+    def yaml_mapping_value(mapping, key)
+      mapping.children.each_slice(2) do |key_node, value_node|
+        return value_node if key_node.value.to_s == key.to_s
+      end
+
+      nil
+    end
+
+    def remove_line_ranges(content, ranges)
+      delete_lines = ranges.flat_map(&:to_a).to_set
+      content.to_s.lines.each_with_index.reject { |_line, index| delete_lines.include?(index) }.map(&:first).join
     end
 
     def preserve_github_workflow_project_settings(recipe, content, destination_content, project_root:)
