@@ -5863,7 +5863,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('diff = "smorg-rb"')
       expect(content).to include('key = "diff.smorg-rb.command"')
       expect(content).to include('value = "smorg-rb diff-driver"')
-      expect(content).not_to include("smorg-ruby")
+      expect(content).not_to include("smorg-rb")
     end
   end
 
@@ -7533,7 +7533,7 @@ RSpec.describe Kettle::Jem do
       expect(content).to include('key = "diff.smorg-rb.command"')
       expect(content).to include('value = "smorg-rb diff-driver"')
       expect(content).to include("[profiles.textconv-normalized]")
-      expect(content).not_to include("smorg-ruby")
+      expect(content).not_to include("smorg-rb")
     end
   end
 

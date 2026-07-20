@@ -239,7 +239,7 @@ RSpec.describe Toml::Merge do
 
       [[profiles.semantic-diff.attributes]]
       pattern = "*.rb"
-      diff = "smorg-ruby"
+      diff = "smorg-rb"
 
       [profiles.textconv-normalized]
       description = "Template-only profile"
@@ -265,7 +265,7 @@ RSpec.describe Toml::Merge do
     expect(result.fetch(:output)).to include('diff = "smorg-rb"')
     expect(result.fetch(:output)).to include('description = "Destination driver"')
     expect(result.fetch(:output)).to include('[[profiles.textconv-normalized.attributes]]')
-    expect(result.fetch(:output)).not_to include('smorg-ruby')
+    expect(result.fetch(:output)).not_to include('smorg-rb')
   end
 
   it 'exposes non-overlapping effective table ranges and source fragments through the TOML substrate' do
