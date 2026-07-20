@@ -31,10 +31,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated multi-engine workflow files, including `heads.yml` and
   `dep-heads.yml`, now omit JRuby and TruffleRuby jobs when the project config
   declares an MRI-only `engines` list.
-- `kettle-jem`'s default development bundle now pins
-  `tree_sitter_language_pack` to the StructuredMerge fork branch that exposes
-  the Ruby parser API, while still allowing templating runs to override it with
-  `VENDORED_GEMS`.
+- `kettle-jem`'s generated development Gemfiles now depend on released
+  `tree_sitter_language_pack` 1.13.2 or newer by default, while still allowing
+  templating runs to override it with `VENDORED_GEMS`.
 - Gemspec templating now deletes empty generated development-dependency comment
   sections through Prism-backed CRISPR structural edits, preventing blank-line
   churn before the closing `Gem::Specification` `end`.
