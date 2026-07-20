@@ -284,6 +284,17 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
+  it "parses opt-in Ractor file worker counts" do
+    expect(described_class.send(:file_work_workers_for, {}, {})).to eq(0)
+    expect(described_class.send(:file_work_workers_for, {"KETTLE_JEM_RACTOR_FILE_WORKERS" => "3"}, {})).to eq(3)
+    expect(described_class.send(:file_work_workers_for, {}, {file_work_workers: 2})).to eq(2)
+
+    expect do
+      described_class.send(:file_work_workers_for, {"KETTLE_JEM_RACTOR_FILE_WORKERS" => "-1"}, {})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+  end
+
+
   it "reduces phase write intents into per-file work units" do
     first_write = described_class::WriteIntent.new(
       relative_path: "lib/example.rb",
@@ -328,6 +339,84 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     expect do
       described_class::FileWorkUnit.new(relative_path: "README.md", operations: [write_intent])
     end.to raise_error(ArgumentError, /cannot include operations/)
+  end
+
+
+  it "lets one file worker own ordered operations for a path" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-file-work-unit", tmp_root) do |root|
+      file_path = File.join(root, "lib/example.rb")
+      first_write = described_class::WriteIntent.new(
+        relative_path: "lib/example.rb",
+        absolute_path: file_path,
+        action: :write,
+        content: "first\n",
+        recipe_name: "first_recipe"
+      )
+      final_write = described_class::WriteIntent.new(
+        relative_path: "lib/example.rb",
+        absolute_path: file_path,
+        action: :write,
+        content: "final\n",
+        recipe_name: "final_recipe"
+      )
+      work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/example.rb",
+        operations: [first_write, final_write]
+      )
+
+      described_class.send(:commit_file_work_unit, work_unit)
+
+      expect(File.read(file_path)).to eq("final\n")
+    end
+  end
+
+
+  it "can commit independent file work units through Ractors within a phase" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-ractor-file-work-units", tmp_root) do |root|
+      first_path = File.join(root, "lib/first.rb")
+      second_path = File.join(root, "lib/second.rb")
+      FileUtils.mkdir_p(File.dirname(second_path))
+      File.write(second_path, "old\n")
+      first_work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/first.rb",
+        operations: [
+          described_class::WriteIntent.new(
+            relative_path: "lib/first.rb",
+            absolute_path: first_path,
+            action: :write,
+            content: "first\n",
+            recipe_name: "first_recipe"
+          )
+        ]
+      )
+      second_work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/second.rb",
+        operations: [
+          described_class::WriteIntent.new(
+            relative_path: "lib/second.rb",
+            absolute_path: second_path,
+            action: :write,
+            content: "new\n",
+            recipe_name: "second_recipe"
+          ),
+          described_class::WriteIntent.new(
+            relative_path: "lib/second.rb",
+            absolute_path: second_path,
+            action: :delete,
+            recipe_name: "cleanup_recipe"
+          )
+        ]
+      )
+
+      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit], workers: 2)
+
+      expect(File.read(first_path)).to eq("first\n")
+      expect(File).not_to exist(second_path)
+    end
   end
 
 

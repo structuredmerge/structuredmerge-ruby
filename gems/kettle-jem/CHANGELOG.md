@@ -55,8 +55,8 @@ Please file a bug if you notice a violation of semantic versioning.
   compares classified planning with and without opt-in Ractor workers.
 - Apply now routes recipe report mutations through explicit write intents and
   phase-gated per-file work units, preparing the file-processing path for
-  future actor/Ractor execution without changing phase gates or final
-  filesystem outcomes.
+  opt-in `KETTLE_JEM_RACTOR_FILE_WORKERS` execution without changing phase gates
+  or final filesystem outcomes.
 - The former monolithic thin-slice spec has been split into behavior-named
   integration, system, and end-to-end specs so the project test harness can
   parallelize templating coverage more effectively.

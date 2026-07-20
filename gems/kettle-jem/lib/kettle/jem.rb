@@ -3565,6 +3565,22 @@ module Kettle
       raise ArgumentError, "KETTLE_JEM_RACTOR_WORKERS must be a non-negative integer"
     end
 
+    def file_work_workers_for(env, run_options)
+      value = (run_options || {})[:ractor_file_workers] ||
+        (run_options || {})["ractor_file_workers"] ||
+        (run_options || {})[:file_work_workers] ||
+        (run_options || {})["file_work_workers"] ||
+        (env || {})["KETTLE_JEM_RACTOR_FILE_WORKERS"]
+      return 0 if value.nil? || value.to_s.strip.empty?
+
+      workers = Integer(value)
+      raise ArgumentError, "KETTLE_JEM_RACTOR_FILE_WORKERS must be >= 0" if workers.negative?
+
+      workers
+    rescue ArgumentError
+      raise ArgumentError, "KETTLE_JEM_RACTOR_FILE_WORKERS must be a non-negative integer"
+    end
+
     def execute_recipe_reports(project_root:, recipes:, facts:, files:, template_contents:, decision_policy:, env:, events:, strategy:, workers: 0)
       case strategy.to_s
       when "sequential"
@@ -3722,6 +3738,8 @@ module Kettle
     def apply_project(project_root, env: ENV, run_options: {})
       events = event_stream_from_options(run_options)
       report = plan_project(project_root, env: env, run_options: run_options).merge(mode: "apply")
+      file_work_workers = with_event_phase(events, "file_work_workers") { file_work_workers_for(env, run_options) }
+      report[:file_work_workers] = file_work_workers
       with_event_phase(events, "apply") do
         before_apply_files = with_event_phase(events, "snapshot_changed_files") do
           snapshot_changed_files(
@@ -3729,7 +3747,9 @@ module Kettle
             report.fetch(:recipe_reports).filter_map { |entry| entry[:relative_path] }
           )
         end
-        with_event_phase(events, "write_template_files") { run_apply_phases(project_root, report) }
+        with_event_phase(events, "write_template_files") do
+          run_apply_phases(project_root, report, file_workers: file_work_workers)
+        end
         report[:changed_files] = with_event_phase(events, "actual_changed_files") do
           actual_changed_files_after_apply(project_root, report.fetch(:changed_files), before_apply_files)
         end
@@ -10386,7 +10406,7 @@ module Kettle
       }
     end
 
-    def run_apply_phases(project_root, report)
+    def run_apply_phases(project_root, report, file_workers: 0)
       plugin_registry = plugin_registry_for_project(project_root)
       changed_files = report.fetch(:changed_files)
       diagnostics = report.fetch(:diagnostics)
@@ -10414,9 +10434,10 @@ module Kettle
             phase_stats: phase_stats
           )
         end
-        file_work_units_for_phase(project_root, reports_by_phase.fetch(phase, [])).each do |file_work_unit|
-          commit_file_outcome(file_work_unit.outcome)
-        end
+        commit_file_work_units(
+          file_work_units_for_phase(project_root, reports_by_phase.fetch(phase, [])),
+          workers: file_workers
+        )
         unless plugin_registry.empty?
           plugin_registry.run(
             timing: :after,
@@ -10443,6 +10464,29 @@ module Kettle
       commit_file_outcome(intent) if intent
     end
 
+    def commit_file_work_units(file_work_units, workers: 0)
+      units = Array(file_work_units)
+      return if units.empty?
+      return commit_file_work_units_ractor(units, workers: workers.to_i) if workers.to_i.positive?
+
+      units.each { |file_work_unit| commit_file_work_unit(file_work_unit) }
+    end
+
+    def commit_file_work_units_ractor(file_work_units, workers:)
+      file_work_units.each_slice(workers).each do |slice|
+        slice.map do |file_work_unit|
+          payload = Ractor.make_shareable(file_work_unit_payload(file_work_unit))
+          Ractor.new(payload) do |worker_payload|
+            Kettle::Jem.commit_file_work_unit_payload(worker_payload)
+          end
+        end.each(&:value)
+      end
+    end
+
+    def commit_file_work_unit(file_work_unit)
+      file_work_unit.operations.each { |operation| commit_file_outcome(operation) }
+    end
+
     def file_work_units_for_phase(project_root, recipe_reports)
       file_work_units_from_write_intents(write_intents_for_phase(project_root, recipe_reports))
     end
@@ -10460,6 +10504,22 @@ module Kettle
       grouped_operations.map do |relative_path, operations|
         FileWorkUnit.new(relative_path: relative_path, operations: operations)
       end
+    end
+
+    def file_work_unit_payload(file_work_unit)
+      {
+        relative_path: file_work_unit.relative_path,
+        operations: file_work_unit.operations.map { |operation| file_outcome_payload(operation) }
+      }
+    end
+
+    def file_outcome_payload(file_outcome)
+      {
+        relative_path: file_outcome.relative_path,
+        absolute_path: file_outcome.absolute_path,
+        action: file_outcome.action.to_s,
+        content: file_outcome.content
+      }
     end
 
     def write_intent_from_recipe_report(project_root, recipe_report)
@@ -10487,14 +10547,45 @@ module Kettle
     end
 
     def commit_filesystem_outcome(file_outcome)
-      path = file_outcome.absolute_path
-      if file_outcome.delete?
-        FileUtils.rm_f(path)
-      elsif file_outcome.write?
-        FileUtils.mkdir_p(File.dirname(path))
-        File.write(path, file_outcome.content)
+      commit_filesystem_outcome_payload(file_outcome_payload(file_outcome))
+    end
+
+    def commit_file_work_unit_payload(payload)
+      Array(payload.fetch(:operations)).each { |operation| commit_filesystem_outcome_payload(operation) }
+      payload.fetch(:relative_path)
+    end
+
+    def commit_filesystem_outcome_payload(payload)
+      path = payload.fetch(:absolute_path)
+      action = payload.fetch(:action).to_s
+      if action == "delete"
+        File.delete(path) if File.exist?(path) || File.symlink?(path)
+      elsif action == "write"
+        mkdir_p_core(File.dirname(path))
+        File.write(path, payload.fetch(:content))
       else
-        raise ArgumentError, "Unsupported file outcome action #{file_outcome.action.inspect}"
+        raise ArgumentError, "Unsupported file outcome action #{action.inspect}"
+      end
+    end
+
+    def mkdir_p_core(path)
+      dir = path.to_s
+      return if dir.empty? || dir == "." || Dir.exist?(dir)
+
+      pending = []
+      until dir.empty? || dir == "." || Dir.exist?(dir)
+        pending << dir
+        parent = File.dirname(dir)
+        break if parent == dir
+
+        dir = parent
+      end
+      pending.reverse_each do |entry|
+        begin
+          Dir.mkdir(entry) unless Dir.exist?(entry)
+        rescue Errno::EEXIST
+          nil
+        end
       end
     end
 
