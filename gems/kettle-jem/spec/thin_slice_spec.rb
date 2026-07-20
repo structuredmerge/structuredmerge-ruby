@@ -97,6 +97,20 @@ RSpec.describe Kettle::Jem do
     end.to raise_error(ArgumentError, /Unsupported kettle-jem recipe planning strategy/)
   end
 
+  it "parses Ractor recipe planning workers from options and env" do
+    expect(described_class.send(:recipe_planning_workers_for, {}, {})).to eq(0)
+    expect(described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "2"}, {})).to eq(2)
+    expect(described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "2"}, {recipe_planning_workers: "1"})).to eq(1)
+    expect(described_class.send(:recipe_planning_workers_for, {}, {ractor_workers: "3"})).to eq(3)
+
+    expect do
+      described_class.send(:recipe_planning_workers_for, {}, {recipe_planning_workers: "-1"})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+    expect do
+      described_class.send(:recipe_planning_workers_for, {"KETTLE_JEM_RACTOR_WORKERS" => "many"}, {})
+    end.to raise_error(ArgumentError, /non-negative integer/)
+  end
+
   it "classifies only side-effect-free cleanup and generated recipes as worker-safe for now" do
     safe_recipe = {
       name: "github_actions_obsolete_workflow_cleanup_old",
@@ -168,6 +182,74 @@ RSpec.describe Kettle::Jem do
 
       expect(normalize.call(classified)).to eq(normalize.call(sequential))
       expect(classified.map { |report| report.fetch(:recipe_name) }).to eq(%w[noop_main_only github_actions_obsolete_workflow_cleanup_old])
+    end
+  end
+
+  it "keeps Ractor-backed classified recipe planning equivalent to main-Ractor classified planning" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-ractor-planning", tmp_root) do |root|
+      write_tree(root, {
+        ".github/workflows/old.yml" => "name: old\n",
+        ".github/workflows/stale.yml" => "name: stale\n",
+        "README.md" => "# Example\n"
+      })
+      recipes = [
+        {
+          name: "github_actions_obsolete_workflow_cleanup_old",
+          target_path: ".github/workflows/old.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        },
+        {
+          name: "noop_main_only",
+          target_path: "README.md",
+          provider_family: "markdown",
+          primitive: "noop",
+          facts: []
+        },
+        {
+          name: "github_actions_obsolete_workflow_cleanup_stale",
+          target_path: ".github/workflows/stale.yml",
+          provider_family: "file",
+          primitive: "supplied_obsolete_file_deletion",
+          facts: []
+        }
+      ]
+      files = {
+        ".github/workflows/old.yml" => "name: old\n",
+        ".github/workflows/stale.yml" => "name: stale\n",
+        "README.md" => "# Example\n"
+      }
+      policy = described_class::DecisionPolicy.from_env({"force" => "true"})
+      common = {
+        project_root: root,
+        recipes: recipes,
+        facts: {},
+        files: files,
+        template_contents: {},
+        decision_policy: policy,
+        env: {},
+        events: nil,
+        strategy: "classified"
+      }
+      normalize = lambda do |reports|
+        Marshal.load(Marshal.dump(reports)).each do |report|
+          report.dig(:metadata)&.delete(:duration_ms)
+          report.dig(:report_envelope, :report, :metadata)&.delete(:duration_ms)
+        end
+      end
+
+      main_ractor = described_class.send(:execute_recipe_reports, **common.merge(workers: 0))
+      workers = described_class.send(:execute_recipe_reports, **common.merge(workers: 2))
+
+      expect(normalize.call(workers)).to eq(normalize.call(main_ractor))
+      expect(workers.map { |report| report.fetch(:recipe_name) }).to eq(%w[
+        github_actions_obsolete_workflow_cleanup_old
+        noop_main_only
+        github_actions_obsolete_workflow_cleanup_stale
+      ])
     end
   end
 
