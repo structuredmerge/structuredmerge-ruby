@@ -31,6 +31,13 @@ RSpec.describe Smorg::RB do
     JSON.parse(File.read(path))
   end
 
+  def diff_driver_smoke_fixture
+    path = File.expand_path(
+      '../../../../fixtures/diagnostics/slice-903-diff-driver-smoke-fixtures/diff-driver-smoke-fixtures.json', __dir__
+    )
+    JSON.parse(File.read(path))
+  end
+
   def run_git(dir, *args)
     return skip('git executable is required for repository integration fixture') unless system('git', '--version',
                                                                                                out: File::NULL, err: File::NULL)
@@ -448,6 +455,30 @@ RSpec.describe Smorg::RB do
 
       expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
       expect(stdout.string).to include('structured-diff package.json')
+      expect(stdout.string).to include('review-diff unified')
+      expect(stdout.string).to include('@@ -1,1 +1,1 @@')
+      expect(stdout.string).to include('-{"old":true}')
+      expect(stdout.string).to include('+{"new":true}')
+    end
+  end
+
+  it 'keeps no-ext-diff source review fragments in structured diff output' do
+    source_pair = diff_driver_smoke_fixture.fetch('suite').fetch('real_source_pairs').first
+    old_path = write_file(@dir, 'old-source.rb', source_pair.fetch('old_source'))
+    new_path = write_file(@dir, 'new-source.rb', source_pair.fetch('new_source'))
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    plain_diff = IO.popen([{ 'GIT_CONFIG_NOSYSTEM' => '1' }, 'git', '--no-pager', 'diff', '--no-ext-diff',
+                            '--no-index', old_path, new_path], err: %i[child out], &:read)
+    expect([0, 1]).to include($?.exitstatus)
+    exit_code = described_class.run(['diff-driver', '--path-name', source_pair.fetch('path'), old_path,
+                                     new_path], stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    source_pair.fetch('expected_plain_diff_fragments').each { |fragment| expect(plain_diff).to include(fragment) }
+    source_pair.fetch('expected_structured_diff_fragments').each do |fragment|
+      expect(stdout.string).to include(fragment)
     end
   end
 

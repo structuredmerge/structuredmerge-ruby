@@ -544,7 +544,29 @@ module Smorg
         stdout.puts('status changed')
         stdout.puts("old-lines #{line_count(old_source)}")
         stdout.puts("new-lines #{line_count(new_source)}")
+        print_structured_diff_review_hunk(stdout, path_name, old_source, new_source)
       end
+    end
+
+    def print_structured_diff_review_hunk(stdout, path_name, old_source, new_source)
+      old_lines = diff_source_lines(old_source)
+      new_lines = diff_source_lines(new_source)
+      stdout.puts('review-diff unified')
+      stdout.puts("--- a/#{path_name}")
+      stdout.puts("+++ b/#{path_name}")
+      stdout.puts("@@ -1,#{old_lines.length} +1,#{new_lines.length} @@")
+      old_lines.each { |line| write_diff_line(stdout, '-', line) }
+      new_lines.each { |line| write_diff_line(stdout, '+', line) }
+    end
+
+    def diff_source_lines(source)
+      source.to_s.lines.to_a
+    end
+
+    def write_diff_line(stdout, prefix, line)
+      stdout.write(prefix)
+      stdout.write(line)
+      stdout.write("\n") unless line.end_with?("\n")
     end
 
     def run_conflicts(args, stdout, stderr)

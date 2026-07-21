@@ -850,7 +850,7 @@ module Ast
                                     :path_placeholder, :expected_exit_code, :expected_current_file_updated, keyword_init: true)
     GitDriverSmokeSuite = Struct.new(:suite_id, :version, :driver_name, :cases, :diagnostics, keyword_init: true)
     DiffDriverSmokeCase = Struct.new(:case_id, :argument_count, :argument_roles, :expected_exit_code,
-                                     :expected_output_kind, keyword_init: true)
+                                     :expected_output_kind, :expected_output_fragments, keyword_init: true)
     DiffDriverSmokeSuite = Struct.new(:suite_id, :version, :driver_name, :cases, :diagnostics, keyword_init: true)
     PerformanceTimeoutDiagnostic = Struct.new(:severity, :category, :code, :fallback, keyword_init: true)
     PerformanceGuardrails = Struct.new(:guardrail_id, :version, :max_bytes, :max_nodes, :max_match_candidates,

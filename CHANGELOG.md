@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
   instead of spawning one Ractor per file.
 - `kettle-jem` README processing now reuses structural owner scans and batches
   several Markdown deletions to reduce repeated parser passes.
+- `smorg-rb` diff-driver output now appends a unified review hunk with exact
+  removed and added source text after the semantic structured-diff summary.
 - Retemplated generated project metadata, support documentation, CI workflows,
   binstubs, and development dependency floors across the StructuredMerge Ruby
   gem family with `kettle-jem` v7.0.0.
