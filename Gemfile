@@ -2,8 +2,8 @@ kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 
 source "https://rubygems.org"
 
-# Use the StructuredMerge TSLP fork until the Ruby ABI platform-gem fix is released.
-gem "tree_sitter_language_pack", git: "https://github.com/structuredmerge/tree-sitter-language-pack.git", branch: "fix/ruby-4-platform-gem-abi", glob: "packages/ruby/*.gemspec"
+# Use released TSLP with the Ruby ABI platform-gem fix.
+gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"
 
 unless kettle_dev_dev.casecmp("false").zero?
   require "nomono/bundler"

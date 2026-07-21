@@ -7,7 +7,6 @@
 require 'nomono/bundler' unless defined?(Nomono)
 
 structuredmerge_local_gems = %w[
-  tree_sitter_language_pack
   tree_haver
   ast-merge
   ast-merge-git
@@ -47,8 +46,6 @@ declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
 structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[bash-merge] - declared_gems
 kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[bash-merge] - declared_gems
 
-# export VENDORED_GEMS=tree_sitter_language_pack
-# export VENDOR_GEM_DIR=/path/to/vendor # expects $VENDOR_GEM_DIR/tree_sitter_language_pack
 platform :mri do
   if ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0
     eval_nomono_gems(

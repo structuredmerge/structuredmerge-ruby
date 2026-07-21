@@ -2108,9 +2108,9 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(direct_block).to include('prefix: "RUBYTHEMS"')
       expect(direct_block).to include('path_env: "RUBYTHEMS_DEV"')
       expect(direct_block).to include('root: ["src", "my", "rubythems"]')
-      expect(gemfile).to include("Use the StructuredMerge TSLP fork until the Ruby ABI platform-gem fix is released")
+      expect(gemfile).to include("Use released TSLP with the Ruby ABI platform-gem fix")
       expect(gemfile).to include(
-        'gem "tree_sitter_language_pack", git: "https://github.com/structuredmerge/tree-sitter-language-pack.git", branch: "fix/ruby-4-platform-gem-abi", glob: "packages/ruby/*.gemspec"'
+        'gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"'
       )
       expect(gemfile).not_to include('branch: "fix/ruby-parser-api-methods"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)

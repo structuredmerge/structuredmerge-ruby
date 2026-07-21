@@ -1,21 +1,3 @@
-GIT
-  remote: https://github.com/structuredmerge/tree-sitter-language-pack.git
-  revision: e736879d00ce55b9bbfa479a5c07363bde1512e2
-  branch: fix/ruby-4-platform-gem-abi
-  glob: packages/ruby/*.gemspec
-  specs:
-    tree_sitter_language_pack (1.13.2)
-      rb_sys (>= 0.9, < 0.9.128)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.13.2-aarch64-linux)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.13.2-arm64-darwin)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.13.2-x86_64-darwin)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.13.2-x86_64-linux)
-      sorbet-runtime (~> 0.5)
-
 PATH
   remote: .
   specs:
@@ -340,6 +322,8 @@ GEM
       parslet (~> 2.0)
       tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
       version_gem (~> 1.1, >= 1.1.9)
+tree_sitter_language_pack (1.13.3-x86_64-linux)
+  sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.2.0)
       parallel_tests (>= 3.3.0, < 6)
@@ -415,7 +399,7 @@ DEPENDENCIES
   standard (>= 1.50)
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
-  tree_sitter_language_pack!
+  tree_sitter_language_pack (~> 1.13, >= 1.13.3)
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
   yard-fence (~> 0.9, >= 0.9.1)

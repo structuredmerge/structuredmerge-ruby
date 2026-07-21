@@ -967,7 +967,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
           # frozen_string_literal: true
 
           local_gems = %w[
-            tree_sitter_language_pack
             tree_haver
             ast-merge
             rubocop-ruby2_4
@@ -988,7 +987,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("local-only")
       expect(content).not_to include("rubocop-ruby2_3")
       expect(content).to include("kettle-jem")
-      expect(content).to include("tree_sitter_language_pack")
+      expect(content).not_to include("tree_sitter_language_pack")
       expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
     end
   end

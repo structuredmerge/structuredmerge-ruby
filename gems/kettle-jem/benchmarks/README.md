@@ -141,8 +141,7 @@ with `BUNDLE_GEMFILE` pinned to this checkout's `Gemfile`, so local sibling
 StructuredMerge APIs are used while destination setup commands still sanitize
 Bundler activation and select the copied fixture's own Gemfile. The development
 bundle resolves `tree_sitter_language_pack` from
-`structuredmerge/tree-sitter-language-pack` branch
-`fix/ruby-4-platform-gem-abi` until the Ruby ABI platform-gem fix is released.
+released `tree_sitter_language_pack` gem with the Ruby ABI platform-gem fix.
 Run `bundle install` with the same `K_JEM_TEMPLATING`, `STRUCTUREDMERGE_DEV`,
 `VENDORED_GEMS`, and `VENDOR_GEM_DIR` values shown above before invoking the
 benchmark; otherwise Bundler can fail with "The git source ... is not yet
