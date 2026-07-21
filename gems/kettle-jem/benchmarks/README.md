@@ -32,6 +32,7 @@ STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
 VENDORED_GEMS= \
 VENDOR_GEM_DIR= \
 KETTLE_JEM_BENCHMARK_WORKERS=1,4,8,16 \
+KETTLE_JEM_BENCHMARK_RUNS=3 \
 bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
 
@@ -47,6 +48,7 @@ VENDORED_GEMS= \
 VENDOR_GEM_DIR= \
 KETTLE_JEM_BENCHMARK_MODE=raw-template \
 KETTLE_JEM_BENCHMARK_WORKERS=1,4,8,16 \
+KETTLE_JEM_BENCHMARK_RUNS=3 \
 bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
 
