@@ -595,14 +595,14 @@ module Kettle
               command_runner: command_runner
             )
           ]
-          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_binstubs])
-            steps << {
+          steps << if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_binstubs])
+            {
               name: "bundle_binstubs",
               status: "skipped",
               reason: "skip_binstubs"
             }
           else
-            steps << run_command_step(
+            run_command_step(
               "bundle_binstubs",
               bundle_binstubs_command(project_root, env: env),
               project_root: project_root,

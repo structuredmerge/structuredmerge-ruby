@@ -1,5 +1,4 @@
-# Targets the evergreen latest release of ruby, truffleruby, and jruby
-#   and tests against the HEAD of runtime dependencies
+# Targets enabled evergreen Ruby engines and tests against the HEAD of runtime dependencies
 name: Runtime Deps @ HEAD
 
 permissions:
@@ -104,6 +103,11 @@ jobs:
           - ruby: "truffleruby"
             appraisal: "dep-heads"
             exec_cmd: "kettle-test"
+            # TruffleRuby's bundled RubyGems/Bundler path cannot reliably
+            # bootstrap Appraisal against all configured gem servers here.
+            # Run directly from the generated appraisal Gemfile instead.
+            # This makes gemfiles/dep_heads.gemfile required checked-in output
+            # for repositories using this generated workflow.
             bundle_gemfile: "gemfiles/dep_heads.gemfile"
             direct_bundle: true
             rubygems: default

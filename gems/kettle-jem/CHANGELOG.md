@@ -18,61 +18,6 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ## [Unreleased]
 
-### Changed
-
-- Templating now reuses static, shareable regexes and small lookup lists in the
-  recipe dispatch and template-policy paths instead of reallocating them during
-  each recipe execution.
-- Opt-in recipe-planning Ractor mode now batches worker-safe recipes across a
-  bounded chunked worker pool instead of spawning one Ractor per recipe, and it
-  keeps parser/merge paths with known unshareable dependency state on the main
-  Ractor.
-- Templating can now opt into thread-backed recipe planning and file work with
-  `KETTLE_JEM_THREAD_WORKERS` and `KETTLE_JEM_THREAD_FILE_WORKERS`, providing a
-  benchmarkable alternative to main-thread and Ractor execution.
-- Templating now supports benchmark-oriented skip controls for external
-  post-template work: `--skip-drift-check`, `--skip-rubocop-gradual`, and
-  `--skip-binstubs`, with matching `KETTLE_JEM_SKIP_*` environment variables.
-- Templating reports now persist phase duration metadata, install command steps
-  record elapsed duration, and benchmark summaries show recipe-phase time apart
-  from external command time.
-- The benchmark harness now supports `KETTLE_JEM_BENCHMARK_MODE=raw-template`
-  to compare scoped raw `TemplateTask` runs separately from the default
-  install-orchestrated one-shot template flow.
-- The benchmark harness now defaults worker counts to `1,min(4,n/2),min(8,n/2),n`
-  instead of only `min(2,n)`, giving higher-core machines a useful default
-  scaling matrix while keeping low-core hosts bounded.
-- Benchmark summaries now show each variant's median percentage delta against
-  `baseline-main` immediately after the variant name.
-- README recipe reports now include sub-step timing metadata, and benchmark
-  results summarize the baseline README timing breakdown.
-
-### Fixed
-
-- Install orchestration now bundles each distinct Bundler environment it will
-  execute under, and probes RuboCop Gradual tasks with the same environment used
-  for the eventual command.
-- Bundler child commands now strip inherited command-line Git configuration, so
-  parent `safe.bareRepository=explicit` settings do not break Bundler Git source
-  caches during templating.
-- Generated semantic diff Git driver configuration now consistently uses the
-  installed `smorg-rb` executable and Git diff driver name for Ruby diffs.
-- Generated multi-engine workflow files, including `heads.yml` and
-  `dep-heads.yml`, now omit JRuby and TruffleRuby jobs when the project config
-  declares an MRI-only `engines` list.
-- `kettle-jem`'s generated development Gemfiles now depend on released
-  `tree_sitter_language_pack` 1.13.2 or newer by default, while still
-  allowing templating runs to switch to a local source with
-  `VENDORED_GEMS=tree_sitter_language_pack` / `VENDOR_GEM_DIR`.
-- Gemspec templating now deletes empty generated development-dependency comment
-  sections through Prism-backed CRISPR structural edits, preventing blank-line
-  churn before the closing `Gem::Specification` `end`.
-- Fixed the `kettle-jem` package manifest so runtime template assets are
-  included even when the gemspec is loaded from the monorepo root.
-- Generated local templating Gemfiles can now route
-  `tree_sitter_language_pack` through nomono's `VENDORED_GEMS` /
-  `VENDOR_GEM_DIR` support instead of using a one-off inferred local path.
-
 ### Added
 
 - Templating plan reports now include per-recipe duration metadata, template
@@ -157,6 +102,33 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Templating now reuses static, shareable regexes and small lookup lists in the
+  recipe dispatch and template-policy paths instead of reallocating them during
+  each recipe execution.
+- Opt-in recipe-planning Ractor mode now batches worker-safe recipes across a
+  bounded chunked worker pool instead of spawning one Ractor per recipe, and it
+  keeps parser/merge paths with known unshareable dependency state on the main
+  Ractor.
+- Templating can now opt into thread-backed recipe planning and file work with
+  `KETTLE_JEM_THREAD_WORKERS` and `KETTLE_JEM_THREAD_FILE_WORKERS`, providing a
+  benchmarkable alternative to main-thread and Ractor execution.
+- Templating now supports benchmark-oriented skip controls for external
+  post-template work: `--skip-drift-check`, `--skip-rubocop-gradual`, and
+  `--skip-binstubs`, with matching `KETTLE_JEM_SKIP_*` environment variables.
+- Templating reports now persist phase duration metadata, install command steps
+  record elapsed duration, and benchmark summaries show recipe-phase time apart
+  from external command time.
+- The benchmark harness now supports `KETTLE_JEM_BENCHMARK_MODE=raw-template`
+  to compare scoped raw `TemplateTask` runs separately from the default
+  install-orchestrated one-shot template flow.
+- The benchmark harness now defaults worker counts to `1,min(4,n/2),min(8,n/2),n`
+  instead of only `min(2,n)`, giving higher-core machines a useful default
+  scaling matrix while keeping low-core hosts bounded.
+- Benchmark summaries now show each variant's median percentage delta against
+  `baseline-main` immediately after the variant name.
+- README recipe reports now include sub-step timing metadata, and benchmark
+  results summarize the baseline README timing breakdown.
+
 - Generated gemspec templates now require `kettle-dev` >= 2.3.7.
 - kettle-jem now requires `kettle-rb` >= 0.1.4.
 - Refreshed generated GitHub Actions workflow pins for `ruby/setup-ruby` and
@@ -240,11 +212,46 @@ Please file a bug if you notice a violation of semantic versioning.
 - kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer
   repository-only files by default to reduce downstream distro packaging churn.
 
+- kettle-jem-template-20260720-001 - Generated READMEs can now render
+  template-managed corporate sponsor logos from project or family config.
+- kettle-jem-template-20260720-002 - Generated development Gemfiles now use the
+  released `tree_sitter_language_pack` gem 1.13.3 or newer by default.
+- kettle-jem-template-20260720-003 - Generated StructuredMerge Git diff driver
+  config now uses the installed `smorg-rb` Ruby driver name.
+- kettle-jem-template-20260720-004 - Generated multi-engine workflow files now
+  omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.
+- kettle-jem-template-20260720-005 - Generated README Support & Community rows
+  now include a RubyForum help badge.
+
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Install orchestration now bundles each distinct Bundler environment it will
+  execute under, and probes RuboCop Gradual tasks with the same environment used
+  for the eventual command.
+- Bundler child commands now strip inherited command-line Git configuration, so
+  parent `safe.bareRepository=explicit` settings do not break Bundler Git source
+  caches during templating.
+- Generated semantic diff Git driver configuration now consistently uses the
+  installed `smorg-rb` executable and Git diff driver name for Ruby diffs.
+- Generated multi-engine workflow files, including `heads.yml` and
+  `dep-heads.yml`, now omit JRuby and TruffleRuby jobs when the project config
+  declares an MRI-only `engines` list.
+- `kettle-jem`'s generated development Gemfiles now depend on released
+  `tree_sitter_language_pack` 1.13.2 or newer by default, while still
+  allowing templating runs to switch to a local source with
+  `VENDORED_GEMS=tree_sitter_language_pack` / `VENDOR_GEM_DIR`.
+- Gemspec templating now deletes empty generated development-dependency comment
+  sections through Prism-backed CRISPR structural edits, preventing blank-line
+  churn before the closing `Gem::Specification` `end`.
+- Fixed the `kettle-jem` package manifest so runtime template assets are
+  included even when the gemspec is loaded from the monorepo root.
+- Generated local templating Gemfiles can now route
+  `tree_sitter_language_pack` through nomono's `VENDORED_GEMS` /
+  `VENDOR_GEM_DIR` support instead of using a one-off inferred local path.
 
 - Templating setup now respects explicit `STRUCTUREDMERGE_DEV=false` and
   `KETTLE_DEV_DEV=false` values when reading the kettle-family local install

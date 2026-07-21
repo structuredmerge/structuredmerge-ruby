@@ -96,7 +96,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "keeps Appraisals recording gemfiles only when configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -137,7 +136,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"')
     end
   end
-
 
   it "ports old Appraisals template behavior without losing custom destination blocks" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -190,7 +188,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "preserves destination additions inside same-named Appraisal blocks" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -236,7 +233,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       )
     end
   end
-
 
   it "collapses framework appraisals onto standard appraisals without overwriting kept framework gemfiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -337,7 +333,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "adds configured support gemfiles to standard test Appraisal blocks" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -403,7 +398,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "does not add broad standard support gemfiles to collapsed framework appraisals" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -463,7 +457,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
         "\n  eval_gemfile \"modular/activerecord/r3/v8.0.gemfile\"")
     end
   end
-
 
   it "adds standard gemfiles beside ordinary support gemfiles while respecting framework fragments" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -531,7 +524,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "prunes GitHub workflow appraisal matrix entries below minimum Ruby" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -583,7 +575,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "runs TruffleRuby dep-heads directly from the generated appraisal gemfile" do
     template = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example"))
 
@@ -594,7 +585,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(template).to include("run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}")
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
   end
-
 
   it "serializes legacy engine setup-ruby workaround in generated CI workflows" do
     ci = {
@@ -670,7 +660,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 
-
   it "serializes RSpec status cache steps in generated CI workflows" do
     ci = {
       default_branch: "main",
@@ -712,7 +701,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       "rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-"
     )
   end
-
 
   it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -756,7 +744,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, relative_path))).to eq(content)
     end
   end
-
 
   it "preserves destination-only main Gemfile ruby-bucket eval_gemfile entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -813,7 +800,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
   end
-
 
   it "repairs missing main Gemfile recording evals from configured Appraisals" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -875,7 +861,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "removes the destination package from the main Gemfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -935,7 +920,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "merges modular local Gemfile dependency lists while preserving the destination package" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -992,7 +976,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "adds configured kettle plugins to the kettle-rb local Gemfile overrides" do
     runtime = described_class.send(
       :project_runtime_facts,
@@ -1012,7 +995,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
   end
 
-
   it "exposes package summary and description tokens for generated metadata" do
     tokens = described_class.send(
       :template_tokens,
@@ -1031,7 +1013,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(tokens.fetch("KJ|PACKAGE_SUMMARY")).to eq("Example summary")
     expect(tokens.fetch("KJ|PACKAGE_DESCRIPTION")).to eq("Example description")
   end
-
 
   it "templates spec helper coverage bootstrap before loading the library" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1084,7 +1065,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content.scan('require "example/custom"').size).to eq(1)
     end
   end
-
 
   it "preserves destination spec helper support wiring while adding template bootstrap" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1155,7 +1135,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "treats packaged local Gemfiles as template-owned by default" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1200,7 +1179,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "excludes the current gem and already declared gems from documentation local path overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1233,7 +1211,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).to include("gems: local_gems_to_eval")
     end
   end
-
 
   it "generates nomono in the main Gemfile before local workspace overrides need it" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1268,7 +1245,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "does not generate a duplicate nomono dependency in nomono's own main Gemfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1297,7 +1273,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
   end
-
 
   it "adds nomono bootstrap to existing main Gemfiles before templating local overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1337,7 +1312,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(gemfile.index('gem "nomono"')).to be < gemfile.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
     end
   end
-
 
   it "treats packaged CITATION.cff as template-owned metadata by default" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1386,7 +1360,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include("/gems/example")
     end
   end
-
 
   it "removes the destination package from arbitrary modular Gemfile dependency lists" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1447,7 +1420,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-
   it "removes gemspec runtime dependencies from modular Gemfile dependency lists" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1494,7 +1466,6 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, "gemfiles/modular/documentation.gemfile"))).to eq(content)
     end
   end
-
 
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1579,5 +1550,4 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(reapplied)
     end
   end
-
 end

@@ -131,5 +131,4 @@ RSpec.describe Kettle::Jem, "shim profile templating" do
       expect { described_class.plan_project(root, env: {}) }.not_to raise_error
     end
   end
-
 end

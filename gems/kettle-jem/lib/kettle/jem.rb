@@ -341,16 +341,16 @@ module Kettle
       /\Atemplate_obsolete_license_cleanup_/,
       /\Atemplate_shim_profile_cleanup_/
     ])
-    GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE = /\Agithub_actions_framework_gemfile_/.freeze
-    GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_obsolete_workflow_cleanup_/.freeze
-    GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_opt_in_workflow_cleanup_/.freeze
-    OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE = /\Aopencollective_disabled_file_cleanup_/.freeze
-    TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE = /\Atemplate_legacy_destination_cleanup_/.freeze
-    TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE = /\Atemplate_obsolete_license_cleanup_/.freeze
-    TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE = /\Atemplate_shim_profile_cleanup_/.freeze
-    GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE = /\Agithub_actions_workflow_snippets_/.freeze
-    TEMPLATE_SOURCE_PREFERENCE_RECIPE = /\Atemplate_source_preference_/.freeze
-    TEMPLATE_SOURCE_APPLICATION_RECIPE = /\Atemplate_source_application_/.freeze
+    GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE = /\Agithub_actions_framework_gemfile_/
+    GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_obsolete_workflow_cleanup_/
+    GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE = /\Agithub_actions_opt_in_workflow_cleanup_/
+    OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE = /\Aopencollective_disabled_file_cleanup_/
+    TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE = /\Atemplate_legacy_destination_cleanup_/
+    TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE = /\Atemplate_obsolete_license_cleanup_/
+    TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE = /\Atemplate_shim_profile_cleanup_/
+    GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE = /\Agithub_actions_workflow_snippets_/
+    TEMPLATE_SOURCE_PREFERENCE_RECIPE = /\Atemplate_source_preference_/
+    TEMPLATE_SOURCE_APPLICATION_RECIPE = /\Atemplate_source_application_/
     DECISION_NO_WRITE_ACTIONS = %w[keep skip].freeze
     RUBY_TEMPLATE_POLICY_FILE_TYPES = %i[gemfile gemspec appraisals].freeze
     GEMFILE_POLICY_SELF_DEPENDENCIES = %w[appraisal].freeze
@@ -373,11 +373,11 @@ module Kettle
       "jruby" => "jruby",
       "truffleruby" => "truffleruby"
     }.freeze
-    CHANGELOG_TRANSFER_KEY_SEPARATOR = /\s+-\s+/.freeze
-    CHANGELOG_TRANSFER_KEY_PATTERN = /\Akettle-jem-template-\d{8}-\d{3}\z/.freeze
-    CHANGELOG_TRANSFER_KEY_SCAN_PATTERN = /\bkettle-jem-template-\d{8}-\d{3}\b/.freeze
-    README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/.freeze
-    CHANGELOG_COVERAGE_KLOC_PATTERN = /-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i.freeze
+    CHANGELOG_TRANSFER_KEY_SEPARATOR = /\s+-\s+/
+    CHANGELOG_TRANSFER_KEY_PATTERN = /\Akettle-jem-template-\d{8}-\d{3}\z/
+    CHANGELOG_TRANSFER_KEY_SCAN_PATTERN = /\bkettle-jem-template-\d{8}-\d{3}\b/
+    README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/
+    CHANGELOG_COVERAGE_KLOC_PATTERN = /-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
     RUBY_TEMPLATE_SUFFIXES = %w[.gemspec .gemfile].freeze
     RUBY_TEMPLATE_EXTENSIONS = %w[.rb .rake].freeze
@@ -3751,7 +3751,11 @@ module Kettle
         thread_worker_count: thread_worker_count,
         thread_spawns: thread_worker_count,
         thread_recipes: use_threads ? indexed_recipes.length : 0,
-        main_recipes: use_threads ? 0 : main_only.length + (use_ractors ? 0 : worker_safe.length)
+        main_recipes: if use_threads
+                        0
+                      else
+                        main_only.length + (use_ractors ? 0 : worker_safe.length)
+                      end
       )
       if use_threads
         reports_by_index.merge!(
@@ -3769,26 +3773,26 @@ module Kettle
       else
         reports_by_index.merge!(
           if use_ractors
-          execute_worker_safe_recipe_reports_ractor(
-            project_root: project_root,
-            indexed_recipes: worker_safe,
-            facts: facts,
-            files: files,
-            template_contents: template_contents,
-            decision_policy: decision_policy,
-            env: env,
-            workers: worker_count
-          )
+            execute_worker_safe_recipe_reports_ractor(
+              project_root: project_root,
+              indexed_recipes: worker_safe,
+              facts: facts,
+              files: files,
+              template_contents: template_contents,
+              decision_policy: decision_policy,
+              env: env,
+              workers: worker_count
+            )
           else
-          execute_indexed_recipe_reports(
-            project_root: project_root,
-            indexed_recipes: worker_safe,
-            facts: facts,
-            files: files,
-            template_contents: template_contents,
-            decision_policy: decision_policy,
-            env: env
-          )
+            execute_indexed_recipe_reports(
+              project_root: project_root,
+              indexed_recipes: worker_safe,
+              facts: facts,
+              files: files,
+              template_contents: template_contents,
+              decision_policy: decision_policy,
+              env: env
+            )
           end
         )
         reports_by_index.merge!(
@@ -4136,13 +4140,15 @@ module Kettle
       timings << {name: name.to_s, status: "ok", duration_ms: duration_ms_since(started_at)}
       result
     rescue => error
-      timings << {
-        name: name.to_s,
-        status: "failed",
-        duration_ms: duration_ms_since(started_at),
-        error_class: error.class.name,
-        error_message: error.message
-      } if timings && started_at
+      if timings && started_at
+        timings << {
+          name: name.to_s,
+          status: "failed",
+          duration_ms: duration_ms_since(started_at),
+          error_class: error.class.name,
+          error_message: error.message
+        }
+      end
       raise
     end
 
@@ -10920,7 +10926,7 @@ module Kettle
 
       relative_path = recipe_report.fetch(:relative_path)
       action = recipe_report.dig(:metadata, :delete_file) ? :delete : :write
-      content = action == :write ? recipe_report.fetch(:final_content) : nil
+      content = (action == :write) ? recipe_report.fetch(:final_content) : nil
       WriteIntent.new(
         relative_path: relative_path,
         absolute_path: File.join(project_root, relative_path),
@@ -10974,11 +10980,9 @@ module Kettle
         dir = parent
       end
       pending.reverse_each do |entry|
-        begin
-          Dir.mkdir(entry) unless Dir.exist?(entry)
-        rescue Errno::EEXIST
-          nil
-        end
+        Dir.mkdir(entry) unless Dir.exist?(entry)
+      rescue Errno::EEXIST
+        nil
       end
     end
 

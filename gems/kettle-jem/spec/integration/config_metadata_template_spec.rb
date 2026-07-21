@@ -92,7 +92,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "honors configured project runtime URI tokens when ENV is absent" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -132,7 +131,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
     end
   end
-
 
   it "syncs ENV-backed values back into kettle config during templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -198,7 +196,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "prunes legacy kettle config keys after their replacement exists" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -245,7 +242,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "migrates legacy-only README top logo mode config" do
     content = <<~YAML
       readme:
@@ -260,7 +256,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(config.fetch("readme")).not_to have_key("top_logo_mode")
   end
 
-
   it "migrates comma-separated legacy README top logo mode config" do
     content = <<~YAML
       readme:
@@ -274,7 +269,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(config.dig("readme", "h2_synopsis_logos")).to eq("related-org,ruby")
     expect(config.fetch("readme")).not_to have_key("top_logo_mode")
   end
-
 
   it "preserves explicit kettle config values while refreshing the config template" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -319,7 +313,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "normalizes combined top logo config when Synopsis H2 logos already exist" do
     content = <<~YAML
       readme:
@@ -333,7 +326,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(config.dig("readme", "top_logos")).to eq("org")
     expect(config.dig("readme", "h2_synopsis_logos")).to eq("related-org,ruby")
   end
-
 
   it "derives source and forge tokens from git origin when gemspec metadata is absent" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -374,7 +366,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
     end
   end
-
 
   it "prefers git origin over stale generated gemspec homepage metadata" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -430,7 +421,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(File.read(File.join(root, "example.gemspec"))).to include('spec.homepage = "https://github.com/rubocop-lts/example"')
     end
   end
-
 
   it "merges destination gemspec files entries into the template files assignment" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -491,7 +481,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content.scan(/^\s*"lib\/\*\*\/\*\.rb",/).size).to eq(1)
     end
   end
-
 
   it "replaces old broad generated gemspec manifests with the minimal package manifest" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -584,7 +573,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "merges recursive config package files without preserving stale frozen files overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -649,7 +637,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "unions literal Dir gemspec files assignments from destination and template" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -697,7 +684,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "fails hard on unsupported custom nonliteral destination gemspec files assignments" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -741,7 +727,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       end.to raise_error(Kettle::Jem::Error, /Unsupported gemspec spec\.files assignment/)
     end
   end
-
 
   it "preserves destination splat files assignments without appending duplicate template splats" do
     template = <<~RUBY
@@ -798,7 +783,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(merged).to match(/^\s*\*enumerate_package_files\.call\(["']sig["']\)\n/)
     expect(merged.scan(/\*enumerate_package_files\.call\(["']lib["']\)/).size).to eq(1)
   end
-
 
   it "supports the generated Dir plus Array gemspec files assignment shape" do
     template = <<~RUBY
@@ -859,7 +843,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     expect(merged.scan("spec.files =").size).to eq(1)
   end
 
-
   it "projects README top logo template tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -909,7 +892,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "allows README logo options to override rendered widths" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -950,7 +932,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).to include(%(<a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="12%" align="right"/></a>))
     end
   end
-
 
   it "renders configured corporate sponsor logos near the top of README" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1002,7 +983,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "renders corporate sponsors inherited from kettle-family environment" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1052,7 +1032,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       ])
     end
   end
-
 
   it "keeps generated Synopsis H2 logo HTML when normalizing existing README headings and prunes stale logo refs" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1111,7 +1090,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "separates full template profile from monorepo sub-project URL topology" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1157,7 +1135,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(plan.dig(:facts, :readme_logo, :top_logo_refs).to_s).to eq("")
     end
   end
-
 
   it "does not invent a gems path for a monorepo topology when the project is the git root" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1207,7 +1184,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "projects README logo row entries from named logo options" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1254,7 +1230,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "deduplicates README logos by asset while preserving the related-org link" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1298,7 +1273,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "maps legacy README top logo modes to named logo options" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1339,7 +1313,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(final_content).not_to include("example-gem Logo")
     end
   end
-
 
   it "projects configured README logo row entries by normalized logo type" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1396,7 +1369,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "fails fast when template application leaves unresolved tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1425,7 +1397,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       end.to raise_error(ArgumentError, /unresolved kettle-jem template tokens: \{KJ\|UNKNOWN\}/)
     end
   end
-
 
   it "reports template checksum drift" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1476,7 +1447,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "reports duplicate drift during template apply runs" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1521,7 +1491,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "skips duplicate drift checks when requested" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1547,7 +1516,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
     end
   end
-
 
   it "exposes template root and manifest metadata for adjacent tools" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1575,7 +1543,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(manifest.fetch(:checksums).keys).to eq(["README.md.example"])
     end
   end
-
 
   it "renders self-test and templating diagnostics reports" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1670,7 +1637,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "derives run stats from recipe reports" do
     stats = described_class.recipe_run_stats(
       [
@@ -1695,7 +1661,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       summary: "recipes 4 created 1 pre_existing 2 identical 1 changed 1 deleted 1 plugin_file_changes 1"
     )
   end
-
 
   it "reports the Kettle/Jem non-interactive decision policy and recipe defaults" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1806,7 +1771,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "hard-fails decision evaluation only when no fatal default is available" do
     policy = described_class::DecisionPolicy.from_env({"force" => "true"})
     expect do
@@ -1819,7 +1783,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
     end.to raise_error(Kettle::Jem::Error, /No safe default decision/)
   end
-
 
   it "reports git preflight state and lets skip-commit bypass clean-worktree enforcement" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1853,7 +1816,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(plan.fetch(:git_preflight).fetch(:dirty_entries)).not_to be_empty
     end
   end
-
 
   it "loads configured plugins and runs apply-time phase hooks" do
     plugin_module = Module.new do
@@ -1961,7 +1923,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "keeps direct sibling runtime dependencies available during lockfile normalization" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2033,7 +1994,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       )
     end
   end
-
 
   it "generates templating-aware main Gemfile nomono wiring for direct sibling runtime dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2116,7 +2076,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(File.read(File.join(root, "Gemfile"))).to eq(gemfile)
     end
   end
-
 
   it "collapses repeated direct sibling runtime dependency wiring in the main Gemfile" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2221,7 +2180,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "does not path-wire direct sibling dependencies when the sibling directory has a different gemspec name" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2305,7 +2263,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-
   it "keeps the nomono requirements assignment before an existing nomono gem call" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2365,7 +2322,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(requirement_line).to be < gem_line
     end
   end
-
 
   it "does not add generic direct sibling wiring for gems already handled by local modular Gemfiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2428,7 +2384,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(gemfile).to include(%(eval_gemfile "gemfiles/modular/ur_brain.gemfile"))
     end
   end
-
 
   it "preserves local modular runtime wiring declared through nomono local gem lists" do
     tmp_root = File.expand_path("../tmp", __dir__)

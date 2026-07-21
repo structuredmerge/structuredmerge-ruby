@@ -92,7 +92,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     RUBY
   end
 
-
   it "plans deterministic appraisal matrices from supplied version metadata" do
     versions = %w[5.0.0 5.1.0 5.2.0 6.0.0 6.1.0 7.0.0 7.1.0 7.2.0].map do |number|
       {number: number}
@@ -146,7 +145,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )
   end
 
-
   it "detects appraisal Ruby seams and assigns selected versions to buckets" do
     versions = [
       {number: "5.2.8", min_ruby: "2.3"},
@@ -187,7 +185,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )
   end
 
-
   it "resolves appraisal sub-dependencies from supplied metadata" do
     resolved = described_class.appraisal_resolve_sub_dependencies(
       parent_gem: "activerecord",
@@ -214,7 +211,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
     expect(resolved).to eq("sqlite3" => "1.6.9")
   end
-
 
   it "resolves RubyGems version metadata through a cacheable Kettle/Jem resolver" do
     response = Struct.new(:code, :body)
@@ -280,7 +276,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )
   end
 
-
   it "loads gemspec metadata through Kettle/Jem GemSpecReader" do
     Dir.mktmpdir do |project_root|
       write_tree(
@@ -323,7 +318,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
   ensure
     described_class::GemSpecReader.clear_cache!
   end
-
 
   it "ports appraisal CLI config orchestration helpers into Kettle/Jem" do
     gemspec_content = <<~RUBY
@@ -422,7 +416,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )).to be false
   end
 
-
   it "plans stale flat appraisal gemfile cleanup paths" do
     stale_paths = described_class.appraisal_stale_gemfile_paths(
       existing_paths: [
@@ -438,7 +431,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
     expect(stale_paths).to eq(["gemfiles/kja-ar-6-1-r2.gemfile"])
   end
-
 
   it "honors author template token config and environment overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -509,7 +501,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "applies author email environment overrides to gemspec and destination config" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -574,7 +565,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "preserves existing multi-author gemspec metadata in packaged gemspec templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -612,7 +602,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "derives author names from copyright holders when gemspec authors are absent" do
     author = described_class.send(
       :author_facts,
@@ -630,7 +619,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       "KJ|AUTHOR:NAMES" => '["Ada Lovelace", "Grace Hopper"]'
     )
   end
-
 
   it "honors forge user template token config and environment overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -689,7 +677,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "honors supported funding platform template token config and environment overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -746,7 +733,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "normalizes SECURITY.md supported version token from the gem version" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -790,7 +776,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       end
     end
   end
-
 
   it "honors social template token config and environment overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -848,7 +833,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       )
     end
   end
-
 
   it "projects license template tokens from configured licenses" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -927,7 +911,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "uses MIT as the License-Eye compatibility license when MIT is configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -975,7 +958,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "formats README metadata SPDX license identifiers as code spans" do
     block = described_class.readme_metadata_block(
       package: {
@@ -995,7 +977,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
     expect(block).to include("| License | `AGPL-3.0-only` OR `PolyForm-Small-Business-1.0.0` |")
   end
-
 
   it "formats README metadata values as Markdown table cells" do
     block = described_class.readme_metadata_block(
@@ -1017,7 +998,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     expect(block).to include("| Description | First line<br>Second \\| line<br>Third line |")
     expect(block).not_to include("First line\n")
   end
-
 
   it "renders optional FOSSA README badge tokens from configuration" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1043,7 +1023,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(tokens.fetch("KJ|README:FOSSA_REFS")).to include("git%2Bgithub.com%2Fpboling%2Fflag_shih_tzu?ref=badge_shield")
     end
   end
-
 
   it "disables coverage integrations across README badges, upload steps, templates, and config cleanup" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1088,7 +1067,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "keeps coverage integrations active when only README badges are disabled" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1126,7 +1104,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "supports partial coverage integration disablement" do
     config = {
       "integrations" => {
@@ -1163,7 +1140,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     expect(described_class.append_github_actions_coverage_steps(workflow_without_steps, disabled_integrations: [])).to eq(workflow_without_steps)
   end
 
-
   it "disables SkyWalking Eyes from boolean keys and disabled lists" do
     expect(described_class.disabled_integrations(
       {
@@ -1183,7 +1159,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       license: {spdx: ["MIT"]}
     )).to include("skywalking-eyes")
   end
-
 
   it "defaults SkyWalking Eyes off unless a compatible license is configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1223,7 +1198,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "keeps SkyWalking Eyes enabled for MIT licenses and explicit opt-in" do
     mit_config = {
       "templates" => {
@@ -1249,7 +1223,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     )
   end
 
-
   it "applies configured licenses to merged gemspec output" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
@@ -1274,7 +1247,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
 
     expect(output).to include('spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]')
   end
-
 
   it "escapes and de-duplicates emoji in gemspec summary and description tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1321,7 +1293,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(Gem::Specification.load(gemspec_path)).not_to be_nil
     end
   end
-
 
   it "refreshes README metadata during template-source README application" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1376,7 +1347,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(File.read(File.join(root, "README.md"))).to eq(first_readme)
     end
   end
-
 
   it "applies and prunes root license files from configured licenses" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1434,7 +1404,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "does not package configured named license files in the generated gemspec by default" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1471,7 +1440,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(gemspec).not_to include("MIT.md")
     end
   end
-
 
   it "renders configured extra package files in the generated gemspec" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1513,7 +1481,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "does not package multiple configured named license files in the generated gemspec by default" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1552,7 +1519,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(gemspec).not_to include("Big-Time-Public-License.md")
     end
   end
-
 
   it "projects copyright holders from git blame into license templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1657,7 +1623,6 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
     end
   end
 
-
   it "falls back to configured author copyright sections when git blame is unavailable" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1708,5 +1673,4 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(readme_report.fetch(:final_content)).to include("- #{expected_line}")
     end
   end
-
 end

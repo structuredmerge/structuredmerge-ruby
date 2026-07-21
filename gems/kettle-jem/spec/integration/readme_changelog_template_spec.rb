@@ -87,7 +87,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "creates a package README through the packaged README style API" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -117,7 +116,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(described_class.plan_readme_style(root, env: {}).fetch(:changed)).to be(false)
     end
   end
-
 
   it "merges CHANGELOG templates without replacing release history" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -205,7 +203,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "applies transferable changelog entries once while preserving project entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -257,7 +254,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "applies multiple missed transferable changelog entries without duplicating existing keys" do
     changelog = <<~MARKDOWN
       # Changelog
@@ -293,7 +289,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
   end
 
-
   it "keeps the real CHANGELOG template in canonical Unreleased form" do
     template = File.read(project_root.join("lib/kettle/jem/templates/CHANGELOG.md.example"))
 
@@ -313,7 +308,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       ### Security
     MARKDOWN
   end
-
 
   it "fills configured README section partials while preserving unconfigured manual sections" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -371,7 +365,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "loads packaged README section partials" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -404,7 +397,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(plan.dig(:readme_style, :section_partials, "configuration", :source_root)).to eq("packaged")
     end
   end
-
 
   it "removes Open Collective funding when disabled" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -506,7 +498,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "applies the packaged README Open Collective recipe from the canonical template" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -554,7 +545,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(File.read(File.join(root, "README.md"))).to eq(readme)
     end
   end
-
 
   it "updates the README KLOC badge from the current changelog release coverage" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -618,7 +608,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "keeps shim-only template files out of full profile inventory" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -647,7 +636,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(shim_entries).to include("shim/.structuredmerge/kettle-jem.yml")
     end
   end
-
 
   it "applies packaged monorepo subgem README badge policy" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -709,7 +697,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "honors falsey Open Collective environment variables when config is absent" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -740,7 +727,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "lets explicit Open Collective config override falsey environment variables" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -768,7 +754,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "uses explicit Open Collective config as the template token source" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -793,7 +778,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(plan.dig(:facts, :templates, :tokens)).to include("KJ|OPENCOLLECTIVE_ORG" => "config-org")
     end
   end
-
 
   it "uses GitHub funding Open Collective config as the template token source" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -825,7 +809,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "defaults Open Collective template content to galtzo-floss when no org can be resolved" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -855,7 +838,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "warns when the default Open Collective org differs from the GitHub org" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -879,7 +861,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       )
     end
   end
-
 
   it "discovers Open Collective org from environment before .opencollective.yml" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -926,7 +907,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "discovers Open Collective org from .opencollective.yml when env is absent" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -949,7 +929,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(plan.dig(:facts, :funding, :urls)).to include("https://opencollective.com/yaml-org")
     end
   end
-
 
   it "applies selected template content with projected tokens when configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1031,7 +1010,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "applies packaged template files when no project template root exists" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1101,7 +1079,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "trims README compatibility badges from minimum Ruby and engine config" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1164,7 +1141,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "keeps Ruby 2.3 in the untested README support badge set" do
     template = File.read(project_root.join("lib/kettle/jem/templates/README.md.example"))
     ruby_2_line = template.lines.find { |line| line.start_with?("| Works with MRI Ruby 2") }
@@ -1175,7 +1151,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(template).not_to include("[🚎ruby-2.3-wf]:")
     expect(template).not_to include("[🚎ruby-2.3-wfi]:")
   end
-
 
   it "keeps current runtime badges distinct from prior-current engine badges" do
     template = File.read(project_root.join("lib/kettle/jem/templates/README.md.example"))
@@ -1191,7 +1166,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(truffleruby_line).to include("[![Truffle Ruby current Compat][💎truby-c-i]][🚎9-t-wf]")
     expect(truffleruby_line).to include("[![Truffle Ruby HEAD Compat][💎truby-headi]][🚎3-hd-wf]")
   end
-
 
   it "adds missing compatible versioned engine README badges when workflows exist" do
     readme = <<~MARKDOWN
@@ -1235,7 +1209,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(processed).to include("[💎jruby-10.0i]: https://img.shields.io/badge/JRuby-10.0-FBE742")
     expect(processed).not_to include("[💎truby-33.0i]: https://img.shields.io/badge/Truffle_Ruby-33.0-34BCB1")
   end
-
 
   it "keeps same-minor Ruby compatibility badges for patch-level runtime floors" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1292,7 +1265,6 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
-
   it "keeps the Ruby 1.8 compatibility badge for a Ruby 1.8.7 runtime floor" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1340,5 +1312,4 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(final_content).to match(/^\[💎ruby-1\.9i\]:/)
     end
   end
-
 end

@@ -47,11 +47,8 @@ Gem::Specification.new do |spec|
   spec.metadata["rubygems_mfa_required"] = "true"
 
   enumerate_package_files = lambda do |root|
-    absolute_root = File.join(__dir__, root)
-    Dir.glob(File.join(absolute_root, "**", "*"), File::FNM_DOTMATCH).filter_map do |path|
-      next unless File.file?(path) && ![".", ".."].include?(File.basename(path))
-
-      path.delete_prefix("#{__dir__}/")
+    Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+      File.file?(path) && ![".", ".."].include?(File.basename(path))
     end
   end
   package_metadata_files = %w[
@@ -70,7 +67,7 @@ Gem::Specification.new do |spec|
     # Executables and executable support scripts
     *enumerate_package_files.call("exe"),
     # Extra package files configured by .structuredmerge/kettle-jem.yml
-    *enumerate_package_files.call("certs")
+    *Dir.glob("certs/**", File::FNM_DOTMATCH).select { |path| File.file?(path) }
   ]
   spec.rdoc_options += [
     "--title",
@@ -138,13 +135,17 @@ Gem::Specification.new do |spec|
 
   # Testing
   spec.add_development_dependency("appraisal2", "~> 3.2", ">= 3.2.0")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
-  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")            # ruby >= 4.0.0
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.12")            # ruby >= 4.0.0
   spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.0")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
   spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0
   spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.6")          # ruby >= 2.2.0
 
+  # Development tasks
+  # The cake is a lie. erb v2.2, the oldest release, was never compatible with Ruby 2.3.
+  # This means we have no choice but to use the erb that shipped with Ruby 2.3
+  # /opt/hostedtoolcache/Ruby/2.3.8/x64/lib/ruby/gems/2.3.0/gems/erb-2.2.2/lib/erb.rb:670:in `prepare_trim_mode': undefined method `match?' for "-":String (NoMethodError)
   # spec.add_development_dependency("erb", ">= 2.2")                                  # ruby >= 2.3.0, not SemVer, old rubies get dropped in a patch.
   spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.4")            # ruby >= 2.4
 end

@@ -94,7 +94,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "normalizes preserved gemspec lines to the template block receiver" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -151,7 +150,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "lets configured rubygems minimum Ruby override preserved gemspec Ruby floor" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -191,7 +189,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "inlines gemspec version loading when minimum Ruby is at least 3.1" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -273,7 +270,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "rewrites preserved dependency requirements that interpolate the project version constant" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -341,7 +337,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "keeps gemspec legacy version loading with require_relative when minimum Ruby is below 3.1 and at least 2.2" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -392,7 +387,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "keeps load-path gemspec legacy version loading only when minimum Ruby is below 2.2" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -440,7 +434,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "keeps explicit zero runtime gemspec floor dependency-free for Ruby 1.x compatibility" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -492,7 +485,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "my-gem.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "removes version_gem dependency and entrypoint references under an old Ruby floor" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -603,7 +595,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "does not add the RequiredRubyVersion RuboCop disable for Ruby 2+ runtime floors" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -645,7 +636,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(gemspec_content).not_to include("Gemspec/RequiredRubyVersion")
     end
   end
-
 
   it "preserves missing runtime gemspec dependencies above the development dependency separator" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -700,7 +690,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "keeps the greater version requirement for template-managed gemspec dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -758,7 +747,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "does not duplicate runtime gemspec dependencies as development dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -809,7 +797,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "keeps old runtime dependency customizations above the development dependency note block" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
@@ -858,7 +845,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(runtime_index).to be < note_index
     expect(note_index).to be < bundler_audit_index
   end
-
 
   it "does not accumulate duplicate blank section separators across repeated gemspec merges" do
     template = <<~RUBY
@@ -939,7 +925,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(twice).to eq(once)
   end
 
-
   it "replaces executable destination gemspec files assignments with template package collections" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
@@ -980,7 +965,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).not_to include("IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL)")
   end
 
-
   it "normalizes destination gemspec receiver names while preserving destination-only fields" do
     template = <<~RUBY
       Gem::Specification.new do |spec|
@@ -1007,7 +991,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     expect(merged).to include('spec.authors = ["Someone"]')
     expect(merged).to include('spec.add_dependency("foo", "~> 1.0")')
   end
-
 
   it "preserves zero-byte template outputs" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1042,7 +1025,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.binread(File.join(root, "REEK"))).to eq("")
     end
   end
-
 
   it "sorts runtime gemspec dependencies with RuboCop-compatible gem name ordering" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1100,7 +1082,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "ports old gemspec emoji field replacement without duplicating the Gem::Specification block" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1179,7 +1160,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "preserves multiline heredoc gemspec assignments as whole fields" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1243,7 +1223,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(gemspec_content).not_to match(/^spec\./)
     end
   end
-
 
   it "ports old gemspec freeze block location preservation" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1313,7 +1292,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "preserves gemspec freeze blocks with configured custom freeze tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1369,7 +1347,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(File.read(File.join(root, "example.gemspec"))).to eq(gemspec_content)
     end
   end
-
 
   it "ports old gemspec self-dependency removal while preserving project fields" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1434,7 +1411,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
     end
   end
 
-
   it "keeps multiline gemspec descriptions valid when adding the project emoji" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1484,7 +1460,6 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(gemspec_content).not_to include("spec.description = 🔮")
     end
   end
-
 
   it "keeps squiggly heredoc gemspec descriptions valid when adding the project emoji" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1546,5 +1521,4 @@ RSpec.describe Kettle::Jem, "gemspec templating" do
       expect(gemspec_content).not_to include("spec.description = 📧")
     end
   end
-
 end

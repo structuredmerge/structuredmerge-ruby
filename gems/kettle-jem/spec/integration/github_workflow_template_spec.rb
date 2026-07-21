@@ -32,7 +32,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "removes legacy tests workflow files as obsolete GitHub Actions workflows" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -68,7 +67,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(File).not_to exist(File.join(root, ".github/workflows/tests.yml"))
     end
   end
-
 
   it "projects configured workflow exec_cmd into GitHub workflow templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -115,7 +113,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "normalizes obsolete Appraisal-relative workflow exec_cmd values" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -159,7 +156,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(workflow_report.fetch(:final_content)).to include('exec_cmd: "kettle-test"')
     end
   end
-
 
   it "fails closed for GitHub YAML template merges when the YAML provider reports a ProcessResult adapter failure" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -211,7 +207,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "fails closed for Gemfile template merges when Prism cannot merge the Ruby DSL" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -259,7 +254,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "strictly merges arbitrary top-level Gemfile dependencies from a template directory" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -303,7 +297,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       RUBY
     end
   end
-
 
   it "strictly merges arbitrary Gemfile dependency blocks and comments from a template directory" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -375,7 +368,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "merges custom workflow YAML snippets without replacing destination jobs" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -439,7 +431,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "normalizes GitHub Action refs when merging packaged workflow templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -487,7 +478,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(content).not_to include("ruby/setup-ruby@v1")
     end
   end
-
 
   it "preserves newer destination GitHub Action SHA pins when accepting workflow templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -558,7 +548,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "normalizes GitHub Action refs in existing workflows outside the active recipe set" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -603,7 +592,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "deletes skipped packaged workflows that already exist" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -646,7 +634,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "deletes legacy dashed Ruby workflow files when dotted packaged workflows replace them" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -687,7 +674,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(report.fetch(:metadata)).to include(delete_file: true)
     end
   end
-
 
   it "does not allow generated CI Ruby floor below 2.4" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -732,7 +718,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "deletes skipped packaged workflows for monorepo subgem profiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -773,7 +758,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(report.fetch(:metadata)).to include(delete_file: true)
     end
   end
-
 
   it "keeps the packaged Discord notifier workflow opt-in via include" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -818,7 +802,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(included_report.fetch(:metadata)).not_to include(delete_file: true)
     end
   end
-
 
   it "generates packaged framework workflow matrices only when configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -922,7 +905,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "prunes packaged workflow files by configured engines and minimum Ruby" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -960,7 +942,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(plan.fetch(:changed_files)).not_to include(".github/workflows/ruby-2.7.yml")
     end
   end
-
 
   it "prunes disabled engine jobs from packaged multi-engine workflows" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1001,7 +982,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       end
     end
   end
-
 
   it "prunes versioned engine workflows below minimum Ruby compatibility" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1062,7 +1042,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "prunes packaged gemfile templates below minimum Ruby" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1097,7 +1076,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       expect(r23_report.fetch(:metadata)).to include(delete_file: true)
     end
   end
-
 
   it "prunes packaged recording gemfile templates unless recording is configured" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1148,7 +1126,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "disables checkout credential persistence in packaged GitHub workflows" do
     workflow_templates = Dir[File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/*.{yml,yaml}.example")]
     checkout_templates = workflow_templates.select { |path| File.read(path).include?("uses: actions/checkout@") }
@@ -1159,7 +1136,6 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-
   it "updates root templating bootstrap dependencies before generated templating workflow commands run" do
     workflow = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, ".github/workflows/templating.yml.example"))
 
@@ -1169,5 +1145,4 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     expect(workflow).to include("run: bundle update nomono")
     expect(workflow.index("Update templating bootstrap dependencies")).to be < workflow.index("[Attempt 1] Appraisal")
   end
-
 end

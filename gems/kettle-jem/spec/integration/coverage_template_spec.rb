@@ -38,7 +38,6 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).not_to include("track_files")
   end
 
-
   it "removes obsolete .simplecov keep_destination config during config sync" do
     content = <<~YAML
       defaults:
@@ -58,7 +57,6 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).to include("Rakefile:")
     expect(output).not_to include(".simplecov:")
   end
-
 
   it "normalizes stale spec helper SimpleCov bootstrap without dropping local wiring" do
     content = <<~RUBY
@@ -90,7 +88,6 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output).not_to include("`.simplecov` is run here")
   end
 
-
   it "upgrades modifier-form spec helper SimpleCov bootstrap to the kettle-soup-cover startup block" do
     content = <<~RUBY
       # frozen_string_literal: true
@@ -118,7 +115,6 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
     expect(output.index("SimpleCov.start")).to be < output.index('require "active_record"')
     expect(output).not_to include("`.simplecov` is run here")
   end
-
 
   it "updates old generated SimpleCov files in the same templating pass that removes keep_destination" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -189,5 +185,4 @@ RSpec.describe Kettle::Jem, "coverage bootstrap template behavior" do
       expect(kettle_config.fetch(:final_content)).not_to include(".simplecov:")
     end
   end
-
 end

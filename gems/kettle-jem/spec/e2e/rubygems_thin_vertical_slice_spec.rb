@@ -71,5 +71,4 @@ RSpec.describe Kettle::Jem, "RubyGems thin vertical slice" do
       )
     end
   end
-
 end

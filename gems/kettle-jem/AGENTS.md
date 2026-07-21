@@ -179,12 +179,6 @@ Use the `kettle-jem` executable as the public entrypoint. The
 `kettle:jem:*` rake tasks are internal orchestration targets that the
 executable may call after it has prepared the templating environment.
 
-User-facing template output changes must also add an entry to
-`lib/kettle/jem/templates/CHANGELOG.transfer.md`. This transfer changelog is
-promoted into destination projects, so README, workflow, gemspec, config,
-documentation, and other generated-template behavior changes need a concise
-transfer entry in addition to the normal project changelog.
-
 **Current defaults** (no flags needed):
 - **quiet=true** — only phase summary lines shown; use `--verbose` or `KETTLE_JEM_VERBOSE=true` to opt out
 - **force=true** — non-interactive; use `--interactive` to opt out

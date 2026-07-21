@@ -45,7 +45,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "uses JSON structural merge for JSON template files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -87,7 +86,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(report.fetch(:final_content)).to include('"ghcr.io/devcontainers/features/git:1": {}')
     end
   end
-
 
   it "uses JSONC structural merge for JSONC template files" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -136,7 +134,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "uses RBS structural merge for RBS template files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -181,7 +178,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(report.fetch(:final_content)).to include("VERSION: String")
     end
   end
-
 
   it "loudly rejects explicit Bash structural routing when the node parser is unavailable" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -228,7 +224,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       end.to raise_error(ArgumentError, /failed to merge bash template scripts\/setup: bash structural merge is unavailable/)
     end
   end
-
 
   it "refreshes mise trust after templating mise.toml when mise is available" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -289,7 +284,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "preserves coverage thresholds from an existing coverage workflow in generated mise.toml" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -331,7 +325,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(mise).to include('K_SOUP_COV_MIN_LINE = "90"')
     end
   end
-
 
   it "preserves coverage thresholds from mise.toml in generated coverage workflow" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -375,7 +368,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "generates QLTY coverage uploads with OIDC in the packaged coverage workflow" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -406,7 +398,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(workflow).not_to include("KJ|GITHUB_ACTIONS:COVERAGE_UPLOAD_STEPS")
     end
   end
-
 
   it "bootstraps version_gem touchpoints before bundled setup" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -482,7 +473,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "uses configured version_gem namespace before stale entrypoint inference" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -530,7 +520,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(signature).not_to include("module Oauth2")
     end
   end
-
 
   it "discovers public entrypoint version namespace before stale gemspec metadata" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -586,7 +575,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "discovers nested public entrypoint namespace before stale generated version namespace" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -637,7 +625,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(tokens.fetch("KJ|NAMESPACE_SHIELD")).to eq("Warden::OAuth")
     end
   end
-
 
   it "does not infer nested implementation namespaces from the public entrypoint" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -693,14 +680,12 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "normalizes generated README badge image URLs consistently with pre-release checks" do
     expect(described_class.send(:shield_token, "Example::Gem")).to eq("Example::Gem")
     expect(described_class.send(:license_compat_img, :a)).to include(
       "Apache_Compatible:_Category_A-%E2%9C%93-259D6C.svg"
     )
   end
-
 
   it "places version_gem entrypoint requires from top-level Ruby structure" do
     content = <<~RUBY
@@ -731,7 +716,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     expect(updated).to include("Example::Gem::Version.class_eval do")
   end
 
-
   it "anchors version_gem relative entrypoint requires after an existing top-level version_gem require" do
     content = <<~RUBY
       # frozen_string_literal: true
@@ -758,7 +742,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       module Example
     RUBY
   end
-
 
   it "reports setup execution context without load-path inspection" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -819,7 +802,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       )
     end
   end
-
 
   it "preserves configured README sections during merge template application" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -934,7 +916,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "does not duplicate destination-only README sections already inside a preserved parent section" do
     template = <<~MARKDOWN
       # Example
@@ -983,7 +964,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       "## 🌻 Synopsis\n\nDestination synopsis.\n\n### This README\n\nThis README has two jobs."
     )
   end
-
 
   it "preserves a front Important section that encloses the README badge cloud" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1045,7 +1025,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "only preserves recognized README front sections before the first canonical section" do
     template = <<~MARKDOWN
       # Example
@@ -1093,7 +1072,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     expect(described_class.send(:preserve_readme_front_sections, template, no_synopsis_destination)).to eq(template)
     expect(described_class.send(:preserve_readme_front_sections, "# Example\n", important_destination)).to eq("# Example\n")
   end
-
 
   it "merges YAML and TOML template applications with destination values" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1228,7 +1206,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "merges Git driver TOML manifests with destination driver values" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1302,7 +1279,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "restores documentation comments from YAML templates when destination config stripped them" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1347,7 +1323,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(File.read(File.join(root, ".kettle-jem.yml"))).to eq(final_content)
     end
   end
-
 
   it "allows YAML template recipes to keep git-style destination comment policy" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1397,7 +1372,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(final_content).to include("  name: example")
     end
   end
-
 
   it "merges Ruby-family template applications with destination declarations and DSL calls" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1517,7 +1491,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     end
   end
 
-
   it "normalizes generated Rakefile section spacing after merge" do
     rakefile = described_class.send(:normalize_generated_rakefile, <<~RAKE)
       task :custom do
@@ -1532,7 +1505,6 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
     expect(rakefile).to include("\n\n### TEMPLATING TASKS\n")
     expect(rakefile).not_to include("\n\n\n### TEMPLATING TASKS")
   end
-
 
   it "passes Ruby method move policy through per-file template strategy config" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1602,5 +1574,4 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       )
     end
   end
-
 end

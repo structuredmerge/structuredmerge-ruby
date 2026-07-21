@@ -27,7 +27,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "deduplicates template source reads while planning recipes" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -59,7 +58,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "records recipe timing metadata in top-level and envelope reports" do
     report = described_class.send(:timed_recipe_report) do
       {
@@ -76,7 +74,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     expect(report.dig(:report_envelope, :report, :metadata, :duration_ms)).to eq(report.dig(:metadata, :duration_ms))
   end
 
-
   it "records phase timing metadata for persisted reports" do
     events = described_class.event_stream_from_options({})
 
@@ -91,7 +88,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       )
     )
   end
-
 
   it "records README sub-step timing metadata for README recipe reports" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -127,7 +123,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "parses recipe planning strategies from options and env" do
     expect(described_class.send(:recipe_planning_strategy_for, {}, {})).to eq("sequential")
     expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {})).to eq("classified")
@@ -138,7 +133,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       described_class.send(:recipe_planning_strategy_for, {}, {recipe_planning_strategy: "ractor"})
     end.to raise_error(ArgumentError, /Unsupported kettle-jem recipe planning strategy/)
   end
-
 
   it "parses Ractor recipe planning workers from options and env" do
     expect(described_class.send(:recipe_planning_workers_for, {}, {})).to eq(0)
@@ -154,7 +148,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end.to raise_error(ArgumentError, /non-negative integer/)
   end
 
-
   it "parses thread recipe planning workers from options and env" do
     expect(described_class.send(:recipe_planning_thread_workers_for, {}, {})).to eq(0)
     expect(described_class.send(:recipe_planning_thread_workers_for, {"KETTLE_JEM_THREAD_WORKERS" => "2"}, {})).to eq(2)
@@ -168,7 +161,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       described_class.send(:recipe_planning_thread_workers_for, {"KETTLE_JEM_THREAD_WORKERS" => "many"}, {})
     end.to raise_error(ArgumentError, /non-negative integer/)
   end
-
 
   it "classifies side-effect-free cleanup and template-source recipes as worker-safe" do
     safe_recipe = {
@@ -206,7 +198,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       )
     ).to be(false)
   end
-
 
   it "keeps classified recipe planning report output equivalent to sequential planning" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -261,7 +252,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       expect(classified.map { |report| report.fetch(:recipe_name) }).to eq(%w[noop_main_only github_actions_obsolete_workflow_cleanup_old])
     end
   end
-
 
   it "keeps Ractor-backed classified recipe planning equivalent to main-Ractor classified planning" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -365,7 +355,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "keeps thread-backed classified recipe planning equivalent to main-Ractor classified planning" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -438,7 +427,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "turns changed recipe reports into deterministic write intents" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -473,7 +461,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "parses opt-in Ractor file worker counts" do
     expect(described_class.send(:file_work_workers_for, {}, {})).to eq(0)
     expect(described_class.send(:file_work_workers_for, {"KETTLE_JEM_RACTOR_FILE_WORKERS" => "3"}, {})).to eq(3)
@@ -484,7 +471,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end.to raise_error(ArgumentError, /non-negative integer/)
   end
 
-
   it "parses opt-in thread file worker counts" do
     expect(described_class.send(:file_work_thread_workers_for, {}, {})).to eq(0)
     expect(described_class.send(:file_work_thread_workers_for, {"KETTLE_JEM_THREAD_FILE_WORKERS" => "3"}, {})).to eq(3)
@@ -494,7 +480,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       described_class.send(:file_work_thread_workers_for, {"KETTLE_JEM_THREAD_FILE_WORKERS" => "-1"}, {})
     end.to raise_error(ArgumentError, /non-negative integer/)
   end
-
 
   it "reduces phase write intents into per-file work units" do
     first_write = described_class::WriteIntent.new(
@@ -527,7 +512,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     expect(work_units.fetch(1).outcome).to eq(other_write)
   end
 
-
   it "rejects file work units that mix relative paths" do
     write_intent = described_class::WriteIntent.new(
       relative_path: "lib/example.rb",
@@ -541,7 +525,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       described_class::FileWorkUnit.new(relative_path: "README.md", operations: [write_intent])
     end.to raise_error(ArgumentError, /cannot include operations/)
   end
-
 
   it "lets one file worker own ordered operations for a path" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -572,7 +555,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       expect(File.read(file_path)).to eq("final\n")
     end
   end
-
 
   it "can commit independent file work units through Ractors within a phase" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -644,7 +626,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "can commit independent file work units through threads within a phase" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -692,7 +673,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "commits file outcomes while preserving current apply behavior" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -721,7 +701,6 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     end
   end
 
-
   it "normalizes GitHub remote source URLs structurally" do
     expect(described_class.normalize_git_source_url("git@github.com:rubythems/them-server.git")).to eq(
       "https://github.com/rubythems/them-server"
@@ -733,5 +712,4 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
       "https://gitlab.com/rubythems/them-server.git"
     )
   end
-
 end

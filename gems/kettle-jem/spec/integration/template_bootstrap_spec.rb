@@ -45,7 +45,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "bootstraps kettle config from packaged reference template when missing" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -79,7 +78,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(bootstrap_report.fetch(:final_content))
     end
   end
-
 
   it "removes explicit RuboCop TargetRubyVersion when templating rubocop-lts config" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -135,7 +133,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "activates the RSpec RuboCop plugin when templating the RSpec RuboCop overlay" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -171,7 +168,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, ".rubocop.yml"))).to eq(report.fetch(:final_content))
     end
   end
-
 
   it "seeds bootstrap config licenses from the gemspec" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -210,7 +206,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       YAML
     end
   end
-
 
   it "seeds bootstrap config minimum Ruby from the gemspec" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -251,7 +246,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "seeds bootstrap config runtime URI values from gemspec metadata" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -283,7 +277,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "syncs OpenCollective ENV into bootstrap config funding tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -310,7 +303,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "syncs FUNDING_ORG ENV into bootstrap config OpenCollective tokens" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -334,7 +326,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "bootstraps full-template Gemfile ownership to avoid merging legacy Gemfile dependency sets" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -357,7 +348,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config.dig("files", "Gemfile", "strategy")).to eq("accept_template")
     end
   end
-
 
   it "seeds bootstrap config CI minimum Ruby no lower than 2.4" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -383,7 +373,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(content).to include('min_ruby: "2.3"')
     end
   end
-
 
   it "bootstraps a monorepo subgem template profile with package-owned entries and Gemfile support files" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -456,7 +445,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "bootstraps a monorepo subgem release profile with per-gem harness entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -506,7 +494,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "renders version_gem Ruby and RBS files from packaged templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -550,7 +537,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(post_step.fetch(:changed_files)).to eq(["lib/example/gem.rb"])
     end
   end
-
 
   it "replaces legacy version files with the packaged version_gem template" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -596,7 +582,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "uses configured RubyGems entrypoint and namespace for version_gem files" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -637,7 +622,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(post_step.fetch(:changed_files)).not_to include("lib/turbo_tests2.rb")
     end
   end
-
 
   it "migrates all legacy nested RBS files into the package-level signature" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -715,7 +699,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "migrates all legacy nested RBS files when the package-level signature is templated" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -779,7 +762,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "migrates legacy nested RBS files without requiring a version_gem dependency" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -831,7 +813,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "bootstraps a monorepo root template profile with shared documentation entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -870,7 +851,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config.lines.count { |line| line == "  .github:\n" }).to eq(1)
     end
   end
-
 
   it "templates a monorepo root without a gemspec and syncs root Gemfile tooling dependencies" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -933,7 +913,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "adds released root Gemfile tooling even when local nomono overrides are present" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -984,7 +963,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect_gem_dependency_declared(gemfile, "turbo_tests2")
     end
   end
-
 
   it "guards preserved main Gemfile local workspace overrides during templating" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1045,7 +1023,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "collapses duplicate templating guards around main Gemfile local workspace overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1100,7 +1077,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "preserves monorepo root Rakefile tasks during scaffold cleanup" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1136,7 +1112,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, "Rakefile"))).to include("task default: :spec")
     end
   end
-
 
   it "rewrites monorepo subgem README policy document references to source-hosted URLs" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1203,7 +1178,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "exposes canonical repository URL tokens for monorepo subgem templates" do
     repository = {
       url: "https://github.com/structuredmerge/structuredmerge-ruby",
@@ -1232,7 +1206,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     )
     expect(tokens.fetch("KJ|CHANGELOG:GL_TAGS_URL")).to eq("https://gitlab.com/structuredmerge/structuredmerge-ruby/-/tags")
   end
-
 
   it "projects monorepo subgem README output to thin form while preserving destination-owned sections" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1359,7 +1332,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
     end
   end
 
-
   it "seeds a default project emoji for monorepo subgems without a README" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1383,7 +1355,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: 💎\n")
     end
   end
-
 
   it "seeds project emoji from KJ_PROJECT_EMOJI before README or defaults" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1409,7 +1380,6 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to include("project_emoji: ☯️\n")
     end
   end
-
 
   it "seeds project emoji from gemspec summary when README has no leading H1" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1441,5 +1411,4 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to include("project_emoji: 🥨\n")
     end
   end
-
 end

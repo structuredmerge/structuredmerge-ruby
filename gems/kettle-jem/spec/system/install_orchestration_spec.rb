@@ -45,7 +45,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "hard-fails malformed Ruby project entrypoints during preflight" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -73,7 +72,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "hard-fails invalid kettle config shape before later discovery" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -99,7 +97,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       end
     end
   end
-
 
   it "classifies template entries with files and patterns strategy config" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -146,7 +143,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(cert_report.dig(:metadata, :template_source_preference)).to include(strategy: "raw_copy")
     end
   end
-
 
   it "projects full per-file merge options into recipe metadata and runtime context" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -205,7 +201,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "plans packaged template inventory when entries are omitted" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -248,7 +243,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(gemspec).to include(configured_source: "gem.gemspec", selected_source: "gem.gemspec.example")
     end
   end
-
 
   it "applies remaining-files copy-only and legacy destination policies" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -303,7 +297,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(apply.fetch(:changed_files)).to include(".github/COPILOT_INSTRUCTIONS.md")
     end
   end
-
 
   it "runs install as active apply plus local post-template checks" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -616,7 +609,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "applies full templates after accepting a newly bootstrapped config before bundled handoff" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -679,7 +671,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "uses KJ_MIN_RUBY during the accepted config one-shot followup apply" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -723,7 +714,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "silences Bundler and debug environment for quiet orchestration commands" do
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install], quiet: true)).to eq(%w[bundle install --quiet])
     expect(Kettle::Jem::Tasks::InstallTask.quiet_command(%w[bundle install --quiet], quiet: true)).to eq(%w[bundle install --quiet])
@@ -742,7 +732,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
-
   it "generates only curated documented binstubs" do
     status = instance_double(Process::Status, success?: false)
     allow(Open3).to receive(:capture3).and_return(["", "", status])
@@ -751,7 +740,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
-
 
   it "omits curated binstubs for gems missing from the destination bundle" do
     status = instance_double(Process::Status, success?: true)
@@ -765,7 +753,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       %w[bundle binstubs appraisal2 rake rbs rspec-core kettle-dev kettle-test kettle-soup-cover stone_checksums]
     )
   end
-
 
   it "skips bundled handoff when kettle-jem is absent from the destination bundle" do
     status = instance_double(Process::Status, success?: true)
@@ -781,7 +768,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       reason: "kettle_jem_not_in_bundle"
     )
   end
-
 
   it "runs setup commands when the caller passes Ruby ENV" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -826,7 +812,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(command_envs).to all(include("BUNDLE_GEMFILE" => File.join(root, "Gemfile")))
     end
   end
-
 
   it "runs setup commands without inherited Bundler activation" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -892,7 +877,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "uses kettle-family local install roots for templating setup" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -933,7 +917,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "detects rake tasks using the same bundle environment as command execution" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -956,7 +939,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "skips rubocop gradual autocorrect before probing rake tasks when requested" do
     expect(Kettle::Jem::Tasks::InstallTask).not_to receive(:rake_task_available?)
 
@@ -966,7 +948,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       reason: "skip_rubocop_gradual"
     )
   end
-
 
   it "runs install follow-up templating whenever the canonical config changes" do
     report = {
@@ -981,7 +962,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
     expect(Kettle::Jem::Tasks::InstallTask.config_bootstrap_changed?(report)).to be(true)
   end
-
 
   it "skips rubocop gradual autocorrect when the destination Rakefile does not define the task" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1003,7 +983,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
     end
   end
-
 
   it "skips curated binstub generation when requested" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1033,7 +1012,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "records command duration metadata for install command steps" do
     command_runner = lambda do |_command, chdir:, env:, quiet:|
       expect(chdir).to eq("/project")
@@ -1059,7 +1037,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       duration_ms: be >= 0
     )
   end
-
 
   it "honors install ENV skip-commit and normalizes lockfiles without templating env overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1158,7 +1135,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "can skip install lockfile normalization from ENV" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1188,7 +1164,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
     end
   end
-
 
   it "normalizes lockfiles from the template task without templating env overrides" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1276,7 +1251,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "activates local git hooks when requested by the template task" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1331,7 +1305,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "makes generated git hook scripts executable during template apply" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1368,7 +1341,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "plans local semantic Git driver setup by default" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {})
 
@@ -1390,7 +1362,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
-
   it "plans builtin Git diff attributes when requested" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "builtin-diff"})
 
@@ -1407,7 +1378,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     ))
   end
 
-
   it "normalizes Git driver mode aliases" do
     expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode(nil)).to eq("local")
     expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("off")).to eq("none")
@@ -1419,7 +1389,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("undo")).to eq("undo")
     expect(Kettle::Jem::Tasks::InstallTask.normalize_git_drivers_mode("custom")).to eq("custom")
   end
-
 
   it "plans a RuboCop-LTS branch switch for local RuboCop-LTS templating" do
     report = {
@@ -1450,7 +1419,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
-
   it "skips the RuboCop-LTS branch switch when the local checkout is already on the matrix branch" do
     report = {
       facts: {
@@ -1477,7 +1445,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     )
   end
 
-
   it "skips the RuboCop-LTS branch switch when templating the RuboCop-LTS checkout itself" do
     report = {
       facts: {
@@ -1503,7 +1470,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       reason: "destination_is_rubocop_lts_checkout"
     )
   end
-
 
   it "skips the RuboCop-LTS branch switch when the checkout paths differ only by realpath" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1541,7 +1507,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "does not plan a RuboCop-LTS branch switch when local RuboCop-LTS is disabled" do
     report = {
       facts: {
@@ -1558,7 +1523,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       env: {"RUBOCOP_LTS_LOCAL" => "off"}
     )).to be_nil
   end
-
 
   it "fails local RuboCop-LTS branch planning when the selected wrapper is unknown" do
     report = {
@@ -1578,7 +1542,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
     }.to raise_error(Kettle::Jem::Error, /Cannot select RUBOCOP_LTS_LOCAL branch/)
   end
-
 
   it "executes the RuboCop-LTS branch switch before later orchestration commands" do
     commands = []
@@ -1616,7 +1579,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     ])
   end
 
-
   it "writes managed .gitattributes and local config for local semantic Git driver setup" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1653,7 +1615,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "reports conflicting unmanaged .gitattributes entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1675,7 +1636,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "plans local Git driver setup without writing attributes in dry-run mode" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1688,7 +1648,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
     end
   end
-
 
   it "plans global Git driver command registration when requested" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "global"})
@@ -1708,7 +1667,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     expect(step.fetch(:diagnostics)).to include(hash_including(key: "forge_ignores_external_diff_drivers"))
   end
 
-
   it "plans global Git driver command removal with unset-all when requested" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "undo"})
 
@@ -1726,7 +1684,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       ["git", "config", "--global", "--unset-all", "merge.smorg-rb.name"]
     )
   end
-
 
   it "writes include-file Git driver configuration when requested" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1752,7 +1709,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(File.read(File.join(root, ".git", "smorg", "config"))).to include("[diff \"smorg-rb\"]")
     end
   end
-
 
   it "loads project Git driver manifests for attribute and command planning" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1789,7 +1745,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "keeps committed Git driver manifests on the smorg-rb executable name" do
     repo_root = project_root.join("../..").expand_path
     manifest_paths = [
@@ -1806,7 +1761,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(content).not_to include("smorg-ruby")
     end
   end
-
 
   it "rejects unsafe interpolation in committed Git driver manifests" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1831,7 +1785,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "rejects cachetextconv outside explicit textconv profiles" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1854,7 +1807,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       end.to raise_error(Kettle::Jem::Error, /cachetextconv requires an explicit textconv profile/)
     end
   end
-
 
   it "keeps semantic diff commands separate from textconv projections" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1903,7 +1855,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "keeps textconv projections display-only and out of merge inputs" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -1938,7 +1889,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "skips Git driver setup when explicitly disabled" do
     step = Kettle::Jem::Tasks::InstallTask.git_drivers_step("/example", {git_drivers: "none"})
 
@@ -1949,7 +1899,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       mode: "none"
     )
   end
-
 
   it "loads canonical structuredmerge kettle-jem config before legacy root config" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1963,7 +1912,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(described_class.kettle_jem_config(root).fetch("templates").fetch("root")).to eq("canonical")
     end
   end
-
 
   it "migrates legacy kettle-jem config to the structuredmerge directory" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -1986,7 +1934,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(File.read(File.join(root, ".structuredmerge", "kettle-jem.yml"))).to eq("templates:\n  root: packaged\n")
     end
   end
-
 
   it "reports a conflict when canonical and legacy kettle-jem configs both exist" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2011,7 +1958,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       ))
     end
   end
-
 
   it "reports gemspec dependency sync through the install task" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2061,7 +2007,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
-
   it "drops retired kettle-drift gemspec development dependencies during gemspec sync" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
@@ -2101,7 +2046,6 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       expect(content).to include('spec.add_development_dependency "rake", "~> 13.0"')
     end
   end
-
 
   it "ports old install post-template project cleanup and safety checks" do
     tmp_root = File.expand_path("../tmp", __dir__)
@@ -2211,5 +2155,4 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
     end
   end
-
 end
