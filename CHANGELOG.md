@@ -58,6 +58,9 @@ Please file a bug if you notice a violation of semantic versioning.
   format-neutral ownership mechanics. The shared helpers now also cover
   interstitial region construction, public owner projection, source spans,
   source content slices, and attached leading comment regions.
+- `kettle-jem` benchmark runs now support `--only` and
+  `KETTLE_JEM_BENCHMARK_ONLY` selectors so combined worker variants can be
+  measured without also running planning-only and file-only split variants.
 - Root architecture specs now guard merge emission files against new ad hoc
   comment or blank-line ownership scans, keeping the remaining cleanup debt
   explicit while shared ast-merge attachment and layout helpers are adopted.

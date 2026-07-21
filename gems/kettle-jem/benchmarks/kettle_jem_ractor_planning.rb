@@ -18,7 +18,28 @@ SUMMARY_PATH = File.join(PROJECT_ROOT, "tmp", "benchmarks", "summary.json")
 RESULTS_README = File.join(BENCHMARK_ROOT, "results", "README.md")
 KETTLE_JEM_EXE = File.join(PROJECT_ROOT, "exe", "kettle-jem")
 KETTLE_JEM_GEMFILE = File.join(PROJECT_ROOT, "Gemfile")
-SUMMARIZE_ONLY = ARGV.delete("--summarize-only")
+summarize_only = false
+only_args = []
+remaining_args = []
+until ARGV.empty?
+  arg = ARGV.shift
+  case arg
+  when "--summarize-only"
+    summarize_only = true
+  when "--only"
+    value = ARGV.shift
+    raise "--only requires a value" unless value
+
+    only_args << value
+  when /\A--only=(.+)\z/
+    only_args << Regexp.last_match(1)
+  else
+    remaining_args << arg
+  end
+end
+raise "Unsupported arguments: #{remaining_args.join(" ")}" unless remaining_args.empty?
+
+SUMMARIZE_ONLY = summarize_only
 STDOUT.sync = true
 
 RUNS = Integer(ENV.fetch("KETTLE_JEM_BENCHMARK_RUNS", "3"))
@@ -31,6 +52,11 @@ WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", DEFAULT_WORKER_COUNTS.
   .uniq
 COMMAND = ENV.fetch("KETTLE_JEM_BENCHMARK_COMMAND", "template")
 BENCHMARK_MODE = ENV.fetch("KETTLE_JEM_BENCHMARK_MODE", "install-template")
+BENCHMARK_ONLY = (ENV.fetch("KETTLE_JEM_BENCHMARK_ONLY", "").split(",") + only_args.flat_map { |arg| arg.split(",") })
+  .map { |token| token.strip.downcase }
+  .reject(&:empty?)
+  .uniq
+VALID_BENCHMARK_ONLY = %w[baseline planning file combined ractor thread].freeze
 
 raise "KETTLE_JEM_BENCHMARK_RUNS must be positive" unless RUNS.positive?
 raise "KETTLE_JEM_BENCHMARK_WORKERS must include at least one value" if WORKER_COUNTS.empty?
@@ -44,6 +70,8 @@ end
 unless %w[install-template raw-template].include?(BENCHMARK_MODE)
   raise "Unsupported benchmark mode #{BENCHMARK_MODE.inspect}"
 end
+unknown_only = BENCHMARK_ONLY - VALID_BENCHMARK_ONLY
+raise "Unsupported benchmark selector(s): #{unknown_only.join(", ")}" unless unknown_only.empty?
 if COMMAND != "template" && BENCHMARK_MODE != "install-template"
   raise "KETTLE_JEM_BENCHMARK_MODE=#{BENCHMARK_MODE} requires KETTLE_JEM_BENCHMARK_COMMAND=template"
 end
@@ -75,6 +103,8 @@ def benchmark_variants
   variants = [
     {
       name: "baseline-main",
+      family: "baseline",
+      worker_type: "none",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
@@ -88,6 +118,8 @@ def benchmark_variants
   WORKER_COUNTS.each do |workers|
     variants << {
       name: "planning-ractor-#{workers}",
+      family: "planning",
+      worker_type: "ractor",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
@@ -98,6 +130,8 @@ def benchmark_variants
     }
     variants << {
       name: "planning-thread-#{workers}",
+      family: "planning",
+      worker_type: "thread",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
@@ -110,6 +144,8 @@ def benchmark_variants
 
     variants << {
       name: "file-ractor-#{workers}",
+      family: "file",
+      worker_type: "ractor",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
@@ -120,6 +156,8 @@ def benchmark_variants
     }
     variants << {
       name: "file-thread-#{workers}",
+      family: "file",
+      worker_type: "thread",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
@@ -130,6 +168,8 @@ def benchmark_variants
     }
     variants << {
       name: "combined-ractor-#{workers}",
+      family: "combined",
+      worker_type: "ractor",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => workers.to_s,
@@ -140,6 +180,8 @@ def benchmark_variants
     }
     variants << {
       name: "combined-thread-#{workers}",
+      family: "combined",
+      worker_type: "thread",
       env: {
         "KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified",
         "KETTLE_JEM_RACTOR_WORKERS" => "0",
@@ -150,6 +192,22 @@ def benchmark_variants
     }
   end
   variants
+end
+
+def selected_variants
+  variants = benchmark_variants
+  return variants if BENCHMARK_ONLY.empty?
+
+  selected = variants.select do |variant|
+    variant.fetch(:name) == "baseline-main" ||
+      BENCHMARK_ONLY.include?(variant.fetch(:family)) ||
+      BENCHMARK_ONLY.include?(variant.fetch(:worker_type))
+  end
+  selected_names = selected.map { |variant| variant.fetch(:name) }
+  if selected_names == ["baseline-main"] && !BENCHMARK_ONLY.include?("baseline")
+    raise "No benchmark variants matched --only #{BENCHMARK_ONLY.join(", ")}"
+  end
+  selected
 end
 
 def reset_worktree
@@ -368,6 +426,7 @@ def summary_payload(results, generated_at: Time.now)
     fixture: FIXTURE_ROOT,
     command: benchmark_command_label,
     mode: BENCHMARK_MODE,
+    only: BENCHMARK_ONLY,
     runs: RUNS,
     worker_counts: WORKER_COUNTS,
     min_ruby: BASE_ENV.fetch("KJ_MIN_RUBY"),
@@ -408,6 +467,7 @@ def build_results_readme(payload)
     "| Fixture | `#{payload.fetch("fixture")}` |",
     "| Command | `#{payload.fetch("command")}` |",
     "| Mode | `#{payload.fetch("mode", "install-template")}` |",
+    "| Only | `#{Array(payload.fetch("only", [])).empty? ? "all" : payload.fetch("only").join(", ")}` |",
     "| Runs per variant | `#{payload.fetch("runs")}` |",
     "| Worker counts | `#{payload.fetch("worker_counts").join(", ")}` |",
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
@@ -489,11 +549,12 @@ FileUtils.rm_rf(REPORT_ROOT)
 FileUtils.mkdir_p(REPORT_ROOT)
 reset_worktree
 
-variants = benchmark_variants
+variants = selected_variants
 puts "kettle-jem Ractor planning benchmark"
 puts "fixture: #{FIXTURE_ROOT}"
 puts "command: #{benchmark_command_label}"
 puts "mode: #{BENCHMARK_MODE}"
+puts "only: #{BENCHMARK_ONLY.empty? ? "all" : BENCHMARK_ONLY.join(", ")}"
 puts "runs: #{RUNS}"
 puts "worker counts: #{WORKER_COUNTS.join(", ")}"
 puts "variants: #{variants.length}"

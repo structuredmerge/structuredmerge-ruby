@@ -52,6 +52,22 @@ bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 
 `raw-template` pre-bootstraps `.structuredmerge/kettle-jem.yml` outside the measured interval, then benchmarks scoped template `--only "**/*"` so it routes through `TemplateTask` instead of the default install-orchestrated flow.
 
+Combined-worker-only benchmark:
+
+```console
+cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+KETTLE_JEM_BENCHMARK_RUNS=3 \
+bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb --only combined
+```
+
+`--only combined` retains `baseline-main` for delta calculations and skips the planning-only and file-only split variants. Multiple selectors can be comma-separated or repeated.
+
 ## ENV Variables
 
 Useful environment variables:
@@ -62,6 +78,7 @@ Useful environment variables:
 | `KETTLE_JEM_BENCHMARK_WORKERS` | `1,min(4,n/2),min(8,n/2),n` | Comma-separated worker counts for Ractor and thread variants, where `n` is `Etc.nprocessors`. |
 | `KETTLE_JEM_BENCHMARK_COMMAND` | `template` | Public `kettle-jem` command to benchmark: `plan`, `apply`, `template`, or `install`. |
 | `KETTLE_JEM_BENCHMARK_MODE` | `install-template` | Template benchmark mode: `install-template` keeps the one-shot install orchestration path; `raw-template` scopes `template` to all targets with `--only "**/*"` so it routes through `TemplateTask`. |
+| `KETTLE_JEM_BENCHMARK_ONLY` | unset | Optional comma-separated variant selectors: `baseline`, `planning`, `file`, `combined`, `ractor`, or `thread`. CLI `--only` uses the same tokens and combines with this env var. |
 | `KETTLE_JEM_BENCHMARK_MIN_RUBY` | `1.8.7` | Minimum Ruby value passed through `KJ_MIN_RUBY` to broaden generated workflow/gemfile coverage. |
 
 Benchmark runs set `KETTLE_JEM_SKIP_DRIFT_CHECK=true`,
@@ -87,6 +104,8 @@ The default `template` benchmark compares:
 - file-only thread workers via `KETTLE_JEM_THREAD_FILE_WORKERS`
 - combined planning and file Ractor workers
 - combined planning and file thread workers
+
+Use `--only combined` or `KETTLE_JEM_BENCHMARK_ONLY=combined` when only the combined planning+file worker runs are useful. Baseline remains selected automatically so the summary can still show percentage deltas.
 
 Benchmark summaries include planning execution counters from each report:
 worker-safe recipe count, Ractor/thread spawn count, and recipe count actually
