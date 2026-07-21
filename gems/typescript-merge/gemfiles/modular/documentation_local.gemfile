@@ -11,21 +11,19 @@
 # Bundler then aborts with "already activated nomono X, but your Gemfile
 # requires nomono Y". Prefer the locked compatible version when present, then
 # activate it explicitly before requiring the Bundler DSL extension used below.
-nomono_activation_requirements = ["~> 1.0", ">= 1.0.8"]
-nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+nomono_activation_requirements = ['~> 1.0', '>= 1.0.8']
+nomono_lockfile = File.expand_path('../../Gemfile.lock', __dir__)
 if File.file?(nomono_lockfile)
   nomono_locked_spec = Bundler::LockfileParser
-    .new(Bundler.read_file(nomono_lockfile))
-    .specs
-    .find { |spec| spec.name == "nomono" }
+                       .new(Bundler.read_file(nomono_lockfile))
+                       .specs
+                       .find { |spec| spec.name == 'nomono' }
   nomono_locked = nomono_locked_spec &&
-    Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
-  if nomono_locked
-    nomono_activation_requirements = ["= #{nomono_locked_spec.version}"]
-  end
+                  Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+  nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
 end
-Kernel.send(:gem, "nomono", *nomono_activation_requirements)
-require "nomono/bundler"
+Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+require 'nomono/bundler'
 
 local_gems = %w[yard-fence yard-timekeeper yard-yaml]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
@@ -34,9 +32,9 @@ local_gems_to_eval = local_gems - %w[typescript-merge] - declared_gems
 # export GALTZO_FLOSS_DEV=/path/to/galtzo-floss
 eval_nomono_gems(
   gems: local_gems_to_eval,
-  prefix: "GALTZO_FLOSS",
-  path_env: "GALTZO_FLOSS_DEV",
-  vendored_gems_env: "GALTZO_FLOSS_VENDORED_GEMS",
-  vendor_gem_dir_env: "GALTZO_FLOSS_VENDOR_GEM_DIR",
-  debug_env: "GALTZO_FLOSS_DEBUG"
+  prefix: 'GALTZO_FLOSS',
+  path_env: 'GALTZO_FLOSS_DEV',
+  vendored_gems_env: 'GALTZO_FLOSS_VENDORED_GEMS',
+  vendor_gem_dir_env: 'GALTZO_FLOSS_VENDOR_GEM_DIR',
+  debug_env: 'GALTZO_FLOSS_DEBUG'
 )
