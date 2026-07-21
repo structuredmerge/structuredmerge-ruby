@@ -1,19 +1,41 @@
 # frozen_string_literal: true
 
-# We run rubocop on the latest version of Ruby,
-#   but in support of the oldest supported version of Ruby
+# Style tasks run on the latest Ruby; RuboCop-LTS selects the compatibility
+# rules for the configured Ruby floor independently from task dependency floors.
 
 # Local path overrides for development.
 # Loaded by the associated non-local gemfile when RUBOCOP_LTS_LOCAL != "false".
 
-require 'nomono/bundler' unless defined?(Nomono)
+# Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
+# Bundler records that dependency during Gemfile evaluation, but it does not
+# activate that exact version before the immediate `require "nomono/bundler"`.
+# If multiple compatible nomono versions are installed, RubyGems may activate
+# the newest installed version while Gemfile.lock pins an older compatible one;
+# Bundler then aborts with "already activated nomono X, but your Gemfile
+# requires nomono Y". Prefer the locked compatible version when present, then
+# activate it explicitly before requiring the Bundler DSL extension used below.
+nomono_activation_requirements = ['~> 1.0', '>= 1.0.8']
+nomono_lockfile = File.expand_path('../../Gemfile.lock', __dir__)
+if File.file?(nomono_lockfile)
+  nomono_locked_spec = Bundler::LockfileParser
+                       .new(Bundler.read_file(nomono_lockfile))
+                       .specs
+                       .find { |spec| spec.name == 'nomono' }
+  nomono_locked = nomono_locked_spec &&
+                  Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+  nomono_activation_requirements = ["= #{nomono_locked_spec.version}"] if nomono_locked
+end
+Kernel.send(:gem, 'nomono', *nomono_activation_requirements)
+require 'nomono/bundler'
 
 local_gems = %w[rubocop-lts rubocop-lts-rspec rubocop-ruby3_2 standard-rubocop-lts]
+declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
+local_gems_to_eval = local_gems - %w[markly-merge] - declared_gems
 
 # export VENDORED_GEMS=rubocop-lts,rubocop-lts-rspec,rubocop-ruby3_2,standard-rubocop-lts
 platform :mri do
   eval_nomono_gems(
-    gems: local_gems,
+    gems: local_gems_to_eval,
     prefix: 'RUBOCOP_LTS',
     path_env: 'RUBOCOP_LTS_LOCAL',
     vendored_gems_env: 'VENDORED_GEMS',
