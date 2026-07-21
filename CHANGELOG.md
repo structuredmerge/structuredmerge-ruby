@@ -33,6 +33,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged
+  monorepo subgems even when the selected template profile does not otherwise
+  manage per-gem harness files.
 - `kettle-jem` RuboCop guidance now treats `.rubocop_gradual.lock` as a work
   list rather than a baseline, and documents explicit config and inline
   exceptions for intentional style deviations.

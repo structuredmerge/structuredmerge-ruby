@@ -139,6 +139,10 @@ module Kettle
         "spec/spec_helper.rb"
       ] + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES
     ).freeze
+    SIMPLECOV_BOOTSTRAP_TEMPLATE_PATHS = %w[
+      .simplecov
+      spec/spec_helper.rb
+    ].freeze
     SHIM_TEMPLATE_STATIC_ENTRIES = [
       "README.md",
       "CHANGELOG.md",
@@ -2920,6 +2924,11 @@ module Kettle
         opencollective_disabled: opencollective_disabled,
         include_patterns: template_selection[:include]
       )
+      template_preferences += existing_simplecov_bootstrap_template_preferences(
+        project_root,
+        template_config,
+        template_preferences
+      )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
       template_tokens = template_tokens(facts, funding)
       template_facts[:tokens] = template_tokens unless template_tokens.empty?
@@ -3145,6 +3154,11 @@ module Kettle
         template_config,
         opencollective_disabled: opencollective_disabled,
         include_patterns: template_selection[:include]
+      )
+      template_preferences += existing_simplecov_bootstrap_template_preferences(
+        project_root,
+        template_config,
+        template_preferences
       )
       template_facts[:source_preferences] = template_preferences unless template_preferences.empty?
       template_facts[:inactive_packaged_template_cleanups] = inactive_templates unless inactive_templates.empty?
@@ -5603,6 +5617,7 @@ module Kettle
 
     def finalize_template_source_content(recipe, content)
       return finalize_rubocop_config(content) if recipe.fetch(:target_path).to_s == ".rubocop.yml"
+      return normalize_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == ".simplecov"
       return normalize_spec_helper_simplecov_template_source(content) if recipe.fetch(:target_path).to_s == "spec/spec_helper.rb"
 
       content
@@ -6555,9 +6570,63 @@ module Kettle
     def normalize_spec_helper_simplecov_template_source(content)
       output = remove_duplicate_simplecov_do_cov_bootstrap_blocks(content)
       output = ensure_spec_helper_simplecov_do_cov_bootstrap(output)
+      output = remove_obsolete_simplecov_rescue_bootstrap_blocks(output)
       output = remove_duplicate_simplecov_requires(output)
       output = ensure_spec_helper_simplecov_config_require(output)
       ensure_spec_helper_simplecov_start(output)
+    end
+
+    def remove_obsolete_simplecov_rescue_bootstrap_blocks(content)
+      records = obsolete_simplecov_rescue_bootstrap_records(content)
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(output, record.fetch(:start_line), expand_line_range_through_following_blanks(output, record.fetch(:end_line)), "")
+      end
+    end
+
+    def obsolete_simplecov_rescue_bootstrap_records(content)
+      result = prism_parse_success(content)
+      return [] unless result
+
+      complete_bootstrap_present = simplecov_do_cov_bootstrap_records(content).any? { |record| record.fetch(:complete) }
+      result.value.breadth_first_search_all do |node|
+        obsolete_simplecov_rescue_bootstrap_node?(node, complete_bootstrap_present: complete_bootstrap_present)
+      end.map do |node|
+        {
+          start_line: node.location.start_line,
+          end_line: ruby_node_source_end_line(node)
+        }
+      end
+    end
+
+    def obsolete_simplecov_rescue_bootstrap_node?(node, complete_bootstrap_present:)
+      return false unless node.is_a?(::Prism::BeginNode)
+      return false unless node.rescue_clause
+
+      calls = prism_call_nodes(node)
+      has_kettle_soup_cover_require = calls.any? { |call| simplecov_kettle_soup_cover_require_call_node?(call) }
+      has_simplecov_require = calls.any? { |call| simplecov_require_call_node?(call) }
+      has_config_require = calls.any? { |call| simplecov_config_require_call_node?(call) }
+      has_kettle_soup_cover_require &&
+        !has_config_require &&
+        (has_simplecov_require || complete_bootstrap_present) &&
+        calls.all? { |call| simplecov_bootstrap_call_node?(call) || simplecov_load_error_guard_call_node?(call) }
+    end
+
+    def simplecov_bootstrap_call_node?(node)
+      simplecov_require_call_node?(node) ||
+        simplecov_config_require_call_node?(node) ||
+        simplecov_kettle_soup_cover_require_call_node?(node) ||
+        simplecov_start_call_node?(node)
+    end
+
+    def simplecov_load_error_guard_call_node?(node)
+      return true if node.name == :raise
+      return true if node.name == :message
+      return true if node.name == :include? && ruby_string_argument(node) == "kettle"
+
+      false
     end
 
     def remove_duplicate_simplecov_do_cov_bootstrap_blocks(content)
@@ -14105,6 +14174,39 @@ module Kettle
           include_patterns: include_patterns,
           apply_templates: apply_templates
         )
+      end
+    end
+
+    def existing_simplecov_bootstrap_template_preferences(project_root, config, preferences)
+      templates = template_activation_config(config)
+      return [] unless templates.is_a?(Hash)
+
+      root = template_root(project_root, templates)
+      return [] unless root.fetch(:kind) == "packaged"
+
+      configured_paths = preferences.map { |preference| preference.fetch(:target_path).to_s }.to_set
+      SIMPLECOV_BOOTSTRAP_TEMPLATE_PATHS.filter_map do |target_path|
+        next if configured_paths.include?(target_path)
+        next unless File.exist?(File.join(project_root, target_path))
+
+        selected_source = preferred_template_source(root.fetch(:path), target_path)
+        next unless selected_source
+
+        {
+          target_path: target_path,
+          configured_source: target_path,
+          selected_source: template_source_display_path(root, selected_source),
+          selection_reason: template_source_selection_reason(target_path, template_source_display_path(root, selected_source)),
+          apply: templates["apply"] == true,
+          strategy: "merge",
+          preference: "template",
+          add_template_only_nodes: true,
+          freeze_token: config.dig("defaults", "freeze_token").to_s.empty? ? "kettle-jem" : config.dig("defaults", "freeze_token").to_s,
+          source_relative_path: selected_source,
+          source_root: root.fetch(:kind),
+          source_root_path: root.fetch(:path),
+          migration: "simplecov_bootstrap"
+        }
       end
     end
 
