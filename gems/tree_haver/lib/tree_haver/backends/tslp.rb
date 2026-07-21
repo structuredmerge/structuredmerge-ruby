@@ -11,6 +11,12 @@ module TreeHaver
       @load_attempted = false
       @loaded = false
       @unavailable_reason = nil
+      PARSER_SMOKE_SOURCES = {
+        'json' => '{}',
+        'toml' => "title = \"tree_haver\"\n",
+        'ruby' => "class TreeHaverSmoke\nend\n",
+        'markdown' => "# TreeHaver\n"
+      }.freeze
 
       class << self
         attr_reader :unavailable_reason
@@ -20,9 +26,11 @@ module TreeHaver
 
           @load_attempted = true
           begin
-            require 'tree_sitter_language_pack'
+            require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
             @loaded = parser_api_available?
-            @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed' unless @loaded
+            if !@loaded && @unavailable_reason.to_s.empty?
+              @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed'
+            end
           rescue LoadError => e
             @loaded = false
             @unavailable_reason = e.message
@@ -57,11 +65,28 @@ module TreeHaver
         def parser_api_available?
           return false unless ::TreeSitterLanguagePack.respond_to?(:get_parser)
           return false unless defined?(::TreeSitterLanguagePack::Parser)
+          return false unless ::TreeSitterLanguagePack::Parser.instance_methods.include?(:parse)
 
-          ::TreeSitterLanguagePack::Parser.instance_methods.include?(:parse)
+          parser_api_smoke_test
         rescue StandardError => e
           @unavailable_reason = e.message
           false
+        end
+
+        def parser_api_smoke_test
+          language_name, source = PARSER_SMOKE_SOURCES.find do |name, _smoke_source|
+            !::TreeSitterLanguagePack.respond_to?(:has_language) ||
+              ::TreeSitterLanguagePack.has_language(name)
+          end
+          return false unless language_name
+
+          parser = ::TreeSitterLanguagePack.get_parser(language_name)
+          return false unless parser
+
+          tree = parser.parse(source)
+          return false unless tree&.respond_to?(:root_node)
+
+          !!tree.root_node
         end
       end
 
