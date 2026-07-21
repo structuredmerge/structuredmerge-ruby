@@ -25,7 +25,7 @@ module TreeHaver
         'toml' => "title = \"tree_haver\"\n",
         'yaml' => "tree_haver: true\n"
       }.freeze
-      DEFAULT_PARSER_SMOKE_SOURCE = ''.freeze
+      DEFAULT_PARSER_SMOKE_SOURCE = ''
 
       class << self
         attr_reader :unavailable_reason
@@ -112,7 +112,7 @@ module TreeHaver
         def smoke_parse_language(language_name, source: smoke_source_for(language_name))
           name = language_name.to_s
           if ::TreeSitterLanguagePack.respond_to?(:has_language) &&
-              !::TreeSitterLanguagePack.has_language(name)
+             !::TreeSitterLanguagePack.has_language(name)
             @unavailable_reason = "tree_sitter_language_pack does not publish #{name}"
             return false
           end
