@@ -4,6 +4,8 @@ family:
   members_root: gems
 
 members:
+  exclude:
+    - "**/benchmarks/**"
   order:
     mode: dependency
     hints:
