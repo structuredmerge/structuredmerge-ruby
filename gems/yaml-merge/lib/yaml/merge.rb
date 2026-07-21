@@ -141,7 +141,8 @@ module Yaml
         return unsupported_feature_merge_result("Unsupported YAML backend #{diagnostic_backend}.")
       end
 
-      merge_yaml_with_parser(template_source, destination_source, dialect, backend: requested) do |source, parse_dialect|
+      merge_yaml_with_parser(template_source, destination_source, dialect,
+                             backend: requested) do |source, parse_dialect|
         parse_yaml(source, parse_dialect, backend: requested)
       end
     end
@@ -217,11 +218,11 @@ module Yaml
     end
     private_class_method :parse_tree_sitter_source
 
-    def with_tree_sitter_backend(backend)
+    def with_tree_sitter_backend(backend, &block)
       if backend.to_s.empty?
         yield
       else
-        TreeHaver.with_backend(backend) { yield }
+        TreeHaver.with_backend(backend, &block)
       end
     end
     private_class_method :with_tree_sitter_backend

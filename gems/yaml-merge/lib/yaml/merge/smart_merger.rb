@@ -113,11 +113,9 @@ module Yaml
           dest_nodes.each_with_index do |dest_node, index|
             next if consumed_dest.include?(index)
 
-            if @remove_template_missing_nodes
-              next
-            else
-              emit_node_with_leading_gap(dest_node, dest_analysis, dest_nodes, boundary_line: dest_boundary_line)
-            end
+            next if @remove_template_missing_nodes
+
+            emit_node_with_leading_gap(dest_node, dest_analysis, dest_nodes, boundary_line: dest_boundary_line)
           end
         end
 
@@ -140,9 +138,9 @@ module Yaml
             )
           elsif template_node.mapping_pair? && dest_node.mapping_pair?
             merge_mapping_pair(template_node, dest_node, template_analysis, dest_analysis, template_owners: template_owners,
-                                                                                         dest_owners: dest_owners,
-                                                                                         template_boundary_line: template_boundary_line,
-                                                                                         dest_boundary_line: dest_boundary_line)
+                                                                                           dest_owners: dest_owners,
+                                                                                           template_boundary_line: template_boundary_line,
+                                                                                           dest_boundary_line: dest_boundary_line)
           elsif template_node.mapping? && dest_node.mapping?
             merge_node_lists(
               template_node.mergeable_children,

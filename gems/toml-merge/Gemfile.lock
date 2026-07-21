@@ -6,24 +6,6 @@ PATH
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
-PATH
-  remote: /home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
-  specs:
-    ast-merge (7.1.0)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.4)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
-
-PATH
-  remote: /home/pboling/src/my/structuredmerge/ruby/gems/tree_haver
-  specs:
-    tree_haver (7.1.0)
-      citrus (~> 3.0)
-      parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.13.2, < 2.0)
-      version_gem (~> 1.1, >= 1.1.9)
-
 GEM
   remote: https://gem.coop/
   specs:
@@ -35,6 +17,11 @@ GEM
       rake (>= 10)
       thor (>= 0.14)
     ast (2.4.3)
+    ast-merge (7.1.0)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -140,8 +127,6 @@ GEM
     nokogiri (1.19.4-aarch64-linux-musl)
       racc (~> 1.4)
     nokogiri (1.19.4-arm64-darwin)
-      racc (~> 1.4)
-    nokogiri (1.19.4-x86_64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
@@ -321,12 +306,15 @@ GEM
       timecop (>= 0.7, < 1)
     token-resolver (2.0.4)
       parslet (~> 2.0)
-      version_gem (~> 1.1, >= 1.1.13)
+      version_gem (~> 1.1, >= 1.1.14)
+    tree_haver (7.1.0)
+      citrus (~> 3.0)
+      parslet (~> 2.0)
+      tree_sitter_language_pack (>= 1.13.2, < 2.0)
+      version_gem (~> 1.1, >= 1.1.9)
     tree_sitter_language_pack (1.13.3-aarch64-linux)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.13.3-arm64-darwin)
-      sorbet-runtime (~> 0.5)
-    tree_sitter_language_pack (1.13.3-x86_64-darwin)
       sorbet-runtime (~> 0.5)
     tree_sitter_language_pack (1.13.3-x86_64-linux)
       sorbet-runtime (~> 0.5)
@@ -369,14 +357,13 @@ PLATFORMS
   aarch64-linux-gnu
   aarch64-linux-musl
   arm64-darwin
-  x86_64-darwin
+  x86_64-linux
   x86_64-linux-gnu
   x86_64-linux-musl
 
 DEPENDENCIES
   addressable (>= 2.8, < 3)
   appraisal2 (~> 3.0, >= 3.0.6)
-  ast-merge!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
   debug (>= 1.1)
@@ -406,7 +393,6 @@ DEPENDENCIES
   stone_checksums (~> 1.0, >= 1.0.3)
   stringio (>= 3.0)
   toml-merge!
-  tree_haver!
   tree_sitter_language_pack (~> 1.13, >= 1.13.3)
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
@@ -464,7 +450,6 @@ CHECKSUMS
   nokogiri (1.19.4-aarch64-linux-gnu) sha256=1269fb644a6de405057a53dd5c762b1209b43ca7424f839454d3dbc677c31a8f
   nokogiri (1.19.4-aarch64-linux-musl) sha256=35c65b9ce72b3bb03207bdbe7067915019dc18c1b9b59139684bd6690fdd01af
   nokogiri (1.19.4-arm64-darwin) sha256=a46db9853286e6597b36ebc6953817d15acf3a299583eb3f89fdc6f91dd63527
-  nokogiri (1.19.4-x86_64-darwin) sha256=7fd17057d3e1f00e9954a74b3cd76595d3d4a5ef233b7ed9599047c204f70551
   nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
   nokogiri (1.19.4-x86_64-linux-musl) sha256=17dfb7c1fa194ae02fbf7c51a7afc8d278045ab3fdacfd86f91d02d7b274470b
   nomono (1.0.9)
@@ -538,7 +523,6 @@ CHECKSUMS
   tree_haver (7.1.0)
   tree_sitter_language_pack (1.13.3-aarch64-linux) sha256=55ffc7c87868cb45658338363d9eba51b4a8b0259aa88e4de368d2bd1d52fea4
   tree_sitter_language_pack (1.13.3-arm64-darwin) sha256=bc2498db605f212a1dbd2465ed3f65190d7da786f6ed5d30fcf958121aeb4a5c
-  tree_sitter_language_pack (1.13.3-x86_64-darwin) sha256=061f7da6e1cc4ba936fad436ee0653d7dfdfa4aa879cf555403e3aa373d43966
   tree_sitter_language_pack (1.13.3-x86_64-linux) sha256=1ffd045bd236ea54f58c5872ee66121d01033359c1f28f375b7fd4a4b5620cf9
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
