@@ -15,13 +15,20 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/cgi/r4/v0.5.gemfile:367169322": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/cgi/vHEAD.gemfile:2729540777": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -57,6 +64,13 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/webrick/vHEAD.gemfile:3867684682": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
@@ -66,10 +80,10 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:909736663": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/vHEAD.gemfile:907917303": [
+  "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
@@ -217,23 +231,23 @@
     [16, 5, 6329, "Metrics/ClassLength: Class has too many lines. [140/100]", 1868859478],
     [183, 7, 586, "Metrics/MethodLength: Method has too many lines. [14/10]", 4015595961]
   ],
-  "lib/json/merge/file_analysis.rb:4214581229": [
-    [7, 5, 8625, "Metrics/ClassLength: Class has too many lines. [230/100]", 3986988439],
+  "lib/json/merge/file_analysis.rb:2615144059": [
+    [7, 5, 8534, "Metrics/ClassLength: Class has too many lines. [231/100]", 1552473597],
     [20, 7, 897, "Metrics/MethodLength: Method has too many lines. [16/10]", 2945813957],
     [83, 9, 6, "Naming/MemoizedInstanceVariableName: Memoized variable `@nodes` does not match method name `statements`. Use `@statements` instead.", 2756313398],
     [182, 7, 530, "Metrics/MethodLength: Method has too many lines. [12/10]", 2217856870],
-    [218, 7, 679, "Metrics/AbcSize: Assignment Branch Condition size for `collect_parse_errors` is too high. [<1, 19, 11> 21.98/17]", 1780421309],
-    [218, 7, 679, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_parse_errors` is too high. [11/7]", 1780421309],
-    [218, 7, 679, "Metrics/MethodLength: Method has too many lines. [13/10]", 1780421309],
-    [218, 7, 679, "Metrics/PerceivedComplexity: Perceived complexity for `collect_parse_errors` is too high. [11/8]", 1780421309],
-    [235, 7, 1373, "Metrics/AbcSize: Assignment Branch Condition size for `extract_freeze_blocks` is too high. [<16, 23, 14> 31.32/17]", 2629976180],
-    [235, 7, 1373, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_freeze_blocks` is too high. [12/7]", 2629976180],
-    [235, 7, 1373, "Metrics/MethodLength: Method has too many lines. [33/10]", 2629976180],
-    [235, 7, 1373, "Metrics/PerceivedComplexity: Perceived complexity for `extract_freeze_blocks` is too high. [14/8]", 2629976180],
-    [279, 7, 575, "Metrics/AbcSize: Assignment Branch Condition size for `integrate_nodes_and_freeze_blocks` is too high. [<8, 19, 10> 22.91/17]", 1313409663],
-    [279, 7, 575, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/7]", 1313409663],
-    [279, 7, 575, "Metrics/MethodLength: Method has too many lines. [13/10]", 1313409663],
-    [279, 7, 575, "Metrics/PerceivedComplexity: Perceived complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/8]", 1313409663]
+    [217, 7, 679, "Metrics/AbcSize: Assignment Branch Condition size for `collect_parse_errors` is too high. [<1, 19, 11> 21.98/17]", 1780421309],
+    [217, 7, 679, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collect_parse_errors` is too high. [11/7]", 1780421309],
+    [217, 7, 679, "Metrics/MethodLength: Method has too many lines. [13/10]", 1780421309],
+    [217, 7, 679, "Metrics/PerceivedComplexity: Perceived complexity for `collect_parse_errors` is too high. [11/8]", 1780421309],
+    [234, 7, 1373, "Metrics/AbcSize: Assignment Branch Condition size for `extract_freeze_blocks` is too high. [<16, 23, 14> 31.32/17]", 2629976180],
+    [234, 7, 1373, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_freeze_blocks` is too high. [12/7]", 2629976180],
+    [234, 7, 1373, "Metrics/MethodLength: Method has too many lines. [33/10]", 2629976180],
+    [234, 7, 1373, "Metrics/PerceivedComplexity: Perceived complexity for `extract_freeze_blocks` is too high. [14/8]", 2629976180],
+    [278, 7, 575, "Metrics/AbcSize: Assignment Branch Condition size for `integrate_nodes_and_freeze_blocks` is too high. [<8, 19, 10> 22.91/17]", 1313409663],
+    [278, 7, 575, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/7]", 1313409663],
+    [278, 7, 575, "Metrics/MethodLength: Method has too many lines. [13/10]", 1313409663],
+    [278, 7, 575, "Metrics/PerceivedComplexity: Perceived complexity for `integrate_nodes_and_freeze_blocks` is too high. [11/8]", 1313409663]
   ],
   "lib/json/merge/freeze_node.rb:340454761": [
     [11, 21, 97, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 4181995290]
@@ -275,12 +289,12 @@
     [188, 7, 574, "Metrics/MethodLength: Method has too many lines. [13/10]", 1857730257],
     [221, 7, 1053, "Metrics/MethodLength: Method has too many lines. [24/10]", 3329630813]
   ],
-  "spec/fixtures_integration_spec.rb:1148249567": [
-    [3, 1, 9137, "Metrics/BlockLength: Block has too many lines. [189/25]", 3333617620],
+  "spec/fixtures_integration_spec.rb:4153476545": [
+    [3, 1, 9054, "Metrics/BlockLength: Block has too many lines. [188/25]", 3333617620],
     [61, 23, 55, "Style/SingleArgumentDig: Use `described_class.json_plan_context[:feature_profile]` instead of `described_class.json_plan_context.dig(:feature_profile)`.", 2689605560],
-    [116, 60, 25, "Style/SymbolProc: Pass `&:compact` as an argument to `map` instead of a block.", 2107480170],
-    [124, 59, 25, "Style/SymbolProc: Pass `&:compact` as an argument to `map` instead of a block.", 2107480170],
-    [188, 3, 801, "Metrics/BlockLength: Block has too many lines. [27/25]", 716259872]
+    [115, 60, 25, "Style/SymbolProc: Pass `&:compact` as an argument to `map` instead of a block.", 2107480170],
+    [123, 59, 25, "Style/SymbolProc: Pass `&:compact` as an argument to `map` instead of a block.", 2107480170],
+    [187, 3, 801, "Metrics/BlockLength: Block has too many lines. [27/25]", 716259872]
   ],
   "spec/reproducible_merge_spec.rb:133932627": [
     [5, 1, 1854, "Metrics/BlockLength: Block has too many lines. [40/25]", 671932104]
