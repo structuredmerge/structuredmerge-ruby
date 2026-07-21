@@ -26,12 +26,22 @@ Useful environment variables:
 | `KETTLE_JEM_BENCHMARK_RUNS` | `3` | Number of measured runs for each variant. |
 | `KETTLE_JEM_BENCHMARK_WORKERS` | `min(2, Etc.nprocessors)` | Comma-separated worker counts for Ractor and thread variants. |
 | `KETTLE_JEM_BENCHMARK_COMMAND` | `template` | Public `kettle-jem` command to benchmark: `plan`, `apply`, `template`, or `install`. |
+| `KETTLE_JEM_BENCHMARK_MODE` | `install-template` | Template benchmark mode: `install-template` keeps the one-shot install orchestration path; `raw-template` scopes `template` to all targets with `--only "**/*"` so it routes through `TemplateTask`. |
 | `KETTLE_JEM_BENCHMARK_MIN_RUBY` | `1.8.7` | Minimum Ruby value passed through `KJ_MIN_RUBY` to broaden generated workflow/gemfile coverage. |
 
 Benchmark runs set `KETTLE_JEM_SKIP_DRIFT_CHECK=true`,
 `KETTLE_JEM_SKIP_RUBOCOP_GRADUAL=true`, `KETTLE_JEM_SKIP_BINSTUBS=true`, and
 `KETTLE_JEM_SKIP_LOCK_NORMALIZATION=true` so external drift/style/setup cleanup
 does not pad the template timing comparison.
+
+The harness invokes `exe/kettle-jem` through the kettle-jem development bundle
+with `BUNDLE_GEMFILE` pinned to this checkout's `Gemfile`, so local sibling
+StructuredMerge APIs are used while destination setup commands still sanitize
+Bundler activation and select the copied fixture's own Gemfile. `K_JEM_TEMPLATING`
+is applied only to the executed `kettle-jem` process, not to Bundler's Gemfile
+evaluation. By default this resolves the released
+`tree_sitter_language_pack` gem; set `VENDORED_GEMS=tree_sitter_language_pack`
+and `VENDOR_GEM_DIR` to benchmark against a local vendored source instead.
 
 The default `template` benchmark compares:
 
@@ -60,9 +70,15 @@ and thread recipe counts, and file Ractor/thread unit counts for completed runs.
 
 For `plan`, file-worker variants are skipped because no filesystem apply phase
 runs. The default `template --accept-config` run exercises kettle-jem's
-supported one-shot flow: environment variables seed `.structuredmerge/kettle-jem.yml`,
-the config bootstrap is written, and the install/template task continues through
-the follow-up apply against that config.
+supported one-shot install flow: environment variables seed
+`.structuredmerge/kettle-jem.yml`, the config bootstrap is written, and the
+install/template task continues through the follow-up apply against that config.
+Set `KETTLE_JEM_BENCHMARK_MODE=raw-template` to benchmark scoped
+`template --only "**/*"` runs through `TemplateTask`, which isolates raw template
+apply work from install orchestration. Raw-template mode first writes
+`.structuredmerge/kettle-jem.yml` outside the measured interval so the timed run
+uses the same accepted configuration shape without measuring install
+orchestration.
 
 The latest committed benchmark summary lives at `results/README.md`. If the
 full benchmark has already run and `tmp/benchmarks/summary.json` still exists,

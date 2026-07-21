@@ -52,6 +52,7 @@ RSpec.describe TreeHaver::Backends::Tslp do
     stub_const('TreeSitterLanguagePack', Module.new)
     TreeSitterLanguagePack.const_set(:Parser, parser_class)
     allow(TreeSitterLanguagePack).to receive(:get_parser).with('toml').and_return(parser)
+    allow(described_class).to receive(:available?).and_return(true)
 
     tree_haver_parser = described_class::Parser.new
     tree_haver_parser.language = described_class::Language.new(:toml)

@@ -17,6 +17,7 @@ REPORT_ROOT = File.join(PROJECT_ROOT, "tmp", "benchmarks", "reports")
 SUMMARY_PATH = File.join(PROJECT_ROOT, "tmp", "benchmarks", "summary.json")
 RESULTS_README = File.join(BENCHMARK_ROOT, "results", "README.md")
 KETTLE_JEM_EXE = File.join(PROJECT_ROOT, "exe", "kettle-jem")
+KETTLE_JEM_GEMFILE = File.join(PROJECT_ROOT, "Gemfile")
 SUMMARIZE_ONLY = ARGV.delete("--summarize-only")
 STDOUT.sync = true
 
@@ -26,6 +27,7 @@ WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].m
   .map { |value| Integer(value.strip) }
   .uniq
 COMMAND = ENV.fetch("KETTLE_JEM_BENCHMARK_COMMAND", "template")
+BENCHMARK_MODE = ENV.fetch("KETTLE_JEM_BENCHMARK_MODE", "install-template")
 
 raise "KETTLE_JEM_BENCHMARK_RUNS must be positive" unless RUNS.positive?
 raise "KETTLE_JEM_BENCHMARK_WORKERS must include at least one value" if WORKER_COUNTS.empty?
@@ -36,9 +38,16 @@ raise "Missing fixture skeleton at #{FIXTURE_ROOT}" unless Dir.exist?(FIXTURE_RO
 unless %w[plan apply template install].include?(COMMAND)
   raise "Unsupported benchmark command #{COMMAND.inspect}"
 end
+unless %w[install-template raw-template].include?(BENCHMARK_MODE)
+  raise "Unsupported benchmark mode #{BENCHMARK_MODE.inspect}"
+end
+if COMMAND != "template" && BENCHMARK_MODE != "install-template"
+  raise "KETTLE_JEM_BENCHMARK_MODE=#{BENCHMARK_MODE} requires KETTLE_JEM_BENCHMARK_COMMAND=template"
+end
 
 BASE_ENV = {
-  "K_JEM_TEMPLATING" => "true",
+  "BUNDLE_GEMFILE" => KETTLE_JEM_GEMFILE,
+  "STRUCTUREDMERGE_DEV" => ENV.fetch("STRUCTUREDMERGE_DEV", File.expand_path("..", PROJECT_ROOT)),
   "KETTLE_JEM_ACCEPT_CONFIG" => "true",
   "KETTLE_JEM_SKIP_COMMIT" => "true",
   "KETTLE_JEM_SKIP_DRIFT_CHECK" => "true",
@@ -211,6 +220,7 @@ def run_variant(variant, index)
 
   progress("starting #{variant.fetch(:name)} run #{index}/#{RUNS}")
   reset_worktree
+  prepare_raw_template_worktree(env) if raw_template_mode?
   started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   stdout, stderr, status = Open3.capture3(env, *command, chdir: WORKTREE)
   elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at
@@ -247,6 +257,10 @@ end
 
 def benchmark_command(report_path)
   command = [
+    "bundle",
+    "exec",
+    "env",
+    "K_JEM_TEMPLATING=true",
     RbConfig.ruby,
     KETTLE_JEM_EXE,
     COMMAND,
@@ -257,7 +271,52 @@ def benchmark_command(report_path)
     "--report",
     report_path
   ]
+  command.concat(raw_template_command_options) if raw_template_mode?
   command
+end
+
+def prepare_raw_template_worktree(env)
+  report_path = File.join(REPORT_ROOT, "raw-template-bootstrap.json")
+  command = [
+    "bundle",
+    "exec",
+    "env",
+    "K_JEM_TEMPLATING=true",
+    RbConfig.ruby,
+    KETTLE_JEM_EXE,
+    "template",
+    "--force",
+    "--quiet",
+    "--accept-config",
+    "--skip-commit",
+    "--report",
+    report_path,
+    "--only",
+    ".structuredmerge/kettle-jem.yml"
+  ]
+  _stdout, stderr, status = Open3.capture3(env, *command, chdir: WORKTREE)
+  return if status.success?
+
+  raise <<~MESSAGE
+    Raw-template benchmark bootstrap failed with status #{status.exitstatus}.
+    Command: #{command.join(" ")}
+    STDERR:
+    #{stderr}
+  MESSAGE
+end
+
+def raw_template_mode?
+  COMMAND == "template" && BENCHMARK_MODE == "raw-template"
+end
+
+def raw_template_command_options
+  ["--only", "**/*"]
+end
+
+def benchmark_command_label
+  label = "kettle-jem #{COMMAND}"
+  label = "#{label} #{raw_template_command_options.join(" ")}" if raw_template_mode?
+  label
 end
 
 def format_seconds(value)
@@ -268,7 +327,8 @@ def summary_payload(results, generated_at: Time.now)
   {
     generated_at: generated_at.iso8601,
     fixture: FIXTURE_ROOT,
-    command: "kettle-jem #{COMMAND}",
+    command: benchmark_command_label,
+    mode: BENCHMARK_MODE,
     runs: RUNS,
     worker_counts: WORKER_COUNTS,
     min_ruby: BASE_ENV.fetch("KJ_MIN_RUBY"),
@@ -306,6 +366,7 @@ def build_results_readme(payload)
     "| --- | --- |",
     "| Fixture | `#{payload.fetch("fixture")}` |",
     "| Command | `#{payload.fetch("command")}` |",
+    "| Mode | `#{payload.fetch("mode", "install-template")}` |",
     "| Runs per variant | `#{payload.fetch("runs")}` |",
     "| Worker counts | `#{payload.fetch("worker_counts").join(", ")}` |",
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
@@ -370,7 +431,8 @@ reset_worktree
 variants = benchmark_variants
 puts "kettle-jem Ractor planning benchmark"
 puts "fixture: #{FIXTURE_ROOT}"
-puts "command: kettle-jem #{COMMAND}"
+puts "command: #{benchmark_command_label}"
+puts "mode: #{BENCHMARK_MODE}"
 puts "runs: #{RUNS}"
 puts "worker counts: #{WORKER_COUNTS.join(", ")}"
 puts "variants: #{variants.length}"

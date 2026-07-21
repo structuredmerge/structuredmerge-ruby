@@ -4,7 +4,7 @@ PATH
     tree_haver (7.1.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
-      tree_sitter_language_pack (>= 1.9.0.pre.rc.40, < 2.0)
+      tree_sitter_language_pack (>= 1.13.2, < 2.0)
       version_gem (~> 1.1, >= 1.1.9)
 
 GEM
@@ -264,7 +264,7 @@ GEM
     simplecov-rcov (0.3.7)
       simplecov (>= 0.4.1)
     simplecov_json_formatter (0.1.4)
-    sorbet-runtime (0.6.13342)
+    sorbet-runtime (0.6.13344)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -299,7 +299,7 @@ GEM
     toml-rb (4.2.0)
       citrus (~> 3.0, > 3.0)
       racc (~> 1.7)
-    tree_sitter_language_pack (1.13.1-x86_64-linux)
+    tree_sitter_language_pack (1.13.2-x86_64-linux)
       sorbet-runtime (~> 0.5)
     tsort (0.2.0)
     turbo_tests2 (3.2.0)
@@ -374,6 +374,7 @@ DEPENDENCIES
   toml (~> 0.3)
   toml-rb (~> 4.1)
   tree_haver!
+  tree_sitter_language_pack (>= 1.13.2, < 2.0)
   yaml-converter (~> 0.1)
   yard (~> 0.9, >= 0.9.44)
   yard-fence (~> 0.9, >= 0.9.1)
@@ -482,7 +483,7 @@ CHECKSUMS
   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_json_formatter (0.1.4) sha256=529418fbe8de1713ac2b2d612aa3daa56d316975d307244399fa4838c601b428
-  sorbet-runtime (0.6.13342) sha256=dbeb9892597f593ed2b29e38018912787f6c4e0c4b736d8af0d6bd3c63bde3c3
+  sorbet-runtime (0.6.13344) sha256=0b4e3310cd10bc814f0d7cfa65db82151103322e75dd63c961546845dd8ba5e5
   standard (1.56.0) sha256=ae2af4d9669589162ac69ed5ef59dcf9f346d4afc81f7e62b84339310dfcb787
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -497,7 +498,7 @@ CHECKSUMS
   toml (0.3.0) sha256=0a91d0f76a9036e84e44f95693b12f58d358c1df3ac8e3b5271f2056ecc6e4b9
   toml-rb (4.2.0) sha256=10a48c91613e20cf63483a7a776767dfb3cd7d70e9327c0237443da601e13776
   tree_haver (7.1.0)
-  tree_sitter_language_pack (1.13.1-x86_64-linux)
+  tree_sitter_language_pack (1.13.2-x86_64-linux) sha256=ab3beba6831edc30a99d962db505f70105b5489b149fd302802cf9df9b956385
   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
   turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
   unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42

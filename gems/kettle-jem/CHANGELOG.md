@@ -36,6 +36,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating reports now persist phase duration metadata, install command steps
   record elapsed duration, and benchmark summaries show recipe-phase time apart
   from external command time.
+- The benchmark harness now supports `KETTLE_JEM_BENCHMARK_MODE=raw-template`
+  to compare scoped raw `TemplateTask` runs separately from the default
+  install-orchestrated one-shot template flow.
 
 ### Fixed
 
@@ -51,8 +54,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `dep-heads.yml`, now omit JRuby and TruffleRuby jobs when the project config
   declares an MRI-only `engines` list.
 - `kettle-jem`'s generated development Gemfiles now depend on released
-  `tree_sitter_language_pack` 1.13.2 or newer by default, while still allowing
-  templating runs to override it with `VENDORED_GEMS`.
+  `tree_sitter_language_pack` 1.13.2 or newer by default, while still
+  allowing templating runs to switch to a local source with
+  `VENDORED_GEMS=tree_sitter_language_pack` / `VENDOR_GEM_DIR`.
 - Gemspec templating now deletes empty generated development-dependency comment
   sections through Prism-backed CRISPR structural edits, preventing blank-line
   churn before the closing `Gem::Specification` `end`.
