@@ -39,6 +39,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - The benchmark harness now supports `KETTLE_JEM_BENCHMARK_MODE=raw-template`
   to compare scoped raw `TemplateTask` runs separately from the default
   install-orchestrated one-shot template flow.
+- The benchmark harness now defaults worker counts to `1,min(4,n/2),min(8,n/2),n`
+  instead of only `min(2,n)`, giving higher-core machines a useful default
+  scaling matrix while keeping low-core hosts bounded.
 
 ### Fixed
 

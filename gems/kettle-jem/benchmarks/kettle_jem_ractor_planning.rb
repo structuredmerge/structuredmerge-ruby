@@ -22,7 +22,10 @@ SUMMARIZE_ONLY = ARGV.delete("--summarize-only")
 STDOUT.sync = true
 
 RUNS = Integer(ENV.fetch("KETTLE_JEM_BENCHMARK_RUNS", "3"))
-WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", [2, Etc.nprocessors].min.to_s)
+NPROCESSORS = Etc.nprocessors
+HALF_NPROCESSORS = [1, NPROCESSORS / 2].max
+DEFAULT_WORKER_COUNTS = [1, [4, HALF_NPROCESSORS].min, [8, HALF_NPROCESSORS].min, NPROCESSORS].uniq
+WORKER_COUNTS = ENV.fetch("KETTLE_JEM_BENCHMARK_WORKERS", DEFAULT_WORKER_COUNTS.join(","))
   .split(",")
   .map { |value| Integer(value.strip) }
   .uniq

@@ -31,7 +31,6 @@ K_JEM_TEMPLATING=true \
 STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
 VENDORED_GEMS= \
 VENDOR_GEM_DIR= \
-KETTLE_JEM_BENCHMARK_WORKERS=1,4,8,16 \
 KETTLE_JEM_BENCHMARK_RUNS=3 \
 bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
@@ -47,7 +46,6 @@ STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
 VENDORED_GEMS= \
 VENDOR_GEM_DIR= \
 KETTLE_JEM_BENCHMARK_MODE=raw-template \
-KETTLE_JEM_BENCHMARK_WORKERS=1,4,8,16 \
 KETTLE_JEM_BENCHMARK_RUNS=3 \
 bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
@@ -61,7 +59,7 @@ Useful environment variables:
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `KETTLE_JEM_BENCHMARK_RUNS` | `3` | Number of measured runs for each variant. |
-| `KETTLE_JEM_BENCHMARK_WORKERS` | `min(2, Etc.nprocessors)` | Comma-separated worker counts for Ractor and thread variants. |
+| `KETTLE_JEM_BENCHMARK_WORKERS` | `1,min(4,n/2),min(8,n/2),n` | Comma-separated worker counts for Ractor and thread variants, where `n` is `Etc.nprocessors`. |
 | `KETTLE_JEM_BENCHMARK_COMMAND` | `template` | Public `kettle-jem` command to benchmark: `plan`, `apply`, `template`, or `install`. |
 | `KETTLE_JEM_BENCHMARK_MODE` | `install-template` | Template benchmark mode: `install-template` keeps the one-shot install orchestration path; `raw-template` scopes `template` to all targets with `--only "**/*"` so it routes through `TemplateTask`. |
 | `KETTLE_JEM_BENCHMARK_MIN_RUBY` | `1.8.7` | Minimum Ruby value passed through `KJ_MIN_RUBY` to broaden generated workflow/gemfile coverage. |
