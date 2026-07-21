@@ -21,13 +21,20 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/cgi/r4/v0.5.gemfile:367169322": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/cgi/vHEAD.gemfile:2729540777": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -63,6 +70,13 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/webrick/vHEAD.gemfile:3867684682": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
@@ -72,17 +86,17 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:909736663": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/vHEAD.gemfile:907917303": [
+  "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
   "lib/ast-crispr.rb:247837913": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`ast-crispr.rb`) should use snake_case.", 5381]
   ],
-  "lib/ast/crispr.rb:1596713986": [
+  "lib/ast/crispr.rb:2551127366": [
     [12, 5, 11, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Error`.", 62528179],
     [22, 5, 11, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Limit`.", 51888158],
     [47, 7, 622, "Metrics/MethodLength: Method has too many lines. [14/10]", 2816807495],
@@ -110,76 +124,79 @@
     [512, 21, 211, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 1155506365],
     [552, 7, 585, "Metrics/MethodLength: Method has too many lines. [13/10]", 13786997],
     [569, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::OperationProfile`.", 1974079861],
-    [597, 21, 188, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 2526147676],
-    [652, 7, 478, "Metrics/MethodLength: Method has too many lines. [11/10]", 795235914],
-    [678, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Adapters::Null`.", 3515430288],
-    [711, 5, 21, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::DocumentContext`.", 594998459],
-    [771, 5, 19, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::OwnerSelector`.", 3092459999],
-    [774, 21, 81, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 2293822273],
-    [836, 7, 606, "Metrics/MethodLength: Method has too many lines. [16/10]", 422136278],
-    [866, 5, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Selectors`.", 2133324825],
-    [866, 5, 5586, "Metrics/ModuleLength: Module has too many lines. [130/100]", 3440946513],
-    [869, 7, 1642, "Metrics/AbcSize: Assignment Branch Condition size for `owner_filter` is too high. [<6, 18, 11> 21.93/17]", 3224577904],
-    [869, 7, 1642, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `owner_filter` is too high. [10/7]", 3224577904],
-    [869, 7, 1642, "Metrics/MethodLength: Method has too many lines. [37/10]", 3224577904],
-    [869, 7, 1642, "Metrics/PerceivedComplexity: Perceived complexity for `owner_filter` is too high. [11/8]", 3224577904],
-    [869, 23, 135, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3231562627],
-    [913, 7, 1936, "Metrics/AbcSize: Assignment Branch Condition size for `comment_region_owned_owner` is too high. [<7, 16, 7> 18.81/17]", 2629441148],
-    [913, 7, 1936, "Metrics/MethodLength: Method has too many lines. [40/10]", 2629441148],
-    [913, 37, 190, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 4159525724],
-    [914, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 940069302],
-    [958, 7, 1731, "Metrics/AbcSize: Assignment Branch Condition size for `line_block` is too high. [<12, 22, 14> 28.71/17]", 1307990669],
-    [958, 7, 1731, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `line_block` is too high. [12/7]", 1307990669],
-    [958, 7, 1731, "Metrics/MethodLength: Method has too many lines. [38/10]", 1307990669],
-    [958, 7, 1731, "Metrics/PerceivedComplexity: Perceived complexity for `line_block` is too high. [12/8]", 1307990669],
-    [958, 21, 130, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 515174999],
-    [1010, 5, 23, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationSupport`.", 343849029],
-    [1010, 5, 8952, "Metrics/ModuleLength: Module has too many lines. [199/100]", 1847775109],
-    [1046, 7, 983, "Metrics/MethodLength: Method has too many lines. [23/10]", 152504950],
-    [1128, 7, 1758, "Metrics/AbcSize: Assignment Branch Condition size for `insertion_from` is too high. [<5, 21, 11> 24.23/17]", 29011294],
-    [1128, 7, 1758, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `insertion_from` is too high. [9/7]", 29011294],
-    [1128, 7, 1758, "Metrics/MethodLength: Method has too many lines. [28/10]", 29011294],
-    [1128, 7, 1758, "Metrics/PerceivedComplexity: Perceived complexity for `insertion_from` is too high. [10/8]", 29011294],
-    [1171, 7, 827, "Metrics/AbcSize: Assignment Branch Condition size for `splice_after_anchor` is too high. [<4, 19, 2> 19.52/17]", 14691010],
-    [1171, 7, 827, "Metrics/MethodLength: Method has too many lines. [16/10]", 14691010],
-    [1175, 9, 72, "Style/RaiseArgs: Provide an exception class and message as arguments to `raise`.", 789091243],
-    [1177, 23, 72, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 2503424841],
-    [1209, 9, 25, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 768340433],
-    [1253, 5, 26, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationProfilable`.", 4114431854],
-    [1262, 7, 19, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationProfilable::ClassMethods`.", 3606528253],
-    [1274, 5, 18, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::MergeReplace`.", 395761599],
-    [1302, 7, 789, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<11, 35, 3> 36.81/17]", 793163309],
-    [1302, 7, 789, "Metrics/MethodLength: Method has too many lines. [20/10]", 793163309],
-    [1327, 5, 13, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Replace`.", 1563590855],
-    [1352, 7, 643, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<10, 32, 3> 33.66/17]", 3656683885],
-    [1352, 7, 643, "Metrics/MethodLength: Method has too many lines. [14/10]", 3656683885],
-    [1371, 5, 12, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Delete`.", 2011475922],
-    [1395, 7, 538, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<7, 21, 1> 22.16/17]", 2655200768],
-    [1395, 7, 538, "Metrics/MethodLength: Method has too many lines. [13/10]", 2655200768],
-    [1413, 5, 12, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Insert`.", 1590185308],
-    [1447, 5, 10, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Move`.", 3515667002],
-    [1475, 7, 1182, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<14, 40, 7> 42.95/17]", 172197360],
-    [1475, 7, 1182, "Metrics/MethodLength: Method has too many lines. [22/10]", 172197360],
-    [1492, 121, 15, "Layout/LineLength: Line is too long. [135/120]", 2688172402],
-    [1505, 3, 13, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr`.", 315644438],
-    [1505, 3, 10812, "Metrics/ModuleLength: Module has too many lines. [180/100]", 1841926844],
-    [1506, 5, 33, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::ProfileReportCompatibility`.", 3039519892],
-    [1528, 5, 18, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::MatchProfile`.", 365273299],
-    [1541, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::SelectionProfile`.", 2464089216],
-    [1563, 7, 1286, "Metrics/AbcSize: Assignment Branch Condition size for `report` is too high. [<5, 29, 13> 32.17/17]", 1720478959],
-    [1563, 7, 1286, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `report` is too high. [11/7]", 1720478959],
-    [1563, 7, 1286, "Metrics/MethodLength: Method has too many lines. [17/10]", 1720478959],
-    [1563, 7, 1286, "Metrics/PerceivedComplexity: Perceived complexity for `report` is too high. [11/8]", 1720478959],
-    [1578, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 1470192175],
-    [1584, 5, 24, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::DestinationProfile`.", 3442102524],
-    [1599, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::OperationProfile`.", 1974079861],
-    [1602, 7, 733, "Metrics/MethodLength: Method has too many lines. [13/10]", 2619513218],
-    [1619, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::StructureProfile`.", 614380405],
-    [1627, 5, 6309, "Metrics/ClassLength: Class has too many lines. [172/100]", 1270437788],
-    [1632, 7, 2717, "Metrics/MethodLength: Method has too many lines. [67/10]", 1469599129],
-    [1697, 121, 19, "Layout/LineLength: Line is too long. [139/120]", 259030389],
-    [1710, 28, 247, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3385598543],
-    [1742, 28, 242, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 1038219895]
+    [601, 21, 188, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [8/5]", 2526147676],
+    [656, 7, 478, "Metrics/MethodLength: Method has too many lines. [11/10]", 795235914],
+    [682, 7, 10, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Adapters::Null`.", 3515430288],
+    [715, 5, 21, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::DocumentContext`.", 594998459],
+    [775, 5, 19, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::OwnerSelector`.", 3092459999],
+    [778, 21, 81, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 2293822273],
+    [840, 7, 606, "Metrics/MethodLength: Method has too many lines. [16/10]", 422136278],
+    [870, 5, 16, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::Selectors`.", 2133324825],
+    [870, 5, 5586, "Metrics/ModuleLength: Module has too many lines. [130/100]", 3440946513],
+    [873, 7, 1642, "Metrics/AbcSize: Assignment Branch Condition size for `owner_filter` is too high. [<6, 18, 11> 21.93/17]", 3224577904],
+    [873, 7, 1642, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `owner_filter` is too high. [10/7]", 3224577904],
+    [873, 7, 1642, "Metrics/MethodLength: Method has too many lines. [37/10]", 3224577904],
+    [873, 7, 1642, "Metrics/PerceivedComplexity: Perceived complexity for `owner_filter` is too high. [11/8]", 3224577904],
+    [873, 23, 135, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3231562627],
+    [917, 7, 1936, "Metrics/AbcSize: Assignment Branch Condition size for `comment_region_owned_owner` is too high. [<7, 16, 7> 18.81/17]", 2629441148],
+    [917, 7, 1936, "Metrics/MethodLength: Method has too many lines. [40/10]", 2629441148],
+    [917, 37, 190, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [9/5]", 4159525724],
+    [918, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 940069302],
+    [962, 7, 1731, "Metrics/AbcSize: Assignment Branch Condition size for `line_block` is too high. [<12, 22, 14> 28.71/17]", 1307990669],
+    [962, 7, 1731, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `line_block` is too high. [12/7]", 1307990669],
+    [962, 7, 1731, "Metrics/MethodLength: Method has too many lines. [38/10]", 1307990669],
+    [962, 7, 1731, "Metrics/PerceivedComplexity: Perceived complexity for `line_block` is too high. [12/8]", 1307990669],
+    [962, 21, 130, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 515174999],
+    [1014, 5, 23, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationSupport`.", 343849029],
+    [1014, 5, 9160, "Metrics/ModuleLength: Module has too many lines. [203/100]", 4118890580],
+    [1055, 7, 983, "Metrics/MethodLength: Method has too many lines. [23/10]", 152504950],
+    [1137, 7, 1758, "Metrics/AbcSize: Assignment Branch Condition size for `insertion_from` is too high. [<5, 21, 11> 24.23/17]", 29011294],
+    [1137, 7, 1758, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `insertion_from` is too high. [9/7]", 29011294],
+    [1137, 7, 1758, "Metrics/MethodLength: Method has too many lines. [28/10]", 29011294],
+    [1137, 7, 1758, "Metrics/PerceivedComplexity: Perceived complexity for `insertion_from` is too high. [10/8]", 29011294],
+    [1180, 7, 827, "Metrics/AbcSize: Assignment Branch Condition size for `splice_after_anchor` is too high. [<4, 19, 2> 19.52/17]", 14691010],
+    [1180, 7, 827, "Metrics/MethodLength: Method has too many lines. [16/10]", 14691010],
+    [1184, 9, 72, "Style/RaiseArgs: Provide an exception class and message as arguments to `raise`.", 789091243],
+    [1186, 23, 72, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 2503424841],
+    [1218, 9, 25, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 768340433],
+    [1262, 5, 26, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationProfilable`.", 4114431854],
+    [1271, 7, 19, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::OperationProfilable::ClassMethods`.", 3606528253],
+    [1283, 5, 18, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::MergeReplace`.", 395761599],
+    [1311, 7, 789, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<11, 35, 3> 36.81/17]", 793163309],
+    [1311, 7, 789, "Metrics/MethodLength: Method has too many lines. [20/10]", 793163309],
+    [1336, 5, 13, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Replace`.", 1563590855],
+    [1361, 7, 643, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<10, 32, 3> 33.66/17]", 3656683885],
+    [1361, 7, 643, "Metrics/MethodLength: Method has too many lines. [14/10]", 3656683885],
+    [1380, 5, 12, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Delete`.", 2011475922],
+    [1404, 7, 538, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<7, 21, 1> 22.16/17]", 2655200768],
+    [1404, 7, 538, "Metrics/MethodLength: Method has too many lines. [13/10]", 2655200768],
+    [1422, 5, 17, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::DeleteBatch`.", 727028494],
+    [1446, 7, 866, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<14, 35, 5> 38.03/17]", 19628260],
+    [1446, 7, 866, "Metrics/MethodLength: Method has too many lines. [20/10]", 19628260],
+    [1472, 5, 12, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Insert`.", 1590185308],
+    [1506, 5, 10, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::Move`.", 3515667002],
+    [1534, 7, 1182, "Metrics/AbcSize: Assignment Branch Condition size for `call` is too high. [<14, 40, 7> 42.95/17]", 172197360],
+    [1534, 7, 1182, "Metrics/MethodLength: Method has too many lines. [22/10]", 172197360],
+    [1551, 121, 15, "Layout/LineLength: Line is too long. [135/120]", 2688172402],
+    [1564, 3, 13, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr`.", 315644438],
+    [1564, 3, 10812, "Metrics/ModuleLength: Module has too many lines. [180/100]", 1841926844],
+    [1565, 5, 33, "Style/Documentation: Missing top-level documentation comment for `module Ast::Crispr::ProfileReportCompatibility`.", 3039519892],
+    [1587, 5, 18, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::MatchProfile`.", 365273299],
+    [1600, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::SelectionProfile`.", 2464089216],
+    [1622, 7, 1286, "Metrics/AbcSize: Assignment Branch Condition size for `report` is too high. [<5, 29, 13> 32.17/17]", 1720478959],
+    [1622, 7, 1286, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `report` is too high. [11/7]", 1720478959],
+    [1622, 7, 1286, "Metrics/MethodLength: Method has too many lines. [17/10]", 1720478959],
+    [1622, 7, 1286, "Metrics/PerceivedComplexity: Perceived complexity for `report` is too high. [11/8]", 1720478959],
+    [1637, 121, 37, "Layout/LineLength: Line is too long. [157/120]", 1470192175],
+    [1643, 5, 24, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::DestinationProfile`.", 3442102524],
+    [1658, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::OperationProfile`.", 1974079861],
+    [1661, 7, 733, "Metrics/MethodLength: Method has too many lines. [13/10]", 2619513218],
+    [1678, 5, 22, "Style/Documentation: Missing top-level documentation comment for `class Ast::Crispr::StructureProfile`.", 614380405],
+    [1686, 5, 6309, "Metrics/ClassLength: Class has too many lines. [172/100]", 1270437788],
+    [1691, 7, 2717, "Metrics/MethodLength: Method has too many lines. [67/10]", 1469599129],
+    [1756, 121, 19, "Layout/LineLength: Line is too long. [139/120]", 259030389],
+    [1769, 28, 247, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3385598543],
+    [1801, 28, 242, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 1038219895]
   ],
   "lib/ast/crispr/rspec/shared_examples/destination_profile.rb:2529475135": [
     [3, 1, 2386, "Metrics/BlockLength: Block has too many lines. [28/25]", 2846758965],
@@ -191,20 +208,20 @@
   "lib/ast/crispr/rspec/shared_examples/operation_profile.rb:3583567850": [
     [3, 1, 2148, "Metrics/BlockLength: Block has too many lines. [26/25]", 2745151209]
   ],
-  "spec/old_runtime_spec.rb:260031317": [
-    [5, 1, 20252, "Metrics/BlockLength: Block has too many lines. [437/25]", 938123867],
+  "spec/old_runtime_spec.rb:682575016": [
+    [5, 1, 22396, "Metrics/BlockLength: Block has too many lines. [485/25]", 3050657641],
     [6, 3, 69, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 3712453399],
     [7, 3, 68, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 1429320782],
     [8, 3, 59, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 253007150],
-    [10, 3, 891, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 361389624],
-    [20, 37, 11, "Lint/UnusedMethodArgument: Unused method argument - `owner_scope`.", 3846606321],
-    [24, 46, 6, "Lint/UnusedMethodArgument: Unused method argument - `region`.", 2124512157],
-    [24, 64, 11, "Lint/UnusedMethodArgument: Unused method argument - `owner_scope`.", 3846606321],
-    [83, 3, 8534, "Metrics/BlockLength: Block has too many lines. [176/25]", 3042299525],
-    [323, 3, 4558, "Metrics/BlockLength: Block has too many lines. [90/25]", 139893120],
-    [448, 3, 1417, "Metrics/BlockLength: Block has too many lines. [28/25]", 1907697465],
-    [449, 5, 1365, "Metrics/BlockLength: Block has too many lines. [26/25]", 3735259564],
-    [481, 3, 1663, "Metrics/BlockLength: Block has too many lines. [41/25]", 115074475]
+    [10, 3, 965, "Lint/ConstantDefinitionInBlock: Do not define constants this way within a block.", 315542089],
+    [24, 37, 11, "Lint/UnusedMethodArgument: Unused method argument - `owner_scope`.", 3846606321],
+    [28, 46, 6, "Lint/UnusedMethodArgument: Unused method argument - `region`.", 2124512157],
+    [28, 64, 11, "Lint/UnusedMethodArgument: Unused method argument - `owner_scope`.", 3846606321],
+    [87, 3, 8534, "Metrics/BlockLength: Block has too many lines. [176/25]", 3042299525],
+    [327, 3, 5459, "Metrics/BlockLength: Block has too many lines. [108/25]", 2383759627],
+    [507, 3, 1417, "Metrics/BlockLength: Block has too many lines. [28/25]", 1907697465],
+    [508, 5, 1365, "Metrics/BlockLength: Block has too many lines. [26/25]", 3735259564],
+    [540, 3, 1663, "Metrics/BlockLength: Block has too many lines. [41/25]", 115074475]
   ],
   "spec/provider_architecture_spec.rb:3233381474": [
     [3, 1, 1743, "Metrics/BlockLength: Block has too many lines. [28/25]", 896214455]

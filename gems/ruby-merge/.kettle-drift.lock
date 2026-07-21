@@ -1,130 +1,10 @@
 {
-  "(direct_sibling_local ||\nENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        80,
-        120,
-        160,
-        200,
-        240,
-        280,
-        320,
-        360,
-        400
-      ]
-    }
-  ],
-  ".find { |spec| spec.name == 'nomono' }\nnomono_locked = nomono_locked_spec &&": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        91,
-        131,
-        171,
-        211,
-        251,
-        291,
-        331,
-        371,
-        411
-      ]
-    }
-  ],
-  "ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?)\ndirect_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        81,
-        121,
-        161,
-        201,
-        241,
-        281,
-        321,
-        361,
-        401
-      ]
-    }
-  ],
-  "Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)\nnomono_activation_requirements = [\"= #{nomono_locked_spec.version}\"] if nomono_locked": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        93,
-        133,
-        173,
-        213,
-        253,
-        293,
-        333,
-        373,
-        413
-      ]
-    }
-  ],
-  "Kernel.send(:gem, 'nomono', *nomono_activation_requirements)\nrequire 'nomono/bundler'": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        96,
-        136,
-        176,
-        216,
-        256,
-        296,
-        336,
-        376,
-        416
-      ]
-    }
-  ],
-  "direct_sibling_dev_was_set = ENV.key?('STRUCTUREDMERGE_DEV')\ndirect_sibling_dev_original = ENV.fetch('STRUCTUREDMERGE_DEV', nil)": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        82,
-        122,
-        162,
-        202,
-        242,
-        282,
-        322,
-        362,
-        402
-      ]
-    }
-  ],
   "eval_nomono_gems(\ngems: direct_sibling_gems,": [
     {
       "file": "Gemfile",
       "lines": [
         60,
-        100,
-        140,
-        180,
-        220,
-        260,
-        300,
-        340,
-        380,
-        420
-      ]
-    }
-  ],
-  "gems: direct_sibling_gems,\nprefix: 'STRUCTUREDMERGE',": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        101,
-        141,
-        181,
-        221,
-        261,
-        301,
-        341,
-        381,
-        421
+        100
       ]
     }
   ],
@@ -133,31 +13,7 @@
       "file": "Gemfile",
       "lines": [
         43,
-        87,
-        127,
-        167,
-        207,
-        247,
-        287,
-        327,
-        367,
-        407
-      ]
-    }
-  ],
-  "if direct_sibling_dev_was_set\nENV['STRUCTUREDMERGE_DEV'] = direct_sibling_dev_original": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        110,
-        150,
-        190,
-        230,
-        270,
-        310,
-        350,
-        390,
-        430
+        87
       ]
     }
   ],
@@ -166,15 +22,7 @@
       "file": "Gemfile",
       "lines": [
         35,
-        79,
-        119,
-        159,
-        199,
-        239,
-        279,
-        319,
-        359,
-        399
+        79
       ]
     }
   ],
@@ -183,31 +31,7 @@
       "file": "Gemfile",
       "lines": [
         69,
-        109,
-        149,
-        189,
-        229,
-        269,
-        309,
-        349,
-        389,
-        429
-      ]
-    }
-  ],
-  "nomono_activation_requirements = nomono_requirements\nnomono_lockfile = File.expand_path('Gemfile.lock', __dir__)": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        85,
-        125,
-        165,
-        205,
-        245,
-        285,
-        325,
-        365,
-        405
+        109
       ]
     }
   ],
@@ -216,15 +40,7 @@
       "file": "Gemfile",
       "lines": [
         48,
-        92,
-        132,
-        172,
-        212,
-        252,
-        292,
-        332,
-        372,
-        412
+        92
       ]
     }
   ],
@@ -233,104 +49,7 @@
       "file": "Gemfile",
       "lines": [
         44,
-        88,
-        128,
-        168,
-        208,
-        248,
-        288,
-        328,
-        368,
-        408
-      ]
-    }
-  ],
-  "nomono_lockfile = File.expand_path('Gemfile.lock', __dir__)\nif File.file?(nomono_lockfile)": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        86,
-        126,
-        166,
-        206,
-        246,
-        286,
-        326,
-        366,
-        406
-      ]
-    }
-  ],
-  "path_env: 'STRUCTUREDMERGE_DEV',\nroot: %w[src my structuredmerge]": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        103,
-        143,
-        183,
-        223,
-        263,
-        303,
-        343,
-        383,
-        423
-      ]
-    }
-  ],
-  "prefix: 'STRUCTUREDMERGE',\npath_env: 'STRUCTUREDMERGE_DEV',": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        102,
-        142,
-        182,
-        222,
-        262,
-        302,
-        342,
-        382,
-        422
-      ]
-    }
-  ],
-  "require 'nomono/bundler'\nENV['STRUCTUREDMERGE_DEV'] = File.expand_path('..', __dir__) if direct_sibling_templating && !direct_sibling_local": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        97,
-        137,
-        177,
-        217,
-        257,
-        297,
-        337,
-        377,
-        417
-      ]
-    }
-  ],
-  "rescue LoadError\nwarn 'Install nomono to enable STRUCTUREDMERGE_DEV local sibling-gem dependencies.'": [
-    {
-      "file": "Gemfile",
-      "lines": [
-        106,
-        146,
-        186,
-        226,
-        266,
-        306,
-        346,
-        386,
-        426
-      ]
-    }
-  ],
-  "vendored_gems_env: 'VENDORED_GEMS',\nvendor_gem_dir_env: 'VENDOR_GEM_DIR',": [
-    {
-      "file": "gemfiles/modular/templating_local.gemfile",
-      "lines": [
-        58,
-        69
+        88
       ]
     }
   ]
