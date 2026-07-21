@@ -13,10 +13,30 @@ runs one-shot templating from that copied gem root, writes reports under
 `tmp/benchmarks/summary.json`, updates `results/README.md`, and resets the
 copied skeleton before and after the run.
 
-Run the benchmark from the `kettle-jem` project root:
+Run the benchmark from the `kettle-jem` project root. Because the development
+bundle currently resolves `tree_sitter_language_pack` from the StructuredMerge
+Git fork, install the bundle before the first benchmark run or whenever the
+lockfile changes:
 
 ```bash
-mise exec -C /path/to/kettle-jem -- ruby benchmarks/kettle_jem_ractor_planning.rb
+cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0=safe.bareRepository \
+GIT_CONFIG_VALUE_0=all \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle install
+
+mise exec -C . -- env \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
 
 ## Examples
@@ -25,6 +45,16 @@ Default install-orchestrated benchmark:
 
 ```console
 cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0=safe.bareRepository \
+GIT_CONFIG_VALUE_0=all \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle install
 
 mise exec -C . -- env \
 K_JEM_TEMPLATING=true \
@@ -39,6 +69,16 @@ Raw template-only benchmark:
 
 ```console
 cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0=safe.bareRepository \
+GIT_CONFIG_VALUE_0=all \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle install
 
 mise exec -C . -- env \
 K_JEM_TEMPLATING=true \
@@ -56,6 +96,16 @@ Combined-worker-only benchmark:
 
 ```console
 cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+GIT_CONFIG_COUNT=1 \
+GIT_CONFIG_KEY_0=safe.bareRepository \
+GIT_CONFIG_VALUE_0=all \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle install
 
 mise exec -C . -- env \
 K_JEM_TEMPLATING=true \
@@ -89,11 +139,15 @@ does not pad the template timing comparison.
 The harness invokes `exe/kettle-jem` through the kettle-jem development bundle
 with `BUNDLE_GEMFILE` pinned to this checkout's `Gemfile`, so local sibling
 StructuredMerge APIs are used while destination setup commands still sanitize
-Bundler activation and select the copied fixture's own Gemfile. `K_JEM_TEMPLATING`
-is applied only to the executed `kettle-jem` process, not to Bundler's Gemfile
-evaluation. By default this resolves the released
-`tree_sitter_language_pack` gem; set `VENDORED_GEMS=tree_sitter_language_pack`
-and `VENDOR_GEM_DIR` to benchmark against a local vendored source instead.
+Bundler activation and select the copied fixture's own Gemfile. The development
+bundle resolves `tree_sitter_language_pack` from
+`structuredmerge/tree-sitter-language-pack` branch
+`fix/ruby-4-platform-gem-abi` until the Ruby ABI platform-gem fix is released.
+Run `bundle install` with the same `K_JEM_TEMPLATING`, `STRUCTUREDMERGE_DEV`,
+`VENDORED_GEMS`, and `VENDOR_GEM_DIR` values shown above before invoking the
+benchmark; otherwise Bundler can fail with "The git source ... is not yet
+checked out." The `GIT_CONFIG_*` variables allow Bundler's bare Git cache on
+systems configured with `safe.bareRepository=explicit`.
 
 The default `template` benchmark compares:
 
