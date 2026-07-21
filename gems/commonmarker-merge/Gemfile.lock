@@ -6,6 +6,14 @@ PATH
       markdown-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
+PATH
+  remote: /home/pboling/src/my/structuredmerge/ruby/gems/markdown-merge
+  specs:
+    markdown-merge (7.1.0)
+      ast-merge (= 7.1.0)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -122,14 +130,10 @@ GEM
     language_server-protocol (3.17.0.6)
     lint_roller (1.1.0)
     logger (1.7.0)
-    markdown-merge (7.1.0)
-      ast-merge (= 7.1.0)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
     mutex_m (0.3.0)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
-    nomono (1.0.8)
+    nomono (1.0.9)
     openssl (4.0.2)
     ostruct (0.6.3)
     parallel (1.28.0)
@@ -271,7 +275,7 @@ GEM
     simplecov-rcov (0.3.7)
       simplecov (>= 0.4.1)
     simplecov_json_formatter (0.1.4)
-    sorbet-runtime (0.6.13342)
+    sorbet-runtime (0.6.13347)
     standard (1.56.0)
       language_server-protocol (~> 3.17.0.2)
       lint_roller (~> 1.0)
@@ -303,7 +307,7 @@ GEM
       timecop (>= 0.7, < 1)
     token-resolver (2.0.4)
       parslet (~> 2.0)
-      version_gem (~> 1.1, >= 1.1.14)
+      version_gem (~> 1.1, >= 1.1.13)
     tree_haver (7.1.0)
       citrus (~> 3.0)
       parslet (~> 2.0)
@@ -365,6 +369,7 @@ DEPENDENCIES
   kettle-test (~> 2.0, >= 2.0.9)
   kramdown (~> 2.5, >= 2.5.1)
   kramdown-parser-gfm (~> 1.1)
+  markdown-merge!
   mutex_m (~> 0.2)
   nomono (~> 1.0, >= 1.0.8)
   rake (~> 13.0)
@@ -439,7 +444,7 @@ CHECKSUMS
   markdown-merge (7.1.0)
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
   nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
-  nomono (1.0.8) sha256=bf4b9b426cbf216ab17b70db474f691b8ae1f1e29de8db4b0ecd405e6e7e1c80
+  nomono (1.0.9)
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
   parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
@@ -493,7 +498,7 @@ CHECKSUMS
   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
   simplecov-rcov (0.3.7) sha256=372f50bf6df6b6350b7d0c840f2f8bdabe021861a43c26877b747c9ac96139fc
   simplecov_json_formatter (0.1.4) sha256=529418fbe8de1713ac2b2d612aa3daa56d316975d307244399fa4838c601b428
-  sorbet-runtime (0.6.13342) sha256=dbeb9892597f593ed2b29e38018912787f6c4e0c4b736d8af0d6bd3c63bde3c3
+  sorbet-runtime (0.6.13347) sha256=54e7221d9f4b63f58aec79f3043752a9ba7810347c6ae0d903531591cc2d5f01
   standard (1.56.0) sha256=ae2af4d9669589162ac69ed5ef59dcf9f346d4afc81f7e62b84339310dfcb787
   standard-custom (1.0.2) sha256=424adc84179a074f1a2a309bb9cf7cd6bfdb2b6541f20c6bf9436c0ba22a652b
   standard-performance (1.9.0) sha256=49483d31be448292951d80e5e67cdcb576c2502103c7b40aec6f1b6e9c88e3f2
@@ -507,21 +512,21 @@ CHECKSUMS
   timecop-rspec (1.0.3) sha256=005f14841bb606dcaefb060e321b5388e2e59537742bee8b3a9a9a40e598fab9
   token-resolver (2.0.4) sha256=33b926958f504525bba3ed511ab66fbcbf8ef30390815e931436b30f27ffcad0
   tree_haver (7.1.0)
-  tree_sitter_language_pack (1.13.3-x86_64-linux)
-  tsort (0.2.0)
-  turbo_tests2 (3.2.0)
-  unicode-display_width (3.2.0)
-  unicode-emoji (4.2.0)
-  version_gem (1.1.14)
-  yaml-converter (0.2.3)
-  yard (0.9.45)
-  yard-fence (0.9.6)
-  yard-junk (0.1.0)
-  yard-relative_markdown_links (0.6.0)
-  yard-timekeeper (0.2.4)
-  yard-yaml (0.2.3)
-  zeitwerk (2.8.2)
-  zlib (3.2.3)
+  tree_sitter_language_pack (1.13.3-x86_64-linux) sha256=1ffd045bd236ea54f58c5872ee66121d01033359c1f28f375b7fd4a4b5620cf9
+  tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
+  turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
+  unicode-display_width (3.2.0) sha256=0cdd96b5681a5949cdbc2c55e7b420facae74c4aaf9a9815eee1087cb1853c42
+  unicode-emoji (4.2.0) sha256=519e69150f75652e40bf736106cfbc8f0f73aa3fb6a65afe62fefa7f80b0f80f
+  version_gem (1.1.14) sha256=6b7306c7e9416d06067561981ab3444e2cecb844f26cc325ae3c27b44cf85613
+  yaml-converter (0.2.3) sha256=d35e69e547610d9e347672cc277fcb7d71dff3c53a942e66f82b1c64022ada72
+  yard (0.9.45) sha256=52e211493f7cb8a3ebf7e104a25a1e73937a3103092545d34cb88fafebb3dc51
+  yard-fence (0.9.6) sha256=3d1dbf4e3df462ac78b8bd2e01cf740a2de20168387c929aca31a0bcee490659
+  yard-junk (0.1.0) sha256=e85fe2ec1afa47313decd333447b53458cb1ed49b510b70015fdc3041a94bcdd
+  yard-relative_markdown_links (0.6.0) sha256=3e5ffa85cbad9bac70bee5421774b190fb25d3bdf489323a5b3534f647d1a70e
+  yard-timekeeper (0.2.4) sha256=62f8d001d737c6e2ac688e7b37386f958dceb0f6aff9c909575e1bec8d20775a
+  yard-yaml (0.2.3) sha256=fe5fef18819e1cbd05bb8f1b9e1baad6bf70c28125eb75b57bbf6397b0831812
+  zeitwerk (2.8.2) sha256=7212a61311083c604184b1ea2574b9aa05cd14f855a0841c06985cabe9181d12
+  zlib (3.2.3) sha256=5bd316698b32f31a64ab910a8b6c282442ca1626a81bbd6a1674e8522e319c20
 
 BUNDLED WITH
   4.0.16
