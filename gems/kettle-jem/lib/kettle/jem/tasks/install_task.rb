@@ -1677,14 +1677,17 @@ module Kettle
             }
           end
 
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           success = result.fetch(:success)
           if success
             return {
               name: name,
               command: command,
               status: "succeeded",
-              exitstatus: result[:exitstatus]
+              exitstatus: result[:exitstatus],
+              duration_ms: duration_ms
             }
           end
 
@@ -1695,11 +1698,14 @@ module Kettle
           return step unless step.fetch(:status) == "ready"
 
           command_env = step.fetch(:env, env)
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(step.fetch(:command), chdir: project_root, env: command_env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           if result.fetch(:success)
             return step.merge(
               status: "succeeded",
               exitstatus: result[:exitstatus],
+              duration_ms: duration_ms,
               reason: "executed"
             )
           end
@@ -1723,18 +1729,22 @@ module Kettle
 
           command_env = step.fetch(:env, env)
           results = step.fetch(:commands).map do |command|
+            started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
             result = command_runner.call(command, chdir: project_root, env: command_env, quiet: quiet)
+            duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
             unless result.fetch(:success)
               raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{command.join(" ")}\n#{result[:stderr]}"
             end
             {
               command: command,
-              exitstatus: result[:exitstatus]
+              exitstatus: result[:exitstatus],
+              duration_ms: duration_ms
             }
           end
           step.merge(
             status: "succeeded",
             command_results: results,
+            duration_ms: results.sum { |result| result.fetch(:duration_ms, 0).to_f }.round(3),
             reason: "executed"
           )
         end
@@ -1746,13 +1756,16 @@ module Kettle
             path = File.join(project_root.to_s, relative_path)
             FileUtils.chmod(0o755, path) if File.file?(path)
           end
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(step.fetch(:command), chdir: project_root, env: env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           unless result.fetch(:success)
             raise Kettle::Jem::Error, "hook_templates failed: #{step.fetch(:command).join(" ")}\n#{result[:stderr]}"
           end
           step.merge(
             status: "succeeded",
             exitstatus: result[:exitstatus],
+            duration_ms: duration_ms,
             reason: "executed"
           )
         end

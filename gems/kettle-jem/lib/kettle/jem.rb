@@ -3563,6 +3563,7 @@ module Kettle
           decision_evaluations: decision_evaluations,
           prompt_requests: prompt_requests,
           changed_files: changed_files,
+          phase_timings: events.respond_to?(:phase_timings) ? events.phase_timings : [],
           warnings: warnings.uniq,
           diagnostics: diagnostics,
           run_stats: run_stats
@@ -3837,9 +3838,8 @@ module Kettle
       chunks.reject(&:empty?).flat_map do |chunk|
         Thread.new do
           thread_id = Thread.current.object_id
-          started_at = monotonic_time
           chunk.map do |recipe, index|
-            report = execute_recipe(
+            report = execute_timed_recipe(
               project_root: project_root,
               recipe: recipe,
               facts: facts,
@@ -3848,7 +3848,6 @@ module Kettle
               decision_policy: decision_policy,
               env: env
             )
-            report = report_with_duration(report, duration_ms_since(started_at))
             report[:metadata][:executor] = "thread"
             report[:metadata][:thread_id] = thread_id
             report.dig(:report_envelope, :report, :metadata)[:executor] = "thread"
@@ -4003,6 +4002,7 @@ module Kettle
           )
         end
       end
+      report[:phase_timings] = events.phase_timings if events.respond_to?(:phase_timings)
       emit_summary_event(events, report)
       report
     end
@@ -4025,25 +4025,50 @@ module Kettle
     end
 
     def event_stream_from_options(run_options)
-      stream = (run_options || {})[:event_stream] || (run_options || {})["event_stream"]
-      stream if stream.respond_to?(:emit)
+      options = run_options || {}
+      recorder = options[:event_recorder] || options["event_recorder"]
+      return recorder if recorder.respond_to?(:emit)
+
+      stream = options[:event_stream] || options["event_stream"]
+      phase_timings = options[:phase_timings] ||= []
+      recorder = EventRecorder.new(stream.respond_to?(:emit) ? stream : nil, phase_timings)
+      options[:event_recorder] = recorder if options.respond_to?(:[]=)
+      recorder
     end
 
     def with_event_phase(events, phase, payload = {})
+      started_at = monotonic_time
       emit_phase_event(events, phase, status: "started", **payload)
       result = yield
-      emit_phase_event(events, phase, status: "ok", **payload)
+      duration_ms = duration_ms_since(started_at)
+      record_phase_timing(events, phase, status: "ok", duration_ms: duration_ms, payload: payload)
+      emit_phase_event(events, phase, status: "ok", duration_ms: duration_ms, **payload)
       result
     rescue => error
+      duration_ms = duration_ms_since(started_at) if started_at
+      record_phase_timing(events, phase, status: "failed", duration_ms: duration_ms, payload: payload)
       emit_phase_event(
         events,
         phase,
         status: "failed",
+        duration_ms: duration_ms,
         error_class: error.class.name,
         error_message: error.message,
         **payload
       )
       raise
+    end
+
+    def record_phase_timing(events, phase, status:, duration_ms:, payload:)
+      return unless events.respond_to?(:record_phase_timing)
+
+      events.record_phase_timing(
+        payload.merge(
+          phase: phase.to_s,
+          status: status,
+          duration_ms: duration_ms
+        )
+      )
     end
 
     def emit_phase_event(events, phase, status:, **payload)
@@ -4169,6 +4194,23 @@ module Kettle
 
         @io.puts(JSON.generate(payload.compact))
         @io.flush if @io.respond_to?(:flush)
+      end
+    end
+
+    class EventRecorder
+      def initialize(stream, phase_timings)
+        @stream = stream
+        @phase_timings = phase_timings
+      end
+
+      attr_reader :phase_timings
+
+      def emit(payload)
+        @stream.emit(payload) if @stream
+      end
+
+      def record_phase_timing(payload)
+        @phase_timings << payload.compact
       end
     end
 

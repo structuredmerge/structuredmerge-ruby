@@ -168,6 +168,16 @@ def report_snapshot(path)
   report = JSON.parse(File.read(path))
   planning_execution = report.fetch("recipe_planning_execution", {})
   file_execution = report.fetch("file_work_execution", {})
+  phase_timings = Array(report["phase_timings"])
+  install_steps = Array(report["install_steps"]) + Array(report["template_steps"])
+  command_duration_ms = install_steps.sum do |step|
+    command_results = Array(step["command_results"])
+    if command_results.empty?
+      step.fetch("duration_ms", 0).to_f
+    else
+      command_results.sum { |result| result.fetch("duration_ms", 0).to_f }
+    end
+  end
   {
     strategy: report["recipe_planning_strategy"],
     planning_workers: report["recipe_planning_workers"],
@@ -185,6 +195,10 @@ def report_snapshot(path)
     file_ractor_units: file_execution.fetch("file_ractor_units", 0),
     file_thread_spawns: file_execution.fetch("file_thread_spawn_count", 0),
     file_thread_units: file_execution.fetch("file_thread_units", 0),
+    phase_duration_ms: phase_timings.sum { |entry| entry.fetch("duration_ms", 0).to_f }.round(3),
+    recipes_duration_ms: phase_timings.select { |entry| entry.fetch("phase", "") == "recipes" }.sum { |entry| entry.fetch("duration_ms", 0).to_f }.round(3),
+    apply_duration_ms: phase_timings.select { |entry| entry.fetch("phase", "") == "apply" }.sum { |entry| entry.fetch("duration_ms", 0).to_f }.round(3),
+    command_duration_ms: command_duration_ms.round(3),
     recipes: Array(report["recipe_reports"]).length,
     changed: Array(report["changed_files"]).length
   }
@@ -297,19 +311,21 @@ def build_results_readme(payload)
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
     "| Source reports | `#{payload.fetch("report_root")}` |",
     "",
-    "| Variant | Min | Median | Mean | Max | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    "| Variant | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   ]
   variants.each do |name, result|
     summary = result.fetch("summary")
     snapshot = result.fetch("snapshot")
     lines << format(
-      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<plan_ractors>d | %<plan_threads>d | %<file_ractors>d | %<file_threads>d | %<safe>d | %<plan_ractor_recipes>d | %<plan_thread_recipes>d | %<file_units>d | %<file_ractor_units>d | %<file_thread_units>d | %<recipes>d | %<changed>d |",
+      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<recipe_phase>s | %<command_steps>s | %<plan_ractors>d | %<plan_threads>d | %<file_ractors>d | %<file_threads>d | %<safe>d | %<plan_ractor_recipes>d | %<plan_thread_recipes>d | %<file_units>d | %<file_ractor_units>d | %<file_thread_units>d | %<recipes>d | %<changed>d |",
       name: name,
       min: format_seconds(summary.fetch("min")),
       median: format_seconds(summary.fetch("median")),
       mean: format_seconds(summary.fetch("mean")),
       max: format_seconds(summary.fetch("max")),
+      recipe_phase: format_seconds(snapshot_count.call(snapshot, "recipes_duration_ms") / 1000.0),
+      command_steps: format_seconds(snapshot_count.call(snapshot, "command_duration_ms") / 1000.0),
       plan_ractors: snapshot_count.call(snapshot, "planning_workers"),
       plan_threads: snapshot_count.call(snapshot, "planning_thread_workers"),
       file_ractors: snapshot_count.call(snapshot, "file_workers"),
@@ -374,12 +390,14 @@ puts
 puts "summary"
 puts
 puts format(
-  "%-28s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
+  "%-28s %8s %8s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
   "variant",
   "min",
   "median",
   "mean",
   "max",
+  "recipes",
+  "cmds",
   "pr",
   "pt",
   "fr",
@@ -397,12 +415,14 @@ results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)
   puts format(
-    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %7d %7d",
+    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %7d %7d",
     name,
     summary.fetch(:min),
     summary.fetch(:median),
     summary.fetch(:mean),
     summary.fetch(:max),
+    snapshot.fetch(:recipes_duration_ms) / 1000.0,
+    snapshot.fetch(:command_duration_ms) / 1000.0,
     snapshot.fetch(:planning_workers),
     snapshot.fetch(:planning_thread_workers),
     snapshot.fetch(:file_workers),

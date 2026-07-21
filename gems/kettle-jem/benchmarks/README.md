@@ -50,6 +50,10 @@ file work units, file-worker Ractor/thread spawns, and file work units committed
 in Ractors or threads. These counters distinguish "workers were enabled" from
 "work actually ran concurrently".
 
+Reports also persist phase durations and install command-step durations. The
+benchmark table surfaces recipe-phase and external-command time separately so
+template execution changes are not hidden by setup commands.
+
 Long runs print timestamped progress lines before and after each measured
 variant run, including elapsed seconds, recipe/change counts, planning Ractor
 and thread recipe counts, and file Ractor/thread unit counts for completed runs.

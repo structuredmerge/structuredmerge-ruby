@@ -273,14 +273,14 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
         command_runner: command_runner
       )
 
-      expect(install.fetch(:install_steps)).to include(
+      expect(install.fetch(:install_steps)).to include(hash_including(
         name: "mise_trust",
         path: "mise.toml",
         command: ["mise", "trust", "-C", root],
         status: "succeeded",
         reason: "executed",
         exitstatus: 0
-      )
+      ))
       expect(install.fetch(:install_phase_reports)).to include(hash_including(
         phase: "post_template",
         statuses: hash_including("mise_trust" => "succeeded")

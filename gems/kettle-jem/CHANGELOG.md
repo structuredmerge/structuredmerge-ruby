@@ -33,6 +33,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Templating now supports benchmark-oriented skip controls for external
   post-template work: `--skip-drift-check`, `--skip-rubocop-gradual`, and
   `--skip-binstubs`, with matching `KETTLE_JEM_SKIP_*` environment variables.
+- Templating reports now persist phase duration metadata, install command steps
+  record elapsed duration, and benchmark summaries show recipe-phase time apart
+  from external command time.
 
 ### Fixed
 

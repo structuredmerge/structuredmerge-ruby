@@ -352,30 +352,30 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         path: "bin/setup",
         status: "updated"
       )
-      expect(install.fetch(:install_steps)).to include(
+      expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bin_setup",
         command: ["bin/setup", "--quiet"],
         status: "succeeded",
         exitstatus: 0
-      )
-      expect(install.fetch(:install_steps)).to include(
+      ))
+      expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundle_binstubs",
         command: curated_binstubs,
         status: "succeeded",
         exitstatus: 0
-      )
+      ))
       expect(install.fetch(:install_steps)).to include(
         name: "rubocop_gradual_autocorrect",
         status: "skipped",
         reason: "missing_rubocop_gradual_task"
       )
-      expect(install.fetch(:install_steps)).to include(
+      expect(install.fetch(:install_steps)).to include(hash_including(
         name: "bundled_handoff",
         command: kettle_jem_handoff_command("--skip-commit", "--quiet", "--only", "bin/setup"),
         status: "succeeded",
         exitstatus: 0,
         reason: "executed"
-      )
+      ))
       expect(install.fetch(:install_steps)).to include(
         name: "bootstrap_commit",
         status: "skipped",
@@ -432,13 +432,13 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         path: "bin/setup",
         status: "already_executable"
       )
-      expect(second.fetch(:install_steps)).to include(
+      expect(second.fetch(:install_steps)).to include(hash_including(
         name: "bundled_handoff",
         command: kettle_jem_handoff_command("--quiet", "--only", "bin/setup"),
         status: "succeeded",
         exitstatus: 0,
         reason: "executed"
-      )
+      ))
       second_commit_step = second.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }
       expect(second_commit_step.fetch(:status)).to eq("unavailable")
       expect(second_commit_step.fetch(:reason)).to eq("not_git_repository")
@@ -467,19 +467,20 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         run_options: {only: "bin/setup"},
         command_runner: command_runner
       )
-      expect(git_ready.fetch(:install_steps)).to include(hash_including(
-        name: "bootstrap_commit",
+      bootstrap_step = git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }
+      expect(bootstrap_step).to include(
         status: "succeeded",
         commands: [
           %w[git add -A],
           ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"]
         ],
-        command_results: [
-          {command: %w[git add -A], exitstatus: 0},
-          {command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0}
-        ],
-        reason: "executed"
-      ))
+        reason: "executed",
+        duration_ms: be >= 0
+      )
+      expect(bootstrap_step.fetch(:command_results)).to contain_exactly(
+        hash_including(command: %w[git add -A], exitstatus: 0, duration_ms: be >= 0),
+        hash_including(command: ["git", "commit", "-m", "🎨 Template bootstrap by kettle-jem v#{Kettle::Jem::Version::VERSION}"], exitstatus: 0, duration_ms: be >= 0)
+      )
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 
       Dir.mktmpdir("kettle-jem-clean-bootstrap", tmp_root) do |clean_root|
@@ -1030,6 +1031,33 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
       expect(commands.map { |entry| entry.fetch(:command) }).to eq([["bin/setup"]])
     end
+  end
+
+
+  it "records command duration metadata for install command steps" do
+    command_runner = lambda do |_command, chdir:, env:, quiet:|
+      expect(chdir).to eq("/project")
+      expect(env).to eq({})
+      expect(quiet).to be(true)
+      {success: true, exitstatus: 0, stdout: "", stderr: ""}
+    end
+
+    step = Kettle::Jem::Tasks::InstallTask.run_command_step(
+      "example",
+      %w[echo ok],
+      project_root: "/project",
+      env: {},
+      quiet: true,
+      command_runner: command_runner
+    )
+
+    expect(step).to include(
+      name: "example",
+      command: %w[echo ok],
+      status: "succeeded",
+      exitstatus: 0,
+      duration_ms: be >= 0
+    )
   end
 
 

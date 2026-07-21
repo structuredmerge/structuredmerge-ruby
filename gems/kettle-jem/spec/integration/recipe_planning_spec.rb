@@ -77,6 +77,22 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
+  it "records phase timing metadata for persisted reports" do
+    events = described_class.event_stream_from_options({})
+
+    described_class.send(:with_event_phase, events, "example_phase", total: 1) { "ok" }
+
+    expect(events.phase_timings).to contain_exactly(
+      include(
+        phase: "example_phase",
+        status: "ok",
+        total: 1,
+        duration_ms: be >= 0
+      )
+    )
+  end
+
+
   it "parses recipe planning strategies from options and env" do
     expect(described_class.send(:recipe_planning_strategy_for, {}, {})).to eq("sequential")
     expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {})).to eq("classified")
@@ -380,6 +396,10 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
         main_recipe_count: 0
       )
       expect(workers.map { |report| report.dig(:metadata, :executor) }).to eq(%w[thread thread])
+      expect(workers.map { |report| report.dig(:metadata, :duration_ms) }).to all(be >= 0)
+      expect(workers.map { |report| report.dig(:report_envelope, :report, :metadata, :duration_ms) }).to eq(
+        workers.map { |report| report.dig(:metadata, :duration_ms) }
+      )
     end
   end
 
