@@ -377,7 +377,9 @@ module Toml
         prev_emitted_end_line = nil
         prev_emitted_analysis = nil
 
-        entries.sort_by { |node, _analysis| node.respond_to?(:key_name) ? node.key_name.to_s : node.type.to_s }.each do |node, analysis|
+        entries.sort_by do |node, _analysis|
+          node.respond_to?(:key_name) ? node.key_name.to_s : node.type.to_s
+        end.each do |node, analysis|
           emit_gap_before_node(node, analysis, prev_emitted_end_line, prev_emitted_analysis)
           emit_node(node, analysis)
           prev_emitted_end_line = emitted_end_line_for(node)
@@ -1049,9 +1051,9 @@ module Toml
             [dest_node, dest_analysis]
           end
         emit_gap_before_node(alternate_node, alternate_analysis, prev_end_line, prev_analysis)
-        if selected_node.equal?(template_node)
-          emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: dest_owners)
-        end
+        return unless selected_node.equal?(template_node)
+
+        emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: dest_owners)
       end
 
       def emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: nil)
