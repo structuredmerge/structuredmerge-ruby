@@ -796,7 +796,7 @@ module Kettle
       end
 
       def workflow_references(content)
-        markdown_link_definition_owners(content).each_with_object({}) do |owner, references|
+        markdown_structural_owners(content, :link_definitions).fetch(:link_definitions).each_with_object({}) do |owner, references|
           workflow = URI(owner.url.to_s).path.to_s.split("/actions/workflows/", 2).last
           next unless workflow
           workflow = workflow.split("/", 2).first
@@ -935,9 +935,10 @@ module Kettle
       end
 
       def prune_unused_compatibility_reference_definitions(content)
-        referenced_labels = markdown_inline_reference_owners(content).flat_map(&:labels).to_h { |label| [label, true] }
+        owners = markdown_structural_owners(content, :inline_references, :link_definitions)
+        referenced_labels = owners.fetch(:inline_references).flat_map(&:labels).to_h { |label| [label, true] }
 
-        labels = markdown_link_definition_owners(content).filter_map do |owner|
+        labels = owners.fetch(:link_definitions).filter_map do |owner|
           label = owner.label.to_s
           label if COMPATIBILITY_REFERENCE_LABEL_RE.match?(label) && !referenced_labels[label]
         end
@@ -945,8 +946,9 @@ module Kettle
       end
 
       def prune_orphaned_workflow_inline_references(content)
-        defined_labels = markdown_link_definition_owners(content).map { |owner| owner.label.to_s }.to_set
-        orphaned_labels = markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).uniq.select do |label|
+        owners = markdown_structural_owners(content, :link_definitions, :inline_references)
+        defined_labels = owners.fetch(:link_definitions).map { |owner| owner.label.to_s }.to_set
+        orphaned_labels = owners.fetch(:inline_references).flat_map(&:labels).map(&:to_s).uniq.select do |label|
           label.start_with?("🚎") && !defined_labels.include?(label)
         end
         processed = orphaned_labels.reduce(content.to_s) do |memo, label|
@@ -979,6 +981,16 @@ module Kettle
         []
       end
 
+      def markdown_structural_owners(content, *owner_scopes)
+        Kettle::Jem.ensure_runtime_dependencies!
+        context = Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
+        owner_scopes.each_with_object({}) do |owner_scope, owners|
+          owners[owner_scope] = context.structural_owners(owner_scope: owner_scope)
+        end
+      rescue Ast::Crispr::Error
+        owner_scopes.to_h { |owner_scope| [owner_scope, []] }
+      end
+
       def compatibility_row?(line)
         text = line.to_s.lstrip
         text.start_with?("| Works with MRI Ruby", "| Works with JRuby", "| Works with Truffle Ruby")
@@ -986,13 +998,12 @@ module Kettle
 
       def delete_markdown_link_definitions(content, labels)
         Kettle::Jem.ensure_runtime_dependencies!
-        labels.uniq.reduce(content.to_s) do |processed, label|
-          Ast::Crispr::Delete.call(
-            content: processed,
-            target: Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0}),
-            source_label: "README.md"
-          ).updated_content
+        targets = labels.uniq.map do |label|
+          Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0})
         end
+        return content if targets.empty?
+
+        Ast::Crispr::DeleteBatch.call(content: content.to_s, targets: targets, source_label: "README.md").updated_content
       end
 
       def remove_markdown_inline_references(content, label)
@@ -5836,12 +5847,7 @@ module Kettle
       ensure_runtime_dependencies!
       processed = content.to_s.gsub(badge_source, "").lines.map(&:rstrip).join("\n")
       processed = "#{processed}\n" if content.to_s.end_with?("\n")
-      Array(link_labels).reduce(processed) do |memo, label|
-        delete_markdown_with_ast_crispr(
-          memo,
-          Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0})
-        )
-      end
+      ReadmePostProcessor.delete_markdown_link_definitions(processed, Array(link_labels))
     end
 
     def apply_markdown_conditional_block(content, name, keep:)
@@ -6058,12 +6064,7 @@ module Kettle
         pruned_badges = README_INTEGRATION_BADGE_PATTERNS.fetch(integration.to_s, []).reduce(result) do |memo, pattern|
           memo.gsub(pattern, "")
         end
-        README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, []).reduce(pruned_badges) do |memo, label|
-          delete_markdown_with_ast_crispr(
-            memo,
-            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: label, limit: {at_least: 0})
-          )
-        end
+        ReadmePostProcessor.delete_markdown_link_definitions(pruned_badges, README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, []))
       end.gsub(/[ \t]{2,}/, " ")
     end
 
@@ -6072,15 +6073,11 @@ module Kettle
       existing = Array(workflow_paths).map { |path| path.to_s.delete_prefix("./") }.to_set
       Ast::Crispr::Markdown::Markly.document_context(content: content.to_s, source_label: "README.md")
         .structural_owners(owner_scope: :link_definitions)
-        .reduce(content.to_s) do |processed, owner|
+        .filter_map do |owner|
           workflow_path = readme_workflow_path_from_url(owner.url)
-          next processed if workflow_path.empty? || existing.include?(workflow_path)
-
-          delete_markdown_with_ast_crispr(
-            processed,
-            Ast::Crispr::Markdown::Markly::Selectors.link_definition(label: owner.label, limit: {at_least: 0})
-          )
+          owner.label if !workflow_path.empty? && !existing.include?(workflow_path)
         end
+        .then { |labels| ReadmePostProcessor.delete_markdown_link_definitions(content, labels) }
     end
 
     def readme_workflow_path_from_url(url)

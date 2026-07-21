@@ -8,12 +8,16 @@ RSpec.describe Ast::Crispr do
   FakeOwner = Struct.new(:location, :key, keyword_init: true)
 
   class FakeAdapter
+    attr_reader :read_count
+
     def initialize(owners:, comments:)
       @owners = owners
       @comments = comments
+      @read_count = 0
     end
 
     def read_ast(_document)
+      @read_count += 1
       { owners: @owners, comments: @comments }
     end
 
@@ -381,6 +385,26 @@ RSpec.describe Ast::Crispr do
       it_behaves_like 'Ast::Crispr::OperationProfile contract'
     end
 
+    describe Ast::Crispr::DeleteBatch do
+      let(:operation_profile) { described_class.operation_profile }
+      let(:expected_operation_kind) { :delete_batch }
+      let(:expected_operation_family) { :removal }
+      let(:expected_known_operation_kind) { true }
+      let(:expected_source_requirement) { :required }
+      let(:expected_destination_requirement) { :none }
+      let(:expected_replacement_source) { :none }
+      let(:expected_captures_source_text) { true }
+      let(:expected_supports_if_missing) { false }
+      let(:expected_selects_source) { true }
+      let(:expected_requires_source) { true }
+      let(:expected_supports_destination) { false }
+      let(:expected_requires_destination) { false }
+      let(:expected_explicit_replacement) { false }
+      let(:expected_may_reuse_captured_text) { false }
+
+      it_behaves_like 'Ast::Crispr::OperationProfile contract'
+    end
+
     describe Ast::Crispr::Insert do
       let(:operation_profile) { described_class.operation_profile }
       let(:expected_operation_kind) { :insert }
@@ -442,6 +466,41 @@ RSpec.describe Ast::Crispr do
       expect(actor.failure?).to be(true)
       expect(actor.error).to include('matched 2 node(s); expected == 1')
       expect(actor.operation_profile.operation_kind).to eq(:replace)
+    end
+  end
+
+  describe described_class::DeleteBatch do
+    it 'deletes matches from multiple selectors using one document context' do
+      content = <<~TEXT
+        ### MANAGED SNIPPET
+        puts "one"
+
+        ### MANAGED SNIPPET
+        puts "two"
+        puts "still managed"
+
+        ### STABLE
+        puts "stable"
+      TEXT
+      selector_one = Ast::Crispr::Selectors.owner_filter(
+        id: 'managed-one',
+        adapter: adapter,
+        limit: { exactly: 1 }
+      ) { |_context, owner| owner.key == :managed_one }
+      selector_two = Ast::Crispr::Selectors.owner_filter(
+        id: 'stable',
+        adapter: adapter,
+        limit: { exactly: 1 }
+      ) { |_context, owner| owner.key == :stable }
+
+      actor = described_class.call(content: content, targets: [selector_one, selector_two])
+
+      expect(actor.changed).to be(true)
+      expect(actor.match_count).to eq(2)
+      expect(actor.captured_text).to include('puts "one"')
+      expect(actor.captured_text).to include('puts "stable"')
+      expect(actor.updated_content).to eq("\n### MANAGED SNIPPET\nputs \"two\"\nputs \"still managed\"\n\n")
+      expect(adapter.read_count).to eq(1)
     end
   end
 

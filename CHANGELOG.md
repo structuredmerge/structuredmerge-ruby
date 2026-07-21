@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `ast-crispr` now provides `Ast::Crispr::DeleteBatch` for deleting matches from
+  multiple structural selectors through one parsed document context.
 - Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
   HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
   structural edit adapter.
