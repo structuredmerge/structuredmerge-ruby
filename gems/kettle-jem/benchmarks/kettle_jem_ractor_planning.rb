@@ -326,6 +326,12 @@ def format_seconds(value)
   format("%.3fs", value)
 end
 
+def format_baseline_delta(value, baseline)
+  return "n/a" if baseline.to_f.zero?
+
+  format("%+.1f%%", ((value - baseline) / baseline) * 100.0)
+end
+
 def summary_payload(results, generated_at: Time.now)
   {
     generated_at: generated_at.iso8601,
@@ -360,6 +366,7 @@ end
 def build_results_readme(payload)
   variants = payload.fetch("variants")
   snapshot_count = ->(snapshot, key) { snapshot.fetch(key, 0) }
+  baseline_median = variants.fetch("baseline-main").fetch("summary").fetch("median")
   lines = [
     "# kettle-jem benchmark results",
     "",
@@ -375,15 +382,16 @@ def build_results_readme(payload)
     "| Minimum Ruby | `#{payload.fetch("min_ruby")}` |",
     "| Source reports | `#{payload.fetch("report_root")}` |",
     "",
-    "| Variant | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |",
-    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
+    "| Variant | +/- baseline | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |"
   ]
   variants.each do |name, result|
     summary = result.fetch("summary")
     snapshot = result.fetch("snapshot")
     lines << format(
-      "| `%<name>s` | %<min>s | %<median>s | %<mean>s | %<max>s | %<recipe_phase>s | %<command_steps>s | %<plan_ractors>d | %<plan_threads>d | %<file_ractors>d | %<file_threads>d | %<safe>d | %<plan_ractor_recipes>d | %<plan_thread_recipes>d | %<file_units>d | %<file_ractor_units>d | %<file_thread_units>d | %<recipes>d | %<changed>d |",
+      "| `%<name>s` | %<baseline_delta>s | %<min>s | %<median>s | %<mean>s | %<max>s | %<recipe_phase>s | %<command_steps>s | %<plan_ractors>d | %<plan_threads>d | %<file_ractors>d | %<file_threads>d | %<safe>d | %<plan_ractor_recipes>d | %<plan_thread_recipes>d | %<file_units>d | %<file_ractor_units>d | %<file_thread_units>d | %<recipes>d | %<changed>d |",
       name: name,
+      baseline_delta: format_baseline_delta(summary.fetch("median"), baseline_median),
       min: format_seconds(summary.fetch("min")),
       median: format_seconds(summary.fetch("median")),
       mean: format_seconds(summary.fetch("mean")),
@@ -454,9 +462,11 @@ end
 puts
 puts "summary"
 puts
+baseline_median = results.fetch("baseline-main").fetch(:summary).fetch(:median)
 puts format(
-  "%-28s %8s %8s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
+  "%-28s %8s %8s %8s %8s %8s %8s %8s %4s %4s %4s %4s %4s %4s %4s %4s %4s %4s %7s %7s",
   "variant",
+  "+/-",
   "min",
   "median",
   "mean",
@@ -480,8 +490,9 @@ results.each do |name, result|
   summary = result.fetch(:summary)
   snapshot = result.fetch(:snapshot)
   puts format(
-    "%-28s %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %7d %7d",
+    "%-28s %8s %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %8.3fs %4d %4d %4d %4d %4d %4d %4d %4d %4d %4d %7d %7d",
     name,
+    format_baseline_delta(summary.fetch(:median), baseline_median),
     summary.fetch(:min),
     summary.fetch(:median),
     summary.fetch(:mean),

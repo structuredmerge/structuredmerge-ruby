@@ -42,6 +42,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - The benchmark harness now defaults worker counts to `1,min(4,n/2),min(8,n/2),n`
   instead of only `min(2,n)`, giving higher-core machines a useful default
   scaling matrix while keeping low-core hosts bounded.
+- Benchmark summaries now show each variant's median percentage delta against
+  `baseline-main` immediately after the variant name.
 
 ### Fixed
 

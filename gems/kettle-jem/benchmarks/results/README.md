@@ -1,26 +1,44 @@
 # kettle-jem benchmark results
 
-Last generated: `2026-07-20T18:57:42-06:00`
+Last generated: `2026-07-20T19:17:52-06:00`
 
 | Setting | Value |
 | --- | --- |
 | Fixture | `/var/home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem/benchmarks/fixtures/skeleton` |
-| Command | `kettle-jem template` |
-| Mode | `install-template` |
+| Command | `kettle-jem template --only **/*` |
+| Mode | `raw-template` |
 | Runs per variant | `3` |
-| Worker counts | `2` |
+| Worker counts | `1, 4, 8, 16` |
 | Minimum Ruby | `1.8.7` |
 | Source reports | `/var/home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem/tmp/benchmarks/reports` |
 
-| Variant | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `baseline-main` | 12.110s | 12.134s | 12.260s | 12.537s | 7.166s | 2.960s | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 132 | 0 | 0 | 146 | 134 |
-| `planning-ractor-2` | 13.524s | 14.119s | 13.944s | 14.191s | 8.631s | 2.875s | 2 | 0 | 0 | 0 | 2 | 2 | 0 | 132 | 0 | 0 | 146 | 134 |
-| `planning-thread-2` | 11.841s | 12.109s | 12.101s | 12.353s | 7.287s | 3.248s | 0 | 2 | 0 | 0 | 2 | 0 | 140 | 132 | 0 | 0 | 146 | 134 |
-| `file-ractor-2` | 14.165s | 14.349s | 14.375s | 14.611s | 9.167s | 3.050s | 0 | 0 | 2 | 0 | 2 | 0 | 0 | 132 | 132 | 0 | 146 | 134 |
-| `file-thread-2` | 11.961s | 12.625s | 12.439s | 12.733s | 7.097s | 2.999s | 0 | 0 | 0 | 2 | 2 | 0 | 0 | 132 | 0 | 132 | 146 | 134 |
-| `combined-ractor-2` | 13.299s | 13.683s | 13.781s | 14.361s | 8.793s | 2.845s | 2 | 0 | 2 | 0 | 2 | 2 | 0 | 132 | 132 | 0 | 146 | 134 |
-| `combined-thread-2` | 12.173s | 12.175s | 12.228s | 12.336s | 7.551s | 2.839s | 0 | 2 | 0 | 2 | 2 | 0 | 140 | 132 | 0 | 132 | 146 | 134 |
+| Variant | +/- baseline | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `baseline-main` | +0.0% | 8.027s | 8.721s | 8.529s | 8.838s | 7.442s | 0.002s | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-ractor-1` | +20.0% | 9.777s | 10.466s | 10.485s | 11.212s | 9.070s | 0.003s | 1 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-thread-1` | -8.1% | 7.957s | 8.015s | 7.999s | 8.026s | 6.595s | 0.003s | 0 | 1 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
+| `file-ractor-1` | -5.2% | 8.267s | 8.268s | 8.498s | 8.959s | 7.475s | 0.003s | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `file-thread-1` | +17.3% | 10.137s | 10.232s | 10.270s | 10.440s | 8.299s | 0.002s | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
+| `combined-ractor-1` | +22.7% | 10.262s | 10.698s | 10.619s | 10.897s | 9.403s | 0.002s | 1 | 0 | 1 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `combined-thread-1` | -5.0% | 8.098s | 8.283s | 8.458s | 8.993s | 7.527s | 0.006s | 0 | 1 | 0 | 1 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
+| `planning-ractor-4` | +18.0% | 9.567s | 10.290s | 10.347s | 11.185s | 8.077s | 0.003s | 4 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-thread-4` | -4.3% | 8.234s | 8.345s | 8.345s | 8.455s | 7.086s | 0.003s | 0 | 4 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
+| `file-ractor-4` | +2.8% | 8.325s | 8.963s | 8.767s | 9.013s | 7.501s | 0.002s | 0 | 0 | 4 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `file-thread-4` | -4.2% | 8.228s | 8.352s | 8.323s | 8.388s | 6.814s | 0.003s | 0 | 0 | 0 | 4 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
+| `combined-ractor-4` | +10.5% | 9.472s | 9.637s | 9.752s | 10.146s | 8.219s | 0.003s | 4 | 0 | 4 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `combined-thread-4` | +6.1% | 8.470s | 9.256s | 9.040s | 9.395s | 7.900s | 0.003s | 0 | 4 | 0 | 4 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
+| `planning-ractor-8` | +25.9% | 10.717s | 10.984s | 10.943s | 11.129s | 9.420s | 0.002s | 8 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-thread-8` | +5.1% | 8.487s | 9.167s | 9.151s | 9.799s | 7.022s | 0.002s | 0 | 8 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
+| `file-ractor-8` | +0.6% | 8.264s | 8.773s | 8.619s | 8.820s | 7.367s | 0.002s | 0 | 0 | 8 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `file-thread-8` | -1.3% | 8.509s | 8.605s | 8.705s | 9.001s | 7.573s | 0.003s | 0 | 0 | 0 | 8 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
+| `combined-ractor-8` | +19.4% | 9.594s | 10.410s | 10.148s | 10.442s | 8.132s | 0.002s | 8 | 0 | 8 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `combined-thread-8` | -1.2% | 8.561s | 8.619s | 8.634s | 8.723s | 7.166s | 0.002s | 0 | 8 | 0 | 8 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
+| `planning-ractor-16` | +14.9% | 9.511s | 10.020s | 9.976s | 10.395s | 8.921s | 0.002s | 16 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-thread-16` | -1.9% | 8.519s | 8.556s | 8.545s | 8.561s | 7.175s | 0.002s | 0 | 16 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
+| `file-ractor-16` | +2.3% | 8.247s | 8.920s | 8.709s | 8.959s | 7.528s | 0.002s | 0 | 0 | 16 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `file-thread-16` | -6.2% | 8.061s | 8.182s | 8.378s | 8.892s | 6.681s | 0.002s | 0 | 0 | 0 | 16 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
+| `combined-ractor-16` | +18.7% | 10.301s | 10.351s | 10.423s | 10.617s | 8.846s | 0.003s | 16 | 0 | 16 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `combined-thread-16` | +0.9% | 8.747s | 8.801s | 8.814s | 8.894s | 7.281s | 0.003s | 0 | 16 | 0 | 16 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
 
 These results are generated by `ruby benchmarks/kettle_jem_ractor_planning.rb`.
 Regenerate this README from the saved summary without rerunning the benchmark with:

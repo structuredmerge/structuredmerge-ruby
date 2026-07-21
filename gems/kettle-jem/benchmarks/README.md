@@ -97,7 +97,9 @@ in Ractors or threads. These counters distinguish "workers were enabled" from
 
 Reports also persist phase durations and install command-step durations. The
 benchmark table surfaces recipe-phase and external-command time separately so
-template execution changes are not hidden by setup commands.
+template execution changes are not hidden by setup commands. Summary tables also
+show each variant's median wall-clock percentage delta against `baseline-main`
+as the second column.
 
 Long runs print timestamped progress lines before and after each measured
 variant run, including elapsed seconds, recipe/change counts, planning Ractor
