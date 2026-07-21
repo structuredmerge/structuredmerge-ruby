@@ -580,6 +580,7 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
     Dir.mktmpdir("kettle-jem-ractor-file-work-units", tmp_root) do |root|
       first_path = File.join(root, "lib/first.rb")
       second_path = File.join(root, "lib/second.rb")
+      third_path = File.join(root, "lib/third.rb")
       FileUtils.mkdir_p(File.dirname(second_path))
       File.write(second_path, "old\n")
       first_work_unit = described_class::FileWorkUnit.new(
@@ -612,18 +613,31 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
           )
         ]
       )
+      third_work_unit = described_class::FileWorkUnit.new(
+        relative_path: "lib/third.rb",
+        operations: [
+          described_class::WriteIntent.new(
+            relative_path: "lib/third.rb",
+            absolute_path: third_path,
+            action: :write,
+            content: "third\n",
+            recipe_name: "third_recipe"
+          )
+        ]
+      )
 
       stats = described_class.send(:file_work_execution_stats, 2)
 
-      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit], workers: 2, stats: stats)
+      described_class.send(:commit_file_work_units, [first_work_unit, second_work_unit, third_work_unit], workers: 2, stats: stats)
 
       expect(File.read(first_path)).to eq("first\n")
       expect(File).not_to exist(second_path)
+      expect(File.read(third_path)).to eq("third\n")
       expect(stats).to include(
         file_worker_count: 2,
-        file_work_units: 2,
-        file_operations: 3,
-        file_ractor_units: 2,
+        file_work_units: 3,
+        file_operations: 4,
+        file_ractor_units: 3,
         file_ractor_spawn_count: 2,
         main_file_units: 0
       )

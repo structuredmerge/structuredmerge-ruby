@@ -5798,8 +5798,9 @@ module Kettle
     end
 
     def prune_unused_readme_logo_link_definitions(content)
-      referenced = ReadmePostProcessor.markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).to_set
-      labels = ReadmePostProcessor.markdown_link_definition_owners(content).filter_map do |owner|
+      owners = ReadmePostProcessor.markdown_structural_owners(content, :inline_references, :link_definitions)
+      referenced = owners.fetch(:inline_references).flat_map(&:labels).map(&:to_s).to_set
+      labels = owners.fetch(:link_definitions).filter_map do |owner|
         label = owner.label.to_s
         label if label.start_with?("🖼️") && !referenced.include?(label)
       end
@@ -5905,12 +5906,9 @@ module Kettle
       start_text = "KJ:#{name}:START"
       end_text = "KJ:#{name}:END"
       if keep
-        processed = delete_markdown_with_ast_crispr(
+        delete_markdown_with_ast_crispr_batch(
           content,
-          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: start_text, limit: {at_least: 0})
-        )
-        delete_markdown_with_ast_crispr(
-          processed,
+          Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: start_text, limit: {at_least: 0}),
           Ast::Crispr::Markdown::Markly::Selectors.html_comment(text: end_text, limit: {at_least: 0})
         )
       else
@@ -6005,8 +6003,9 @@ module Kettle
     end
 
     def append_used_markdown_link_definitions(content, definition_source)
-      existing = ReadmePostProcessor.markdown_link_definition_owners(content).map { |owner| owner.label.to_s }.to_set
-      referenced = ReadmePostProcessor.markdown_inline_reference_owners(content).flat_map(&:labels).map(&:to_s).to_set
+      owners = ReadmePostProcessor.markdown_structural_owners(content, :link_definitions, :inline_references)
+      existing = owners.fetch(:link_definitions).map { |owner| owner.label.to_s }.to_set
+      referenced = owners.fetch(:inline_references).flat_map(&:labels).map(&:to_s).to_set
       available = ReadmePostProcessor.markdown_link_definition_owners(definition_source).to_h do |owner|
         [owner.label.to_s, owner]
       end
@@ -6021,6 +6020,14 @@ module Kettle
     def delete_markdown_with_ast_crispr(content, target)
       ensure_runtime_dependencies!
       Ast::Crispr::Delete.call(content: content.to_s, target: target, source_label: "README.md").updated_content
+    end
+
+    def delete_markdown_with_ast_crispr_batch(content, *targets)
+      ensure_runtime_dependencies!
+      target_list = targets.flatten.compact
+      return content if target_list.empty?
+
+      Ast::Crispr::DeleteBatch.call(content: content.to_s, targets: target_list, source_label: "README.md").updated_content
     end
 
     def replace_markdown_with_ast_crispr(content, target, replacement)
@@ -6120,12 +6127,14 @@ module Kettle
     def prune_readme_integration_badges(content, readme_style)
       ensure_runtime_dependencies!
       integrations = Array(readme_style[:missing_integrations]) + Array(readme_style[:disabled_integrations])
-      integrations.uniq.reduce(content.to_s) do |result, integration|
-        pruned_badges = README_INTEGRATION_BADGE_PATTERNS.fetch(integration.to_s, []).reduce(result) do |memo, pattern|
+      labels = []
+      pruned = integrations.uniq.reduce(content.to_s) do |result, integration|
+        labels.concat(README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, []))
+        README_INTEGRATION_BADGE_PATTERNS.fetch(integration.to_s, []).reduce(result) do |memo, pattern|
           memo.gsub(pattern, "")
         end
-        ReadmePostProcessor.delete_markdown_link_definitions(pruned_badges, README_INTEGRATION_LINK_LABELS.fetch(integration.to_s, []))
-      end.gsub(/[ \t]{2,}/, " ")
+      end
+      ReadmePostProcessor.delete_markdown_link_definitions(pruned, labels).gsub(/[ \t]{2,}/, " ")
     end
 
     def prune_missing_workflow_link_definitions(content, workflow_paths)
@@ -10833,7 +10842,7 @@ module Kettle
       stats[:file_operations] += units.sum { |unit| unit.operations.length }
       if workers.positive?
         stats[:file_ractor_units] += units.length
-        stats[:file_ractor_spawn_count] += units.length
+        stats[:file_ractor_spawn_count] += [workers, units.length].min
       elsif thread_workers.positive?
         stats[:file_thread_units] += units.length
         stats[:file_thread_spawn_count] += [thread_workers, units.length].min
@@ -10843,24 +10852,28 @@ module Kettle
     end
 
     def commit_file_work_units_thread(file_work_units, workers:)
-      chunks = Array.new([workers, file_work_units.length].min) { [] }
-      file_work_units.each_with_index do |file_work_unit, offset|
-        chunks.fetch(offset % chunks.length) << file_work_unit
-      end
-      chunks.map do |chunk|
+      distribute_file_work_units(file_work_units, workers).map do |chunk|
         Thread.new { chunk.each { |file_work_unit| commit_file_work_unit(file_work_unit) } }
       end.each(&:join)
     end
 
     def commit_file_work_units_ractor(file_work_units, workers:)
-      file_work_units.each_slice(workers).each do |slice|
-        slice.map do |file_work_unit|
-          payload = Ractor.make_shareable(file_work_unit_payload(file_work_unit))
-          Ractor.new(payload) do |worker_payload|
+      distribute_file_work_units(file_work_units, workers).map do |chunk|
+        payloads = Ractor.make_shareable(chunk.map { |file_work_unit| file_work_unit_payload(file_work_unit) })
+        Ractor.new(payloads) do |worker_payloads|
+          worker_payloads.map do |worker_payload|
             Kettle::Jem.commit_file_work_unit_payload(worker_payload)
           end
-        end.each(&:value)
+        end
+      end.each(&:value)
+    end
+
+    def distribute_file_work_units(file_work_units, workers)
+      chunks = Array.new([workers, file_work_units.length].min) { [] }
+      file_work_units.each_with_index do |file_work_unit, offset|
+        chunks.fetch(offset % chunks.length) << file_work_unit
       end
+      chunks
     end
 
     def commit_file_work_unit(file_work_unit)

@@ -63,7 +63,7 @@ module Kettle
         end
 
         def install_run_options(env, run_options)
-          Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
+          Kettle::Jem::Tasks::TemplateTask.templating_run_options(env || {}, run_options || {})
         end
 
         def followup_apply_after_config_bootstrap(project_root, env:, run_options:, report:)

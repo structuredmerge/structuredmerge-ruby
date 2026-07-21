@@ -28,6 +28,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - TreeHaver RSpec dependency tags now support parser capability checks, and
   `ruby-merge` exposes TSLP Ruby capability tags for import records, top-level
   call records, and namespace-form equivalence.
+- `kettle-jem` benchmark results now include README timing breakdowns for both
+  the baseline and fastest non-baseline variant.
 
 ### Changed
 
@@ -36,6 +38,12 @@ Please file a bug if you notice a violation of semantic versioning.
   exceptions for intentional style deviations.
 - Current CI now detects changed monorepo gems and runs each changed gem's own
   `kettle-test` suite instead of installing the root aggregate bundle.
+- `kettle-jem` templating now defaults no-option runs to classified thread
+  planning and file work with half of the available CPU cores.
+- `kettle-jem` Ractor-backed file work now batches file units by worker count
+  instead of spawning one Ractor per file.
+- `kettle-jem` README processing now reuses structural owner scans and batches
+  several Markdown deletions to reduce repeated parser passes.
 - Retemplated generated project metadata, support documentation, CI workflows,
   binstubs, and development dependency floors across the StructuredMerge Ruby
   gem family with `kettle-jem` v7.0.0.
