@@ -402,7 +402,8 @@ module TreeHaver
         require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
         TreeHaver::Backends::Tslp.available? &&
           ::TreeSitterLanguagePack.respond_to?(:has_language) &&
-          ::TreeSitterLanguagePack.has_language(@language_name.to_s)
+          ::TreeSitterLanguagePack.has_language(@language_name.to_s) &&
+          TreeHaver::Backends::Tslp.parser_available_for?(@language_name)
       rescue LoadError
         false
       rescue StandardError => e

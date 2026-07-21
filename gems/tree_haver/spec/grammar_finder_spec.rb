@@ -8,6 +8,7 @@ RSpec.describe TreeHaver::GrammarFinder do
       stub_const('TreeSitterLanguagePack', Module.new)
       allow(TreeSitterLanguagePack).to receive(:has_language).with('cold_cache_toml').and_return(true)
       allow(TreeHaver::Backends::Tslp).to receive(:available?).and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:parser_available_for?).with(:cold_cache_toml).and_return(true)
 
       finder = described_class.new(:cold_cache_toml)
 
@@ -20,6 +21,7 @@ RSpec.describe TreeHaver::GrammarFinder do
       stub_const('TreeSitterLanguagePack', Module.new)
       allow(TreeSitterLanguagePack).to receive(:has_language).with('cold_cache_json').and_return(true)
       allow(TreeHaver::Backends::Tslp).to receive(:available?).and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:parser_available_for?).with(:cold_cache_json).and_return(true)
 
       finder = described_class.new(:cold_cache_json)
 
@@ -36,6 +38,7 @@ RSpec.describe TreeHaver::GrammarFinder do
       stub_const('TreeSitterLanguagePack', Module.new)
       allow(TreeSitterLanguagePack).to receive(:has_language).with('cold_cache_markdown').and_return(true)
       allow(TreeHaver::Backends::Tslp).to receive(:available?).and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:parser_available_for?).with(:cold_cache_markdown).and_return(true)
 
       finder = described_class.new(:cold_cache_markdown)
       allow(finder).to receive(:find_library_path).and_raise(
@@ -48,6 +51,19 @@ RSpec.describe TreeHaver::GrammarFinder do
 
       expect(parser).to be_a(TreeHaver::Backends::Tslp::Parser)
       expect(finder).not_to have_received(:find_library_path)
+    end
+
+    it 'does not register TSLP when the language smoke parse fails' do
+      stub_const('TreeSitterLanguagePack', Module.new)
+      allow(TreeSitterLanguagePack).to receive(:has_language).with('cold_cache_bad_json').and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:available?).and_return(true)
+      allow(TreeHaver::Backends::Tslp).to receive(:parser_available_for?).with(:cold_cache_bad_json).and_return(false)
+
+      finder = described_class.new(:cold_cache_bad_json)
+      allow(finder).to receive(:find_library_path).and_return(nil)
+
+      expect(finder.register!).to be(false)
+      expect(TreeHaver.registered_languages(:cold_cache_bad_json)).not_to include(:tslp)
     end
   end
 end

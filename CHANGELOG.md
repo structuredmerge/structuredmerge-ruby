@@ -84,10 +84,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
-- TreeHaver now smoke-tests `tree_sitter_language_pack` parser execution before
-  registering the TSLP backend, so broken native gem artifacts fail closed with a
-  useful reason instead of surfacing parser self-conversion `TypeError`s during
-  JSON merges.
+- TreeHaver now smoke-tests `tree_sitter_language_pack` parser execution for the
+  requested language before registering the TSLP backend, so broken native gem
+  artifacts fail closed with a useful reason instead of surfacing parser
+  self-conversion `TypeError`s during JSON merges.
 - `json-merge` file analysis now registers its TreeHaver JSON backend before
   direct parsing, preventing templating from failing with `No parser registered
   for json` when JSON smart merges instantiate file analysis directly.
