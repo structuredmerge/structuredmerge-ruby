@@ -2,14 +2,8 @@ kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 
 source "https://rubygems.org"
 
-# Use the released TSLP gem by default; templating can override it via VENDORED_GEMS.
-vendored_gems = ENV.fetch("VENDORED_GEMS", "").split(",").map(&:strip)
-tslp_declared_by_templating =
-  ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero? &&
-    vendored_gems.include?("tree_sitter_language_pack")
-unless tslp_declared_by_templating
-  gem "tree_sitter_language_pack", ">= 1.13.2", "< 2.0"
-end
+# Use the StructuredMerge TSLP fork until the Ruby ABI platform-gem fix is released.
+gem "tree_sitter_language_pack", git: "https://github.com/structuredmerge/tree-sitter-language-pack.git", branch: "fix/ruby-4-platform-gem-abi", glob: "packages/ruby/*.gemspec"
 
 unless kettle_dev_dev.casecmp("false").zero?
   require "nomono/bundler"

@@ -72,10 +72,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Root architecture specs now guard merge emission files against new ad hoc
   comment or blank-line ownership scans, keeping the remaining cleanup debt
   explicit while shared ast-merge attachment and layout helpers are adopted.
-- Gems that use `tree_sitter_language_pack` now default to the released
-  `tree_sitter_language_pack` 1.13.2 or newer, while preserving the explicit
-  `VENDORED_GEMS=tree_sitter_language_pack` / `VENDOR_GEM_DIR` local-source
-  split for templating.
+- Development Gemfiles for gems that use `tree_sitter_language_pack` now default
+  to the StructuredMerge fork branch with the Ruby ABI platform-gem fix until
+  that fix is released upstream.
 - Structured merge gems now fail closed when no registered TreeHaver backend is
   available instead of falling back to direct parser-library paths outside the
   TreeHaver and ast-merge stack.
