@@ -19,6 +19,39 @@ Run the benchmark from the `kettle-jem` project root:
 mise exec -C /path/to/kettle-jem -- ruby benchmarks/kettle_jem_ractor_planning.rb
 ```
 
+## Examples
+
+Default install-orchestrated benchmark:
+
+```console
+cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
+```
+
+Raw template-only benchmark:
+
+```console
+cd /home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem
+
+mise exec -C . -- env \
+K_JEM_TEMPLATING=true \
+STRUCTUREDMERGE_DEV=/home/pboling/src/my/structuredmerge/ruby/gems \
+VENDORED_GEMS= \
+VENDOR_GEM_DIR= \
+KETTLE_JEM_BENCHMARK_MODE=raw-template \
+bundle exec ruby benchmarks/kettle_jem_ractor_planning.rb
+```
+
+`raw-template` pre-bootstraps `.structuredmerge/kettle-jem.yml` outside the measured interval, then benchmarks scoped template `--only "**/*"` so it routes through `TemplateTask` instead of the default install-orchestrated flow.
+
+## ENV Variables
+
 Useful environment variables:
 
 | Variable | Default | Purpose |
