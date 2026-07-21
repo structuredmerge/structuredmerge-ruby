@@ -470,7 +470,7 @@ RSpec.describe Smorg::RB do
     stderr = StringIO.new
 
     plain_diff = IO.popen([{ 'GIT_CONFIG_NOSYSTEM' => '1' }, 'git', '--no-pager', 'diff', '--no-ext-diff',
-                            '--no-index', old_path, new_path], err: %i[child out], &:read)
+                           '--no-index', old_path, new_path], err: %i[child out], &:read)
     expect([0, 1]).to include($?.exitstatus)
     exit_code = described_class.run(['diff-driver', '--path-name', source_pair.fetch('path'), old_path,
                                      new_path], stdout: stdout, stderr: stderr)
