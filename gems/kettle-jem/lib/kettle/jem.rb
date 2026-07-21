@@ -4117,6 +4117,35 @@ module Kettle
       ((monotonic_time - started_at) * 1000).round(3)
     end
 
+    def with_readme_timing_context(relative_path, timings)
+      return yield unless relative_path.to_s == "README.md"
+
+      previous = Thread.current[:kettle_jem_readme_timings]
+      Thread.current[:kettle_jem_readme_timings] = timings
+      yield
+    ensure
+      Thread.current[:kettle_jem_readme_timings] = previous if relative_path.to_s == "README.md"
+    end
+
+    def with_readme_timing(name)
+      timings = Thread.current[:kettle_jem_readme_timings]
+      return yield unless timings
+
+      started_at = monotonic_time
+      result = yield
+      timings << {name: name.to_s, status: "ok", duration_ms: duration_ms_since(started_at)}
+      result
+    rescue => error
+      timings << {
+        name: name.to_s,
+        status: "failed",
+        duration_ms: duration_ms_since(started_at),
+        error_class: error.class.name,
+        error_message: error.message
+      } if timings && started_at
+      raise
+    end
+
     def report_with_duration(report, duration_ms)
       report[:metadata] = report.fetch(:metadata, {}).merge(duration_ms: duration_ms)
       report.dig(:report_envelope, :report, :metadata)&.[]=(:duration_ms, duration_ms)
@@ -5084,50 +5113,53 @@ module Kettle
       destination_existed = File.exist?(File.join(project_root, relative_path))
       original = files.fetch(relative_path, "")
       deletion = rakefile_scaffold_cleanup_recipe?(recipe) ? rakefile_scaffold_cleanup(original, facts) : nil
-      final = case recipe.fetch(:name)
-      when "readme_metadata"
-        synchronize_readme(original, facts, project_root: project_root)
-      when "changelog_unreleased"
-        apply_changelog_transfer_entries(
-          normalize_changelog(original, facts),
-          facts.to_h.dig(:changelog, :transfer_entries)
-        )
-      when "generated_block_sync"
-        synchronize_managed_block(original, facts)
-      when "github_funding_yml"
-        synchronize_github_funding_yml(original, facts)
-      when "github_actions_ci"
-        synchronize_github_actions_ci(original, facts)
-      when "github_actions_framework_ci"
-        synchronize_github_actions_framework_ci(original, facts)
-      when GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE
-        synchronize_github_actions_framework_gemfile(recipe.fetch(:target_path), facts)
-      when "github_actions_coverage_ci"
-        synchronize_github_actions_coverage_ci(original, facts)
-      when GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE
-        ""
-      when GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE
-        ""
-      when OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE
-        ""
-      when TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE
-        ""
-      when TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE
-        ""
-      when TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE
-        ""
-      when GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE
-        synchronize_github_actions_workflow_snippets(original, facts: facts)
-      when "kettle_config_bootstrap"
-        apply_kettle_config_bootstrap(project_root, recipe, env: env, template_contents: template_contents)
-      when TEMPLATE_SOURCE_PREFERENCE_RECIPE
-        original
-      when TEMPLATE_SOURCE_APPLICATION_RECIPE
-        apply_template_source(project_root, recipe, original, facts: facts, env: env, template_contents: template_contents)
-      when "rakefile_scaffold_cleanup"
-        deletion.fetch(:content)
-      else
-        original
+      readme_timings = []
+      final = with_readme_timing_context(relative_path, readme_timings) do
+        case recipe.fetch(:name)
+        when "readme_metadata"
+          synchronize_readme(original, facts, project_root: project_root)
+        when "changelog_unreleased"
+          apply_changelog_transfer_entries(
+            normalize_changelog(original, facts),
+            facts.to_h.dig(:changelog, :transfer_entries)
+          )
+        when "generated_block_sync"
+          synchronize_managed_block(original, facts)
+        when "github_funding_yml"
+          synchronize_github_funding_yml(original, facts)
+        when "github_actions_ci"
+          synchronize_github_actions_ci(original, facts)
+        when "github_actions_framework_ci"
+          synchronize_github_actions_framework_ci(original, facts)
+        when GITHUB_ACTIONS_FRAMEWORK_GEMFILE_RECIPE
+          synchronize_github_actions_framework_gemfile(recipe.fetch(:target_path), facts)
+        when "github_actions_coverage_ci"
+          synchronize_github_actions_coverage_ci(original, facts)
+        when GITHUB_ACTIONS_OBSOLETE_WORKFLOW_CLEANUP_RECIPE
+          ""
+        when GITHUB_ACTIONS_OPT_IN_WORKFLOW_CLEANUP_RECIPE
+          ""
+        when OPENCOLLECTIVE_DISABLED_FILE_CLEANUP_RECIPE
+          ""
+        when TEMPLATE_LEGACY_DESTINATION_CLEANUP_RECIPE
+          ""
+        when TEMPLATE_OBSOLETE_LICENSE_CLEANUP_RECIPE
+          ""
+        when TEMPLATE_SHIM_PROFILE_CLEANUP_RECIPE
+          ""
+        when GITHUB_ACTIONS_WORKFLOW_SNIPPETS_RECIPE
+          synchronize_github_actions_workflow_snippets(original, facts: facts)
+        when "kettle_config_bootstrap"
+          apply_kettle_config_bootstrap(project_root, recipe, env: env, template_contents: template_contents)
+        when TEMPLATE_SOURCE_PREFERENCE_RECIPE
+          original
+        when TEMPLATE_SOURCE_APPLICATION_RECIPE
+          apply_template_source(project_root, recipe, original, facts: facts, env: env, template_contents: template_contents)
+        when "rakefile_scaffold_cleanup"
+          deletion.fetch(:content)
+        else
+          original
+        end
       end
       final = normalize_generated_rakefile(final) if relative_path == "Rakefile"
       final = ensure_trailing_newline(final) unless delete_file_recipe?(recipe)
@@ -5164,6 +5196,7 @@ module Kettle
       end
       step_report = content_recipe_step_report(recipe: recipe, request: request, original: original, final: final, changed: changed, deletion: deletion)
       metadata[:decision_evaluation] = decision_evaluation
+      metadata[:readme_timings] = readme_timings unless readme_timings.empty?
       report = content_recipe_execution_report(
         request: request,
         final_content: final,
@@ -5514,16 +5547,21 @@ module Kettle
       resolved = prepare_readme_template(resolved, recipe[:readme_style]) if recipe.fetch(:target_path) == "README.md"
       resolved = prepare_github_workflow_template(resolved, recipe, facts)
       if recipe.fetch(:target_path) == "README.md" && (strategy.empty? || strategy == "merge")
-        processed = postprocess_readme_content(
+        merged_readme = with_readme_timing("readme.merge_template") do
           merge_readme_template(
             template_content: resolved,
             destination_content: original,
             preserve_config: recipe.dig(:template_preference, :readme_preserve_config) || {}
-          ),
+          )
+        end
+        processed = postprocess_readme_content(
+          merged_readme,
           facts,
           project_root: project_root
         )
-        return append_used_markdown_link_definitions(processed, resolved)
+        return with_readme_timing("readme.append_used_link_definitions") do
+          append_used_markdown_link_definitions(processed, resolved)
+        end
       end
       if strategy.empty? || strategy == "merge"
         merged = merge_config_template_source(recipe, resolved, original, facts: facts, env: env)
@@ -5732,21 +5770,25 @@ module Kettle
     def postprocess_readme_content(content, facts, project_root: nil)
       return content unless facts
 
-      processed = ReadmePostProcessor.process(
-        content: content,
-        min_ruby: minimum_ruby_token(facts.dig(:rubygems, :min_ruby)),
-        engines: facts.dig(:rubygems, :engines)
-      )
-      processed = normalize_readme_project_heading(processed, facts)
-      processed = normalize_readme_synopsis_heading(processed, facts)
-      processed = apply_readme_conditional_blocks(processed, facts)
-      processed = apply_readme_badge_policy(processed, facts)
-      processed = prune_unused_readme_logo_link_definitions(processed)
-      processed = apply_readme_kloc_badge(processed, facts, project_root)
-      processed = apply_monorepo_subgem_thin_readme_projection(processed, facts)
-      processed = apply_monorepo_subgem_readme_recipe(processed, facts)
-      processed = replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
-      normalize_readme_blank_line_runs(processed)
+      processed = with_readme_timing("postprocess.readme_post_processor") do
+        ReadmePostProcessor.process(
+          content: content,
+          min_ruby: minimum_ruby_token(facts.dig(:rubygems, :min_ruby)),
+          engines: facts.dig(:rubygems, :engines)
+        )
+      end
+      processed = with_readme_timing("postprocess.project_heading") { normalize_readme_project_heading(processed, facts) }
+      processed = with_readme_timing("postprocess.synopsis_heading") { normalize_readme_synopsis_heading(processed, facts) }
+      processed = with_readme_timing("postprocess.conditional_blocks") { apply_readme_conditional_blocks(processed, facts) }
+      processed = with_readme_timing("postprocess.badge_policy") { apply_readme_badge_policy(processed, facts) }
+      processed = with_readme_timing("postprocess.logo_link_prune") { prune_unused_readme_logo_link_definitions(processed) }
+      processed = with_readme_timing("postprocess.kloc_badge") { apply_readme_kloc_badge(processed, facts, project_root) }
+      processed = with_readme_timing("postprocess.monorepo_thin_projection") { apply_monorepo_subgem_thin_readme_projection(processed, facts) }
+      processed = with_readme_timing("postprocess.monorepo_subgem_recipe") { apply_monorepo_subgem_readme_recipe(processed, facts) }
+      processed = with_readme_timing("postprocess.metadata_block") do
+        replace_existing_markdown_managed_block(processed, "kettle-jem:metadata", readme_metadata_block(facts))
+      end
+      with_readme_timing("postprocess.blank_lines") { normalize_readme_blank_line_runs(processed) }
     end
 
     def normalize_readme_blank_line_runs(content)
@@ -5822,23 +5864,31 @@ module Kettle
     end
 
     def apply_readme_badge_policy(content, facts)
-      processed = remove_readme_badge_and_refs(content, README_CODETRIAGE_BADGE, README_CODETRIAGE_LINK_LABELS)
+      processed = with_readme_timing("badge_policy.codetriage") do
+        remove_readme_badge_and_refs(content, README_CODETRIAGE_BADGE, README_CODETRIAGE_LINK_LABELS)
+      end
       if facts.dig(:readme_style, :fossa_project).to_s.empty?
-        processed = remove_readme_badge_and_refs(processed, README_FOSSA_BADGE, README_FOSSA_LINK_LABELS)
+        processed = with_readme_timing("badge_policy.fossa") do
+          remove_readme_badge_and_refs(processed, README_FOSSA_BADGE, README_FOSSA_LINK_LABELS)
+        end
       end
       if Array(facts.dig(:readme_style, :disabled_integrations)).map(&:to_s).include?(SKYWALKING_EYES_INTEGRATION)
-        processed = remove_readme_badge_and_refs(
-          processed,
-          README_LICENSE_EYE_WORKFLOW_BADGE,
-          README_LICENSE_EYE_WORKFLOW_LINK_LABELS
-        )
+        processed = with_readme_timing("badge_policy.license_eye") do
+          remove_readme_badge_and_refs(
+            processed,
+            README_LICENSE_EYE_WORKFLOW_BADGE,
+            README_LICENSE_EYE_WORKFLOW_LINK_LABELS
+          )
+        end
       end
       if facts.dig(:funding, :open_collective_disabled)
-        processed = remove_readme_badge_and_refs(
-          processed,
-          README_OPEN_COLLECTIVE_FUNDING_BADGES,
-          README_OPEN_COLLECTIVE_LINK_LABELS
-        )
+        processed = with_readme_timing("badge_policy.open_collective") do
+          remove_readme_badge_and_refs(
+            processed,
+            README_OPEN_COLLECTIVE_FUNDING_BADGES,
+            README_OPEN_COLLECTIVE_LINK_LABELS
+          )
+        end
       end
       processed
     end
@@ -6041,20 +6091,30 @@ module Kettle
 
     def prepare_readme_template(content, readme_style)
       style = readme_style || {}
-      prepared = prune_readme_integration_badges(content, style)
+      prepared = with_readme_timing("prepare.integration_badges") { prune_readme_integration_badges(content, style) }
       if style[:workflow_paths]
-        prepared = ReadmePostProcessor.process(
-          content: prepared,
-          min_ruby: "0",
-          workflow_paths: style[:workflow_paths]
-        )
+        prepared = with_readme_timing("prepare.workflow_post_processor") do
+          ReadmePostProcessor.process(
+            content: prepared,
+            min_ruby: "0",
+            workflow_paths: style[:workflow_paths]
+          )
+        end
       end
-      prepared = prune_missing_workflow_link_definitions(prepared, style[:workflow_paths]) if style[:workflow_paths]
-      prepared = ReadmePostProcessor.prune_orphaned_workflow_inline_references(prepared) if style[:workflow_paths]
+      if style[:workflow_paths]
+        prepared = with_readme_timing("prepare.workflow_link_prune") do
+          prune_missing_workflow_link_definitions(prepared, style[:workflow_paths])
+        end
+        prepared = with_readme_timing("prepare.workflow_inline_prune") do
+          ReadmePostProcessor.prune_orphaned_workflow_inline_references(prepared)
+        end
+      end
       omitted_sections = Array(style[:omitted_sections]).map(&:to_s)
       omitted_sections << "security" if style.key?(:security_enabled) && !style[:security_enabled]
       omitted_sections << "floss_funding" if style.key?(:floss_funding_enabled) && !style[:floss_funding_enabled]
-      remove_readme_sections(prepared, omitted_sections.map { |section| section.tr("_", " ") })
+      with_readme_timing("prepare.remove_sections") do
+        remove_readme_sections(prepared, omitted_sections.map { |section| section.tr("_", " ") })
+      end
     end
 
     def prune_readme_integration_badges(content, readme_style)

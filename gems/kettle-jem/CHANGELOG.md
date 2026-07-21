@@ -44,6 +44,8 @@ Please file a bug if you notice a violation of semantic versioning.
   scaling matrix while keeping low-core hosts bounded.
 - Benchmark summaries now show each variant's median percentage delta against
   `baseline-main` immediately after the variant name.
+- README recipe reports now include sub-step timing metadata, and benchmark
+  results summarize the baseline README timing breakdown.
 
 ### Fixed
 

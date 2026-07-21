@@ -1,44 +1,48 @@
 # kettle-jem benchmark results
 
-Last generated: `2026-07-20T19:17:52-06:00`
+Last generated: `2026-07-20T19:32:16-06:00`
 
 | Setting | Value |
 | --- | --- |
 | Fixture | `/var/home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem/benchmarks/fixtures/skeleton` |
 | Command | `kettle-jem template --only **/*` |
 | Mode | `raw-template` |
-| Runs per variant | `3` |
-| Worker counts | `1, 4, 8, 16` |
+| Runs per variant | `1` |
+| Worker counts | `1` |
 | Minimum Ruby | `1.8.7` |
 | Source reports | `/var/home/pboling/src/my/structuredmerge/ruby/gems/kettle-jem/tmp/benchmarks/reports` |
 
 | Variant | +/- baseline | Min | Median | Mean | Max | Recipe phase | Command steps | Plan Ractors | Plan threads | File Ractors | File threads | Safe recipes | Plan Ractor jobs | Plan thread jobs | File units | File Ractor units | File thread units | Recipes | Changed |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| `baseline-main` | +0.0% | 8.027s | 8.721s | 8.529s | 8.838s | 7.442s | 0.002s | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 133 | 0 | 0 | 140 | 133 |
-| `planning-ractor-1` | +20.0% | 9.777s | 10.466s | 10.485s | 11.212s | 9.070s | 0.003s | 1 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
-| `planning-thread-1` | -8.1% | 7.957s | 8.015s | 7.999s | 8.026s | 6.595s | 0.003s | 0 | 1 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
-| `file-ractor-1` | -5.2% | 8.267s | 8.268s | 8.498s | 8.959s | 7.475s | 0.003s | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `file-thread-1` | +17.3% | 10.137s | 10.232s | 10.270s | 10.440s | 8.299s | 0.002s | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
-| `combined-ractor-1` | +22.7% | 10.262s | 10.698s | 10.619s | 10.897s | 9.403s | 0.002s | 1 | 0 | 1 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `combined-thread-1` | -5.0% | 8.098s | 8.283s | 8.458s | 8.993s | 7.527s | 0.006s | 0 | 1 | 0 | 1 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
-| `planning-ractor-4` | +18.0% | 9.567s | 10.290s | 10.347s | 11.185s | 8.077s | 0.003s | 4 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
-| `planning-thread-4` | -4.3% | 8.234s | 8.345s | 8.345s | 8.455s | 7.086s | 0.003s | 0 | 4 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
-| `file-ractor-4` | +2.8% | 8.325s | 8.963s | 8.767s | 9.013s | 7.501s | 0.002s | 0 | 0 | 4 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `file-thread-4` | -4.2% | 8.228s | 8.352s | 8.323s | 8.388s | 6.814s | 0.003s | 0 | 0 | 0 | 4 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
-| `combined-ractor-4` | +10.5% | 9.472s | 9.637s | 9.752s | 10.146s | 8.219s | 0.003s | 4 | 0 | 4 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `combined-thread-4` | +6.1% | 8.470s | 9.256s | 9.040s | 9.395s | 7.900s | 0.003s | 0 | 4 | 0 | 4 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
-| `planning-ractor-8` | +25.9% | 10.717s | 10.984s | 10.943s | 11.129s | 9.420s | 0.002s | 8 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
-| `planning-thread-8` | +5.1% | 8.487s | 9.167s | 9.151s | 9.799s | 7.022s | 0.002s | 0 | 8 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
-| `file-ractor-8` | +0.6% | 8.264s | 8.773s | 8.619s | 8.820s | 7.367s | 0.002s | 0 | 0 | 8 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `file-thread-8` | -1.3% | 8.509s | 8.605s | 8.705s | 9.001s | 7.573s | 0.003s | 0 | 0 | 0 | 8 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
-| `combined-ractor-8` | +19.4% | 9.594s | 10.410s | 10.148s | 10.442s | 8.132s | 0.002s | 8 | 0 | 8 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `combined-thread-8` | -1.2% | 8.561s | 8.619s | 8.634s | 8.723s | 7.166s | 0.002s | 0 | 8 | 0 | 8 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
-| `planning-ractor-16` | +14.9% | 9.511s | 10.020s | 9.976s | 10.395s | 8.921s | 0.002s | 16 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
-| `planning-thread-16` | -1.9% | 8.519s | 8.556s | 8.545s | 8.561s | 7.175s | 0.002s | 0 | 16 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
-| `file-ractor-16` | +2.3% | 8.247s | 8.920s | 8.709s | 8.959s | 7.528s | 0.002s | 0 | 0 | 16 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `file-thread-16` | -6.2% | 8.061s | 8.182s | 8.378s | 8.892s | 6.681s | 0.002s | 0 | 0 | 0 | 16 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
-| `combined-ractor-16` | +18.7% | 10.301s | 10.351s | 10.423s | 10.617s | 8.846s | 0.003s | 16 | 0 | 16 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
-| `combined-thread-16` | +0.9% | 8.747s | 8.801s | 8.814s | 8.894s | 7.281s | 0.003s | 0 | 16 | 0 | 16 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
+| `baseline-main` | +0.0% | 8.436s | 8.436s | 8.436s | 8.436s | 6.989s | 0.003s | 0 | 0 | 0 | 0 | 2 | 0 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-ractor-1` | +32.5% | 11.181s | 11.181s | 11.181s | 11.181s | 9.629s | 0.002s | 1 | 0 | 0 | 0 | 2 | 2 | 0 | 133 | 0 | 0 | 140 | 133 |
+| `planning-thread-1` | +15.0% | 9.704s | 9.704s | 9.704s | 9.704s | 8.052s | 0.003s | 0 | 1 | 0 | 0 | 2 | 0 | 140 | 133 | 0 | 0 | 140 | 133 |
+| `file-ractor-1` | +21.8% | 10.279s | 10.279s | 10.279s | 10.279s | 8.179s | 0.003s | 0 | 0 | 1 | 0 | 2 | 0 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `file-thread-1` | +17.7% | 9.933s | 9.933s | 9.933s | 9.933s | 8.310s | 0.003s | 0 | 0 | 0 | 1 | 2 | 0 | 0 | 133 | 0 | 133 | 140 | 133 |
+| `combined-ractor-1` | +38.4% | 11.674s | 11.674s | 11.674s | 11.674s | 10.003s | 0.003s | 1 | 0 | 1 | 0 | 2 | 2 | 0 | 133 | 133 | 0 | 140 | 133 |
+| `combined-thread-1` | +18.0% | 9.955s | 9.955s | 9.955s | 9.955s | 8.299s | 0.003s | 0 | 1 | 0 | 1 | 2 | 0 | 140 | 133 | 0 | 133 | 140 | 133 |
+
+## Baseline README timing breakdown
+
+| Step | Duration | Share | Count |
+| --- | ---: | ---: | ---: |
+| `postprocess.readme_post_processor` | 0.410s | 17.8% | 2 |
+| `prepare.integration_badges` | 0.406s | 17.6% | 1 |
+| `readme.append_used_link_definitions` | 0.323s | 14.0% | 1 |
+| `postprocess.conditional_blocks` | 0.235s | 10.2% | 2 |
+| `postprocess.badge_policy` | 0.181s | 7.8% | 2 |
+| `postprocess.logo_link_prune` | 0.163s | 7.1% | 2 |
+| `badge_policy.codetriage` | 0.103s | 4.5% | 2 |
+| `prepare.remove_sections` | 0.092s | 4.0% | 1 |
+| `readme.merge_template` | 0.081s | 3.5% | 1 |
+| `postprocess.project_heading` | 0.079s | 3.4% | 2 |
+| `postprocess.synopsis_heading` | 0.078s | 3.4% | 2 |
+| `badge_policy.fossa` | 0.078s | 3.4% | 2 |
+| `postprocess.metadata_block` | 0.075s | 3.3% | 2 |
+| `postprocess.blank_lines` | 0.000s | 0.0% | 2 |
+| `postprocess.kloc_badge` | 0.000s | 0.0% | 2 |
+| `postprocess.monorepo_thin_projection` | 0.000s | 0.0% | 2 |
+| `postprocess.monorepo_subgem_recipe` | 0.000s | 0.0% | 2 |
 
 These results are generated by `ruby benchmarks/kettle_jem_ractor_planning.rb`.
 Regenerate this README from the saved summary without rerunning the benchmark with:

@@ -93,6 +93,41 @@ RSpec.describe Kettle::Jem, "recipe planning and write-intent behavior" do
   end
 
 
+  it "records README sub-step timing metadata for README recipe reports" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-readme-timing", tmp_root) do |root|
+      write_tree(root, {"README.md" => fixture.dig(:inputs, :files, :"README.md")})
+      recipe = {
+        name: "readme_metadata",
+        target_path: "README.md",
+        provider_family: "markdown",
+        primitive: "supplied_readme_metadata_synchronization",
+        facts: []
+      }
+
+      report = described_class.send(
+        :execute_recipe,
+        project_root: root,
+        recipe: recipe,
+        facts: fixture.fetch(:expected).fetch(:facts),
+        files: {"README.md" => fixture.dig(:inputs, :files, :"README.md")},
+        template_contents: {},
+        decision_policy: described_class::DecisionPolicy.from_env({"force" => "true"}),
+        env: {}
+      )
+
+      timings = report.dig(:metadata, :readme_timings)
+      expect(timings).to include(
+        include(name: "postprocess.readme_post_processor", status: "ok", duration_ms: be >= 0),
+        include(name: "postprocess.badge_policy", status: "ok", duration_ms: be >= 0),
+        include(name: "postprocess.blank_lines", status: "ok", duration_ms: be >= 0)
+      )
+      expect(report.dig(:report_envelope, :report, :metadata, :readme_timings)).to eq(timings)
+    end
+  end
+
+
   it "parses recipe planning strategies from options and env" do
     expect(described_class.send(:recipe_planning_strategy_for, {}, {})).to eq("sequential")
     expect(described_class.send(:recipe_planning_strategy_for, {"KETTLE_JEM_RECIPE_PLANNING_STRATEGY" => "classified"}, {})).to eq("classified")
