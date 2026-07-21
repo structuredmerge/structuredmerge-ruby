@@ -505,13 +505,13 @@ module Rbs
         if selected_members.empty?
           return empty_container_header_lines(selected_analysis, start_line: start_line, end_line: end_line) +
                  merge_member_lines(template_members, dest_members, template_owners: template_members,
-                                                                  dest_owners: dest_members) +
+                                                                    dest_owners: dest_members) +
                  empty_container_footer_lines(selected_analysis, start_line: start_line, end_line: end_line)
         end
 
         container_header_lines(selected_decl, selected_analysis) +
           merge_member_lines(template_members, dest_members, template_owners: template_members,
-                                                              dest_owners: dest_members) +
+                                                             dest_owners: dest_members) +
           container_footer_lines(selected_decl, selected_analysis)
       end
 
@@ -786,7 +786,12 @@ module Rbs
                           []
                         end
 
-        leading_gap_lines = leading_lines.empty? ? layout_gap_lines_for(statement, analysis, side: :leading, owners: owners) : []
+        leading_gap_lines = if leading_lines.empty?
+                              layout_gap_lines_for(statement, analysis, side: :leading,
+                                                                        owners: owners)
+                            else
+                              []
+                            end
 
         leading_gap_lines + leading_lines + extract_raw_statement_lines(statement, analysis)
       end
@@ -847,7 +852,8 @@ module Rbs
         return [primary_region, analysis, decl] if region_present?(primary_region)
 
         if comment_source_decl && comment_source_analysis
-          source_region = leading_region_for(comment_source_decl, comment_source_analysis, owners: comment_source_owners)
+          source_region = leading_region_for(comment_source_decl, comment_source_analysis,
+                                             owners: comment_source_owners)
           return [source_region, comment_source_analysis, comment_source_decl] if region_present?(source_region)
         end
 

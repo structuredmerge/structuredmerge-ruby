@@ -193,6 +193,7 @@ module Rbs
 
         blank_line_count_before(region_start, analysis)
       end
+
       # Get start line for a declaration (works with both backends)
       def get_decl_start_line(decl)
         if decl.respond_to?(:start_line)
