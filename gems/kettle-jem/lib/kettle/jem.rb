@@ -12009,11 +12009,7 @@ module Kettle
       dev_env = "#{prefix}_DEV"
       root_literal = ruby_array_literal(["src", "my", workspace_slug].reject(&:empty?))
       word_array = names.map { |name| "  #{name}" }.join("\n")
-      nomono_loader = if package_name.to_s == "nomono"
-        %(require_relative "lib/nomono/bundler")
-      else
-        %(require "nomono/bundler")
-      end
+      nomono_loader = %(require "nomono/bundler")
 
       blocks << <<~RUBY.rstrip
         # Direct sibling dependencies (env-switched via #{dev_env})
@@ -12216,12 +12212,8 @@ module Kettle
       RUBY
     end
 
-    def local_gemfile_nomono_bootstrap(package_name)
-      if package_name.to_s == "nomono"
-        %(require_relative "../../lib/nomono/bundler")
-      else
-        %(require "nomono/bundler")
-      end
+    def local_gemfile_nomono_bootstrap(_package_name)
+      %(require "nomono/bundler")
     end
 
     def project_homepage_uri(config, env, yard_host:, gemspec_homepage_uri: nil)

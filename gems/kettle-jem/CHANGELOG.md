@@ -237,6 +237,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `tree_sitter_language_pack` declaration that belongs to the templating
   modular Gemfile.
 - Generated README source badges now use GitHub's canonical capitalization.
+- Generated nomono local Gemfiles now use the normal `require "nomono/bundler"`
+  loader instead of a nomono-specific `require_relative` path.
 - Install orchestration now bundles each distinct Bundler environment it will
   execute under, and probes RuboCop Gradual tasks with the same environment used
   for the eventual command.
