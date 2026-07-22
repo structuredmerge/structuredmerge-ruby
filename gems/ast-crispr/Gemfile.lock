@@ -6,15 +6,6 @@ PATH
       service_actor (~> 3.9)
       version_gem (~> 1.1, >= 1.1.9)
 
-PATH
-  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-merge
-  specs:
-    ast-merge (7.1.0)
-      benchmark
-      token-resolver (~> 2.0, >= 2.0.4)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
-
 GEM
   remote: https://gem.coop/
   specs:
@@ -30,6 +21,11 @@ GEM
       rubocop (>= 1.0)
       version_gem (~> 1.1, >= 1.1.14)
     ast (2.4.3)
+    ast-merge (7.1.0)
+      benchmark
+      token-resolver (~> 2.0, >= 2.0.4)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
     backports (3.25.3)
     benchmark (0.5.0)
     bigdecimal (4.1.2)
@@ -390,7 +386,6 @@ DEPENDENCIES
   appraisal2 (~> 3.0, >= 3.0.6)
   appraisal2-rubocop (~> 1.0, >= 1.0.0)
   ast-crispr!
-  ast-merge!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
   cgi (~> 0.5)
