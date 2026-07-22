@@ -47,6 +47,9 @@ Please file a bug if you notice a violation of semantic versioning.
   instead of spawning one Ractor per file.
 - `kettle-jem` README processing now reuses structural owner scans and batches
   several Markdown deletions to reduce repeated parser passes.
+- `kettle-jem` main Gemfile templating now removes repeated direct sibling
+  execution blocks left behind by older `nomono` bootstrap output while applying
+  the simplified `require "nomono/bundler"` loader.
 - `smorg-rb` diff-driver output now appends a unified review hunk with exact
   removed and added source text after the semantic structured-diff summary.
 - Retemplated generated project metadata, support documentation, CI workflows,

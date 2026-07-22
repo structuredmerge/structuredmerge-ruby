@@ -64,6 +64,9 @@ Please file a bug if you notice a violation of semantic versioning.
   collection entries with template package entries so project-specific
   packaged files are not lost when the template rewrites the generated gemspec
   structure.
+- Main Gemfile templating now removes repeated direct sibling execution blocks
+  left behind by older `nomono` bootstrap output when applying the simplified
+  `require "nomono/bundler"` loader.
 - Gemspec templating now restores additional legacy Prism policy behavior for
   destination-only metadata fields, Bundler `git ls-files` package declarations,
   and empty development-dependency section cleanup after runtime dependency

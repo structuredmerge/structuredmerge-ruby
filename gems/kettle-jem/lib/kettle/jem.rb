@@ -6316,7 +6316,7 @@ module Kettle
       records = main_gemfile_direct_sibling_records(content)
       return content if records.length <= 1
 
-      records[0...-1].sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+      records[1..].sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
         replace_source_range_lines(
           output,
           record.fetch(:start_line),
@@ -6334,18 +6334,21 @@ module Kettle
       return [] if assignments.empty?
 
       lines = content.to_s.lines
-      assignments.filter_map do |assignment|
-        block_if = body.find do |node|
+      assignments.each_with_object([]) do |assignment, records|
+        block_ifs = body.select do |node|
           node.is_a?(::Prism::IfNode) &&
             node.location.start_line > assignment.location.end_line &&
             prism_subtree_contains_call?(node, :eval_nomono_gems)
         end
-        next unless block_if
+        next if block_ifs.empty?
 
         start_line = assignment.location.start_line
         previous = lines[start_line - 2].to_s
         start_line -= 1 if previous.strip.start_with?("# Direct sibling dependencies")
-        {start_line: start_line, end_line: block_if.location.end_line}
+        records << {start_line: start_line, end_line: block_ifs.first.location.end_line}
+        block_ifs.drop(1).each do |block_if|
+          records << {start_line: block_if.location.start_line, end_line: block_if.location.end_line}
+        end
       end
     end
 
