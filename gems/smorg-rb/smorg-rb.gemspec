@@ -102,6 +102,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'kettle-jem', "= #{spec.version}"
   spec.add_dependency 'markly-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
+  spec.add_dependency('diff-lcs', '~> 1.5')
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.9') # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

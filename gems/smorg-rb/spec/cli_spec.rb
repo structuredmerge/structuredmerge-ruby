@@ -456,10 +456,32 @@ RSpec.describe Smorg::RB do
       expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
       expect(stdout.string).to include('structured-diff package.json')
       expect(stdout.string).to include('review-diff unified')
-      expect(stdout.string).to include('@@ -1,1 +1,1 @@')
+      expect(stdout.string).to include('@@ -1 +1 @@')
       expect(stdout.string).to include('-{"old":true}')
       expect(stdout.string).to include('+{"new":true}')
     end
+  end
+
+  it 'renders compact review hunks instead of whole-file replacements' do
+    old_source = (1..12).map { |index| "sentinel_#{index.to_s.rjust(2, '0')}\n" }.join
+    new_source = old_source.sub("sentinel_07\n", "changed_07\n")
+    old_path = write_file(@dir, 'old-source.rb', old_source)
+    new_path = write_file(@dir, 'new-source.rb', new_source)
+    stdout = StringIO.new
+    stderr = StringIO.new
+
+    exit_code = described_class.run(['diff-driver', '--path-name', 'lib/example.rb', old_path, new_path],
+                                    stdout: stdout, stderr: stderr)
+
+    expect(exit_code).to eq(described_class::EXIT_SUCCESS), stderr.string
+    expect(stdout.string).to include('structured-diff lib/example.rb')
+    expect(stdout.string).to include('review-diff unified')
+    expect(stdout.string).to include('@@ -4,7 +4,7 @@')
+    expect(stdout.string).to include('-sentinel_07')
+    expect(stdout.string).to include('+changed_07')
+    expect(stdout.string).not_to include('sentinel_01')
+    expect(stdout.string).not_to include('sentinel_12')
+    expect(stdout.string).not_to include('@@ -1,12 +1,12 @@')
   end
 
   it 'keeps no-ext-diff source review fragments in structured diff output' do

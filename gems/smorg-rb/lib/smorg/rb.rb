@@ -5,6 +5,8 @@ require 'version_gem'
 require 'go-merge'
 require 'ast/merge'
 require 'ast-merge-git'
+require 'diff/lcs'
+require 'diff/lcs/hunk'
 require 'json'
 require 'json-merge'
 require 'kettle/jem'
@@ -20,6 +22,7 @@ module Smorg
     EXIT_UNRESOLVED_CONFLICT = 1
     EXIT_USER_ERROR = 2
     EXIT_INTERNAL_ERROR = 3
+    REVIEW_DIFF_CONTEXT_LINES = 3
 
     module_function
 
@@ -554,19 +557,24 @@ module Smorg
       stdout.puts('review-diff unified')
       stdout.puts("--- a/#{path_name}")
       stdout.puts("+++ b/#{path_name}")
-      stdout.puts("@@ -1,#{old_lines.length} +1,#{new_lines.length} @@")
-      old_lines.each { |line| write_diff_line(stdout, '-', line) }
-      new_lines.each { |line| write_diff_line(stdout, '+', line) }
+
+      file_length_difference = 0
+      Diff::LCS.diff(old_lines, new_lines).each do |piece|
+        hunk = Diff::LCS::Hunk.new(old_lines, new_lines, piece, REVIEW_DIFF_CONTEXT_LINES, file_length_difference)
+        file_length_difference = hunk.file_length_difference
+        write_diff_text(stdout, hunk.diff(:unified))
+      end
     end
 
     def diff_source_lines(source)
       source.to_s.lines.to_a
     end
 
-    def write_diff_line(stdout, prefix, line)
-      stdout.write(prefix)
-      stdout.write(line)
-      stdout.write("\n") unless line.end_with?("\n")
+    def write_diff_text(stdout, text)
+      return if text.to_s.empty?
+
+      stdout.write(text)
+      stdout.write("\n") unless text.end_with?("\n")
     end
 
     def run_conflicts(args, stdout, stderr)
