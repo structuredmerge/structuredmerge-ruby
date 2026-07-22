@@ -7,16 +7,16 @@
 # NOTE: Gemfiles for non-coverage appraisals may not have kettle-soup-cover.
 #       The rescue LoadError handles that scenario.
 begin
-  require "kettle-soup-cover"
+  require 'kettle-soup-cover'
   if Kettle::Soup::Cover::DO_COV
     # Requiring simplecov loads the project-local `.simplecov`.
-    require "simplecov"
-    require "kettle/soup/cover/config"
+    require 'simplecov'
+    require 'kettle/soup/cover/config'
     SimpleCov.start
   end
-rescue LoadError => error
+rescue LoadError => e
   # check the error message and re-raise when unexpected
-  raise error unless error.message.include?("kettle")
+  raise e unless e.message.include?('kettle')
 end
 
 # External RSpec & related config
