@@ -845,6 +845,7 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
             spec.summary = "Example gem"
             spec.authors = ["Jane Q Public"]
             spec.email = ["jane@example.test"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example"
             spec.licenses = ["MIT"]
           end
         RUBY
@@ -874,9 +875,9 @@ RSpec.describe Kettle::Jem, "appraisal helpers and template tokens" do
       expect(plan.dig(:facts, :package, :license_expression)).to eq(
         "AGPL-3.0-only OR PolyForm-Small-Business-1.0.0 OR LicenseRef-Big-Time-Public-License"
       )
-      expect(final_content).to include("[AGPL-3.0-only](AGPL-3.0-only.md)")
-      expect(final_content).to include("[PolyForm-Small-Business-1.0.0](PolyForm-Small-Business-1.0.0.md)")
-      expect(final_content).to include("[Big-Time-Public-License](Big-Time-Public-License.md)")
+      expect(final_content).to include("[AGPL-3.0-only](https://github.com/acme/example/blob/main/AGPL-3.0-only.md)")
+      expect(final_content).to include("[PolyForm-Small-Business-1.0.0](https://github.com/acme/example/blob/main/PolyForm-Small-Business-1.0.0.md)")
+      expect(final_content).to include("[Big-Time-Public-License](https://github.com/acme/example/blob/main/Big-Time-Public-License.md)")
       expect(final_content).to include("## Use-case guide")
       expect(final_content).to include("- Required Notice: Copyright")
       expect(final_content).to include("Jane Q Public")
