@@ -575,15 +575,23 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
-  it "runs TruffleRuby dep-heads directly from the generated appraisal gemfile" do
+  it "runs every dep-heads job directly from the generated appraisal gemfile" do
     template = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example"))
+    workflow = YAML.safe_load(template, permitted_classes: [], aliases: true)
+    jobs = workflow.fetch("jobs")
 
-    expect(template).to include("truffleruby:")
     expect(template).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.bundle_gemfile || 'Appraisal.root.gemfile' }}")
-    expect(template).to include('bundle_gemfile: "gemfiles/dep_heads.gemfile"')
-    expect(template).to include("direct_bundle: true")
-    expect(template).to include("run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}")
+    expect(template).not_to include("bundle exec appraisal ${{ matrix.appraisal }}")
     expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
+
+    expect(jobs.keys).to include("ruby", "truffleruby", "jruby")
+    jobs.each_value do |job|
+      entry = job.fetch("strategy").fetch("matrix").fetch("include").first
+
+      expect(entry.fetch("appraisal")).to eq("dep-heads")
+      expect(entry.fetch("bundle_gemfile")).to eq("gemfiles/dep_heads.gemfile")
+      expect(entry.fetch("direct_bundle")).to be(true)
+    end
   end
 
   it "serializes legacy engine setup-ruby workaround in generated CI workflows" do

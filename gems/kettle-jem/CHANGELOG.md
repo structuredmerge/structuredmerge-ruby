@@ -54,9 +54,9 @@ Please file a bug if you notice a violation of semantic versioning.
   per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
   across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
   matrix runs.
-- Generated dep-heads workflows now document why TruffleRuby runs directly from
-  `gemfiles/dep_heads.gemfile`, making that generated Appraisal file required
-  checked-in output for the workflow.
+- Generated dep-heads workflows now document why every engine job runs directly
+  from `gemfiles/dep_heads.gemfile`, making that generated Appraisal file
+  required checked-in output for the workflow.
 - JRuby 9.2 workflow templates now use the legacy-engine bundle install path
   instead of `ruby/setup-ruby` bundler caching so old Bundler does not fail
   setup against gem servers without the full legacy index.
@@ -277,9 +277,10 @@ Please file a bug if you notice a violation of semantic versioning.
   `sig/<entrypoint>/**/*.rbs` content into the package-level signature and
   removes the nested files, including when the package-level signature is
   managed by a template entry.
-- Generated dep-heads workflows now run current TruffleRuby directly from the
+- Generated dep-heads workflows now run every engine job directly from the
   generated `gemfiles/dep_heads.gemfile`, avoiding `Appraisal.root.gemfile`
-  bootstrap failures with TruffleRuby's bundled RubyGems/Bundler and gem.coop.
+  bootstrap failures with RubyGems/Bundler and gem.coop before the dep-heads
+  appraisal is selected.
 - Packaged Rakefile templating now merges destination Rakefiles by default
   instead of replacing them wholesale, preserving project-specific rake tasks
   such as release or adapter test helpers.
