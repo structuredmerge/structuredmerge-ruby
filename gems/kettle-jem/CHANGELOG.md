@@ -71,8 +71,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added the repo-local `bin/kettle-jem-workflow-pins` maintenance script to
   update the GitHub Actions SHA pin index used by generated workflow templates
   via `kettle-gha-sha-pins`.
-- Generated local Gemfile templates now document why `nomono` is explicitly
-  activated before requiring `nomono/bundler`.
+- Generated local Gemfile templates now use a simple `require "nomono/bundler"`
+  loader, with a provider-relative loader for `nomono` itself, instead of
+  emitting runtime lockfile parsing or explicit gem activation ceremony.
 - Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
   dependency-bearing kettle-jem templates and update their dependency floors.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the

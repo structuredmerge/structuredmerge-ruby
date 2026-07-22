@@ -403,6 +403,7 @@ module Kettle
       KJ|LICENSE_EYE:DEPENDENCY_LICENSES
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
+      KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK
       KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
@@ -4468,7 +4469,7 @@ module Kettle
       [
         {name: "appraisal2", source: %(gem "appraisal2", "~> 3.2", ">= 3.2.0"\n)},
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
-        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.3", ">= 2.3.8"\n)},
+        {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.3", ">= 2.3.9"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.6"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.12"\n)},
@@ -11874,6 +11875,7 @@ module Kettle
         template_run_year: run_timestamp.year.to_s,
         kettle_dev_gem: "kettle-dev",
         kettle_dev_local_gems: kettle_dev_local_gems(config),
+        local_gemfile_nomono_bootstrap: local_gemfile_nomono_bootstrap(package_name),
         main_gemfile_nomono_bootstrap: main_gemfile_nomono_bootstrap(package_name),
         package_name: package_name.to_s,
         yard_host: yard_host,
@@ -11887,6 +11889,7 @@ module Kettle
         github_org: github_org_from_url(source_url).to_s,
         main_gemfile_direct_sibling_block: main_gemfile_direct_sibling_block(
           direct_sibling_gems,
+          package_name: package_name,
           source_url: source_url,
           project_root: project_root,
           local_modular_eval_paths: local_modular_eval_paths.values.flatten
@@ -11978,7 +11981,7 @@ module Kettle
       end
     end
 
-    def main_gemfile_direct_sibling_block(gems, source_url:, project_root:, local_modular_eval_paths: [])
+    def main_gemfile_direct_sibling_block(gems, package_name:, source_url:, project_root:, local_modular_eval_paths: [])
       names = Array(gems).map(&:to_s).reject(&:empty?).uniq
       eval_paths = Array(local_modular_eval_paths).map(&:to_s).reject(&:empty?).uniq.sort
       return "" if names.empty? && eval_paths.empty?
@@ -11998,6 +12001,11 @@ module Kettle
       dev_env = "#{prefix}_DEV"
       root_literal = ruby_array_literal(["src", "my", workspace_slug].reject(&:empty?))
       word_array = names.map { |name| "  #{name}" }.join("\n")
+      nomono_loader = if package_name.to_s == "nomono"
+        %(require_relative "lib/nomono/bundler")
+      else
+        %(require "nomono/bundler")
+      end
 
       blocks << <<~RUBY.rstrip
         # Direct sibling dependencies (env-switched via #{dev_env})
@@ -12014,25 +12022,9 @@ module Kettle
               ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?)
           direct_sibling_dev_was_set = ENV.key?("#{dev_env}")
           direct_sibling_dev_original = ENV.fetch("#{dev_env}", nil)
+          #{nomono_loader}
           begin
-            nomono_activation_requirements = nomono_requirements
-            nomono_lockfile = File.expand_path("Gemfile.lock", __dir__)
-            if File.file?(nomono_lockfile)
-              nomono_locked_spec = Bundler::LockfileParser
-                .new(Bundler.read_file(nomono_lockfile))
-                .specs
-                .find { |spec| spec.name == "nomono" }
-              nomono_locked = nomono_locked_spec &&
-                Gem::Requirement.new(nomono_requirements).satisfied_by?(nomono_locked_spec.version)
-              if nomono_locked
-                nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"]
-              end
-            end
-            Kernel.send(:gem, "nomono", *nomono_activation_requirements)
-            require "nomono/bundler"
-            if direct_sibling_templating && !direct_sibling_local
-              ENV["#{dev_env}"] = File.expand_path("..", __dir__)
-            end
+            ENV["#{dev_env}"] = File.expand_path("..", __dir__) if direct_sibling_templating && !direct_sibling_local
 
             eval_nomono_gems(
               gems: direct_sibling_gems,
@@ -12040,8 +12032,6 @@ module Kettle
               path_env: "#{dev_env}",
               root: #{root_literal}
             )
-          rescue LoadError
-            warn "Install nomono to enable #{dev_env} local sibling-gem dependencies."
           ensure
             if direct_sibling_templating && !direct_sibling_local
               if direct_sibling_dev_was_set
@@ -12185,6 +12175,7 @@ module Kettle
         "KJ|TEMPLATE_RUN_YEAR" => project_runtime[:template_run_year].to_s,
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,
+        "KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:local_gemfile_nomono_bootstrap].to_s,
         "KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:main_gemfile_nomono_bootstrap].to_s,
         "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
@@ -12215,6 +12206,14 @@ module Kettle
         nomono_requirements = ["~> 1.0", ">= 1.0.8"]
         gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
       RUBY
+    end
+
+    def local_gemfile_nomono_bootstrap(package_name)
+      if package_name.to_s == "nomono"
+        %(require_relative "../../lib/nomono/bundler")
+      else
+        %(require "nomono/bundler")
+      end
     end
 
     def project_homepage_uri(config, env, yard_host:, gemspec_homepage_uri: nil)

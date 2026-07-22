@@ -65,8 +65,6 @@ RSpec.describe KettleJemDepsFloor do
     write_file("template/local.gemfile.example", <<~RUBY)
       # frozen_string_literal: true
 
-      nomono_activation_requirements = ["~> 1.0", ">= 1.0.8"]
-      Kernel.send(:gem, "nomono", *nomono_activation_requirements)
       require "nomono/bundler"
     RUBY
     write_file("template/documentation.gemfile.example", <<~RUBY)
@@ -78,6 +76,7 @@ RSpec.describe KettleJemDepsFloor do
       # frozen_string_literal: true
 
       {name: "embedded_dep", source: %(gem "embedded_dep", "~> 4.5", ">= 4.5.6"\\n)}
+      nomono_requirements = ["~> 1.0", ">= 1.0.8"]
     RUBY
   end
 
@@ -131,12 +130,13 @@ RSpec.describe KettleJemDepsFloor do
 
     expect(result[:updates]).to eq(6)
     expect(read_file("lib/embedded.rb")).to include('{name: "embedded_dep", source: %(gem "embedded_dep", "~> 4.5", ">= 4.5.7"\\n)}')
+    expect(read_file("lib/embedded.rb")).to include('nomono_requirements = ["~> 1.0", ">= 1.0.9"]')
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.3", ">= 1.3.0"')
     expect(read_file("template/valid.gemfile.example")).to include('spec.add_development_dependency("other_dep", "~> 3.1", ">= 3.1.0")')
     expect(read_file("template/valid.gemfile.example")).to include('# gem "ignored_dep", "~> 1.0", ">= 1.0.0"')
     expect(read_file("template/tokenized.gemspec.example")).to include('spec.add_development_dependency("example_dep", "~> 1.3", ">= 1.3.0")')
     expect(read_file("template/tokenized.gemspec.example")).to include('spec.add_development_dependency("{KJ|TOKENIZED_GEM}", "~> 9.0", ">= 9.0.0")')
-    expect(read_file("template/local.gemfile.example")).to include('nomono_activation_requirements = ["~> 1.0", ">= 1.0.9"]')
+    expect(read_file("template/local.gemfile.example")).to include('require "nomono/bundler"')
     expect(read_file("template/documentation.gemfile.example")).to include('gem "yard-timekeeper", "~> 0.2", ">= 0.2.4", require: false')
   end
 
