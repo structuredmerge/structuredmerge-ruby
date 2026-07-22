@@ -77,6 +77,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated local Gemfile templates now use a simple `require "nomono/bundler"`
   loader, with a provider-relative loader for `nomono` itself, instead of
   emitting runtime lockfile parsing or explicit gem activation ceremony.
+- Generated root Gemfiles now declare `nomono` with a plain dependency line
+  requiring `nomono` 1.1.0 or newer, and retemplating removes the older
+  `nomono_requirements` helper block.
 - Added the repo-local `bin/kettle-jem-deps-floor` maintenance script to scan
   dependency-bearing kettle-jem templates and update their dependency floors.
 - `kettle-jem install` now generates a curated `bin/appraisal` binstub for the

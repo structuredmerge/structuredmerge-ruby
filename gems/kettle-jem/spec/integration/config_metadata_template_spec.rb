@@ -2050,7 +2050,8 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(direct_block).to include(
         'direct_sibling_templating = ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?'
       )
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
       expect(direct_block).to include('require "nomono/bundler"')
       expect(direct_block).not_to include("nomono_activation_requirements")
       expect(direct_block).not_to include("nomono_lockfile")
@@ -2109,8 +2110,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2212,8 +2212,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBYTHEMS_DEV)
           direct_sibling_gems = %w[
@@ -2310,8 +2309,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
 
           gemspec
 
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-          gem "nomono", *nomono_requirements, require: false
+          gem "nomono", "~> 1.1", ">= 1.1.0", require: false
 
           # Direct sibling dependencies (env-switched via RUBY_OPENID_DEV)
           direct_sibling_gems = %w[
@@ -2360,7 +2358,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
-  it "keeps the nomono requirements assignment before an existing nomono gem call" do
+  it "replaces legacy nomono requirements assignments with a plain dependency declaration" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-main-gemfile-nomono-order", tmp_root) do |root|
@@ -2379,6 +2377,7 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           source "https://gem.coop"
 
           # Local workspace dependency wiring for *_local.gemfile overrides
+          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
           gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
           gem "progress_bar"
 
@@ -2392,8 +2391,6 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
           )
 
           gemspec
-
-          nomono_requirements = ["~> 1.0", ">= 1.0.8"]
         RUBY
         ".kettle-jem.yml" => <<~YAML
           project_emoji: "💎"
@@ -2411,12 +2408,10 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         run_options: {accept: true, force: true, skip_commit: true}
       )
       gemfile = File.read(File.join(root, "Gemfile"))
-      requirement_line = gemfile.lines.index { |line| line.include?("nomono_requirements =") }
-      gem_line = gemfile.lines.index { |line| line.include?('gem "nomono", *nomono_requirements') }
 
-      expect(requirement_line).not_to be_nil
-      expect(gem_line).not_to be_nil
-      expect(requirement_line).to be < gem_line
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
+      expect(gemfile).not_to include('gem "nomono", *nomono_requirements')
     end
   end
 

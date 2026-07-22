@@ -1284,8 +1284,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       end
       content = report.fetch(:final_content)
 
-      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
-      expect(content).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(content).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(content).not_to include("nomono_requirements")
       expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
@@ -1314,7 +1314,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       apply = described_class.apply_project(root, env: {})
       content = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
 
-      expect(content).not_to include('gem "nomono", *nomono_requirements')
+      expect(content).not_to include('gem "nomono"')
       expect(content).not_to include("nomono_requirements =")
       expect(File.read(File.join(root, "Gemfile"))).to eq(content)
     end
@@ -1353,8 +1353,8 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       gemfile = File.read(File.join(root, "Gemfile"))
 
       expect(apply.fetch(:changed_files)).to include("Gemfile")
-      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
-      expect(gemfile).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(gemfile).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(gemfile).not_to include("nomono_requirements")
       expect(gemfile.index('gem "nomono"')).to be < gemfile.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
     end
   end

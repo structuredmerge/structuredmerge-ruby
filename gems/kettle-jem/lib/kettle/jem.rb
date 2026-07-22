@@ -6287,7 +6287,7 @@ module Kettle
         output = remove_stale_main_gemfile_direct_sibling_block(output, template_content)
         output = deduplicate_main_gemfile_direct_sibling_blocks(output)
         output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
-        output = normalize_main_gemfile_nomono_requirements(output)
+        output = normalize_main_gemfile_nomono_declaration(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
@@ -6389,12 +6389,11 @@ module Kettle
 
     def main_gemfile_nomono_bootstrap_source(template_content)
       records = main_gemfile_nomono_requirement_records(template_content)
-      assignment = records.fetch(:assignments).first
       call = records.fetch(:calls).first
-      return "" unless assignment && call
+      return "" unless call
 
       lines = template_content.to_s.lines
-      start_line = assignment.fetch(:start_line)
+      start_line = call.fetch(:start_line)
       previous = lines[start_line - 2].to_s
       start_line -= 1 if previous.strip.start_with?("# Local workspace dependency wiring")
       lines[(start_line - 1)..(call.fetch(:end_line) - 1)].join.rstrip + "\n\n"
@@ -6416,11 +6415,10 @@ module Kettle
       ruby_call_records(content, :gemspec).map { |call| ruby_node_source_end_line(call) + 1 }.min
     end
 
-    def normalize_main_gemfile_nomono_requirements(content)
+    def normalize_main_gemfile_nomono_declaration(content)
       records = main_gemfile_nomono_requirement_records(content)
-      return content if records.fetch(:calls).empty? || records.fetch(:assignments).empty?
+      return content if records.fetch(:calls).empty?
 
-      assignment_source = records.fetch(:assignments).first.fetch(:source).strip
       output = records.fetch(:assignments).sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |memo, record|
         replace_source_range_lines(
           memo,
@@ -6429,13 +6427,11 @@ module Kettle
           ""
         )
       end
-      call = main_gemfile_nomono_requirement_records(output).fetch(:calls).first
-      return output unless call
+      main_gemfile_nomono_requirement_records(output).fetch(:calls).sort_by { |record| -record.fetch(:start_line) }.reduce(output) do |memo, record|
+        next memo unless record.fetch(:source).include?("*nomono_requirements")
 
-      lines = output.lines
-      insert_at = call.fetch(:start_line) - 1
-      lines.insert(insert_at, "#{assignment_source}\n")
-      ensure_trailing_newline(lines.join.gsub(/\n{3,}/, "\n\n"))
+        replace_source_range_lines(memo, record.fetch(:start_line), record.fetch(:end_line), "#{nomono_gemfile_declaration}\n")
+      end
     end
 
     def main_gemfile_nomono_requirement_records(content)
@@ -6454,7 +6450,8 @@ module Kettle
 
         {
           start_line: call.location.start_line,
-          end_line: ruby_node_source_end_line(call)
+          end_line: ruby_node_source_end_line(call),
+          source: call.location.slice
         }
       end
       {assignments: assignments, calls: calls.sort_by { |record| record.fetch(:start_line) }}
@@ -12210,9 +12207,12 @@ module Kettle
 
       <<~RUBY.rstrip
         # Local workspace dependency wiring for *_local.gemfile overrides
-        nomono_requirements = ["~> 1.0", ">= 1.0.8"]
-        gem "nomono", *nomono_requirements, require: false # ruby >= 2.2
+        #{nomono_gemfile_declaration}
       RUBY
+    end
+
+    def nomono_gemfile_declaration
+      %(gem "nomono", "~> 1.1", ">= 1.1.0", require: false # ruby >= 3.2.0)
     end
 
     def local_gemfile_nomono_bootstrap(_package_name)
