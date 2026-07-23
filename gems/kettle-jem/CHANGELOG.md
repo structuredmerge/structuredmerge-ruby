@@ -111,6 +111,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- The `kettle-jem` executable now prints a standard startup header on normal
+  runs while preserving version-only output for `version`, `-v`, and
+  `--version`.
 - `kettle-jem-deps-floor --write` now commits its managed dependency floor
   updates by default, with `--no-commit` available for callers that need the
   previous uncommitted write behavior.

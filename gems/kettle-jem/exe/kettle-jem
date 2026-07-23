@@ -1,6 +1,16 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+script_basename = File.basename(__FILE__)
+require_relative "../lib/kettle/jem/version"
+
+if ARGV.first == "version" || ARGV.any? { |arg| arg == "-v" || arg == "--version" }
+  puts Kettle::Jem::Version::VERSION
+  exit(0)
+end
+
 require_relative "../lib/kettle-jem"
+
+puts "== #{script_basename} v#{Kettle::Jem::Version::VERSION} =="
 
 exit(Kettle::Jem::CLI.run(ARGV, env: ENV, out: $stdout, err: $stderr))

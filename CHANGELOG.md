@@ -33,6 +33,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- The `smorg-rb` executable now supports `-v` / `--version` and prints a
+  standard startup header on normal runs.
 - `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged
   monorepo subgems even when the selected template profile does not otherwise
   manage per-gem harness files.
