@@ -109,6 +109,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- `kettle-jem-deps-floor --write` now commits its managed dependency floor
+  updates by default, with `--no-commit` available for callers that need the
+  previous uncommitted write behavior.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.2.1 or newer so
   generated workflow pin tooling can rely on the corrected Ruby floor.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.2.0 or newer.
