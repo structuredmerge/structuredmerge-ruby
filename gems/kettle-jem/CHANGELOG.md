@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Curated Bundler binstub generation now includes `kettle-gha-pins` when it is
+  present in the destination bundle.
 - Templating plan reports now include per-recipe duration metadata, template
   planning deduplicates destination and template-source file reads, and runtime
   loading is reduced to explicit main-Ractor extension points. A disabled

@@ -467,7 +467,7 @@ RSpec.describe Kettle::Jem, "structural merge template behavior" do
       expect(signature).to include("module Version")
       expect(signature).to include("VERSION: String")
       expect(commands).to include(
-        %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover stone_checksums],
+        %w[bundle binstubs appraisal2 rake rbs rspec-core yard kettle-dev kettle-test kettle-soup-cover kettle-gha-pins stone_checksums],
         kettle_jem_handoff_command("--skip-commit", "--only", "example-gem.gemspec")
       )
     end
