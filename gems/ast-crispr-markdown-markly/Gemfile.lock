@@ -6,6 +6,22 @@ PATH
       markly-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr
+  specs:
+    ast-crispr (7.1.0)
+      ast-merge (= 7.1.0)
+      service_actor (~> 3.9)
+      version_gem (~> 1.1, >= 1.1.9)
+
+PATH
+  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/markly-merge
+  specs:
+    markly-merge (7.1.0)
+      markdown-merge (= 7.1.0)
+      markly (~> 0.9)
+      version_gem (~> 1.1, >= 1.1.9)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -21,10 +37,6 @@ GEM
       rubocop (>= 1.0)
       version_gem (~> 1.1, >= 1.1.14)
     ast (2.4.3)
-    ast-crispr (7.1.0)
-      ast-merge (= 7.1.0)
-      service_actor (~> 3.9)
-      version_gem (~> 1.1, >= 1.1.9)
     ast-merge (7.1.0)
       benchmark
       token-resolver (~> 2.0, >= 2.0.4)
@@ -138,10 +150,6 @@ GEM
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
     markly (0.16.0)
-    markly-merge (7.1.0)
-      markdown-merge (= 7.1.0)
-      markly (~> 0.9)
-      version_gem (~> 1.1, >= 1.1.9)
     mutex_m (0.3.0)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
@@ -402,6 +410,7 @@ DEPENDENCIES
   addressable (>= 2.8, < 3)
   appraisal2 (~> 3.0, >= 3.0.6)
   appraisal2-rubocop (~> 1.0, >= 1.0.0)
+  ast-crispr!
   ast-crispr-markdown-markly!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
@@ -416,6 +425,7 @@ DEPENDENCIES
   kettle-test (~> 2.0, >= 2.0.9)
   kramdown (~> 2.5, >= 2.5.2)
   kramdown-parser-gfm (~> 1.1)
+  markly-merge!
   mutex_m (~> 0.2)
   nomono (~> 1.1, >= 1.1.0)
   rake (~> 13.0)

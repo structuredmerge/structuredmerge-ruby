@@ -6,6 +6,14 @@ PATH
       ruby-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
+PATH
+  remote: /home/pboling/src/my/structuredmerge/ruby/gems/ruby-merge
+  specs:
+    ruby-merge (7.1.0)
+      ast-merge (= 7.1.0)
+      tree_haver (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
+
 GEM
   remote: https://gem.coop/
   specs:
@@ -280,10 +288,6 @@ GEM
       lint_roller (~> 1.1)
       rubocop (~> 1.72, >= 1.72.1)
       rubocop-ast (>= 1.44.0, < 2.0)
-    ruby-merge (7.1.0)
-      ast-merge (= 7.1.0)
-      tree_haver (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
     ruby-progressbar (1.13.0)
     ruby_engine (2.0.3)
     ruby_version (1.0.3)
@@ -419,6 +423,7 @@ DEPENDENCIES
   rubocop-on-rbs (~> 2.0, >= 2.0.0)
   rubocop-packaging (~> 0.6, >= 0.6.0)
   rubocop-ruby3_2 (~> 3.0, >= 3.0.6)
+  ruby-merge!
   ruby-progressbar (~> 1.13)
   standard (~> 1.56, >= 1.56.0)
   stone_checksums (~> 1.0, >= 1.0.3)
