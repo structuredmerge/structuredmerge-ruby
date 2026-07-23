@@ -104,6 +104,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem` local Gemfile templating now removes obsolete nomono activation
+  ceremony from existing destination files while retaining the simple
+  `require "nomono/bundler"` loader.
 - `kettle-jem` bootstrap commits can now be serialized by monorepo family
   templating, preventing concurrent member template jobs from racing while
   updating the shared `HEAD`.

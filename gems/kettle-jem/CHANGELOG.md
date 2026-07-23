@@ -245,6 +245,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Local Gemfile templating now removes obsolete nomono activation ceremony from
+  existing destination files while retaining the simple
+  `require "nomono/bundler"` loader.
 - Bootstrap commit execution now honors `KETTLE_JEM_GIT_COMMIT_LOCK` by locking
   around the dirty recheck, `git add`, and `git commit` sequence for monorepo
   family templating.

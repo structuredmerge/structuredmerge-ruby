@@ -6290,6 +6290,7 @@ module Kettle
         output = normalize_main_gemfile_nomono_declaration(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
+      output = normalize_local_gemfile_nomono_bootstrap(output) if local_gemfile_template_recipe?(recipe)
       return output if recipe.dig(:template_preference, :strategy).to_s == "accept_template"
       return output unless local_gemfile_template_recipe?(recipe)
 
@@ -6923,6 +6924,69 @@ module Kettle
 
     def local_gemfile_template_recipe?(recipe)
       recipe.fetch(:target_path).to_s.end_with?("_local.gemfile")
+    end
+
+    def normalize_local_gemfile_nomono_bootstrap(content)
+      output = remove_obsolete_local_gemfile_nomono_activation(content)
+      return output if ruby_call_records(output, :require).any? { |call| ruby_string_argument(call) == "nomono/bundler" }
+
+      insertion = %(require "nomono/bundler"\n\n)
+      if (record = local_gems_assignment_record(output))
+        insert_lines_before(output, record.fetch(:start_line), insertion)
+      else
+        ensure_trailing_newline([output.to_s.rstrip, insertion.rstrip].reject(&:empty?).join("\n\n"))
+      end
+    end
+
+    def remove_obsolete_local_gemfile_nomono_activation(content)
+      records = obsolete_local_gemfile_nomono_activation_records(content)
+      return content if records.empty?
+
+      records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
+    end
+
+    def obsolete_local_gemfile_nomono_activation_records(content)
+      result = prism_parse_success(content)
+      body = result&.value&.statements&.body || []
+      assignments = body.select do |node|
+        node.is_a?(::Prism::LocalVariableWriteNode) && node.name == :nomono_activation_requirements
+      end
+      return [] if assignments.empty?
+
+      lines = content.to_s.lines
+      assignments.filter_map do |assignment|
+        kernel_gem_call = body.find do |node|
+          local_gemfile_nomono_kernel_activation_call?(node) &&
+            node.location.start_line > assignment.location.start_line
+        end
+        next unless kernel_gem_call
+
+        {
+          start_line: preceding_comment_block_start_line(lines, assignment.location.start_line),
+          end_line: ruby_node_source_end_line(kernel_gem_call)
+        }
+      end
+    end
+
+    def local_gemfile_nomono_kernel_activation_call?(node)
+      node.is_a?(::Prism::CallNode) &&
+        node.name == :send &&
+        node.receiver&.slice == "Kernel" &&
+        node.arguments&.arguments&.[](0)&.location&.slice == ":gem" &&
+        ruby_string_argument_at(node, 1) == "nomono"
+    end
+
+    def preceding_comment_block_start_line(lines, line_number)
+      line = line_number
+      line -= 1 while line > 1 && lines[line - 2].to_s.strip.start_with?("#")
+      line
     end
 
     def merge_local_gem_overrides(content, destination_content, facts:, template_content: nil)

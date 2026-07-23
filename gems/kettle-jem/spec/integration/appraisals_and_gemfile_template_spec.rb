@@ -1191,6 +1191,72 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "removes obsolete nomono activation ceremony from merged local Gemfiles" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-local-gemfile-nomono-loader-cleanup", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          files:
+            gemfiles/modular/coverage_local.gemfile:
+              strategy: merge
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/coverage_local.gemfile
+        YAML
+        "gemfiles/modular/coverage_local.gemfile" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Local path overrides for development.
+          # Loaded by the associated non-local gemfile when KETTLE_DEV_DEV != "false".
+
+          # Bootstrapping nomono here cannot rely on a plain `gem "nomono", ...` line.
+          # Bundler records that dependency during Gemfile evaluation, but it does not
+          # activate that exact version before the immediate `require "nomono/bundler"`.
+          nomono_activation_requirements = ["~> 1.0", ">= 1.0.8"]
+          nomono_lockfile = File.expand_path("../../Gemfile.lock", __dir__)
+          if File.file?(nomono_lockfile)
+            nomono_locked_spec = Bundler::LockfileParser
+              .new(Bundler.read_file(nomono_lockfile))
+              .specs
+              .find { |spec| spec.name == "nomono" }
+            nomono_locked = nomono_locked_spec &&
+              Gem::Requirement.new(nomono_activation_requirements).satisfied_by?(nomono_locked_spec.version)
+            if nomono_locked
+              nomono_activation_requirements = ["= \#{nomono_locked_spec.version}"]
+            end
+          end
+          Kernel.send(:gem, "nomono", *nomono_activation_requirements)
+          require "nomono/bundler"
+
+          local_gems = %w[
+            custom-local
+          ]
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/coverage_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content.scan('require "nomono/bundler"').size).to eq(1)
+      expect(content).not_to include("nomono_activation_requirements")
+      expect(content).not_to include("nomono_lockfile")
+      expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).not_to include('Kernel.send(:gem, "nomono"')
+    end
+  end
+
   it "loads nomono's own local Gemfiles from the local source tree" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
