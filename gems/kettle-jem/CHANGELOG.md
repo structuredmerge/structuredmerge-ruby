@@ -245,6 +245,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated templating workflows now update the root `nomono` bootstrap
+  dependency before enabling `K_JEM_TEMPLATING`, so cold CI runners can install
+  `nomono` before local templating gemfiles require its Bundler DSL.
 - Local Gemfile templating now removes obsolete nomono activation ceremony from
   existing destination files while retaining the simple
   `require "nomono/bundler"` loader.

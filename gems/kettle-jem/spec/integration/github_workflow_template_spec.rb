@@ -479,7 +479,7 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
     end
   end
 
-  it "preserves newer destination GitHub Action SHA pins when accepting workflow templates" do
+  it "normalizes stale destination GitHub Action SHA pins when accepting workflow templates" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
     Dir.mktmpdir("kettle-jem-workflow-action-pin-preserve-slice", tmp_root) do |root|
@@ -509,7 +509,7 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
           jobs:
             test:
               steps:
-                - uses: actions/checkout@#{newer_checkout_sha} # v7.0.0
+                - uses: actions/checkout@#{newer_checkout_sha} # v9.0.0
                 - uses: ruby/setup-ruby@#{destination_setup_ruby_sha} # v1.0.0
         YAML
         "template/.github/workflows/current.yml.example" => <<~YAML
@@ -529,22 +529,13 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
       content = report.fetch(:final_content)
 
       expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
-      expect(content).to include("actions/checkout@#{newer_checkout_sha} # v7.0.0")
+      expect_pinned_action(content, "actions/checkout")
+      expect(content).not_to include("actions/checkout@#{newer_checkout_sha} # v9.0.0")
       expect(content).not_to include("actions/checkout@#{template_checkout_sha} # v7.0.0")
       expect_pinned_action(content, "ruby/setup-ruby")
       expect(content).not_to include("ruby/setup-ruby@v1")
-      expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to contain_exactly(
-        include(
-          path: ".github/workflows/current.yml",
-          action: "actions/checkout",
-          version: "v7.0.0",
-          preserved_sha: newer_checkout_sha,
-          template_sha: template_checkout_sha
-        )
-      )
-      expect(plan.fetch(:warnings)).to contain_exactly(
-        include("GitHub Actions template pins appear stale for .github/workflows/current.yml")
-      )
+      expect(report.dig(:metadata, :stale_github_workflow_template_pins)).to be_nil
+      expect(plan.fetch(:warnings)).to be_empty
     end
   end
 
@@ -1141,8 +1132,10 @@ RSpec.describe Kettle::Jem, "GitHub workflow templating" do
 
     expect(workflow).to include("- name: Update templating bootstrap dependencies")
     expect(workflow).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/Gemfile")
-    expect(workflow).to include("K_JEM_TEMPLATING: \"true\"")
     expect(workflow).to include("run: bundle update nomono")
     expect(workflow.index("Update templating bootstrap dependencies")).to be < workflow.index("[Attempt 1] Appraisal")
+
+    bootstrap_step = workflow[/      - name: Update templating bootstrap dependencies.*?(?=^      - name:)/m]
+    expect(bootstrap_step).not_to include("K_JEM_TEMPLATING")
   end
 end
