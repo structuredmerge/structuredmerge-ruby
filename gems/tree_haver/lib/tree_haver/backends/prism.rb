@@ -167,7 +167,7 @@ module TreeHaver
         # @raise [TreeHaver::NotAvailable] if prism is not available
         def initialize
           super
-          raise TreeHaver::NotAvailable, 'prism not available' unless Prism.available?
+          raise TreeHaver::NotAvailable, 'prism not available' unless TreeHaver::Backends::Prism.available?
 
           @options = {}
         end

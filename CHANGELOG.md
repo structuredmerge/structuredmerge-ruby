@@ -141,6 +141,8 @@ Please file a bug if you notice a violation of semantic versioning.
   integrations in the current process.
 - Ast-merge changed-gem CI no longer times out or fails when exercising
   isolated fixture integrations that require Prism-backed Ruby merging.
+- TreeHaver's Prism parser backend no longer depends on the removed upstream
+  `Prism.available?` API, allowing Prism 1.9+ to parse during templating.
 - Changed-gem CI suites now pass in isolated gem bundles by loading required
   adapter gems explicitly, avoiding Ruby 4 `Pathname#find` assumptions, and
   keeping Prism merge tests on the local TreeHaver capability registry.
