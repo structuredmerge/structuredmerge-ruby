@@ -1717,6 +1717,37 @@ module Kettle
           return step unless step.fetch(:status) == "ready"
 
           if step.fetch(:name) == "bootstrap_commit"
+            return execute_bootstrap_commit_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+          end
+
+          execute_unlocked_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+        end
+
+        def execute_bootstrap_commit_step(step, project_root:, env:, quiet:, command_runner:)
+          lock_path = env.fetch("KETTLE_JEM_GIT_COMMIT_LOCK", nil).to_s
+          if lock_path.empty?
+            return execute_unlocked_ready_commands_step(
+              step,
+              project_root: project_root,
+              env: env,
+              quiet: quiet,
+              command_runner: command_runner
+            )
+          end
+
+          FileUtils.mkdir_p(File.dirname(lock_path))
+          File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+            lock.flock(File::LOCK_EX)
+            execute_unlocked_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner).merge(
+              git_commit_lock: lock_path
+            )
+          ensure
+            lock&.flock(File::LOCK_UN)
+          end
+        end
+
+        def execute_unlocked_ready_commands_step(step, project_root:, env:, quiet:, command_runner:)
+          if step.fetch(:name) == "bootstrap_commit"
             dirty_entries = git_output(project_root, "status", "--porcelain").lines.map(&:chomp).reject(&:empty?)
             if dirty_entries.empty?
               return step.merge(

@@ -104,6 +104,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- `kettle-jem` bootstrap commits can now be serialized by monorepo family
+  templating, preventing concurrent member template jobs from racing while
+  updating the shared `HEAD`.
 - TreeHaver now smoke-tests `tree_sitter_language_pack` parser execution for the
   requested language before registering the TSLP backend, so broken native gem
   artifacts fail closed with a useful reason instead of surfacing parser

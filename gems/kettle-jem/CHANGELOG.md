@@ -245,6 +245,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Bootstrap commit execution now honors `KETTLE_JEM_GIT_COMMIT_LOCK` by locking
+  around the dirty recheck, `git add`, and `git commit` sequence for monorepo
+  family templating.
 - Generated license summaries now link split license detail files to the
   repository `blob/main` copy instead of packaging-relative files that are
   intentionally excluded from gem manifests.

@@ -476,6 +476,40 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
       )
       expect(git_ready.fetch(:install_steps).find { |step| step.fetch(:name) == "bootstrap_commit" }.fetch(:dirty_entries)).not_to be_empty
 
+      Dir.mktmpdir("kettle-jem-locked-bootstrap", tmp_root) do |locked_root|
+        expect(system("git", "init", locked_root, out: File::NULL, err: File::NULL)).to be(true)
+        File.write(File.join(locked_root, "tracked.txt"), "changed\n")
+        lock_path = File.join(locked_root, ".git", "kettle-family-template-commit.lock")
+        lock_observations = []
+        locked_runner = lambda do |command, chdir:, env:, quiet:|
+          commands << {command: command, chdir: chdir, env: env, quiet: quiet}
+          File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+            locked = !lock.flock(File::LOCK_EX | File::LOCK_NB)
+            lock_observations << locked if command.first == "git"
+          end
+          {success: true, exitstatus: 0, stdout: "", stderr: ""}
+        end
+
+        locked_step = Kettle::Jem::Tasks::InstallTask.send(
+          :execute_ready_commands_step,
+          {
+            name: "bootstrap_commit",
+            status: "ready",
+            dirty_entries: ["?? tracked.txt"],
+            commands: [%w[git add -A], ["git", "commit", "-m", "locked"]]
+          },
+          project_root: locked_root,
+          env: {"KETTLE_JEM_GIT_COMMIT_LOCK" => lock_path},
+          quiet: false,
+          command_runner: locked_runner
+        )
+        expect(locked_step).to include(
+          status: "succeeded",
+          git_commit_lock: lock_path
+        )
+        expect(lock_observations).to all(be(true))
+      end
+
       Dir.mktmpdir("kettle-jem-clean-bootstrap", tmp_root) do |clean_root|
         expect(system("git", "init", clean_root, out: File::NULL, err: File::NULL)).to be(true)
         stale_commit_step = Kettle::Jem::Tasks::InstallTask.send(
