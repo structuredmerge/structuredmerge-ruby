@@ -9,4 +9,10 @@ RSpec.describe TreeHaver::Backends::Prism::Parser do
 
     expect { described_class.new }.not_to raise_error
   end
+
+  it 'fails hard when the TreeHaver Prism backend is unavailable' do
+    allow(TreeHaver::Backends::Prism).to receive(:available?).and_return(false)
+
+    expect { described_class.new }.to raise_error(TreeHaver::NotAvailable, 'prism not available')
+  end
 end
