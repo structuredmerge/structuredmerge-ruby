@@ -109,6 +109,7 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Changed
 
+- Runtime dependency metadata now requires `kettle-gha-pins` 0.2.0 or newer.
 - `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
   directly for cache, GitHub ref resolution, and upgrade planning instead of
   shelling out to `kettle-gha-sha-pins`.
