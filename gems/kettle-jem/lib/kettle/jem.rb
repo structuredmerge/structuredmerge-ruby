@@ -6288,6 +6288,7 @@ module Kettle
         output = deduplicate_main_gemfile_direct_sibling_blocks(output)
         output = ensure_main_gemfile_nomono_bootstrap(output, template_content)
         output = normalize_main_gemfile_nomono_declaration(output)
+        output = deduplicate_main_gemfile_eval_gemfiles(output)
         output = guard_main_gemfile_runtime_workspace_overrides(output)
       end
       output = normalize_local_gemfile_nomono_bootstrap(output) if local_gemfile_template_recipe?(recipe)
@@ -6414,6 +6415,41 @@ module Kettle
 
     def main_gemfile_after_gemspec_line(content)
       ruby_call_records(content, :gemspec).map { |call| ruby_node_source_end_line(call) + 1 }.min
+    end
+
+    def deduplicate_main_gemfile_eval_gemfiles(content)
+      records = ruby_call_records(content, :eval_gemfile).filter_map do |call|
+        path = ruby_string_argument(call)
+        next unless path
+
+        {
+          path: path,
+          start_line: gemfile_eval_comment_start_line(content.to_s.lines, call.location.start_line),
+          end_line: ruby_node_source_end_line(call)
+        }
+      end
+      return content if records.length <= 1
+
+      seen = Set.new
+      duplicate_records = []
+      records.reverse_each do |record|
+        path = record.fetch(:path)
+        if seen.include?(path)
+          duplicate_records << record
+        else
+          seen.add(path)
+        end
+      end
+      return content if duplicate_records.empty?
+
+      duplicate_records.sort_by { |record| -record.fetch(:start_line) }.reduce(content.to_s) do |output, record|
+        replace_source_range_lines(
+          output,
+          record.fetch(:start_line),
+          expand_line_range_through_following_blanks(output, record.fetch(:end_line)),
+          ""
+        )
+      end
     end
 
     def normalize_main_gemfile_nomono_declaration(content)

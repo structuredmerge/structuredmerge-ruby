@@ -245,6 +245,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Main Gemfile templating now removes duplicate `eval_gemfile` declarations
+  for the same modular dependency file, avoiding duplicate Bundler dependency
+  warnings after repeated templating.
 - Generated templating workflows now update the root `nomono` bootstrap
   dependency before enabling `K_JEM_TEMPLATING`, so cold CI runners can install
   `nomono` before local templating gemfiles require its Bundler DSL.
