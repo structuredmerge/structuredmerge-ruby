@@ -1,12 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require "fileutils"
 require "json"
 require "open3"
 require "optparse"
-require "securerandom"
 
+require "kettle/gha/pins"
 require_relative "../lib/kettle/jem"
 
 # Repository-local maintenance tool for updating kettle-jem workflow template pins.
@@ -138,48 +137,89 @@ class KettleJemWorkflowPins
   end
 
   def resolve_updates(pins, upgrade)
-    temp_root = File.join(@project_root, "tmp", "kettle-jem-workflow-pins-#{Process.pid}-#{SecureRandom.hex(4)}")
-    workflow_dir = File.join(temp_root, ".github", "workflows")
-    FileUtils.mkdir_p(workflow_dir)
-    File.write(File.join(workflow_dir, "action-pin-index.yml"), synthetic_workflow(pins))
+    persistent_cache = Kettle::Gha::Pins::PersistentActionCache.new(
+      path: @env["KETTLE_GHA_SHA_PINS_CACHE"] || Kettle::Gha::Pins::PersistentActionCache.default_path
+    )
+    client = Kettle::Gha::Pins::GitHubClient.new(
+      token: github_token,
+      api_base: Kettle::Gha::Pins::API_BASE,
+      user_agent: "kettle-jem-workflow-pins",
+      persistent_cache: persistent_cache
+    )
+    action_versions = {}
+    planned_changes = []
+    outdated_pins = []
 
-    command = [
-      "kettle-gha-sha-pins",
-      "--root", workflow_dir,
-      "--upgrade", upgrade,
-      "--json",
-      "--no-progress"
-    ]
-    stdout, stderr, status = Open3.capture3(@env.to_hash, *command, chdir: @project_root)
-    unless status.success? || status.exitstatus == 3
-      details = [stderr, stdout].map(&:to_s).map(&:strip).reject(&:empty?).join("\n")
-      raise "kettle-gha-sha-pins failed with exit #{status.exitstatus}: #{details}"
+    pins.sort.each do |action, pin|
+      parsed = parse_pin(pin)
+      next unless parsed
+
+      repo_ref = action_repo_ref(action)
+      plan = Kettle::Gha::Pins.resolve_action_plan(
+        cache: action_versions,
+        client: client,
+        repo_ref: repo_ref,
+        old_ref: parsed.fetch(:ref),
+        upgrade_level: upgrade
+      )
+
+      if plan[:updates]
+        planned_changes << {
+          "action" => repo_ref,
+          "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+          "old_ref" => parsed.fetch(:ref),
+          "old_version" => plan[:current_version],
+          "new_ref" => plan[:updates][:sha],
+          "new_version" => plan[:updates][:version],
+          "reason" => plan[:updates][:reason]
+        }
+      end
+
+      next unless plan[:is_outdated]
+
+      latest_outdated = plan[:latest_outdated]
+      outdated_pins << {
+        "action" => repo_ref,
+        "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+        "old_ref" => parsed.fetch(:ref),
+        "old_version" => plan[:current_version],
+        "new_ref" => latest_outdated ? latest_outdated[:sha] : nil,
+        "new_version" => latest_outdated ? latest_outdated[:version] : nil,
+        "upgrade_level" => upgrade,
+        "reason" => plan[:reason]
+      }
     end
 
-    JSON.parse(stdout)
-  ensure
-    FileUtils.rm_rf(temp_root) if temp_root && File.directory?(temp_root)
+    {
+      "planned_changes" => planned_changes,
+      "outdated_pins" => outdated_pins
+    }
   end
 
-  def synthetic_workflow(pins)
-    steps = pins.sort.map.with_index do |(action, pin), index|
-      <<~YAML
-        - name: #{action}
-          id: action_#{index}
-          uses: #{pin}
-      YAML
-    end.join
-    indented_steps = steps.lines.map { |line| "      #{line}" }.join
+  def parse_pin(pin)
+    value = pin.to_s.strip
+    old_value, _comment = value.split(/[ \t]+#/, 2)
+    action, separator, ref = old_value.rpartition("@")
+    return nil unless separator == "@" && !action.empty? && !ref.empty?
 
-    <<~YAML
-      name: kettle-jem action pin index
-      on: workflow_dispatch
-      jobs:
-        pins:
-          runs-on: ubuntu-latest
-          steps:
-      #{indented_steps}
-    YAML
+    {action: action, ref: ref}
+  end
+
+  def action_repo_ref(action)
+    action.to_s.split("/").first(2).join("/")
+  end
+
+  def github_token
+    token = @env["GITHUB_TOKEN"] || @env["GH_TOKEN"]
+    return token unless token.to_s.empty?
+
+    stdout, _stderr, status = Open3.capture3(@env.to_hash, "gh", "auth", "token", chdir: @project_root)
+    return nil unless status.success?
+
+    token = stdout.to_s.strip
+    token.empty? ? nil : token
+  rescue Errno::ENOENT
+    nil
   end
 
   def replacement_map(planned_changes, pins)

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "psych"
-
 load File.expand_path("../../bin/kettle-jem-workflow-pins", __dir__)
 
 RSpec.describe KettleJemWorkflowPins do
@@ -12,6 +10,24 @@ RSpec.describe KettleJemWorkflowPins do
   let(:new_pin) { "actions/checkout@#{new_sha} # v1.0.1" }
   let(:pin_index_path) { File.join(project_root, "lib", "kettle", "jem.rb") }
   let(:workflow_path) { File.join(project_root, "lib", "kettle", "jem", "templates", ".github", "workflows", "ci.yml.example") }
+  let(:env) { {"GITHUB_TOKEN" => "token"} }
+  let(:client) { instance_double(Kettle::Gha::Pins::GitHubClient) }
+  let(:resolver_plan) do
+    {
+      is_outdated: true,
+      current_version: "1.0.0",
+      latest_outdated: {
+        sha: new_sha,
+        version: "1.0.1"
+      },
+      reason: Kettle::Gha::Pins::UPGRADE_REASON,
+      updates: {
+        sha: new_sha,
+        version: "1.0.1",
+        reason: Kettle::Gha::Pins::UPGRADE_REASON
+      }
+    }
+  end
 
   before do
     FileUtils.mkdir_p(File.dirname(pin_index_path))
@@ -19,31 +35,8 @@ RSpec.describe KettleJemWorkflowPins do
     File.write(pin_index_path, %(def github_actions_step_pins\n  {"actions/checkout" => "#{old_pin}"}\nend\n))
     File.write(workflow_path, "steps:\n  - uses: #{old_pin}\n")
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => old_pin})
-    allow(Open3).to receive(:capture3) do |_env, *command, chdir:|
-      root_arg = command.fetch(command.index("--root") + 1)
-      synthetic_workflow = File.read(File.join(root_arg, "action-pin-index.yml"))
-
-      expect(chdir).to eq(project_root)
-      expect(command).not_to include("--cache-path")
-      expect(command.fetch(command.index("--upgrade") + 1)).to eq("major")
-      expect { Psych.parse_stream(synthetic_workflow) }.not_to raise_error
-      expect(synthetic_workflow).to include("      - name: actions/checkout\n")
-
-      [
-        JSON.generate(
-          "planned_changes" => [
-            {
-              "action" => "actions/checkout",
-              "new_ref" => new_sha,
-              "new_version" => "1.0.1"
-            }
-          ],
-          "outdated_pins" => []
-        ),
-        "",
-        instance_double(Process::Status, success?: true, exitstatus: 0)
-      ]
-    end
+    allow(Kettle::Gha::Pins::GitHubClient).to receive(:new).and_return(client)
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(resolver_plan)
   end
 
   after do
@@ -57,11 +50,18 @@ RSpec.describe KettleJemWorkflowPins do
   end
 
   it "updates the pin index and workflow examples by action key" do
-    result = described_class.new(project_root: project_root, options: {write: true}).run
+    result = described_class.new(project_root: project_root, env: env, options: {write: true}).run
 
     expect(result[:updated_actions]).to eq(["actions/checkout"])
     expect(File.read(pin_index_path)).to include(new_pin)
     expect(File.read(workflow_path)).to include("uses: #{new_pin}")
+    expect(Kettle::Gha::Pins).to have_received(:resolve_action_plan).with(
+      cache: {},
+      client: client,
+      repo_ref: "actions/checkout",
+      old_ref: old_sha,
+      upgrade_level: "major"
+    )
   end
 
   it "preserves Ruby source delimiters around pins when writing updates" do
@@ -80,7 +80,7 @@ RSpec.describe KettleJemWorkflowPins do
       end
     RUBY
 
-    result = described_class.new(project_root: project_root, options: {write: true}).run
+    result = described_class.new(project_root: project_root, env: env, options: {write: true}).run
     updated = File.read(pin_index_path)
 
     expect(result[:updated_actions]).to eq(["actions/checkout"])
@@ -88,7 +88,7 @@ RSpec.describe KettleJemWorkflowPins do
     expect(updated).to include(%("actions/checkout" => "#{new_pin}"))
   end
 
-  it "updates sub-action pins when kettle-gha-sha-pins reports the parent action repository" do
+  it "updates sub-action pins through the parent action repository" do
     sub_action = "github/codeql-action/init"
     old_sub_pin = "#{sub_action}@#{old_sha} # v4.36.0"
     new_sub_pin = "#{sub_action}@#{new_sha} # v4.36.2"
@@ -96,27 +96,30 @@ RSpec.describe KettleJemWorkflowPins do
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({sub_action => old_sub_pin})
     File.write(pin_index_path, %(def github_actions_step_pins\n  {"#{sub_action}" => "#{old_sub_pin}"}\nend\n))
     File.write(workflow_path, "steps:\n  - uses: #{old_sub_pin}\n")
-    allow(Open3).to receive(:capture3).and_return([
-      JSON.generate(
-        "planned_changes" => [
-          {
-            "action" => "github/codeql-action",
-            "old_value" => "#{sub_action}@#{old_sha}",
-            "new_ref" => new_sha,
-            "new_version" => "4.36.2"
-          }
-        ],
-        "outdated_pins" => []
-      ),
-      "",
-      instance_double(Process::Status, success?: true, exitstatus: 0)
-    ])
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(
+      resolver_plan.merge(
+        current_version: "4.36.0",
+        latest_outdated: {sha: new_sha, version: "4.36.2"},
+        updates: {
+          sha: new_sha,
+          version: "4.36.2",
+          reason: Kettle::Gha::Pins::UPGRADE_REASON
+        }
+      )
+    )
 
-    result = described_class.new(project_root: project_root, options: {write: true}).run
+    result = described_class.new(project_root: project_root, env: env, options: {write: true}).run
 
     expect(result[:updated_actions]).to eq([sub_action])
     expect(File.read(pin_index_path)).to include(new_sub_pin)
     expect(File.read(workflow_path)).to include("uses: #{new_sub_pin}")
+    expect(Kettle::Gha::Pins).to have_received(:resolve_action_plan).with(
+      cache: {},
+      client: client,
+      repo_ref: "github/codeql-action",
+      old_ref: old_sha,
+      upgrade_level: "major"
+    )
   end
 
   it "fails check mode when template sources drift from the canonical pin index" do
@@ -126,14 +129,12 @@ RSpec.describe KettleJemWorkflowPins do
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => canonical_pin})
     File.write(pin_index_path, %(def github_actions_step_pins\n  {"actions/checkout" => "#{canonical_pin}"}\nend\n))
     File.write(workflow_path, "steps:\n  - uses: #{stale_pin}\n")
-    allow(Open3).to receive(:capture3).and_return([
-      JSON.generate("planned_changes" => [], "outdated_pins" => []),
-      "",
-      instance_double(Process::Status, success?: true, exitstatus: 0)
-    ])
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(
+      {is_outdated: false, current_version: nil, latest_outdated: nil, reason: nil, updates: nil}
+    )
 
     expect {
-      described_class.new(project_root: project_root, options: {check: true}).run
+      described_class.new(project_root: project_root, env: env, options: {check: true}).run
     }.to raise_error(RuntimeError, /GitHub Actions pins are stale/)
   end
 
@@ -144,28 +145,26 @@ RSpec.describe KettleJemWorkflowPins do
     allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"actions/checkout" => canonical_pin})
     File.write(pin_index_path, %(def github_actions_step_pins\n  {"actions/checkout" => "#{canonical_pin}"}\nend\n))
     File.write(workflow_path, "steps:\n  - uses: #{stale_pin}\n")
-    allow(Open3).to receive(:capture3).and_return([
-      JSON.generate("planned_changes" => [], "outdated_pins" => []),
-      "",
-      instance_double(Process::Status, success?: true, exitstatus: 0)
-    ])
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(
+      {is_outdated: false, current_version: nil, latest_outdated: nil, reason: nil, updates: nil}
+    )
 
-    result = described_class.new(project_root: project_root, options: {write: true}).run
+    result = described_class.new(project_root: project_root, env: env, options: {write: true}).run
 
     expect(result[:updated_actions]).to eq(["actions/checkout"])
     expect(File.read(pin_index_path)).to include(canonical_pin)
     expect(File.read(workflow_path)).to include("uses: #{canonical_pin}")
   end
 
-  it "includes stdout diagnostics when kettle-gha-sha-pins fails without stderr" do
-    allow(Open3).to receive(:capture3).and_return([
-      JSON.generate("errors" => [{"error" => "yaml_parse_error"}]),
-      "",
-      instance_double(Process::Status, success?: false, exitstatus: 2)
-    ])
+  it "uses gh auth token as a fallback when token env vars are absent" do
+    allow(Open3).to receive(:capture3).with({}, "gh", "auth", "token", chdir: project_root).and_return(
+      ["gh-token\n", "", instance_double(Process::Status, success?: true)]
+    )
 
-    expect {
-      described_class.new(project_root: project_root).run
-    }.to raise_error(RuntimeError, /kettle-gha-sha-pins failed with exit 2: .*yaml_parse_error/m)
+    described_class.new(project_root: project_root, env: {}).run
+
+    expect(Kettle::Gha::Pins::GitHubClient).to have_received(:new).with(
+      hash_including(token: "gh-token", user_agent: "kettle-jem-workflow-pins")
+    )
   end
 end
