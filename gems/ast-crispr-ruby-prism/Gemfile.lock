@@ -6,22 +6,6 @@ PATH
       prism-merge (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
-PATH
-  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/ast-crispr
-  specs:
-    ast-crispr (7.1.0)
-      ast-merge (= 7.1.0)
-      service_actor (~> 3.9)
-      version_gem (~> 1.1, >= 1.1.9)
-
-PATH
-  remote: /var/home/pboling/src/my/structuredmerge/ruby/gems/prism-merge
-  specs:
-    prism-merge (7.1.0)
-      prism (~> 1.6)
-      ruby-merge (= 7.1.0)
-      version_gem (~> 1.1, >= 1.1.9)
-
 GEM
   remote: https://gem.coop/
   specs:
@@ -37,6 +21,10 @@ GEM
       rubocop (>= 1.0)
       version_gem (~> 1.1, >= 1.1.14)
     ast (2.4.3)
+    ast-crispr (7.1.0)
+      ast-merge (= 7.1.0)
+      service_actor (~> 3.9)
+      version_gem (~> 1.1, >= 1.1.9)
     ast-merge (7.1.0)
       benchmark
       token-resolver (~> 2.0, >= 2.0.4)
@@ -162,6 +150,10 @@ GEM
       prettyprint
     prettyprint (0.2.0)
     prism (1.9.0)
+    prism-merge (7.1.0)
+      prism (~> 1.6)
+      ruby-merge (= 7.1.0)
+      version_gem (~> 1.1, >= 1.1.9)
     psych (5.4.0)
       date
       stringio
@@ -408,7 +400,6 @@ DEPENDENCIES
   addressable (>= 2.8, < 3)
   appraisal2 (~> 3.0, >= 3.0.6)
   appraisal2-rubocop (~> 1.0, >= 1.0.0)
-  ast-crispr!
   ast-crispr-ruby-prism!
   benchmark (~> 0.5, >= 0.5.0)
   bundler-audit (~> 0.9.3)
@@ -425,7 +416,6 @@ DEPENDENCIES
   kramdown-parser-gfm (~> 1.1)
   mutex_m (~> 0.2)
   nomono (~> 1.1, >= 1.1.0)
-  prism-merge!
   rake (~> 13.0)
   rbs (>= 3.0)
   rdoc (~> 6.11)
