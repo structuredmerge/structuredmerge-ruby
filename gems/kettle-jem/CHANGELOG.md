@@ -128,6 +128,9 @@ Please file a bug if you notice a violation of semantic versioning.
   by default, with `--no-commit` available for uncommitted writes.
 - `kettle-jem-workflow-pins` now detects and updates stale version comments
   when a pinned GitHub Action SHA is already current.
+- Generated Kettle local Gemfiles now resolve `KETTLE_DEV_DEV=true` to the
+  `kettle-dev` workspace family root instead of sibling directories directly
+  under `~/src/my`.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.1 or newer.
 - `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
   directly for cache, GitHub ref resolution, and upgrade planning instead of

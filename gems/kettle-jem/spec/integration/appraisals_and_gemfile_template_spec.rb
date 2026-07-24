@@ -1319,6 +1319,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include("nomono_lockfile")
       expect(content).not_to include("Bundler::LockfileParser")
       expect(content).not_to include('Kernel.send(:gem, "nomono"')
+      expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
   end
 
@@ -1353,6 +1354,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content).not_to include("nomono_activation_requirements")
       expect(content).not_to include("nomono_lockfile")
       expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).to include('root: ["src", "my", "kettle-dev"]')
     end
   end
 

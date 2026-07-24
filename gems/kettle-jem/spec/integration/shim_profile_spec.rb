@@ -105,6 +105,7 @@ RSpec.describe Kettle::Jem, "shim profile templating" do
       expect(generated[:Gemfile]).not_to include("git:")
       expect_gem_dependency_declared(generated[:"gemfiles/modular/templating.gemfile"], "kettle-jem")
       expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include(%(structuredmerge_local_gems = %w[))
+      expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include('root: ["src", "my", "kettle-dev"]')
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
       expect(generated[:"lib/legacy/strategies/shim.rb"]).to include(%(require "legacy/shim"))
