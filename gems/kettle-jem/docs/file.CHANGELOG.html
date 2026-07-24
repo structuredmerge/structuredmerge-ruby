@@ -177,6 +177,12 @@ runs while preserving version-only output for <code>version</code>, <code>-v</co
 <code>kettle-jem-deps-floor --write</code> now commits its managed dependency floor<br>
 updates by default, with <code>--no-commit</code> available for callers that need the<br>
 previous uncommitted write behavior.</li>
+  <li>
+<code>kettle-jem-deps-floor</code> now labels text reports with dry-run/write mode and<br>
+prints the exact <code>--write</code> hint when stale floors are found in dry-run mode.</li>
+  <li>
+<code>kettle-jem-deps-floor --write</code> now stages dependency floor updates correctly<br>
+when <code>kettle-jem</code> is nested below a monorepo Git worktree root.</li>
   <li>Runtime dependency metadata now requires <code>kettle-gha-pins</code> 0.3.1 or newer.</li>
   <li>
 <code>bin/kettle-jem-workflow-pins</code> now calls the shared <code>kettle-gha-pins</code> API<br>
@@ -1104,7 +1110,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jul 23 20:51:51 2026 by
+  Generated on Thu Jul 23 21:27:26 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

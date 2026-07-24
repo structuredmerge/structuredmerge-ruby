@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "open3"
+require "stringio"
 
 load File.expand_path("../../bin/kettle-jem-deps-floor", __dir__)
 
@@ -160,6 +161,20 @@ RSpec.describe KettleJemDepsFloor do
     expect(read_file("template/valid.gemfile.example")).to include('gem "example_dep", "~> 1.2", ">= 1.2.3"')
   end
 
+  it "prints dry-run mode and a write hint when stale floors are found" do
+    out = StringIO.new
+    err = StringIO.new
+    allow(described_class).to receive(:new)
+      .and_return(described_class.new(project_root: project_root, resolver: resolver, options: {upgrade: "patch"}))
+
+    status = described_class.run(%w[--upgrade patch], out: out, err: err)
+
+    expect(status).to eq(0)
+    expect(out.string).to include("deps-floor: mode=dry-run upgrade=patch")
+    expect(out.string).to include("hint: rerun with --write --upgrade patch")
+    expect(err.string).to eq("")
+  end
+
   it "updates parseable Ruby and tokenized template files when writing" do
     result = described_class.new(project_root: project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
 
@@ -190,6 +205,37 @@ RSpec.describe KettleJemDepsFloor do
     )
     expect(git_status).to eq("")
     expect(git_subject).to eq("⬆️ Raise kettle-jem dependency floors")
+  end
+
+  it "commits written updates from a project nested below the git worktree root" do
+    monorepo_root = Dir.mktmpdir
+    nested_project_root = File.join(monorepo_root, "gems", "kettle-jem")
+    FileUtils.mkdir_p(nested_project_root)
+    begin
+      described_class::SOURCE_GLOBS.each do |pattern|
+        source = File.join(project_root, pattern)
+        next unless File.file?(source)
+
+        destination = File.join(nested_project_root, pattern)
+        FileUtils.mkdir_p(File.dirname(destination))
+        FileUtils.cp(source, destination)
+      end
+      run_git("init", monorepo_root)
+      run_git("-C", monorepo_root, "config", "user.name", "Spec User")
+      run_git("-C", monorepo_root, "config", "user.email", "spec@example.com")
+      run_git("-C", monorepo_root, "add", ".")
+      run_git("-C", monorepo_root, "commit", "-m", "initial")
+
+      result = described_class.new(project_root: nested_project_root, resolver: resolver, options: {write: true, upgrade: "minor"}).run
+      stdout, _stderr, status = Open3.capture3("git", "-C", monorepo_root, "status", "--short")
+
+      expect(result[:commit]).to include(status: "committed")
+      expect(result[:commit].fetch(:files)).to include("lib/embedded.rb")
+      expect(stdout).to eq("")
+      expect(status).to be_success
+    ensure
+      FileUtils.rm_rf(monorepo_root)
+    end
   end
 
   it "leaves written updates uncommitted when commit is disabled" do

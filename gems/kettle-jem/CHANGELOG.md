@@ -117,6 +117,10 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem-deps-floor --write` now commits its managed dependency floor
   updates by default, with `--no-commit` available for callers that need the
   previous uncommitted write behavior.
+- `kettle-jem-deps-floor` now labels text reports with dry-run/write mode and
+  prints the exact `--write` hint when stale floors are found in dry-run mode.
+- `kettle-jem-deps-floor --write` now stages dependency floor updates correctly
+  when `kettle-jem` is nested below a monorepo Git worktree root.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.1 or newer.
 - `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
   directly for cache, GitHub ref resolution, and upgrade planning instead of

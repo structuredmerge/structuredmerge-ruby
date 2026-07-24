@@ -46,6 +46,7 @@ class KettleJemDepsFloor
     if options[:json]
       out.puts(JSON.pretty_generate(result))
     else
+      out.puts("deps-floor: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("deps-floor: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:planned_changes, []).each do |change|
         out.puts(
@@ -56,6 +57,8 @@ class KettleJemDepsFloor
       end
       if result[:commit]
         out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      elsif !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
+        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
     end
     0
@@ -362,7 +365,7 @@ class KettleJemDepsFloor
     changed_paths = dirty_paths(relative_paths)
     return {status: "clean_noop", reason: "no_file_changes"} if changed_paths.empty?
 
-    run_git!("add", "--", *changed_paths)
+    run_git!("add", "--", *changed_paths.map { |path| worktree_relative_path(path) })
     run_git!("commit", "-m", "⬆️ Raise kettle-jem dependency floors")
     {status: "committed", files: changed_paths}
   end
@@ -372,20 +375,44 @@ class KettleJemDepsFloor
   end
 
   def git_repository?
-    stdout, _stderr, status = Open3.capture3("git", "rev-parse", "--show-toplevel", chdir: project_root)
-    status.success? && !stdout.strip.empty?
+    !!git_worktree_root
   end
 
   def dirty_paths(relative_paths)
     stdout, _stderr, _status = Open3.capture3("git", "status", "--porcelain", "--", *relative_paths, chdir: project_root)
-    stdout.lines.map { |line| line[3..].to_s.chomp }.reject(&:empty?)
+    stdout.lines.filter_map do |line|
+      path = line[3..].to_s.chomp
+      next if path.empty?
+
+      project_relative_path(path)
+    end
   end
 
   def run_git!(*args)
-    stdout, stderr, status = Open3.capture3("git", *args, chdir: project_root)
+    stdout, stderr, status = Open3.capture3("git", *args, chdir: git_worktree_root || project_root)
     return stdout if status.success?
 
     raise "git #{args.join(" ")} failed: #{stderr.empty? ? stdout : stderr}"
+  end
+
+  def git_worktree_root
+    stdout, _stderr, status = Open3.capture3("git", "rev-parse", "--show-toplevel", chdir: project_root)
+    return unless status.success?
+
+    stdout.strip unless stdout.strip.empty?
+  end
+
+  def project_relative_path(path)
+    return path if File.file?(File.join(project_root, path))
+
+    absolute_path = File.expand_path(path, git_worktree_root || project_root)
+    Pathname(absolute_path).relative_path_from(Pathname(project_root)).to_s
+  rescue ArgumentError
+    path
+  end
+
+  def worktree_relative_path(path)
+    Pathname(File.join(project_root, path)).relative_path_from(Pathname(git_worktree_root || project_root)).to_s
   end
 
   def serializable_change(change)
