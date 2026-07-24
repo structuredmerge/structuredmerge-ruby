@@ -183,6 +183,13 @@ prints the exact <code>--write</code> hint when stale floors are found in dry-ru
   <li>
 <code>kettle-jem-deps-floor --write</code> now stages dependency floor updates correctly<br>
 when <code>kettle-jem</code> is nested below a monorepo Git worktree root.</li>
+  <li>
+<code>kettle-jem-workflow-pins</code> now labels text reports with dry-run/write mode<br>
+and prints the exact <code>--write</code> hint when stale workflow pins are found in<br>
+dry-run mode.</li>
+  <li>
+<code>kettle-jem-workflow-pins --write</code> now commits managed workflow pin updates<br>
+by default, with <code>--no-commit</code> available for uncommitted writes.</li>
   <li>Runtime dependency metadata now requires <code>kettle-gha-pins</code> 0.3.1 or newer.</li>
   <li>
 <code>bin/kettle-jem-workflow-pins</code> now calls the shared <code>kettle-gha-pins</code> API<br>
@@ -1110,7 +1117,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jul 23 21:27:26 2026 by
+  Generated on Thu Jul 23 21:40:35 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

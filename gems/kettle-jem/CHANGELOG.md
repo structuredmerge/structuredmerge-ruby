@@ -124,6 +124,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem-workflow-pins` now labels text reports with dry-run/write mode
   and prints the exact `--write` hint when stale workflow pins are found in
   dry-run mode.
+- `kettle-jem-workflow-pins --write` now commits managed workflow pin updates
+  by default, with `--no-commit` available for uncommitted writes.
 - Runtime dependency metadata now requires `kettle-gha-pins` 0.3.1 or newer.
 - `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
   directly for cache, GitHub ref resolution, and upgrade planning instead of

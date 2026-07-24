@@ -45,10 +45,43 @@ RSpec.describe KettleJemWorkflowPins do
     FileUtils.rm_rf(project_root)
   end
 
+  def init_git_repository(root = project_root)
+    run_git("init", root)
+    run_git("-C", root, "config", "user.name", "Spec User")
+    run_git("-C", root, "config", "user.email", "spec@example.com")
+    run_git("-C", root, "add", ".")
+    run_git("-C", root, "commit", "-m", "initial")
+  end
+
+  def run_git(*args)
+    _stdout, stderr, status = Open3.capture3("git", *args)
+    raise stderr unless status.success?
+  end
+
+  def git_status(root = project_root)
+    stdout, _stderr, status = Open3.capture3("git", "-C", root, "status", "--short")
+    raise "git status failed" unless status.success?
+
+    stdout
+  end
+
+  def git_subject(root = project_root)
+    stdout, _stderr, status = Open3.capture3("git", "-C", root, "log", "-1", "--format=%s")
+    raise "git log failed" unless status.success?
+
+    stdout.chomp
+  end
+
   it "defaults the project root to the gem root relative to the bin script" do
     options = described_class.parse_options([])
 
     expect(options.fetch(:project_root)).to eq(File.expand_path("../..", __dir__))
+  end
+
+  it "allows workflow pin writes to opt out of default commits" do
+    options = described_class.parse_options(%w[--write --no-commit])
+
+    expect(options).to include(write: true, commit: false)
   end
 
   it "updates the pin index and workflow examples by action key" do
@@ -79,6 +112,62 @@ RSpec.describe KettleJemWorkflowPins do
     expect(out.string).to include("workflow-pins: 1 update")
     expect(out.string).to include("hint: rerun with --write --upgrade patch")
     expect(err.string).to eq("")
+  end
+
+  it "commits written updates by default inside git repositories" do
+    init_git_repository
+
+    result = described_class.new(project_root: project_root, env: env, options: {write: true}).run
+
+    expect(result[:commit]).to include(status: "committed")
+    expect(result[:commit].fetch(:files)).to include(
+      "lib/kettle/jem.rb",
+      "lib/kettle/jem/templates/.github/workflows/ci.yml.example"
+    )
+    expect(git_status).to eq("")
+    expect(git_subject).to eq("📌 Update kettle-jem workflow pins")
+  end
+
+  it "leaves written updates uncommitted when commit is disabled" do
+    init_git_repository
+
+    result = described_class.new(project_root: project_root, env: env, options: {write: true, commit: false}).run
+
+    expect(result[:commit]).to be_nil
+    expect(git_status).to include(" M lib/kettle/jem.rb")
+    expect(git_status).to include(" M lib/kettle/jem/templates/.github/workflows/ci.yml.example")
+  end
+
+  it "refuses to commit when target files were already dirty before writing" do
+    init_git_repository
+    File.write(workflow_path, "#{File.read(workflow_path)}# local edit\n")
+
+    expect {
+      described_class.new(project_root: project_root, env: env, options: {write: true}).run
+    }.to raise_error(RuntimeError, /target files were already dirty/)
+  end
+
+  it "commits written updates from a project nested below the git worktree root" do
+    monorepo_root = Dir.mktmpdir
+    nested_project_root = File.join(monorepo_root, "gems", "kettle-jem")
+    nested_pin_index_path = File.join(nested_project_root, "lib", "kettle", "jem.rb")
+    nested_workflow_path = File.join(nested_project_root, "lib", "kettle", "jem", "templates", ".github", "workflows", "ci.yml.example")
+    begin
+      FileUtils.mkdir_p(File.dirname(nested_pin_index_path))
+      FileUtils.mkdir_p(File.dirname(nested_workflow_path))
+      FileUtils.cp(pin_index_path, nested_pin_index_path)
+      FileUtils.cp(workflow_path, nested_workflow_path)
+      init_git_repository(monorepo_root)
+
+      result = described_class.new(project_root: nested_project_root, env: env, options: {write: true}).run
+
+      expect(result[:commit]).to include(status: "committed")
+      expect(result[:commit].fetch(:files)).to include("lib/kettle/jem.rb")
+      expect(git_status(monorepo_root)).to eq("")
+      expect(git_subject(monorepo_root)).to eq("📌 Update kettle-jem workflow pins")
+    ensure
+      FileUtils.rm_rf(monorepo_root)
+    end
   end
 
   it "preserves Ruby source delimiters around pins when writing updates" do

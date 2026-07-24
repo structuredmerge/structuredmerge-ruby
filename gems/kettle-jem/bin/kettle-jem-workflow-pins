@@ -4,6 +4,7 @@
 require "json"
 require "open3"
 require "optparse"
+require "pathname"
 
 require "kettle/gha/pins"
 require_relative "../lib/kettle/jem"
@@ -21,6 +22,7 @@ class KettleJemWorkflowPins
     @options = {
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }.merge(options.transform_keys(&:to_sym))
@@ -35,8 +37,11 @@ class KettleJemWorkflowPins
       out.puts("workflow-pins: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:updated_actions, []).each { |action| out.puts("  #{action}") }
+      if result[:commit]
+        out.puts("commit: #{result.fetch(:commit).fetch(:status)}")
+      end
       if !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
-        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply these updates")
+        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply and commit these updates")
       end
     end
     0
@@ -54,6 +59,7 @@ class KettleJemWorkflowPins
       project_root: DEFAULT_PROJECT_ROOT,
       write: false,
       check: false,
+      commit: true,
       json: false,
       upgrade: DEFAULT_UPGRADE_LEVEL
     }
@@ -66,9 +72,10 @@ class KettleJemWorkflowPins
 
   def self.parser
     OptionParser.new do |opts|
-      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--upgrade LEVEL]"
+      opts.banner = "Usage: bin/kettle-jem-workflow-pins [PROJECT_ROOT] [--json] [--write] [--check] [--commit|--no-commit] [--upgrade LEVEL]"
       opts.on("-w", "--write", "Write updates to kettle-jem template sources.") { |value| value }
       opts.on("--check", "Fail when template workflow pins are stale.") { |value| value }
+      opts.on("--[no-]commit", "Commit written updates (default with --write).") { |value| value }
       opts.on("--json", "Print the machine-readable report as JSON.") { |value| value }
       opts.on("--upgrade LEVEL", "Upgrade strategy: major, minor, patch (default: #{DEFAULT_UPGRADE_LEVEL})") { |value| value }
     end
@@ -89,7 +96,12 @@ class KettleJemWorkflowPins
     source_pin_replacements(pins, desired_pins_by_action(pins, replacements)).each do |old_pin, replacement|
       replacements[old_pin] = replacement
     end
-    apply_replacements(replacements.values) if @options[:write] && replacements.any?
+    if @options[:write] && replacements.any?
+      target_paths = replacement_target_paths(replacements.values)
+      preexisting_dirty_paths = preexisting_dirty_target_paths(target_paths)
+      apply_replacements(replacements.values)
+      commit_result = commit_changes(target_paths, preexisting_dirty_paths) if @options[:commit]
+    end
 
     if @options[:check] && replacements.any?
       raise "GitHub Actions pins are stale; run bin/kettle-jem-workflow-pins --write --upgrade #{upgrade}"
@@ -102,6 +114,7 @@ class KettleJemWorkflowPins
       pin_count: pins.length,
       updates: replacements.length,
       updated_actions: replacements.values.map { |replacement| replacement.fetch(:action) }.uniq.sort,
+      commit: commit_result,
       planned_changes: report.fetch("planned_changes", []),
       outdated_pins: report.fetch("outdated_pins", [])
     }
@@ -288,6 +301,77 @@ class KettleJemWorkflowPins
       end
       File.write(path, updated) if updated != original
     end
+  end
+
+  def replacement_target_paths(replacements)
+    return [] if replacements.empty?
+
+    source_paths.select do |path|
+      original = File.read(path)
+      replacements.any? { |replacement| original.include?(replacement.fetch(:old_pin)) }
+    end.map { |path| project_relative_path(path) }.uniq.sort
+  end
+
+  def preexisting_dirty_target_paths(relative_paths)
+    return [] if relative_paths.empty? || !git_repository?
+
+    dirty_paths(relative_paths)
+  end
+
+  def commit_changes(relative_paths, preexisting_dirty_paths)
+    return {status: "skipped", reason: "no_updates"} if relative_paths.empty?
+    return {status: "unavailable", reason: "not_git_repository"} unless git_repository?
+    unless preexisting_dirty_paths.empty?
+      raise "Refusing to commit workflow pin updates because target files were already dirty: #{preexisting_dirty_paths.join(", ")}"
+    end
+
+    changed_paths = dirty_paths(relative_paths)
+    return {status: "clean_noop", reason: "no_file_changes"} if changed_paths.empty?
+
+    run_git!("add", "--", *changed_paths.map { |path| worktree_relative_path(path) })
+    run_git!("commit", "-m", "📌 Update kettle-jem workflow pins")
+    {status: "committed", files: changed_paths}
+  end
+
+  def git_repository?
+    !!git_worktree_root
+  end
+
+  def dirty_paths(relative_paths)
+    stdout, _stderr, _status = Open3.capture3("git", "status", "--porcelain", "--", *relative_paths, chdir: @project_root)
+    stdout.lines.filter_map do |line|
+      path = line[3..].to_s.chomp
+      next if path.empty?
+
+      project_relative_path(path)
+    end
+  end
+
+  def run_git!(*args)
+    stdout, stderr, status = Open3.capture3("git", *args, chdir: git_worktree_root || @project_root)
+    return stdout if status.success?
+
+    raise "git #{args.join(" ")} failed: #{stderr.empty? ? stdout : stderr}"
+  end
+
+  def git_worktree_root
+    stdout, _stderr, status = Open3.capture3("git", "rev-parse", "--show-toplevel", chdir: @project_root)
+    return unless status.success?
+
+    stdout.strip unless stdout.strip.empty?
+  end
+
+  def project_relative_path(path)
+    return path if File.file?(File.join(@project_root, path))
+
+    absolute_path = (File.absolute_path(path) == path) ? path : File.expand_path(path, git_worktree_root || @project_root)
+    Pathname(absolute_path).relative_path_from(Pathname(@project_root)).to_s
+  rescue ArgumentError
+    path
+  end
+
+  def worktree_relative_path(path)
+    Pathname(File.join(@project_root, path)).relative_path_from(Pathname(git_worktree_root || @project_root)).to_s
   end
 end
 
