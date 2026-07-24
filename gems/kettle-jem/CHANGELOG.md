@@ -117,9 +117,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem-deps-floor --write` now commits its managed dependency floor
   updates by default, with `--no-commit` available for callers that need the
   previous uncommitted write behavior.
-- Runtime dependency metadata now requires `kettle-gha-pins` 0.2.1 or newer so
-  generated workflow pin tooling can rely on the corrected Ruby floor.
-- Runtime dependency metadata now requires `kettle-gha-pins` 0.2.0 or newer.
+- Runtime dependency metadata now requires `kettle-gha-pins` 0.3.1 or newer.
 - `bin/kettle-jem-workflow-pins` now calls the shared `kettle-gha-pins` API
   directly for cache, GitHub ref resolution, and upgrade planning instead of
   shelling out to `kettle-gha-sha-pins`.
@@ -250,6 +248,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- The `kettle-jem` executable now uses normal `require` loading and suppresses
+  its startup header for `--json` / `--events` machine-readable output.
 - Generated MRI 2.4 through 2.7 workflows now bypass `ruby/setup-ruby`
   Bundler caching and run an explicit bundle install, avoiding `bundle lock`
   failures against gem.coop's missing legacy specs index.

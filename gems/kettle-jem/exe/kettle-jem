@@ -2,15 +2,19 @@
 # frozen_string_literal: true
 
 script_basename = File.basename(__FILE__)
-require_relative "../lib/kettle/jem/version"
+repo_lib = File.expand_path("../lib", __dir__)
+$LOAD_PATH.unshift(repo_lib) if File.directory?(repo_lib) && !$LOAD_PATH.include?(repo_lib)
+
+require "kettle/jem/version"
 
 if ARGV.first == "version" || ARGV.any? { |arg| arg == "-v" || arg == "--version" }
   puts Kettle::Jem::Version::VERSION
   exit(0)
 end
 
-require_relative "../lib/kettle-jem"
+require "kettle-jem"
 
-puts "== #{script_basename} v#{Kettle::Jem::Version::VERSION} =="
+machine_output = ARGV.any? { |arg| arg == "--json" || arg.start_with?("--events") }
+puts "== #{script_basename} v#{Kettle::Jem::Version::VERSION} ==" unless machine_output
 
 exit(Kettle::Jem::CLI.run(ARGV, env: ENV, out: $stdout, err: $stderr))
