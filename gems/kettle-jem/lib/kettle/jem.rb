@@ -15463,7 +15463,7 @@ module Kettle
     def github_actions_setup_ruby_steps(indent:)
       yaml = <<~YAML
         - name: Setup Ruby & RubyGems
-          uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0
+          uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
           with:
             ruby-version: "${{ matrix.ruby }}"
             rubygems: "${{ matrix.rubygems }}"
@@ -15574,7 +15574,7 @@ module Kettle
         "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "",
         "      - name: Setup Ruby & RubyGems",
-        "        uses: ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0",
+        "        uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
         "        with:",
         "          ruby-version: \"${{ matrix.ruby }}\"",
         "          rubygems: \"${{ matrix.rubygems }}\"",
@@ -16012,7 +16012,7 @@ module Kettle
       {
         "actions/checkout" => "actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
         "actions/cache" => "actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0",
-        "ruby/setup-ruby" => "ruby/setup-ruby@a30dfa457ad68707b8b910ac3a244714b61c0626 # v1.320.0",
+        "ruby/setup-ruby" => "ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0",
         "coverallsapp/github-action" => "coverallsapp/github-action@5cbfd81b66ca5d10c19b062c04de0199c215fb6e # v2.3.7",
         "qltysh/qlty-action/coverage" => "qltysh/qlty-action/coverage@08a0a862c159eae9b9003081da6663d96efef637 # v2.3.0",
         "codecov/codecov-action" => "codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7",

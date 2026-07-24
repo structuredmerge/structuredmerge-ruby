@@ -72,27 +72,36 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD">Unreleased</a></h2>
 
-<h3 id="fixed">Fixed</h3>
-
-<ul>
-  <li>
-<code>kettle-jem</code>’s default development bundle now pins<br>
-<code>tree_sitter_language_pack</code> to the StructuredMerge fork branch that exposes<br>
-the Ruby parser API, while still allowing templating runs to override it with<br>
-<code>VENDORED_GEMS</code>.</li>
-  <li>Gemspec templating now deletes empty generated development-dependency comment<br>
-sections through Prism-backed CRISPR structural edits, preventing blank-line<br>
-churn before the closing <code>Gem::Specification</code> <code>end</code>.</li>
-  <li>Fixed the <code>kettle-jem</code> package manifest so runtime template assets are<br>
-included even when the gemspec is loaded from the monorepo root.</li>
-  <li>Generated local templating Gemfiles can now route<br>
-<code>tree_sitter_language_pack</code> through nomono’s <code>VENDORED_GEMS</code> /<br>
-<code>VENDOR_GEM_DIR</code> support instead of using a one-off inferred local path.</li>
-</ul>
-
 <h3 id="added">Added</h3>
 
 <ul>
+  <li>Curated Bundler binstub generation now includes <code>kettle-gha-pins</code> when it is<br>
+present in the destination bundle.</li>
+  <li>Templating plan reports now include per-recipe duration metadata, template<br>
+planning deduplicates destination and template-source file reads, and runtime<br>
+loading is reduced to explicit main-Ractor extension points. A disabled<br>
+classified planning strategy now identifies worker-safe recipes, can opt into<br>
+experimental Ractor workers with <code>KETTLE_JEM_RACTOR_WORKERS</code>, records<br>
+execution counters, and preserves sequential report parity in preparation for<br>
+Ractor-based recipe planning.</li>
+  <li>Added a <code>benchmarks/</code> harness that templates a reset Bundler gem skeleton and<br>
+compares classified planning and phase-gated file work with and without<br>
+opt-in Ractor workers. The harness now defaults <code>KJ_MIN_RUBY</code> to <code>1.8.7</code> so<br>
+benchmark runs exercise legacy workflow and gemfile generation through the<br>
+supported one-shot <code>template --accept-config</code> flow, prints progress while<br>
+long benchmark matrices run, records planning and file-worker execution<br>
+counters for both Ractors and threads, and records the latest benchmark<br>
+outcome in a committed results README.</li>
+  <li>Apply now routes recipe report mutations through explicit write intents and<br>
+phase-gated per-file work units, preparing the file-processing path for<br>
+opt-in <code>KETTLE_JEM_RACTOR_FILE_WORKERS</code> execution without changing phase gates<br>
+or final filesystem outcomes.</li>
+  <li>The former monolithic thin-slice spec has been split into behavior-named<br>
+integration, system, and end-to-end specs so the project test harness can<br>
+parallelize templating coverage more effectively.</li>
+  <li>Generated README Support &amp; Community rows now include a RubyForum help badge.</li>
+  <li>Generated READMEs can now render template-managed corporate sponsor logos<br>
+from <code>readme.corporate_sponsors</code> config or family-provided sponsorship data.</li>
   <li>
 <code>kettle-jem</code> now supports <code>--events</code> for newline-delimited JSON progress<br>
 events, including named event type filters via comma-separated<br>
@@ -103,9 +112,9 @@ orchestration consumers.</li>
 per-workflow keys so <code>kettle-test</code> / <code>turbo_tests2</code> can reuse timing data<br>
 across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework<br>
 matrix runs.</li>
-  <li>Generated dep-heads workflows now document why TruffleRuby runs directly from<br>
-<code>gemfiles/dep_heads.gemfile</code>, making that generated Appraisal file required<br>
-checked-in output for the workflow.</li>
+  <li>Generated dep-heads workflows now document why every engine job runs directly<br>
+from <code>gemfiles/dep_heads.gemfile</code>, making that generated Appraisal file<br>
+required checked-in output for the workflow.</li>
   <li>JRuby 9.2 workflow templates now use the legacy-engine bundle install path<br>
 instead of <code>ruby/setup-ruby</code> bundler caching so old Bundler does not fail<br>
 setup against gem servers without the full legacy index.</li>
@@ -113,6 +122,9 @@ setup against gem servers without the full legacy index.</li>
 collection entries with template package entries so project-specific<br>
 packaged files are not lost when the template rewrites the generated gemspec<br>
 structure.</li>
+  <li>Main Gemfile templating now removes repeated direct sibling execution blocks<br>
+left behind by older <code>nomono</code> bootstrap output when applying the simplified<br>
+<code>require "nomono/bundler"</code> loader.</li>
   <li>Gemspec templating now restores additional legacy Prism policy behavior for<br>
 destination-only metadata fields, Bundler <code>git ls-files</code> package declarations,<br>
 and empty development-dependency section cleanup after runtime dependency<br>
@@ -120,8 +132,12 @@ promotion.</li>
   <li>Added the repo-local <code>bin/kettle-jem-workflow-pins</code> maintenance script to<br>
 update the GitHub Actions SHA pin index used by generated workflow templates<br>
 via <code>kettle-gha-sha-pins</code>.</li>
-  <li>Generated local Gemfile templates now document why <code>nomono</code> is explicitly<br>
-activated before requiring <code>nomono/bundler</code>.</li>
+  <li>Generated local Gemfile templates now use a simple <code>require "nomono/bundler"</code><br>
+loader, with a provider-relative loader for <code>nomono</code> itself, instead of<br>
+emitting runtime lockfile parsing or explicit gem activation ceremony.</li>
+  <li>Generated root Gemfiles now declare <code>nomono</code> with a plain dependency line<br>
+requiring <code>nomono</code> 1.1.0 or newer, and retemplating removes the older<br>
+<code>nomono_requirements</code> helper block.</li>
   <li>Added the repo-local <code>bin/kettle-jem-deps-floor</code> maintenance script to scan<br>
 dependency-bearing kettle-jem templates and update their dependency floors.</li>
   <li>
@@ -154,6 +170,46 @@ deletes obsolete implementation code, behavior specs, workflows, and gemfiles.</
 <h3 id="changed">Changed</h3>
 
 <ul>
+  <li>The <code>kettle-jem</code> executable now prints a standard startup header on normal<br>
+runs while preserving version-only output for <code>version</code>, <code>-v</code>, and<br>
+<code>--version</code>.</li>
+  <li>
+<code>kettle-jem-deps-floor --write</code> now commits its managed dependency floor<br>
+updates by default, with <code>--no-commit</code> available for callers that need the<br>
+previous uncommitted write behavior.</li>
+  <li>Runtime dependency metadata now requires <code>kettle-gha-pins</code> 0.3.1 or newer.</li>
+  <li>
+<code>bin/kettle-jem-workflow-pins</code> now calls the shared <code>kettle-gha-pins</code> API<br>
+directly for cache, GitHub ref resolution, and upgrade planning instead of<br>
+shelling out to <code>kettle-gha-sha-pins</code>.</li>
+  <li>Templating now reuses static, shareable regexes and small lookup lists in the<br>
+recipe dispatch and template-policy paths instead of reallocating them during<br>
+each recipe execution.</li>
+  <li>Opt-in recipe-planning Ractor mode now batches worker-safe recipes across a<br>
+bounded chunked worker pool instead of spawning one Ractor per recipe, and it<br>
+keeps parser/merge paths with known unshareable dependency state on the main<br>
+Ractor.</li>
+  <li>Templating can now opt into thread-backed recipe planning and file work with<br>
+<code>KETTLE_JEM_THREAD_WORKERS</code> and <code>KETTLE_JEM_THREAD_FILE_WORKERS</code>, providing a<br>
+benchmarkable alternative to main-thread and Ractor execution.</li>
+  <li>Templating now supports benchmark-oriented skip controls for external<br>
+post-template work: <code>--skip-drift-check</code>, <code>--skip-rubocop-gradual</code>, and<br>
+<code>--skip-binstubs</code>, with matching <code>KETTLE_JEM_SKIP_*</code> environment variables.</li>
+  <li>Templating reports now persist phase duration metadata, install command steps<br>
+record elapsed duration, and benchmark summaries show recipe-phase time apart<br>
+from external command time.</li>
+  <li>The benchmark harness now supports <code>KETTLE_JEM_BENCHMARK_MODE=raw-template</code><br>
+to compare scoped raw <code>TemplateTask</code> runs separately from the default<br>
+install-orchestrated one-shot template flow.</li>
+  <li>The benchmark harness now defaults worker counts to <code>1,min(4,n/2),min(8,n/2),n</code><br>
+instead of only <code>min(2,n)</code>, giving higher-core machines a useful default<br>
+scaling matrix while keeping low-core hosts bounded.</li>
+  <li>Benchmark summaries now show each variant’s median percentage delta against<br>
+<code>baseline-main</code> immediately after the variant name.</li>
+  <li>
+    <p>README recipe reports now include sub-step timing metadata, and benchmark<br>
+results summarize the baseline README timing breakdown.</p>
+  </li>
   <li>Generated gemspec templates now require <code>kettle-dev</code> &gt;= 2.3.7.</li>
   <li>kettle-jem now requires <code>kettle-rb</code> &gt;= 0.1.4.</li>
   <li>Refreshed generated GitHub Actions workflow pins for <code>ruby/setup-ruby</code> and<br>
@@ -239,17 +295,81 @@ reserving <code>appraisal:update</code> for intentional lock refreshes.</li>
   </li>
   <li>kettle-jem-template-20260716-001 - Shim gemspec manifests now include<br>
 <code>LICENSE.md</code> instead of nonexistent <code>LICENSE.txt</code>.</li>
-  <li>kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer<br>
-repository-only files by default to reduce downstream distro packaging churn.</li>
+  <li>
+    <p>kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer<br>
+repository-only files by default to reduce downstream distro packaging churn.</p>
+  </li>
+  <li>kettle-jem-template-20260720-001 - Generated READMEs can now render<br>
+template-managed corporate sponsor logos from project or family config.</li>
+  <li>kettle-jem-template-20260720-002 - Generated development Gemfiles now use the<br>
+released <code>tree_sitter_language_pack</code> gem 1.13.3 or newer by default.</li>
+  <li>kettle-jem-template-20260720-003 - Generated StructuredMerge Git diff driver<br>
+config now uses the installed <code>smorg-rb</code> Ruby driver name.</li>
+  <li>kettle-jem-template-20260720-004 - Generated multi-engine workflow files now<br>
+omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.</li>
+  <li>kettle-jem-template-20260720-005 - Generated README Support &amp; Community rows<br>
+now include a RubyForum help badge.</li>
 </ul>
 
 <h3 id="deprecated">Deprecated</h3>
 
 <h3 id="removed">Removed</h3>
 
-<h3 id="fixed-1">Fixed</h3>
+<h3 id="fixed">Fixed</h3>
 
 <ul>
+  <li>The <code>kettle-jem</code> executable now uses normal <code>require</code> loading and suppresses<br>
+its startup header for <code>--json</code> / <code>--events</code> machine-readable output.</li>
+  <li>Generated MRI 2.4 through 2.7 workflows now bypass <code>ruby/setup-ruby</code><br>
+Bundler caching and run an explicit bundle install, avoiding <code>bundle lock</code><br>
+failures against gem.coop’s missing legacy specs index.</li>
+  <li>Main Gemfile templating now removes duplicate <code>eval_gemfile</code> declarations<br>
+for the same modular dependency file, avoiding duplicate Bundler dependency<br>
+warnings after repeated templating.</li>
+  <li>Generated templating workflows now update the root <code>nomono</code> bootstrap<br>
+dependency before enabling <code>K_JEM_TEMPLATING</code>, so cold CI runners can install<br>
+<code>nomono</code> before local templating gemfiles require its Bundler DSL.</li>
+  <li>Local Gemfile templating now removes obsolete nomono activation ceremony from<br>
+existing destination files while retaining the simple<br>
+<code>require "nomono/bundler"</code> loader.</li>
+  <li>Bootstrap commit execution now honors <code>KETTLE_JEM_GIT_COMMIT_LOCK</code> by locking<br>
+around the dirty recheck, <code>git add</code>, and <code>git commit</code> sequence for monorepo<br>
+family templating.</li>
+  <li>Generated license summaries now link split license detail files to the<br>
+repository <code>blob/main</code> copy instead of packaging-relative files that are<br>
+intentionally excluded from gem manifests.</li>
+  <li>Generated root Gemfiles no longer duplicate the<br>
+<code>tree_sitter_language_pack</code> declaration that belongs to the templating<br>
+modular Gemfile.</li>
+  <li>Generated README source badges now use GitHub’s canonical capitalization.</li>
+  <li>Generated nomono local Gemfiles now use the normal <code>require "nomono/bundler"</code><br>
+loader instead of a nomono-specific <code>require_relative</code> path.</li>
+  <li>Install orchestration now bundles each distinct Bundler environment it will<br>
+execute under, and probes RuboCop Gradual tasks with the same environment used<br>
+for the eventual command.</li>
+  <li>Bundler child commands now strip inherited command-line Git configuration, so<br>
+parent <code>safe.bareRepository=explicit</code> settings do not break Bundler Git source<br>
+caches during templating.</li>
+  <li>Generated semantic diff Git driver configuration now consistently uses the<br>
+installed <code>smorg-rb</code> executable and Git diff driver name for Ruby diffs.</li>
+  <li>Generated multi-engine workflow files, including <code>heads.yml</code> and<br>
+<code>dep-heads.yml</code>, now omit JRuby and TruffleRuby jobs when the project config<br>
+declares an MRI-only <code>engines</code> list.</li>
+  <li>
+<code>kettle-jem</code>’s generated development Gemfiles now depend on released<br>
+<code>tree_sitter_language_pack</code> 1.13.2 or newer by default, while still<br>
+allowing templating runs to switch to a local source with<br>
+<code>VENDORED_GEMS=tree_sitter_language_pack</code> / <code>VENDOR_GEM_DIR</code>.</li>
+  <li>Gemspec templating now deletes empty generated development-dependency comment<br>
+sections through Prism-backed CRISPR structural edits, preventing blank-line<br>
+churn before the closing <code>Gem::Specification</code> <code>end</code>.</li>
+  <li>Fixed the <code>kettle-jem</code> package manifest so runtime template assets are<br>
+included even when the gemspec is loaded from the monorepo root.</li>
+  <li>
+    <p>Generated local templating Gemfiles can now route<br>
+<code>tree_sitter_language_pack</code> through nomono’s <code>VENDORED_GEMS</code> /<br>
+<code>VENDOR_GEM_DIR</code> support instead of using a one-off inferred local path.</p>
+  </li>
   <li>Templating setup now respects explicit <code>STRUCTUREDMERGE_DEV=false</code> and<br>
 <code>KETTLE_DEV_DEV=false</code> values when reading the kettle-family local install<br>
 marker, preventing prepare-mode bundle updates from re-enabling stale local<br>
@@ -275,9 +395,10 @@ without falling back to the default organization.</li>
 <code>sig/&lt;entrypoint&gt;/**/*.rbs</code> content into the package-level signature and<br>
 removes the nested files, including when the package-level signature is<br>
 managed by a template entry.</li>
-  <li>Generated dep-heads workflows now run current TruffleRuby directly from the<br>
+  <li>Generated dep-heads workflows now run every engine job directly from the<br>
 generated <code>gemfiles/dep_heads.gemfile</code>, avoiding <code>Appraisal.root.gemfile</code><br>
-bootstrap failures with TruffleRuby’s bundled RubyGems/Bundler and gem.coop.</li>
+bootstrap failures with RubyGems/Bundler and gem.coop before the dep-heads<br>
+appraisal is selected.</li>
   <li>Packaged Rakefile templating now merges destination Rakefiles by default<br>
 instead of replacing them wholesale, preserving project-specific rake tasks<br>
 such as release or adapter test helpers.</li>
@@ -983,7 +1104,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Mon Jul 20 00:27:53 2026 by
+  Generated on Thu Jul 23 20:51:51 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
