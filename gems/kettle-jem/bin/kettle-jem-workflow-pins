@@ -32,8 +32,12 @@ class KettleJemWorkflowPins
     if options[:json]
       out.puts(JSON.pretty_generate(result))
     else
+      out.puts("workflow-pins: mode=#{result.fetch(:mode)} upgrade=#{result.fetch(:upgrade)}")
       out.puts("workflow-pins: #{result.fetch(:updates)} update#{"s" unless result.fetch(:updates) == 1}")
       result.fetch(:updated_actions, []).each { |action| out.puts("  #{action}") }
+      if !result.fetch(:mode).to_s.eql?("write") && result.fetch(:updates).positive?
+        out.puts("hint: rerun with --write --upgrade #{result.fetch(:upgrade)} to apply these updates")
+      end
     end
     0
   rescue OptionParser::ParseError, ArgumentError => error

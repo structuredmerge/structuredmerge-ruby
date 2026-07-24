@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "stringio"
+
 load File.expand_path("../../bin/kettle-jem-workflow-pins", __dir__)
 
 RSpec.describe KettleJemWorkflowPins do
@@ -62,6 +64,21 @@ RSpec.describe KettleJemWorkflowPins do
       old_ref: old_sha,
       upgrade_level: "major"
     )
+  end
+
+  it "prints dry-run mode and a write hint when stale pins are found" do
+    out = StringIO.new
+    err = StringIO.new
+    allow(described_class).to receive(:new)
+      .and_return(described_class.new(project_root: project_root, env: env, options: {upgrade: "patch"}))
+
+    status = described_class.run(%w[--upgrade patch], env: env, out: out, err: err)
+
+    expect(status).to eq(0)
+    expect(out.string).to include("workflow-pins: mode=dry-run upgrade=patch")
+    expect(out.string).to include("workflow-pins: 1 update")
+    expect(out.string).to include("hint: rerun with --write --upgrade patch")
+    expect(err.string).to eq("")
   end
 
   it "preserves Ruby source delimiters around pins when writing updates" do
