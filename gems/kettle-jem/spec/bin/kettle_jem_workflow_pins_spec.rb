@@ -228,6 +228,37 @@ RSpec.describe KettleJemWorkflowPins do
     )
   end
 
+  it "updates stale version comments when the pinned SHA is already current" do
+    old_comment_pin = "codecov/codecov-action@#{old_sha} # v7"
+    new_comment_pin = "codecov/codecov-action@#{old_sha} # v7.0.0"
+    allow(Kettle::Jem).to receive(:github_actions_step_pins).and_return({"codecov/codecov-action" => old_comment_pin})
+    File.write(pin_index_path, %(def github_actions_step_pins\n  {"codecov/codecov-action" => "#{old_comment_pin}"}\nend\n))
+    File.write(workflow_path, "steps:\n  - uses: #{old_comment_pin}\n")
+    allow(Kettle::Gha::Pins).to receive(:resolve_action_plan).and_return(
+      {
+        is_outdated: false,
+        current_version: "7.0.0",
+        latest_outdated: nil,
+        reason: nil,
+        updates: nil
+      }
+    )
+
+    result = described_class.new(project_root: project_root, env: env, options: {write: true, commit: false}).run
+
+    expect(result[:updated_actions]).to eq(["codecov/codecov-action"])
+    expect(result[:planned_changes]).to include(
+      hash_including(
+        "action" => "codecov/codecov-action",
+        "old_version" => "7",
+        "new_version" => "7.0.0",
+        "reason" => "update_version_comment"
+      )
+    )
+    expect(File.read(pin_index_path)).to include(new_comment_pin)
+    expect(File.read(workflow_path)).to include("uses: #{new_comment_pin}")
+  end
+
   it "fails check mode when template sources drift from the canonical pin index" do
     stale_pin = "actions/checkout@#{old_sha} # v1.0.0"
     canonical_pin = "actions/checkout@#{new_sha} # v1.0.1"

@@ -191,6 +191,17 @@ class KettleJemWorkflowPins
           "reason" => plan[:updates][:reason]
         }
       end
+      if !plan[:updates] && plan[:current_version] && !parsed[:version].to_s.empty? && parsed[:version] != plan[:current_version]
+        planned_changes << {
+          "action" => repo_ref,
+          "old_value" => "#{action}@#{parsed.fetch(:ref)}",
+          "old_ref" => parsed.fetch(:ref),
+          "old_version" => parsed[:version],
+          "new_ref" => parsed.fetch(:ref),
+          "new_version" => plan[:current_version],
+          "reason" => "update_version_comment"
+        }
+      end
 
       next unless plan[:is_outdated]
 
@@ -215,11 +226,11 @@ class KettleJemWorkflowPins
 
   def parse_pin(pin)
     value = pin.to_s.strip
-    old_value, _comment = value.split(/[ \t]+#/, 2)
+    old_value, comment = value.split(/[ \t]+#/, 2)
     action, separator, ref = old_value.rpartition("@")
     return nil unless separator == "@" && !action.empty? && !ref.empty?
 
-    {action: action, ref: ref}
+    {action: action, ref: ref, version: comment.to_s.strip.delete_prefix("v")}
   end
 
   def action_repo_ref(action)

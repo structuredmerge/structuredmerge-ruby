@@ -190,6 +190,9 @@ dry-run mode.</li>
   <li>
 <code>kettle-jem-workflow-pins --write</code> now commits managed workflow pin updates<br>
 by default, with <code>--no-commit</code> available for uncommitted writes.</li>
+  <li>
+<code>kettle-jem-workflow-pins</code> now detects and updates stale version comments<br>
+when a pinned GitHub Action SHA is already current.</li>
   <li>Runtime dependency metadata now requires <code>kettle-gha-pins</code> 0.3.1 or newer.</li>
   <li>
 <code>bin/kettle-jem-workflow-pins</code> now calls the shared <code>kettle-gha-pins</code> API<br>
@@ -1117,7 +1120,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jul 23 21:40:35 2026 by
+  Generated on Thu Jul 23 22:01:34 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
