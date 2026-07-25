@@ -112,6 +112,35 @@ Git diff driver setup
 K_JEM_TEMPLATING=true kettle-jem install
 ```
 
+## Merge gem architecture
+
+Merge gems are parser-backed, but merge behavior must not call parser libraries
+directly. Parsing enters through `tree_haver`; structural edits enter through
+`ast-crispr`; common merge orchestration enters through `ast-merge`.
+
+Language and format families have a substrate gem that owns shared merge
+behavior for that family. A substrate gem may also register the tree-sitter
+grammar interface for the same format. Provider gems register an alternate AST
+backend and delegate family behavior back to the substrate gem.
+
+Examples:
+
+- `markdown-merge` registers the tree-sitter Markdown path and owns shared
+  Markdown merge behavior. `commonmarker-merge`, `kramdown-merge`, and
+  `markly-merge` provide backend-specific AST integrations and share that
+  Markdown behavior.
+- `yaml-merge` is the YAML substrate. It registers the tree-sitter YAML path and
+  should own shared YAML merge behavior, including key-path partial merge
+  semantics. `psych-merge` provides the Psych-backed YAML AST integration and
+  should share those YAML behaviors.
+
+Partial document insertion, replacement, and removal are `ast-crispr` work.
+`PartialTemplateMerger` should normalize the API used by merge gems and route
+those operations through structural owners and source-preserving edit plans. Do
+not implement partial merges by converting documents to native Ruby objects and
+serializing them back out; that bypasses owner identity, comments, layout, and
+backend diagnostics.
+
 Troubleshooting Git diffs
 - Use `git diff --no-ext-diff` to compare against Git's built-in diff output.
 - Use `git diff --no-textconv` when a textconv projection obscures the raw file bytes you need to inspect.
