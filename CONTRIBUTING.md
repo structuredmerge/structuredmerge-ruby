@@ -123,6 +123,10 @@ behavior for that family. A substrate gem may also register the tree-sitter
 grammar interface for the same format. Provider gems register an alternate AST
 backend and delegate family behavior back to the substrate gem.
 
+Do not infer backend registration from the behavior role. A substrate often does
+register a TSLP/tree-sitter grammar, and may still share behavior with provider
+gems that register native or Ruby parser backends.
+
 Examples:
 
 - `markdown-merge` registers the tree-sitter Markdown path and owns shared
@@ -133,6 +137,13 @@ Examples:
   should own shared YAML merge behavior, including key-path partial merge
   semantics. `psych-merge` provides the Psych-backed YAML AST integration and
   should share those YAML behaviors.
+- `ruby-merge` registers the tree-sitter Ruby path and owns shared Ruby merge
+  behavior. `prism-merge` provides the Prism-backed Ruby AST integration.
+- `toml-merge` registers the tree-sitter TOML path and owns shared TOML merge
+  behavior. `citrus-toml-merge` and `parslet-toml-merge` provide alternate TOML
+  parser integrations.
+- `rbs-merge` intentionally registers both the official RBS parser backend and
+  the tree-sitter RBS grammar in one gem.
 
 Partial document insertion, replacement, and removal are `ast-crispr` work.
 `PartialTemplateMerger` should normalize the API used by merge gems and route
