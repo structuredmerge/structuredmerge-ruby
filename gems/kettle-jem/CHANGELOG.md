@@ -35,6 +35,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated gemspec templates now include `anonymous_loader` as a development
   dependency, and version spec normalization uses it to execute generated
   `version.rb` files for coverage without redefining package constants.
+- Added a transfer changelog query API so family tooling can report how many
+  template-impacting changelog replay entries a project has not yet applied.
 - Version spec normalization now removes managed version specs when
   `version_gem` is disabled or incompatible with the project's runtime Ruby
   floor.

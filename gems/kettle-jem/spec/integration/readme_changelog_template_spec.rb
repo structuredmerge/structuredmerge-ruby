@@ -396,6 +396,23 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
   end
 
+  it "reports transfer changelog lag from a stored replay cursor" do
+    lag = described_class.transfer_changelog_lag("kettle-jem-template-20260725-001", verbose: true)
+
+    expect(lag.fetch(:last_entry_key)).to eq("kettle-jem-template-20260725-001")
+    expect(lag.fetch(:latest_entry_key)).to eq("kettle-jem-template-20260725-002")
+    expect(lag.fetch(:missing_count)).to eq(1)
+    expect(lag.fetch(:missing_entries).map { |entry| entry.fetch(:key) }).to eq(["kettle-jem-template-20260725-002"])
+  end
+
+  it "reports every transfer changelog entry as missing when no replay cursor exists" do
+    lag = described_class.transfer_changelog_lag
+
+    expect(lag.fetch(:last_entry_key, nil)).to be_nil
+    expect(lag.fetch(:latest_entry_key)).to eq("kettle-jem-template-20260725-002")
+    expect(lag.fetch(:missing_count)).to eq(described_class.transfer_changelog_entries.size)
+  end
+
   it "keeps the real CHANGELOG template in canonical Unreleased form" do
     template = File.read(project_root.join("lib/kettle/jem/templates/CHANGELOG.md.example"))
 

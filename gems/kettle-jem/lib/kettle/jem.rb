@@ -5119,6 +5119,27 @@ module Kettle
       }.compact
     end
 
+    def transfer_changelog_lag(last_entry_key = nil, verbose: false)
+      all_entries = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+      latest = latest_changelog_transfer_entry(all_entries)
+      missing = if last_entry_key.to_s.empty?
+        all_entries
+      else
+        changelog_transfer_entries_after(all_entries, last_entry_key)
+      end
+      result = {
+        last_entry_key: last_entry_key.to_s.empty? ? nil : last_entry_key.to_s,
+        latest_entry_key: latest&.fetch(:key),
+        missing_count: missing.size
+      }.compact
+      result[:missing_entries] = missing if verbose
+      result
+    end
+
+    def transfer_changelog_entries
+      changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
+    end
+
     def latest_changelog_transfer_entry(entries)
       Array(entries).max_by { |entry| entry.fetch(:key).to_s }
     end
