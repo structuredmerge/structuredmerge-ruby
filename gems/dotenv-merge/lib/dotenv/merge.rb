@@ -5,6 +5,8 @@ require 'version_gem'
 
 # Shared merge infrastructure
 require 'ast/merge'
+require 'plain/merge'
+require 'tree_haver'
 
 # This gem
 require_relative 'merge/version'
@@ -62,6 +64,7 @@ module Dotenv
     class CorruptionDetectedError < Error; end
 
     autoload :DebugLogger, 'dotenv/merge/debug_logger'
+    autoload :Backend, 'dotenv/merge/backend'
     autoload :CommentTracker, 'dotenv/merge/comment_tracker'
     autoload :EnvLine, 'dotenv/merge/env_line'
     autoload :FreezeNode, 'dotenv/merge/freeze_node'
@@ -70,6 +73,9 @@ module Dotenv
     autoload :SmartMerger, 'dotenv/merge/smart_merger'
   end
 end
+
+require_relative 'merge/backend'
+Dotenv::Merge.register_backend!
 
 # Register with ast-merge's MergeGemRegistry for RSpec dependency tags
 # Only register if MergeGemRegistry is loaded (i.e., in test environment)

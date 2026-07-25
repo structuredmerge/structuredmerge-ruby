@@ -67,11 +67,11 @@ The family is intentionally layered:
 
 | Gem | Family | What it provides |
 | --- | --- | --- |
-| [`plain-merge`][ruby-plain-merge] | Text | Plain-text fallback contracts and conflict-preserving merge behavior. |
+| [`plain-merge`][ruby-plain-merge] | Text | Line-backed TreeHaver parser registration, plain-text fallback contracts, and conflict-preserving merge behavior. |
 | [`json-merge`][ruby-json-merge] | JSON and JSONC | Object/array-aware JSON merge behavior using the shared StructuredMerge merge substrate and [tree-sitter JSON][ts-json] grammar coverage where the selected backend supplies it. |
 | [`yaml-merge`][ruby-yaml-merge] | YAML | YAML-family merge contracts, shared provider tags, and provider-neutral behavior. |
 | [`toml-merge`][ruby-toml-merge] | TOML | TOML-family merge contracts and provider-neutral behavior. |
-| [`dotenv-merge`][ruby-dotenv-merge] | dotenv | Environment-file merge behavior for key/value configuration files. |
+| [`dotenv-merge`][ruby-dotenv-merge] | dotenv | Dotenv line parser registration and key/value configuration merge behavior built on the plain text substrate. |
 | [`markdown-merge`][ruby-markdown-merge] | Markdown | Markdown-family merge contracts, heading/table/list matching, link-reference handling, fenced-code flow, and provider-neutral behavior. |
 | [`ruby-merge`][ruby-ruby-merge] | Ruby source | Ruby source merge contracts and parser-backed source-language behavior. |
 | [`rbs-merge`][ruby-rbs-merge] | RBS | Ruby signature merge behavior, declaration matching, and template-owned signature updates using [RBS][rbs] and tree-sitter RBS grammar coverage where available. |
@@ -80,7 +80,7 @@ The family is intentionally layered:
 | [`rust-merge`][ruby-rust-merge] | Rust source | Rust source merge contracts for the cross-language StructuredMerge family. |
 | [`typescript-merge`][ruby-typescript-merge] | TypeScript source | TypeScript source merge contracts for the cross-language StructuredMerge family. |
 | [`binary-merge`][ruby-binary-merge] | Binary | Binary tree planning contracts, byte-range ownership, diagnostics, and [Kaitai Struct][kaitai] oriented structured binary support. |
-| [`zip-merge`][ruby-zip-merge] | Archives | ZIP archive planning helpers, archive member ownership, and archive-aware merge contracts. |
+| [`zip-merge`][ruby-zip-merge] | Archives | Kaitai-family ZIP parser registration, archive member ownership, and archive-aware merge contracts. |
 
 ### Provider Gems
 

@@ -24,6 +24,12 @@ Please file a bug if you notice a violation of semantic versioning.
   multiple structural selectors through one parsed document context.
 - `zip-merge` now registers a Kaitai-backed `TreeHaver.parser_for(:zip)` path
   for ZIP inventory analysis.
+- `plain-merge` now registers `TreeHaver.parser_for(:text)` and
+  `TreeHaver.parser_for(:plain)` line-backed parser paths for normalized text
+  block analysis.
+- `dotenv-merge` now registers `TreeHaver.parser_for(:dotenv)` and
+  `TreeHaver.parser_for(:env)` line-backed parser paths built on the
+  `plain-merge` line substrate.
 - Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
   HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
   structural edit adapter.

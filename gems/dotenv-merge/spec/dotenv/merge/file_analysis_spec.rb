@@ -432,3 +432,21 @@ RSpec.describe Dotenv::Merge::FileAnalysis do
     end
   end
 end
+
+RSpec.describe 'Dotenv::Merge TreeHaver backend registration' do
+  it 'registers dotenv and env line backends through TreeHaver parser lookup' do
+    source = <<~DOTENV
+      # Service settings
+      API_KEY=secret
+      export DEBUG=true
+    DOTENV
+
+    dotenv_analysis = TreeHaver.parser_for(:dotenv, backend_type: :line).parse(source)
+    env_analysis = TreeHaver.parser_for(:env, backend_type: :line).parse(source)
+
+    expect(dotenv_analysis).to be_a(Dotenv::Merge::FileAnalysis)
+    expect(dotenv_analysis.line_analysis[:kind]).to eq('text')
+    expect(dotenv_analysis.keys).to eq(%w[API_KEY DEBUG])
+    expect(env_analysis.keys).to eq(dotenv_analysis.keys)
+  end
+end

@@ -22,6 +22,10 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
 `Plain::Merge` provides text-family fallback behavior for content without a richer parser. It normalizes paragraphs into blocks, compares block similarity, and reports whether two text bodies are close enough for a safe fallback decision.
+It also registers the StructuredMerge line substrate with `tree_haver`, so
+callers can enter plain text analysis through
+`TreeHaver.parser_for(:text, backend_type: :line)` or
+`TreeHaver.parser_for(:plain, backend_type: :line)`.
 
 ### Key Features
 
@@ -29,6 +33,8 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 - Jaccard similarity scoring.
 - Configurable text-refinement threshold and weights.
 - Module-level `merge_text` API for fallback integrations.
+- `TreeHaver.parser_for` registration for `:text` and `:plain` through the
+  `:line` backend.
 
 ## 💡 Info you can shake a stick at
 

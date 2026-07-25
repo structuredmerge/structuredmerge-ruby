@@ -147,6 +147,11 @@ Examples:
 - `zip-merge` is a Kaitai-family binary AST integration. It registers and
   consumes a `parser_for(:zip)` Kaitai path so ZIP analysis enters through the
   normalized TreeHaver API.
+- `plain-merge` is the line/text substrate. It registers `:text` and `:plain`
+  parser paths through the `:line` backend.
+- `dotenv-merge` builds dotenv assignment and comment ownership on top of the
+  plain line substrate, and registers `:dotenv` and `:env` parser paths through
+  the same `:line` backend family.
 
 Partial document insertion, replacement, and removal are `ast-crispr` work.
 `PartialTemplateMerger` should normalize the API used by merge gems and route

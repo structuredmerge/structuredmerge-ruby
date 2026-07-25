@@ -91,10 +91,14 @@ Current examples:
   producing TreeHaver ZIP report nodes. Synthetic parsers that produce
   normalized TreeHaver owners belong in this parser-backed category even when
   they are not text grammars.
-- **Byte or line oriented merge gems**: `plain-merge`, `binary-merge`, and
-  current dotenv merge behavior do not define a TreeHaver parser-backed language
-  family substrate. Keep those exceptions explicit instead of using them as
-  models for parser-backed merge gems.
+- **Synthetic line AST merge gems**: `plain-merge` registers `:text` and
+  `:plain` line-backed parser paths for normalized block analysis, and
+  `dotenv-merge` registers `:dotenv` and `:env` parser paths that build dotenv
+  ownership on the plain line substrate.
+- **Byte report substrates**: `binary-merge` provides byte-range policies and
+  report helpers for schema-specific binary families. It is not a parser-backed
+  language by itself; parser-backed binary families such as `zip-merge` should
+  register their concrete parser path.
 
 Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
 
