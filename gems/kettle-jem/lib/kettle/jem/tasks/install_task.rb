@@ -523,7 +523,7 @@ module Kettle
         end
 
         def github_org_from_env(env)
-          %w[FORGE_ORG KJ_GH_USER GITHUB_ORG].each do |key|
+          %w[FORGE_ORG KJ_GH_ORG GITHUB_ORG].each do |key|
             value = (env || {})[key].to_s.strip
             return value unless value.empty? || Kettle::Jem::DecisionPolicy.falsey?(value)
           end

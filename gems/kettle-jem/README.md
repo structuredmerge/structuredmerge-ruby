@@ -455,7 +455,9 @@ fill missing keys during config sync, and act as runtime overrides.
 | `KJ_AUTHOR_GIVEN_NAMES` | First/given names |
 | `KJ_AUTHOR_FAMILY_NAMES` | Last/family names |
 | `KJ_AUTHOR_ORCID` | ORCID identifier |
-| `KJ_GH_USER` | GitHub username |
+| `FORGE_ORG` | Preferred forge organization or owner used for scaffolded repository URLs when no forge remote is available |
+| `KJ_GH_ORG` | GitHub-specific organization or owner fallback for scaffolded repository URLs |
+| `KJ_GH_USER` | GitHub username used for maintainer profile and sponsor links |
 | `KJ_GL_USER` | GitLab username |
 | `KJ_CB_USER` | Codeberg username |
 | `KJ_SH_USER` | SourceHut username |

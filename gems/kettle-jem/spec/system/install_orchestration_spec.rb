@@ -2130,7 +2130,11 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
 
       install = Kettle::Jem::Tasks::InstallTask.run(
         project_root: root,
-        env: {"FORGE_ORG" => "example-org"},
+        env: {
+          "FORGE_ORG" => "example-org",
+          "KJ_GH_ORG" => "ignored-gh-org",
+          "KJ_GH_USER" => "personal-user"
+        },
         run_options: {only: "README.md", skip_commit: true},
         command_runner: command_runner
       )
@@ -2187,6 +2191,43 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
         statuses: include("applied" => be >= 4),
         summary: include("install steps")
       )
+    end
+  end
+
+  it "keeps maintainer GitHub user separate from scaffold repository owner" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-install-gh-org", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.description = "Example description"
+            spec.authors = ["Jane Q Public"]
+            spec.email = ["jane@example.test"]
+            spec.homepage = "https://example.test"
+          end
+        RUBY
+      })
+      command_runner = lambda do |_command, **|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      install = Kettle::Jem::Tasks::InstallTask.run(
+        project_root: root,
+        env: {"KJ_GH_USER" => "personal-user"},
+        run_options: {skip_commit: true},
+        command_runner: command_runner
+      )
+
+      expect(install.fetch(:install_steps)).to include(hash_including(
+        name: "gemspec_homepage_literal",
+        path: "example.gemspec",
+        status: "skipped",
+        reason: "missing_github_org"
+      ))
+      expect(File.read(File.join(root, "example.gemspec"))).to include('spec.homepage = "https://example.test"')
     end
   end
 end

@@ -22,6 +22,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
   progress stream filtering, emission, recording, and phase timing.
+- Added `KJ_GH_ORG` as a GitHub-specific repository-owner override for
+  scaffolded GitHub URLs, while keeping generic `FORGE_ORG` at highest
+  precedence so personal `KJ_GH_USER` maintainer settings do not seed org-owned
+  repos.
 - Changelog replay now records a cursor in the managed `kettle-jem` config
   state so first-time templated projects receive only an initial templating
   changelog entry, while previously templated projects replay only missed
