@@ -4544,7 +4544,7 @@ module Kettle
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.6"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.0"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.1"\n)}
       ].freeze
     end
 
