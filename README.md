@@ -79,8 +79,8 @@ The family is intentionally layered:
 | [`go-merge`][ruby-go-merge] | Go source | Go source merge contracts for the cross-language StructuredMerge family. |
 | [`rust-merge`][ruby-rust-merge] | Rust source | Rust source merge contracts for the cross-language StructuredMerge family. |
 | [`typescript-merge`][ruby-typescript-merge] | TypeScript source | TypeScript source merge contracts for the cross-language StructuredMerge family. |
-| [`binary-merge`][ruby-binary-merge] | Binary | Binary tree planning contracts, byte-range ownership, diagnostics, and [Kaitai Struct][kaitai] oriented structured binary support. |
-| [`zip-merge`][ruby-zip-merge] | Archives | Kaitai-family ZIP parser registration, archive member ownership, and archive-aware merge contracts. |
+| [`binary-merge`][ruby-binary-merge] | Binary | Kaitai/binary-family substrate for byte-range ownership, preservation reports, unsafe diagnostics, and renderer planning. |
+| [`zip-merge`][ruby-zip-merge] | Archives | ZIP parser registration and archive-aware merge contracts built on the binary-family substrate. |
 
 ### Provider Gems
 
@@ -119,7 +119,7 @@ tags are capability names, not package preferences.
 | [RBS][rbs] | `rbs-merge` | Ruby signature parser path. |
 | [CommonMarker][commonmarker], [Markly][markly], [Kramdown][kramdown] | `markdown-merge` providers | Markdown parser families with different CommonMark/GFM/Ruby-native tradeoffs. |
 | [Citrus][citrus], [Parslet][parslet] | `toml-merge` providers | Pure-Ruby TOML parser families exposed as provider-specific TreeHaver backend paths. |
-| [Kaitai Struct][kaitai] | `binary-merge` | Schema-oriented binary parsing support for structured binary work. |
+| [Kaitai Struct][kaitai] | `binary-merge`, `zip-merge` | Schema-oriented binary parsing support and shared binary-family merge behavior. |
 
 #### Backend Platform Compatibility
 

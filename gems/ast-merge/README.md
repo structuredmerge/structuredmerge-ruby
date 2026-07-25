@@ -86,19 +86,18 @@ Current examples:
 - **Dual-backend single gem**: `rbs-merge` registers the official RBS parser
   backend and the tree-sitter RBS grammar in one gem because both surfaces are
   intentional and tested there.
-- **Synthetic or binary AST merge gems**: `zip-merge` is a Kaitai-family binary
-  AST integration. It registers and consumes the `parser_for(:zip)` Kaitai path,
-  producing TreeHaver ZIP report nodes. Synthetic parsers that produce
-  normalized TreeHaver owners belong in this parser-backed category even when
-  they are not text grammars.
+- **Kaitai/binary family**: `binary-merge` is the shared substrate for
+  schema-aware binary merge behavior: byte ranges, preservation reports, unsafe
+  diagnostics, render policies, and nested dispatch conventions. Concrete
+  parser gems such as `zip-merge` depend on that substrate, register their
+  schema parser path, and produce normalized TreeHaver binary report nodes.
 - **Synthetic line AST merge gems**: `plain-merge` registers `:text` and
   `:plain` line-backed parser paths for normalized block analysis, and
   `dotenv-merge` registers `:dotenv` and `:env` parser paths that build dotenv
   ownership on the plain line substrate.
-- **Byte report substrates**: `binary-merge` provides byte-range policies and
-  report helpers for schema-specific binary families. It is not a parser-backed
-  language by itself; parser-backed binary families such as `zip-merge` should
-  register their concrete parser path.
+- **Thin substrates are still substrates**: `binary-merge` is intentionally thin
+  while ZIP is the only Kaitai-backed family member. Shared binary behavior
+  should move there as additional binary schema gems prove common patterns.
 
 Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
 

@@ -146,7 +146,11 @@ Examples:
   the tree-sitter RBS grammar in one gem.
 - `zip-merge` is a Kaitai-family binary AST integration. It registers and
   consumes a `parser_for(:zip)` Kaitai path so ZIP analysis enters through the
-  normalized TreeHaver API.
+  normalized TreeHaver API, and depends on `binary-merge` for shared
+  binary-family report and renderer-planning behavior.
+- `binary-merge` is the Kaitai/binary substrate. It hosts common byte-range,
+  preservation, unsafe-diagnostic, render-policy, and nested-dispatch vocabulary
+  for concrete schema parser gems such as `zip-merge`.
 - `plain-merge` is the line/text substrate. It registers `:text` and `:plain`
   parser paths through the `:line` backend.
 - `dotenv-merge` builds dotenv assignment and comment ownership on top of the

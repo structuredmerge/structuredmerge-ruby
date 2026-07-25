@@ -45,6 +45,20 @@ RSpec.describe Zip::Merge do
   end
 end
 
+RSpec.describe 'Zip::Merge binary substrate integration' do
+  it 'uses the shared binary substrate for merge reports and diagnostics' do
+    report = Zip::Merge.empty_report
+    diagnostic = Zip::Merge.render_error('unsafe_zip_member', '/entries/by_path/secret',
+                                         'unsafe member').diagnostic
+
+    expect(report).to be_a(TreeHaver::BinaryMergeReport)
+    expect(report.format).to eq('zip')
+    expect(report.schema).to eq('zip.ksy')
+    expect(diagnostic).to be_a(TreeHaver::BinaryDiagnostic)
+    expect(diagnostic.category).to eq('unsafe_zip_member')
+  end
+end
+
 RSpec.describe 'Zip::Merge TreeHaver backend registration' do
   it 'registers the ZIP Kaitai backend through TreeHaver parser lookup' do
     source = Zip::Merge.new_stored_zip('docs/readme.md' => "# Readme\n")

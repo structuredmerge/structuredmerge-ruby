@@ -24,7 +24,9 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 `Zip::Merge` plans ZIP archive merges by member path and raw byte ranges. It is
 a Kaitai-family binary AST integration in the StructuredMerge stack: ZIP
 inventories are represented with TreeHaver ZIP report nodes, and analysis enters
-through a `parser_for(:zip)` Kaitai path.
+through a `parser_for(:zip)` Kaitai path. It depends on `binary-merge` for the
+shared binary-family substrate: preservation reports, unsafe diagnostics,
+byte-range ownership, and renderer planning vocabulary.
 It identifies safe preservation cases, unsafe entries, members that need
 structured nested merges, and archive metadata that must be rewritten by a
 renderer.
@@ -33,6 +35,7 @@ renderer.
 
 - Central directory and local header inventory parsing.
 - Kaitai-family binary AST reporting through TreeHaver ZIP structures.
+- Shared binary-family report and diagnostic helpers from `binary-merge`.
 - Member decisions for preserve, add, delete, rewrite, delegate, and reject operations.
 - Nested family dispatch for structured archive members.
 - Raw-preserving renderer for safe unchanged members.

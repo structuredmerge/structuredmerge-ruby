@@ -978,7 +978,7 @@
       <pre class="code"><span class="info file"># File 'lib/zip/merge.rb', line 382</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_diagnostic'>diagnostic</span><span class='lparen'>(</span><span class='id identifier rubyid_category'>category</span><span class='comma'>,</span> <span class='id identifier rubyid_schema_path'>schema_path</span><span class='comma'>,</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
-  <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BinaryDiagnostic</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>severity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>category:</span> <span class='id identifier rubyid_category'>category</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='label'>schema_path:</span> <span class='id identifier rubyid_schema_path'>schema_path</span><span class='rparen'>)</span>
+  <span class='const'>Binary</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_unsafe_diagnostic'>unsafe_diagnostic</span><span class='lparen'>(</span><span class='label'>schema_path:</span> <span class='id identifier rubyid_schema_path'>schema_path</span><span class='comma'>,</span> <span class='label'>byte_range:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>message:</span> <span class='id identifier rubyid_message'>message</span><span class='comma'>,</span> <span class='label'>category:</span> <span class='id identifier rubyid_category'>category</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1009,8 +1009,8 @@
       <pre class="code"><span class="info file"># File 'lib/zip/merge.rb', line 176</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_empty_report'>empty_report</span>
-  <span class='const'>TreeHaver</span><span class='op'>::</span><span class='const'>BinaryMergeReport</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zip</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>schema:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zip.ksy</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>matched_schema_paths:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
-                                   <span class='label'>preserved_ranges:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>rewritten_nodes:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>checksum_updates:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>nested_dispatches:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>diagnostics:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='const'>Binary</span><span class='op'>::</span><span class='const'>Merge</span><span class='period'>.</span><span class='id identifier rubyid_preservation_report'>preservation_report</span><span class='lparen'>(</span><span class='label'>format:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zip</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>schema:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zip.ksy</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>matched_schema_paths:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span>
+                                    <span class='label'>preserved_ranges:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2233,7 +2233,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Jul 24 19:35:31 2026 by
+  Generated on Fri Jul 24 19:54:57 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

@@ -30,6 +30,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - `dotenv-merge` now registers `TreeHaver.parser_for(:dotenv)` and
   `TreeHaver.parser_for(:env)` line-backed parser paths built on the
   `plain-merge` line substrate.
+- `zip-merge` now depends on `binary-merge` for shared Kaitai/binary-family
+  report and diagnostic construction.
 - Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
   HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
   structural edit adapter.
@@ -47,6 +49,8 @@ Please file a bug if you notice a violation of semantic versioning.
   parser-specific object round-trips.
 - Clarified that `zip-merge` is a Kaitai-family binary AST integration and
   should not be categorized with byte or line oriented merge gems.
+- Clarified that `binary-merge` is the Kaitai/binary-family substrate for
+  concrete schema parser gems such as `zip-merge`.
 - The `smorg-rb` executable now supports `-v` / `--version` and prints a
   standard startup header on normal runs.
 - `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged

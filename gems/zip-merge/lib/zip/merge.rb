@@ -174,8 +174,8 @@ module Zip
     end
 
     def empty_report
-      TreeHaver::BinaryMergeReport.new(format: 'zip', schema: 'zip.ksy', matched_schema_paths: [],
-                                       preserved_ranges: [], rewritten_nodes: [], checksum_updates: [], nested_dispatches: [], diagnostics: [])
+      Binary::Merge.preservation_report(format: 'zip', schema: 'zip.ksy', matched_schema_paths: [],
+                                        preserved_ranges: [])
     end
 
     def scan_central_directory(source)
@@ -380,7 +380,7 @@ module Zip
     end
 
     def diagnostic(category, schema_path, message)
-      TreeHaver::BinaryDiagnostic.new(severity: 'error', category: category, message: message, schema_path: schema_path)
+      Binary::Merge.unsafe_diagnostic(schema_path: schema_path, byte_range: nil, message: message, category: category)
     end
 
     def render_error(category, schema_path, message)
@@ -393,6 +393,7 @@ Zip::Merge::Version.class_eval do
   extend VersionGem::Basic
 end
 
+require 'binary/merge'
 require_relative 'merge/backend'
 
 Zip::Merge.register_backend!

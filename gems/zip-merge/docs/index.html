@@ -86,7 +86,9 @@
 <p><code>Zip::Merge</code> plans ZIP archive merges by member path and raw byte ranges. It is<br>
 a Kaitai-family binary AST integration in the StructuredMerge stack: ZIP<br>
 inventories are represented with TreeHaver ZIP report nodes, and analysis enters<br>
-through a <code>parser_for(:zip)</code> Kaitai path.<br>
+through a <code>parser_for(:zip)</code> Kaitai path. It depends on <code>binary-merge</code> for the<br>
+shared binary-family substrate: preservation reports, unsafe diagnostics,<br>
+byte-range ownership, and renderer planning vocabulary.<br>
 It identifies safe preservation cases, unsafe entries, members that need<br>
 structured nested merges, and archive metadata that must be rewritten by a<br>
 renderer.</p>
@@ -96,6 +98,7 @@ renderer.</p>
 <ul>
   <li>Central directory and local header inventory parsing.</li>
   <li>Kaitai-family binary AST reporting through TreeHaver ZIP structures.</li>
+  <li>Shared binary-family report and diagnostic helpers from <code>binary-merge</code>.</li>
   <li>Member decisions for preserve, add, delete, rewrite, delegate, and reject operations.</li>
   <li>Nested family dispatch for structured archive members.</li>
   <li>Raw-preserving renderer for safe unchanged members.</li>
@@ -332,7 +335,7 @@ See <a href="LICENSE.md">LICENSE.md</a> for details.</p>
 </div></div>
 
       <div id="footer">
-  Generated on Fri Jul 24 19:35:30 2026 by
+  Generated on Fri Jul 24 19:54:57 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
