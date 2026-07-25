@@ -28,8 +28,7 @@ module Kettle
           install_steps = []
           install_steps << config_migration_step if config_migration_step
           install_steps << gemspec_dependency_sync_step(report)
-          version_step = version_gem_bootstrap_step(project_root, report)
-          install_steps << version_step if version_step
+          install_steps.concat(version_gem_bootstrap_steps(project_root, report))
           mise_step = mise_trust_step(project_root, report, env: env)
           install_steps << mise_step if mise_step
           install_steps.concat(post_template_project_fix_steps(project_root, report, env: env))
@@ -158,9 +157,13 @@ module Kettle
             .uniq
         end
 
-        def version_gem_bootstrap_step(project_root, report)
-          report.fetch(:post_apply_steps, []).find { |step| step.fetch(:name, nil) == "version_gem_bootstrap" } ||
-            Kettle::Jem.template_version_gem_bootstrap_step(project_root, report)
+        def version_gem_bootstrap_steps(project_root, report)
+          existing = report.fetch(:post_apply_steps, []).select do |step|
+            %w[version_gem_bootstrap version_gem_cleanup legacy_rbs_consolidation].include?(step.fetch(:name, nil))
+          end
+          return existing unless existing.empty?
+
+          [Kettle::Jem.template_version_gem_bootstrap_step(project_root, report)].flatten.compact
         end
 
         def install_phase_reports(install_steps)
@@ -169,6 +172,8 @@ module Kettle
             "post_template" => %w[
               kettle_config_migration
               version_gem_bootstrap
+              version_gem_cleanup
+              legacy_rbs_consolidation
               mise_trust
               legacy_ruby_version_file_cleanup
               readme_compatibility_badges

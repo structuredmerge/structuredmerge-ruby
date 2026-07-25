@@ -32,6 +32,12 @@ Please file a bug if you notice a violation of semantic versioning.
   template-impacting entries.
 - Curated Bundler binstub generation now includes `kettle-gha-pins` when it is
   present in the destination bundle.
+- Generated gemspec templates now include `anonymous_loader` as a development
+  dependency, and version spec normalization uses it to execute generated
+  `version.rb` files for coverage without redefining package constants.
+- Version spec normalization now removes managed version specs when
+  `version_gem` is disabled or incompatible with the project's runtime Ruby
+  floor.
 - Templating plan reports now include per-recipe duration metadata, template
   planning deduplicates destination and template-source file reads, and runtime
   loading is reduced to explicit main-Ractor extension points. A disabled

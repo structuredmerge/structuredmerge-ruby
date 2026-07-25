@@ -4325,7 +4325,7 @@ module Kettle
 
     def post_apply_steps(project_root, report)
       [
-        template_version_gem_bootstrap_step(project_root, report),
+        *[template_version_gem_bootstrap_step(project_root, report)].flatten,
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
         git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
@@ -4586,7 +4586,10 @@ module Kettle
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = facts.dig(:package, :name).to_s.tr("-", "/") if entrypoint_require.empty?
       unless project_gemspec_declares_version_gem?(project_root)
-        return legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+        return [
+          version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: false),
+          legacy_rbs_consolidation_step(project_root, facts, entrypoint_require: entrypoint_require)
+        ].compact
       end
 
       return version_gem_cleanup_step(project_root, facts) unless version_gem_runtime_compatible?(facts)
@@ -4622,23 +4625,28 @@ module Kettle
       }
     end
 
-    def version_gem_cleanup_step(project_root, facts)
+    def version_gem_cleanup_step(project_root, facts, cleanup_entrypoint: true)
       package_name = facts.dig(:package, :name).to_s
       return {name: "version_gem_cleanup", status: "unavailable", reason: "missing_package_facts"} if package_name.empty?
 
       entrypoint_require = facts.dig(:rubygems, :entrypoint_require).to_s
       entrypoint_require = package_name.tr("-", "/") if entrypoint_require.empty?
       entrypoint_path = File.join("lib", "#{entrypoint_require}.rb")
+      version_spec_path = File.join("spec", entrypoint_require, "version_spec.rb")
+      changed_files = []
       current = read_project_file(project_root, entrypoint_path)
-      return {name: "version_gem_cleanup", status: "already_current", changed_files: []} if current.empty?
-
-      cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
-      changed = write_if_changed(project_root, entrypoint_path, cleaned)
+      if cleanup_entrypoint && !current.empty?
+        cleaned = version_gem_free_entrypoint_content(current, entrypoint_require: entrypoint_require)
+        changed_files << write_if_changed(project_root, entrypoint_path, cleaned)
+      end
+      changed_files << cleanup_version_gem_version_spec(project_root, version_spec_path)
+      changed_files.compact!
       {
         name: "version_gem_cleanup",
-        status: changed ? "applied" : "already_current",
-        changed_files: changed ? [changed] : [],
-        entrypoint_path: entrypoint_path
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files,
+        entrypoint_path: entrypoint_path,
+        version_spec_path: version_spec_path
       }
     end
 
@@ -12487,7 +12495,13 @@ module Kettle
         version_gem_bootstrap_entrypoint_content(current_entrypoint, namespace: namespace, entrypoint_require: entrypoint_require)
       end
       changes << write_if_changed(project_root, entrypoint_path, entrypoint_content)
-      changes << normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require) if non_default_version_gem
+      changes << normalize_version_gem_version_spec(
+        project_root,
+        version_spec_path,
+        entrypoint_require,
+        namespace,
+        ensure_version_gem_require: non_default_version_gem
+      )
       if manage_signature_file || !legacy_signature_paths.empty?
         changes.concat(
           write_consolidated_version_signature(
@@ -12542,16 +12556,78 @@ module Kettle
       namespace.start_with?("#{parent}::")
     end
 
-    def normalize_non_default_version_gem_version_spec(project_root, version_spec_path, entrypoint_require)
+    def normalize_version_gem_version_spec(project_root, version_spec_path, entrypoint_require, namespace, ensure_version_gem_require:)
       current = read_project_file(project_root, version_spec_path)
       return if current.empty?
 
       require_path = File.join(entrypoint_require.to_s, "version_gem")
-      return if ruby_top_level_require?(current, "require", require_path)
+      requirements = []
+      requirements << %(require "anonymous_loader"\n) unless ruby_top_level_require?(current, "require", "anonymous_loader")
+      if ensure_version_gem_require && !ruby_top_level_require?(current, "require", require_path)
+        requirements << %(require "#{require_path}"\n)
+      end
 
-      lines = current.lines
-      lines.insert(version_spec_require_insertion_index(current), %(require "#{require_path}"\n))
-      write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(lines.join))
+      updated = current
+      if requirements.any?
+        lines = updated.lines
+        lines.insert(version_spec_require_insertion_index(updated), *requirements)
+        updated = lines.join
+      end
+      updated = normalize_version_spec_anonymous_loader_example(
+        updated,
+        version_spec_path: version_spec_path,
+        entrypoint_require: entrypoint_require,
+        namespace: namespace
+      )
+      write_if_changed(project_root, version_spec_path, collapse_excess_blank_lines(updated))
+    end
+
+    def cleanup_version_gem_version_spec(project_root, version_spec_path)
+      current = read_project_file(project_root, version_spec_path)
+      return if current.empty? || !managed_version_gem_version_spec?(current)
+
+      delete_project_file(project_root, version_spec_path)
+    end
+
+    def managed_version_gem_version_spec?(content)
+      content.to_s.include?('it_behaves_like "a Version module"') ||
+        version_spec_anonymous_loader_call?(content)
+    end
+
+    def normalize_version_spec_anonymous_loader_example(content, version_spec_path:, entrypoint_require:, namespace:)
+      return content if version_spec_anonymous_loader_call?(content)
+
+      describe_call = version_spec_rspec_describe_call(content)
+      return content unless describe_call&.block
+
+      version_path = version_spec_relative_version_path(version_spec_path, entrypoint_require)
+      clean_namespace = namespace.to_s.start_with?("::") ? namespace.to_s[2..] : namespace.to_s
+      example = <<~RUBY
+
+          it "executes the version file for coverage without redefining constants" do
+            path = File.expand_path("#{version_path}", __dir__)
+            anonymous_namespace = AnonymousLoader.load(files: path)
+
+            expect(anonymous_namespace::#{clean_namespace}::Version::VERSION).to eq(described_class::VERSION)
+          end
+      RUBY
+
+      insert_lines_before(content, describe_call.block.closing_loc.start_line, example)
+    end
+
+    def version_spec_anonymous_loader_call?(content)
+      ruby_call_records(content, :load).any? { |call| call.receiver&.slice == "AnonymousLoader" }
+    end
+
+    def version_spec_rspec_describe_call(content)
+      top_level_ruby_call_records(content, :describe).find do |call|
+        call.receiver&.slice == "RSpec" && call.block
+      end
+    end
+
+    def version_spec_relative_version_path(version_spec_path, entrypoint_require)
+      spec_depth = File.dirname(version_spec_path.to_s).split(File::SEPARATOR).reject(&:empty?).length
+      "#{"../" * spec_depth}lib/#{entrypoint_require}/version.rb"
     end
 
     def legacy_rbs_signature_paths(project_root, entrypoint_require)

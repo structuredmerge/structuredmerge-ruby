@@ -18,3 +18,8 @@
   files now run when pull request head branches start with `feature/release`,
   so release CI monitoring does not report intentionally skipped engine
   workflows as failures.
+- kettle-jem-template-20260725-002 - Generated gemspec templates now include
+  `anonymous_loader` as a development dependency, and version specs use it to
+  execute generated `version.rb` files for coverage without redefining package
+  constants. Managed version specs are removed when `version_gem` is disabled
+  or incompatible with the project's runtime Ruby floor.

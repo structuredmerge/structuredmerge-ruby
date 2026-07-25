@@ -234,6 +234,118 @@ RSpec.describe Kettle::Jem do
     end
   end
 
+  it "normalizes existing version specs to load version files anonymously for coverage" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-version-spec", tmp_root) do |root|
+      write_file(root, "kettle-family.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "kettle-family"
+          spec.version = "1.1.7"
+          spec.summary = "Kettle family"
+          spec.required_ruby_version = ">= 3.2"
+          spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")
+        end
+      RUBY
+      write_file(root, "lib/kettle/family.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require "version_gem"
+        require_relative "family/version"
+
+        module Kettle
+          module Family
+          end
+        end
+
+        Kettle::Family::Version.class_eval do
+          extend VersionGem::Basic
+        end
+      RUBY
+      write_file(root, "spec/kettle/family/version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        RSpec.describe Kettle::Family::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_bootstrap",
+          status: "applied",
+          changed_files: include("lib/kettle/family/version.rb", "spec/kettle/family/version_spec.rb")
+        )
+      )
+      version_spec = File.read(File.join(root, "spec/kettle/family/version_spec.rb"))
+      expect(version_spec).to include('require "anonymous_loader"')
+      expect(version_spec).to include('path = File.expand_path("../../../lib/kettle/family/version.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include(
+        "expect(anonymous_namespace::Kettle::Family::Version::VERSION).to eq(described_class::VERSION)"
+      )
+      expect(version_spec).not_to include("load path")
+    end
+  end
+
+  it "removes managed version specs when version_gem is not declared" do
+    tmp_root = File.join(__dir__, "tmp")
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-version-gem-spec-disabled", tmp_root) do |root|
+      write_file(root, "plain-gem.gemspec", <<~RUBY)
+        Gem::Specification.new do |spec|
+          spec.name = "plain-gem"
+          spec.version = "1.0.0"
+          spec.summary = "Plain gem"
+          spec.required_ruby_version = ">= 3.2"
+        end
+      RUBY
+      write_file(root, "lib/plain/gem.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        require_relative "gem/version"
+
+        module Plain
+          module Gem
+          end
+        end
+      RUBY
+      write_file(root, "spec/plain/gem/version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        RSpec.describe Plain::Gem::Version do
+          it_behaves_like "a Version module", described_class
+        end
+      RUBY
+      write_file(root, "spec/plain/gem/custom_version_spec.rb", <<~RUBY)
+        # frozen_string_literal: true
+
+        RSpec.describe Plain::Gem::Version do
+          it "keeps custom checks" do
+            expect(described_class.name).to end_with("Version")
+          end
+        end
+      RUBY
+
+      result = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
+
+      expect(result.fetch(:post_apply_steps)).to include(
+        include(
+          name: "version_gem_cleanup",
+          status: "applied",
+          changed_files: ["spec/plain/gem/version_spec.rb"]
+        )
+      )
+      expect(File).not_to exist(File.join(root, "spec/plain/gem/version_spec.rb"))
+      expect(File).to exist(File.join(root, "spec/plain/gem/custom_version_spec.rb"))
+      entrypoint = File.read(File.join(root, "lib/plain/gem.rb"))
+      expect(entrypoint).to include('require_relative "gem/version"')
+      expect(entrypoint).not_to include("VersionGem")
+    end
+  end
+
   it "preserves non-default version_gem loading when a dedicated version_gem entrypoint exists" do
     tmp_root = File.join(__dir__, "tmp")
     FileUtils.mkdir_p(tmp_root)
@@ -311,8 +423,14 @@ RSpec.describe Kettle::Jem do
       expect(gemspec).not_to include("version_gem")
       expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
       version_spec = File.read(File.join(root, "spec/nomono/version_spec.rb"))
+      expect(version_spec).to include('require "anonymous_loader"')
       expect(version_spec).to include('require "nomono/version_gem"')
       expect(version_spec).to include("RSpec.describe Nomono::Version do")
+      expect(version_spec).to include('path = File.expand_path("../../lib/nomono/version.rb", __dir__)')
+      expect(version_spec).to include("anonymous_namespace = AnonymousLoader.load(files: path)")
+      expect(version_spec).to include(
+        "expect(anonymous_namespace::Nomono::Version::VERSION).to eq(described_class::VERSION)"
+      )
     end
   end
 end
