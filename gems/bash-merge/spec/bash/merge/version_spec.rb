@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
-require "anonymous_loader"
+require 'anonymous_loader'
 
 RSpec.describe Bash::Merge::Version do
   it_behaves_like 'a Version module', described_class
@@ -16,10 +16,10 @@ RSpec.describe Bash::Merge::Version do
     end
   end
 
-it "executes the version file for coverage without redefining constants" do
-  path = File.expand_path("../../../lib/bash/merge/version.rb", __dir__)
-  anonymous_namespace = AnonymousLoader.load(files: path)
+  it 'executes the version file for coverage without redefining constants' do
+    path = File.expand_path('../../../lib/bash/merge/version.rb', __dir__)
+    anonymous_namespace = AnonymousLoader.load(files: path)
 
-  expect(anonymous_namespace::Bash::Merge::Version::VERSION).to eq(described_class::VERSION)
-end
+    expect(anonymous_namespace::Bash::Merge::Version::VERSION).to eq(described_class::VERSION)
+  end
 end
