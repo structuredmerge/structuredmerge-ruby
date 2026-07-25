@@ -288,6 +288,9 @@ Please file a bug if you notice a violation of semantic versioning.
 - Generated MRI 2.4 through 2.7 workflows now bypass `ruby/setup-ruby`
   Bundler caching and run an explicit bundle install, avoiding `bundle lock`
   failures against gem.coop's missing legacy specs index.
+- Generated legacy-engine workflows now configure Bundler to mirror gem.coop to
+  RubyGems.org during explicit CI installs, avoiding old Bundler full-index
+  requests that gem.coop does not support.
 - Main Gemfile templating now removes duplicate `eval_gemfile` declarations
   for the same modular dependency file, avoiding duplicate Bundler dependency
   warnings after repeated templating.

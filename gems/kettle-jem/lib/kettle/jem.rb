@@ -15582,6 +15582,7 @@ module Kettle
           if: ${{ matrix.ruby == 'ruby-2.4' || matrix.ruby == 'ruby-2.5' || matrix.ruby == 'ruby-2.6' || matrix.ruby == 'ruby-2.7' || matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}
           run: |
             bundle config set --local path "${RUNNER_TEMP}/bundle"
+            bundle config set --local mirror.https://gem.coop https://rubygems.org
             bundle install --jobs 1
       YAML
       yaml.lines.map { |line| line.strip.empty? ? line : "#{indent}#{line}" }.join.rstrip

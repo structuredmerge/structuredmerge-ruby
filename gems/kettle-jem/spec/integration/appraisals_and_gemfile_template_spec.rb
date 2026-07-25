@@ -644,6 +644,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
     expect(workflows).to all(include("        if: ${{ matrix.ruby == 'ruby-2.4' || matrix.ruby == 'ruby-2.5' || matrix.ruby == 'ruby-2.6' || matrix.ruby == 'ruby-2.7' || matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}"))
     expect(workflows).to all(include('          bundle config set --local path "${RUNNER_TEMP}/bundle"'))
+    expect(workflows).to all(include("          bundle config set --local mirror.https://gem.coop https://rubygems.org"))
     expect(workflows).to all(include("          bundle install --jobs 1"))
 
     %w[2.4 2.5 2.6 2.7].each do |version|
@@ -651,6 +652,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(packaged_workflow).to include("bundler-cache: false")
       expect(packaged_workflow).to include("      - name: Bundle install for Ruby #{version}")
       expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+      expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
       expect(packaged_workflow).to include("          bundle install --jobs 1")
     end
 
@@ -661,18 +663,21 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
 
     packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.2.yml.example"))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.2")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
 
     packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.3.yml.example"))
     expect(packaged_workflow).to include("bundler-cache: false")
     expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.3")
     expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle config set --local mirror.https://gem.coop https://rubygems.org")
     expect(packaged_workflow).to include("          bundle install --jobs 1")
   end
 
