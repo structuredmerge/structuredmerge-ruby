@@ -223,6 +223,12 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
             apply: false
             entries:
               - README.md
+          kettle-jem:
+            version: "7.0.0"
+            changelog_replay:
+              last_entry_key: "kettle-jem-template-20260715-999"
+              last_entry_date: "2026-07-15"
+            checksums: {}
         YAML
         "CHANGELOG.md" => <<~MARKDOWN
           # Changelog
@@ -251,6 +257,48 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       expect(changelog.scan("kettle-jem-template-20260716-001").size).to eq(1)
       expect(changelog).to include("- Project-authored item.")
       expect(changelog).to include("- Existing fix.")
+    end
+  end
+
+  it "adds only the initial templating changelog entry when no replay state exists" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-changelog-initial-template-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: false
+            entries:
+              - README.md
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN
+          # Changelog
+
+          ## [Unreleased]
+
+          ### Added
+
+          - Project-authored item.
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan[:recipe_reports].find { |candidate| candidate.fetch(:recipe_name) == "changelog_unreleased" }
+      changelog = report.fetch(:final_content)
+
+      expect(changelog).to include("- kettle-jem-template-initial - Initial templating by kettle-jem.")
+      expect(changelog).not_to include("kettle-jem-template-20260716-001")
+      expect(changelog).to include("- Project-authored item.")
     end
   end
 

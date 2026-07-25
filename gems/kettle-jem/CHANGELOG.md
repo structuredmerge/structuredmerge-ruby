@@ -20,6 +20,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Changelog replay now records a cursor in the managed `kettle-jem` config
+  state so first-time templated projects receive only an initial templating
+  changelog entry, while previously templated projects replay only missed
+  template-impacting entries.
 - Curated Bundler binstub generation now includes `kettle-gha-pins` when it is
   present in the destination bundle.
 - Templating plan reports now include per-recipe duration metadata, template

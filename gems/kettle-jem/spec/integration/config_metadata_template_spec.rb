@@ -1439,10 +1439,20 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       described_class::TemplateChecksums.write_to_config(
         config_path: File.join(root, ".kettle-jem.yml"),
         checksums: current,
-        version: "1.2.3"
+        version: "1.2.3",
+        applied_at: "2026-07-24",
+        changelog_replay: {
+          "last_entry_key" => "kettle-jem-template-20260720-005",
+          "last_entry_date" => "2026-07-20"
+        }
       )
       rewritten = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
       expect(rewritten.fetch("kettle-jem").fetch("version")).to eq("1.2.3")
+      expect(rewritten.fetch("kettle-jem").fetch("applied_at")).to eq("2026-07-24")
+      expect(rewritten.fetch("kettle-jem").fetch("changelog_replay")).to eq(
+        "last_entry_key" => "kettle-jem-template-20260720-005",
+        "last_entry_date" => "2026-07-20"
+      )
       expect(rewritten.fetch("kettle-jem").fetch("checksums")).to eq(current)
     end
   end

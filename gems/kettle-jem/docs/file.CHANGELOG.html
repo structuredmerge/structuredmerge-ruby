@@ -75,6 +75,10 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 <h3 id="added">Added</h3>
 
 <ul>
+  <li>Changelog replay now records a cursor in the managed <code>kettle-jem</code> config<br>
+state so first-time templated projects receive only an initial templating<br>
+changelog entry, while previously templated projects replay only missed<br>
+template-impacting entries.</li>
   <li>Curated Bundler binstub generation now includes <code>kettle-gha-pins</code> when it is<br>
 present in the destination bundle.</li>
   <li>Templating plan reports now include per-recipe duration metadata, template<br>
@@ -1123,7 +1127,7 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Thu Jul 23 22:15:24 2026 by
+  Generated on Fri Jul 24 18:19:52 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

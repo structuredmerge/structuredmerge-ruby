@@ -75,7 +75,12 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(bootstrap_report.fetch(:final_content)).to include("#   tokens    - values for {KJ|...} placeholders used across template files")
 
       described_class.apply_project(root, env: {"KJ_MIN_DIVERGENCE_THRESHOLD" => "7"})
-      expect(File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))).to eq(bootstrap_report.fetch(:final_content))
+      applied_config = File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))
+      expect(applied_config).to start_with(bootstrap_report.fetch(:final_content).rstrip)
+      expect(YAML.safe_load(applied_config).fetch("kettle-jem")).to include(
+        "version" => described_class::VERSION,
+        "checksums" => a_kind_of(Hash)
+      )
     end
   end
 

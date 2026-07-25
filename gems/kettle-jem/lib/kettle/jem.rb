@@ -380,6 +380,11 @@ module Kettle
     CHANGELOG_TRANSFER_KEY_SEPARATOR = /\s+-\s+/
     CHANGELOG_TRANSFER_KEY_PATTERN = /\Akettle-jem-template-\d{8}-\d{3}\z/
     CHANGELOG_TRANSFER_KEY_SCAN_PATTERN = /\bkettle-jem-template-\d{8}-\d{3}\b/
+    CHANGELOG_INITIAL_TEMPLATE_KEY = "kettle-jem-template-initial"
+    CHANGELOG_INITIAL_TEMPLATE_ENTRY = {
+      key: CHANGELOG_INITIAL_TEMPLATE_KEY,
+      lines: ["- #{CHANGELOG_INITIAL_TEMPLATE_KEY} - Initial templating by kettle-jem."]
+    }.freeze
     README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/
     CHANGELOG_COVERAGE_KLOC_PATTERN = /-\s*COVERAGE:\s*.+--\s*\d+\/(\d+)\s+lines/i
     RUBY_TEMPLATE_BASENAMES = %w[Gemfile Rakefile Appraisals Appraisal.root.gemfile .simplecov].freeze
@@ -1691,6 +1696,10 @@ module Kettle
       YAML_KEY = "kettle-jem"
       CHECKSUMS_SUBKEY = "checksums"
       VERSION_SUBKEY = "version"
+      APPLIED_AT_SUBKEY = "applied_at"
+      CHANGELOG_REPLAY_SUBKEY = "changelog_replay"
+      LAST_ENTRY_KEY_SUBKEY = "last_entry_key"
+      LAST_ENTRY_DATE_SUBKEY = "last_entry_date"
 
       module_function
 
@@ -1709,10 +1718,19 @@ module Kettle
       def load_stored(config_path:)
         return {} unless File.exist?(config_path.to_s)
 
-        data = YAML.safe_load_file(config_path.to_s, permitted_classes: [], aliases: false)
-        entry = data.is_a?(Hash) ? data[YAML_KEY] : nil
+        entry = load_state(config_path: config_path)
         stored = entry.is_a?(Hash) ? entry[CHECKSUMS_SUBKEY] : nil
         stored.is_a?(Hash) ? stored : {}
+      rescue
+        {}
+      end
+
+      def load_state(config_path:)
+        return {} unless File.exist?(config_path.to_s)
+
+        data = YAML.safe_load_file(config_path.to_s, permitted_classes: [], aliases: false)
+        entry = data.is_a?(Hash) ? data[YAML_KEY] : nil
+        entry.is_a?(Hash) ? entry : {}
       rescue
         {}
       end
@@ -1751,46 +1769,82 @@ module Kettle
         ]
       end
 
-      def build_yaml_block(checksums:, version: nil)
+      def build_yaml_block(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
         lines = [YAML_KEY]
         lines[0] = "#{lines[0]}:"
-        lines << "  #{VERSION_SUBKEY}: #{version.to_s.dump}" if version
-        lines << "  #{CHECKSUMS_SUBKEY}:"
-        checksums.sort.each do |path, sha|
-          lines << "    #{path.dump}: #{sha.dump}"
-        end
+        lines.concat(build_yaml_state_lines(checksums: checksums, version: version, applied_at: applied_at, changelog_replay: changelog_replay).map { |line| "  #{line}" })
         lines.join("\n")
       end
 
-      def write_to_config(config_path:, checksums:, version: nil)
+      def build_yaml_state(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
+        build_yaml_state_lines(
+          checksums: checksums,
+          version: version,
+          applied_at: applied_at,
+          changelog_replay: changelog_replay
+        ).join("\n")
+      end
+
+      def build_yaml_state_lines(checksums:, version: nil, applied_at: nil, changelog_replay: nil)
+        lines = []
+        lines << "#{VERSION_SUBKEY}: #{version.to_s.dump}" if version
+        lines << "#{APPLIED_AT_SUBKEY}: #{applied_at.to_s.dump}" if applied_at
+        if changelog_replay.is_a?(Hash) && !changelog_replay.empty?
+          lines << "#{CHANGELOG_REPLAY_SUBKEY}:"
+          last_entry_key = changelog_replay[LAST_ENTRY_KEY_SUBKEY] || changelog_replay[:last_entry_key]
+          last_entry_date = changelog_replay[LAST_ENTRY_DATE_SUBKEY] || changelog_replay[:last_entry_date]
+          lines << "  #{LAST_ENTRY_KEY_SUBKEY}: #{last_entry_key.to_s.dump}" if last_entry_key
+          lines << "  #{LAST_ENTRY_DATE_SUBKEY}: #{last_entry_date.to_s.dump}" if last_entry_date
+        end
+        lines << "#{CHECKSUMS_SUBKEY}:"
+        checksums.sort.each do |path, sha|
+          lines << "  #{path.dump}: #{sha.dump}"
+        end
+        lines
+      end
+
+      def write_to_config(config_path:, checksums:, version: nil, applied_at: nil, changelog_replay: nil)
         return unless File.exist?(config_path.to_s)
 
         content = File.read(config_path.to_s)
-        new_block = build_yaml_block(checksums: checksums, version: version)
-        updated = replace_top_level_yaml_block(content, YAML_KEY, "#{new_block}\n")
-        updated = "#{content.rstrip}\n\n#{new_block}\n" if updated == content
+        state = build_yaml_state(
+          checksums: checksums,
+          version: version,
+          applied_at: applied_at,
+          changelog_replay: changelog_replay
+        )
+        updated = merge_yaml_state(content, "#{YAML_KEY}:\n#{state.lines.map { |line| "  #{line}" }.join}")
         File.write(config_path.to_s, updated)
       end
 
-      def replace_top_level_yaml_block(content, key, replacement)
+      def merge_yaml_state(content, state_block)
+        range = yaml_state_node_range(content)
+        return "#{content.to_s.rstrip}\n\n#{state_block}\n" unless range
+
         lines = content.to_s.lines
-        document = Psych.parse_stream(content.to_s).children.first
-        root = document&.root
-        return content unless root.is_a?(Psych::Nodes::Mapping)
+        [*lines[0...range.begin], "#{state_block}\n", *lines[range.end..].to_a].join
+      end
 
-        pairs = root.children.each_slice(2).to_a
-        pairs.each_with_index do |(key_node, value_node), index|
-          next unless key_node.is_a?(Psych::Nodes::Scalar) && key_node.value.to_s == key.to_s
+      def yaml_state_node_range(content)
+        require "yaml/merge"
 
-          next_key = pairs[index + 1]&.first
-          end_line = next_key&.start_line || value_node.end_line
-          end_line += 1 if end_line <= key_node.start_line
-          return [*lines[0...key_node.start_line], replacement, *lines[end_line..].to_a].join
+        analysis = Yaml::Merge::FileAnalysis.new(content.to_s)
+        raise Error, "could not parse kettle-jem config as YAML" unless analysis.valid?
+
+        body = analysis.documents.first&.body_node
+        return unless body&.mapping?
+
+        pairs = body.mapping_pairs
+        pairs.each_with_index do |pair, index|
+          next unless pair.key_name == YAML_KEY
+
+          start_index = pair.start_line.to_i - 1
+          next_pair = pairs[index + 1]
+          end_index = next_pair ? next_pair.start_line.to_i - 1 : [pair.end_line.to_i - 1, content.to_s.lines.length].min
+          return start_index...end_index
         end
 
-        content
-      rescue Psych::Exception
-        content
+        nil
       end
     end
 
@@ -3201,8 +3255,8 @@ module Kettle
         )
         facts[:readme_style] = readme_style unless readme_style.empty?
         facts[:ruby_style] = ruby_style_facts(project_root)
-        changelog_transfers = changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT)
-        facts[:changelog] = {transfer_entries: changelog_transfers} unless changelog_transfers.empty?
+        changelog = changelog_transfer_facts(project_root, changelog_transfer_entries(PACKAGED_TEMPLATE_ROOT))
+        facts[:changelog] = changelog unless changelog.empty?
         gemspec_facts = gemspec_template_facts(kettle_config)
         facts[:gemspec] = gemspec_facts unless gemspec_facts.empty?
         template_tokens = template_tokens(facts, funding)
@@ -4023,7 +4077,7 @@ module Kettle
         emit_step_events(events, "post_apply_step", report.fetch(:post_apply_steps), phase: "post_apply")
       end
       report[:changed_files] = (report.fetch(:changed_files, []) + report.fetch(:post_apply_steps).flat_map do |step|
-        step.fetch(:changed_files, [])
+        reported_post_apply_changed_files(step)
       end).uniq.sort
       report[:duplicate_drift] = with_event_phase(events, "duplicate_drift") do
         if DecisionPolicy.value_to_boolean((run_options || {})[:skip_drift_check])
@@ -4233,6 +4287,12 @@ module Kettle
       payload.fetch(key, payload.fetch(key.to_s, nil))
     end
 
+    def reported_post_apply_changed_files(step)
+      return [] if event_payload_value(step, :metadata_only)
+
+      Array(event_payload_value(step, :changed_files) || [])
+    end
+
     def emit_summary_event(events, report)
       emit_event(
         events,
@@ -4308,7 +4368,8 @@ module Kettle
         monorepo_root_gemfile_dependency_sync_step(project_root, report),
         git_hooks_executable_step(project_root),
         github_actions_pin_sync_step(project_root),
-        monorepo_subgem_kettle_config_profile_sync_step(project_root, report)
+        monorepo_subgem_kettle_config_profile_sync_step(project_root, report),
+        kettle_jem_state_sync_step(project_root, report)
       ].compact
     end
 
@@ -4370,6 +4431,44 @@ module Kettle
         path: KETTLE_CONFIG_PATH,
         status: (after == before) ? "already_current" : "applied",
         changed_files: (after == before) ? [] : [KETTLE_CONFIG_PATH]
+      }
+    end
+
+    def kettle_jem_state_sync_step(project_root, report)
+      config_path = kettle_jem_config_path(project_root)
+      return unless File.file?(config_path)
+
+      relative_path = config_path.delete_prefix("#{project_root}/")
+      before = File.read(config_path)
+      latest_replay = report.dig(:facts, :changelog, :latest_transfer_entry)
+      existing_replay = TemplateChecksums.load_state(config_path: config_path)[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+      changelog_replay = if latest_replay
+        {
+          TemplateChecksums::LAST_ENTRY_KEY_SUBKEY => latest_replay.fetch(:key),
+          TemplateChecksums::LAST_ENTRY_DATE_SUBKEY => changelog_transfer_key_date(latest_replay.fetch(:key))
+        }
+      elsif existing_replay.is_a?(Hash)
+        existing_replay
+      end
+      TemplateChecksums.write_to_config(
+        config_path: config_path,
+        checksums: TemplateChecksums.compute(template_root: template_root_path(project_root, config: kettle_jem_config(project_root))),
+        version: VERSION,
+        applied_at: Time.now.utc.strftime("%Y-%m-%d"),
+        changelog_replay: changelog_replay
+      )
+      after = File.read(config_path)
+      if after != before
+        config_report = report.fetch(:recipe_reports, []).find { |entry| entry.fetch(:relative_path, nil) == relative_path }
+        config_report[:final_content] = after if config_report
+        config_report&.dig(:report_envelope, :report)&.[]=(:final_content, after)
+      end
+      {
+        name: "kettle_jem_state_sync",
+        path: relative_path,
+        status: (after == before) ? "already_current" : "applied",
+        changed_files: (after == before) ? [] : [relative_path],
+        metadata_only: true
       }
     end
 
@@ -5023,6 +5122,43 @@ module Kettle
       end
       lines << ""
       lines
+    end
+
+    def changelog_transfer_facts(project_root, entries)
+      all_entries = Array(entries)
+      latest = latest_changelog_transfer_entry(all_entries)
+      state = TemplateChecksums.load_state(config_path: kettle_jem_config_path(project_root))
+      replay = state[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+      replay = replay.is_a?(Hash) ? replay : {}
+      last_key = replay[TemplateChecksums::LAST_ENTRY_KEY_SUBKEY].to_s
+      selected_entries = if state.empty?
+        [CHANGELOG_INITIAL_TEMPLATE_ENTRY]
+      elsif !last_key.empty?
+        changelog_transfer_entries_after(all_entries, last_key)
+      else
+        all_entries
+      end
+
+      {
+        transfer_entries: selected_entries,
+        latest_transfer_entry: latest,
+        first_template: state.empty?
+      }.compact
+    end
+
+    def latest_changelog_transfer_entry(entries)
+      Array(entries).max_by { |entry| entry.fetch(:key).to_s }
+    end
+
+    def changelog_transfer_entries_after(entries, key)
+      Array(entries).select { |entry| entry.fetch(:key).to_s > key.to_s }
+    end
+
+    def changelog_transfer_key_date(key)
+      match = key.to_s.match(/\Akettle-jem-template-(\d{4})(\d{2})(\d{2})-\d{3}\z/)
+      return nil unless match
+
+      "#{match[1]}-#{match[2]}-#{match[3]}"
     end
 
     def changelog_transfer_entries(template_root)

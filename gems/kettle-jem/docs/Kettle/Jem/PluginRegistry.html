@@ -386,15 +386,15 @@
       <pre class="lines">
 
 
-1445
-1446
-1447
-1448
-1449
-1450</pre>
+1450
+1451
+1452
+1453
+1454
+1455</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1445</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1450</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='label'>configured_plugins:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>loaded_plugins:</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
   <span class='ivar'>@hooks</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -439,12 +439,12 @@
       <pre class="lines">
 
 
-1443
-1444
-1445</pre>
+1448
+1449
+1450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1443</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_configured_plugins'>configured_plugins</span>
   <span class='ivar'>@configured_plugins</span>
@@ -481,12 +481,12 @@
       <pre class="lines">
 
 
-1443
-1444
-1445</pre>
+1448
+1449
+1450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1443</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hooks'>hooks</span>
   <span class='ivar'>@hooks</span>
@@ -523,12 +523,12 @@
       <pre class="lines">
 
 
-1443
-1444
-1445</pre>
+1448
+1449
+1450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1443</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load_errors'>load_errors</span>
   <span class='ivar'>@load_errors</span>
@@ -565,12 +565,12 @@
       <pre class="lines">
 
 
-1443
-1444
-1445</pre>
+1448
+1449
+1450</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1443</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1448</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_loaded_plugins'>loaded_plugins</span>
   <span class='ivar'>@loaded_plugins</span>
@@ -625,12 +625,12 @@
       <pre class="lines">
 
 
-1477
-1478
-1479</pre>
+1482
+1483
+1484</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1477</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1482</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_empty?'>empty?</span>
   <span class='ivar'>@hooks</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
@@ -678,19 +678,19 @@
       <pre class="lines">
 
 
-1452
-1453
-1454
-1455
-1456
 1457
 1458
 1459
 1460
-1461</pre>
+1461
+1462
+1463
+1464
+1465
+1466</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1452</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1457</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='label'>plugin_name:</span><span class='comma'>,</span> <span class='label'>phase:</span><span class='comma'>,</span> <span class='label'>timing:</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_callback'>callback</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span> <span class='const'>ArgumentError</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Plugin callbacks require a block</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_callback'>callback</span>
@@ -722,11 +722,6 @@
       <pre class="lines">
 
 
-1463
-1464
-1465
-1466
-1467
 1468
 1469
 1470
@@ -734,10 +729,15 @@
 1472
 1473
 1474
-1475</pre>
+1475
+1476
+1477
+1478
+1479
+1480</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1463</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1468</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='label'>timing:</span><span class='comma'>,</span> <span class='label'>phase:</span><span class='comma'>,</span> <span class='label'>context:</span><span class='comma'>,</span> <span class='label'>actor:</span><span class='comma'>,</span> <span class='label'>phase_stats:</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_normalized_phase'>normalized_phase</span> <span class='op'>=</span> <span class='id identifier rubyid_normalize_phase'>normalize_phase</span><span class='lparen'>(</span><span class='id identifier rubyid_phase'>phase</span><span class='rparen'>)</span>
@@ -762,7 +762,7 @@
 </div>
 
       <div id="footer">
-  Generated on Thu Jul 23 22:15:27 2026 by
+  Generated on Fri Jul 24 18:19:55 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>
