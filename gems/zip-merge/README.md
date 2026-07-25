@@ -21,11 +21,18 @@ I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-ta
 
 ## 🌻 Synopsis <a href="https://discord.gg/3qme4XHNKN"><img alt="Galtzo FLOSS Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/galtzo-floss/avatar-128px.svg" width="8%" align="right"/></a> <a href="https://ruby-toolbox.com"><img alt="ruby-lang Logo, Yukihiro Matsumoto, Ruby Visual Identity Team, CC BY-SA 2.5" src="https://logos.galtzo.com/assets/images/ruby-lang/avatar-128px.svg" width="8%" align="right"/></a>
 
-`Zip::Merge` plans ZIP archive merges by member path and raw byte ranges. It identifies safe preservation cases, unsafe entries, members that need structured nested merges, and archive metadata that must be rewritten by a renderer.
+`Zip::Merge` plans ZIP archive merges by member path and raw byte ranges. It is
+a Kaitai-family binary AST integration in the StructuredMerge stack: ZIP
+inventories are represented with TreeHaver ZIP report nodes, and analysis enters
+through a `parser_for(:zip)` Kaitai path.
+It identifies safe preservation cases, unsafe entries, members that need
+structured nested merges, and archive metadata that must be rewritten by a
+renderer.
 
 ### Key Features
 
 - Central directory and local header inventory parsing.
+- Kaitai-family binary AST reporting through TreeHaver ZIP structures.
 - Member decisions for preserve, add, delete, rewrite, delegate, and reject operations.
 - Nested family dispatch for structured archive members.
 - Raw-preserving renderer for safe unchanged members.
@@ -104,9 +111,10 @@ Rendering requires caller-supplied member bytes for added, rewritten, or delegat
 ```ruby
 require "zip/merge"
 
-ancestor = Zip::Merge.parse_zip_inventory(File.binread("base.zip"))
-current = Zip::Merge.parse_zip_inventory(File.binread("ours.zip"))
-incoming = Zip::Merge.parse_zip_inventory(File.binread("theirs.zip"))
+zip_parser = TreeHaver.parser_for(:zip, backend_type: :kaitai)
+ancestor = zip_parser.parse(File.binread("base.zip"))
+current = zip_parser.parse(File.binread("ours.zip"))
+incoming = zip_parser.parse(File.binread("theirs.zip"))
 
 plan = Zip::Merge.plan_zip_merge(ancestor, current, incoming)
 plan.member_decisions.each do |decision|

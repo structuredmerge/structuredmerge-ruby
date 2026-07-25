@@ -144,6 +144,9 @@ Examples:
   parser integrations.
 - `rbs-merge` intentionally registers both the official RBS parser backend and
   the tree-sitter RBS grammar in one gem.
+- `zip-merge` is a Kaitai-family binary AST integration. It registers and
+  consumes a `parser_for(:zip)` Kaitai path so ZIP analysis enters through the
+  normalized TreeHaver API.
 
 Partial document insertion, replacement, and removal are `ast-crispr` work.
 `PartialTemplateMerger` should normalize the API used by merge gems and route

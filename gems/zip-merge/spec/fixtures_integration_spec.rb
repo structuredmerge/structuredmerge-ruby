@@ -44,3 +44,15 @@ RSpec.describe Zip::Merge do
     expect(categories.fetch('encrypted-member')).to eq('encrypted_member')
   end
 end
+
+RSpec.describe 'Zip::Merge TreeHaver backend registration' do
+  it 'registers the ZIP Kaitai backend through TreeHaver parser lookup' do
+    source = Zip::Merge.new_stored_zip('docs/readme.md' => "# Readme\n")
+    parser = TreeHaver.parser_for(:zip, backend_type: :kaitai)
+    inventory = parser.parse(source)
+
+    expect(inventory).to be_a(TreeHaver::ZipFamilyReport)
+    expect(inventory.archive.schema).to eq('zip.ksy')
+    expect(inventory.entries.map(&:normalized_path)).to eq(['docs/readme.md'])
+  end
+end

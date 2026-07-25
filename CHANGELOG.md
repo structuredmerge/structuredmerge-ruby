@@ -22,6 +22,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - `ast-crispr` now provides `Ast::Crispr::DeleteBatch` for deleting matches from
   multiple structural selectors through one parsed document context.
+- `zip-merge` now registers a Kaitai-backed `TreeHaver.parser_for(:zip)` path
+  for ZIP inventory analysis.
 - Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
   HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
   structural edit adapter.
@@ -37,6 +39,8 @@ Please file a bug if you notice a violation of semantic versioning.
   substrate/provider behavior sharing and the requirement that partial document
   insertion, replacement, and removal flow through `ast-crispr` instead of
   parser-specific object round-trips.
+- Clarified that `zip-merge` is a Kaitai-family binary AST integration and
+  should not be categorized with byte or line oriented merge gems.
 - The `smorg-rb` executable now supports `-v` / `--version` and prints a
   standard startup header on normal runs.
 - `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged

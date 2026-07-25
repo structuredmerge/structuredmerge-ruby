@@ -67,7 +67,7 @@ These are two separate axes:
   backend and delegates family behavior to the substrate when one exists.
 - **Backend role** answers how parsing is registered. A gem may register a
   TSLP/tree-sitter grammar, a native/provider backend, both, or no parser at all
-  for text/binary-specialized merge behavior.
+  for byte or line oriented merge behavior.
 
 Current examples:
 
@@ -86,10 +86,15 @@ Current examples:
 - **Dual-backend single gem**: `rbs-merge` registers the official RBS parser
   backend and the tree-sitter RBS grammar in one gem because both surfaces are
   intentional and tested there.
-- **Special-purpose non-AST merge gems**: `plain-merge`, `binary-merge`,
-  `zip-merge`, and current dotenv merge behavior do not define a parser-backed
-  language family substrate. Keep those exceptions explicit instead of using
-  them as models for parser-backed merge gems.
+- **Synthetic or binary AST merge gems**: `zip-merge` is a Kaitai-family binary
+  AST integration. It registers and consumes the `parser_for(:zip)` Kaitai path,
+  producing TreeHaver ZIP report nodes. Synthetic parsers that produce
+  normalized TreeHaver owners belong in this parser-backed category even when
+  they are not text grammars.
+- **Byte or line oriented merge gems**: `plain-merge`, `binary-merge`, and
+  current dotenv merge behavior do not define a TreeHaver parser-backed language
+  family substrate. Keep those exceptions explicit instead of using them as
+  models for parser-backed merge gems.
 
 Backend fallback inside `tree_haver` is allowed when it is explicit TreeHaver backend selection. Backend fallback outside `tree_haver` is not allowed, because it bypasses owner identity, backend diagnostics, parser capability reporting, and shared merge-stack behavior.
 
