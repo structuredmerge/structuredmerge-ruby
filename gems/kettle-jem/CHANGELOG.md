@@ -20,6 +20,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
+  progress stream filtering, emission, recording, and phase timing.
 - Changelog replay now records a cursor in the managed `kettle-jem` config
   state so first-time templated projects receive only an initial templating
   changelog entry, while previously templated projects replay only missed

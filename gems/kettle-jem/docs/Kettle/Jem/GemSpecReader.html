@@ -204,12 +204,12 @@
       <pre class="lines">
 
 
-1208
 1209
-1210</pre>
+1210
+1211</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1208</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1209</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_clear_cache!'>clear_cache!</span>
   <span class='const'>CACHE</span><span class='period'>.</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='lbrace'>{</span> <span class='const'>CACHE</span><span class='period'>.</span><span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span> <span class='rbrace'>}</span>
@@ -234,7 +234,6 @@
       <pre class="lines">
 
 
-1192
 1193
 1194
 1195
@@ -248,10 +247,11 @@
 1203
 1204
 1205
-1206</pre>
+1206
+1207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1192</span>
+      <pre class="code"><span class="info file"># File 'lib/kettle/jem.rb', line 1193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_load'>load</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='rparen'>)</span>
   <span class='id identifier rubyid_cache_key'>cache_key</span> <span class='op'>=</span> <span class='const'>File</span><span class='period'>.</span><span class='id identifier rubyid_expand_path'>expand_path</span><span class='lparen'>(</span><span class='id identifier rubyid_root'><span class='object_link'><a href="../../top-level-namespace.html" title="Top Level Namespace (root)">root</a></span></span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span>
@@ -278,7 +278,7 @@
 </div>
 
       <div id="footer">
-  Generated on Fri Jul 24 18:19:55 2026 by
+  Generated on Fri Jul 24 22:24:28 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.45 (ruby-4.0.6).
 </div>

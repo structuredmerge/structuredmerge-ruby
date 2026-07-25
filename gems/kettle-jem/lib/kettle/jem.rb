@@ -14,6 +14,7 @@ require "addressable/uri"
 require "token/resolver"
 require "yaml"
 require "ast/merge"
+require "kettle/ndjson"
 require "rbs"
 require "kettle/dev"
 require "kettle/rb/compat_matrix"
@@ -4100,20 +4101,22 @@ module Kettle
     end
 
     def event_stream(io, types: nil)
-      EventStream.new(io, types: parse_event_types(types))
+      Kettle::Ndjson.event_stream(
+        io,
+        types: types,
+        event_types: EVENT_TYPES,
+        aliases: EVENT_TYPE_ALIASES
+      )
     end
 
     def parse_event_types(types)
-      tokens = Array(types).flat_map { |value| value.to_s.split(",") }.map(&:strip).reject(&:empty?)
-      tokens = ["default"] if tokens.empty?
-      expanded = tokens.flat_map do |token|
-        normalized = token.tr("-", "_")
-        EVENT_TYPE_ALIASES.fetch(normalized, normalized)
-      end.uniq
-      unknown = expanded - EVENT_TYPES
-      raise ArgumentError, "Unknown event type(s): #{unknown.join(", ")}. Supported event types: #{EVENT_TYPES.join(", ")}" unless unknown.empty?
-
-      expanded
+      Kettle::Ndjson.normalize_event_types(
+        Array(types).join(","),
+        event_types: EVENT_TYPES,
+        aliases: EVENT_TYPE_ALIASES
+      )
+    rescue Kettle::Ndjson::UnknownEventTypeError => error
+      raise ArgumentError, "#{error.message}. Supported event types: #{EVENT_TYPES.join(", ")}"
     end
 
     def event_stream_from_options(run_options)
@@ -4123,7 +4126,7 @@ module Kettle
 
       stream = options[:event_stream] || options["event_stream"]
       phase_timings = options[:phase_timings] ||= []
-      recorder = EventRecorder.new(stream.respond_to?(:emit) ? stream : nil, phase_timings)
+      recorder = Kettle::Ndjson.event_recorder(stream.respond_to?(:emit) ? stream : nil, phase_timings: phase_timings)
       options[:event_recorder] = recorder if options.respond_to?(:[]=)
       recorder
     end
@@ -4152,20 +4155,11 @@ module Kettle
     end
 
     def record_phase_timing(events, phase, status:, duration_ms:, payload:)
-      return unless events.respond_to?(:record_phase_timing)
-
-      events.record_phase_timing(
-        payload.merge(
-          phase: phase.to_s,
-          status: status,
-          duration_ms: duration_ms
-        )
-      )
+      Kettle::Ndjson.record_phase_timing(events, phase, status: status, duration_ms: duration_ms, payload: payload)
     end
 
     def emit_phase_event(events, phase, status:, **payload)
-      event_type = (status == "started") ? "phase_start" : "phase_finish"
-      emit_event(events, event_type, payload.merge(phase: phase.to_s, status: status))
+      Kettle::Ndjson.emit_phase_event(events, phase, status: status, **payload)
     end
 
     def emit_recipe_event(events, report, index:, total:)
@@ -4307,40 +4301,7 @@ module Kettle
     end
 
     def emit_event(events, type, payload = {})
-      return unless events
-
-      events.emit(payload.merge(type: type, event_version: 1))
-    end
-
-    class EventStream
-      def initialize(io, types:)
-        @io = io
-        @types = types
-      end
-
-      def emit(payload)
-        return unless @types.include?(payload.fetch(:type).to_s)
-
-        @io.puts(JSON.generate(payload.compact))
-        @io.flush if @io.respond_to?(:flush)
-      end
-    end
-
-    class EventRecorder
-      def initialize(stream, phase_timings)
-        @stream = stream
-        @phase_timings = phase_timings
-      end
-
-      attr_reader :phase_timings
-
-      def emit(payload)
-        @stream.emit(payload) if @stream
-      end
-
-      def record_phase_timing(payload)
-        @phase_timings << payload.compact
-      end
+      Kettle::Ndjson.emit_event(events, type, payload)
     end
 
     def snapshot_changed_files(project_root, changed_files)
