@@ -275,6 +275,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Changelog replay now cross-checks stored replay cursors against the
+  destination changelog contents, so legacy templated projects whose cursor was
+  stamped before transfer entries landed receive the missing transfer entries
+  on the next template run.
+
 - Raised the `kettle-ndjson` runtime dependency floor to v0.1.1 so template
   tooling can install it on the Ruby 2.4+ Kettle support floor.
 

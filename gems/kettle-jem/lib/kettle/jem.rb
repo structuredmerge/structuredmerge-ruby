@@ -5092,10 +5092,14 @@ module Kettle
       replay = state[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
       replay = replay.is_a?(Hash) ? replay : {}
       last_key = replay[TemplateChecksums::LAST_ENTRY_KEY_SUBKEY].to_s
+      applied_keys = changelog_transfer_applied_keys(project_root)
       selected_entries = if state.empty?
         [CHANGELOG_INITIAL_TEMPLATE_ENTRY]
       elsif !last_key.empty?
-        changelog_transfer_entries_after(all_entries, last_key)
+        all_entries.select do |entry|
+          key = entry.fetch(:key).to_s
+          key > last_key || !applied_keys.include?(key)
+        end
       else
         all_entries
       end
@@ -5109,6 +5113,13 @@ module Kettle
 
     def latest_changelog_transfer_entry(entries)
       Array(entries).max_by { |entry| entry.fetch(:key).to_s }
+    end
+
+    def changelog_transfer_applied_keys(project_root)
+      path = File.join(project_root.to_s, "CHANGELOG.md")
+      return Set.new unless File.file?(path)
+
+      changelog_transfer_keys(File.read(path))
     end
 
     def changelog_transfer_entries_after(entries, key)

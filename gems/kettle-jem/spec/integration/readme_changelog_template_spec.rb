@@ -260,6 +260,65 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "replays transfer entries when stored replay state claims entries absent from the changelog" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-changelog-replay-state-drift-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.homepage = "https://github.com/structuredmerge/example"
+            spec.licenses = ["MIT"]
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: false
+            entries:
+              - README.md
+          kettle-jem:
+            version: "7.1.0"
+            changelog_replay:
+              last_entry_key: "kettle-jem-template-20260725-001"
+              last_entry_date: "2026-07-25"
+            checksums: {}
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN
+          # Changelog
+
+          ## [Unreleased]
+
+          ### Added
+
+          ### Changed
+
+          - Project-authored item.
+
+          ### Deprecated
+
+          ### Removed
+
+          ### Fixed
+
+          ### Security
+        MARKDOWN
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan[:recipe_reports].find { |candidate| candidate.fetch(:recipe_name) == "changelog_unreleased" }
+      changelog = report.fetch(:final_content)
+
+      expect(changelog).to include("- Project-authored item.")
+      expect(changelog).to include("kettle-jem-template-20260716-001")
+      expect(changelog).to include("kettle-jem-template-20260725-001")
+      expect(changelog).not_to include("kettle-jem-template-initial")
+    end
+  end
+
   it "adds only the initial templating changelog entry when no replay state exists" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
