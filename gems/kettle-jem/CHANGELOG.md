@@ -66,6 +66,9 @@ Please file a bug if you notice a violation of semantic versioning.
   per-workflow keys so `kettle-test` / `turbo_tests2` can reuse timing data
   across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework
   matrix runs.
+- Generated JRuby and TruffleRuby workflow templates now run when pull request
+  head branches start with `feature/release`, so `kettle-release` CI monitoring
+  does not treat intentionally skipped engine workflows as release failures.
 - Generated dep-heads workflows now document why every engine job runs directly
   from `gemfiles/dep_heads.gemfile`, making that generated Appraisal file
   required checked-in output for the workflow.

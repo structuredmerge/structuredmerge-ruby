@@ -14,3 +14,7 @@
   omit JRuby and TruffleRuby jobs when project config declares MRI-only engines.
 - kettle-jem-template-20260720-005 - Generated README Support & Community rows
   now include a RubyForum help badge.
+- kettle-jem-template-20260725-001 - Generated JRuby and TruffleRuby workflow
+  files now run when pull request head branches start with `feature/release`,
+  so release CI monitoring does not report intentionally skipped engine
+  workflows as failures.

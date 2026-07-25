@@ -711,8 +711,10 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
+    expect(jruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
     expect(truffleruby_workflow).to include("rspec-status-truffleruby-25.0-${{matrix.ruby}}-${{matrix.appraisal}}-")
     expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'truffleruby/')")
+    expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'feature/release')")
     expect(framework_workflow).to include(
       "rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-"
     )
