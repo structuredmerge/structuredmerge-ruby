@@ -275,6 +275,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Raised the `kettle-ndjson` runtime dependency floor to v0.1.1 so template
+  tooling can install it on the Ruby 2.4+ Kettle support floor.
+
 - The `kettle-jem` executable now uses normal `require` loading and suppresses
   its startup header for `--json` / `--events` machine-readable output.
 - Generated MRI 2.4 through 2.7 workflows now bypass `ruby/setup-ruby`
