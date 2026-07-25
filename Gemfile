@@ -73,7 +73,7 @@ gem "bundler-audit", "~> 0.9.3"
 if kettle_dev_dev.casecmp("false").zero?
   gem "kettle-dev", "~> 2.2", ">= 2.2.25"
 
-  gem "kettle-family", ">= 1.0.5"
+  gem "kettle-family", ">= 1.1.7"
 
   gem "kettle-test", "~> 2.0", ">= 2.0.11"
 end

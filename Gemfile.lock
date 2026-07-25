@@ -82,6 +82,7 @@ PATH
   specs:
     dotenv-merge (7.1.0)
       ast-merge (= 7.1.0)
+      plain-merge (= 7.1.0)
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.14)
 
@@ -116,6 +117,7 @@ PATH
       json-merge (= 7.1.0)
       kettle-dev (~> 2.3, >= 2.3.5)
       kettle-gha-pins (~> 0.3, >= 0.3.1)
+      kettle-ndjson (~> 0.1, >= 0.1.1)
       kettle-rb (~> 0.1, >= 0.1.4)
       kramdown-merge (= 7.1.0)
       markdown-merge (= 7.1.0)
@@ -264,6 +266,7 @@ PATH
   remote: gems/zip-merge
   specs:
     zip-merge (7.1.0)
+      binary-merge (= 7.1.0)
       tree_haver (= 7.1.0)
       version_gem (~> 1.1, >= 1.1.9)
 
@@ -298,18 +301,20 @@ GEM
     docopt_ng (0.7.1)
     emoji_regex (15.0.0)
     erb (6.0.6)
-    gitmoji-regex (2.0.4)
-      version_gem (~> 1.1, >= 1.1.13)
+    gitmoji-regex (2.0.5)
+      version_gem (~> 1.1, >= 1.1.14)
     io-console (0.8.2)
-    kettle-dev (2.3.11)
+    kettle-dev (2.4.5)
       emoji_regex (>= 15.0)
-      kettle-gha-pins (~> 0.2, >= 0.2.1)
+      kettle-gha-pins (~> 0.3, >= 0.3.1)
+      kettle-ndjson (~> 0.1, >= 0.1.1)
       kettle-rb (~> 0.1, >= 0.1.2)
       kettle-test (~> 2.0, >= 2.0.12)
       ruby-progressbar (~> 1.13)
-    kettle-drift (1.0.6)
+      tty-progressbar (~> 0.18)
+    kettle-drift (1.0.7)
       version_gem (~> 1.1, >= 1.1.14)
-    kettle-family (1.1.4)
+    kettle-family (1.1.8)
       command_kit (~> 0.6)
       command_kit-completion (~> 0.1)
       kettle-dev (~> 2.3, >= 2.3.10)
@@ -320,8 +325,10 @@ GEM
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
       version_gem (~> 1.1, >= 1.1.14)
+    kettle-ndjson (0.1.1)
+      version_gem (~> 1.1, >= 1.1.14)
     kettle-rb (0.1.5)
-    kettle-test (2.0.14)
+    kettle-test (2.0.15)
       appraisal2 (~> 3.0, >= 3.0.6)
       backports (~> 3.0)
       rspec (~> 3.0)
@@ -374,7 +381,7 @@ GEM
       rspec-core (~> 3.0)
       ruby_engine (~> 2.0)
       ruby_version (~> 1.0)
-    rspec-stubbed_env (1.0.6)
+    rspec-stubbed_env (1.0.7)
     rspec-support (3.13.7)
     rspec_junit_formatter (0.6.0)
       rspec-core (>= 2, < 4, != 2.12.0)
@@ -386,7 +393,7 @@ GEM
     silent_stream (1.0.12)
       logger (~> 1.2)
       version_gem (>= 1.1.8, < 3)
-    sorbet-runtime (0.6.13354)
+    sorbet-runtime (0.6.13361)
     stone_checksums (1.0.6)
       version_gem (~> 1.1, >= 1.1.13)
     strings-ansi (0.2.0)
@@ -414,7 +421,7 @@ GEM
       tty-screen (~> 0.8)
       unicode-display_width (>= 1.6, < 3.0)
     tty-screen (0.8.2)
-    turbo_tests2 (3.2.0)
+    turbo_tests2 (3.2.1)
       parallel_tests (>= 3.3.0, < 6)
       rspec (>= 3.10)
       version_gem (~> 1.1, >= 1.1.14)
@@ -445,7 +452,7 @@ DEPENDENCIES
   json-merge!
   kettle-dev (~> 2.2, ~> 2.0, >= 2.2.25)
   kettle-drift (~> 1.0, >= 1.0.5)
-  kettle-family (>= 1.1.4)
+  kettle-family (>= 1.1.7)
   kettle-jem!
   kettle-test (~> 2.0, >= 2.0.9, >= 2.0.11)
   kramdown-merge!
@@ -505,17 +512,18 @@ CHECKSUMS
   dotenv-merge (7.1.0)
   emoji_regex (15.0.0) sha256=a508b2c0bee561169564e0aec96085020c900520d335e5533fd8e78e59493829
   erb (6.0.6) sha256=a9b24986700f5bf127c4f297c5403c3ca41b83b0a316c0cd09a096b56e644ae5
-  gitmoji-regex (2.0.4) sha256=01410d3217940bd0e7b2299ec805245afe8d0f06a5d6d38f623d63a63c0ac34f
+  gitmoji-regex (2.0.5) sha256=79a785fa564521491ded1e8b9d775557197bb114017cd8dc5dfcb992f87e448f
   go-merge (7.1.0)
   io-console (0.8.2) sha256=d6e3ae7a7cc7574f4b8893b4fca2162e57a825b223a177b7afa236c5ef9814cc
   json-merge (7.1.0)
-  kettle-dev (2.3.11) sha256=71314c06450780ac63ce71cb635138d40270517019c22c57656e127dbad497e3
-  kettle-drift (1.0.6) sha256=46eda08fa4411d1f3c6682a95eef1c9df4e94611b3949f49d4c7b43c0ed356a3
-  kettle-family (1.1.4) sha256=abe5d5805832da8d0aaf84e860eb8ec47cb33aa7d2e1e7218d451838990dac51
+  kettle-dev (2.4.5) sha256=3a451940796a671b7adc910db7c3da87899ebec7c5274921ca598345549ae7eb
+  kettle-drift (1.0.7) sha256=878117280782e89b6eec111ca3f5b31f7b2b9da3d96041c399a607173d1c3a5c
+  kettle-family (1.1.8) sha256=7098c558dc8e61e13a416985a4ffb6b8c1e25f3a2dcb227bbb4e3e3f8723264d
   kettle-gha-pins (0.3.1) sha256=b13a82a403af31880288fe65f85f2a24a93ae4740c0c7cbc15a35044d27aaa51
   kettle-jem (7.1.0)
+  kettle-ndjson (0.1.1) sha256=2d84314e8c911d6f560f2736e8f72019df6d811829674788ff33b3bbf518ed66
   kettle-rb (0.1.5) sha256=0322a569860c86e70f90d5ebe72353b8720b7054c7efa9f9044857f5c972d29f
-  kettle-test (2.0.14) sha256=27902fb7d34b4e3b916946d328367358ca8b47ad7fd50a1759cd6659b7a93028
+  kettle-test (2.0.15) sha256=993b132ffec17fe82cc81c69f876e15d6eb610a4831df08dc01c0cce5c070caa
   kramdown (2.5.2) sha256=1ba542204c66b6f9111ff00dcc26075b95b220b07f2905d8261740c82f7f02fa
   kramdown-merge (7.1.0)
   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
@@ -545,7 +553,7 @@ CHECKSUMS
   rspec-expectations (3.13.5) sha256=33a4d3a1d95060aea4c94e9f237030a8f9eae5615e9bd85718fe3a09e4b58836
   rspec-mocks (3.13.8) sha256=086ad3d3d17533f4237643de0b5c42f04b66348c28bf6b9c2d3f4a3b01af1d47
   rspec-pending_for (0.1.21) sha256=c87fda50c20f8faca72d9cfa6a936abffd37860343f14aced95bbb29b8ae96bf
-  rspec-stubbed_env (1.0.6) sha256=6467a6eb0f72146d443ffb0c5a2a549d8812e59c04fbc81e03cd914ebf1f28dc
+  rspec-stubbed_env (1.0.7) sha256=c04769368ec3e9eb21aa64a74c1191c471227fc549767ecdcae8b78363342cee
   rspec-support (3.13.7) sha256=0640e5570872aafefd79867901deeeeb40b0c9875a36b983d85f54fb7381c47c
   rspec_junit_formatter (0.6.0) sha256=40dde674e6ae4e6cc0ff560da25497677e34fefd2338cc467a8972f602b62b15
   ruby-merge (7.1.0)
@@ -556,7 +564,7 @@ CHECKSUMS
   service_actor (3.9.4) sha256=e63b523630b9a7e62959b2a90113b08d2565b5de9c148557b281ef847c9539ce
   silent_stream (1.0.12) sha256=377c43aa10033fe90c33b39ea8cd97d79f2d1c4856df598efc56f3091f3ae782
   smorg-rb (7.1.0)
-  sorbet-runtime (0.6.13354) sha256=1e9de4e2c445ed8de4157fb4ce96443e345952f740c74393e9d9839c7fb01be8
+  sorbet-runtime (0.6.13361) sha256=db97298968ec7af25372403071de59633e611922f575f3feb12421fda9e37f13
   stone_checksums (1.0.6) sha256=c775f830513d6c6ab26e31d1a5fbecd4c4e39002663d4d9f8fa96e97990b5298
   strings-ansi (0.2.0) sha256=90262d760ea4a94cc2ae8d58205277a343409c288cbe7c29416b1826bd511c88
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
@@ -572,7 +580,7 @@ CHECKSUMS
   tty-cursor (0.7.1) sha256=79534185e6a777888d88628b14b6a1fdf5154a603f285f80b1753e1908e0bf48
   tty-progressbar (0.18.3) sha256=6cbb4260e55e74a9180d502143eb6a467d2c8e51bf5f3c9509fb5cacc3d4a5f6
   tty-screen (0.8.2) sha256=c090652115beae764336c28802d633f204fb84da93c6a968aa5d8e319e819b50
-  turbo_tests2 (3.2.0) sha256=8b35421548399d1923567b177970f42671c65695b93cdd134d78fbcbab85dff0
+  turbo_tests2 (3.2.1) sha256=f531b71fae4ce8c82c118375cda8c99a5fa51680ce764465ea0d06fb8c593375
   typescript-merge (7.1.0)
   unicode-display_width (2.6.0) sha256=12279874bba6d5e4d2728cef814b19197dbb10d7a7837a869bab65da943b7f5a
   version_gem (1.1.14) sha256=6b7306c7e9416d06067561981ab3444e2cecb844f26cc325ae3c27b44cf85613
