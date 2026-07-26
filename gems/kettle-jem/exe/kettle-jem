@@ -15,6 +15,6 @@ end
 require "kettle-jem"
 
 machine_output = ARGV.any? { |arg| arg == "--json" || arg.start_with?("--events") }
-puts "== #{script_basename} v#{Kettle::Jem::Version::VERSION} ==" unless machine_output
+puts "== #{script_basename} v#{Kettle::Jem::Version::VERSION} ==" if ARGV.include?("--verbose") && !machine_output
 
 exit(Kettle::Jem::CLI.run(ARGV, env: ENV, out: $stdout, err: $stderr))
