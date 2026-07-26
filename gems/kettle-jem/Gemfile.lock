@@ -276,6 +276,8 @@ GEM
       kettle-test (~> 2.0, >= 2.0.12)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
+    kettle-drift (1.0.8)
+      version_gem (~> 1.1, >= 1.1.14)
     kettle-gha-pins (0.3.1)
       ruby-progressbar (~> 1.13)
       tty-progressbar (~> 0.18)
@@ -314,7 +316,7 @@ GEM
     mutex_m (0.3.0)
     nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
-    nomono (1.1.0)
+    nomono (1.1.1)
     openssl (4.0.2)
     ostruct (0.6.3)
     parallel (1.28.0)
@@ -596,6 +598,7 @@ DEPENDENCIES
   gitmoji-regex (~> 2.0, >= 2.0.6)
   irb (~> 1.17)
   json-merge!
+  kettle-drift (~> 1.0, >= 1.0.7)
   kettle-jem!
   kettle-soup-cover (~> 3.0, >= 3.0.5)
   kettle-test (~> 2.0, >= 2.0.15)
@@ -627,6 +630,7 @@ DEPENDENCIES
   stringio (>= 3.0)
   toml-merge!
   tree_haver!
+  tree_sitter_language_pack (~> 1.13, >= 1.13.3)
   turbo_tests2 (~> 3.2, >= 3.2.2)
   webrick (~> 1.9)
   yaml-converter (~> 0.2, >= 0.2.3)
@@ -687,6 +691,7 @@ CHECKSUMS
   json (2.21.1) sha256=13a43df75d95641443f5702dff350f237164a9d811ff0f2c2800d4d980220583
   json-merge (7.1.0)
   kettle-dev (2.4.5) sha256=3a451940796a671b7adc910db7c3da87899ebec7c5274921ca598345549ae7eb
+  kettle-drift (1.0.8)
   kettle-gha-pins (0.3.1) sha256=b13a82a403af31880288fe65f85f2a24a93ae4740c0c7cbc15a35044d27aaa51
   kettle-jem (7.1.0)
   kettle-ndjson (0.1.1) sha256=2d84314e8c911d6f560f2736e8f72019df6d811829674788ff33b3bbf518ed66
@@ -705,7 +710,7 @@ CHECKSUMS
   markly-merge (7.1.0)
   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
   nokogiri (1.19.4-x86_64-linux-gnu) sha256=379fae440b28915e3f19d752ce2dcf8465ed2b2fbefd2a7ca0dd497bc981a06a
-  nomono (1.1.0) sha256=463dd4c79da02a855739a1b5483190d527b7868688be905e84abdb3449b32c88
+  nomono (1.1.1)
   openssl (4.0.2) sha256=1037ad2868ae58df9ad917891c0c0f9815a1172f6846d4bcdd508e4c2ee747c2
   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
   parallel (1.28.0) sha256=33e6de1484baf2524792d178b0913fc8eb94c628d6cfe45599ad4458c638c970
