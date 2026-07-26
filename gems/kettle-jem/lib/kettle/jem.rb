@@ -5426,7 +5426,9 @@ module Kettle
     def changelog_transfer_facts(project_root, entries)
       all_entries = Array(entries)
       latest = latest_changelog_transfer_entry(all_entries)
-      state = TemplateChecksums.load_state(config_path: kettle_jem_config_path(project_root))
+      lock = TemplateLock.load(project_root: project_root, config_path: kettle_jem_config_path(project_root))
+      state = lock[TemplateLock::TEMPLATE_STATE_KEY]
+      state = state.is_a?(Hash) ? state : {}
       replay = state[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
       replay = replay.is_a?(Hash) ? replay : {}
       last_key = replay[TemplateChecksums::LAST_ENTRY_KEY_SUBKEY].to_s

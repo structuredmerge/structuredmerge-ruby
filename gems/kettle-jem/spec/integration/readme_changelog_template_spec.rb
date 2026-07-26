@@ -319,6 +319,52 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     end
   end
 
+  it "uses migrated lockfile replay state for transfer changelog selection" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-changelog-lock-replay-state-slice", tmp_root) do |root|
+      write_tree(root, {
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: false
+            entries:
+              - README.md
+        YAML
+        ".kettle-jem.lock" => <<~YAML,
+          ---
+          version: 1
+          template_state:
+            version: 7.1.0
+            changelog_replay:
+              last_entry_key: kettle-jem-template-20260720-001
+              last_entry_date: '2026-07-20'
+            checksums:
+              README.md.example: old
+          files: {}
+        YAML
+        "CHANGELOG.md" => <<~MARKDOWN
+          # Changelog
+
+          ## [Unreleased]
+
+          ### Added
+
+          - kettle-jem-template-20260720-001 - Already applied.
+        MARKDOWN
+      })
+      entries = [
+        {key: "kettle-jem-template-20260720-001", section: "Added", lines: ["Already applied."]},
+        {key: "kettle-jem-template-20260721-001", section: "Fixed", lines: ["Later fix."]}
+      ]
+
+      facts = described_class.send(:changelog_transfer_facts, root, entries)
+
+      expect(facts.fetch(:first_template)).to be(false)
+      expect(facts.fetch(:transfer_entries).map { |entry| entry.fetch(:key) }).to eq(["kettle-jem-template-20260721-001"])
+    end
+  end
+
   it "adds only the initial templating changelog entry when no replay state exists" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

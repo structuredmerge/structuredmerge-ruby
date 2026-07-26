@@ -303,6 +303,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 - Existing managed checksum state is now migrated out of the user-managed
   kettle-jem config and into `.kettle-jem.lock` automatically.
+- Changelog transfer replay now reads migrated `.kettle-jem.lock` state, so
+  projects do not fall back to first-template changelog behavior after
+  checksum-state migration.
 - Generated `.yard-lint.yml` files now use yard-lint's current schema for
   severity gating and tag ordering, so documentation lint can boot before docs
   are regenerated.
