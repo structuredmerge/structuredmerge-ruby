@@ -255,6 +255,7 @@ If none of the available licenses suit your use case, please [contact us](mailto
 [🖐contrib-rocks]: https://contrib.rocks
 [🖐contributors]: https://github.com/structuredmerge/structuredmerge-ruby/graphs/contributors
 [🖐contributors-img]: https://contrib.rocks/image?repo=structuredmerge/structuredmerge-ruby
+[🚎contributors-gl]: https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main
 [🪇conduct]: https://github.com/structuredmerge/structuredmerge-ruby/blob/main/CODE_OF_CONDUCT.md
 [🪇conduct-img]: https://img.shields.io/badge/Contributor_Covenant-2.1-259D6C.svg
 [📌pvc]: http://guides.rubygems.org/patterns/#pessimistic-version-constraint

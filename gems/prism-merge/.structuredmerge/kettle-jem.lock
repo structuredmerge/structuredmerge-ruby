@@ -4,7 +4,7 @@ template_state:
   version: 7.1.0
   applied_at: '2026-07-26'
   changelog_replay:
-    last_entry_key: kettle-jem-template-20260726-001
+    last_entry_key: kettle-jem-template-20260726-002
     last_entry_date: '2026-07-26'
   checksums:
     ".aiignore.example": 48a5dfdd93afd1a15fdce39cc28ca9920263f00018b0968ab031fa744521e5ce
@@ -85,7 +85,7 @@ template_state:
     Appraisals.example: 9cb1abcfb1a0bd6d859ca0705efb874dbe546754c8c71f9f95025ff6817f1471
     Big-Time-Public-License.md.example: b0c02a112c9eee0ed69f05fd8f22277a2f8bc62d447b6cb75d6df560e05bf431
     CHANGELOG.md.example: 73459e50dad34d84db88844c993d975097557bdf5229e101b0d1339de6f98ffc
-    CHANGELOG.transfer.md: 1f760573c829f196c41df245ed061a48665ea73d3e471f0240bb701065a956d9
+    CHANGELOG.transfer.md: 9c201849117c9d4234724c4599643dd42fdce5f0a673a1abee97b97e556c301b
     CITATION.cff.example: e404ea0a7919d78a83d53d80e211d17b9663576aa606583b709795dc023fd75c
     CODE_OF_CONDUCT.md.example: f1ad532f1860f73ef774c6b27a26d41f4bc1cb8813034f5957487766ebb0986b
     CONTRIBUTING.md.example: 63d339848c615f2c181d6b0565c42e56371eedb66f310d146cb7da297f7bc641
@@ -200,7 +200,7 @@ files:
     recipe: template_source_application_Gemfile
     action: write
     dest_sha256: f2b5f9f624cccf21fc9306f1b6fcf567d845be6940609c319c5e09950853fa08
-    input_fingerprint: 2fedec5b0afa9079510115361b2a090f6405ae4158794335b4fba6829de89545
+    input_fingerprint: 17abe410d8ba5ae3633f2d3a0deb2c5c962b0f5dbf1c2d921a1749617580f341
     template_sources:
     - Gemfile.example
   LICENSE.md:
@@ -438,14 +438,14 @@ files:
     recipe: template_source_application_gemfiles_modular_templating_gemfile
     action: write
     dest_sha256: 6cedc39529daa9aac3a4cf13fe31a628b62a4a2428f5c4f8657c5a2fa027bb35
-    input_fingerprint: 0b9065f945cbad5c795f331b262e233b10744ea4bb61c230d80ee4837ca52692
+    input_fingerprint: e3405a09c3e7db576885afc6ff9ab20c1a1aebbe3a4646586d6268c222f36c52
     template_sources:
     - gemfiles/modular/templating.gemfile.example
   gemfiles/modular/templating_local.gemfile:
     recipe: template_source_application_gemfiles_modular_templating_local_gemfile
     action: write
     dest_sha256: 914ac600fdb25cfd277e92ad8f6f7b2da98588d320690b7ce9808ba46fb994eb
-    input_fingerprint: f03dce1a8cacdaac5483a5ecd192ff53faa11932799738c49fb780a24228f0fa
+    input_fingerprint: 72fe0a4d371440a8d989c6211740a8d3b25afce934a1559cfa67f46563af757f
     template_sources:
     - gemfiles/modular/templating_local.gemfile.example
   gemfiles/modular/webrick/r4/v1.9.gemfile:

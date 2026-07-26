@@ -1,8 +1,11 @@
 # frozen_string_literal: true
 
 module TreeHaver
+  # Version namespace for this gem.
   module Version
-    VERSION = '7.1.0'
+    # Current gem version.
+    VERSION = "7.1.0"
   end
+  # Current gem version exposed at the traditional constant location.
   VERSION = Version::VERSION # Traditional Constant Location
 end
