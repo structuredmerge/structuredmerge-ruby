@@ -3915,7 +3915,7 @@ module Kettle
         recipe_version: report.dig(:request_envelope, :request, :recipe_version).to_s,
         relative_path: report.fetch(:relative_path).to_s,
         template_source: template_source_lock_path(preference),
-        template_source_sha256: source_path && File.file?(source_path) ? Digest::SHA256.file(source_path).hexdigest : "",
+        template_source_sha256: (source_path && File.file?(source_path)) ? Digest::SHA256.file(source_path).hexdigest : "",
         template_source_preference: stringify_keys_for_json(preference),
         template_token_keys: tokens.keys.sort,
         template_tokens_sha256: Digest::SHA256.hexdigest(JSON.generate(tokens))
