@@ -10,6 +10,6 @@ end
 
 require 'smorg-rb'
 
-puts "== #{script_basename} v#{Smorg::RB::Version::VERSION} ==" if ARGV.delete("--verbose")
+puts "== #{script_basename} v#{Smorg::RB::Version::VERSION} ==" if ARGV.delete('--verbose')
 
 exit(Smorg::RB.run(ARGV))
