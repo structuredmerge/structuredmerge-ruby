@@ -241,8 +241,8 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
 
           ### Changed
 
-          - kettle-jem-template-20260716-001 - Shim gemspec manifests now include
-            `LICENSE.md` instead of nonexistent `LICENSE.txt`.
+          - kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
+            of a missing `LICENSE.txt` file.
 
           ### Fixed
 
