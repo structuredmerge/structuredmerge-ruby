@@ -432,7 +432,7 @@ module Markdown
         stripped = source_text.to_s.lines.first.to_s.lstrip
         return stripped[0, 2].strip if stripped.start_with?('- ', '* ')
 
-        marker = stripped.split(" ", 2).first.to_s
+        marker = stripped.split(' ', 2).first.to_s
         marker.end_with?('.') ? marker : nil
       end
 
