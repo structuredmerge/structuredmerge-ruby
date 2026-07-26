@@ -12625,12 +12625,12 @@ module Kettle
       clean_namespace = namespace.to_s.start_with?("::") ? namespace.to_s[2..] : namespace.to_s
       example = <<~RUBY
 
-          it "executes the version file for coverage without redefining constants" do
-            path = File.expand_path("#{version_path}", __dir__)
-            anonymous_namespace = AnonymousLoader.load(files: path)
+        it "executes the version file for coverage without redefining constants" do
+          path = File.expand_path("#{version_path}", __dir__)
+          anonymous_namespace = AnonymousLoader.load(files: path)
 
-            expect(anonymous_namespace::#{clean_namespace}::Version::VERSION).to eq(described_class::VERSION)
-          end
+          expect(anonymous_namespace::#{clean_namespace}::Version::VERSION).to eq(described_class::VERSION)
+        end
       RUBY
 
       insert_lines_before(content, describe_call.block.closing_loc.start_line, example)

@@ -1864,7 +1864,6 @@ module Kettle
         end
 
         def execute_unlocked_git_drivers_step(step, project_root:, env:, quiet:, command_runner:)
-
           changed_files = []
           if step.fetch(:mode) == "include-file"
             include_path = File.join(project_root.to_s, step.fetch(:include_file))
