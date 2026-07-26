@@ -132,6 +132,9 @@ Please file a bug if you notice a violation of semantic versioning.
   `KETTLE_JEM_SHIMMED_GEM`, generates only the shim runtime/docs/specs/CI, and
   deletes obsolete implementation code, behavior specs, workflows, and gemfiles.
 
+- kettle-jem-template-20260726-001 - Projects now include an optional
+  `yard:lint` task and YARD lint configuration for documentation quality checks.
+
 ### Changed
 
 - The `kettle-jem` executable startup header is now shown only when

@@ -702,7 +702,7 @@ module Kettle
 
     class TransferChangelogLineParser < Parslet::Parser
       rule(:space) { match('\s') }
-      rule(:digit) { match('[0-9]') }
+      rule(:digit) { match("[0-9]") }
       rule(:date) { digit.repeat(8, 8).as(:date) }
       rule(:sequence) { digit.repeat(3, 3).as(:sequence) }
       rule(:key) { (str("kettle-jem-template-") >> date >> str("-") >> sequence).as(:key) }

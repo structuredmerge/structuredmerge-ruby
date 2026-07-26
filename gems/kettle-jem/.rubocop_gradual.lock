@@ -7,7 +7,7 @@
     [466, 8, 66, "Style/RedundantFormat: Use `\"step                                           duration    share count\"` directly instead of `format`.", 4013676740],
     [622, 6, 309, "Style/RedundantFormat: Use `\"variant                           +/-      min   median     mean      max  recipes     cmds   pr   pt   fr   ft safe f_units pr_job pt_job fr_job ft_job recipes changed\"` directly instead of `format`.", 3979716419]
   ],
-  "kettle-jem.gemspec:979778399": [
+  "kettle-jem.gemspec:1852843947": [
     [19, 32, 10, "Gemspec/RequiredRubyVersion: `required_ruby_version` and `TargetRubyVersion` (3.2, which may be specified in .rubocop.yml) should be equal.", 3888670706],
     [90, 3, 70, "Gemspec/DependencyVersion: Dependency version specification is required.", 4023754366],
     [91, 3, 65, "Gemspec/DependencyVersion: Dependency version specification is required.", 1638532368],
@@ -20,18 +20,19 @@
     [102, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 670728969],
     [103, 3, 58, "Gemspec/DependencyVersion: Dependency version specification is required.", 1722946409],
     [104, 3, 56, "Gemspec/DependencyVersion: Dependency version specification is required.", 2273926958],
-    [105, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 1475977371],
-    [106, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 3458446143],
-    [108, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 3112555885],
-    [109, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1663642130],
-    [111, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 527713396],
-    [113, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
-    [114, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
+    [106, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 1475977371],
+    [107, 3, 55, "Gemspec/DependencyVersion: Dependency version specification is required.", 3458446143],
+    [109, 3, 53, "Gemspec/DependencyVersion: Dependency version specification is required.", 3112555885],
+    [110, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 1663642130],
+    [112, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 527713396],
+    [114, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 3116501450],
+    [115, 3, 54, "Gemspec/DependencyVersion: Dependency version specification is required.", 2771890615]
   ],
-  "lib/kettle/jem.rb:3024228670": [
-    [3932, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [11177, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
-    [12650, 80, 23, "Performance/Count: Use `count` instead of `reject...length`.", 4275829615]
+  "lib/kettle/jem.rb:330213921": [
+    [3949, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
+    [5227, 7, 31, "ThreadSafety/ClassInstanceVariable: Avoid class instance variables.", 3672762618],
+    [11365, 9, 10, "ThreadSafety/NewThread: Avoid starting new threads.", 3411682361],
+    [12839, 80, 23, "Performance/Count: Use `count` instead of `reject...length`.", 4275829615]
   ],
   "lib/kettle/jem/tasks/install_task.rb:254900132": [
     [1107, 47, 29, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 964126728]
@@ -44,7 +45,7 @@
     [3, 1, 67, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*appraisal_helpers_and_template_tokens*_spec.rb`.", 1438226331],
     [3, 29, 39, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1357968070]
   ],
-  "spec/integration/appraisals_and_gemfile_template_spec.rb:3167958269": [
+  "spec/integration/appraisals_and_gemfile_template_spec.rb:3687543804": [
     [3, 1, 63, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*Appraisals_and_Gemfile_templating*_spec.rb`.", 2367084249],
     [3, 29, 35, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1539510212]
   ],
@@ -64,7 +65,7 @@
     [3, 1, 56, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*GitHub_workflow_templating*_spec.rb`.", 446190427],
     [3, 29, 28, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 855400678]
   ],
-  "spec/integration/readme_changelog_template_spec.rb:1459044584": [
+  "spec/integration/readme_changelog_template_spec.rb:3492964860": [
     [3, 1, 61, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*README_and_changelog_templating*_spec.rb`.", 997155358],
     [3, 29, 33, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 3993812611]
   ],
@@ -80,7 +81,7 @@
     [3, 1, 64, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*structural_merge_template_behavior*_spec.rb`.", 1693815617],
     [3, 29, 36, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 3903270460]
   ],
-  "spec/integration/template_bootstrap_spec.rb:2828653469": [
+  "spec/integration/template_bootstrap_spec.rb:3026613040": [
     [3, 1, 71, "RSpec/SpecFilePathFormat: Spec path should end with `kettle/jem*template_selection_and_bootstrap_behavior*_spec.rb`.", 2832878461],
     [3, 29, 43, "RSpec/DescribeMethod: The second argument to describe should be the method being tested. '#instance' or '.class'.", 1664161888]
   ],

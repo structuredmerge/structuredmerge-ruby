@@ -51,6 +51,7 @@
 # rake spec                                   # Run RSpec code examples
 # rake test                                   # Run tests
 # rake yard                                   # Generate YARD Documentation
+# rake yard:lint                              # Lint YARD Documentation
 #
 
 # simplecov:disable
@@ -171,6 +172,13 @@ if kettle_jem_selftest_unavailable_note
   desc("(stub) kettle:jem:selftest is unavailable")
   task("kettle:jem:selftest") do
     warn(kettle_jem_selftest_unavailable_note)
+  end
+end
+
+namespace :yard do
+  desc "Lint YARD Documentation"
+  task :lint do
+    sh("bundle", "exec", "yard-lint", "lib")
   end
 end
 
