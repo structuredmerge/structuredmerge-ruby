@@ -136,6 +136,7 @@ module Kettle
         "Rakefile",
         ".rspec",
         ".simplecov",
+        ".yard-lint.yml",
         ".yardignore",
         ".yardopts",
         "bin/setup",
@@ -176,6 +177,7 @@ module Kettle
       "Appraisals",
       "Guardfile",
       ".simplecov",
+      ".yard-lint.yml",
       ".yardignore",
       ".yardopts",
       ".github/FUNDING.yml",
@@ -5192,12 +5194,15 @@ module Kettle
         owner.level == 2 && changelog_transfer_section_map.key?(owner.heading_text.to_s.strip)
       end
       list_items = context.structural_owners(owner_scope: :list_items)
-      entries = sections.flat_map do |section|
+      ordered_sections = sections.sort_by { |section| section.location.start_line }
+      entries = ordered_sections.each_with_index.flat_map do |section, index|
         heading = changelog_transfer_section_map.fetch(section.heading_text.to_s.strip)
+        next_section = ordered_sections[index + 1]
+        section_end_line = next_section ? next_section.location.start_line - 1 : section.location.end_line
         list_items.filter_map do |item|
           next unless item.depth == 1
           next unless item.location.start_line > section.location.start_line
-          next unless item.location.end_line <= section.location.end_line
+          next unless item.location.end_line <= section_end_line
 
           payload = changelog_transfer_list_item_payload(item.source)
           parsed = parse_changelog_transfer_line(payload)
@@ -5208,8 +5213,8 @@ module Kettle
           }
         end
       end
-      validate_changelog_transfer_entry_order!(entries, path)
-      entries
+      validate_changelog_transfer_entries!(entries, path)
+      entries.sort_by { |entry| entry.fetch(:key).to_s }
     end
 
     def changelog_transfer_section_map
@@ -5251,16 +5256,10 @@ module Kettle
       nil
     end
 
-    def validate_changelog_transfer_entry_order!(entries, path)
+    def validate_changelog_transfer_entries!(entries, path)
       keys = entries.map { |entry| entry.fetch(:key).to_s }
       duplicates = keys.tally.select { |_key, count| count > 1 }.keys
       raise Error, "Duplicate transfer changelog key(s) in #{path}: #{duplicates.join(", ")}" if duplicates.any?
-
-      keys.each_cons(2) do |left, right|
-        next if right > left
-
-        raise Error, "Transfer changelog keys must increase in document order in #{path}: #{left} before #{right}"
-      end
     end
 
     def changelog_transfer_key(line)
@@ -5277,6 +5276,7 @@ module Kettle
       return ensure_trailing_newline(content) if transfer_entries.empty?
 
       normalized = normalize_changelog(content, {})
+      normalized = refresh_existing_changelog_transfer_entries(normalized, transfer_entries)
       existing_keys = changelog_transfer_keys(normalized)
       missing = transfer_entries.reject { |entry| existing_keys.include?(entry.fetch(:key)) }
       return ensure_trailing_newline(normalized) if missing.empty?
@@ -5304,6 +5304,105 @@ module Kettle
       ensure_trailing_newline(merged_lines.join("\n").gsub(/\n{3,}/, "\n\n"))
     end
 
+    def refresh_existing_changelog_transfer_entries(content, entries)
+      entry_by_key = entries.to_h { |entry| [entry.fetch(:key).to_s, entry] }
+      lines = markdown_source_lines(content)
+      found = {}
+      removals = changelog_existing_transfer_occurrences(content).filter_map do |occurrence|
+        key = occurrence.fetch(:key).to_s
+        next unless entry_by_key.key?(key)
+
+        found[key] = occurrence.fetch(:release_heading)
+        (occurrence.fetch(:start_line)..occurrence.fetch(:end_line))
+      end
+      return content if found.empty?
+
+      cleaned = lines.each_with_index.reject do |_line, index|
+        line_number = index + 1
+        removals.any? { |range| range.cover?(line_number) }
+      end.map(&:first)
+      grouped_entries = found.each_with_object({}) do |(key, heading), grouped|
+        grouped[heading] ||= []
+        grouped[heading] << entry_by_key.fetch(key)
+      end
+      grouped_entries.reduce(cleaned) do |current_lines, (heading, heading_entries)|
+        insert_changelog_transfer_entries_in_release(current_lines, heading, heading_entries)
+      end.join("\n").then { |text| ensure_trailing_newline(text.gsub(/\n{3,}/, "\n\n")) }
+    end
+
+    def changelog_existing_transfer_occurrences(content)
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: "CHANGELOG.md")
+      release_sections = context.structural_owners(owner_scope: :heading_sections)
+        .select { |owner| owner.level == 2 }
+        .sort_by { |owner| owner.location.start_line }
+      list_items = context.structural_owners(owner_scope: :list_items)
+      list_items.filter_map do |item|
+        next unless item.depth == 1
+
+        key = changelog_transfer_key(item.source)
+        next unless key
+
+        release = changelog_release_section_for_item(release_sections, item)
+        next unless release
+
+        {
+          key: key,
+          release_heading: "## #{release.heading_text}",
+          start_line: item.location.start_line,
+          end_line: item.location.end_line
+        }
+      end
+    end
+
+    def changelog_release_section_for_item(release_sections, item)
+      release_sections.each_with_index.find do |section, index|
+        next_section = release_sections[index + 1]
+        section_end_line = next_section ? next_section.location.start_line - 1 : section.location.end_line
+        item.location.start_line > section.location.start_line &&
+          item.location.end_line <= section_end_line
+      end&.first
+    end
+
+    def insert_changelog_transfer_entries_in_release(lines, heading, entries)
+      heading_index = lines.index { |line| line.to_s == heading.to_s }
+      heading_index = changelog_unreleased_line_index(lines) if heading_index.nil?
+      return lines if heading_index.nil?
+
+      release_end = changelog_unreleased_end_index(lines, heading_index)
+      release_body = lines[(heading_index + 1)...release_end] || []
+      release_preamble = changelog_section_preamble(release_body)
+      items = changelog_unreleased_items(release_body)
+      entries.group_by { |entry| entry.fetch(:section, "### Changed") }.each do |section, section_entries|
+        section = CHANGELOG_STANDARD_HEADINGS.include?(section) ? section : "### Changed"
+        items[section] ||= []
+        items[section].pop while items[section].any? && items[section].last.to_s.strip.empty?
+        items[section] << "" if items[section].any?
+        section_entries.each do |entry|
+          items[section].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+        end
+      end
+
+      lines[0...heading_index] +
+        build_changelog_section(lines.fetch(heading_index), release_preamble, items) +
+        lines[release_end..].to_a
+    end
+
+    def changelog_section_preamble(body_lines)
+      body_lines.take_while { |line| !line.to_s.start_with?("### ") }.map(&:rstrip)
+    end
+
+    def build_changelog_section(heading, preamble, items)
+      lines = [heading.rstrip, ""]
+      preamble_lines = Array(preamble).map(&:rstrip)
+      preamble_lines.pop while preamble_lines.any? && preamble_lines.last.to_s.strip.empty?
+      if preamble_lines.any?
+        lines.concat(preamble_lines)
+        lines << ""
+      end
+      section_lines = build_changelog_unreleased_section(heading, items)
+      lines.concat(section_lines.drop(2))
+    end
+
     def changelog_transfer_keys(content)
       content.to_s.scan(CHANGELOG_TRANSFER_KEY_SCAN_PATTERN).to_set
     end
@@ -5322,7 +5421,7 @@ module Kettle
       while index < lines.length
         current = lines.fetch(index).to_s
         current_indent = current.length - current.lstrip.length
-        break if !in_fence && current.start_with?("### ")
+        break if !in_fence && changelog_heading_line?(current)
         break if !in_fence && changelog_bullet_line?(current) && current_indent <= base_indent
 
         if current.lstrip.start_with?("```")
@@ -5338,6 +5437,12 @@ module Kettle
         index += 1
       end
       [item_lines, index]
+    end
+
+    def changelog_heading_line?(line)
+      stripped = line.to_s.lstrip
+      marker, text = stripped.split(" ", 2)
+      !text.to_s.empty? && marker.to_s.each_char.all? { |char| char == "#" }
     end
 
     def changelog_unreleased_heading?(heading_text)
@@ -11428,6 +11533,7 @@ module Kettle
         .reek.yml
         .standard.yml
         .simplecov
+        .yard-lint.yml
         .yardopts
         Rakefile
       ].include?(path)

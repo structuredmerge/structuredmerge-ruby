@@ -480,6 +480,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         "Rakefile",
         ".rspec",
         ".simplecov",
+        ".yard-lint.yml",
         ".yardopts",
         ".yardignore",
         "bin/setup",
@@ -489,13 +490,15 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
-      expect(apply.fetch(:changed_files)).to include("Gemfile", ".yardopts", ".yardignore", "bin/setup")
+      expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup")
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File).to exist(File.join(root, ".yard-lint.yml"))
       expect(File).to exist(File.join(root, ".yardopts"))
+      expect(File.read(File.join(root, "Rakefile"))).to include('sh("bundle", "exec", "yard-lint", "lib")')
       updated_config = YAML.safe_load_file(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
-      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yardopts")
+      expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yard-lint.yml", ".yardopts")
     end
   end
 

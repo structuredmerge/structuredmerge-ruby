@@ -401,29 +401,170 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
   end
 
-  it "parses sectioned transferable changelog entries through Markdown owners" do
+  it "corrects stale transfer changelog entries inside released sections by stable ID" do
+    changelog = <<~MARKDOWN
+      # Changelog
+
+      ## [Unreleased]
+
+      ### Added
+
+      ### Changed
+
+      ### Deprecated
+
+      ### Removed
+
+      ### Fixed
+
+      ### Security
+
+      ## [1.0.7] - 2026-07-25
+
+      - TAG: [v1.0.7][1.0.7t]
+      - COVERAGE: 100.00% -- 129/129 lines in 8 files
+      - BRANCH COVERAGE: 100.00% -- 42/42 branches in 8 files
+      - 54.17% documented
+
+      ### Changed
+
+      - Project-authored changed entry.
+
+      - kettle-jem-template-20260716-001 - Shim gemspec manifests now include
+        `LICENSE.md` instead of nonexistent `LICENSE.txt`.
+      - kettle-jem-template-20260720-001 - Generated READMEs can now render
+        template-managed corporate sponsor logos from project or family config.
+      - kettle-jem-template-20260725-001 - Generated JRuby and TruffleRuby workflow
+        files now run when pull request head branches start with `feature/release`,
+        so release CI monitoring does not report intentionally skipped engine
+        workflows as failures.
+
+      ### Fixed
+
+      - Project-authored fixed entry.
+
+      ## [1.0.6] - 2026-07-11
+
+      - TAG: [v1.0.6][1.0.6t]
+
+      ### Changed
+
+      - Prior release entry.
+    MARKDOWN
+    entries = [
+      {
+        key: "kettle-jem-template-20260716-001",
+        section: "### Fixed",
+        lines: [
+          "- kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead",
+          "  of a missing `LICENSE.txt` file."
+        ]
+      },
+      {
+        key: "kettle-jem-template-20260720-001",
+        section: "### Added",
+        lines: [
+          "- kettle-jem-template-20260720-001 - READMEs can now display configured",
+          "  corporate sponsor logos."
+        ]
+      },
+      {
+        key: "kettle-jem-template-20260725-001",
+        section: "### Fixed",
+        lines: [
+          "- kettle-jem-template-20260725-001 - Release pull request branches beginning",
+          "  with `feature/release` now run JRuby and TruffleRuby workflows."
+        ]
+      }
+    ]
+
+    result = described_class.send(:apply_changelog_transfer_entries, changelog, entries)
+
+    expect(result.scan("kettle-jem-template-20260716-001").size).to eq(1)
+    expect(result.scan("kettle-jem-template-20260720-001").size).to eq(1)
+    expect(result.scan("kettle-jem-template-20260725-001").size).to eq(1)
+    expect(result).to include("## [1.0.7] - 2026-07-25")
+    expect(result).to include("- TAG: [v1.0.7][1.0.7t]")
+    expect(result).to include("- Project-authored changed entry.")
+    expect(result).to include("- Project-authored fixed entry.")
+    expect(result).to include("### Added\n\n- kettle-jem-template-20260720-001 - READMEs can now display configured")
+    expect(result).to include("### Fixed\n\n- Project-authored fixed entry.\n\n- kettle-jem-template-20260716-001")
+    expect(result).to include("- kettle-jem-template-20260725-001 - Release pull request branches beginning")
+    expect(result).not_to include("Shim gemspec manifests now include")
+    expect(result).not_to include("Generated READMEs can now render")
+    expect(result).not_to include("so release CI monitoring does not report")
+    expect(result).to include("## [1.0.6] - 2026-07-11")
+    expect(result).to include("- Prior release entry.")
+  end
+
+  it "corrects interleaved transfer changelog entries across multiple released sections" do
+    changelog = File.read(project_root.join("spec/fixtures/kettle_family_interleaved_changelog.md"))
     entries = described_class.transfer_changelog_entries
 
-    expect(entries.map { |entry| entry.fetch(:section) }.uniq).to eq(["### Changed"])
-    expect(entries.map { |entry| entry.fetch(:key) }).to include("kettle-jem-template-20260725-002")
-    expect(entries.last.fetch(:lines).join("\n")).to include("Version specs now use `anonymous_loader`")
+    result = described_class.send(:apply_changelog_transfer_entries, changelog, entries)
+
+    entries.each do |entry|
+      expect(result.scan(entry.fetch(:key)).size).to eq(1)
+      expect(result).to include(entry.fetch(:lines).join("\n"))
+    end
+    expect(result).to include("## [1.1.9] - 2026-07-25")
+    expect(result).to include("- TAG: [v1.1.9][1.1.9t]")
+    expect(result).to include("## [1.1.6] - 2026-07-25")
+    expect(result).to include("## [1.0.2] - 2026-07-21")
+    expect(result).to include("## [1.0.0] - 2026-07-17")
+    expect(result).to include("- `kettle-family state` now marks mismatched GitHub release tags")
+    expect(result).to include("- Bare `kettle-family bump` now defaults to `--only bump`")
+    expect(result).to include("- Release summaries now count only members that reached a release terminal")
+    expect(result).to include("- `kettle-family template` now passes family-level `readme.corporate_sponsors`")
+    expect(result).to include("- Promoted the gems that provide built-in `kettle-family` workflow commands")
+    expect(result).not_to include("Generated gemspec templates now include")
+    expect(result).not_to include("Generated JRuby and TruffleRuby workflow")
+    expect(result).not_to include("Generated READMEs can now render")
+    expect(result).not_to include("Generated StructuredMerge Git diff driver")
+    expect(result).not_to include("Generated multi-engine workflow files")
+    expect(result).not_to include("Shim gemspec manifests now include")
+  end
+
+  it "parses sectioned transferable changelog entries through Markdown owners" do
+    path = File.join(described_class::PACKAGED_TEMPLATE_ROOT, described_class::TRANSFER_CHANGELOG_TEMPLATE_PATH)
+    content = File.read(path)
+    context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: path)
+    sections = context.structural_owners(owner_scope: :heading_sections).select do |owner|
+      owner.level == 2 && described_class.send(:changelog_transfer_section_map).key?(owner.heading_text.to_s.strip)
+    end
+    entries = described_class.transfer_changelog_entries
+
+    expect(sections.map { |section| section.heading_text.to_s.strip }.uniq.size).to be > 1
+    expect(entries).not_to be_empty
+    expect(entries.map { |entry| entry.fetch(:section) }.uniq.size).to be > 1
+    expect(entries.map { |entry| entry.fetch(:key) }).to eq(entries.map { |entry| entry.fetch(:key) }.sort)
+    entries.each do |entry|
+      expect(entry.fetch(:key)).to match(/\Akettle-jem-template-\d{8}-\d{3}\z/)
+      expect(described_class::CHANGELOG_STANDARD_HEADINGS).to include(entry.fetch(:section))
+      expect(entry.fetch(:lines).join("\n")).to include(entry.fetch(:key))
+    end
   end
 
   it "reports transfer changelog lag from a stored replay cursor" do
-    lag = described_class.transfer_changelog_lag("kettle-jem-template-20260725-001", verbose: true)
+    entries = described_class.transfer_changelog_entries
+    cursor = entries.fetch(-2).fetch(:key)
+    latest = entries.last.fetch(:key)
+    expected_missing = entries.last(1)
+    lag = described_class.transfer_changelog_lag(cursor, verbose: true)
 
-    expect(lag.fetch(:last_entry_key)).to eq("kettle-jem-template-20260725-001")
-    expect(lag.fetch(:latest_entry_key)).to eq("kettle-jem-template-20260725-002")
-    expect(lag.fetch(:missing_count)).to eq(1)
-    expect(lag.fetch(:missing_entries).map { |entry| entry.fetch(:key) }).to eq(["kettle-jem-template-20260725-002"])
+    expect(lag.fetch(:last_entry_key)).to eq(cursor)
+    expect(lag.fetch(:latest_entry_key)).to eq(latest)
+    expect(lag.fetch(:missing_count)).to eq(expected_missing.size)
+    expect(lag.fetch(:missing_entries)).to eq(expected_missing)
   end
 
   it "reports every transfer changelog entry as missing when no replay cursor exists" do
+    entries = described_class.transfer_changelog_entries
     lag = described_class.transfer_changelog_lag
 
     expect(lag.fetch(:last_entry_key, nil)).to be_nil
-    expect(lag.fetch(:latest_entry_key)).to eq("kettle-jem-template-20260725-002")
-    expect(lag.fetch(:missing_count)).to eq(described_class.transfer_changelog_entries.size)
+    expect(lag.fetch(:latest_entry_key)).to eq(entries.last.fetch(:key))
+    expect(lag.fetch(:missing_count)).to eq(entries.size)
   end
 
   it "keeps the real CHANGELOG template in canonical Unreleased form" do

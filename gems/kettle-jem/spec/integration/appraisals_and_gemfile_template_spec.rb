@@ -1653,6 +1653,12 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     end
   end
 
+  it "keeps YARD linting in the documentation modular Gemfile" do
+    content = File.read(File.join(described_class::PACKAGED_TEMPLATE_ROOT, "gemfiles", "modular", "documentation.gemfile.example"))
+
+    expect(content).to include('gem "yard-lint", "~> 1.10", ">= 1.10.2", require: false')
+  end
+
   it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

@@ -37,6 +37,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `version.rb` files for coverage without redefining package constants.
 - Added a transfer changelog query API so family tooling can report how many
   template-impacting changelog replay entries a project has not yet applied.
+- Generated documentation tooling now includes `yard-lint`, a `.yard-lint.yml`
+  config, and an explicit `yard:lint` rake task.
 - Version spec normalization now removes managed version specs when
   `version_gem` is disabled or incompatible with the project's runtime Ruby
   floor.
@@ -293,6 +295,11 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- The packaged transfer changelog is now actually grouped by changelog section,
+  while replay still treats entries as a key-sorted stack for cursor tracking.
+- Changelog replay now corrects stale transfer entries already present in
+  released changelog sections by stable transfer ID, preserving release metadata
+  and project-authored entries.
 - Monorepo templating now serializes local Git driver configuration with the
   shared family Git operation lock and retries transient Git lock conflicts,
   preventing parallel `git config --local` workers from racing on `.git/config`.
