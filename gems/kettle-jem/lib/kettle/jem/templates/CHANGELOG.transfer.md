@@ -6,8 +6,9 @@
   corporate sponsor logos.
 - kettle-jem-template-20260720-005 - README Support & Community links now
   include RubyForum.
-- kettle-jem-template-20260726-001 - Projects now include an optional
-  `yard:lint` task and YARD lint configuration for documentation quality checks.
+- kettle-jem-template-20260726-001 - Projects now include YARD lint
+  configuration and documentation dependencies so documentation issues fail
+  before generated docs are refreshed.
 
 ## Changed
 

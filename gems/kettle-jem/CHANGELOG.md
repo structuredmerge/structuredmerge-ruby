@@ -37,8 +37,8 @@ Please file a bug if you notice a violation of semantic versioning.
   `version.rb` files for coverage without redefining package constants.
 - Added a transfer changelog query API so family tooling can report how many
   template-impacting changelog replay entries a project has not yet applied.
-- Generated documentation tooling now includes `yard-lint`, a `.yard-lint.yml`
-  config, and an explicit `yard:lint` rake task.
+- Generated documentation tooling now includes `yard-lint` and a
+  `.yard-lint.yml` config for kettle-dev's documentation lint task.
 - Version spec normalization now removes managed version specs when
   `version_gem` is disabled or incompatible with the project's runtime Ruby
   floor.

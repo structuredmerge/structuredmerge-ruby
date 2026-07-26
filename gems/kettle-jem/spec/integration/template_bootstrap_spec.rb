@@ -495,7 +495,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(File).to exist(File.join(root, "Gemfile"))
       expect(File).to exist(File.join(root, ".yard-lint.yml"))
       expect(File).to exist(File.join(root, ".yardopts"))
-      expect(File.read(File.join(root, "Rakefile"))).to include('sh("bundle", "exec", "yard-lint", "lib")')
+      expect(File.read(File.join(root, "gemfiles", "modular", "documentation.gemfile"))).to include('gem "yard-lint"')
       updated_config = YAML.safe_load_file(File.join(root, ".structuredmerge", "kettle-jem.yml"))
       expect(updated_config.dig("templates", "profile")).to eq("monorepo-subgem-release")
       expect(updated_config.dig("templates", "entries")).to include("Rakefile", ".yard-lint.yml", ".yardopts")

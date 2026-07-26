@@ -151,13 +151,6 @@ if kettle_jem_selftest_unavailable_note
   end
 end
 
-namespace :yard do
-  desc "Lint YARD Documentation"
-  task :lint do
-    sh("bundle", "exec", "yard-lint", "lib")
-  end
-end
-
 ### RELEASE TASKS
 # Setup stone_checksums
 begin
