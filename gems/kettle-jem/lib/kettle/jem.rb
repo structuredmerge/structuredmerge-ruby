@@ -36,6 +36,7 @@ module Kettle
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
+    KETTLE_LOCK_PATH = ".kettle-jem.lock"
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
@@ -1710,6 +1711,62 @@ module Kettle
       end
     end
 
+    class ChecksumMode
+      VALID_TOKENS = %w[dest template ignore-dest ignore-template off].freeze
+      DEFAULT = "template,ignore-dest"
+
+      attr_reader :tokens
+
+      def self.parse(value)
+        new(value)
+      end
+
+      def initialize(value)
+        raw_tokens = value.to_s.strip.empty? ? DEFAULT.split(",") : value.to_s.split(",")
+        normalized = raw_tokens.map { |token| token.to_s.strip.downcase }.reject(&:empty?)
+        normalized = DEFAULT.split(",") if normalized.empty?
+        unknown = normalized - VALID_TOKENS
+        raise ArgumentError, "unknown --checksums mode(s): #{unknown.join(", ")}" unless unknown.empty?
+
+        if normalized.include?("off")
+          raise ArgumentError, "--checksums=off cannot be combined with other checksum modes" if normalized.length > 1
+
+          @tokens = ["off"]
+          return
+        end
+
+        normalized << "template" if normalized.include?("dest") && !normalized.include?("ignore-template") && !normalized.include?("template")
+        normalized << "ignore-dest" if normalized.include?("template") && !normalized.include?("dest") && !normalized.include?("ignore-dest")
+        if normalized.include?("dest") && normalized.include?("ignore-dest")
+          raise ArgumentError, "--checksums cannot combine dest and ignore-dest"
+        end
+        if normalized.include?("template") && normalized.include?("ignore-template")
+          raise ArgumentError, "--checksums cannot combine template and ignore-template"
+        end
+        if normalized.include?("ignore-dest") && normalized.include?("ignore-template")
+          raise ArgumentError, "--checksums=ignore-dest,ignore-template is equivalent to off; use --checksums=off"
+        end
+
+        @tokens = normalized.uniq
+      end
+
+      def off?
+        tokens.include?("off")
+      end
+
+      def check_template?
+        !off? && tokens.include?("template")
+      end
+
+      def check_destination?
+        !off? && tokens.include?("dest")
+      end
+
+      def to_s
+        tokens.join(",")
+      end
+    end
+
     module TemplateChecksums
       YAML_KEY = "kettle-jem"
       CHECKSUMS_SUBKEY = "checksums"
@@ -1751,6 +1808,19 @@ module Kettle
         entry.is_a?(Hash) ? entry : {}
       rescue
         {}
+      end
+
+      def remove_from_config(config_path:)
+        return false unless File.exist?(config_path.to_s)
+
+        content = File.read(config_path.to_s)
+        range = yaml_state_node_range(content)
+        return false unless range
+
+        lines = content.to_s.lines
+        updated = [*lines[0...range.begin], *lines[range.end..].to_a].join
+        File.write(config_path.to_s, updated.gsub(/\n{3,}/, "\n\n"))
+        true
       end
 
       def diff(current:, stored:)
@@ -1863,6 +1933,71 @@ module Kettle
         end
 
         nil
+      end
+    end
+
+    module TemplateLock
+      VERSION = 1
+      TEMPLATE_STATE_KEY = "template_state"
+      FILES_KEY = "files"
+
+      module_function
+
+      def path(project_root)
+        File.join(project_root.to_s, KETTLE_LOCK_PATH)
+      end
+
+      def load(project_root:, config_path: nil)
+        lock_path = path(project_root)
+        lock = if File.exist?(lock_path)
+          data = YAML.safe_load_file(lock_path, permitted_classes: [], aliases: false)
+          data.is_a?(Hash) ? data : {}
+        else
+          {}
+        end
+        legacy = config_path ? TemplateChecksums.load_state(config_path: config_path) : {}
+        merge_legacy(lock, legacy)
+      rescue
+        {}
+      end
+
+      def merge_legacy(lock, legacy)
+        return lock unless legacy.is_a?(Hash) && !legacy.empty?
+
+        merged = lock.dup
+        state = (merged[TEMPLATE_STATE_KEY].is_a?(Hash) ? merged[TEMPLATE_STATE_KEY].dup : {})
+        state["version"] ||= legacy[TemplateChecksums::VERSION_SUBKEY]
+        state["applied_at"] ||= legacy[TemplateChecksums::APPLIED_AT_SUBKEY]
+        state["changelog_replay"] ||= legacy[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY] if legacy[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+        state["checksums"] ||= legacy[TemplateChecksums::CHECKSUMS_SUBKEY] if legacy[TemplateChecksums::CHECKSUMS_SUBKEY]
+        merged["version"] ||= VERSION
+        merged[TEMPLATE_STATE_KEY] = state unless state.empty?
+        merged[FILES_KEY] ||= {}
+        merged
+      end
+
+      def write(project_root:, lock:)
+        lock_path = path(project_root)
+        FileUtils.mkdir_p(File.dirname(lock_path))
+        File.write(lock_path, "#{YAML.dump(lock)}")
+      end
+
+      def files(lock)
+        value = lock.is_a?(Hash) ? lock[FILES_KEY] : nil
+        value.is_a?(Hash) ? value : {}
+      end
+
+      def file_record(lock, relative_path)
+        record = files(lock)[relative_path.to_s]
+        record.is_a?(Hash) ? record : {}
+      end
+
+      def build_lock(template_state:, file_records:)
+        {
+          "version" => VERSION,
+          TEMPLATE_STATE_KEY => template_state,
+          FILES_KEY => file_records.sort.to_h
+        }
       end
     end
 
@@ -3600,6 +3735,7 @@ module Kettle
       with_event_phase(events, "runtime_dependencies") { ensure_runtime_dependencies! }
       with_event_phase(events, "preflight") { preflight_project!(project_root) }
       template_selection = with_event_phase(events, "template_selection") { template_selection_for(env, run_options) }
+      checksum_mode = with_event_phase(events, "checksum_mode") { checksum_mode_for(env, run_options) }
       decision_policy = with_event_phase(events, "decision_policy") { decision_policy_for(env, run_options) }
       git_preflight = with_event_phase(events, "git_preflight") do
         git_preflight_report(project_root, template_selection: template_selection)
@@ -3633,6 +3769,10 @@ module Kettle
           stats: recipe_planning_execution
         )
       end
+      template_lock = with_event_phase(events, "template_lock") { template_lock_state(project_root) }
+      recipe_reports = with_event_phase(events, "checksum_skip") do
+        apply_checksum_skips(project_root, recipe_reports, checksum_mode: checksum_mode, template_lock: template_lock)
+      end
       plugin_registry = with_event_phase(events, "plugins") { plugin_registry_for_project(project_root) }
       changed_files = changed_files_from_recipe_reports(recipe_reports)
       diagnostics = recipe_reports.flat_map { |report| report[:diagnostics] }
@@ -3664,6 +3804,8 @@ module Kettle
           recipe_planning_thread_workers: recipe_planning_thread_workers,
           recipe_planning_execution: recipe_planning_execution,
           decision_policy: decision_policy.to_h,
+          checksum_mode: checksum_mode.to_s,
+          template_lock: template_lock,
           template_selection: template_selection,
           git_preflight: git_preflight,
           decision_evaluations: decision_evaluations,
@@ -3686,6 +3828,128 @@ module Kettle
         latest_by_path[path] = report if path
       end
       latest_by_path.values.filter_map { |report| report[:relative_path] if report[:changed] }.uniq.sort
+    end
+
+    def checksum_mode_for(env, run_options)
+      raw = (run_options || {})[:checksums] ||
+        (run_options || {})["checksums"] ||
+        (env || {})["KETTLE_JEM_CHECKSUMS"]
+      ChecksumMode.parse(raw)
+    end
+
+    def template_lock_state(project_root)
+      TemplateLock.load(project_root: project_root, config_path: kettle_jem_config_path(project_root))
+    end
+
+    def apply_checksum_skips(project_root, recipe_reports, checksum_mode:, template_lock:)
+      return recipe_reports if checksum_mode.off?
+
+      recipe_reports.map do |report|
+        next report unless checksum_skip_report?(project_root, report, checksum_mode: checksum_mode, template_lock: template_lock)
+
+        skipped = deep_dup(report)
+        skipped[:changed] = false
+        skipped[:checksum_skipped] = true
+        skipped[:metadata] = deep_dup(skipped.fetch(:metadata, {})).merge(
+          checksum_skip: {
+            mode: checksum_mode.to_s,
+            reason: "lock_match"
+          }
+        )
+        skipped
+      end
+    end
+
+    def checksum_skip_report?(project_root, report, checksum_mode:, template_lock:)
+      return false unless report[:changed]
+      return false unless checksum_cache_safe_report?(report)
+
+      relative_path = report.fetch(:relative_path).to_s
+      record = TemplateLock.file_record(template_lock, relative_path)
+      return false if record.empty?
+
+      if checksum_mode.check_template?
+        expected = record["input_fingerprint"].to_s
+        return false if expected.empty?
+        return false unless expected == template_input_fingerprint(project_root, report)
+      end
+      if checksum_mode.check_destination?
+        expected = record["dest_sha256"].to_s
+        return false if expected.empty?
+        return false unless expected == destination_file_sha256(project_root, relative_path).to_s
+      end
+      true
+    end
+
+    def checksum_cache_safe_report?(report)
+      metadata = report.fetch(:metadata, {})
+      preference = metadata[:template_source_preference] || metadata["template_source_preference"]
+      return false unless preference.is_a?(Hash)
+      return false if report.dig(:metadata, :delete_file) || report.dig(:metadata, "delete_file")
+
+      primitive = report.dig(:request_envelope, :request, :recipe_name).to_s
+      primitive == "supplied_template_source_application"
+    end
+
+    def template_input_fingerprint(project_root, report)
+      Digest::SHA256.hexdigest(JSON.generate(template_input_fingerprint_payload(project_root, report)))
+    end
+
+    def template_input_fingerprint_payload(project_root, report)
+      metadata = report.fetch(:metadata, {})
+      preference = metadata[:template_source_preference] || metadata["template_source_preference"] || {}
+      source_path = template_source_absolute_path(project_root, preference)
+      {
+        kettle_jem_version: VERSION,
+        kettle_jem_implementation_sha256: Digest::SHA256.file(__FILE__).hexdigest,
+        recipe_name: report[:recipe_name].to_s,
+        request_recipe_name: report.dig(:request_envelope, :request, :recipe_name).to_s,
+        recipe_version: report.dig(:request_envelope, :request, :recipe_version).to_s,
+        relative_path: report.fetch(:relative_path).to_s,
+        template_source: template_source_lock_path(preference),
+        template_source_sha256: source_path && File.file?(source_path) ? Digest::SHA256.file(source_path).hexdigest : "",
+        template_source_preference: stringify_keys_for_json(preference),
+        template_tokens: stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
+      }
+    end
+
+    def template_source_absolute_path(project_root, preference)
+      return unless preference.is_a?(Hash)
+
+      root = preference[:source_root_path] || preference["source_root_path"] || project_root
+      relative = preference[:source_relative_path] || preference["source_relative_path"] ||
+        preference[:selected_source] || preference["selected_source"]
+      return if relative.to_s.empty?
+
+      File.join(root.to_s, relative.to_s)
+    end
+
+    def template_source_lock_path(preference)
+      return "" unless preference.is_a?(Hash)
+
+      (preference[:source_relative_path] || preference["source_relative_path"] ||
+        preference[:selected_source] || preference["selected_source"]).to_s
+    end
+
+    def destination_file_sha256(project_root, relative_path)
+      path = File.join(project_root.to_s, relative_path.to_s)
+      return unless File.file?(path)
+
+      Digest::SHA256.file(path).hexdigest
+    end
+
+    def stringify_keys_for_json(value)
+      case value
+      when Hash
+        value.keys.map(&:to_s).sort.to_h do |key|
+          raw_value = value.key?(key) ? value[key] : value[key.to_sym]
+          [key, stringify_keys_for_json(raw_value)]
+        end
+      when Array
+        value.map { |entry| stringify_keys_for_json(entry) }
+      else
+        value
+      end
     end
 
     def recipe_planning_strategy_for(env, run_options)
@@ -4416,10 +4680,14 @@ module Kettle
       config_path = kettle_jem_config_path(project_root)
       return unless File.file?(config_path)
 
-      relative_path = config_path.delete_prefix("#{project_root}/")
-      before = File.read(config_path)
+      relative_config_path = config_path.delete_prefix("#{project_root}/")
+      lock_path = TemplateLock.path(project_root)
+      relative_lock_path = lock_path.delete_prefix("#{project_root}/")
+      before_config = File.read(config_path)
+      before_lock = File.exist?(lock_path) ? File.read(lock_path) : nil
       latest_replay = report.dig(:facts, :changelog, :latest_transfer_entry)
-      existing_replay = TemplateChecksums.load_state(config_path: config_path)[TemplateChecksums::CHANGELOG_REPLAY_SUBKEY]
+      existing_state = TemplateLock.load(project_root: project_root, config_path: config_path)
+      existing_replay = existing_state.dig(TemplateLock::TEMPLATE_STATE_KEY, TemplateChecksums::CHANGELOG_REPLAY_SUBKEY)
       changelog_replay = if latest_replay
         {
           TemplateChecksums::LAST_ENTRY_KEY_SUBKEY => latest_replay.fetch(:key),
@@ -4428,26 +4696,71 @@ module Kettle
       elsif existing_replay.is_a?(Hash)
         existing_replay
       end
-      TemplateChecksums.write_to_config(
-        config_path: config_path,
-        checksums: TemplateChecksums.compute(template_root: template_root_path(project_root, config: kettle_jem_config(project_root))),
-        version: VERSION,
-        applied_at: Time.now.utc.strftime("%Y-%m-%d"),
-        changelog_replay: changelog_replay
+      template_state = {
+        "version" => VERSION,
+        "applied_at" => Time.now.utc.strftime("%Y-%m-%d"),
+        TemplateChecksums::CHANGELOG_REPLAY_SUBKEY => changelog_replay,
+        TemplateChecksums::CHECKSUMS_SUBKEY => TemplateChecksums.compute(
+          template_root: template_root_path(project_root, config: kettle_jem_config(project_root))
+        )
+      }.compact
+      file_records = checksum_file_records(project_root, report, existing_state)
+      TemplateLock.write(
+        project_root: project_root,
+        lock: TemplateLock.build_lock(template_state: template_state, file_records: file_records)
       )
-      after = File.read(config_path)
-      if after != before
-        config_report = report.fetch(:recipe_reports, []).find { |entry| entry.fetch(:relative_path, nil) == relative_path }
-        config_report[:final_content] = after if config_report
-        config_report&.dig(:report_envelope, :report)&.[]=(:final_content, after)
+      TemplateChecksums.remove_from_config(config_path: config_path)
+      after_config = File.read(config_path)
+      after_lock = File.read(lock_path)
+      if after_config != before_config
+        config_report = report.fetch(:recipe_reports, []).find { |entry| entry.fetch(:relative_path, nil) == relative_config_path }
+        config_report[:final_content] = after_config if config_report
+        config_report&.dig(:report_envelope, :report)&.[]=(:final_content, after_config)
       end
+      changed_files = []
+      changed_files << relative_config_path if after_config != before_config
+      changed_files << relative_lock_path if after_lock != before_lock
       {
         name: "kettle_jem_state_sync",
-        path: relative_path,
-        status: (after == before) ? "already_current" : "applied",
-        changed_files: (after == before) ? [] : [relative_path],
+        path: relative_lock_path,
+        status: changed_files.empty? ? "already_current" : "applied",
+        changed_files: changed_files,
         metadata_only: true
       }
+    end
+
+    def checksum_file_records(project_root, report, existing_state)
+      existing_records = TemplateLock.files(existing_state)
+      report.fetch(:recipe_reports, []).each_with_object(existing_records.dup) do |recipe_report, records|
+        next unless checksum_cache_safe_report?(recipe_report)
+
+        relative_path = recipe_report.fetch(:relative_path).to_s
+        existing = records[relative_path].is_a?(Hash) ? records[relative_path].dup : {}
+        if recipe_report[:checksum_skipped]
+          records[relative_path] = existing.merge(
+            "recipe" => recipe_report[:recipe_name].to_s,
+            "input_fingerprint" => template_input_fingerprint(project_root, recipe_report),
+            "template_sources" => [template_source_lock_path(
+              recipe_report.dig(:metadata, :template_source_preference) ||
+                recipe_report.dig(:metadata, "template_source_preference") ||
+                {}
+            )].reject(&:empty?)
+          )
+          next
+        end
+
+        records[relative_path] = {
+          "recipe" => recipe_report[:recipe_name].to_s,
+          "action" => recipe_report.dig(:metadata, :delete_file) ? "delete" : "write",
+          "dest_sha256" => destination_file_sha256(project_root, relative_path),
+          "input_fingerprint" => template_input_fingerprint(project_root, recipe_report),
+          "template_sources" => [template_source_lock_path(
+            recipe_report.dig(:metadata, :template_source_preference) ||
+              recipe_report.dig(:metadata, "template_source_preference") ||
+              {}
+          )].reject(&:empty?)
+        }.compact
+      end
     end
 
     def sync_kettle_config_monorepo_subgem_profile(content, gemspec_path, profile)

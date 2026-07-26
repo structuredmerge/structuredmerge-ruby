@@ -184,13 +184,15 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       expect(config.fetch("yard_host")).to eq("docs.env.test")
       expect(config.fetch("homepage_uri")).to eq("https://homepage.env.test")
       expect(config.dig("rubygems", "min_ruby")).to eq("1.8.7")
-      expect(config.dig("kettle-jem", "version")).to eq(Kettle::Jem::Version::VERSION)
+      expect(config).not_to have_key("kettle-jem")
       expect(config.dig("tokens", "forge", "gh_user")).to eq("env-user")
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+      expect(lock.dig("template_state", "version")).to eq(Kettle::Jem::Version::VERSION)
       expect(report.fetch(:final_content)).to include("min_divergence_threshold: 12 # ENV override: KJ_MIN_DIVERGENCE_THRESHOLD")
       expect(report.fetch(:final_content)).to include('yard_host: "docs.env.test" # ENV override: KJ_YARD_HOST')
       expect(report.fetch(:final_content)).to include('homepage_uri: "https://homepage.env.test" # ENV override: KJ_HOMEPAGE_URI')
       expect(report.fetch(:final_content)).to include('min_ruby: "1.8.7" # ENV override: KJ_MIN_RUBY')
-      expect(report.fetch(:final_content)).to include(%(version: "#{Kettle::Jem::Version::VERSION}"))
+      expect(report.fetch(:final_content)).not_to include("kettle-jem:")
       expect(report.fetch(:final_content)).to include('gh_user: "env-user" # GitHub username only. ENV: KJ_GH_USER')
       expect(File.read(File.join(root, described_class::KETTLE_CONFIG_PATH))).to eq(report.fetch(:final_content))
     end
@@ -1454,6 +1456,92 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
         "last_entry_date" => "2026-07-20"
       )
       expect(rewritten.fetch("kettle-jem").fetch("checksums")).to eq(current)
+    end
+  end
+
+  it "migrates legacy config checksum state into a kettle-jem lockfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-lock-migration", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+
+          kettle-jem:
+            version: "0.1.0"
+            applied_at: "2026-07-01"
+            checksums:
+              "config.yml.example": "old"
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+      config = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
+
+      expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
+        changed_files: include(".kettle-jem.lock", ".kettle-jem.yml")
+      )
+      expect(config).not_to have_key("kettle-jem")
+      expect(lock.fetch("template_state").fetch("checksums")).to include("config.yml.example")
+      expect(lock.fetch("files").fetch("config.yml")).to include("input_fingerprint", "dest_sha256")
+    end
+  end
+
+  it "skips unchanged template inputs by default but honors destination checksum mode" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-skip", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      File.write(File.join(root, "config.yml"), "name: local\n")
+
+      default_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      default_report = default_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
+
+      expect(default_report.fetch(:checksum_skipped)).to be(true)
+      expect(File.read(File.join(root, "config.yml"))).to eq("name: local\n")
+
+      dest_apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true, checksums: "dest,template"})
+      dest_report = dest_apply.fetch(:recipe_reports).find { |report| report.fetch(:relative_path) == "config.yml" }
+
+      expect(dest_report).not_to include(:checksum_skipped)
+      expect(File.read(File.join(root, "config.yml"))).to eq("name: template\n")
     end
   end
 

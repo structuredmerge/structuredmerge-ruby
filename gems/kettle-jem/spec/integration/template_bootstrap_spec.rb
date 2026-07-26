@@ -77,7 +77,8 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       described_class.apply_project(root, env: {"KJ_MIN_DIVERGENCE_THRESHOLD" => "7"})
       applied_config = File.read(File.join(root, ".structuredmerge/kettle-jem.yml"))
       expect(applied_config).to start_with(bootstrap_report.fetch(:final_content).rstrip)
-      expect(YAML.safe_load(applied_config).fetch("kettle-jem")).to include(
+      expect(YAML.safe_load(applied_config)).not_to have_key("kettle-jem")
+      expect(YAML.safe_load_file(File.join(root, described_class::KETTLE_LOCK_PATH)).fetch("template_state")).to include(
         "version" => described_class::VERSION,
         "checksums" => a_kind_of(Hash)
       )

@@ -20,6 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Added `.kettle-jem.lock` for template application state and checksum-based
+  template skipping, with `--checksums` modes and `--ignore-checksums` as an
+  alias for `--checksums=off`.
 - `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
   progress stream filtering, emission, recording, and phase timing.
 - Added `KJ_GH_ORG` as a GitHub-specific repository-owner override for
@@ -298,6 +301,8 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Existing managed checksum state is now migrated out of the user-managed
+  kettle-jem config and into `.kettle-jem.lock` automatically.
 - Generated `.yard-lint.yml` files now use yard-lint's current schema for
   severity gating and tag ordering, so documentation lint can boot before docs
   are regenerated.

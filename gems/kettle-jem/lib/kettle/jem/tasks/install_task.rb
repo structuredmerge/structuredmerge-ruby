@@ -1640,6 +1640,7 @@ module Kettle
           argv << "--accept" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:accept])
           argv << "--interactive" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:interactive])
           argv << "--dry-run" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:dry_run])
+          argv.concat(value_arg("--checksums", options[:checksums]))
           argv.concat(value_arg("--failure-mode", options[:failure_mode]))
           argv.concat(value_arg("--allowed", options[:allowed]))
           argv.concat(value_arg("--hook-templates", options[:hook_templates]))

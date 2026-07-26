@@ -67,6 +67,7 @@ module Kettle
             skip_rubocop_gradual: truthy?(env["KETTLE_JEM_SKIP_RUBOCOP_GRADUAL"]),
             skip_binstubs: truthy?(env["KETTLE_JEM_SKIP_BINSTUBS"]),
             skip_lock_normalization: truthy?(env["KETTLE_JEM_SKIP_LOCK_NORMALIZATION"]),
+            checksums: env["KETTLE_JEM_CHECKSUMS"],
             accept_config: truthy?(env["KETTLE_JEM_ACCEPT_CONFIG"]),
             bootstrap_mode: truthy?(env["KETTLE_JEM_BOOTSTRAP_MODE"]),
             quiet: truthy?(env["KETTLE_JEM_QUIET"]),
