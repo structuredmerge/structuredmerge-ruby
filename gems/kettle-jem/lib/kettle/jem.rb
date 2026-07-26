@@ -16457,7 +16457,8 @@ module Kettle
               github-token: ${{ secrets.GITHUB_TOKEN }}
               file: coverage/lcov.info
               format: lcov
-            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+              fail-on-error: false
+            continue-on-error: true
         YAML
       end
 
@@ -16470,8 +16471,8 @@ module Kettle
               oidc: true
               files: coverage/lcov.info
               format: lcov
-              skip-errors: false
-            continue-on-error: ${{ matrix.experimental || endsWith(matrix.ruby, 'head') }}
+              skip-errors: true
+            continue-on-error: true
         YAML
       end
 
@@ -16486,6 +16487,7 @@ module Kettle
               fail_ci_if_error: false
               files: coverage/lcov.info,coverage/coverage.xml
               verbose: true
+            continue-on-error: true
         YAML
       end
 

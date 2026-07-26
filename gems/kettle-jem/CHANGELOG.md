@@ -303,6 +303,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated coverage workflows now treat Coveralls, QLTY, and Codecov uploads
+  as optional so third-party coverage outages do not fail CI while the internal
+  coverage threshold check remains authoritative.
 - Generated version files now document their version namespace and constants,
   reducing warning-only `yard-lint` output in templated gems.
 - Existing managed checksum state is now migrated out of the user-managed
