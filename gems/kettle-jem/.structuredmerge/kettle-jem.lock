@@ -4,7 +4,7 @@ template_state:
   version: 7.1.0
   applied_at: '2026-07-26'
   changelog_replay:
-    last_entry_key: kettle-jem-template-20260726-001
+    last_entry_key: kettle-jem-template-20260726-002
     last_entry_date: '2026-07-26'
   checksums:
     ".aiignore.example": 48a5dfdd93afd1a15fdce39cc28ca9920263f00018b0968ab031fa744521e5ce
@@ -85,7 +85,7 @@ template_state:
     Appraisals.example: 9cb1abcfb1a0bd6d859ca0705efb874dbe546754c8c71f9f95025ff6817f1471
     Big-Time-Public-License.md.example: b0c02a112c9eee0ed69f05fd8f22277a2f8bc62d447b6cb75d6df560e05bf431
     CHANGELOG.md.example: 73459e50dad34d84db88844c993d975097557bdf5229e101b0d1339de6f98ffc
-    CHANGELOG.transfer.md: 1f760573c829f196c41df245ed061a48665ea73d3e471f0240bb701065a956d9
+    CHANGELOG.transfer.md: 9c201849117c9d4234724c4599643dd42fdce5f0a673a1abee97b97e556c301b
     CITATION.cff.example: e404ea0a7919d78a83d53d80e211d17b9663576aa606583b709795dc023fd75c
     CODE_OF_CONDUCT.md.example: f1ad532f1860f73ef774c6b27a26d41f4bc1cb8813034f5957487766ebb0986b
     CONTRIBUTING.md.example: 63d339848c615f2c181d6b0565c42e56371eedb66f310d146cb7da297f7bc641
@@ -473,7 +473,7 @@ files:
     recipe: template_source_application_structuredmerge_kettle_jem_yml
     action: write
     dest_sha256: 2927be378c55c62116b6bcc913950334d006c7ac28335822bb968d486cea6a01
-    input_fingerprint: c83bfb4cc6518bec2b28547af1df04b1e3eb101284bfdc015b48c4817058a0dd
+    input_fingerprint: 612ec3d5b147626e8b86e6d80cc3b99267042f441b6ffdadffa95f64d1bcbddf
     template_sources:
     - ".structuredmerge/kettle-jem.yml.example"
   ".yard-lint.yml":
@@ -564,7 +564,7 @@ files:
     recipe: template_source_application_Gemfile
     action: write
     dest_sha256: c69eab4c75ada74e20a4afb3d156f52feef7fe822869eeddba4fb476f546b56d
-    input_fingerprint: 427320992e294cae111002eb781c9d54c69aaaf702db121d2866f75463aeff99
+    input_fingerprint: 7fa09cec32dac25816418ef6e1bd9a7d97b265dafb24e8b4ea9a5f0578907288
     template_sources:
     - Gemfile.example
   IRP.md:
@@ -844,14 +844,14 @@ files:
     recipe: template_source_application_gemfiles_modular_templating_gemfile
     action: write
     dest_sha256: 3cefc686c9d78c0cb93ad37188ac5d16f9fc39a3cc8911688fb27fde777f4f5c
-    input_fingerprint: ecdf4884bdeeb6296d1aff1eee3dc35e647eb84438c415c88323a05e3352207d
+    input_fingerprint: 6b22a0076c33625f9b496b3fc03ca25cbdadc2339c22bec304124f35555768ff
     template_sources:
     - gemfiles/modular/templating.gemfile.example
   gemfiles/modular/templating_local.gemfile:
     recipe: template_source_application_gemfiles_modular_templating_local_gemfile
     action: write
     dest_sha256: 3c5515ef00392db00cd417a3c871cbd8748c7f38cd6214493950ac9415ac64d2
-    input_fingerprint: 01ff068f2eee39082ec901fa74075e44d62307bca5e360636c1abf08b42cabd1
+    input_fingerprint: 7024be7877b005d8e40539c6a19936d36613c6d1c0bf31f932d8fd714ab9f1d2
     template_sources:
     - gemfiles/modular/templating_local.gemfile.example
   gemfiles/modular/webrick/r4/v1.9.gemfile:
@@ -921,7 +921,7 @@ files:
     recipe: template_source_application_mise_toml
     action: write
     dest_sha256: 600fd16492506782b154b791a3075cd03d10613c61a62e0b90ce45080c21d7cf
-    input_fingerprint: e3996593d2caa02123bbb180fa4f95abfd036aa7fabcf910ef08dacedde3fbe2
+    input_fingerprint: 344d87b71d90337ab0bef7b23ab845f1361cc30282924f225e21f8492a9c1296
     template_sources:
     - mise.toml.example
   parsers.toml:
