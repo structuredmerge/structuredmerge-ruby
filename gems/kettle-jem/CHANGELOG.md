@@ -298,6 +298,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Generated `.yard-lint.yml` files now use yard-lint's current schema for
+  severity gating and tag ordering, so documentation lint can boot before docs
+  are regenerated.
 - The packaged transfer changelog is now actually grouped by changelog section,
   while replay still treats entries as a key-sorted stack for cursor tracking.
 - Changelog replay now corrects stale transfer entries already present in

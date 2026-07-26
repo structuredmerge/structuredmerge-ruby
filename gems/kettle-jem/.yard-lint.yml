@@ -15,8 +15,7 @@ AllValidators:
     - tmp/**/*
     - vendor/**/*
 
-FailOnSeverity: error
-
+  FailOnSeverity: error
 Documentation/LineLength:
   Enabled: true
   Severity: warning
@@ -41,7 +40,7 @@ Tags/ExampleSyntax:
 Tags/Order:
   Enabled: true
   Severity: warning
-  Order:
+  EnforcedOrder:
     - param
     - option
     - yield
