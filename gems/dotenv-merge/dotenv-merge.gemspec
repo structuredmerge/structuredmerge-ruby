@@ -9,47 +9,47 @@
 Gem::Specification.new do |spec|
   spec.name = 'dotenv-merge'
   spec.version = Module.new.tap { |mod| Kernel.load("#{__dir__}/lib/dotenv/merge/version.rb", mod) }::Dotenv::Merge::Version::VERSION
-  spec.authors = ['Peter H. Boling']
-  spec.email = ['floss@galtzo.com']
+  spec.authors = ["Peter H. Boling"]
+  spec.email = ["floss@galtzo.com"]
 
   spec.summary = '☯️ Structured Merge dotenv analysis and merge for Ruby'
   spec.description = '☯️ Dotenv assignment, comment, freeze-block, and template merge behavior for Structured Merge.'
   spec.homepage = 'https://github.com/structuredmerge/structuredmerge-ruby'
-  spec.licenses = ['AGPL-3.0-only', 'PolyForm-Small-Business-1.0.0']
-  spec.required_ruby_version = '>= 4.0.0'
+  spec.licenses = ["AGPL-3.0-only", "PolyForm-Small-Business-1.0.0"]
+  spec.required_ruby_version = ">= 4.0.0"
 
   # Linux distros often package gems and securely certify them independent
   #   of the official RubyGem certification process. Allowed via ENV["SKIP_GEM_SIGNING"]
   # Ref: https://gitlab.com/ruby-oauth/version_gem/-/issues/3
   # Hence, only enable signing if `SKIP_GEM_SIGNING` is not set in ENV.
   # See CONTRIBUTING.md
-  unless ENV.include?('SKIP_GEM_SIGNING')
-    user_cert = "certs/#{ENV.fetch('GEM_CERT_USER', ENV['USER'])}.pem"
+  unless ENV.include?("SKIP_GEM_SIGNING")
+    user_cert = "certs/#{ENV.fetch("GEM_CERT_USER", ENV["USER"])}.pem"
     cert_file_path = File.join(__dir__, user_cert)
-    cert_chain = cert_file_path.split(',')
+    cert_chain = cert_file_path.split(",")
     cert_chain.select! { |fp| File.exist?(fp) }
     if cert_file_path && cert_chain.any?
       spec.cert_chain = cert_chain
-      if $PROGRAM_NAME.end_with?('gem') && ARGV[0] == 'build'
-        spec.signing_key = File.join(Gem.user_home, '.ssh', 'gem-private_key.pem')
+      if $PROGRAM_NAME.end_with?("gem") && ARGV[0] == "build"
+        spec.signing_key = File.join(Gem.user_home, ".ssh", "gem-private_key.pem")
       end
     end
   end
 
-  spec.metadata['homepage_uri'] = 'https://structuredmerge.org'
-  spec.metadata['source_code_uri'] = "#{spec.homepage}/tree/v#{spec.version}"
-  spec.metadata['changelog_uri'] = "#{spec.homepage}/blob/v#{spec.version}/CHANGELOG.md"
-  spec.metadata['bug_tracker_uri'] = "#{spec.homepage}/issues"
-  spec.metadata['documentation_uri'] = "https://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
-  spec.metadata['funding_uri'] = 'https://github.com/sponsors/pboling'
-  spec.metadata['wiki_uri'] = "#{spec.homepage}/wiki"
-  spec.metadata['news_uri'] = "https://www.railsbling.com/tags/#{spec.name}"
-  spec.metadata['discord_uri'] = 'https://discord.gg/3qme4XHNKN'
-  spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.metadata["homepage_uri"] = "https://structuredmerge.org"
+  spec.metadata["source_code_uri"] = "#{spec.homepage}/tree/v#{spec.version}"
+  spec.metadata["changelog_uri"] = "#{spec.homepage}/blob/v#{spec.version}/CHANGELOG.md"
+  spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
+  spec.metadata["documentation_uri"] = "https://www.rubydoc.info/gems/#{spec.name}/#{spec.version}"
+  spec.metadata["funding_uri"] = "https://github.com/sponsors/pboling"
+  spec.metadata["wiki_uri"] = "#{spec.homepage}/wiki"
+  spec.metadata["news_uri"] = "https://www.railsbling.com/tags/#{spec.name}"
+  spec.metadata["discord_uri"] = "https://discord.gg/3qme4XHNKN"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   enumerate_package_files = lambda do |root|
-    Dir.glob(File.join(root, '**', '*'), File::FNM_DOTMATCH).select do |path|
-      File.file?(path) && !['.', '..'].include?(File.basename(path))
+    Dir.glob(File.join(root, "**", "*"), File::FNM_DOTMATCH).select do |path|
+      File.file?(path) && ![".", ".."].include?(File.basename(path))
     end
   end
   package_metadata_files = %w[
@@ -69,17 +69,17 @@ Gem::Specification.new do |spec|
     *enumerate_package_files.call('exe')
   ]
   spec.rdoc_options += [
-    '--title',
+    "--title",
     "#{spec.name} - #{spec.summary}",
-    '--main',
-    'README.md',
-    '--exclude',
-    '^sig/',
-    '--line-numbers',
-    '--inline-source',
-    '--quiet'
+    "--main",
+    "README.md",
+    "--exclude",
+    "^sig/",
+    "--line-numbers",
+    "--inline-source",
+    "--quiet"
   ]
-  spec.bindir = 'exe'
+  spec.bindir = "exe"
   # Listed files are the relative paths from bindir above.
   spec.executables = []
 
@@ -89,13 +89,13 @@ Gem::Specification.new do |spec|
   # dotenv-merge will then preserve content between those markers across template runs.
   # kettle-jem:unfreeze
 
-  spec.require_paths = ['lib']
+  spec.require_paths = ["lib"]
 
   # Utilities
   spec.add_dependency 'ast-merge', "= #{spec.version}"
   spec.add_dependency 'plain-merge', "= #{spec.version}"
   spec.add_dependency 'tree_haver', "= #{spec.version}"
-  spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.14') # ruby >= 2.2.0
+  spec.add_dependency("version_gem", "~> 1.1", ">= 1.1.14")              # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased
   #       visibility and discoverability.
@@ -111,32 +111,32 @@ Gem::Specification.new do |spec|
   #       and preferably a modular one (see gemfiles/modular/*.gemfile).
 
   # Dev, Test, & Release Tasks
-  spec.add_development_dependency('kettle-dev', '~> 2.3', '>= 2.3.7') # ruby >= 4.0.0
+  spec.add_development_dependency("kettle-dev", "~> 2.3", ">= 2.3.7")     # ruby >= 4.0.0
 
   # Security
-  spec.add_development_dependency('bundler-audit', '~> 0.9.3') # ruby >= 2.0.0
+  spec.add_development_dependency("bundler-audit", "~> 0.9.3")                      # ruby >= 2.0.0
 
   # Tasks
-  spec.add_development_dependency('rake', '~> 13.0') # ruby >= 2.2.0
+  spec.add_development_dependency("rake", "~> 13.0")                                # ruby >= 2.2.0
 
   # Debugging
-  spec.add_development_dependency('require_bench', '~> 1.0', '>= 1.0.4') # ruby >= 2.2.0
+  spec.add_development_dependency("require_bench", "~> 1.0", ">= 1.0.4")            # ruby >= 2.2.0
 
   # Testing
   # Loads version files in anonymous namespaces for coverage without constant redefinition warnings.
-  spec.add_development_dependency('anonymous_loader', '~> 0.1', '>= 0.1.3')         # ruby >= 2.2.0
-  spec.add_development_dependency('appraisal2', '~> 3.2', '>= 3.2.0')               # ruby >= 1.8.7, for testing against multiple versions of dependencies
-  spec.add_development_dependency('kettle-test', '~> 2.0', '>= 2.0.15') # ruby >= 4.0.0
-  spec.add_development_dependency('turbo_tests2', '~> 3.2', '>= 3.2.2') # ruby >= 2.4.0, default kettle-test runner
+  spec.add_development_dependency("anonymous_loader", "~> 0.1", ">= 0.1.3")         # ruby >= 2.2.0
+  spec.add_development_dependency("appraisal2", "~> 3.2", ">= 3.2.0")               # ruby >= 1.8.7, for testing against multiple versions of dependencies
+  spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.15")            # ruby >= 4.0.0
+  spec.add_development_dependency("turbo_tests2", "~> 3.2", ">= 3.2.2")           # ruby >= 2.4.0, default kettle-test runner
 
   # Releasing
-  spec.add_development_dependency('ruby-progressbar', '~> 1.13')                    # ruby >= 0
-  spec.add_development_dependency('stone_checksums', '~> 1.0', '>= 1.0.7')          # ruby >= 2.2.0
+  spec.add_development_dependency("ruby-progressbar", "~> 1.13")                    # ruby >= 0
+  spec.add_development_dependency("stone_checksums", "~> 1.0", ">= 1.0.7")          # ruby >= 2.2.0
 
   # Development tasks
   # The cake is a lie. erb v2.2, the oldest release, was never compatible with Ruby 2.3.
   # This means we have no choice but to use the erb that shipped with Ruby 2.3
   # /opt/hostedtoolcache/Ruby/2.3.8/x64/lib/ruby/gems/2.3.0/gems/erb-2.2.2/lib/erb.rb:670:in `prepare_trim_mode': undefined method `match?' for "-":String (NoMethodError)
   # spec.add_development_dependency("erb", ">= 2.2")                                  # ruby >= 2.3.0, not SemVer, old rubies get dropped in a patch.
-  spec.add_development_dependency('gitmoji-regex', '~> 2.0', '>= 2.0.6') # ruby >= 2.4
+  spec.add_development_dependency("gitmoji-regex", "~> 2.0", ">= 2.0.6")            # ruby >= 2.4
 end
