@@ -331,7 +331,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
             entries:
               - README.md
         YAML
-        ".kettle-jem.lock" => <<~YAML,
+        Kettle::Jem::KETTLE_LOCK_PATH => <<~YAML,
           ---
           version: 1
           template_state:

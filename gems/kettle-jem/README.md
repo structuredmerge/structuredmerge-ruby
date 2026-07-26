@@ -444,8 +444,9 @@ Rake task arguments) and CLI flags passed to `kettle-jem setup`.
 
 #### Checksum Skip Modes
 
-Kettle::Jem writes managed template state to `.kettle-jem.lock`. The legacy
-whole-template checksum inventory now lives under `template_state.checksums`.
+Kettle::Jem writes managed template state to
+`.structuredmerge/kettle-jem.lock`. The legacy whole-template checksum
+inventory now lives under `template_state.checksums`.
 That inventory is useful for coarse template drift state, but it is not used to
 skip individual files. File skipping uses `files.*.input_fingerprint`, a
 per-destination digest that includes the selected template source SHA, recipe

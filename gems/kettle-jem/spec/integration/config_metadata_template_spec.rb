@@ -1495,11 +1495,58 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
       config = YAML.safe_load_file(File.join(root, ".kettle-jem.yml"))
 
       expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
-        changed_files: include(".kettle-jem.lock", ".kettle-jem.yml")
+        changed_files: include(Kettle::Jem::KETTLE_LOCK_PATH, ".kettle-jem.yml")
       )
       expect(config).not_to have_key("kettle-jem")
       expect(lock.fetch("template_state").fetch("checksums")).to include("config.yml.example")
       expect(lock.fetch("files").fetch("config.yml")).to include("input_fingerprint", "dest_sha256")
+    end
+  end
+
+  it "moves a legacy root kettle-jem lockfile into the structuredmerge directory" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-root-lock-migration", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "name: template\n",
+        ".kettle-jem.lock" => <<~YAML,
+          ---
+          version: 1
+          template_state:
+            version: 7.1.0
+            changelog_replay:
+              last_entry_key: kettle-jem-template-20260720-001
+            checksums:
+              config.yml.example: old
+          files: {}
+        YAML
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock = YAML.safe_load_file(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+
+      expect(File).not_to exist(File.join(root, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH))
+      expect(lock.fetch("template_state")).to include("changelog_replay", "checksums")
+      expect(apply.fetch(:post_apply_steps).find { |step| step.fetch(:name) == "kettle_jem_state_sync" }).to include(
+        changed_files: include(Kettle::Jem::KETTLE_LOCK_PATH, Kettle::Jem::LEGACY_KETTLE_LOCK_PATH)
+      )
     end
   end
 

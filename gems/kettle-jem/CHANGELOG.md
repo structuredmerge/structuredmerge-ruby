@@ -20,9 +20,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
-- Added `.kettle-jem.lock` for template application state and checksum-based
-  template skipping, with `--checksums` modes and `--ignore-checksums` as an
-  alias for `--checksums=off`.
+- Added `.structuredmerge/kettle-jem.lock` for template application state and
+  checksum-based template skipping, with `--checksums` modes and
+  `--ignore-checksums` as an alias for `--checksums=off`.
 - Documented checksum skip modes and the per-destination `input_fingerprint`
   used by template-based skipping.
 - `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
@@ -304,12 +304,14 @@ Please file a bug if you notice a violation of semantic versioning.
 ### Fixed
 
 - Existing managed checksum state is now migrated out of the user-managed
-  kettle-jem config and into `.kettle-jem.lock` automatically.
-- Changelog transfer replay now reads migrated `.kettle-jem.lock` state, so
-  projects do not fall back to first-template changelog behavior after
+  kettle-jem config and into `.structuredmerge/kettle-jem.lock` automatically.
+- Legacy root `.kettle-jem.lock` files are now moved to
+  `.structuredmerge/kettle-jem.lock` automatically.
+- Changelog transfer replay now reads migrated `.structuredmerge/kettle-jem.lock`
+  state, so projects do not fall back to first-template changelog behavior after
   checksum-state migration.
 - Template checksum fingerprints now hash template token values without writing
-  those values into `.kettle-jem.lock`.
+  those values into `.structuredmerge/kettle-jem.lock`.
 - Generated `.yard-lint.yml` files now use yard-lint's current schema for
   severity gating and tag ordering, so documentation lint can boot before docs
   are regenerated.

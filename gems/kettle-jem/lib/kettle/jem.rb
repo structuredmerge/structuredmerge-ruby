@@ -36,7 +36,8 @@ module Kettle
     CONTENT_RECIPE_TRANSPORT_VERSION = Ast::Merge::STRUCTURED_EDIT_TRANSPORT_VERSION
     KETTLE_CONFIG_PATH = ".structuredmerge/kettle-jem.yml"
     LEGACY_KETTLE_CONFIG_PATH = ".kettle-jem.yml"
-    KETTLE_LOCK_PATH = ".kettle-jem.lock"
+    KETTLE_LOCK_PATH = ".structuredmerge/kettle-jem.lock"
+    LEGACY_KETTLE_LOCK_PATH = ".kettle-jem.lock"
     MANAGED_BLOCK_OPEN = "# <<kettle-jem:generated>> do not edit below this line"
     MANAGED_BLOCK_CLOSE = "# <</kettle-jem:generated>>"
     GEMSPEC_DEPENDENCY_MINIMUM_REQUIREMENTS = {
@@ -1947,10 +1948,18 @@ module Kettle
         File.join(project_root.to_s, KETTLE_LOCK_PATH)
       end
 
+      def legacy_path(project_root)
+        File.join(project_root.to_s, LEGACY_KETTLE_LOCK_PATH)
+      end
+
       def load(project_root:, config_path: nil)
         lock_path = path(project_root)
+        legacy_lock_path = legacy_path(project_root)
         lock = if File.exist?(lock_path)
           data = YAML.safe_load_file(lock_path, permitted_classes: [], aliases: false)
+          data.is_a?(Hash) ? data : {}
+        elsif File.exist?(legacy_lock_path)
+          data = YAML.safe_load_file(legacy_lock_path, permitted_classes: [], aliases: false)
           data.is_a?(Hash) ? data : {}
         else
           {}
@@ -1980,6 +1989,14 @@ module Kettle
         lock_path = path(project_root)
         FileUtils.mkdir_p(File.dirname(lock_path))
         File.write(lock_path, "#{YAML.dump(lock)}")
+      end
+
+      def remove_legacy(project_root)
+        legacy_lock_path = legacy_path(project_root)
+        return false unless File.exist?(legacy_lock_path)
+
+        File.delete(legacy_lock_path)
+        true
       end
 
       def files(lock)
@@ -4692,6 +4709,9 @@ module Kettle
       relative_config_path = config_path.delete_prefix("#{project_root}/")
       lock_path = TemplateLock.path(project_root)
       relative_lock_path = lock_path.delete_prefix("#{project_root}/")
+      legacy_lock_path = TemplateLock.legacy_path(project_root)
+      relative_legacy_lock_path = legacy_lock_path.delete_prefix("#{project_root}/")
+      legacy_lock_existed = File.exist?(legacy_lock_path)
       before_config = File.read(config_path)
       before_lock = File.exist?(lock_path) ? File.read(lock_path) : nil
       latest_replay = report.dig(:facts, :changelog, :latest_transfer_entry)
@@ -4718,6 +4738,7 @@ module Kettle
         project_root: project_root,
         lock: TemplateLock.build_lock(template_state: template_state, file_records: file_records)
       )
+      TemplateLock.remove_legacy(project_root)
       TemplateChecksums.remove_from_config(config_path: config_path)
       after_config = File.read(config_path)
       after_lock = File.read(lock_path)
@@ -4729,6 +4750,7 @@ module Kettle
       changed_files = []
       changed_files << relative_config_path if after_config != before_config
       changed_files << relative_lock_path if after_lock != before_lock
+      changed_files << relative_legacy_lock_path if legacy_lock_existed
       {
         name: "kettle_jem_state_sync",
         path: relative_lock_path,
