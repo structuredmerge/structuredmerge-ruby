@@ -3,7 +3,7 @@
 
 script_basename = File.basename(__FILE__)
 require_relative '../lib/smorg/rb/version'
-if ARGV.any? { |arg| arg == '-v' || arg == '--version' }
+if ARGV.any? { |arg| ['-v', '--version'].include?(arg) }
   puts Smorg::RB::Version::VERSION
   exit(0)
 end
