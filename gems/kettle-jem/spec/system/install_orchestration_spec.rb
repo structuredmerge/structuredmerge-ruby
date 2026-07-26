@@ -1649,6 +1649,60 @@ RSpec.describe Kettle::Jem, "install and local orchestration behavior" do
     end
   end
 
+  it "serializes local semantic Git driver setup with the shared Git operation lock" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-lock", tmp_root) do |root|
+      lock_path = File.join(root, ".git", "kettle-family-template-git.lock")
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      command_runner = lambda do |_command, **|
+        {success: true, exitstatus: 0, stdout: "", stderr: ""}
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {"KETTLE_JEM_GIT_LOCK" => lock_path},
+        run_options: {},
+        command_runner: command_runner
+      ).first
+
+      expect(result).to include(
+        status: "succeeded",
+        git_lock: lock_path
+      )
+    end
+  end
+
+  it "retries local semantic Git driver setup after transient Git lock conflicts" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-git-driver-lock-retry", tmp_root) do |root|
+      step = Kettle::Jem::Tasks::InstallTask.git_drivers_step(root, {})
+      calls = 0
+      allow(Kettle::Jem::Tasks::InstallTask).to receive(:sleep)
+      command_runner = lambda do |_command, **|
+        calls += 1
+        if calls == 1
+          {success: false, exitstatus: 1, stdout: "", stderr: "error: could not lock config file .git/config: File exists"}
+        else
+          {success: true, exitstatus: 0, stdout: "", stderr: ""}
+        end
+      end
+
+      result = Kettle::Jem::Tasks::InstallTask.execute_orchestration_steps(
+        [step],
+        project_root: root,
+        env: {},
+        run_options: {},
+        command_runner: command_runner
+      ).first
+
+      expect(result).to include(status: "succeeded")
+      expect(result.fetch(:command_results).first).to include(attempts: 2)
+    end
+  end
+
   it "reports conflicting unmanaged .gitattributes entries" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)

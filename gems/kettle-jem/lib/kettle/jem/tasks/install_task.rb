@@ -19,6 +19,9 @@ module Kettle
           kettle-drift
           yard
         ].freeze
+        GIT_OPERATION_LOCK_ENV_KEYS = %w[KETTLE_JEM_GIT_LOCK KETTLE_JEM_GIT_COMMIT_LOCK].freeze
+        GIT_OPERATION_LOCK_RETRY_ATTEMPTS = 5
+        GIT_OPERATION_LOCK_RETRY_SLEEP_SECONDS = 0.25
 
         def run(project_root: Dir.pwd, env: ENV, run_options: {}, command_runner: method(:run_system_command))
           effective_run_options = install_run_options(env, run_options)
@@ -1703,19 +1706,15 @@ module Kettle
           return step unless step.fetch(:status) == "ready"
 
           command_env = step.fetch(:env, env)
-          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-          result = command_runner.call(step.fetch(:command), chdir: project_root, env: command_env, quiet: quiet)
-          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
-          if result.fetch(:success)
-            return step.merge(
-              status: "succeeded",
-              exitstatus: result[:exitstatus],
-              duration_ms: duration_ms,
-              reason: "executed"
-            )
+          result = run_ready_step_command(step.fetch(:name), step.fetch(:command), project_root: project_root, env: command_env, quiet: quiet, command_runner: command_runner)
+          step.merge(
+            status: "succeeded",
+            exitstatus: result[:exitstatus],
+            duration_ms: result.fetch(:duration_ms),
+            reason: "executed"
+          ).tap do |report|
+            report[:attempts] = result.fetch(:attempts) if result.fetch(:attempts) > 1
           end
-
-          raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{step.fetch(:command).join(" ")}\n#{result[:stderr]}"
         end
 
         def execute_ready_commands_step(step, project_root:, env:, quiet:, command_runner:)
@@ -1729,25 +1728,14 @@ module Kettle
         end
 
         def execute_bootstrap_commit_step(step, project_root:, env:, quiet:, command_runner:)
-          lock_path = env.fetch("KETTLE_JEM_GIT_COMMIT_LOCK", nil).to_s
-          if lock_path.empty?
-            return execute_unlocked_ready_commands_step(
+          with_git_operation_lock(env, metadata_key: :git_commit_lock) do
+            execute_unlocked_ready_commands_step(
               step,
               project_root: project_root,
               env: env,
               quiet: quiet,
               command_runner: command_runner
             )
-          end
-
-          FileUtils.mkdir_p(File.dirname(lock_path))
-          File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
-            lock.flock(File::LOCK_EX)
-            execute_unlocked_ready_commands_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner).merge(
-              git_commit_lock: lock_path
-            )
-          ensure
-            lock&.flock(File::LOCK_UN)
           end
         end
 
@@ -1765,17 +1753,14 @@ module Kettle
 
           command_env = step.fetch(:env, env)
           results = step.fetch(:commands).map do |command|
-            started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-            result = command_runner.call(command, chdir: project_root, env: command_env, quiet: quiet)
-            duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
-            unless result.fetch(:success)
-              raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{command.join(" ")}\n#{result[:stderr]}"
-            end
+            result = run_ready_step_command(step.fetch(:name), command, project_root: project_root, env: command_env, quiet: quiet, command_runner: command_runner)
             {
               command: command,
               exitstatus: result[:exitstatus],
-              duration_ms: duration_ms
-            }
+              duration_ms: result.fetch(:duration_ms)
+            }.tap do |report|
+              report[:attempts] = result.fetch(:attempts) if result.fetch(:attempts) > 1
+            end
           end
           step.merge(
             status: "succeeded",
@@ -1783,6 +1768,66 @@ module Kettle
             duration_ms: results.sum { |result| result.fetch(:duration_ms, 0).to_f }.round(3),
             reason: "executed"
           )
+        end
+
+        def run_ready_step_command(step_name, command, project_root:, env:, quiet:, command_runner:)
+          attempts = git_operation_step_name?(step_name) ? GIT_OPERATION_LOCK_RETRY_ATTEMPTS : 1
+          attempt = 0
+          last_result = nil
+          last_duration_ms = 0.0
+          loop do
+            attempt += 1
+            started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+            last_result = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
+            last_duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
+            if last_result.fetch(:success)
+              return {
+                success: true,
+                exitstatus: last_result[:exitstatus],
+                duration_ms: last_duration_ms,
+                attempts: attempt
+              }
+            end
+
+            break unless attempt < attempts && git_lock_conflict?(last_result[:stderr])
+
+            sleep(GIT_OPERATION_LOCK_RETRY_SLEEP_SECONDS * attempt)
+          end
+
+          raise Kettle::Jem::Error, "#{step_name} failed: #{command.join(" ")}\n#{last_result[:stderr]}"
+        end
+
+        def git_operation_step_name?(step_name)
+          %w[bootstrap_commit git_drivers].include?(step_name.to_s)
+        end
+
+        def git_lock_conflict?(stderr)
+          text = stderr.to_s
+          text.include?("could not lock config file") ||
+            text.include?("config.lock") ||
+            text.include?("index.lock") ||
+            text.include?("Unable to create") && text.include?(".lock")
+        end
+
+        def git_operation_lock_path(env)
+          GIT_OPERATION_LOCK_ENV_KEYS.each do |key|
+            value = env.fetch(key, nil).to_s
+            return value unless value.empty?
+          end
+          nil
+        end
+
+        def with_git_operation_lock(env, metadata_key:)
+          lock_path = git_operation_lock_path(env || {})
+          return yield if lock_path.to_s.empty?
+
+          FileUtils.mkdir_p(File.dirname(lock_path))
+          File.open(lock_path, File::RDWR | File::CREAT, 0o644) do |lock|
+            lock.flock(File::LOCK_EX)
+            yield.merge(metadata_key => lock_path)
+          ensure
+            lock&.flock(File::LOCK_UN)
+          end
         end
 
         def execute_hook_templates_step(step, project_root:, env:, quiet:, command_runner:)
@@ -1812,6 +1857,13 @@ module Kettle
           if step.fetch(:mode) == "check"
             return execute_git_drivers_check_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
           end
+
+          with_git_operation_lock(env, metadata_key: :git_lock) do
+            execute_unlocked_git_drivers_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+          end
+        end
+
+        def execute_unlocked_git_drivers_step(step, project_root:, env:, quiet:, command_runner:)
 
           changed_files = []
           if step.fetch(:mode) == "include-file"

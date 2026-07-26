@@ -283,6 +283,9 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- Monorepo templating now serializes local Git driver configuration with the
+  shared family Git operation lock and retries transient Git lock conflicts,
+  preventing parallel `git config --local` workers from racing on `.git/config`.
 - Changelog replay now cross-checks stored replay cursors against the
   destination changelog contents, so legacy templated projects whose cursor was
   stamped before transfer entries landed receive the missing transfer entries
