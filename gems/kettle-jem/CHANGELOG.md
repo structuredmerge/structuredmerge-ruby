@@ -306,6 +306,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Changelog transfer replay now reads migrated `.kettle-jem.lock` state, so
   projects do not fall back to first-template changelog behavior after
   checksum-state migration.
+- Template checksum fingerprints now hash template token values without writing
+  those values into `.kettle-jem.lock`.
 - Generated `.yard-lint.yml` files now use yard-lint's current schema for
   severity gating and tag ordering, so documentation lint can boot before docs
   are regenerated.

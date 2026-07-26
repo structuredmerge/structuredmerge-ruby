@@ -3898,6 +3898,7 @@ module Kettle
     def template_input_fingerprint_payload(project_root, report)
       metadata = report.fetch(:metadata, {})
       preference = metadata[:template_source_preference] || metadata["template_source_preference"] || {}
+      tokens = stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
       source_path = template_source_absolute_path(project_root, preference)
       {
         kettle_jem_version: VERSION,
@@ -3909,7 +3910,8 @@ module Kettle
         template_source: template_source_lock_path(preference),
         template_source_sha256: source_path && File.file?(source_path) ? Digest::SHA256.file(source_path).hexdigest : "",
         template_source_preference: stringify_keys_for_json(preference),
-        template_tokens: stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
+        template_token_keys: tokens.keys.sort,
+        template_tokens_sha256: Digest::SHA256.hexdigest(JSON.generate(tokens))
       }
     end
 

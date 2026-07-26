@@ -1545,6 +1545,42 @@ RSpec.describe Kettle::Jem, "configuration and metadata templating" do
     end
   end
 
+  it "does not write template token values to the checksum lockfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-checksum-token-redaction", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "template/config.yml.example" => "freeze: {KJ|FREEZE_TOKEN}\n",
+        ".kettle-jem.yml" => <<~YAML
+          defaults:
+            freeze_token: "ghp_sensitive-example-value"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - source: config.yml.example
+                target: config.yml
+          files:
+            config.yml:
+              strategy: accept_template
+        YAML
+      })
+
+      described_class.apply_project(root, env: {}, run_options: {accept: true, skip_drift_check: true})
+      lock_content = File.read(File.join(root, Kettle::Jem::KETTLE_LOCK_PATH))
+
+      expect(lock_content).to include("input_fingerprint")
+      expect(lock_content).not_to include("ghp_sensitive-example-value")
+      expect(lock_content).not_to include("freeze: ghp_sensitive-example-value")
+    end
+  end
+
   it "reports duplicate drift during template apply runs" do
     tmp_root = File.expand_path("../tmp", __dir__)
     FileUtils.mkdir_p(tmp_root)
