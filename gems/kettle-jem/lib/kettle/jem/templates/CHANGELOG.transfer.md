@@ -30,3 +30,5 @@
   TruffleRuby workflow jobs.
 - kettle-jem-template-20260725-001 - Release pull request branches beginning
   with `feature/release` now run JRuby and TruffleRuby workflows.
+- kettle-jem-template-20260726-002 - Generated version files now document their
+  version namespace and constants, reducing warning-only YARD lint output.

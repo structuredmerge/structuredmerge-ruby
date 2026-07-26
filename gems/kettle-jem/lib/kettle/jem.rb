@@ -12277,7 +12277,9 @@ module Kettle
 
     def shim_version_file_content(namespace:, replacement_namespace:, replacement_require:)
       body = [
+        "# Version namespace delegated to the replacement gem.",
         "Version = #{replacement_namespace}::Version unless const_defined?(:Version, false)",
+        "# Current gem version delegated to the replacement gem.",
         "VERSION = #{replacement_namespace}::VERSION unless const_defined?(:VERSION, false)"
       ]
 
@@ -13257,9 +13259,12 @@ module Kettle
     def version_gem_version_file_content(existing_version:, namespace:, version:)
       resolved_version = existing_version.to_s.empty? ? version.to_s : existing_version.to_s
       body = [
+        "# Version namespace for this gem.",
         "module Version",
+        "  # Current gem version.",
         "  VERSION = #{resolved_version.dump}",
         "end",
+        "# Current gem version exposed at the traditional constant location.",
         "VERSION = Version::VERSION # Traditional Constant Location"
       ]
 

@@ -108,6 +108,8 @@ RSpec.describe Kettle::Jem, "shim profile templating" do
       expect(generated[:"gemfiles/modular/templating_local.gemfile"]).to include('root: ["src", "my", "kettle-dev"]')
       expect(generated[:"legacy-shim.gemspec"]).not_to include("old-implementation")
       expect(generated[:"lib/legacy/shim.rb"]).to include(%(require "legacy-shim2"))
+      expect(generated[:"lib/legacy/shim/version.rb"]).to include("# Version namespace delegated to the replacement gem.")
+      expect(generated[:"lib/legacy/shim/version.rb"]).to include("# Current gem version delegated to the replacement gem.")
       expect(generated[:"lib/legacy/strategies/shim.rb"]).to include(%(require "legacy/shim"))
       expect(generated[:"spec/shim_spec.rb"]).to include(%(require("legacy-shim2")))
       expect(generated[:"README.md"]).to include("compatibility shim for `legacy-shim2`")
