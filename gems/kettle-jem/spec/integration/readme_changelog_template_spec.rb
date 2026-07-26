@@ -374,10 +374,12 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     entries = [
       {
         key: "kettle-jem-template-20260716-001",
+        section: "### Changed",
         lines: ["- kettle-jem-template-20260716-001 - Already applied."]
       },
       {
         key: "kettle-jem-template-20260716-002",
+        section: "### Fixed",
         lines: [
           "- kettle-jem-template-20260716-002 - First missed transfer.",
           "  Continued detail."
@@ -385,6 +387,7 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
       },
       {
         key: "kettle-jem-template-20260716-003",
+        section: "### Security",
         lines: ["- kettle-jem-template-20260716-003 - Second missed transfer."]
       }
     ]
@@ -392,8 +395,18 @@ RSpec.describe Kettle::Jem, "README and changelog templating" do
     result = described_class.send(:apply_changelog_transfer_entries, changelog, entries)
 
     expect(result.scan("kettle-jem-template-20260716-001").size).to eq(1)
+    expect(result).to include("### Fixed\n\n- kettle-jem-template-20260716-002")
+    expect(result).to include("### Security\n\n- kettle-jem-template-20260716-003")
     expect(result).to include("- kettle-jem-template-20260716-002 - First missed transfer.\n  Continued detail.")
     expect(result).to include("- kettle-jem-template-20260716-003 - Second missed transfer.")
+  end
+
+  it "parses sectioned transferable changelog entries through Markdown owners" do
+    entries = described_class.transfer_changelog_entries
+
+    expect(entries.map { |entry| entry.fetch(:section) }.uniq).to eq(["### Changed"])
+    expect(entries.map { |entry| entry.fetch(:key) }).to include("kettle-jem-template-20260725-002")
+    expect(entries.last.fetch(:lines).join("\n")).to include("Version specs now use `anonymous_loader`")
   end
 
   it "reports transfer changelog lag from a stored replay cursor" do

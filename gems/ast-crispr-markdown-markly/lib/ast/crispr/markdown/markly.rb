@@ -29,6 +29,8 @@ module Ast
               analysis.link_definition_owners
             when :html_comments
               analysis.html_comment_owners
+            when :list_items
+              analysis.list_item_owners
             when :inline_references
               analysis.inline_reference_owners
             when :table_rows
@@ -71,6 +73,13 @@ module Ast
                 owner_selector: :line_bound_statements,
                 supported_comment_regions: [],
                 metadata: { adapter: :markly, markdown_owner: :html_comment }
+              )
+            when :list_items
+              Ast::Crispr::StructureProfile.new(
+                owner_scope: owner_scope,
+                owner_selector: :list_items,
+                supported_comment_regions: [],
+                metadata: { adapter: :markly, markdown_owner: :list_item }
               )
             when :inline_references
               Ast::Crispr::StructureProfile.new(
@@ -185,6 +194,39 @@ module Ast
                       start_boundary: :owner_start,
                       end_boundary: :owner_end,
                       payload_kind: :structural_owner_body,
+                      text: owner.text
+                    }
+                  )
+                end
+              end
+            )
+          end
+
+          def list_item(text: nil, id: nil, limit: nil, metadata: {}, **options)
+            Ast::Crispr::OwnerSelector.new(
+              id: id || ['list_item', text].compact.join(':'),
+              limit: limit,
+              metadata: metadata.merge(
+                adapter: Ast::Crispr::Markdown::Markly.adapter,
+                owner_scope: :list_items,
+                selector_kind: :list_item,
+                selection_intent: :predicate_filter,
+                include_trailing_gap: false
+              ).merge(options),
+              locate: lambda do |context|
+                context.structural_owners(owner_scope: :list_items).filter_map do |owner|
+                  next if text && !owner.text.to_s.include?(text.to_s)
+
+                  Ast::Crispr::Match.new(
+                    node: owner,
+                    start_line: owner.location.start_line,
+                    end_line: owner.location.end_line,
+                    metadata: {
+                      start_boundary: :owner_start,
+                      end_boundary: :owner_end,
+                      payload_kind: :structural_owner_body,
+                      depth: owner.depth,
+                      marker: owner.marker,
                       text: owner.text
                     }
                   )

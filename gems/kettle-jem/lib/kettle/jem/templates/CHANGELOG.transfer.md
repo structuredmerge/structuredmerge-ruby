@@ -1,5 +1,7 @@
 # kettle-jem Transferable Changelog
 
+## Changed
+
 - kettle-jem-template-20260716-001 - Shim gems now package `LICENSE.md` instead
   of a missing `LICENSE.txt` file.
 - kettle-jem-template-20260716-002 - Gemspecs now ship fewer repository-only

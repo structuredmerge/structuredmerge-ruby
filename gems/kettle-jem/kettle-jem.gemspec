@@ -102,6 +102,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("kramdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markdown-merge", "= #{spec.version}")             # ruby >= 4.0.0
   spec.add_dependency("markly-merge", "= #{spec.version}")               # ruby >= 4.0.0
+  spec.add_dependency("parslet", "~> 2.0")                               # ruby >= 2.6.0
   spec.add_dependency("prism-merge", "= #{spec.version}")                # ruby >= 4.0.0
   spec.add_dependency("psych-merge", "= #{spec.version}")                # ruby >= 4.0.0
   spec.add_dependency("rbs", ">= 3.10")                                  # ruby >= 3.1.0

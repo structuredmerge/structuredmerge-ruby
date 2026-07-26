@@ -135,6 +135,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - The `kettle-jem` executable startup header is now shown only when
   `--verbose` is passed, while `version`, `-v`, and `--version` still print
   just the executable version and exit.
+- Transfer changelog replay now reads sectioned Markdown structurally and
+  applies transferred entries to the matching destination changelog section.
 - Transfer changelog entries now use concise destination-project wording,
   focusing on what maintainers see after templating.
 - `kettle-jem-deps-floor --write` now commits its managed dependency floor

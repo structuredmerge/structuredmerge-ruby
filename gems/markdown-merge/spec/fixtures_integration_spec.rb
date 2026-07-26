@@ -101,6 +101,27 @@ RSpec.describe Markdown::Merge do
     )
   end
 
+  it 'exposes Markdown list items with source spans' do
+    source = <<~MARKDOWN
+      # Title
+
+      ## Changed
+
+      - First item
+        continuation
+        - Nested item
+      - Second item
+    MARKDOWN
+
+    analysis = Markdown::Merge::FileAnalysis.new(source)
+    owners = analysis.list_item_owners
+
+    expect(owners.map(&:text)).to include(a_string_including('First item'), a_string_including('Nested item'))
+    expect(owners.map(&:depth)).to include(1, 2)
+    expect(owners.first.source).to include("- First item\n  continuation")
+    expect(owners.first.location.start_line).to eq(5)
+  end
+
   it 'conforms to the slice-721 Markdown provider parity fixture for the TSLP backend' do
     fixture = read_json(
       fixtures_root.join(

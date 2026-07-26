@@ -7,6 +7,7 @@ require "digest"
 require "json"
 require "net/http"
 require "open3"
+require "parslet"
 require "rbconfig"
 require "time"
 require "uri"
@@ -14,6 +15,7 @@ require "addressable/uri"
 require "token/resolver"
 require "yaml"
 require "ast/merge"
+require "ast/crispr/markdown/markly"
 require "kettle/ndjson"
 require "rbs"
 require "kettle/dev"
@@ -384,6 +386,7 @@ module Kettle
     CHANGELOG_INITIAL_TEMPLATE_KEY = "kettle-jem-template-initial"
     CHANGELOG_INITIAL_TEMPLATE_ENTRY = {
       key: CHANGELOG_INITIAL_TEMPLATE_KEY,
+      section: "### Added",
       lines: ["- #{CHANGELOG_INITIAL_TEMPLATE_KEY} - Initial templating by kettle-jem."]
     }.freeze
     README_KLOC_BADGE_PATTERN = /(\[🧮kloc-img\]:\s*https?:\/\/img\.shields\.io\/badge\/KLOC-)(\d+(?:\.\d+)?)(-[^\s]*)/
@@ -693,6 +696,18 @@ module Kettle
 
         severity_value
       end
+    end
+
+    class TransferChangelogLineParser < Parslet::Parser
+      rule(:space) { match('\s') }
+      rule(:digit) { match('[0-9]') }
+      rule(:date) { digit.repeat(8, 8).as(:date) }
+      rule(:sequence) { digit.repeat(3, 3).as(:sequence) }
+      rule(:key) { (str("kettle-jem-template-") >> date >> str("-") >> sequence).as(:key) }
+      rule(:separator) { space.repeat(1) >> str("-") >> space.repeat(1) }
+      rule(:message) { any.repeat(1).as(:message) }
+      rule(:entry) { key >> separator >> message >> any.absent? }
+      root(:entry)
     end
 
     module ReadmePostProcessor
@@ -5141,7 +5156,7 @@ module Kettle
     end
 
     def latest_changelog_transfer_entry(entries)
-      Array(entries).max_by { |entry| entry.fetch(:key).to_s }
+      Array(entries).last
     end
 
     def changelog_transfer_applied_keys(project_root)
@@ -5152,42 +5167,107 @@ module Kettle
     end
 
     def changelog_transfer_entries_after(entries, key)
-      Array(entries).select { |entry| entry.fetch(:key).to_s > key.to_s }
+      all_entries = Array(entries)
+      index = all_entries.index { |entry| entry.fetch(:key).to_s == key.to_s }
+      return all_entries if index.nil?
+
+      all_entries[(index + 1)..].to_a
     end
 
     def changelog_transfer_key_date(key)
-      match = key.to_s.match(/\Akettle-jem-template-(\d{4})(\d{2})(\d{2})-\d{3}\z/)
-      return nil unless match
+      parsed = parse_changelog_transfer_key(key)
+      return nil unless parsed
 
-      "#{match[1]}-#{match[2]}-#{match[3]}"
+      date = parsed.fetch(:date)
+      "#{date[0, 4]}-#{date[4, 2]}-#{date[6, 2]}"
     end
 
     def changelog_transfer_entries(template_root)
       path = File.join(template_root, TRANSFER_CHANGELOG_TEMPLATE_PATH)
       return [] unless File.file?(path)
 
-      lines = markdown_source_lines(File.read(path))
-      entries = []
-      index = 0
-      while index < lines.length
-        line = lines.fetch(index)
-        unless changelog_bullet_line?(line)
-          index += 1
-          next
-        end
-
-        item_lines, index = collect_changelog_list_item(lines, index)
-        key = changelog_transfer_key(item_lines.first)
-        next unless key
-
-        entries << {key: key, lines: item_lines}
+      content = File.read(path)
+      context = Ast::Crispr::Markdown::Markly.document_context(content: content, source_label: path)
+      sections = context.structural_owners(owner_scope: :heading_sections).select do |owner|
+        owner.level == 2 && changelog_transfer_section_map.key?(owner.heading_text.to_s.strip)
       end
+      list_items = context.structural_owners(owner_scope: :list_items)
+      entries = sections.flat_map do |section|
+        heading = changelog_transfer_section_map.fetch(section.heading_text.to_s.strip)
+        list_items.filter_map do |item|
+          next unless item.depth == 1
+          next unless item.location.start_line > section.location.start_line
+          next unless item.location.end_line <= section.location.end_line
+
+          payload = changelog_transfer_list_item_payload(item.source)
+          parsed = parse_changelog_transfer_line(payload)
+          {
+            key: parsed.fetch(:key),
+            section: heading,
+            lines: item.source.lines.map { |line| line.chomp.rstrip }
+          }
+        end
+      end
+      validate_changelog_transfer_entry_order!(entries, path)
       entries
     end
 
+    def changelog_transfer_section_map
+      CHANGELOG_STANDARD_HEADINGS.to_h do |heading|
+        [heading.delete_prefix("### ").strip, heading]
+      end
+    end
+
+    def changelog_transfer_line_parser
+      @changelog_transfer_line_parser ||= TransferChangelogLineParser.new
+    end
+
+    def changelog_transfer_list_item_payload(source)
+      stripped = source.to_s.lines.first.to_s.lstrip.chomp
+      %w[- *].each do |marker|
+        prefix = "#{marker} "
+        return stripped.delete_prefix(prefix) if stripped.start_with?(prefix)
+      end
+
+      stripped
+    end
+
+    def parse_changelog_transfer_line(payload)
+      parsed = changelog_transfer_line_parser.parse(payload.to_s)
+      key_data = parsed.fetch(:key)
+      date = key_data.fetch(:date).to_s
+      sequence = key_data.fetch(:sequence).to_s
+      {
+        key: "kettle-jem-template-#{date}-#{sequence}",
+        date: date,
+        sequence: sequence,
+        message: parsed.fetch(:message).to_s
+      }
+    end
+
+    def parse_changelog_transfer_key(key)
+      parse_changelog_transfer_line("#{key} - placeholder")
+    rescue Parslet::ParseFailed
+      nil
+    end
+
+    def validate_changelog_transfer_entry_order!(entries, path)
+      keys = entries.map { |entry| entry.fetch(:key).to_s }
+      duplicates = keys.tally.select { |_key, count| count > 1 }.keys
+      raise Error, "Duplicate transfer changelog key(s) in #{path}: #{duplicates.join(", ")}" if duplicates.any?
+
+      keys.each_cons(2) do |left, right|
+        next if right > left
+
+        raise Error, "Transfer changelog keys must increase in document order in #{path}: #{left} before #{right}"
+      end
+    end
+
     def changelog_transfer_key(line)
-      key = line.to_s.lstrip.delete_prefix("- ").delete_prefix("* ").split(CHANGELOG_TRANSFER_KEY_SEPARATOR, 2).first.to_s
-      key.match?(CHANGELOG_TRANSFER_KEY_PATTERN) ? key : nil
+      payload = changelog_transfer_list_item_payload(line)
+      parse_changelog_transfer_line(payload)&.fetch(:key)
+    rescue Parslet::ParseFailed
+      nil
     end
 
     def apply_changelog_transfer_entries(content, entries)
@@ -5208,11 +5288,14 @@ module Kettle
       destination_end = changelog_unreleased_end_index(lines, unreleased)
       destination_body = lines[(unreleased + 1)...destination_end] || []
       items = changelog_unreleased_items(destination_body)
-      items["### Changed"] ||= []
-      items["### Changed"].pop while items["### Changed"].any? && items["### Changed"].last.to_s.strip.empty?
-      items["### Changed"] << "" if items["### Changed"].any?
-      missing.each do |entry|
-        items["### Changed"].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+      missing.group_by { |entry| entry.fetch(:section, "### Changed") }.each do |section, section_entries|
+        section = CHANGELOG_STANDARD_HEADINGS.include?(section) ? section : "### Changed"
+        items[section] ||= []
+        items[section].pop while items[section].any? && items[section].last.to_s.strip.empty?
+        items[section] << "" if items[section].any?
+        section_entries.each do |entry|
+          items[section].concat(Array(entry.fetch(:lines)).map(&:rstrip))
+        end
       end
 
       merged_lines = lines[0...unreleased] +
