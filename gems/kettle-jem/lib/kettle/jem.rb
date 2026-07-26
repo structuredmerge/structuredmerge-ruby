@@ -3900,6 +3900,13 @@ module Kettle
       preference = metadata[:template_source_preference] || metadata["template_source_preference"] || {}
       tokens = stringify_keys_for_json(metadata[:template_tokens] || metadata["template_tokens"] || {})
       source_path = template_source_absolute_path(project_root, preference)
+      # This payload is the per-destination "template checksum" used by
+      # --checksums=template. It intentionally includes the selected template
+      # source SHA, recipe identity/version, resolved token digest, and
+      # kettle-jem implementation SHA. The coarse template_state.checksums
+      # inventory records whole-template-tree drift, but it is not consulted
+      # for skip decisions because unrelated template files should not force a
+      # destination file to retemplate.
       {
         kettle_jem_version: VERSION,
         kettle_jem_implementation_sha256: Digest::SHA256.file(__FILE__).hexdigest,

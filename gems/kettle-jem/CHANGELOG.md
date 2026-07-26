@@ -23,6 +23,8 @@ Please file a bug if you notice a violation of semantic versioning.
 - Added `.kettle-jem.lock` for template application state and checksum-based
   template skipping, with `--checksums` modes and `--ignore-checksums` as an
   alias for `--checksums=off`.
+- Documented checksum skip modes and the per-destination `input_fingerprint`
+  used by template-based skipping.
 - `kettle-jem` now uses the shared `kettle-ndjson` event toolkit for NDJSON
   progress stream filtering, emission, recording, and phase timing.
 - Added `KJ_GH_ORG` as a GitHub-specific repository-owner override for
