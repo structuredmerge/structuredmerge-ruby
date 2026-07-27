@@ -142,6 +142,7 @@ module Kettle
         ".yardignore",
         ".yardopts",
         "bin/setup",
+        "spec/README.md",
         "spec/spec_helper.rb"
       ] + PACKAGED_MODULAR_GEMFILE_TEMPLATE_ENTRIES
     ).freeze
@@ -417,6 +418,7 @@ module Kettle
       KJ|LICENSE_EYE:MODE
       KJ|LICENSE_EYE:PRIMARY_SPDX
       KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP
+      KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM
       KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK
       KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP
       KJ|MIN_DIVERGENCE_THRESHOLD
@@ -4900,12 +4902,13 @@ module Kettle
         {name: "bundler-audit", source: %(gem "bundler-audit", "~> 0.9.3"\n)},
         {name: "kettle-dev", source: %(gem "kettle-dev", "~> 2.4", ">= 2.4.5"\n)},
         {name: "kettle-drift", source: %(gem "kettle-drift", "~> 1.0", ">= 1.0.7"\n)},
+        {name: "kettle-family", source: %(gem "kettle-family", "~> 1.2", ">= 1.2.0"\n)},
         {name: "kettle-jem", source: %(gem "kettle-jem", "~> 7.0", ">= 7.0.0"\n)},
         {name: "kettle-test", source: %(gem "kettle-test", "~> 2.0", ">= 2.0.15"\n)},
         {name: "rake", source: %(gem "rake", "~> 13.0"\n)},
         {name: "rspec", source: %(gem "rspec", "~> 3.0"\n)},
         {name: "stone_checksums", source: %(gem "stone_checksums", "~> 1.0", ">= 1.0.7"\n)},
-        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.2"\n)}
+        {name: "turbo_tests2", source: %(gem "turbo_tests2", "~> 3.2", ">= 3.2.3"\n)}
       ].freeze
     end
 
@@ -12658,6 +12661,7 @@ module Kettle
         kettle_dev_gem: "kettle-dev",
         kettle_dev_local_gems: kettle_dev_local_gems(config),
         local_gemfile_nomono_bootstrap: local_gemfile_nomono_bootstrap(package_name),
+        main_gemfile_kettle_family_gem: main_gemfile_kettle_family_gem(package_name),
         main_gemfile_nomono_bootstrap: main_gemfile_nomono_bootstrap(package_name),
         package_name: package_name.to_s,
         yard_host: yard_host,
@@ -12954,6 +12958,7 @@ module Kettle
         "KJ|KETTLE_DEV_GEM" => project_runtime[:kettle_dev_gem].to_s,
         "KJ|KETTLE_DEV_LOCAL_GEMS" => project_runtime[:kettle_dev_local_gems].to_s,
         "KJ|LOCAL_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:local_gemfile_nomono_bootstrap].to_s,
+        "KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM" => project_runtime[:main_gemfile_kettle_family_gem].to_s,
         "KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP" => project_runtime[:main_gemfile_nomono_bootstrap].to_s,
         "KJ|MAIN_GEMFILE_DIRECT_SIBLING_BLOCK" => project_runtime[:main_gemfile_direct_sibling_block].to_s,
         "KJ|PACKAGE_NAME" => project_runtime[:package_name].to_s,
@@ -12970,10 +12975,16 @@ module Kettle
     end
 
     def kettle_dev_local_gems(config)
-      gems = %w[kettle-dev kettle-test kettle-soup-cover]
+      gems = %w[kettle-dev kettle-family kettle-test kettle-soup-cover]
       plugin_names = PluginLoader.normalize_plugin_names(plugin_names_from_config(config))
       gems.concat(plugin_names.select { |plugin_name| plugin_name.start_with?("kettle-") })
       gems.uniq.join(" ")
+    end
+
+    def main_gemfile_kettle_family_gem(package_name)
+      return "" if package_name.to_s == "kettle-family"
+
+      %(gem "kettle-family", "~> 1.2", ">= 1.2.0"\n)
     end
 
     def main_gemfile_nomono_bootstrap(package_name)

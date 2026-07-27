@@ -1070,9 +1070,28 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
     )
     tokens = described_class.send(:project_runtime_template_tokens, runtime)
 
-    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-family kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to include('gem "kettle-family"')
     expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
     expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
+  end
+
+  it "omits kettle-family from its own main Gemfile dependency token" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {},
+      {},
+      package_name: "kettle-family",
+      source_url: "https://github.com/kettle-dev/kettle-family",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
+      version: "1.2.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to include("kettle-family")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_KETTLE_FAMILY_GEM")).to eq("")
   end
 
   it "exposes package summary and description tokens for generated metadata" do
@@ -1142,6 +1161,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content).to include('require "kettle/test/rspec"')
+      expect(content).to include("installs harness helpers documented in spec/README.md")
       expect(content.scan('require "example/custom"').size).to eq(1)
     end
   end
@@ -1204,6 +1224,7 @@ RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
       expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
       expect(content).to include("SimpleCov.start")
       expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
+      expect(content).to include("installs harness helpers documented in spec/README.md")
       expect(content.scan('require "example-gem"').size).to eq(1)
       expect(content).not_to include('require "example/gem"')
       expect(content).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")

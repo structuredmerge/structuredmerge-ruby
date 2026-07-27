@@ -447,6 +447,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(apply.fetch(:changed_files)).not_to include("tree_haver.gemspec")
       expect(File).not_to exist(File.join(root, ".github"))
       expect(File.read(File.join(root, "Gemfile"))).to include('gem "nomono", "~> 1.1", ">= 1.1.0", require: false')
+      expect(File.read(File.join(root, "Gemfile"))).to include('gem "kettle-family", "~> 1.2", ">= 1.2.0"')
       expect(File).not_to exist(File.join(root, "Rakefile"))
     end
   end
@@ -485,15 +486,18 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
         ".yardopts",
         ".yardignore",
         "bin/setup",
+        "spec/README.md",
         "spec/spec_helper.rb",
         "gemfiles/modular/documentation.gemfile"
       )
       expect(config_yaml.dig("files", "tree_haver.gemspec", "strategy")).to eq("merge")
 
       apply = described_class.apply_project(root, env: {}, run_options: {accept: true, skip_commit: true})
-      expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup")
+      expect(apply.fetch(:changed_files)).to include("Gemfile", ".yard-lint.yml", ".yardopts", ".yardignore", "bin/setup", "spec/README.md")
       expect(File).to exist(File.join(root, "Rakefile"))
       expect(File).to exist(File.join(root, "Gemfile"))
+      expect(File.read(File.join(root, "spec", "README.md"))).to include("stub_env")
+      expect(File.read(File.join(root, "spec", "README.md"))).to include("include_context \"with rake\"")
       expect(File).to exist(File.join(root, ".yard-lint.yml"))
       yard_lint_config = YAML.safe_load_file(File.join(root, ".yard-lint.yml"))
       expect(yard_lint_config.dig("AllValidators", "FailOnSeverity")).to eq("error")
@@ -922,8 +926,10 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
       expect(gemfile).to include('gemspec path: "gems/kettle-jem"')
       expect(gemfile).not_to include('gem "kettle-jem", "~> 7.0"')
       expect_gem_dependency_declared(gemfile, "kettle-dev")
+      expect_gem_dependency_declared(gemfile, "kettle-family")
       expect_gem_dependency_declared(gemfile, "kettle-test")
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-dev"') }).to eq(1)
+      expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-family"') }).to eq(1)
       expect(gemfile.lines.count { |line| line.start_with?('gem "kettle-test"') }).to eq(1)
       expect_gem_dependency_declared(gemfile, "turbo_tests2")
       expect(rakefile).to include('require "kettle/dev"')
@@ -979,6 +985,7 @@ RSpec.describe Kettle::Jem, "template selection and bootstrap behavior" do
 
       expect(report.fetch(:changed_files)).to include("Gemfile")
       expect_gem_dependency_declared(gemfile, "kettle-dev")
+      expect_gem_dependency_declared(gemfile, "kettle-family")
       expect_gem_dependency_declared(gemfile, "kettle-test")
       expect_gem_dependency_declared(gemfile, "turbo_tests2")
     end

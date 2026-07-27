@@ -20,6 +20,10 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- Generated spec harness files now document the RSpec helpers made available by
+  `kettle-test`.
+- Generated main Gemfiles now include `kettle-family`, except when templating
+  the `kettle-family` gem itself.
 - Added `.structuredmerge/kettle-jem.lock` for template application state and
   checksum-based template skipping, with `--checksums` modes and
   `--ignore-checksums` as an alias for `--checksums=off`.
