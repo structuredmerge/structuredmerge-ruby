@@ -39,14 +39,15 @@ module Kettle
           setup_env = setup_command_env(project_root, env)
           rubocop_lts_branch_step = rubocop_lts_local_branch_step(report, env: setup_env, project_root: project_root)
           install_steps << rubocop_lts_branch_step if rubocop_lts_branch_step
+          install_steps << run_distinct_bundle_install_step(project_root, env: env, setup_env: setup_env, run_options: effective_run_options, command_runner: command_runner)
           install_steps.concat(run_bundle_setup_commands(project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner))
-          install_steps << rubocop_gradual_autocorrect_step(project_root)
+          install_steps << rubocop_gradual_autocorrect_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << normalize_lockfile_step(project_root, env: setup_env, run_options: effective_run_options)
           install_steps << bundled_handoff_step(project_root: project_root, env: env, run_options: effective_run_options)
           install_steps << bootstrap_commit_step(project_root, run_options: effective_run_options)
           install_steps = execute_orchestration_steps(install_steps, project_root: project_root, env: setup_env, run_options: effective_run_options, command_runner: command_runner)
 
-          report.merge(
+          final_report = report.merge(
             mode: "install",
             installed: true,
             install_steps: install_steps,
@@ -57,10 +58,12 @@ module Kettle
               message: "kettle:jem:install applied templates, completed local post-template checks, and executed available orchestration steps."
             }]
           )
+          Kettle::Jem.emit_summary_event(Kettle::Jem.event_stream_from_options(effective_run_options), final_report)
+          final_report
         end
 
         def install_run_options(env, run_options)
-          Kettle::Jem::Tasks::TemplateTask.env_run_options(env || {}).merge(run_options || {})
+          Kettle::Jem::Tasks::TemplateTask.templating_run_options(env || {}, run_options || {})
         end
 
         def followup_apply_after_config_bootstrap(project_root, env:, run_options:, report:)
@@ -77,9 +80,7 @@ module Kettle
 
         def config_bootstrap_changed?(report)
           report.fetch(:recipe_reports, []).any? do |recipe_report|
-            recipe_report.fetch(:relative_path, nil) == Kettle::Jem::KETTLE_CONFIG_PATH &&
-              recipe_report.fetch(:recipe_name, nil) == "kettle_config_bootstrap" &&
-              recipe_report.fetch(:changed, false)
+            recipe_report.fetch(:relative_path, nil) == Kettle::Jem::KETTLE_CONFIG_PATH && recipe_report.fetch(:changed, false)
           end
         end
 
@@ -176,13 +177,14 @@ module Kettle
               env_local_gitignore
               hook_templates
               git_drivers
+              rubocop_lts_local_branch
+              bundle_install_requested_env
               bin_setup_executable
               bin_setup
               bundle_binstubs
               curated_binstubs_executable
               bundle_binstub_pruning
               bundle_binstub_location_validation
-              rubocop_lts_local_branch
               rubocop_gradual_autocorrect
               bundle_lock_normalization
             ],
@@ -591,7 +593,15 @@ module Kettle
               env: env,
               quiet: quiet,
               command_runner: command_runner
-            ),
+            )
+          ]
+          steps << if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_binstubs])
+            {
+              name: "bundle_binstubs",
+              status: "skipped",
+              reason: "skip_binstubs"
+            }
+          else
             run_command_step(
               "bundle_binstubs",
               bundle_binstubs_command(project_root, env: env),
@@ -600,7 +610,7 @@ module Kettle
               quiet: quiet,
               command_runner: command_runner
             )
-          ]
+          end
           if steps.any? { |step| step.fetch(:name) == "bundle_binstubs" && step.fetch(:status) == "succeeded" }
             steps << rewrite_yard_binstub(project_root)
             steps << prune_unwanted_bundler_binstubs(project_root)
@@ -659,7 +669,47 @@ module Kettle
           %w[bundle update]
         end
 
-        def rubocop_gradual_autocorrect_step(project_root)
+        def distinct_bundle_install_step(project_root, env:, setup_env:)
+          bundle_env = bundler_command_env(project_root, env)
+          if same_bundle_env?(bundle_env, setup_env)
+            return {
+              name: "bundle_install_requested_env",
+              status: "skipped",
+              reason: "same_as_setup_bundle_env"
+            }
+          end
+
+          {
+            name: "bundle_install_requested_env",
+            command: %w[bundle install],
+            status: "ready",
+            env: bundle_env,
+            reason: "distinct_bundle_env"
+          }
+        end
+
+        def run_distinct_bundle_install_step(project_root, env:, setup_env:, run_options:, command_runner:)
+          step = distinct_bundle_install_step(project_root, env: env, setup_env: setup_env)
+          return step unless step.fetch(:status) == "ready"
+
+          execute_ready_command_step(
+            step,
+            project_root: project_root,
+            env: setup_env,
+            quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(run_options[:quiet]),
+            command_runner: command_runner
+          )
+        end
+
+        def rubocop_gradual_autocorrect_step(project_root, env: nil, run_options: {})
+          if Kettle::Jem::DecisionPolicy.value_to_boolean((run_options || {})[:skip_rubocop_gradual])
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "skip_rubocop_gradual"
+            }
+          end
+
           rakefile = File.join(project_root.to_s, "Rakefile")
           bin_rake = File.join(project_root.to_s, "bin", "rake")
           unless File.file?(rakefile) && File.file?(bin_rake)
@@ -667,6 +717,13 @@ module Kettle
               name: "rubocop_gradual_autocorrect",
               status: "skipped",
               reason: "missing_rake_entrypoint"
+            }
+          end
+          unless rake_task_available?(project_root, "rubocop_gradual:autocorrect", env: env)
+            return {
+              name: "rubocop_gradual_autocorrect",
+              status: "skipped",
+              reason: "missing_rubocop_gradual_task"
             }
           end
 
@@ -680,6 +737,13 @@ module Kettle
 
         def rubocop_gradual_autocorrect_command
           ["sh", "-c", "rm -f .rubocop_gradual.lock && bin/rake rubocop_gradual:autocorrect"]
+        end
+
+        def rake_task_available?(project_root, task_name, env: nil)
+          stdout, _stderr, status = Open3.capture3((env || {}).to_h, "bin/rake", "--tasks", chdir: project_root.to_s)
+          status.success? && stdout.lines.any? { |line| line.include?(task_name.to_s) }
+        rescue Errno::EACCES, Errno::ENOENT
+          false
         end
 
         def rubocop_lts_local_branch_step(report, env:, project_root: nil)
@@ -750,7 +814,7 @@ module Kettle
           command_env = (env || {}).to_h.dup
           strip_inherited_bundler_activation!(command_env)
           command_env["K_JEM_TEMPLATING"] = "false"
-          %w[KETTLE_RB_DEV GALTZO_FLOSS_DEV STRUCTUREDMERGE_DEV].each do |key|
+          %w[KETTLE_DEV_DEV GALTZO_FLOSS_DEV STRUCTUREDMERGE_DEV].each do |key|
             command_env[key] = "false" if command_env.key?(key)
           end
           gemfile = File.join(project_root.to_s, "Gemfile")
@@ -967,10 +1031,17 @@ module Kettle
           expanded_path
         end
 
-        def execute_orchestration_steps(install_steps, project_root:, env:, run_options:, command_runner:)
+        def execute_orchestration_steps(install_steps, project_root:, env:, run_options:, command_runner:, event_phase: "install")
           quiet = Kettle::Jem::DecisionPolicy.value_to_boolean(run_options[:quiet])
+          events = Kettle::Jem.event_stream_from_options(run_options)
           install_steps.map do |step|
-            case step.fetch(:name)
+            Kettle::Jem.emit_step_event(
+              events,
+              "command_step",
+              step.merge(status: "started"),
+              phase: event_phase
+            )
+            result = case step.fetch(:name)
             when "mise_trust"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "bundled_handoff"
@@ -978,6 +1049,8 @@ module Kettle
             when "bundle_lock_normalization"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_lts_local_branch"
+              execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
+            when "bundle_install_requested_env"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
             when "rubocop_gradual_autocorrect"
               execute_ready_command_step(step, project_root: project_root, env: env, quiet: quiet, command_runner: command_runner)
@@ -990,6 +1063,8 @@ module Kettle
             else
               step
             end
+            Kettle::Jem.emit_step_event(events, "command_step", result, phase: event_phase)
+            result
           end
         end
 
@@ -1001,8 +1076,31 @@ module Kettle
           if File.file?(gemfile) || (!requested_gemfile.empty? && same_path?(requested_gemfile, gemfile))
             command_env["BUNDLE_GEMFILE"] = gemfile
           end
+          command_env["K_JEM_TEMPLATING"] = "false"
           apply_kettle_family_local_install_env!(command_env)
           command_env
+        end
+
+        def bundler_command_env(project_root, env)
+          command_env = (env || {}).to_h.dup
+          strip_inherited_bundler_activation!(command_env)
+          gemfile = File.join(project_root.to_s, "Gemfile")
+          command_env["BUNDLE_GEMFILE"] = gemfile if File.file?(gemfile)
+          command_env["K_JEM_TEMPLATING"] = "false" unless command_env.key?("K_JEM_TEMPLATING")
+          apply_kettle_family_local_install_env!(command_env)
+          command_env
+        end
+
+        def same_bundle_env?(left, right)
+          bundle_env_fingerprint(left) == bundle_env_fingerprint(right)
+        end
+
+        def bundle_env_fingerprint(env)
+          env.to_h.transform_values { |value| value.nil? ? nil : value.to_s }.reject { |key, _value| ignored_bundle_env_key?(key) }
+        end
+
+        def ignored_bundle_env_key?(key)
+          key.to_s.match?(/\A(?:BUNDLE_BIN_PATH|BUNDLE_LOCKFILE|BUNDLER_SETUP|BUNDLER_VERSION|RUBYLIB|RUBYOPT)\z/)
         end
 
         def apply_kettle_family_local_install_env!(command_env)
@@ -1012,12 +1110,12 @@ module Kettle
           return unless Array(marker["installed_members"]).include?("kettle-jem")
 
           members_root = marker["members_root"].to_s
-          if local_env_disabled?(command_env["STRUCTUREDMERGE_DEV"]) && Dir.exist?(File.join(members_root, "kettle-jem"))
+          if !command_env.key?("STRUCTUREDMERGE_DEV") && Dir.exist?(File.join(members_root, "kettle-jem"))
             command_env["STRUCTUREDMERGE_DEV"] = members_root
           end
 
           kettle_root = kettle_family_dependency_root(marker)
-          command_env["KETTLE_RB_DEV"] = kettle_root if kettle_root && local_env_disabled?(command_env["KETTLE_RB_DEV"])
+          command_env["KETTLE_DEV_DEV"] = kettle_root if kettle_root && !command_env.key?("KETTLE_DEV_DEV")
         end
 
         def kettle_family_local_install_marker(command_env)
@@ -1044,6 +1142,7 @@ module Kettle
         def strip_inherited_bundler_activation!(command_env)
           (ENV.keys + command_env.keys).grep(/\ABUNDLE_/).each { |key| command_env[key] = nil }
           (ENV.keys + command_env.keys).grep(/\ABUNDLER_/).each { |key| command_env[key] = nil }
+          (ENV.keys + command_env.keys).grep(/\AGIT_CONFIG_(?:COUNT|KEY_\d+|VALUE_\d+)\z/).each { |key| command_env[key] = nil }
           %w[RUBYLIB RUBYOPT].each { |key| command_env[key] = nil }
         end
 
@@ -1096,7 +1195,7 @@ module Kettle
           normalized
         end
 
-        DEFAULT_GIT_DRIVER_DEFINITIONS = [
+        DEFAULT_GIT_DRIVER_DEFINITIONS = Ractor.make_shareable([
           {
             language: "ruby",
             pattern: "*.rb",
@@ -1121,14 +1220,14 @@ module Kettle
             diff_command: "smorg-rs diff-driver",
             merge_command: "smorg-rs merge-driver %O %A %B %P"
           }
-        ].freeze
-        GIT_DRIVER_LANGUAGE_REGISTRY = DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] }.freeze
+        ])
+        GIT_DRIVER_LANGUAGE_REGISTRY = Ractor.make_shareable(DEFAULT_GIT_DRIVER_DEFINITIONS.to_h { |definition| [definition.fetch(:language), definition] })
 
-        BUILTIN_GIT_DIFF_ATTRIBUTES = [
+        BUILTIN_GIT_DIFF_ATTRIBUTES = Ractor.make_shareable([
           {path: ".gitattributes", pattern: "*.rb", attributes: {"diff" => "ruby"}},
           {path: ".gitattributes", pattern: "*.go", attributes: {"diff" => "golang"}},
           {path: ".gitattributes", pattern: "*.rs", attributes: {"diff" => "rust"}}
-        ].freeze
+        ])
 
         def git_drivers_step(project_root, run_options)
           mode = normalize_git_drivers_mode((run_options || {})[:git_drivers])
@@ -1524,6 +1623,9 @@ module Kettle
           argv = []
           argv << "--accept-config" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:accept_config])
           argv << "--skip-commit" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_commit])
+          argv << "--skip-drift-check" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_drift_check])
+          argv << "--skip-rubocop-gradual" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_rubocop_gradual])
+          argv << "--skip-binstubs" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:skip_binstubs])
           argv << "--quiet" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:quiet])
           argv << "--verbose" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:verbose])
           argv << "--force" if Kettle::Jem::DecisionPolicy.value_to_boolean(options[:force])
@@ -1575,14 +1677,17 @@ module Kettle
             }
           end
 
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(command, chdir: project_root, env: env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           success = result.fetch(:success)
           if success
             return {
               name: name,
               command: command,
               status: "succeeded",
-              exitstatus: result[:exitstatus]
+              exitstatus: result[:exitstatus],
+              duration_ms: duration_ms
             }
           end
 
@@ -1593,11 +1698,14 @@ module Kettle
           return step unless step.fetch(:status) == "ready"
 
           command_env = step.fetch(:env, env)
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(step.fetch(:command), chdir: project_root, env: command_env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           if result.fetch(:success)
             return step.merge(
               status: "succeeded",
               exitstatus: result[:exitstatus],
+              duration_ms: duration_ms,
               reason: "executed"
             )
           end
@@ -1621,18 +1729,22 @@ module Kettle
 
           command_env = step.fetch(:env, env)
           results = step.fetch(:commands).map do |command|
+            started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
             result = command_runner.call(command, chdir: project_root, env: command_env, quiet: quiet)
+            duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
             unless result.fetch(:success)
               raise Kettle::Jem::Error, "#{step.fetch(:name)} failed: #{command.join(" ")}\n#{result[:stderr]}"
             end
             {
               command: command,
-              exitstatus: result[:exitstatus]
+              exitstatus: result[:exitstatus],
+              duration_ms: duration_ms
             }
           end
           step.merge(
             status: "succeeded",
             command_results: results,
+            duration_ms: results.sum { |result| result.fetch(:duration_ms, 0).to_f }.round(3),
             reason: "executed"
           )
         end
@@ -1644,13 +1756,16 @@ module Kettle
             path = File.join(project_root.to_s, relative_path)
             FileUtils.chmod(0o755, path) if File.file?(path)
           end
+          started_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
           result = command_runner.call(step.fetch(:command), chdir: project_root, env: env, quiet: quiet)
+          duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started_at) * 1000.0).round(3)
           unless result.fetch(:success)
             raise Kettle::Jem::Error, "hook_templates failed: #{step.fetch(:command).join(" ")}\n#{result[:stderr]}"
           end
           step.merge(
             status: "succeeded",
             exitstatus: result[:exitstatus],
+            duration_ms: duration_ms,
             reason: "executed"
           )
         end

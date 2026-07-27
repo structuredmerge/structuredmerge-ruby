@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
 require "pathname"
 require "rbs"
 
@@ -9,6 +8,39 @@ RSpec.describe Kettle::Jem do
     path = File.join(root, relative_path)
     FileUtils.mkdir_p(File.dirname(path))
     File.write(path, content)
+  end
+
+  it "removes an empty trailing gemspec development dependency section without leaving its separator" do
+    content = <<~RUBY
+      Gem::Specification.new do |spec|
+        spec.name = "demo-gem"
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Testing
+        spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")
+
+        # HTTP recording for deterministic specs
+        # In Ruby 3.5 (HEAD) the CGI library has been pared down, so we also need to depend on gem "cgi" for ruby@head
+        # This is done in the "head" appraisal.
+        # See: https://github.com/vcr/vcr/issues/1057
+      end
+    RUBY
+
+    cleaned = described_class.remove_empty_gemspec_development_dependency_section_headings(content, receiver: "spec")
+
+    expect(cleaned).to eq(<<~RUBY)
+      Gem::Specification.new do |spec|
+        spec.name = "demo-gem"
+
+        # NOTE: It is preferable to list development dependencies in the gemspec due to increased
+        #       visibility and discoverability.
+
+        # Testing
+        spec.add_development_dependency("kettle-test", "~> 2.0", ">= 2.0.11")
+      end
+    RUBY
   end
 
   it "repairs the version_gem entrypoint shape during template apply" do
@@ -256,8 +288,6 @@ RSpec.describe Kettle::Jem do
       write_file(root, "spec/nomono/version_spec.rb", <<~RUBY)
         # frozen_string_literal: true
 
-        require "spec_helper"
-
         RSpec.describe Nomono::Version do
           it_behaves_like "a Version module", described_class
         end
@@ -281,12 +311,8 @@ RSpec.describe Kettle::Jem do
       expect(gemspec).not_to include("version_gem")
       expect(File.read(File.join(root, "lib/nomono/version_gem.rb"))).to eq(dedicated_entrypoint)
       version_spec = File.read(File.join(root, "spec/nomono/version_spec.rb"))
-      expect(version_spec).to include(<<~RUBY)
-        require "spec_helper"
-        require "nomono/version_gem"
-
-        RSpec.describe Nomono::Version do
-      RUBY
+      expect(version_spec).to include('require "nomono/version_gem"')
+      expect(version_spec).to include("RSpec.describe Nomono::Version do")
     end
   end
 end

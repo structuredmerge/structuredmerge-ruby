@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
   File: CHANGELOG
-
-    &mdash; Documentation by YARD 0.9.44
-
+  
+    &mdash; Documentation by YARD 0.9.45
+  
 </title>
 
   <link rel="stylesheet" href="css/style.css" type="text/css">
@@ -37,14 +37,14 @@
     <div id="main" tabindex="-1">
       <div id="header">
         <div id="menu">
-
-    <a href="_index.html">Index</a> &raquo;
+  
+    <a href="_index.html">Index</a> &raquo; 
     <span class="title">File: CHANGELOG</span>
-
+  
 </div>
 
         <div id="search">
-
+  
     <a class="full_list_link" id="class_list_link"
         href="class_list.html">
 
@@ -54,7 +54,7 @@
           <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
         </svg>
     </a>
-
+  
 </div>
         <div class="clear"></div>
       </div>
@@ -72,12 +72,58 @@ Please file a bug if you notice a violation of semantic versioning.</p>
 
 <h2 id="unreleased"><a href="https://github.com/structuredmerge/structuredmerge-ruby/compare/v7.0.0...HEAD">Unreleased</a></h2>
 
+<h3 id="fixed">Fixed</h3>
+
+<ul>
+  <li>
+<code>kettle-jem</code>’s default development bundle now pins<br>
+<code>tree_sitter_language_pack</code> to the StructuredMerge fork branch that exposes<br>
+the Ruby parser API, while still allowing templating runs to override it with<br>
+<code>VENDORED_GEMS</code>.</li>
+  <li>Gemspec templating now deletes empty generated development-dependency comment<br>
+sections through Prism-backed CRISPR structural edits, preventing blank-line<br>
+churn before the closing <code>Gem::Specification</code> <code>end</code>.</li>
+  <li>Fixed the <code>kettle-jem</code> package manifest so runtime template assets are<br>
+included even when the gemspec is loaded from the monorepo root.</li>
+  <li>Generated local templating Gemfiles can now route<br>
+<code>tree_sitter_language_pack</code> through nomono’s <code>VENDORED_GEMS</code> /<br>
+<code>VENDOR_GEM_DIR</code> support instead of using a one-off inferred local path.</li>
+</ul>
+
 <h3 id="added">Added</h3>
 
 <ul>
+  <li>
+<code>kettle-jem</code> now supports <code>--events</code> for newline-delimited JSON progress<br>
+events, including named event type filters via comma-separated<br>
+<code>--events=TYPE,...</code> values, phase events, per-recipe template progress,<br>
+post-apply and command-step events, diagnostics, and summary events for family<br>
+orchestration consumers.</li>
+  <li>Generated CI workflow templates now cache <code>.rspec_status</code> with explicit<br>
+per-workflow keys so <code>kettle-test</code> / <code>turbo_tests2</code> can reuse timing data<br>
+across MRI, JRuby, TruffleRuby, coverage, heads, dep-heads, and framework<br>
+matrix runs.</li>
+  <li>Generated dep-heads workflows now document why TruffleRuby runs directly from<br>
+<code>gemfiles/dep_heads.gemfile</code>, making that generated Appraisal file required<br>
+checked-in output for the workflow.</li>
+  <li>JRuby 9.2 workflow templates now use the legacy-engine bundle install path<br>
+instead of <code>ruby/setup-ruby</code> bundler caching so old Bundler does not fail<br>
+setup against gem servers without the full legacy index.</li>
+  <li>Gemspec templating now structurally merges destination <code>spec.files</code><br>
+collection entries with template package entries so project-specific<br>
+packaged files are not lost when the template rewrites the generated gemspec<br>
+structure.</li>
+  <li>Gemspec templating now restores additional legacy Prism policy behavior for<br>
+destination-only metadata fields, Bundler <code>git ls-files</code> package declarations,<br>
+and empty development-dependency section cleanup after runtime dependency<br>
+promotion.</li>
   <li>Added the repo-local <code>bin/kettle-jem-workflow-pins</code> maintenance script to<br>
 update the GitHub Actions SHA pin index used by generated workflow templates<br>
 via <code>kettle-gha-sha-pins</code>.</li>
+  <li>Generated local Gemfile templates now document why <code>nomono</code> is explicitly<br>
+activated before requiring <code>nomono/bundler</code>.</li>
+  <li>Added the repo-local <code>bin/kettle-jem-deps-floor</code> maintenance script to scan<br>
+dependency-bearing kettle-jem templates and update their dependency floors.</li>
   <li>
 <code>kettle-jem install</code> now generates a curated <code>bin/appraisal</code> binstub for the<br>
 <code>appraisal2</code> executable.</li>
@@ -85,25 +131,324 @@ via <code>kettle-gha-sha-pins</code>.</li>
 README badges.</li>
   <li>Added explicit <code>ruby.test_minimum</code> template configuration, defaulting to<br>
 Ruby 2.4, for generated CI workflow and Appraisal floors.</li>
+  <li>Added top-level <code>integrations</code> configuration for disabling coverage<br>
+integrations (<code>codecov</code>, <code>coveralls</code>, <code>qlty</code>) and the SkyWalking Eyes license<br>
+check integration across README badges, upload/check workflow steps, packaged<br>
+config/workflow templates, and cleanup of existing config files or workflows.</li>
   <li>kettle-jem’s own <code>mise</code> environment now enables templating dependencies so<br>
 templating-only floors are validated in the normal gem bundle.</li>
   <li>Restored <code>kettle-jem prepare</code> as a pre-flight dependency bootstrap mode for<br>
 applying the minimal templating Gemfile payload before full templating.</li>
+  <li>Gem templates and generated root Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.24.</li>
   <li>Version-gem bootstrapping now removes stale top-level RBS <code>VERSION</code><br>
 declarations and generated style workflows load the RBS environment so<br>
 duplicate declarations fail in CI.</li>
+  <li>Version-gem bootstrapping now removes literal <code>bundle gem</code> scaffold RBS<br>
+<code>VERSION</code> declarations before writing the managed <code>version.rbs</code> signature.</li>
+  <li>Added a destructive <code>shim</code> template profile for compatibility wrapper gems.<br>
+Shim templating accepts the replacement gem via <code>--shimmed-gem</code> or<br>
+<code>KETTLE_JEM_SHIMMED_GEM</code>, generates only the shim runtime/docs/specs/CI, and<br>
+deletes obsolete implementation code, behavior specs, workflows, and gemfiles.</li>
 </ul>
 
 <h3 id="changed">Changed</h3>
 
 <ul>
+  <li>Generated gemspec templates now require <code>kettle-dev</code> &gt;= 2.3.7.</li>
+  <li>kettle-jem now requires <code>kettle-rb</code> &gt;= 0.1.4.</li>
+  <li>Refreshed generated GitHub Actions workflow pins for <code>ruby/setup-ruby</code> and<br>
+CodeQL actions.</li>
+  <li>Gemfile and Appraisals template merge adapter failures now fail closed instead<br>
+of silently accepting template content.</li>
+  <li>Generated pull request engine workflows now keep JRuby and TruffleRuby<br>
+coverage available via branch opt-in prefixes: <code>jruby/*</code> runs JRuby<br>
+workflows, <code>truffleruby/*</code> runs TruffleRuby workflows, and <code>engines/*</code> runs<br>
+all engine workflows. Other pull request branches continue to run MRI checks<br>
+without the alternate engine jobs.</li>
+  <li>Generated CONTRIBUTING docs now explain the <code>jruby/*</code>, <code>truffleruby/*</code>, and<br>
+<code>engines/*</code> branch prefixes that opt pull requests into alternate Ruby engine<br>
+workflows.</li>
+  <li>Generated workflow templates now evaluate skip-CI commit messages only for<br>
+push events, and mixed head/dependency-head templates gate JRuby and<br>
+TruffleRuby jobs before runner provisioning on pull requests.</li>
+  <li>Generated standalone JRuby and TruffleRuby workflow templates now group their<br>
+push skip checks before their pull request branch guards so ordinary pull<br>
+request branches do not run alternate engine jobs.</li>
+  <li>Template apply now restores executable bits on generated Git hook scripts.</li>
+  <li>
+<code>require "kettle/jem"</code> now defers parser-backed template runtime dependencies<br>
+until template execution so Rake task installation does not load<br>
+<code>tree_sitter_language_pack</code> before RuboCop loads <code>parser</code>.</li>
+  <li>
+<code>require "kettle/jem"</code> no longer directly loads <code>version_gem</code> by default;<br>
+require <code>kettle/jem/version_gem</code> for the optional <code>VersionGem::Basic</code><br>
+extension.</li>
+  <li>Ruby, engine, Rails, RuboCop, and RuboCop LTS compatibility choices now come<br>
+from <code>Kettle::Rb::CompatMatrix</code> in <code>kettle-rb</code>.</li>
+  <li>Generated <code>mise.toml</code> files no longer export <code>RUBOCOP_LTS_LOCAL=false</code>;<br>
+local RuboCop-LTS mode is now controlled by setting the variable only when a<br>
+local checkout should be used.</li>
+  <li>Generated style Gemfiles now require <code>rubocop-lts-rspec</code> &gt;= 1.0.4.</li>
+  <li>kettle-jem now declares and loads the direct <code>rbs</code> runtime dependency used<br>
+by its RBS signature cleanup logic.</li>
+  <li>Version-gem bootstrapping now preserves projects that load <code>version_gem</code><br>
+through a dedicated <code>lib/&lt;entrypoint&gt;/version_gem.rb</code> file instead of forcing<br>
+it back into the default entrypoint.</li>
+  <li>Version-gem bootstrapping now updates existing generated version specs to<br>
+require a dedicated <code>lib/&lt;entrypoint&gt;/version_gem.rb</code> entrypoint when present.</li>
+  <li>Gem templates and generated root Gemfiles now require <code>kettle-dev</code> &gt;= 2.3.5.</li>
+  <li>Gem templates and generated root Gemfiles now require <code>kettle-test</code> &gt;= 2.0.11.</li>
+  <li>Gem templates and generated root Gemfiles now require <code>turbo_tests2</code> &gt;= 3.1.14.</li>
+  <li>Generated gemspecs and optional Gemfiles now require <code>stone_checksums</code> &gt;= 1.0.6.</li>
+  <li>Shim gemspec templates now include <code>LICENSE.md</code>, matching the generated<br>
+license template filename, instead of the nonexistent <code>LICENSE.txt</code>.</li>
+  <li>Monorepo subgem package templating now includes the main <code>Gemfile</code> so existing<br>
+generated gems receive the <code>nomono</code> bootstrap required by local modular<br>
+Gemfiles during templating-mode CI.</li>
+  <li>Templating now applies transferable kettle-jem changelog entries to destination<br>
+<code>CHANGELOG.md</code> files using stable <code>kettle-jem-template-YYYYMMDD-NNN</code> IDs.</li>
+  <li>Generated gemspecs now support explicit extra package-file globs via<br>
+<code>gemspec.package_files.include</code> in <code>.structuredmerge/kettle-jem.yml</code>.</li>
+  <li>Version-gem templates now generate one package-level RBS file at<br>
+<code>sig/&lt;entrypoint&gt;.rbs</code> and migrate legacy nested<br>
+<code>sig/&lt;entrypoint&gt;/version.rbs</code> files into it.</li>
+  <li>Generated gemspec package manifests now omit repository-only governance docs,<br>
+signing certs, recursive signature directories, split license files, and<br>
+<code>spec.extra_rdoc_files</code> by default.</li>
+  <li>Generated templates now require the released floors for <code>kettle-dev</code> 2.3.0,<br>
+<code>kettle-drift</code> 1.0.5, <code>kettle-test</code> 2.0.9, <code>nomono</code> 1.0.8, and<br>
+<code>token-resolver</code> 2.0.4.</li>
+  <li>Generated gemspecs now require <code>appraisal2</code> &gt;= 3.1.4.</li>
+  <li>
+    <p>Generated style Gemfiles now require <code>appraisal2-rubocop</code> &gt;= 1.0.0.</p>
+  </li>
+  <li>
+    <p>Generated optional Gemfiles no longer duplicate the gemspec’s direct<br>
+<code>stone_checksums</code> development dependency.</p>
+  </li>
+  <li>Quiet templating orchestration now passes quiet flags and debug-suppressing<br>
+environment to Bundler commands.</li>
+  <li>Generated Appraisal guidance now defaults to <code>bin/rake appraisal:generate</code>,<br>
+reserving <code>appraisal:update</code> for intentional lock refreshes.</li>
+  <li>Gemspec templating now raises preserved <code>rspec-stubbed_env</code> dependencies to<br>
+<code>&gt;= 1.0.6</code>.</li>
+  <li>Generated documentation Gemfiles now require <code>yard-fence</code> &gt;= 0.9.6,<br>
+<code>yard-timekeeper</code> &gt;= 0.2.3, and <code>yard-yaml</code> &gt;= 0.2.3.</li>
+  <li>
+    <p>kettle-jem now requires <code>kettle-rb</code> &gt;= 0.1.2.</p>
+  </li>
+  <li>kettle-jem-template-20260716-001 - Shim gemspec manifests now include<br>
+<code>LICENSE.md</code> instead of nonexistent <code>LICENSE.txt</code>.</li>
+  <li>kettle-jem-template-20260716-002 - Generated gemspec manifests now ship fewer<br>
+repository-only files by default to reduce downstream distro packaging churn.</li>
+</ul>
+
+<h3 id="deprecated">Deprecated</h3>
+
+<h3 id="removed">Removed</h3>
+
+<h3 id="fixed-1">Fixed</h3>
+
+<ul>
+  <li>Templating setup now respects explicit <code>STRUCTUREDMERGE_DEV=false</code> and<br>
+<code>KETTLE_DEV_DEV=false</code> values when reading the kettle-family local install<br>
+marker, preventing prepare-mode bundle updates from re-enabling stale local<br>
+Gemfile wiring.</li>
+  <li>Generated root Gemfiles no longer add a separate <code>gem "nomono"</code> bootstrap<br>
+line when templating the <code>nomono</code> gem itself, avoiding duplicate dependency<br>
+declarations against the package gemspec.</li>
+  <li>
+<code>kettle-jem prepare</code> no longer explicitly asks Bundler to update parser gems<br>
+before they exist in a member lockfile, allowing cold-start templating<br>
+bootstraps to introduce vendored parser path dependencies during<br>
+<code>bundle install</code>.</li>
+  <li>Workflow template pin maintenance now compares and updates complete pinned<br>
+action strings in source files, so <code>bin/kettle-jem-workflow-pins --check</code><br>
+fails when template files drift from <code>github_actions_step_pins</code> even if the<br>
+action name is already covered by the pin index.</li>
+  <li>kettle-jem’s own gemspec now includes public signing certs in packaged files.</li>
+  <li>Generated CI workflow synchronization now emits valid YAML for matrix and<br>
+setup-ruby sections instead of misindenting multi-line template fragments.</li>
+  <li>Open Collective badge/funding detection now respects disabled funding policy<br>
+without falling back to the default organization.</li>
+  <li>Version-gem RBS consolidation now migrates all legacy nested<br>
+<code>sig/&lt;entrypoint&gt;/**/*.rbs</code> content into the package-level signature and<br>
+removes the nested files, including when the package-level signature is<br>
+managed by a template entry.</li>
+  <li>Generated dep-heads workflows now run current TruffleRuby directly from the<br>
+generated <code>gemfiles/dep_heads.gemfile</code>, avoiding <code>Appraisal.root.gemfile</code><br>
+bootstrap failures with TruffleRuby’s bundled RubyGems/Bundler and gem.coop.</li>
+  <li>Packaged Rakefile templating now merges destination Rakefiles by default<br>
+instead of replacing them wholesale, preserving project-specific rake tasks<br>
+such as release or adapter test helpers.</li>
+  <li>Version-gem namespace discovery no longer treats nested implementation<br>
+namespaces in the public entrypoint, such as <code>Kettle::Dev::Tasks</code>, as the gem<br>
+namespace when the existing version namespace is more specific.</li>
+  <li>Gemfile and gemspec templating byte-offset rewrites now splice source with<br>
+byte-aware slicing so non-ASCII content before an edited AST node does not<br>
+corrupt generated Ruby.</li>
+  <li>Generated legacy-engine CI workflows now install Bundler gems under<br>
+<code>${RUNNER_TEMP}/bundle</code> instead of <code>vendor/bundle</code>, preventing Appraisal<br>
+installs from creating nested <code>gemfiles/vendor</code> bundles.</li>
+  <li>
+    <p>Generated RuboCop configs now exclude <code>**/vendor/**/*</code> so nested vendored<br>
+dependency trees are not linted.</p>
+  </li>
+  <li>Fixed <code>bin/kettle-jem-workflow-pins</code> so its default project root resolves to<br>
+the kettle-jem gem root relative to the script instead of the caller’s working<br>
+directory.</li>
+  <li>Generated GitHub Actions workflows now preserve existing push branch filters<br>
+from destination workflows.</li>
+  <li>GitHub Actions workflow templating now preserves existing destination SHA<br>
+pins for the same action/version when accepted templates are stale, and emits<br>
+a final warning telling maintainers to update the workflow template pins.</li>
+  <li>SimpleCov templating now removes legacy kettle-soup-cover startup requires<br>
+from <code>.simplecov</code> and upgrades modifier-form <code>spec_helper</code> coverage bootstraps<br>
+to the full kettle-soup-cover <code>SimpleCov.start</code> block.</li>
+  <li>Root Gemfile templating now keeps <code>nomono_requirements</code> before existing<br>
+<code>gem "nomono", *nomono_requirements</code> calls when merging legacy local sibling<br>
+wiring.</li>
+  <li>Root Gemfile templating no longer adds generic direct-sibling path wiring for<br>
+runtime dependencies already handled by project-specific local modular<br>
+Gemfiles.</li>
+  <li>Root Gemfile templating now evaluates the paired modular Gemfile for direct<br>
+runtime dependencies handled by <code>*_local.gemfile</code> overrides, preserving<br>
+released-vs-local switching after <code>accept_template</code> Gemfile rewrites.</li>
+  <li>Root Gemfile templating now recognizes <code>eval_nomono_gems(gems: local_gems)</code><br>
+declarations in <code>*_local.gemfile</code> files before deciding whether a runtime<br>
+dependency is already handled by paired modular local wiring.</li>
+  <li>Local GitHub remotes now override generated gemspec <code>source_code_uri</code> tag URLs<br>
+when deriving repository owner tokens, preventing stale homepage metadata from<br>
+corrupting README logos and local sibling workspace env names.</li>
+  <li>Bootstrap configs now seed runtime URI values, OpenCollective ENV overrides,<br>
+and Gemfile template ownership so first-time full templating does not leave<br>
+raw URI tokens or merge legacy Gemfile dependency sets into the generated<br>
+bundle.</li>
+  <li>Generated Gemfiles now activate the Bundler-locked <code>nomono</code> before loading<br>
+<code>nomono/bundler</code>, avoiding global gem activation conflicts during<br>
+templating.</li>
+  <li>Generated Gemfiles now scope templating-only direct sibling local-path<br>
+environment overrides to the direct dependency block so later modular<br>
+Gemfiles do not accidentally enter local sibling mode.</li>
+  <li>Generated style Gemfiles now skip released RuboCop-LTS gems that were already<br>
+declared by earlier Gemfile evaluation, avoiding duplicate path/version<br>
+declarations during templating.</li>
+  <li>Generated documentation local Gemfiles now skip the current package and<br>
+already declared gems before adding local family path overrides.</li>
+  <li>Gem templates now require <code>appraisal2</code> &gt;= 3.1.3.</li>
+  <li>Generated style Gemfiles now require <code>appraisal2-rubocop</code> &gt;= 0.2.2.</li>
+  <li>Generated main Gemfiles now require <code>nomono</code> &gt;= 1.0.6.</li>
+  <li>Generated templating local Gemfiles now only use <code>TSLP_DEV</code> for local<br>
+<code>tree_sitter_language_pack</code> path overrides and no longer derive that path<br>
+from <code>STRUCTUREDMERGE_DEV</code>.</li>
+  <li>Generated gemspecs now require <code>version_gem</code> &gt;= 1.1.14.</li>
+  <li>Generated gemspecs now require <code>gitmoji-regex</code> &gt;= 2.0.4.</li>
+  <li>Generated documentation Gemfiles now require <code>yaml-converter</code> &gt;= 0.2.3.</li>
+  <li>Generated documentation Gemfiles now require <code>yard-fence</code> &gt;= 0.9.5.</li>
+  <li>Generated documentation Gemfiles now require <code>yard-timekeeper</code> &gt;= 0.2.2.</li>
+  <li>Generated documentation Gemfiles now require <code>yard-yaml</code> &gt;= 0.2.2.</li>
+  <li>Gemfile, gemspec, Appraisal, and Rakefile template merging now derives Ruby<br>
+call source ranges and static string values from Prism nodes so heredoc<br>
+string arguments are preserved transparently.</li>
+  <li>Gemspec dependency preservation now rewrites project-version constant<br>
+interpolation in dependency requirements to <code>spec.version</code> so preserved<br>
+dependencies remain loadable after anonymous-module version loading.</li>
+  <li>Removed retired funding links and template tokens from generated kettle-jem<br>
+funding and README templates.</li>
+  <li>Retemplated generated project metadata, support documentation, CI workflows,<br>
+binstubs, and development dependency floors with <code>kettle-jem</code> v7.0.0.</li>
+  <li>Generated README and workflow templates now treat Ruby 4.0 as MRI current,<br>
+add discrete JRuby 10.0 and TruffleRuby 33.0 workflows/badges, and include a<br>
+TruffleRuby HEAD badge pointing at the shared heads workflow.</li>
+  <li>Generated CI workflows now disable <code>ruby/setup-ruby</code> Bundler caching for<br>
+TruffleRuby 25.0 and JRuby 9.3 and run a serial Bundler install to avoid<br>
+legacy engine setup failures.</li>
+  <li>
+<code>kettle-jem install</code> now runs <code>rubocop_gradual:autocorrect</code> after templating<br>
+and before the bootstrap commit when the destination project provides<br>
+<code>bin/rake</code>, so project-local Ruby syntax floors can normalize generated<br>
+files.</li>
+  <li>
+<code>RUBOCOP_LTS_LOCAL</code> templating now switches the local <code>rubocop-lts/rubocop-lts</code><br>
+checkout to the branch matching the selected <code>rubocop-rubyN_N</code> wrapper before<br>
+running setup and RuboCop Gradual normalization.</li>
+  <li>Generated RuboCop-LTS local style Gemfiles now exclude the current project<br>
+package and already-declared gems before adding local family path overrides.</li>
+  <li>Generated funding templates now default missing OpenCollective orgs to<br>
+<code>galtzo-floss</code> and warn when that fallback differs from the GitHub org.</li>
+  <li>Shim gemspec templates now include the kettle-dev release/test harness<br>
+dependencies required by <code>kettle-changelog</code>, <code>kettle-test</code>, and release tasks.</li>
+  <li>Shim gemspec templates now resolve the generated gem version token instead of<br>
+leaving <code>{KJ|GEM_VERSION}</code> unresolved.</li>
+  <li>Shim and monorepo-root template profiles now include generated <code>.gitignore</code><br>
+files so local <code>.env.local</code> configuration is ignored consistently.</li>
+  <li>Shim Gemfile templates now include <code>nomono</code> and the generated templating<br>
+Gemfiles so <code>K_JEM_TEMPLATING=true bundle exec kettle-jem install</code> works.</li>
+  <li>Shim Gemfile templates no longer add a Git-sourced replacement gem fallback;<br>
+the released replacement gem is already declared by the generated gemspec.</li>
+  <li>Shim Gemfile templates now use <code>https://gem.coop</code>, matching the full template<br>
+and allowing released replacement gems to resolve without Git sources.</li>
+  <li>Generated README compatibility sections now use prose for the test-matrix<br>
+credit and render all generated details blocks with Markdown enabled.</li>
+  <li>Generated README compatibility sections now pair the test-matrix credit with<br>
+the kettle-dev logo and use a kettle-dev-specific details summary.</li>
+  <li>The generated README dev/test stack table now includes <code>kettle-jem</code> with its<br>
+Appraisals and CI workflow template role.</li>
+  <li>The generated README dev/test stack table now includes <code>kettle-dev</code> and keeps<br>
+stack gems in A-Z order while preserving self-exclusion.</li>
+  <li>Gem templates and generated root Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.22.</li>
+  <li>Generated SimpleCov setup now keeps <code>.simplecov</code> configuration-only and<br>
+starts coverage explicitly from <code>spec/spec_helper.rb</code> for SimpleCov v1.</li>
+  <li>
+<code>.simplecov</code> templating now removes obsolete <code>SimpleCov.start</code> blocks with a<br>
+Prism AST cleanup pass while preserving destination-local configuration.</li>
+  <li>
+<code>.simplecov</code> templating now removes the obsolete kettle-soup-cover config<br>
+require with the same Prism AST cleanup pass so SimpleCov finishes loading<br>
+before formatter configuration is required.</li>
+  <li>
+<code>.simplecov</code> templating now migrates old generated <code>keep_destination</code><br>
+overrides and converts preserved <code>track_files</code> calls to <code>cover</code> calls.</li>
+  <li>Generated spec helper templating now normalizes stale SimpleCov bootstrap<br>
+blocks by deduplicating SimpleCov requires and restoring the formatter config<br>
+require before <code>SimpleCov.start</code>.</li>
+  <li>Generated spec helpers now document that requiring SimpleCov loads the<br>
+configuration-only <code>.simplecov</code> before coverage starts.</li>
+  <li>Generated coverage Gemfiles no longer pin SimpleCov to the pre-release-only<br>
+<code>kettle-dev/simplecov</code> <code>fix-final-parallel-worker-formatting</code> branch.</li>
+  <li>Generated workspace path examples now use the renamed <code>my</code> local workspace<br>
+instead of the old <code>kettle-rb</code> checkout path.</li>
+  <li>Generated coverage Gemfiles now require <code>kettle-soup-cover</code> &gt;= 3.0.0.</li>
+  <li>Generated Rakefiles now use <code># simplecov:disable</code> / <code># simplecov:enable</code><br>
+blocks instead of deprecated legacy coverage markers.</li>
+  <li>
+<code>kettle-jem install</code> now uses the latest <code>kettle-family install</code> marker to<br>
+activate locally installed template-stack source roots during templating<br>
+setup.</li>
+  <li>Generated Gemfiles now guard preserved runtime <code>eval_nomono_gems</code> workspace<br>
+overrides during <code>K_JEM_TEMPLATING=true</code>, keeping templating bundles isolated<br>
+from target runtime sibling path dependencies.</li>
+  <li>Generated main Gemfiles now add templating-aware <code>nomono</code> wiring for direct<br>
+runtime dependencies that exist as sibling gems in the same local family<br>
+workspace.</li>
+  <li>Install lockfile normalization now keeps direct sibling runtime dependencies<br>
+available through the generated family <code>*_DEV</code> environment while still<br>
+disabling templating-only path overrides.</li>
+  <li>Generated kettle-jem usage instructions now use the <code>kettle-jem</code> executable as<br>
+the bootstrap entrypoint instead of starting from <code>bundle exec kettle-jem</code>.</li>
+  <li>Generated templating Gemfiles now resolve the local tree-sitter language pack<br>
+workspace fork from <code>structuredmerge/vendor</code>.</li>
+  <li>Generated Appraisals now use modern keyword hash syntax for the<br>
+<code>appraisal2-rubocop</code> plugin declaration.</li>
   <li>Refreshed the generated <code>codecov/codecov-action</code> workflow pin and made<br>
 workflow-pin specs validate immutable pin shape instead of exact live SHAs.</li>
-  <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.8.</li>
-  <li>The packaged gemspec template now uses the same <code>kettle-dev</code> 2.2.8 floor as<br>
+  <li>Refreshed generated workflow templates to pin <code>actions/checkout</code> to the<br>
+<code>v7.0.0</code> release.</li>
+  <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.2.12.</li>
+  <li>The packaged gemspec template now uses the same <code>kettle-dev</code> 2.2.12 floor as<br>
 generated Gemfile tooling.</li>
-  <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.3.</li>
-  <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.5.</li>
+  <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.4.</li>
+  <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.8.</li>
   <li>Generated coverage Gemfiles now require <code>kettle-soup-cover</code> &gt;= 2.0.2.</li>
   <li>Generated style Gemfiles now require <code>rubocop-gradual</code> &gt;= 0.4.0.</li>
   <li>Generated style Gemfiles now require <code>appraisal2-rubocop</code> &gt;= 0.2.1.</li>
@@ -112,9 +457,15 @@ generated Gemfile tooling.</li>
 instead of replacing it with the primary author token.</li>
   <li>Retemplating now removes legacy <code>.github/workflows/tests.yml</code> files as<br>
 obsolete workflows.</li>
-  <li>Runtime dependency <code>token-resolver</code> now requires 2.0.2 or newer.</li>
-  <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.3 for the default<br>
+  <li>Runtime dependency <code>token-resolver</code> now requires 2.0.3 or newer.</li>
+  <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.6 for the default<br>
 <code>kettle-test</code> runner dependency.</li>
+  <li>The README template now links <code>kettle-readme-backers</code> to the generated<br>
+<code>bin/</code> binstub instead of a non-existent <code>exe/</code> path.</li>
+  <li>The README template’s test matrix credit now highlights the Kettle dev/test<br>
+stack with BestGems, GitHub, and daily download rank links, excluding the<br>
+current gem from its own stack table.</li>
+  <li>The README dev/test stack table now includes <code>kettle-soup-cover</code>.</li>
   <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.2.1.</li>
   <li>Gemfile and gemspec source checks now prefer Prism-backed call records instead<br>
 of regex/string fallback matching for dependency and project-name decisions.</li>
@@ -131,19 +482,26 @@ immutable SHA for v4.</li>
 the peeled commit SHA for v6.0.3 and <code>qltysh/qlty-action/coverage</code> to the<br>
 immutable SHA for v2.2.1.</li>
   <li>Generated GitHub Actions workflow templates now refresh pins for<br>
-<code>coverallsapp/github-action</code>, <code>codecov/codecov-action</code>, and<br>
-<code>kettle-rb/ts-grammar-action</code>.</li>
+<code>coverallsapp/github-action</code> and <code>codecov/codecov-action</code>.</li>
+  <li>Generated templating and unlocked dependency workflows no longer install the<br>
+legacy tree-sitter action and rely on the packaged<br>
+<code>tree_sitter_language_pack</code> runtime instead.</li>
+  <li>Generated templating workflows and <code>kettle-jem prepare</code> now update <code>nomono</code><br>
+before install/selftest commands run, so stale locks do not activate old<br>
+local-workspace wiring code.</li>
   <li>Generated GitHub Actions workflow templates now refresh pins for<br>
 <code>github/codeql-action</code> sub-actions to v4.36.2.</li>
-  <li>Generated workflow templates now pin <code>coverallsapp/github-action</code>,<br>
-<code>codecov/codecov-action</code>, and <code>kettle-rb/ts-grammar-action</code> to resolvable<br>
-release SHAs instead of stripped SemVer strings.</li>
+  <li>Generated workflow templates now pin <code>coverallsapp/github-action</code> and<br>
+<code>codecov/codecov-action</code> to resolvable release SHAs instead of stripped<br>
+SemVer strings.</li>
+  <li>Generated README badge URLs now use the same URI-normalized form as<br>
+<code>kettle-pre-release</code>, avoiding churn between encoded namespace separators<br>
+and Unicode badge messages.</li>
   <li>Generated GitHub Actions workflow templates now refresh <code>ruby/setup-ruby</code> to<br>
 the immutable SHA for v1.312.0 and <code>codecov/codecov-action</code> to the latest<br>
 v7.0.0 release comment.</li>
   <li>Generated GitHub Actions workflow templates now refresh <code>ruby/setup-ruby</code>,<br>
-<code>coverallsapp/github-action</code>, <code>pozil/auto-assign-issue</code>, and<br>
-<code>kettle-rb/ts-grammar-action</code> pins.</li>
+<code>coverallsapp/github-action</code>, and <code>pozil/auto-assign-issue</code> pins.</li>
   <li>Generated coverage workflows now publish QLTY coverage with GitHub OIDC so<br>
 repositories do not require <code>QLTY_COVERAGE_TOKEN</code> to be configured.</li>
   <li>Generated README and FUNDING OpenCollective links now use the configured<br>
@@ -199,12 +557,11 @@ entries, such as <code>org|12%</code> or <code>ruby|96px</code>.</li>
   <li>Documented <code>rubygems.min_ruby</code> in the generated <code>.kettle-jem.yml</code> so projects<br>
 can make the published runtime Ruby floor explicit.</li>
   <li>Documentation templates now require <code>yard-yaml</code> &gt;= 0.2.0.</li>
-  <li>Documentation templates now require <code>yard-fence</code> &gt;= 0.9.3.</li>
+  <li>Documentation templates now require <code>yard-fence</code> &gt;= 0.9.4.</li>
   <li>Documentation templates now require <code>yard-timekeeper</code> &gt;= 0.2.1.</li>
   <li>Gem templates and generated templating Gemfiles now require <code>kettle-dev</code> &gt;= 2.1.1.</li>
   <li>Gem templates now require <code>kettle-test</code> &gt;= 2.0.3.</li>
   <li>Gem templates now require <code>appraisal2</code> &gt;= 3.1.1.</li>
-  <li>Gem templates now require <code>version_gem</code> &gt;= 1.1.11.</li>
   <li>Generated templating Gemfiles now require <code>kettle-drift</code> &gt;= 1.0.1.</li>
   <li>Runtime dependency <code>token-resolver</code> now requires the released 2.x line.</li>
   <li>Development lockfile generation now uses Bundler 4.0.12.</li>
@@ -230,9 +587,9 @@ of hardcoding <code>100 100</code>.</li>
 command config as well as managed <code>.gitattributes</code>, so local <code>git diff</code><br>
 can actually invoke StructuredMerge drivers after templating.</li>
   <li>Runtime dependency <code>token-resolver</code> now requires 2.0.1 or newer.</li>
-  <li>Generated gemspecs now require <code>version_gem</code> &gt;= 1.1.11 while allowing the<br>
+  <li>Generated gemspecs now require <code>version_gem</code> &gt;= 1.1.12 while allowing the<br>
 released 1.1 line.</li>
-  <li>Gem templates now require <code>gitmoji-regex</code> &gt;= 2.0.1.</li>
+  <li>Gem templates now require <code>gitmoji-regex</code> &gt;= 2.0.2.</li>
   <li>Gem templates now require <code>turbo_tests2</code> &gt;= 3.1.1 for the default<br>
 <code>kettle-test</code> runner.</li>
   <li>Generated style Gemfiles now use the latest released <code>rubocop-ruby*</code><br>
@@ -241,21 +598,104 @@ wrapper patch constraints for the RuboCop-LTS family.</li>
 constraints for every supported Ruby floor.</li>
   <li>Generated style Gemfiles now treat style dependency floors as latest-Ruby<br>
 task dependencies, independent from the gemspec runtime Ruby floor.</li>
+  <li>kettle-jem now requires <code>kettle-rb</code> &gt;= 0.1.1.</li>
   <li>Generated coverage Gemfiles now require <code>kettle-soup-cover</code> &gt;= 2.0.1.</li>
-</ul>
-
-<h3 id="deprecated">Deprecated</h3>
-
-<h3 id="removed">Removed</h3>
-
-<h3 id="fixed">Fixed</h3>
-
-<ul>
+  <li>
+    <p>Generated documentation Gemfiles now require <code>yaml-converter</code> &gt;= 0.2.1<br>
+while allowing the released 0.2 line.</p>
+  </li>
+  <li>Generated root Gemfiles no longer path-wire direct sibling dependencies from<br>
+stale sibling directories whose gemspec defines a different gem name.</li>
+  <li>Generated root Gemfiles now remove previously generated direct sibling wiring<br>
+when the current sibling directory no longer defines the dependency gem.</li>
+  <li>Generated RuboCop configs now activate the <code>rubocop-rspec</code> plugin for the<br>
+packaged RSpec RuboCop overlay.</li>
+  <li>Gemspec <code>spec.files</code> merging now supports the generated <code>Dir[...] + [...]</code><br>
+assignment shape on subsequent template runs instead of rejecting it as<br>
+unsupported.</li>
+  <li>Generated modular Gemfiles no longer redeclare runtime dependencies that are<br>
+already supplied by the project gemspec.</li>
+  <li>Existing generated gemspecs with splat-based <code>spec.files</code> assignments now<br>
+retain configured root license files from the template instead of preserving<br>
+the old splat-only assignment wholesale.</li>
+  <li>Gemspec <code>spec.files</code> templating now fails hard for unsupported package-list<br>
+shapes instead of silently preserving destination content.</li>
+  <li>Generated gemspecs now package active root license files declared by the<br>
+project license configuration.</li>
+  <li>Gemspec templating no longer preserves frozen <code>spec.files</code> override blocks;<br>
+<code>spec.files</code> is structurally merged so stale frozen package lists cannot<br>
+replace the merged package payload.</li>
+  <li>README template merging no longer duplicates preserved destination-only<br>
+subsections when they are already inside another preserved destination<br>
+section.</li>
+  <li>Generated gemspecs now add an inline <code>Gemspec/RequiredRubyVersion</code> RuboCop<br>
+disable when the published runtime Ruby floor is below 2.0.</li>
+  <li>
+<code>kettle-jem install</code> no longer tries to switch the local RuboCop-LTS checkout<br>
+while templating the RuboCop-LTS checkout itself.</li>
+  <li>Generated style Gemfiles now require <code>rubocop-ruby3_2</code> &gt;= 3.0.6 so<br>
+Appraisal/RuboCop tasks do not select damaged packages missing<br>
+packaged RuboCop-LTS configuration files.</li>
+  <li>Gemspec <code>spec.files</code> merging now preserves <code>Dir[...]</code> glob expansion when<br>
+merging destination glob entries into an array-based template assignment by<br>
+generating concatenated <code>Dir[...] + [...]</code> package file expressions.</li>
+  <li>Quiet templating orchestration no longer passes unsupported <code>--quiet</code><br>
+switches to Bundler subcommands such as <code>bundle binstubs</code> or <code>bundle lock</code>;<br>
+only Bundler subcommands documented with <code>--quiet</code> receive that flag.</li>
+  <li>Gemspec <code>spec.files</code> merging now inserts missing trailing commas when moving<br>
+existing collection entries before appended template entries, preventing<br>
+invalid Ruby when a destination’s former last entry had no comma.</li>
+  <li>Gemfile templating now preserves destination-only Ruby-bucket<br>
+<code>eval_gemfile</code> entries, preventing configured recording Gemfiles from being<br>
+dropped when the main Gemfile template is reapplied, and restores the main<br>
+recording Gemfile eval when existing Appraisals show recording is configured.</li>
+  <li>Generated templating Gemfiles no longer duplicate <code>appraisal2-rubocop</code>; the<br>
+Appraisal generator formatter is provided by the style Gemfile loaded from<br>
+<code>Appraisal.root.gemfile</code>.</li>
+  <li>Generated local Gemfile overrides now load <code>nomono/bundler</code> without activating<br>
+nomono’s runtime dependencies during Bundler Gemfile evaluation, and bundled<br>
+handoff no longer runs through the RubyGems <code>kettle-jem</code> wrapper.</li>
+  <li>Gemspec template merging now preserves chained squiggly heredoc assignments<br>
+such as <code>spec.description = &lt;&lt;~DESC.strip</code> instead of replacing only the<br>
+opener line.</li>
+  <li>Generated README post-processing now adds missing compatible JRuby 10.0 and<br>
+TruffleRuby 33.0 compatibility badges when the matching workflow files exist.</li>
+  <li>Shunted Gemfile generation no longer duplicates broad gemspec development<br>
+dependencies that already have explicit modular Gemfile compatibility<br>
+overrides, such as old-Ruby fork handling.</li>
+  <li>
+<code>kettle-jem install</code> no longer fails a stale outer bootstrap commit step when<br>
+the bundled handoff already committed the generated changes.</li>
+  <li>Shim template discovery now recovers the package version from the git index<br>
+or <code>HEAD</code> when a previous failed run already replaced the working-tree<br>
+version file with replacement-gem aliases.</li>
+  <li>Shim profile version files now alias the replacement gem version constants<br>
+and compute the replacement version require path relative to the generated<br>
+shim version file, fixing nested require paths such as <code>omniauth/jwt</code><br>
+shimming <code>omniauth/jwt2</code>.</li>
+  <li>
+<code>kettle-jem install</code> now skips its bundled handoff when the destination bundle<br>
+does not include <code>kettle-jem</code>, allowing shim-only gems to finish templating.</li>
+  <li>Namespace discovery now detects nested module declarations in the public<br>
+entrypoint before falling back to a stale generated version namespace, and the<br>
+README namespace badge now uses the shield-safe namespace token.</li>
+  <li>OpenCollective template tokens now use <code>.github/FUNDING.yml</code> as a valid org<br>
+source, preventing empty <code>https://opencollective.com//...</code> README and<br>
+FUNDING links when destination env variables are not loaded.</li>
+  <li>Monorepo-root templating now uses the no-OpenCollective funding templates<br>
+when no OpenCollective slug is configured, preventing empty generated<br>
+OpenCollective badge URLs in root <code>FUNDING.md</code> files.</li>
+  <li>The <code>kettle-jem</code> CLI now refuses to run from the <code>kettle-jem</code> project root<br>
+against a different destination, so templating cannot silently use<br>
+<code>kettle-jem</code>’s own environment instead of the target repo’s environment.</li>
   <li>Fixed <code>bin/kettle-jem-workflow-pins</code> so its synthetic workflow is valid YAML<br>
 and child command failures include stdout diagnostics.</li>
   <li>Fixed <code>bin/kettle-jem-workflow-pins</code> so sub-action updates reported under the<br>
 parent action repository, such as <code>github/codeql-action</code>, update the full<br>
 pinned action path instead of being silently counted as zero updates.</li>
+  <li>Fixed <code>bin/kettle-jem-workflow-pins</code> to default to the same broad upgrade<br>
+strategy used by family workflow pin maintenance, so minor action releases<br>
+such as <code>ruby/setup-ruby</code> are not missed by template pin refreshes.</li>
   <li>README compatibility badge pruning now compares Ruby minor series so patch<br>
 floors like <code>&gt;= 1.8.7</code> and <code>&gt;= 2.2.2</code> keep their matching minor badges.</li>
   <li>Gemspec template summary and description tokens now strip an already-present<br>
@@ -474,7 +914,7 @@ development-tool binstubs such as <code>bin/reek</code>.</li>
 <code>kettle-drift</code> binstubs when they already exist from local/plugin installs<br>
 without requiring unreleased <code>kettle-drift</code> in every generated gemspec.</li>
   <li>Added <code>kettle-drift</code> to generated templating Gemfiles, resolved remotely in<br>
-templating mode and via <code>KETTLE_RB_DEV</code> locally, separate from the<br>
+templating mode and via <code>KETTLE_DEV_DEV</code> locally, separate from the<br>
 <code>STRUCTUREDMERGE_DEV</code> StructuredMerge local gem set.</li>
   <li>Refreshed generated README metadata blocks after template README merging so<br>
 version-derived gemspec metadata such as <code>source_code_uri</code> does not stay stale.</li>
@@ -543,9 +983,9 @@ from being merged into the generated shape.</li>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jun 14 04:56:05 2026 by
+  Generated on Mon Jul 20 00:27:53 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

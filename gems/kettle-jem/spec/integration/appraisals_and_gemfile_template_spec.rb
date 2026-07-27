@@ -1,0 +1,1599 @@
+# frozen_string_literal: true
+
+RSpec.describe Kettle::Jem, "Appraisals and Gemfile templating" do
+  include_context "with isolated kettle-jem environment"
+  include_context "with kettle-jem fixture contracts"
+
+  it "applies Appraisals template policy with self-dependency and minimum Ruby pruning" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-policy-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          # frozen_string_literal: true
+
+          appraise "ruby-2-7" do
+            gem "example"
+            eval_gemfile "gemfiles/modular/x_std_libs/r2/libs.gemfile"
+          end
+
+          appraise "ruby-3-2" do
+            gem "example", path: "../example"
+            eval_gemfile "gemfiles/modular/x_std_libs/r3/libs.gemfile"
+          end
+
+          appraise "coverage" do
+            gem "simplecov"
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          appraise "ruby-3-2" do
+            eval_gemfile "gemfiles/modular/x_std_libs/r3/libs.gemfile"
+          end
+
+          appraise "head" do
+            eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"
+          end
+
+          appraise "path-gems" do
+            %w[
+              example
+              support-gem
+            ].each do |gem_name|
+              gem gem_name, path: "../\#{gem_name}"
+            end
+          end
+
+          appraise "style" do
+            eval_gemfile "gemfiles/modular/style.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      appraisals_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_Appraisals"
+      end
+      appraisals_content = appraisals_report.fetch(:final_content)
+
+      expect(appraisals_content).not_to include('appraise "ruby-2-7"')
+      expect(appraisals_content).not_to include('gem "example"')
+      expect(appraisals_content).to include('appraise "ruby-3-2"')
+      expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/x_std_libs/r3/libs.gemfile"')
+      expect(appraisals_content).to include('appraise "head"')
+      expect(appraisals_content).not_to include('gem "cgi"')
+      expect(appraisals_content).not_to include("modular/recording/")
+      expect(appraisals_content).to include('appraise "coverage"')
+      expect(appraisals_content).to include('gem "simplecov"')
+      expect(appraisals_content).to include('appraise "path-gems"')
+      expect(appraisals_content).to include("support-gem")
+      expect(appraisals_content).not_to match(/^\s+example$/)
+      expect(appraisals_content).to include('appraise "style"')
+      expect(appraisals_report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy)).to include(
+        file_type: "appraisals",
+        operations: include(
+          include(operation: "merge_appraisal_blocks", inserted_appraisals: include("style")),
+          include(operation: "delete_self_dependency_declarations", deleted_dependency_count: 2),
+          include(operation: "prune_minimum_ruby_appraisals", deleted_appraisals: include("ruby-2-7"))
+        )
+      )
+      expect(File.read(File.join(root, "Appraisals"))).to eq(appraisals_content)
+    end
+  end
+
+  it "keeps Appraisals recording gemfiles only when configured" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-recording-slice", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            recording: true
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          appraise "head" do
+            gem "cgi", ">= 0.5"
+            eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      appraisals_report = apply.fetch(:recipe_reports).find do |report|
+        report.fetch(:recipe_name) == "template_source_application_Appraisals"
+      end
+      appraisals_content = appraisals_report.fetch(:final_content)
+
+      expect(appraisals_content).not_to include('gem "cgi"')
+      expect(appraisals_content).to include('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"')
+    end
+  end
+
+  it "ports old Appraisals template behavior without losing custom destination blocks" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    contract_case = old_spec_contract.fetch(:cases).fetch(:appraisals_custom_blocks)
+
+    Dir.mktmpdir("kettle-jem-old-appraisals-policy", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "#{contract_case.fetch(:destination_appraisal)}" do
+            gem "local-only"
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY
+          appraise "#{contract_case.fetch(:template_appraisal)}" do
+            gemfile "gemfiles/ruby_4.0.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include(%(appraise "#{contract_case.fetch(:template_appraisal)}"))
+      expect(appraisals_content).to include(%(appraise "#{contract_case.fetch(:destination_appraisal)}"))
+      expect(appraisals_content).to include('gem "local-only"')
+      expect(report.dig(:report_envelope, :report, :step_reports, 0, :metadata, :ruby_template_policy, :operations)).to include(
+        include(
+          operation: "merge_appraisal_blocks",
+          inserted_appraisals: include(contract_case.fetch(:template_appraisal)),
+          preserved_destination_appraisals: include(contract_case.fetch(:destination_appraisal))
+        )
+      )
+    end
+  end
+
+  it "preserves destination additions inside same-named Appraisal blocks" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisals-same-name-merge", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/activerecord/r3/v8.0.gemfile"
+            eval_gemfile("modular/x_std_libs/r3/libs.gemfile")
+          end
+        RUBY
+        "template/Appraisals.example" => <<~RUBY
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/style.gemfile"
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
+        "modular/style.gemfile",
+        "modular/activerecord/r3/v8.0.gemfile",
+        "modular/x_std_libs/r3/libs.gemfile"
+      )
+    end
+  end
+
+  it "collapses framework appraisals onto standard appraisals without overwriting kept framework gemfiles" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-framework-collapse-kept-gemfiles", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            preset: framework
+            framework_matrix:
+              dimension: rails
+              gem: rails
+              gemfile_pattern: "rails_{version}.gemfile"
+              workflow: false
+              versions:
+                - label: "7.2"
+                  slug: "7_2"
+                  requirement: "~> 7.2.2"
+                  standard_appraisal: ruby-3-2
+                  env:
+                    RAILS_MAJOR_MINOR: "7.2"
+          patterns:
+            - path: "gemfiles/rails_*.gemfile"
+              strategy: keep_destination
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+              - gemfiles/rails_7_2.gemfile
+              - .github/workflows/framework-ci.yml
+              - .github/workflows/ruby-3.2.yml
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+
+          appraise "rails-7-2" do
+            gem "combustion", "~> 1.5"
+            gem "actionmailer", "~> 7.2.2"
+            gem "railties", "~> 7.2.2"
+          end
+        RUBY
+        "gemfiles/rails_7_2.gemfile" => <<~RUBY,
+          # This file was generated by Appraisal
+          gem "combustion", "~> 1.5"
+          gem "actionmailer", "~> 7.2.2"
+          gem "railties", "~> 7.2.2"
+        RUBY
+        "template/Appraisals.example" => <<~RUBY,
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+        "template/.github/workflows/framework-ci.yml.example" => "name: Framework CI\n",
+        "template/.github/workflows/ruby-3.2.yml.example" => <<~YAML,
+          name: Ruby 3.2
+
+          jobs:
+            test:
+              env:
+                BUNDLE_GEMFILE: ${{ github.workspace }}/Appraisal.root.gemfile
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "ruby-3.2"
+                      appraisal: "ruby-3-2"
+                      exec_cmd: "kettle-test"
+        YAML
+        "template/gemfiles/rails_7_2.gemfile.example" => "gem \"rails\", \"~> 7.2.2\"\n"
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      appraisals_report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = appraisals_report.fetch(:final_content)
+      workflow_report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == ".github/workflows/ruby-3.2.yml" }
+      workflow_content = workflow_report.fetch(:final_content)
+
+      expect(appraisals_content).not_to include("ENV[")
+      expect(appraisals_content).to include('eval_gemfile "rails_7_2.gemfile"')
+      expect(appraisals_content).not_to include('appraise "rails-7-2"')
+      expect(workflow_content).to include("KJ_FRAMEWORK_MATRIX_GEM: ${{ matrix.KJ_FRAMEWORK_MATRIX_GEM || '' }}")
+      expect(workflow_content).to include("RAILS_MAJOR_MINOR: ${{ matrix.RAILS_MAJOR_MINOR || '' }}")
+      expect(workflow_content).to include('KJ_FRAMEWORK_MATRIX_GEM: "rails"')
+      expect(workflow_content.scan('KJ_FRAMEWORK_MATRIX_GEM: "rails"').size).to eq(1)
+      expect(workflow_content).to include('RAILS_MAJOR_MINOR: "7.2"')
+      expect(File.read(File.join(root, "gemfiles/rails_7_2.gemfile"))).to include('gem "combustion", "~> 1.5"')
+      expect(File).not_to exist(File.join(root, ".github/workflows/framework-ci.yml"))
+    end
+  end
+
+  it "adds configured support gemfiles to standard test Appraisal blocks" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-standard-appraisal-gemfiles", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          appraisal_matrix:
+            appraisal_gemfiles:
+              - gemfiles/modular/activerecord_support.gemfile
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY
+          appraise "current" do
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+
+          appraise "style" do
+            eval_gemfile "modular/style.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "current" do
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "ruby-3-2" do
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).not_to include(<<~RUBY.strip)
+        appraise "style" do
+          eval_gemfile "modular/style.gemfile"
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs.gemfile"
+        end
+      RUBY
+    end
+  end
+
+  it "does not add broad standard support gemfiles to collapsed framework appraisals" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-standard-appraisal-collapse-skip", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            standard_appraisal_gemfiles:
+              - modular/activerecord_runtime.gemfile
+              - modular/activerecord_support.gemfile
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY
+          appraise "current" do
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/activerecord/r3/v8.0.gemfile"
+            eval_gemfile "modular/activerecord_support.gemfile"
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "current" do
+          eval_gemfile "modular/activerecord_runtime.gemfile"
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).to include(<<~RUBY.strip)
+        appraise "ruby-3-2" do
+          eval_gemfile "modular/activerecord/r3/v8.0.gemfile"
+          eval_gemfile "modular/activerecord_support.gemfile"
+          eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+        end
+      RUBY
+      expect(appraisals_content).not_to include('eval_gemfile "modular/activerecord_runtime.gemfile"' \
+        "\n  eval_gemfile \"modular/activerecord/r3/v8.0.gemfile\"")
+    end
+  end
+
+  it "adds standard gemfiles beside ordinary support gemfiles while respecting framework fragments" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-standard-appraisal-framework-fragments", tmp_root) do |root|
+      write_tree(root, {
+        "demo.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "demo"
+            spec.version = "0.1.0"
+            spec.summary = "test gem"
+            spec.required_ruby_version = ">= 3.1"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          workflows:
+            preset: framework
+            standard_appraisal_gemfiles:
+              - rails_7_2.gemfile
+            framework_matrix:
+              dimension: rails
+              gem: rails
+              gemfile_pattern: "rails_{version}.gemfile"
+              versions:
+                - label: "7.2"
+                  slug: "7_2"
+                  requirement: "~> 7.2.0"
+                  standard_appraisal: "ruby-3-1"
+                - label: "8.0"
+                  slug: "8_0"
+                  requirement: "~> 8.0.0"
+                  standard_appraisal: "ruby-3-2"
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Appraisals
+        YAML
+        "template/Appraisals.example" => <<~RUBY
+          appraise "coverage" do
+            eval_gemfile "modular/coverage.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+
+          appraise "ruby-3-2" do
+            eval_gemfile "modular/x_std_libs/r3/libs.gemfile"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Appraisals" }
+      appraisals_content = report.fetch(:final_content)
+
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "coverage")).to contain_exactly(
+        "modular/coverage.gemfile",
+        "rails_7_2.gemfile",
+        "modular/x_std_libs.gemfile"
+      )
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-2")).to contain_exactly(
+        "modular/x_std_libs/r3/libs.gemfile",
+        "rails_8_0.gemfile"
+      )
+      expect(appraisals_eval_gemfile_paths(appraisals_content, "ruby-3-1")).to contain_exactly("rails_7_2.gemfile")
+    end
+  end
+
+  it "prunes GitHub workflow appraisal matrix entries below minimum Ruby" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-appraisal-workflow-prune", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - .github/workflows/appraisals.yml
+        YAML
+        "template/.github/workflows/appraisals.yml.example" => <<~YAML
+          name: Appraisals
+          on:
+            pull_request:
+          jobs:
+            test:
+              strategy:
+                matrix:
+                  include:
+                    - ruby: "2.7"
+                      appraisal: "ruby-2-7"
+                      exec_cmd: "rake spec"
+                    - ruby: "3.2"
+                      appraisal: "ruby-3-2"
+                      exec_cmd: "rake spec"
+              steps:
+                - run: bundle exec appraisal ${{ matrix.appraisal }} bundle exec ${{ matrix.exec_cmd }}
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      workflow_report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == ".github/workflows/appraisals.yml"
+      end
+      workflow_content = workflow_report.fetch(:final_content)
+
+      expect(workflow_content).not_to include('ruby: "2.7"')
+      expect(workflow_content).not_to include('appraisal: "ruby-2-7"')
+      expect(workflow_content).to include('ruby: "3.2"')
+      expect(workflow_content).to include('appraisal: "ruby-3-2"')
+    end
+  end
+
+  it "runs every dep-heads job directly from the generated appraisal gemfile" do
+    template = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/dep-heads.yml.example"))
+    workflow = YAML.safe_load(template, permitted_classes: [], aliases: true)
+    jobs = workflow.fetch("jobs")
+
+    expect(template).to include("BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.bundle_gemfile || 'Appraisal.root.gemfile' }}")
+    expect(template).not_to include("bundle exec appraisal ${{ matrix.appraisal }}")
+    expect(template).to include("run: bundle exec ${{ matrix.exec_cmd }}")
+
+    expect(jobs.keys).to include("ruby", "truffleruby", "jruby")
+    jobs.each_value do |job|
+      entry = job.fetch("strategy").fetch("matrix").fetch("include").first
+
+      expect(entry.fetch("appraisal")).to eq("dep-heads")
+      expect(entry.fetch("bundle_gemfile")).to eq("gemfiles/dep_heads.gemfile")
+      expect(entry.fetch("direct_bundle")).to be(true)
+    end
+  end
+
+  it "serializes legacy engine setup-ruby workaround in generated CI workflows" do
+    ci = {
+      default_branch: "main",
+      exec_cmd: "kettle-test",
+      ruby_versions: ["truffleruby-25.0", "jruby-9.2", "jruby-9.3"]
+    }
+    workflows = [
+      described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, "", {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      })
+    ]
+    coverage_workflow = described_class.send(:synchronize_github_actions_coverage_ci, "", {
+      ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+    })
+    existing_workflow = <<~YAML
+      name: Existing
+      on:
+        push:
+          branches:
+            - "main"
+            - "*-stable"
+            - "r*_*-*-v*"
+    YAML
+    preserved_workflows = [
+      described_class.send(:synchronize_github_actions_ci, existing_workflow, {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, existing_workflow, {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      }),
+      described_class.send(:synchronize_github_actions_coverage_ci, existing_workflow, {
+        ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+      })
+    ]
+
+    expect(workflows + [coverage_workflow]).not_to include(include('      - "r*_*-*-v*"'))
+    expect(preserved_workflows).to all(include('      - "r*_*-*-v*"'))
+    expect(workflows).to all(include("bundler-cache: ${{ matrix.ruby != 'truffleruby-25.0' && matrix.ruby != 'jruby-9.2' && matrix.ruby != 'jruby-9.3' }}"))
+    expect(workflows).to all(include("      - name: Bundle install for legacy Ruby engine"))
+    expect(workflows).to all(include("        if: ${{ matrix.ruby == 'truffleruby-25.0' || matrix.ruby == 'jruby-9.2' || matrix.ruby == 'jruby-9.3' }}"))
+    expect(workflows).to all(include('          bundle config set --local path "${RUNNER_TEMP}/bundle"'))
+    expect(workflows).to all(include("          bundle install --jobs 1"))
+
+    packaged_rubocop = File.read(project_root.join("lib/kettle/jem/templates/.rubocop.yml.example"))
+    expect(packaged_rubocop).to include('    - "**/vendor/**/*"')
+
+    packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"))
+    expect(packaged_workflow).to include("bundler-cache: false")
+    expect(packaged_workflow).to include("      - name: Bundle install for TruffleRuby 25.0")
+    expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle install --jobs 1")
+
+    packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.2.yml.example"))
+    expect(packaged_workflow).to include("bundler-cache: false")
+    expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.2")
+    expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle install --jobs 1")
+
+    packaged_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby-9.3.yml.example"))
+    expect(packaged_workflow).to include("bundler-cache: false")
+    expect(packaged_workflow).to include("      - name: Bundle install for JRuby 9.3")
+    expect(packaged_workflow).to include('          bundle config set --local path "${RUNNER_TEMP}/bundle"')
+    expect(packaged_workflow).to include("          bundle install --jobs 1")
+  end
+
+  it "serializes RSpec status cache steps in generated CI workflows" do
+    ci = {
+      default_branch: "main",
+      exec_cmd: "kettle-test",
+      ruby_versions: ["ruby", "jruby", "truffleruby-25.0"]
+    }
+    workflows = [
+      described_class.send(:synchronize_github_actions_ci, "", {package: {name: "example"}, ci: ci}),
+      described_class.send(:synchronize_github_actions_framework_ci, "", {
+        ci: ci.merge(
+          framework_matrix: {
+            dimension: "rails",
+            include: [{framework_version: "7.2", appraisal: "rails_7_2"}]
+          }
+        )
+      }),
+      described_class.send(:synchronize_github_actions_coverage_ci, "", {
+        ci: ci.merge(coverage: {appraisal: "ruby_3_2", command: "kettle-test"})
+      })
+    ]
+
+    expect(workflows).to all(include("      - name: Restore RSpec status log"))
+    expect(workflows).to all(include("        uses: actions/cache@"))
+    expect(workflows).to all(include("          path: .rspec_status"))
+    expect(workflows).to all(include("${{hashFiles('**/Gemfile.lock','Appraisal.root.gemfile','gemfiles/**/*.gemfile')}}"))
+    expect(workflows).to all(include("${{github.run_id}}-${{github.run_attempt}}"))
+
+    current_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/current.yml.example"))
+    jruby_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/jruby.yml.example"))
+    truffleruby_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/truffleruby-25.0.yml.example"))
+    framework_workflow = File.read(project_root.join("lib/kettle/jem/templates/.github/workflows/framework-ci.yml.example"))
+
+    expect(current_workflow).to include("rspec-status-current-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(jruby_workflow).to include("rspec-status-jruby-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(jruby_workflow).to include("startsWith(github.head_ref, 'jruby/')")
+    expect(truffleruby_workflow).to include("rspec-status-truffleruby-25.0-${{matrix.ruby}}-${{matrix.appraisal}}-")
+    expect(truffleruby_workflow).to include("startsWith(github.head_ref, 'truffleruby/')")
+    expect(framework_workflow).to include(
+      "rspec-status-framework-ci-${{matrix.ruby}}-${{matrix.framework_version}}-${{matrix.gemfile}}-"
+    )
+  end
+
+  it "ports old modular Gemfile ruby-bucket eval_gemfile replacement" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    contract_case = old_spec_contract.fetch(:cases).fetch(:modular_gemfile_ruby_bucket)
+    relative_path = contract_case.fetch(:path)
+
+    Dir.mktmpdir("kettle-jem-old-modular-gemfile-policy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - #{relative_path}
+        YAML
+        relative_path => contract_case.fetch(:obsolete_eval_paths).map { |path| %(eval_gemfile "#{path}") }.join("\n") +
+          "\n" + %(eval_gemfile "../../benchmark/r4/v0.5.gemfile"\n),
+        "template/#{relative_path}.example" => contract_case.fetch(:template_eval_paths).map do |path|
+          %(eval_gemfile "#{path}")
+        end.join("\n") + "\n"
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == relative_path }
+      content = report.fetch(:final_content)
+
+      contract_case.fetch(:template_eval_paths).each do |path|
+        expect(content.scan(%(eval_gemfile "#{path}")).size).to eq(1)
+      end
+      contract_case.fetch(:obsolete_eval_paths).each do |path|
+        expect(content).not_to include(%(eval_gemfile "#{path}"))
+      end
+      expect(File.read(File.join(root, relative_path))).to eq(content)
+    end
+  end
+
+  it "preserves destination-only main Gemfile ruby-bucket eval_gemfile entries" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-destination-evals", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Test HTTP Interaction Recording
+          eval_gemfile "gemfiles/modular/recording/r3/recording.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content).to include("# Test HTTP Interaction Recording")
+      expect(content.scan('eval_gemfile "gemfiles/modular/recording/r3/recording.gemfile"').size).to eq(1)
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "repairs missing main Gemfile recording evals from configured Appraisals" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-recording-repair", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.0"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Appraisals" => <<~RUBY,
+          appraise "current" do
+            eval_gemfile "modular/recording/r4/recording.gemfile"
+            eval_gemfile "modular/x_std_libs.gemfile"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          # Code Coverage
+          eval_gemfile "gemfiles/modular/coverage.gemfile"
+
+          # Linting
+          eval_gemfile "gemfiles/modular/style.gemfile"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content).to include("# Test HTTP Interaction Recording")
+      expect(content.scan('eval_gemfile "gemfiles/modular/recording/r4/recording.gemfile"').size).to eq(1)
+      expect(content.index("# Test HTTP Interaction Recording")).to be < content.index("# Linting")
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "removes the destination package from the main Gemfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-self-dependency", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example Gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+          gem "example-gem"
+          gem "destination-only"
+        RUBY
+        "template/Gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          dependency_root = ENV["DEPENDENCY_ROOT"].to_s.strip
+
+          if !dependency_root.empty?
+            %w[
+              example-gem
+              helper-gem
+            ].each do |gem_name|
+              gem gem_name, path: File.join(dependency_root, gem_name)
+            end
+          else
+            gem "example-gem", ">= 1.0"
+          end
+
+          gem "shared-tool"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }
+      content = report.fetch(:final_content)
+
+      expect(content).to include("helper-gem")
+      expect(content).to include('gem "shared-tool"')
+      expect(content).not_to match(/^\s+example-gem$/)
+      expect(content).not_to match(/^\s*gem\s+["']example-gem["']/)
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "merges modular local Gemfile dependency lists while preserving the destination package" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-local-gemfile-policy", tmp_root) do |root|
+      write_tree(root, {
+        "kettle-jem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "kettle-jem"
+            spec.summary = "Kettle Jem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/templating_local.gemfile
+        YAML
+        "gemfiles/modular/templating_local.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          local_gems = %w[
+            local-only
+            rubocop-ruby2_3
+            kettle-jem
+          ]
+        RUBY
+        "template/gemfiles/modular/templating_local.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          local_gems = %w[
+            tree_haver
+            ast-merge
+            rubocop-ruby2_4
+            kettle-jem
+          ]
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/templating_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include("tree_haver")
+      expect(content).to include("ast-merge")
+      expect(content).to include("rubocop-ruby2_4")
+      expect(content).to include("local-only")
+      expect(content).not_to include("rubocop-ruby2_3")
+      expect(content).to include("kettle-jem")
+      expect(content).not_to include("tree_sitter_language_pack")
+      expect(File.read(File.join(root, "gemfiles/modular/templating_local.gemfile"))).to eq(content)
+    end
+  end
+
+  it "adds configured kettle plugins to the kettle-rb local Gemfile overrides" do
+    runtime = described_class.send(
+      :project_runtime_facts,
+      {"plugins" => ["kettle-drift", "example-plugin"]},
+      {},
+      package_name: "example",
+      source_url: "https://github.com/example/example",
+      author_domain: "example.test",
+      min_ruby: ">= 3.2",
+      test_min_ruby: Gem::Version.new("3.2"),
+      version: "0.1.0"
+    )
+    tokens = described_class.send(:project_runtime_template_tokens, runtime)
+
+    expect(tokens.fetch("KJ|KETTLE_DEV_LOCAL_GEMS")).to eq("kettle-dev kettle-test kettle-soup-cover kettle-drift")
+    expect(tokens.fetch("KJ|MAIN_GEMFILE_NOMONO_BOOTSTRAP")).to include('gem "nomono"')
+    expect(tokens.fetch("KJ|PACKAGE_NAME")).to eq("example")
+  end
+
+  it "exposes package summary and description tokens for generated metadata" do
+    tokens = described_class.send(
+      :template_tokens,
+      {
+        package: {
+          name: "example",
+          summary: "Example summary",
+          description: "Example description"
+        },
+        rubygems: {},
+        project_runtime: {}
+      },
+      {}
+    )
+
+    expect(tokens.fetch("KJ|PACKAGE_SUMMARY")).to eq("Example summary")
+    expect(tokens.fetch("KJ|PACKAGE_DESCRIPTION")).to eq("Example description")
+  end
+
+  it "templates spec helper coverage bootstrap before loading the library" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-spec-helper-coverage", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          rubygems:
+            entrypoint_require: "example/gem"
+            namespace: "Example::Custom"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - spec/spec_helper.rb
+        YAML
+        "spec/spec_helper.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          require "example/custom"
+
+          RSpec.configure do |config|
+            config.example_status_persistence_file_path = ".rspec_status"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "spec/spec_helper.rb"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example/custom"')
+      expect(content).to include("if Kettle::Soup::Cover::DO_COV")
+      expect(content).to include('require "simplecov"')
+      expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
+      expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
+      expect(content).to include("SimpleCov.start")
+      expect(content).to include('require "kettle/test/rspec"')
+      expect(content.scan('require "example/custom"').size).to eq(1)
+    end
+  end
+
+  it "preserves destination spec helper support wiring while adding template bootstrap" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+
+    Dir.mktmpdir("kettle-jem-spec-helper-custom-wiring", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 3.2"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          project_emoji: 🧪
+          rubygems:
+            entrypoint_require: "example/custom"
+            namespace: "Example::Custom"
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - spec/spec_helper.rb
+        YAML
+        "spec/spec_helper.rb" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Internal ENV config
+          require_relative "config/debug"
+          require_relative "config/vcr"
+
+          require "kettle/test/rspec"
+          require "example-gem"
+
+          # Internal RSpec & related config
+          require_relative "support/shared_contexts/with_rake"
+          require_relative "support/shared_contexts/with_mocked_git_adapter"
+
+          RSpec.configure do |config|
+            config.include_context "with mocked git adapter"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {accept: true})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "spec/spec_helper.rb"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('require "kettle-soup-cover"')
+      expect(content.index('require "kettle-soup-cover"')).to be < content.index('require "example-gem"')
+      expect(content).to include("if Kettle::Soup::Cover::DO_COV")
+      expect(content).to include('require "simplecov"')
+      expect(content.index('require "simplecov"')).to be < content.index('require "kettle/soup/cover/config"')
+      expect(content.index('require "kettle/soup/cover/config"')).to be < content.index("SimpleCov.start")
+      expect(content).to include("SimpleCov.start")
+      expect(content.scan('require "kettle/test/rspec"').size).to eq(1)
+      expect(content.scan('require "example-gem"').size).to eq(1)
+      expect(content).not_to include('require "example/gem"')
+      expect(content).not_to include("require \"kettle/test/rspec\"\n\n\n# Internal ENV config")
+      expect(content).to include('require_relative "config/debug"')
+      expect(content).to include('require_relative "config/vcr"')
+      expect(content).to include('require_relative "support/shared_contexts/with_rake"')
+      expect(content).to include('require_relative "support/shared_contexts/with_mocked_git_adapter"')
+      expect(content).to include('config.include_context "with mocked git adapter"')
+    end
+  end
+
+  it "treats packaged local Gemfiles as template-owned by default" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-packaged-local-gemfile-default-strategy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/style_local.gemfile
+        YAML
+        "gemfiles/modular/style_local.gemfile" => <<~RUBY
+          # frozen_string_literal: true
+
+          local_gems = %w[
+            local-only
+            rubocop-ruby2_3
+          ]
+        RUBY
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/style_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
+      expect(content).to include("rubocop-ruby")
+      expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
+      expect(content).to include("local_gems_to_eval = local_gems - %w[example] - declared_gems")
+      expect(content).to include("gems: local_gems_to_eval")
+      expect(content).to include('require "nomono/bundler"')
+      expect(content).not_to include("nomono_activation_requirements")
+      expect(content).not_to include("nomono_lockfile")
+      expect(content).not_to include("Bundler::LockfileParser")
+      expect(content).not_to include("local-only")
+      expect(content).not_to include("rubocop-ruby2_3")
+    end
+  end
+
+  it "loads nomono's own local Gemfiles from the local source tree" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-nomono-local-gemfile-self-loader", tmp_root) do |root|
+      write_tree(root, {
+        "nomono.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "nomono"
+            spec.summary = "Nomono"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/coverage_local.gemfile
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/coverage_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('require "nomono/bundler"')
+      expect(content).not_to include("require_relative")
+      expect(content).not_to include("nomono_activation_requirements")
+      expect(content).not_to include("nomono_lockfile")
+      expect(content).not_to include("Bundler::LockfileParser")
+    end
+  end
+
+  it "excludes the current gem and already declared gems from documentation local path overrides" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-documentation-local-gemfile-self-exclusion", tmp_root) do |root|
+      write_tree(root, {
+        "yard-yaml.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "yard-yaml"
+            spec.summary = "YARD YAML"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - gemfiles/modular/documentation_local.gemfile
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/documentation_local.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include("local_gems = %w[yard-fence yard-timekeeper yard-yaml]")
+      expect(content).to include("declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)")
+      expect(content).to include("local_gems_to_eval = local_gems - %w[yard-yaml] - declared_gems")
+      expect(content).to include("gems: local_gems_to_eval")
+    end
+  end
+
+  it "generates nomono in the main Gemfile before local workspace overrides need it" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "Gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
+      expect(content).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(content.index('gem "nomono"')).to be < content.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "does not generate a duplicate nomono dependency in nomono's own main Gemfile" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-nomono-self", tmp_root) do |root|
+      write_tree(root, {
+        "nomono.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "nomono"
+            spec.summary = "Nomono"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      content = apply.fetch(:recipe_reports).find { |candidate| candidate.fetch(:relative_path) == "Gemfile" }.fetch(:final_content)
+
+      expect(content).not_to include('gem "nomono", *nomono_requirements')
+      expect(content).not_to include("nomono_requirements =")
+      expect(File.read(File.join(root, "Gemfile"))).to eq(content)
+    end
+  end
+
+  it "adds nomono bootstrap to existing main Gemfiles before templating local overrides" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-main-gemfile-existing-nomono", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+          end
+        RUBY
+        "Gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          source "https://gem.coop"
+
+          gemspec
+
+          eval_gemfile "gemfiles/modular/templating.gemfile" if ENV.fetch("K_JEM_TEMPLATING", "false").casecmp("true").zero?
+        RUBY
+        ".kettle-jem.yml" => <<~YAML
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - Gemfile
+        YAML
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      gemfile = File.read(File.join(root, "Gemfile"))
+
+      expect(apply.fetch(:changed_files)).to include("Gemfile")
+      expect(gemfile).to include('nomono_requirements = ["~> 1.0", ">= 1.0.8"]')
+      expect(gemfile).to include('gem "nomono", *nomono_requirements, require: false')
+      expect(gemfile.index('gem "nomono"')).to be < gemfile.index('eval_gemfile "gemfiles/modular/templating.gemfile"')
+    end
+  end
+
+  it "treats packaged CITATION.cff as template-owned metadata by default" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-packaged-citation-default-strategy", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.authors = ["Ada Lovelace"]
+            spec.email = ["ada@example.com"]
+            spec.metadata["source_code_uri"] = "https://github.com/acme/example"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          repository:
+            topology: standalone
+          templates:
+            root: packaged
+            apply: true
+            entries:
+              - CITATION.cff
+          tokens:
+            author:
+              orcid: 0000-0001-2345-6789
+        YAML
+        "CITATION.cff" => <<~YAML
+          cff-version: 1.2.0
+          title: "example"
+          identifiers:
+            - type: url
+              value: 'https://github.com/acme/example/tree/main/gems/example'
+          repository-code: 'https://github.com/acme/example/tree/main/gems/example'
+        YAML
+      })
+
+      plan = described_class.plan_project(root, env: {})
+      report = plan.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "CITATION.cff"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.dig(:metadata, :template_source_preference)).to include(strategy: "accept_template")
+      expect(content).to include("repository-code: 'https://github.com/acme/example'")
+      expect(content).not_to include("/gems/example")
+    end
+  end
+
+  it "removes the destination package from arbitrary modular Gemfile dependency lists" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-modular-gemfile-self-dependency", tmp_root) do |root|
+      write_tree(root, {
+        "example-gem.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example-gem"
+            spec.summary = "Example Gem"
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/debug.gemfile
+          files:
+            gemfiles:
+              modular:
+                debug.gemfile:
+                  strategy: accept_template
+        YAML
+        "gemfiles/modular/debug.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          gem "existing"
+        RUBY
+        "template/gemfiles/modular/debug.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          dependency_root = ENV["DEPENDENCY_ROOT"].to_s.strip
+
+          if !dependency_root.empty?
+            %w[
+              debug
+              example-gem
+            ].each do |gem_name|
+              gem gem_name, path: File.join(dependency_root, gem_name)
+            end
+          else
+            gem "example-gem", ">= 1.0"
+          end
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/debug.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include("debug")
+      expect(content).not_to match(/^\s+example-gem$/)
+      expect(content).not_to match(/^\s*gem\s+["']example-gem["']/)
+      expect(File.read(File.join(root, "gemfiles/modular/debug.gemfile"))).to eq(content)
+    end
+  end
+
+  it "removes gemspec runtime dependencies from modular Gemfile dependency lists" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    Dir.mktmpdir("kettle-jem-modular-gemfile-runtime-dependency", tmp_root) do |root|
+      write_tree(root, {
+        "yard-yaml.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "yard-yaml"
+            spec.summary = "YARD YAML"
+            spec.add_dependency("yaml-converter", "~> 0.2")
+          end
+        RUBY
+        ".kettle-jem.yml" => <<~YAML,
+          templates:
+            root: template
+            apply: true
+            entries:
+              - gemfiles/modular/documentation.gemfile
+          files:
+            gemfiles:
+              modular:
+                documentation.gemfile:
+                  strategy: accept_template
+        YAML
+        "template/gemfiles/modular/documentation.gemfile.example" => <<~RUBY
+          # frozen_string_literal: true
+
+          # Documentation
+          gem "kramdown", "~> 2.5", ">= 2.5.1", require: false
+          gem "yaml-converter", "~> 0.2", ">= 0.2.3", require: false
+          gem "yard", "~> 0.9", ">= 0.9.44", require: false
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/documentation.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(content).to include('gem "kramdown"')
+      expect(content).to include('gem "yard"')
+      expect(content).not_to include('gem "yaml-converter"')
+      expect(File.read(File.join(root, "gemfiles/modular/documentation.gemfile"))).to eq(content)
+    end
+  end
+
+  it "generates shunted.gemfile entries from resolved development dependency Ruby floors" do
+    tmp_root = File.expand_path("../tmp", __dir__)
+    FileUtils.mkdir_p(tmp_root)
+    resolver = Class.new do
+      def versions(gem_name, requirements: nil)
+        case gem_name
+        when "debug"
+          [{number: "1.9.2", ruby_version: ">= 3.3"}]
+        when "rack-session"
+          [
+            {number: "1.0.1", ruby_version: ">= 2.3"},
+            {number: "2.1.2", ruby_version: ">= 2.5"}
+          ]
+        when "rake"
+          [{number: "13.2.1", ruby_version: ">= 2.6"}]
+        else
+          []
+        end
+      end
+
+      def min_ruby_version(gem_name, version)
+        case gem_name
+        when "debug"
+          Gem::Version.new("3.3")
+        when "rack-session"
+          (version == "1.0.1") ? Gem::Version.new("2.3") : Gem::Version.new("2.5")
+        else
+          Gem::Version.new("2.6")
+        end
+      end
+
+      def parse_min_ruby(requirement)
+        Kettle::Jem::RubyGemsResolver.new.parse_min_ruby(requirement)
+      end
+    end.new
+
+    Dir.mktmpdir("kettle-jem-shunted-gemfile", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY,
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example"
+            spec.required_ruby_version = ">= 3.2"
+            spec.add_development_dependency "debug", "~> 1.9"
+            spec.add_development_dependency "rack-session", ">= 0"
+            spec.add_development_dependency "rake", "~> 13.0"
+          end
+        RUBY
+        "gemfiles/modular/shunted.gemfile" => <<~RUBY,
+          # frozen_string_literal: true
+
+          # local notes remain outside the generated block
+        RUBY
+        "gemfiles/modular/rack-session/r2.4/v2.0.gemfile" => <<~RUBY
+          gem "rack-session", "< 2", github: "pboling/rack-session", branch: "fix-missing-rack-session"
+        RUBY
+      })
+
+      apply = described_class.apply_project(root, env: {}, run_options: {rubygems_resolver: resolver})
+      report = apply.fetch(:recipe_reports).find do |candidate|
+        candidate.fetch(:relative_path) == "gemfiles/modular/shunted.gemfile"
+      end
+      content = report.fetch(:final_content)
+
+      expect(report.fetch(:request_envelope).fetch(:request).fetch(:provider_family)).to eq("ruby")
+      expect(report.fetch(:request_envelope).fetch(:request).fetch(:provider_backend)).to eq("ast-crispr-ruby-prism")
+      expect(report.fetch(:report_envelope).fetch(:report).fetch(:step_reports).first.fetch(:metadata).fetch(:provider_family)).to eq("ruby")
+      expect(content).to include("# local notes remain outside the generated block")
+      expect_gem_dependency_declared(content, "debug")
+      expect(content).not_to include('gem "rack-session"')
+      expect(content).not_to include('gem "rake"')
+      expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(content)
+
+      described_class.apply_project(root, env: {}, run_options: {rubygems_resolver: resolver})
+      reapplied = File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))
+      expect(reapplied.lines.count { |line| line.include?(Kettle::Jem::MANAGED_BLOCK_OPEN) }).to be <= 1
+      expect(reapplied.lines.count { |line| line.include?(Kettle::Jem::MANAGED_BLOCK_CLOSE) }).to be <= 1
+      expect(reapplied).to include("# local notes remain outside the generated block")
+
+      described_class.apply_project(root, env: {}, run_options: {rubygems_resolver: resolver})
+      expect(File.read(File.join(root, "gemfiles/modular/shunted.gemfile"))).to eq(reapplied)
+    end
+  end
+end

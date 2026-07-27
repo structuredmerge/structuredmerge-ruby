@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
 require "rake"
 
 RSpec.describe Kettle::Jem do
@@ -77,5 +76,32 @@ RSpec.describe Kettle::Jem do
       quiet: true,
       verbose: true
     )
+  end
+
+  it "defaults templating to half-core thread workers when no worker options are set" do
+    allow(Etc).to receive(:nprocessors).and_return(22)
+
+    expect(Kettle::Jem::Tasks::TemplateTask.templating_run_options({}, {})).to include(
+      recipe_planning_strategy: "classified",
+      recipe_planning_thread_workers: 11,
+      file_work_thread_workers: 11
+    )
+  end
+
+  it "preserves explicit templating worker options" do
+    allow(Etc).to receive(:nprocessors).and_return(22)
+
+    expect(
+      Kettle::Jem::Tasks::TemplateTask.templating_run_options(
+        {"KETTLE_JEM_THREAD_WORKERS" => "3"},
+        {}
+      )
+    ).not_to include(:file_work_thread_workers)
+    expect(
+      Kettle::Jem::Tasks::TemplateTask.templating_run_options(
+        {},
+        {recipe_planning_strategy: "sequential"}
+      )
+    ).not_to include(:recipe_planning_thread_workers, :file_work_thread_workers)
   end
 end

@@ -35,9 +35,10 @@ RSpec.describe Markdown::Merge do
       )
     )
 
-    expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(
-      json_ready(fixture[:available_backends])
-    )
+    expected_available_backends = fixture[:available_backends].select do |backend|
+      markdown_merge.markdown_backend_available_for_analysis?(backend[:id])
+    end
+    expect(json_ready(markdown_merge.available_markdown_backends.map(&:to_h))).to eq(json_ready(expected_available_backends))
     expect(json_ready(TreeHaver::BackendRegistry.fetch('kreuzberg-language-pack')&.to_h)).to eq(
       json_ready({ id: 'kreuzberg-language-pack', family: 'tree-sitter' })
     )

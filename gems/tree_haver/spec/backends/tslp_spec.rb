@@ -14,10 +14,67 @@ RSpec.describe TreeHaver::Backends::Tslp do
         :tree
       end
     end
+    parser = instance_double(
+      'TreeSitterLanguagePack::Parser',
+      parse: instance_double(
+        'TreeSitterLanguagePack::Tree',
+        root_node: instance_double('TreeSitterLanguagePack::Node', has_error: false)
+      )
+    )
     TreeSitterLanguagePack.const_set(:Parser, parser_class)
-    allow(TreeSitterLanguagePack).to receive(:get_parser)
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
 
     expect(described_class.available?).to be(true)
+  end
+
+  it 'fails closed when the exposed parser method cannot parse a smoke fixture' do
+    stub_const('TreeSitterLanguagePack', Module.new)
+    parser_class = Class.new do
+      def parse(_source)
+        raise TypeError, 'no implicit conversion of TreeSitterLanguagePack::Parser into TreeSitterLanguagePack::Parser'
+      end
+    end
+    parser = parser_class.new
+    TreeSitterLanguagePack.const_set(:Parser, parser_class)
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
+
+    expect(described_class.available?).to be(false)
+    expect(described_class.unavailable_reason)
+      .to include('no implicit conversion of TreeSitterLanguagePack::Parser into TreeSitterLanguagePack::Parser')
+  end
+
+  it 'validates the requested language by parsing that language smoke source' do
+    raw_tree = instance_double(
+      'TreeSitterLanguagePack::Tree',
+      root_node: instance_double('TreeSitterLanguagePack::Node', has_error: false)
+    )
+    parser = instance_double('TreeSitterLanguagePack::Parser', parse: raw_tree)
+    stub_const('TreeSitterLanguagePack', Module.new)
+    TreeSitterLanguagePack.const_set(:Parser, Class.new { def parse(_source) = :tree })
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('toml').and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('toml').and_return(parser)
+    allow(described_class).to receive(:available?).and_return(true)
+
+    expect(described_class.parser_available_for?(:toml)).to be(true)
+    expect(parser).to have_received(:parse).with("title = \"tree_haver\"\n")
+  end
+
+  it 'rejects the requested language when its smoke source cannot parse cleanly' do
+    raw_tree = instance_double(
+      'TreeSitterLanguagePack::Tree',
+      root_node: instance_double('TreeSitterLanguagePack::Node', has_error: true)
+    )
+    parser = instance_double('TreeSitterLanguagePack::Parser', parse: raw_tree)
+    stub_const('TreeSitterLanguagePack', Module.new)
+    TreeSitterLanguagePack.const_set(:Parser, Class.new { def parse(_source) = :tree })
+    allow(TreeSitterLanguagePack).to receive(:has_language).with('json').and_return(true)
+    allow(TreeSitterLanguagePack).to receive(:get_parser).with('json').and_return(parser)
+    allow(described_class).to receive(:available?).and_return(true)
+
+    expect(described_class.parser_available_for?(:json)).to be(false)
+    expect(parser).to have_received(:parse).with('{}')
   end
 
   it 'fails closed when the installed language pack does not expose parser methods' do
@@ -52,6 +109,7 @@ RSpec.describe TreeHaver::Backends::Tslp do
     stub_const('TreeSitterLanguagePack', Module.new)
     TreeSitterLanguagePack.const_set(:Parser, parser_class)
     allow(TreeSitterLanguagePack).to receive(:get_parser).with('toml').and_return(parser)
+    allow(described_class).to receive(:available?).and_return(true)
 
     tree_haver_parser = described_class::Parser.new
     tree_haver_parser.language = described_class::Language.new(:toml)

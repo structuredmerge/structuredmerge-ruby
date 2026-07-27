@@ -6,7 +6,7 @@
 <title>
   File: README
   
-    &mdash; Documentation by YARD 0.9.44
+    &mdash; Documentation by YARD 0.9.45
   
 </title>
 
@@ -71,12 +71,12 @@
 
 <p><code>if ci_badges.map(&amp;:color).all? { it == "green"}</code> 👇️ send money so I can do more of this. FLOSS maintenance is now my full-time job.</p>
 
-<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://polar.sh/pboling"><img src="https://img.shields.io/badge/polar-donate-a51611.svg?style=flat" alt="Donate on Polar"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
+<p><a href="https://opencollective.com/galtzo-floss#backer"><img src="https://opencollective.com/galtzo-floss/backers/badge.svg?style=flat" alt="OpenCollective Backers"></a> <a href="https://opencollective.com/galtzo-floss#sponsor"><img src="https://opencollective.com/galtzo-floss/sponsors/badge.svg?style=flat" alt="OpenCollective Sponsors"></a> <a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling.svg?style=social&amp;logo=github" alt="Sponsor Me on Github"></a> <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?logo=liberapay&amp;color=a51611&amp;style=flat" alt="Liberapay Goal Progress"></a> <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=flat&amp;logo=paypal" alt="Donate on PayPal"></a> <a href="https://www.buymeacoffee.com/pboling"><img src="https://img.shields.io/badge/buy_me_a_coffee-%E2%9C%93-a51611.svg?style=flat" alt="Buy me a coffee"></a> <a href="https://ko-fi.com/pboling"><img src="https://img.shields.io/badge/ko--fi-%E2%9C%93-a51611.svg?style=flat" alt="Donate at ko-fi.com"></a></p>
 
 <details>
- <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
+  <summary>👣 How will this project approach the September 2025 hostile takeover of RubyGems? 🚑️</summary>
 
-I've summarized my thoughts in [this blog post](https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo).
+  <p>I’ve summarized my thoughts in <a href="https://dev.to/galtzo/hostile-takeover-of-rubygems-my-thoughts-5hlo">this blog post</a>.</p>
 
 </details>
 
@@ -130,9 +130,7 @@ to build <code>kettle-jem</code> extension gems against the supported plugin sea
   <tbody>
     <tr>
       <td>Works with MRI Ruby 4</td>
-      <td>
-<a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-4.0-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=white" alt="Ruby 4.0 Compat"></a> <a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a>
-</td>
+      <td><a href="https://github.com/structuredmerge/structuredmerge-ruby/actions/workflows/current.yml"><img src="https://img.shields.io/badge/Ruby-current-CC342D?style=for-the-badge&amp;logo=ruby&amp;logoColor=green" alt="Ruby current Compat"></a></td>
     </tr>
     <tr>
       <td>Support &amp; Community</td>
@@ -188,20 +186,69 @@ This test floor is configured by <code>ruby.test_minimum</code> in <code>.kettle
 may be higher than the gem’s runtime compatibility floor when legacy Rubies are<br>
 not practical for the current toolchain.</p>
 
-<table>
-  <thead>
-    <tr>
-      <th>🚚 <em>Amazing</em> test matrix was brought to you by</th>
-      <th>🔎 appraisal2 🔎 and the color 💚 green 💚</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>👟 Check it out!</td>
-      <td>✨ <a href="https://github.com/appraisal-rb/appraisal2">github.com/appraisal-rb/appraisal2</a> ✨</td>
-    </tr>
-  </tbody>
-</table>
+<p><a href="https://github.com/kettle-dev"><img alt="kettle-dev Logo by Aboling0, CC BY-SA 4.0" src="https://logos.galtzo.com/assets/images/kettle-dev/avatar-128px.svg" width="14%" align="right"></a></p>
+
+<p>The <em>amazing</em> test matrix is powered by the kettle-dev stack.</p>
+
+<details>
+  <summary>How kettle-dev manages complexity in tests</summary>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Gem</th>
+        <th>Source</th>
+        <th>Role</th>
+        <th>Daily download rank</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a href="https://bestgems.org/gems/appraisal2">appraisal2</a></td>
+        <td><a href="https://github.com/appraisal-rb/appraisal2">GitHub</a></td>
+        <td>multi-dependency Appraisal matrix generation</td>
+        <td><a href="https://bestgems.org/gems/appraisal2"><img src="https://img.shields.io/gem/rd/appraisal2.svg?style=flat-square" alt="Daily download rank for appraisal2"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/appraisal2-rubocop">appraisal2-rubocop</a></td>
+        <td><a href="https://github.com/appraisal-rb/appraisal2-rubocop">GitHub</a></td>
+        <td>RuboCop Appraisal generator integration</td>
+        <td><a href="https://bestgems.org/gems/appraisal2-rubocop"><img src="https://img.shields.io/gem/rd/appraisal2-rubocop.svg?style=flat-square" alt="Daily download rank for appraisal2-rubocop"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-dev">kettle-dev</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-dev">GitHub</a></td>
+        <td>development, release, and CI workflow tooling</td>
+        <td><a href="https://bestgems.org/gems/kettle-dev"><img src="https://img.shields.io/gem/rd/kettle-dev.svg?style=flat-square" alt="Daily download rank for kettle-dev"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-soup-cover">kettle-soup-cover</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-soup-cover">GitHub</a></td>
+        <td>SimpleCov coverage policy and reporting</td>
+        <td><a href="https://bestgems.org/gems/kettle-soup-cover"><img src="https://img.shields.io/gem/rd/kettle-soup-cover.svg?style=flat-square" alt="Daily download rank for kettle-soup-cover"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/kettle-test">kettle-test</a></td>
+        <td><a href="https://github.com/kettle-dev/kettle-test">GitHub</a></td>
+        <td>standard test runner and coverage harness</td>
+        <td><a href="https://bestgems.org/gems/kettle-test"><img src="https://img.shields.io/gem/rd/kettle-test.svg?style=flat-square" alt="Daily download rank for kettle-test"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/rubocop-lts">rubocop-lts</a></td>
+        <td><a href="https://github.com/rubocop-lts/rubocop-lts">GitHub</a></td>
+        <td>Ruby-version-aware linting</td>
+        <td><a href="https://bestgems.org/gems/rubocop-lts"><img src="https://img.shields.io/gem/rd/rubocop-lts.svg?style=flat-square" alt="Daily download rank for rubocop-lts"></a></td>
+      </tr>
+      <tr>
+        <td><a href="https://bestgems.org/gems/turbo_tests2">turbo_tests2</a></td>
+        <td><a href="https://github.com/galtzo-floss/turbo_tests2">GitHub</a></td>
+        <td>parallel test execution</td>
+        <td><a href="https://bestgems.org/gems/turbo_tests2"><img src="https://img.shields.io/gem/rd/turbo_tests2.svg?style=flat-square" alt="Daily download rank for turbo_tests2"></a></td>
+      </tr>
+    </tbody>
+  </table>
+
+</details>
 
 <details>
   <summary>StructuredMerge package family</summary>
@@ -381,13 +428,10 @@ tokens:
     domain: &quot;example.com&quot;         # ENV override: KJ_AUTHOR_DOMAIN
     orcid: &quot;0000-0000-0000-0000&quot;  # ENV override: KJ_AUTHOR_ORCID
   funding:
-    patreon: &quot;username&quot;           # ENV override: KJ_FUNDING_PATREON
     kofi: &quot;username&quot;              # ENV override: KJ_FUNDING_KOFI
     paypal: &quot;username&quot;            # ENV override: KJ_FUNDING_PAYPAL
     buymeacoffee: &quot;username&quot;      # ENV override: KJ_FUNDING_BUYMEACOFFEE
-    polar: &quot;username&quot;             # ENV override: KJ_FUNDING_POLAR
     liberapay: &quot;username&quot;         # ENV override: KJ_FUNDING_LIBERAPAY
-    issuehunt: &quot;username&quot;         # ENV override: KJ_FUNDING_ISSUEHUNT
   social:
     mastodon: &quot;username&quot;          # ENV override: KJ_SOCIAL_MASTODON
     bluesky: &quot;user.bsky.social&quot;   # ENV override: KJ_SOCIAL_BLUESKY
@@ -730,7 +774,7 @@ Output is condensed to two summary lines after the template run:</p>
 (SHA-pinned action references) while destination wins for job configuration:</p>
 
 <pre class="code language-yaml"><code class="language-yaml"># Template updates this SHA automatically:
-uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
 
 # Your matrix customizations are preserved:
 matrix:
@@ -909,8 +953,8 @@ fill missing keys during config sync, and act as runtime overrides.</p>
   </thead>
   <tbody>
     <tr>
-      <td><code>KETTLE_RB_DEV</code></td>
-      <td>Workspace root for local sibling gems. <code>true</code> = <code>~/src/kettle-rb</code>; a path = that path; unset/<code>false</code> = released gems.</td>
+      <td><code>KETTLE_DEV_DEV</code></td>
+      <td>Workspace root for local sibling gems. <code>true</code> = <code>~/src/my</code>; a path = that path; unset/<code>false</code> = released gems.</td>
     </tr>
     <tr>
       <td><code>KETTLE_DEV_DEBUG</code></td>
@@ -925,10 +969,6 @@ fill missing keys during config sync, and act as runtime overrides.</p>
       <td>Alternative to <code>FUNDING_ORG</code> for personal OpenCollective pages.</td>
     </tr>
     <tr>
-      <td><code>KJ_FUNDING_PATREON</code></td>
-      <td>Patreon handle for FUNDING.yml</td>
-    </tr>
-    <tr>
       <td><code>KJ_FUNDING_KOFI</code></td>
       <td>Ko-fi handle for FUNDING.yml</td>
     </tr>
@@ -941,16 +981,8 @@ fill missing keys during config sync, and act as runtime overrides.</p>
       <td>Buy Me a Coffee handle for funding links</td>
     </tr>
     <tr>
-      <td><code>KJ_FUNDING_POLAR</code></td>
-      <td>Polar handle for funding links</td>
-    </tr>
-    <tr>
       <td><code>KJ_FUNDING_LIBERAPAY</code></td>
       <td>Liberapay handle for funding links</td>
-    </tr>
-    <tr>
-      <td><code>KJ_FUNDING_ISSUEHUNT</code></td>
-      <td>IssueHunt handle for funding links</td>
     </tr>
     <tr>
       <td><code>KJ_SOCIAL_MASTODON</code></td>
@@ -1033,15 +1065,15 @@ chat rooms and mailing lists agrees to follow the <a href="https://github.com/st
 <p>Also see GitLab Contributors: <a href="https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main">https://gitlab.com/structuredmerge/structuredmerge-ruby/-/graphs/main</a></p>
 
 <details>
- <summary>⭐️ Star History</summary>
+  <summary>⭐️ Star History</summary>
 
-<a href="https://star-history.com/structuredmerge/structuredmerge-ruby&amp;Date">
- <picture>
+  <p><a href="https://star-history.com/structuredmerge/structuredmerge-ruby&amp;Date"></a></p>
+  <picture>
  <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date&amp;theme=dark"></source>
  <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date"></source>
  <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=structuredmerge/structuredmerge-ruby&amp;type=Date">
  </picture>
-</a>
+  <p>&lt;/a&gt;</p>
 
 </details>
 
@@ -1107,7 +1139,7 @@ Please consider sponsoring me or the project.</p>
 
 <p>To say “thanks!” ☝️ Join the Discord or 👇️ send money.</p>
 
-<p><a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling-blue?style=for-the-badge&amp;logo=github" alt="Sponsor me on GitHub Sponsors"></a> 💌 <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?style=for-the-badge&amp;logo=liberapay&amp;color=a51611" alt="Sponsor me on Liberapay"></a> 💌 <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=for-the-badge&amp;logo=paypal&amp;color=0A0A0A" alt="Donate on PayPal"></a></p>
+<p><a href="https://opencollective.com/galtzo-floss"><img src="https://img.shields.io/opencollective/all/galtzo-floss?style=for-the-badge" alt="Sponsor galtzo-floss/kettle-jem on Open Source Collective"></a> 💌 <a href="https://github.com/sponsors/pboling"><img src="https://img.shields.io/badge/Sponsor_Me!-pboling-blue?style=for-the-badge&amp;logo=github" alt="Sponsor me on GitHub Sponsors"></a> 💌 <a href="https://liberapay.com/pboling/donate"><img src="https://img.shields.io/liberapay/goal/pboling.svg?style=for-the-badge&amp;logo=liberapay&amp;color=a51611" alt="Sponsor me on Liberapay"></a> 💌 <a href="https://www.paypal.com/paypalme/peterboling"><img src="https://img.shields.io/badge/donate-paypal-a51611.svg?style=for-the-badge&amp;logo=paypal&amp;color=0A0A0A" alt="Donate on PayPal"></a></p>
 
 <h3 id="please-give-the-project-a-star--">Please give the project a star ⭐ ♥.</h3>
 
@@ -1121,16 +1153,16 @@ Please consider sponsoring me or the project.</p>
 | Package | kettle-jem |<br>
 | Description | 🔮 Kettle::Jem provides gem scaffolding, templating, and setup automation using the *-merge gem family for AST-based file merging and token-resolver for template token resolution. Includes MergerConfig presets, YAML recipes, and a complete gem template scaffold. |<br>
 | Homepage | https://github.com/structuredmerge/structuredmerge-ruby |<br>
-| Source | https://github.com/structuredmerge/structuredmerge-ruby/tree/v7.0.0 |<br>
+| Source | https://github.com/structuredmerge/structuredmerge-ruby |<br>
 | License | <code>AGPL-3.0-only</code> OR <code>PolyForm-Small-Business-1.0.0</code> |<br>
-| Funding | https://github.com/sponsors/pboling, https://issuehunt.io/u/pboling, https://ko-fi.com/pboling, https://liberapay.com/pboling/donate, https://patreon.com/galtzo, https://polar.sh/pboling, https://thanks.dev/u/gh/pboling, https://tidelift.com/funding/github/rubygems/kettle-jem, https://www.buymeacoffee.com/pboling |<br>
+| Funding | https://github.com/sponsors/pboling, https://ko-fi.com/pboling, https://liberapay.com/pboling/donate, https://opencollective.com/galtzo-floss, https://thanks.dev/u/gh/pboling, https://tidelift.com/funding/github/rubygems/kettle-jem, https://www.buymeacoffee.com/pboling |<br>
 <!-- kettle-jem:metadata:end --></p>
 </div></div>
 
       <div id="footer">
-  Generated on Sun Jun 14 04:56:05 2026 by
+  Generated on Mon Jul 20 00:27:53 2026 by
   <a href="https://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.44 (ruby-4.0.5).
+  0.9.45 (ruby-4.0.6).
 </div>
 
     </div>

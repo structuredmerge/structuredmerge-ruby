@@ -24,5 +24,7 @@ RSpec.describe Dotenv::Merge::SmartMerger, 'comment behavior matrix' do
       },
       expected_literal_hash_value: 'literal # hash'
     )
+
+    it_behaves_like 'Ast::Merge::RetainedBlankGapCompliance'
   end
 end

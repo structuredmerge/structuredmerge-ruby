@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "spec_helper"
 require "psych"
 
 load File.expand_path("../../bin/kettle-jem-workflow-pins", __dir__)

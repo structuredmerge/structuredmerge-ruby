@@ -87,24 +87,23 @@ RSpec.describe Json::Merge do
     expect(string_result[:ok]).to be(true)
   end
 
-  it 'fails closed for JSONC analysis when no TreeHaver JSON backend is available' do
+  it 'self-registers the JSON backend for direct file analysis' do
     source = <<~JSON
       {
-        // devcontainer files commonly use JSONC comments.
         "name": "Ruby",
         "customizations": {
           "jetbrains": {
             "backend": "RubyMine"
           }
-        },
+        }
       }
     JSON
 
     analysis = described_class::FileAnalysis.new(source)
 
-    expect(analysis).not_to be_valid
-    expect(analysis.root_object).to be_nil
-    expect(analysis.errors).not_to be_empty
+    expect(analysis).to be_valid
+    expect(analysis.root_object).not_to be_nil
+    expect(analysis.errors).to be_empty
   end
 
   it 'conforms to the structure fixtures' do

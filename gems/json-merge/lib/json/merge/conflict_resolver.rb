@@ -9,6 +9,7 @@ module Json
     #   resolver = ConflictResolver.new(template_analysis, dest_analysis)
     #   resolver.resolve(result)
     class ConflictResolver < Ast::Merge::ConflictResolverBase
+      include Ast::Merge::CommentLayoutEmissionSupport
       include Ast::Merge::StructuredEmitterProvenanceSupport
 
       class MissingSharedInlineRegionError < Json::Merge::Error; end
@@ -104,7 +105,7 @@ module Json
       # @param dest_nodes [Array<NodeWrapper>] Destination nodes
       # @param template_analysis [FileAnalysis] Template analysis for line access
       # @param dest_analysis [FileAnalysis] Destination analysis for line access
-      def merge_node_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis)
+      def merge_node_lists_to_emitter(template_nodes, dest_nodes, template_analysis, dest_analysis, dest_owners: nil)
         # Build signature maps for matching
         template_by_sig = build_signature_map(template_nodes, template_analysis)
         dest_by_sig = build_signature_map(dest_nodes, dest_analysis)
@@ -171,7 +172,8 @@ module Json
               template_node = template_info[:node]
 
               # Both have this node - merge them (recursively if containers)
-              merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
+              merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis,
+                                             dest_owners: dest_nodes)
 
               consumed_template_indices << template_info[:index]
               sig_cursor[dest_sig] = cursor + 1
@@ -195,7 +197,8 @@ module Json
             end
 
             # Merge matched nodes
-            merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
+            merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis,
+                                           dest_owners: dest_nodes)
           elsif @remove_template_missing_nodes
             emit_removed_destination_node_comments(dest_node, dest_analysis)
           else
@@ -236,7 +239,11 @@ module Json
       # @param dest_node [NodeWrapper] Destination node
       # @param template_analysis [FileAnalysis] Template analysis
       # @param dest_analysis [FileAnalysis] Destination analysis
-      def merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
+      def merge_matched_nodes_to_emitter(template_node, dest_node, template_analysis, dest_analysis, dest_owners: nil)
+        if preference_for_pair(template_node, dest_node) == :template
+          emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: dest_owners)
+        end
+
         if dest_node.container? && template_node.container?
           # Both are containers - recursively merge their children
           merge_container_to_emitter(template_node, dest_node, template_analysis, dest_analysis)
@@ -298,7 +305,8 @@ module Json
                   template_value.mergeable_children,
                   dest_value.mergeable_children,
                   template_analysis,
-                  dest_analysis
+                  dest_analysis,
+                  dest_owners: dest_value.mergeable_children
                 )
 
                 emit_container_trailing_lines(trailing_source_node, trailing_source_analysis)
@@ -353,6 +361,15 @@ module Json
             comment_analysis: dest_analysis
           )
         end
+      end
+
+      def emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: nil)
+        gap_lines = retained_owner_leading_gap_lines_for(dest_node, dest_analysis, owners: owners)
+        return if gap_lines.empty?
+        return if @emitter.blank_lines?(gap_lines) && @emitter.ends_with_blank_line?
+
+        gap = retained_owner_leading_gap_for(dest_node, dest_analysis, owners: owners)
+        @emitter.emit_raw_lines(gap_lines, metadata: emitter_block_metadata(dest_analysis, gap.start_line))
       end
 
       # Merge container nodes by emitting via emitter

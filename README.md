@@ -275,10 +275,10 @@ Provider and recipe gems:
 
 ## Portability
 
-The Ruby gems are developed against the shared StructuredMerge fixtures. Those
-fixtures define the cross-language behavior expected from the Go, TypeScript,
-Rust, and Ruby implementations. Conformance checks live in gem specs and in the
-shared spec/fixture tooling rather than in a static status document.
+The Ruby gems are developed against the [shared StructuredMerge fixtures][structuredmerge-fixtures].
+Those fixtures define the cross-language behavior expected from the Go,
+TypeScript, Rust, and Ruby implementations. Conformance checks live in gem specs
+and in the shared spec/fixture tooling rather than in a static status document.
 
 ## Development
 

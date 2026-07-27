@@ -37,8 +37,8 @@ module Rust
     end
 
     def rust_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id && rust_backend_available_for_analysis?(requested)
+      requested = requested_tree_sitter_backend_id(backend)
+      unless rust_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Rust backend #{requested}.")
       end
 
@@ -64,8 +64,9 @@ module Rust
     end
 
     def parse_rust(source, dialect)
-      unless rust_backend_available_for_analysis?(TREE_SITTER_BACKEND.id)
-        return unsupported_feature_result("Unsupported Rust backend #{TREE_SITTER_BACKEND.id}.")
+      unless rust_backend_available_for_analysis?(nil)
+        diagnostic_backend = TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_result("Unsupported Rust backend #{diagnostic_backend}.")
       end
 
       return analyze_rust_module(source) if dialect == 'rust'
@@ -76,11 +77,24 @@ module Rust
 
     def rust_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-      registrations = TreeHaver.registered_languages(:rust)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:rust, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:rust, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
+
+    def requested_tree_sitter_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+    end
+    private_class_method :requested_tree_sitter_backend_id
 
     def match_rust_owners(template, destination)
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
@@ -114,7 +128,7 @@ module Rust
     end
 
     def analyze_rust_module(source)
-      parser = TreeHaver.parser_for(:rust)
+      parser = TreeHaver.parser_for(:rust, backend_type: :tree_sitter)
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 

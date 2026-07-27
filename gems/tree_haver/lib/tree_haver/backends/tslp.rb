@@ -11,6 +11,21 @@ module TreeHaver
       @load_attempted = false
       @loaded = false
       @unavailable_reason = nil
+      @language_availability = {}
+      @language_unavailable_reasons = {}
+      PARSER_SMOKE_SOURCES = {
+        'json' => '{}',
+        'bash' => "echo tree_haver\n",
+        'go' => "package main\nfunc main() {}\n",
+        'html' => "<!doctype html>\n<title>TreeHaver</title>\n",
+        'markdown' => "# TreeHaver\n",
+        'ruby' => "class TreeHaverSmoke\nend\n",
+        'rust' => "fn main() {}\n",
+        'typescript' => "export const treeHaver = true;\n",
+        'toml' => "title = \"tree_haver\"\n",
+        'yaml' => "tree_haver: true\n"
+      }.freeze
+      DEFAULT_PARSER_SMOKE_SOURCE = ''
 
       class << self
         attr_reader :unavailable_reason
@@ -20,9 +35,11 @@ module TreeHaver
 
           @load_attempted = true
           begin
-            require 'tree_sitter_language_pack'
+            require 'tree_sitter_language_pack' unless defined?(::TreeSitterLanguagePack)
             @loaded = parser_api_available?
-            @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed' unless @loaded
+            if !@loaded && @unavailable_reason.to_s.empty?
+              @unavailable_reason = 'tree_sitter_language_pack parser API is not exposed'
+            end
           rescue LoadError => e
             @loaded = false
             @unavailable_reason = e.message
@@ -37,6 +54,8 @@ module TreeHaver
           @load_attempted = false
           @loaded = false
           @unavailable_reason = nil
+          @language_availability = {}
+          @language_unavailable_reasons = {}
         end
 
         def capabilities
@@ -52,16 +71,74 @@ module TreeHaver
           }
         end
 
+        def parser_available_for?(language_name)
+          return false unless available?
+
+          name = language_name.to_s
+          return @language_availability.fetch(name) if @language_availability.key?(name)
+
+          @language_availability[name] = smoke_parse_language(name)
+          @language_unavailable_reasons[name] = @unavailable_reason unless @language_availability.fetch(name)
+          @language_availability.fetch(name)
+        rescue StandardError => e
+          @unavailable_reason = e.message
+          @language_unavailable_reasons[language_name.to_s] = e.message
+          false
+        end
+
         private
 
         def parser_api_available?
           return false unless ::TreeSitterLanguagePack.respond_to?(:get_parser)
           return false unless defined?(::TreeSitterLanguagePack::Parser)
+          return false unless ::TreeSitterLanguagePack::Parser.instance_methods.include?(:parse)
 
-          ::TreeSitterLanguagePack::Parser.instance_methods.include?(:parse)
+          parser_api_smoke_test
         rescue StandardError => e
           @unavailable_reason = e.message
           false
+        end
+
+        def parser_api_smoke_test
+          language_name, source = PARSER_SMOKE_SOURCES.find do |name, _smoke_source|
+            !::TreeSitterLanguagePack.respond_to?(:has_language) ||
+              ::TreeSitterLanguagePack.has_language(name)
+          end
+          return false unless language_name
+
+          smoke_parse_language(language_name, source: source)
+        end
+
+        def smoke_parse_language(language_name, source: smoke_source_for(language_name))
+          name = language_name.to_s
+          if ::TreeSitterLanguagePack.respond_to?(:has_language) &&
+             !::TreeSitterLanguagePack.has_language(name)
+            @unavailable_reason = "tree_sitter_language_pack does not publish #{name}"
+            return false
+          end
+
+          parser = ::TreeSitterLanguagePack.get_parser(name)
+          return false unless parser
+
+          tree = parser.parse(source)
+          return false unless tree&.respond_to?(:root_node)
+
+          root = tree.root_node
+          root && !node_has_error?(root)
+        end
+
+        def smoke_source_for(language_name)
+          PARSER_SMOKE_SOURCES.fetch(language_name.to_s, DEFAULT_PARSER_SMOKE_SOURCE)
+        end
+
+        def node_has_error?(node)
+          if node.respond_to?(:has_error)
+            node.has_error
+          elsif node.respond_to?(:has_error?)
+            node.has_error?
+          else
+            false
+          end
         end
       end
 

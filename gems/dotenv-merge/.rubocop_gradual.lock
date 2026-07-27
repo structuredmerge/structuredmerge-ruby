@@ -1,5 +1,5 @@
 {
-  ".simplecov:811436142": [
+  ".simplecov:1840448245": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "Rakefile:3735002317": [
@@ -8,9 +8,10 @@
     [163, 121, 22, "Layout/LineLength: Line is too long. [142/120]", 1367093088],
     [166, 121, 18, "Layout/LineLength: Line is too long. [138/120]", 3881946477]
   ],
-  "dotenv-merge.gemspec:3219964147": [
+  "dotenv-merge.gemspec:588032134": [
     [125, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 2821357214],
-    [133, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
+    [136, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
+    [137, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
   "gemfiles/modular/benchmark/r4/v0.5.gemfile:3644720371": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
@@ -19,13 +20,20 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/cgi/r4/v0.5.gemfile:367169322": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/cgi/vHEAD.gemfile:2729540777": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -61,6 +69,13 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/webrick/vHEAD.gemfile:3867684682": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
@@ -70,10 +85,10 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:909736663": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/vHEAD.gemfile:907917303": [
+  "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
@@ -103,34 +118,26 @@
     [315, 7, 908, "Metrics/MethodLength: Method has too many lines. [18/10]", 3290540918],
     [315, 7, 908, "Metrics/PerceivedComplexity: Perceived complexity for `integrate_freeze_blocks` is too high. [11/8]", 3290540918]
   ],
-  "lib/dotenv/merge/smart_merger.rb:4110302585": [
-    [27, 5, 20190, "Metrics/ClassLength: Class has too many lines. [398/100]", 2164846336],
-    [52, 7, 1092, "Metrics/MethodLength: Method has too many lines. [16/10]", 2908064588],
-    [52, 21, 401, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [13/5]", 1661881927],
-    [126, 7, 2338, "Metrics/AbcSize: Assignment Branch Condition size for `perform_merge` is too high. [<17, 42, 7> 45.85/17]", 2431495447],
-    [126, 7, 2338, "Metrics/MethodLength: Method has too many lines. [49/10]", 2431495447],
-    [235, 7, 733, "Metrics/MethodLength: Method has too many lines. [11/10]", 3293257138],
-    [260, 7, 331, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_node_typing` is too high. [8/7]", 1465922549],
-    [272, 7, 680, "Metrics/MethodLength: Method has too many lines. [11/10]", 4253249620],
-    [300, 7, 602, "Metrics/MethodLength: Method has too many lines. [12/10]", 1142282607],
-    [364, 7, 1110, "Metrics/AbcSize: Assignment Branch Condition size for `root_boundary_lines_for` is too high. [<7, 29, 24> 38.29/17]", 3853137527],
-    [364, 7, 1110, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `root_boundary_lines_for` is too high. [22/7]", 3853137527],
-    [364, 7, 1110, "Metrics/MethodLength: Method has too many lines. [21/10]", 3853137527],
-    [364, 7, 1110, "Metrics/PerceivedComplexity: Perceived complexity for `root_boundary_lines_for` is too high. [21/8]", 3853137527],
-    [392, 7, 732, "Metrics/AbcSize: Assignment Branch Condition size for `emission_start_line_for` is too high. [<4, 17, 10> 20.12/17]", 2147944725],
-    [392, 7, 732, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `emission_start_line_for` is too high. [9/7]", 2147944725],
-    [392, 7, 732, "Metrics/MethodLength: Method has too many lines. [12/10]", 2147944725],
-    [392, 7, 732, "Metrics/PerceivedComplexity: Perceived complexity for `emission_start_line_for` is too high. [10/8]", 2147944725],
-    [413, 7, 1134, "Metrics/MethodLength: Method has too many lines. [15/10]", 3700686114],
-    [413, 25, 239, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 406985461],
-    [440, 7, 712, "Metrics/MethodLength: Method has too many lines. [13/10]", 3393691510],
-    [506, 7, 1797, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_cross_source_preamble_prefixes` is too high. [<14, 21, 9> 26.8/17]", 3130187278],
-    [506, 7, 1797, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/7]", 3130187278],
-    [506, 7, 1797, "Metrics/MethodLength: Method has too many lines. [31/10]", 3130187278],
-    [506, 7, 1797, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/8]", 3130187278],
-    [546, 7, 536, "Metrics/MethodLength: Method has too many lines. [15/10]", 4188914818]
+  "lib/dotenv/merge/smart_merger.rb:1416653553": [
+    [27, 5, 19504, "Metrics/ClassLength: Class has too many lines. [379/100]", 1271421201],
+    [53, 7, 1092, "Metrics/MethodLength: Method has too many lines. [16/10]", 2908064588],
+    [53, 21, 401, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [13/5]", 1661881927],
+    [127, 7, 2338, "Metrics/AbcSize: Assignment Branch Condition size for `perform_merge` is too high. [<17, 42, 7> 45.85/17]", 2431495447],
+    [127, 7, 2338, "Metrics/MethodLength: Method has too many lines. [49/10]", 2431495447],
+    [237, 7, 733, "Metrics/MethodLength: Method has too many lines. [11/10]", 3293257138],
+    [262, 7, 331, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `apply_node_typing` is too high. [8/7]", 1465922549],
+    [274, 7, 680, "Metrics/MethodLength: Method has too many lines. [11/10]", 4253249620],
+    [302, 7, 707, "Metrics/MethodLength: Method has too many lines. [13/10]", 657590111],
+    [386, 7, 1134, "Metrics/MethodLength: Method has too many lines. [15/10]", 3700686114],
+    [386, 25, 239, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [7/5]", 406985461],
+    [469, 7, 1797, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_cross_source_preamble_prefixes` is too high. [<14, 21, 9> 26.8/17]", 3130187278],
+    [469, 7, 1797, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/7]", 3130187278],
+    [469, 7, 1797, "Metrics/MethodLength: Method has too many lines. [31/10]", 3130187278],
+    [469, 7, 1797, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/8]", 3130187278],
+    [509, 7, 536, "Metrics/MethodLength: Method has too many lines. [15/10]", 4188914818],
+    [537, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5861122]
   ],
-  "spec/dotenv/merge/comment_behavior_matrix_spec.rb:4260851990": [
+  "spec/dotenv/merge/comment_behavior_matrix_spec.rb:3919059317": [
     [13, 37, 15, "Style/SymbolProc: Pass `&:value` as an argument to `lambda` instead of a block.", 1808354951],
     [19, 121, 72, "Layout/LineLength: Line is too long. [192/120]", 727266440],
     [20, 121, 81, "Layout/LineLength: Line is too long. [201/120]", 2338882412],

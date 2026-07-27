@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
-
 RSpec.describe Kettle::Jem do
   describe ".replace_source_offsets" do
     it "applies Prism byte offsets after non-ASCII content" do

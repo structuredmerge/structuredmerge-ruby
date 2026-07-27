@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "bundler"
+
 module Kettle
   module Jem
     module Tasks
@@ -12,6 +14,7 @@ module Kettle
           "mise.toml"
         ].freeze
         CRITICAL_TEMPLATING_GEMS = %w[nomono].freeze
+        LOCKED_TEMPLATING_GEMS = %w[tree_sitter_language_pack].freeze
 
         module_function
 
@@ -23,13 +26,27 @@ module Kettle
           )
           report = Kettle::Jem.apply_project(project_root, env: env, run_options: prepare_run_options)
           setup_env = Kettle::Jem::Tasks::InstallTask.setup_command_env(project_root, env)
+          events = Kettle::Jem.event_stream_from_options(effective_run_options)
+          Kettle::Jem.emit_step_event(
+            events,
+            "command_step",
+            {name: "bundle_update_templating_bootstrap", status: "started", command: bundle_update_templating_bootstrap_command(project_root)},
+            phase: "prepare"
+          )
           update_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_update_templating_bootstrap",
-            bundle_update_templating_bootstrap_command,
+            bundle_update_templating_bootstrap_command(project_root),
             project_root: project_root,
             env: setup_env,
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
             command_runner: command_runner
+          )
+          Kettle::Jem.emit_step_event(events, "command_step", update_step, phase: "prepare")
+          Kettle::Jem.emit_step_event(
+            events,
+            "command_step",
+            {name: "bundle_install", status: "started", command: %w[bundle install]},
+            phase: "prepare"
           )
           bundle_step = Kettle::Jem::Tasks::InstallTask.run_command_step(
             "bundle_install",
@@ -39,8 +56,9 @@ module Kettle
             quiet: Kettle::Jem::DecisionPolicy.value_to_boolean(effective_run_options[:quiet]),
             command_runner: command_runner
           )
+          Kettle::Jem.emit_step_event(events, "command_step", bundle_step, phase: "prepare")
 
-          report.merge(
+          final_report = report.merge(
             mode: "prepare",
             prepared: update_step.fetch(:status) == "succeeded" &&
               bundle_step.fetch(:status) == "succeeded",
@@ -57,10 +75,20 @@ module Kettle
                 "updated critical templating gems, and ran bundle install."
             }]
           )
+          Kettle::Jem.emit_summary_event(events, final_report)
+          final_report
         end
 
-        def bundle_update_templating_bootstrap_command
-          %w[bundle update] + CRITICAL_TEMPLATING_GEMS
+        def bundle_update_templating_bootstrap_command(project_root = Dir.pwd)
+          %w[bundle update] + CRITICAL_TEMPLATING_GEMS + locked_templating_gems(project_root)
+        end
+
+        def locked_templating_gems(project_root)
+          lock_path = File.join(project_root.to_s, "Gemfile.lock")
+          return [] unless File.file?(lock_path)
+
+          locked_names = Bundler::LockfileParser.new(Bundler.read_file(lock_path)).specs.map(&:name)
+          LOCKED_TEMPLATING_GEMS & locked_names
         end
       end
     end

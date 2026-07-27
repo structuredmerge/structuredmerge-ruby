@@ -147,6 +147,21 @@ module Ast
         @lines.empty?
       end
 
+      # Check whether every provided line is blank.
+      #
+      # @param candidate_lines [Array<String>] Lines to classify
+      # @return [Boolean]
+      def blank_lines?(candidate_lines)
+        Array(candidate_lines).all? { |line| line.to_s.strip.empty? }
+      end
+
+      # Check whether the current result ends with a blank line.
+      #
+      # @return [Boolean]
+      def ends_with_blank_line?
+        @lines.any? && blank_lines?([@lines.last])
+      end
+
       # Get the number of lines
       # @return [Integer]
       def line_count

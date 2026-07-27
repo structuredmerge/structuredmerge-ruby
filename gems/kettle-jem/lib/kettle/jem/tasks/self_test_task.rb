@@ -209,9 +209,7 @@ module Kettle
         end
 
         def drift_report(after_dir:, template_root:)
-          begin
-            require "kettle/drift"
-          rescue LoadError
+          unless defined?(Kettle::Drift)
             return {
               available: false,
               reason: "kettle-drift is not available"

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../spec_helper"
-
 RSpec.describe Kettle::Jem do
   it "loads the RBS environment instead of only parsing signatures" do
     workflow = File.read(File.join(__dir__, "../../lib/kettle/jem/templates/.github/workflows/style.yml.example"))

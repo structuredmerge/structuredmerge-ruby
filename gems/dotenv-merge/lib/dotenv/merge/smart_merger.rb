@@ -26,6 +26,7 @@ module Dotenv
     #     preference: { default: :destination, secret: :template })
     class SmartMerger < ::Ast::Merge::SmartMergerBase
       include Ast::Merge::TrailingGroups::DestIterate
+      include Ast::Merge::CommentLayoutEmissionSupport
 
       attr_reader :corruption_handling
 
@@ -224,6 +225,7 @@ module Dotenv
         when :template
           emit_template_preferred_match(template_stmt, dest_stmt)
         else
+          add_retained_leading_gap(dest_stmt, @dest_analysis, decision: MergeResult::DECISION_DESTINATION)
           @result.add_raw(node_lines_for(dest_stmt, @dest_analysis), decision: MergeResult::DECISION_DESTINATION)
         end
       end
@@ -300,6 +302,7 @@ module Dotenv
       def emit_template_preferred_match(template_stmt, dest_stmt)
         comment_source_node, comment_source_analysis = preferred_comment_source_for(template_stmt, dest_stmt)
         inline_comment = preferred_inline_comment_for(template_stmt, dest_stmt)
+        add_retained_leading_gap(dest_stmt, @dest_analysis, decision: MergeResult::DECISION_DESTINATION)
         @result.add_raw(
           node_lines_for(
             template_stmt,
@@ -362,48 +365,18 @@ module Dotenv
       end
 
       def root_boundary_lines_for(kind, analysis)
-        owners = Array(analysis.structural_owners).select do |owner|
-          owner.respond_to?(:start_line) && owner.respond_to?(:end_line) && owner.start_line && owner.end_line
-        end
-
-        if kind == :preamble && owners.empty? && analysis.respond_to?(:lines) && analysis.lines.any?
-          return analysis.lines.map(&:raw)
-        end
-        return [] if owners.empty?
-
-        case kind
-        when :preamble
-          first_owner = owners.min_by(&:start_line)
-          start_line = emission_start_line_for(first_owner, analysis)
-          return [] unless start_line && start_line > 1
-
-          (1...start_line).filter_map { |line_number| raw_line_at(analysis, line_number) }
-        when :postlude
-          last_line = owners.map(&:end_line).compact.max
-          return [] unless last_line && analysis.respond_to?(:lines)
-          return [] if last_line >= analysis.lines.length
-
-          ((last_line + 1)..analysis.lines.length).filter_map { |line_number| raw_line_at(analysis, line_number) }
-        else
-          []
-        end
+        super(kind, analysis, owners: analysis.structural_owners, fallback_to_owner_bounds: true)
       end
 
       def emission_start_line_for(node, analysis)
-        attachment = analysis.comment_attachment_for(node)
-        leading_region = attachment&.leading_region
-        start_line = if leading_region&.start_line
-                       leading_region.start_line
-                     elsif first_structural_owner?(node,
-                                                   analysis) && analysis.comment_augmenter.preamble_region&.start_line
-                       analysis.comment_augmenter.preamble_region.start_line
-                     else
-                       node.start_line
-                     end
+        region_start = region_start_line(leading_region_for(node, analysis))
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node,
+                                                                                                           analysis)
+        preceding_blank_line_start(region_start || preamble_start || node.start_line, analysis)
+      end
 
-        start_line -= 1 while start_line > 1 && raw_line_at(analysis, start_line - 1).to_s.strip.empty?
-
-        start_line
+      def root_boundary_owner_start_line_for(node, analysis)
+        emission_start_line_for(node, analysis)
       end
 
       def first_structural_owner?(node, analysis)
@@ -437,40 +410,30 @@ module Dotenv
         leading_lines + apply_inline_comment(node_lines, inline_comment) + trailing_lines
       end
 
-      def removed_destination_comment_lines_for(node)
-        lines = leading_segment_lines_for(node, @dest_analysis)
-        attachment = @dest_analysis.comment_attachment_for(node)
+      def add_retained_leading_gap(node, analysis, decision:)
+        lines = retained_owner_leading_gap_lines_for(node, analysis, owners: analysis.structural_owners)
+        return if lines.empty?
 
-        if (inline_comment = destination_inline_comment_for(node))
-          lines << promoted_inline_comment_line_for(node, @dest_analysis, inline_comment)
-        end
-
-        if (trailing_region = attachment&.trailing_region)
-          lines.concat(trailing_region.text.split("\n"))
-        end
-
-        trailing_gap = attachment&.trailing_gap
-        if trailing_gap && trailing_gap.effective_controller_side(removed_owners: [node]) == :after
-          lines.concat(trailing_gap.lines)
-        end
-
-        lines.compact
+        @result.add_raw(lines, decision: decision)
       end
 
-      def leading_segment_lines_for(node, analysis)
-        start_line = emission_start_line_for(node, analysis)
-        return [] unless start_line && start_line < node.start_line
+      def removed_destination_comment_lines_for(node)
+        inline_lines = []
 
-        (start_line...node.start_line).filter_map { |line_number| raw_line_at(analysis, line_number) }
+        if (inline_comment = destination_inline_comment_for(node))
+          inline_lines << promoted_inline_comment_line_for(node, @dest_analysis, inline_comment)
+        end
+
+        removed_owner_preserved_lines_for(
+          node,
+          @dest_analysis,
+          owners: @dest_analysis.structural_owners,
+          inline_lines: inline_lines
+        )
       end
 
       def interstitial_trailing_segment_lines_for(node, analysis)
-        return [] unless next_structural_owner_for(node, analysis)
-
-        trailing_region = analysis.comment_attachment_for(node)&.trailing_region
-        return [] unless trailing_region
-
-        trailing_region.text.split("\n")
+        interstitial_trailing_region_lines_for(node, analysis, owners: analysis.structural_owners)
       end
 
       def next_structural_owner_for(node, analysis)
@@ -568,6 +531,17 @@ module Dotenv
       def raw_line_at(analysis, line_number)
         line = analysis.line_at(line_number)
         line.respond_to?(:raw) ? line.raw : line
+      end
+
+      def leading_segment_anchor_line_for(node, analysis, owners: nil, leading_region: nil)
+        region_start = super(node, analysis, owners: owners || analysis.structural_owners, leading_region: leading_region)
+        preamble_start = analysis.comment_augmenter.preamble_region&.start_line if first_structural_owner?(node,
+                                                                                                           analysis)
+        region_start || preamble_start
+      end
+
+      def source_line_at(analysis, line_number)
+        raw_line_at(analysis, line_number)
       end
     end
   end

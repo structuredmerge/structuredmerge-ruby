@@ -6,6 +6,8 @@ module Ast
       # Builds shared blank-line gap objects and per-owner attachments from source
       # lines plus structural owner ranges.
       class Augmenter
+        include LineRangeSupport
+
         attr_reader :lines, :owners, :attachments_by_owner, :preamble_gap, :postlude_gap, :interstitial_gaps, :metadata
 
         class << self
@@ -151,16 +153,14 @@ module Ast
 
         def owner_start_line(owner)
           return @start_line_for.call(owner) if @start_line_for
-          return owner.start_line if owner.respond_to?(:start_line)
 
-          nil
+          object_start_line(owner)
         end
 
         def owner_end_line(owner)
           return @end_line_for.call(owner) if @end_line_for
-          return owner.end_line if owner.respond_to?(:end_line)
 
-          nil
+          object_end_line(owner)
         end
 
         def owner_line_reader_available?(owner, method_name, extractor)

@@ -11,11 +11,11 @@ module Kettle
         Usage:
           kettle-jem [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
           kettle-jem setup [PROJECT_ROOT] [--accept-config] [--bootstrap-mode] [--quiet|--verbose]
-          kettle-jem prepare [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force] [--quiet|--verbose]
-          kettle-jem plan [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem apply [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem template [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
-          kettle-jem install [PROJECT_ROOT] [--json] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem prepare [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force] [--quiet|--verbose]
+          kettle-jem plan [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem apply [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem template [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
+          kettle-jem install [PROJECT_ROOT] [--json|--events[=TYPE,...]] [--report PATH] [--accept|--force|--interactive] [--failure-mode MODE] [--prompt-answer ID=ACTION]
           kettle-jem manifest [PROJECT_ROOT] [--json]
           kettle-jem selftest [PROJECT_ROOT] [--json] [--report PATH] [--destination PATH] [--template-root PATH] [--selftest-output PATH]
           kettle-jem version
@@ -32,6 +32,7 @@ module Kettle
         project_root = File.expand_path(options.fetch(:project_root) || Dir.pwd)
         ensure_not_running_from_own_context!(command, project_root)
         print_debug_snapshot(command, project_root: project_root, env: env, err: err) if debug_enabled?(env)
+        options[:event_io] = out
         result = execute(command, project_root: project_root, env: env, options: options)
         write_report(options[:report_path], result) if options[:report_path]
         print_result(command, result, options: options, out: out)
@@ -69,11 +70,16 @@ module Kettle
       def parse_options(args)
         options = {
           json: false,
+          events: false,
           run_options: {}
         }
         parser = OptionParser.new do |opts|
           opts.banner = USAGE
           opts.on("--json", "Print the full machine-readable result as JSON.") { options[:json] = true }
+          opts.on("--events[=TYPES]", "Print newline-delimited JSON progress events. Optional comma-separated TYPES filter.") do |value|
+            options[:events] = true
+            options[:event_types] = value if value
+          end
           opts.on("--report PATH", "Write the full machine-readable result to PATH as JSON.") do |path|
             options[:report_path] = path
           end
@@ -131,6 +137,18 @@ module Kettle
           opts.on("--skip-commit", "Skip bootstrap commit behavior.") do
             options[:run_options][:skip_commit] = true
           end
+          opts.on("--skip-drift-check", "Skip post-apply duplicate drift checking.") do
+            options[:run_options][:skip_drift_check] = true
+          end
+          opts.on("--skip-duplicate-drift", "Alias for --skip-drift-check.") do
+            options[:run_options][:skip_drift_check] = true
+          end
+          opts.on("--skip-rubocop-gradual", "Skip post-template RuboCop Gradual autocorrect.") do
+            options[:run_options][:skip_rubocop_gradual] = true
+          end
+          opts.on("--skip-binstubs", "Skip post-template curated Bundler binstub generation.") do
+            options[:run_options][:skip_binstubs] = true
+          end
           opts.on("--accept-config", "Accept first-run template config bootstrap.") do
             options[:run_options][:accept_config] = true
           end
@@ -161,30 +179,37 @@ module Kettle
         end
         remaining = parser.parse(args)
         raise ArgumentError, "Expected at most one PROJECT_ROOT" if remaining.length > 1
+        raise OptionParser::InvalidOption, "--events cannot be combined with --json" if options[:events] && options[:json]
 
         options[:project_root] = remaining.first
         options
       end
 
       def execute(command, project_root:, env:, options:)
+        run_options = options.fetch(:run_options)
+        if options[:events]
+          run_options[:event_stream] = Kettle::Jem.event_stream(
+            options.fetch(:event_io),
+            types: options[:event_types]
+          )
+        end
         case command
         when "setup"
-          Kettle::Jem.setup_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.setup_project(project_root, env: env, run_options: run_options)
         when "prepare"
-          Kettle::Jem::Tasks::PrepareTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem::Tasks::PrepareTask.run(project_root: project_root, env: env, run_options: run_options)
         when "plan"
-          Kettle::Jem.plan_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.plan_project(project_root, env: env, run_options: run_options)
         when "apply"
-          Kettle::Jem.apply_project(project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem.apply_project(project_root, env: env, run_options: run_options)
         when "template"
-          run_options = options.fetch(:run_options)
           if scoped_template_run?(run_options)
             Kettle::Jem::Tasks::TemplateTask.run(project_root: project_root, env: env, run_options: run_options)
           else
             Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: run_options)
           end
         when "install"
-          Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: options.fetch(:run_options))
+          Kettle::Jem::Tasks::InstallTask.run(project_root: project_root, env: env, run_options: run_options)
         when "manifest"
           Kettle::Jem.template_manifest(project_root: project_root)
         when "selftest"
@@ -225,6 +250,7 @@ module Kettle
       end
 
       def print_result(command, result, options:, out:)
+        return if options[:events]
         return if options.fetch(:run_options, {})[:quiet] && !options[:json]
 
         if options[:json]
@@ -269,7 +295,7 @@ module Kettle
         err.puts("[kettle-jem] DEBUG: early environment snapshot")
         err.puts("  command=#{command.inspect}")
         err.puts("  project_root=#{project_root.inspect}")
-        %w[DEBUG KETTLE_JEM_DEBUG KETTLE_DEV_DEBUG KETTLE_RB_DEV BUNDLE_GEMFILE BUNDLE_PATH GEM_HOME GEM_PATH RUBYOPT RUBYLIB PWD].each do |key|
+        %w[DEBUG KETTLE_JEM_DEBUG KETTLE_DEV_DEBUG KETTLE_DEV_DEV BUNDLE_GEMFILE BUNDLE_PATH GEM_HOME GEM_PATH RUBYOPT RUBYLIB PWD].each do |key|
           err.puts("  #{key}=#{env_value(env, key).inspect}")
         end
       end

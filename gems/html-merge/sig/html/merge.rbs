@@ -1,0 +1,18 @@
+module Html
+  module Merge
+    VERSION: String
+    module Version
+      VERSION: String
+    end
+
+    def self.register_backend!: () -> nil
+    def self.html_feature_profile: () -> Hash[Symbol, untyped]
+    def self.available_html_backends: () -> Array[untyped]
+    def self.html_backend_feature_profile: (?backend: untyped) -> Hash[Symbol, untyped]
+    def self.html_plan_context: (?backend: untyped) -> Hash[Symbol, untyped]
+    def self.parse_html: (String source, ?String dialect, ?backend: untyped) -> Hash[Symbol, untyped]
+    def self.document_context: (content: String, ?source_label: String) -> untyped
+    def self.element_text_selector: (text: String, ?id: String?) -> untyped
+    def self.ensure_yard_content_wrapper: (String source) -> String
+  end
+end

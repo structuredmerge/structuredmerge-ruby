@@ -18,5 +18,7 @@ RSpec.describe Bash::Merge::SmartMerger, 'comment behavior matrix', :bash_gramma
         inline ? "#{line} # #{inline}" : line
       end
     )
+
+    it_behaves_like 'Ast::Merge::RetainedBlankGapCompliance'
   end
 end

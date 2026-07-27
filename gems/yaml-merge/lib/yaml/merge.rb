@@ -5,6 +5,7 @@ require_relative 'merge/version'
 
 require 'json'
 require 'tree_haver'
+require 'ast/merge'
 
 module Yaml
   module Merge
@@ -15,6 +16,18 @@ module Yaml
     }.freeze
     BACKEND_REFERENCE = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
     BACKEND_REGISTRY = Struct.new(:registered, :mutex).new(false, Mutex.new)
+
+    class Error < Ast::Merge::Error; end
+    class ParseError < Ast::Merge::ParseError; end
+    class TemplateParseError < ParseError; end
+    class DestinationParseError < ParseError; end
+
+    autoload :DebugLogger, 'yaml/merge/debug_logger'
+    autoload :Emitter, 'yaml/merge/emitter'
+    autoload :FileAnalysis, 'yaml/merge/file_analysis'
+    autoload :MergeResult, 'yaml/merge/merge_result'
+    autoload :NodeWrapper, 'yaml/merge/node_wrapper'
+    autoload :SmartMerger, 'yaml/merge/smart_merger'
 
     module_function
 
@@ -72,12 +85,13 @@ module Yaml
     def parse_yaml(source, dialect, backend: nil)
       return unsupported_feature_parse_result("Unsupported YAML dialect #{dialect}.") unless dialect == 'yaml'
 
-      resolved_backend = resolve_backend(backend)
-      unless resolved_backend == BACKEND_REFERENCE.id && yaml_backend_available_for_analysis?(resolved_backend)
-        return unsupported_feature_parse_result("Unsupported YAML backend #{resolved_backend}.")
+      requested = backend.to_s.empty? ? nil : backend.to_s
+      unless yaml_backend_available_for_analysis?(requested)
+        diagnostic_backend = requested || TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_parse_result("Unsupported YAML backend #{diagnostic_backend}.")
       end
 
-      tree = TreeHaver.with_backend(resolved_backend) { TreeHaver.parser_for(:yaml).parse(source) }
+      tree = parse_tree_sitter_source(:yaml, source, backend: requested)
       collect_parse_errors(tree.root_node)
 
       analyze_yaml_document(yaml_value_from_tree(tree.root_node, source), dialect)
@@ -121,17 +135,19 @@ module Yaml
     end
 
     def merge_yaml(template_source, destination_source, dialect, backend: nil)
-      resolved_backend = resolve_backend(backend)
-      unless resolved_backend == BACKEND_REFERENCE.id && yaml_backend_available_for_analysis?(resolved_backend)
-        return unsupported_feature_merge_result("Unsupported YAML backend #{resolved_backend}.")
+      requested = backend.to_s.empty? ? nil : backend.to_s
+      unless yaml_backend_available_for_analysis?(requested)
+        diagnostic_backend = requested || TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_merge_result("Unsupported YAML backend #{diagnostic_backend}.")
       end
 
-      merge_yaml_with_parser(template_source, destination_source, dialect) do |source, parse_dialect|
-        parse_yaml(source, parse_dialect, backend: resolved_backend)
+      merge_yaml_with_parser(template_source, destination_source, dialect,
+                             backend: requested) do |source, parse_dialect|
+        parse_yaml(source, parse_dialect, backend: requested)
       end
     end
 
-    def merge_yaml_with_parser(template_source, destination_source, dialect)
+    def merge_yaml_with_parser(template_source, destination_source, dialect, backend: nil)
       template = yield(template_source, dialect)
       return { ok: false, diagnostics: template[:diagnostics], policies: [] } unless template[:ok]
 
@@ -155,7 +171,14 @@ module Yaml
       {
         ok: true,
         diagnostics: [],
-        output: canonical_yaml(merge_yaml_mappings(template_document, destination_document)),
+        output: with_tree_sitter_backend(backend) do
+          SmartMerger.new(
+            template_source,
+            destination_source,
+            add_template_only_nodes: true,
+            merge_sequences: false
+          ).merge_result.to_yaml
+        end,
         policies: [DESTINATION_WINS_ARRAY_POLICY]
       }
     rescue StandardError => e
@@ -167,18 +190,42 @@ module Yaml
     end
 
     def resolve_backend(backend)
-      backend.to_s.empty? ? BACKEND_REFERENCE.id : backend.to_s
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? BACKEND_REFERENCE.id : contextual.to_s
     end
     private_class_method :resolve_backend
 
     def yaml_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == BACKEND_REFERENCE.id
 
-      registrations = TreeHaver.registered_languages(:yaml)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:yaml, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:yaml, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
     private_class_method :yaml_backend_available_for_analysis?
+
+    def parse_tree_sitter_source(language, source, backend: nil)
+      with_tree_sitter_backend(backend) do
+        TreeHaver.parser_for(language, backend_type: :tree_sitter).parse(source)
+      end
+    end
+    private_class_method :parse_tree_sitter_source
+
+    def with_tree_sitter_backend(backend, &block)
+      if backend.to_s.empty?
+        yield
+      else
+        TreeHaver.with_backend(backend, &block)
+      end
+    end
+    private_class_method :with_tree_sitter_backend
 
     def collect_parse_errors(node)
       raise TreeHaver::NotAvailable, 'YAML parse returned no root node' unless node

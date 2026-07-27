@@ -38,6 +38,7 @@ module Bash
       include ::Ast::Merge::TrailingGroups::DestIterate
       include ::Ast::Merge::Runtime::RootSessionSupport
       include ::Ast::Merge::StructuredEmitterProvenanceSupport
+      include ::Ast::Merge::CommentLayoutEmissionSupport
 
       # Creates a new SmartMerger for intelligent Bash script merging.
       #
@@ -224,6 +225,7 @@ module Bash
         dest_nodes = @dest_analysis.nodes
 
         emitter = Emitter.new
+        @emitted_preserved_line_numbers = Hash.new { |hash, key| hash[key] = [] }
 
         emit_root_boundary_to(emitter, :preamble)
 
@@ -495,9 +497,12 @@ module Bash
 
       def handle_destination_only_node(emitter, dest_node)
         if remove_template_missing_nodes
-          emit_leading_segment_to(emitter, dest_node, @dest_analysis)
-          emit_preserved_floating_gap_to(emitter, dest_node, @dest_analysis)
-          emit_promoted_inline_comment_to(emitter, dest_node, @dest_analysis)
+          lines = removed_destination_node_lines_for(dest_node, @dest_analysis)
+          if lines.any?
+            start_line = emission_start_line_for(dest_node, @dest_analysis)
+            emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(@dest_analysis, start_line))
+            mark_removed_destination_preserved_lines(dest_node, @dest_analysis)
+          end
         else
           emit_node_to(emitter, dest_node, @dest_analysis)
         end
@@ -518,49 +523,19 @@ module Bash
       end
 
       def root_boundary_lines_for(kind, analysis)
-        return [] unless analysis&.respond_to?(:statements)
-        if kind == :preamble && Array(analysis.statements).empty? && analysis.respond_to?(:lines) && analysis.lines.any?
-          return analysis.lines.dup
-        end
-
-        statements = Array(analysis.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.respond_to?(:end_line) && statement.start_line && statement.end_line
-        end
-        return [] if statements.empty?
-
-        case kind
-        when :preamble
-          first_statement = statements.min_by(&:start_line)
-          start_line = emission_start_line_for(first_statement, analysis)
-          return [] unless start_line && start_line > 1
-
-          (1...start_line).filter_map { |line_number| analysis.line_at(line_number) }
-        when :postlude
-          last_line = statements.map(&:end_line).compact.max
-          return [] unless last_line && analysis.respond_to?(:lines)
-          return [] if last_line >= analysis.lines.length
-
-          ((last_line + 1)..analysis.lines.length).filter_map { |line_number| analysis.line_at(line_number) }
-        else
-          []
-        end
+        super(kind, analysis, owners: analysis.nodes, fallback_to_owner_bounds: true)
       end
 
       def emission_start_line_for(node, analysis)
-        return unless node.respond_to?(:start_line) && node.start_line
+        region_start = region_start_line(leading_region_for(node, analysis))
+        comment_start = analysis.comment_tracker.leading_comments_before(node.start_line).first&.fetch(:line, nil)
+        preceding_blank_line_start(region_start || comment_start || node.start_line, analysis)
+      end
 
-        attachment = analysis.comment_attachment_for(node)
-        leading_region = attachment&.leading_region
-        start_line = if leading_region&.respond_to?(:start_line) && leading_region.start_line
-                       leading_region.start_line
-                     else
-                       leading_comments = analysis.comment_tracker.leading_comments_before(node.start_line)
-                       leading_comments.first&.fetch(:line, nil) || node.start_line
-                     end
+      def root_boundary_owner_start_line_for(node, analysis)
+        return node.start_line unless region_present?(leading_region_for(node, analysis))
 
-        start_line -= 1 while start_line > 1 && analysis.line_at(start_line - 1)&.strip == ''
-
-        start_line
+        emission_start_line_for(node, analysis)
       end
 
       # Emit the preferred version of a matched node pair.
@@ -568,10 +543,12 @@ module Bash
         pref = preference_for_pair(template_node, dest_node)
         record_unresolved_choice(template_node: template_node, dest_node: dest_node, provisional_winner: pref)
         if pref == :destination
+          emit_retained_leading_gap_to(emitter, dest_node, @dest_analysis)
           emit_node_to(emitter, dest_node, @dest_analysis)
         else
           comment_source_node, comment_source_analysis = preferred_comment_source_for(template_node, dest_node)
           inline_comment = preferred_inline_comment_for(template_node, dest_node)
+          emit_retained_leading_gap_to(emitter, dest_node, @dest_analysis)
           emit_node_to(
             emitter,
             template_node,
@@ -667,23 +644,12 @@ module Bash
           (node.respond_to?(:variable_assignment?) && node.variable_assignment?)
       end
 
-      def emit_promoted_inline_comment_to(emitter, node, analysis)
+      def promoted_inline_comment_lines_for(node, analysis)
         inline_comment = inline_comment_for(node, analysis)
-        return unless inline_comment && single_line_node?(node) && safe_inline_comment_node?(node)
+        return [] unless inline_comment && single_line_node?(node) && safe_inline_comment_node?(node)
 
         line = promoted_inline_comment_line_for(node, analysis, inline_comment)
-        emitter.emit_raw_lines([line], metadata: emitter_line_metadata(analysis, line_number: node.start_line)) if line
-      end
-
-      def emit_preserved_floating_gap_to(emitter, node, analysis)
-        attachment = analysis.comment_attachment_for(node)
-        return unless attachment&.leading_region
-
-        trailing_gap = attachment.trailing_gap
-        return unless trailing_gap
-        return unless trailing_gap.effective_controller_side(removed_owners: [node]) == :after
-
-        emitter.emit_raw_lines(trailing_gap.lines, metadata: emitter_block_metadata(analysis, trailing_gap.start_line))
+        line ? [line] : []
       end
 
       def promoted_inline_comment_line_for(node, analysis, inline_comment)
@@ -691,6 +657,21 @@ module Bash
         return unless raw_line
 
         "#{raw_line[/\A\s*/]}#{inline_comment[:raw].sub(/\A\s+/, '')}"
+      end
+
+      def removed_destination_node_lines_for(node, analysis)
+        removed_owner_preserved_lines_for(
+          node,
+          analysis,
+          owners: analysis.nodes,
+          inline_lines: promoted_inline_comment_lines_for(node, analysis)
+        )
+      end
+
+      def mark_removed_destination_preserved_lines(node, analysis)
+        @emitted_preserved_line_numbers[analysis.object_id].concat(
+          removed_owner_preserved_line_numbers_for(node, analysis, owners: analysis.nodes)
+        )
       end
 
       # Determine preference for a matched pair, respecting per-type overrides.
@@ -789,13 +770,28 @@ module Bash
       end
 
       def emit_leading_segment_to(emitter, node, analysis)
-        return unless node.respond_to?(:start_line) && node.start_line
+        line_numbers = leading_segment_line_numbers_for(node, analysis, owners: analysis.nodes)
+        emitted_line_numbers = @emitted_preserved_line_numbers[analysis.object_id]
+        line_numbers = line_numbers.reject { |line_number| emitted_line_numbers.include?(line_number) }
+        return if line_numbers.empty?
 
-        start_line = emission_start_line_for(node, analysis)
-        return unless start_line && start_line < node.start_line
-
-        lines = (start_line...node.start_line).filter_map { |line_number| analysis.line_at(line_number) }
+        lines = line_numbers.filter_map { |line_number| analysis.line_at(line_number) }
+        start_line = line_numbers.first
         emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, start_line))
+      end
+
+      def emit_retained_leading_gap_to(emitter, node, analysis)
+        gap = retained_owner_leading_gap_for(node, analysis)
+        return unless gap
+
+        emitted_line_numbers = @emitted_preserved_line_numbers[analysis.object_id]
+        line_numbers = (gap.start_line..gap.end_line).reject do |line_number|
+          emitted_line_numbers.include?(line_number)
+        end
+        return if line_numbers.empty?
+
+        lines = line_numbers.filter_map { |line_number| analysis.line_at(line_number) }
+        emitter.emit_raw_lines(lines, metadata: emitter_block_metadata(analysis, line_numbers.first))
       end
     end
   end

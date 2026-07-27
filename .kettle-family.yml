@@ -4,6 +4,8 @@ family:
   members_root: gems
 
 members:
+  exclude:
+    - "**/benchmarks/**"
   order:
     mode: dependency
     hints:
@@ -17,6 +19,7 @@ members:
       - bash-merge
       - dotenv-merge
       - rbs-merge
+      - html-merge
       - json-merge
       - yaml-merge
       - toml-merge
@@ -114,7 +117,7 @@ release:
   publish_command: bundle exec kettle-release
   env:
     GALTZO_FLOSS_DEV: false
-    KETTLE_RB_DEV: false
+    KETTLE_DEV_DEV: false
     STRUCTUREDMERGE_DEV: false
     TSLP_DEV: ""
   family_changelog:

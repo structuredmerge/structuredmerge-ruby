@@ -97,7 +97,7 @@ Gem::Specification.new do |spec|
   # Utilities
   spec.add_dependency 'citrus', '~> 3.0'
   spec.add_dependency 'parslet', '~> 2.0'
-  spec.add_dependency 'tree_sitter_language_pack', '>= 1.9.0.pre.rc.40', '< 2.0'
+  spec.add_dependency 'tree_sitter_language_pack', '>= 1.13.2', '< 2.0'
   spec.add_dependency('version_gem', '~> 1.1', '>= 1.1.9') # ruby >= 2.2.0
 
   # NOTE: It is preferable to list development dependencies in the gemspec due to increased

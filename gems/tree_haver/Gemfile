@@ -21,20 +21,14 @@ gemspec
 # Local workspace dependency wiring for *_local.gemfile overrides
 nomono_requirements = ['~> 1.0', '>= 1.0.8']
 gem 'nomono', *nomono_requirements, require: false # ruby >= 2.2
-# Use the StructuredMerge TSLP branch until upstream ships Ruby 4-compatible gem metadata.
-tslp_dev = ENV.fetch('TSLP_DEV', nil)
-tslp_declared_by_templating =
-  ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero? && !tslp_dev.to_s.empty?
-if !tslp_declared_by_templating && tslp_dev.to_s.empty?
-end
 
-# Modular sibling dependencies (env-switched inside each modular Gemfile)
-eval_gemfile 'gemfiles/modular/templating.gemfile'
+# Templating (env-switched: STRUCTUREDMERGE_DEV=/path/to/structuredmerge/ruby/gems for local paths)
+eval_gemfile 'gemfiles/modular/templating.gemfile' if ENV.fetch('K_JEM_TEMPLATING', 'false').casecmp('true').zero?
 
 # Debugging
 eval_gemfile 'gemfiles/modular/debug.gemfile'
 
-# Code Coverage (env-switched: KETTLE_RB_DEV=true for local paths)
+# Code Coverage (env-switched: KETTLE_DEV_DEV=true for local paths)
 eval_gemfile 'gemfiles/modular/coverage.gemfile'
 
 # Linting

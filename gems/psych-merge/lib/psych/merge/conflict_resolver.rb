@@ -24,6 +24,7 @@ module Psych
     class ConflictResolver < Ast::Merge::ConflictResolverBase
       include ::Ast::Merge::StructuredEmitterProvenanceSupport
       include ::Ast::Merge::TrailingGroups::DestIterate
+      include ::Ast::Merge::CommentLayoutEmissionSupport
 
       attr_reader :corruption_handling
 
@@ -2098,21 +2099,6 @@ module Psych
         return 0 unless anchor_line
 
         blank_line_count_before(anchor_line, analysis)
-      end
-
-      def blank_line_count_before(line_num, analysis)
-        count = 0
-        current = line_num - 1
-
-        while current >= 1
-          line = analysis.line_at(current)
-          break unless line && line.strip.empty?
-
-          count += 1
-          current -= 1
-        end
-
-        count
       end
 
       def mapping_entry_content_start_line(entry)

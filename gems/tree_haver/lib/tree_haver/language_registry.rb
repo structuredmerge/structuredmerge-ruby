@@ -108,6 +108,36 @@ module TreeHaver
       nil
     end
 
+    def with_registration(name, backend_type, **config)
+      key = name.to_sym
+      backend_key = backend_type.to_sym
+      original = nil
+      had_language = false
+      had_backend = false
+
+      @mutex.synchronize do
+        had_language = @registrations.key?(key)
+        had_backend = @registrations.fetch(key, {}).key?(backend_key)
+        original = @registrations.fetch(key, {})[backend_key]&.dup
+        @registrations[key] ||= {}
+        @registrations[key][backend_key] = config.compact
+        @cache.clear
+      end
+
+      yield
+    ensure
+      @mutex.synchronize do
+        if had_backend
+          @registrations[key][backend_key] = original
+        elsif had_language
+          @registrations[key].delete(backend_key)
+        else
+          @registrations.delete(key)
+        end
+        @cache.clear
+      end
+    end
+
     # Fetch registration entries for a language
     #
     # Returns all backend-specific configurations for a language.

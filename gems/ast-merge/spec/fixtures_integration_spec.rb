@@ -1750,11 +1750,15 @@ RSpec.describe Ast::Merge do
     )
     argument_counts = suite.cases.map(&:argument_count)
     structured_diff_count = suite.cases.count { |smoke_case| smoke_case.expected_output_kind == 'structured_diff' }
+    reviewable_output_case_count = suite.cases.count { |smoke_case| smoke_case.expected_output_fragments.any? }
+    real_source_pair_count = raw.fetch(:real_source_pairs).length
 
     expect(suite.driver_name).to eq(fixture.dig(:expected, :driver_name))
     expect(suite.cases.length).to eq(fixture.dig(:expected, :case_count))
     expect(argument_counts).to eq(fixture.dig(:expected, :argument_counts))
     expect(structured_diff_count).to eq(fixture.dig(:expected, :structured_diff_count))
+    expect(reviewable_output_case_count).to eq(fixture.dig(:expected, :reviewable_output_case_count))
+    expect(real_source_pair_count).to eq(fixture.dig(:expected, :real_source_pair_count))
   end
 
   it 'conforms to the slice-904 performance guardrails fixture' do

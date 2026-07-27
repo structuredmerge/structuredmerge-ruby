@@ -87,7 +87,7 @@ RSpec.describe TypeScript::Merge do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to eq(
       [{ severity: 'error', category: 'unsupported_feature',
-         message: 'Unsupported TypeScript backend kreuzberg-language-pack.' }]
+         message: 'Unsupported TypeScript backend tree-sitter.' }]
     )
   end
 end

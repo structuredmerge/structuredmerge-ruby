@@ -34,7 +34,9 @@ module Prism
       def call
         return @source if @source.empty?
 
-        parse_result = TreeHaver.parser_for(:ruby).parse(@source).parse_result
+        parse_result = TreeHaver.with_backend(Prism::Merge::BACKEND_REFERENCE.id) do
+          TreeHaver.parser_for(:ruby, backend_type: :prism).parse(@source).parse_result
+        end
         statements = parse_result.value.statements&.body&.compact || []
         return @source if statements.empty?
 

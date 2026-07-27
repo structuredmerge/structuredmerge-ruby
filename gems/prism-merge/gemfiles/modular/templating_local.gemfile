@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 # Local path overrides for templating development.
-# Loaded by the associated non-local gemfile when STRUCTUREDMERGE_DEV or KETTLE_RB_DEV
+# Loaded by the associated non-local gemfile when STRUCTUREDMERGE_DEV or KETTLE_DEV_DEV
 # is not "false".
 
-require 'nomono/bundler' unless defined?(Nomono)
+require 'nomono/bundler'
 
 structuredmerge_local_gems = %w[
   tree_haver
@@ -39,19 +39,14 @@ structuredmerge_local_gems = %w[
   ast-crispr-ruby-prism
 ]
 
-kettle_rb_local_gems = %w[
+kettle_dev_local_gems = %w[
   kettle-dev kettle-test kettle-soup-cover kettle-drift
 ]
 declared_gems = instance_variable_get(:@dependencies).to_a.map(&:name)
 structuredmerge_local_gems_to_eval = structuredmerge_local_gems - %w[prism-merge] - declared_gems
-kettle_rb_local_gems_to_eval = kettle_rb_local_gems - %w[prism-merge] - declared_gems
+kettle_dev_local_gems_to_eval = kettle_dev_local_gems - %w[prism-merge] - declared_gems
 
-tslp_dev = ENV.fetch('TSLP_DEV', nil)
-
-# export VENDORED_GEMS=
 platform :mri do
-  gem 'tree_sitter_language_pack', path: tslp_dev unless tslp_dev.to_s.empty?
-
   if ENV.fetch('STRUCTUREDMERGE_DEV', 'false').casecmp('false') != 0
     eval_nomono_gems(
       gems: structuredmerge_local_gems_to_eval,
@@ -63,11 +58,11 @@ platform :mri do
     )
   end
 
-  if ENV.fetch('KETTLE_RB_DEV', 'false').casecmp('false') != 0
+  if ENV.fetch('KETTLE_DEV_DEV', 'false').casecmp('false') != 0
     eval_nomono_gems(
-      gems: kettle_rb_local_gems_to_eval,
-      prefix: 'KETTLE_RB',
-      path_env: 'KETTLE_RB_DEV',
+      gems: kettle_dev_local_gems_to_eval,
+      prefix: 'KETTLE_DEV',
+      path_env: 'KETTLE_DEV_DEV',
       vendored_gems_env: 'VENDORED_GEMS',
       vendor_gem_dir_env: 'VENDOR_GEM_DIR',
       debug_env: 'KETTLE_DEV_DEBUG'

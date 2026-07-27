@@ -41,6 +41,8 @@ module Rbs
     # @see ConflictResolver
     # @see MergeResult
     class SmartMerger < ::Ast::Merge::SmartMergerBase
+      include ::Ast::Merge::CommentLayoutEmissionSupport
+
       attr_reader :corruption_handling
 
       # Creates a new SmartMerger for intelligent RBS file merging.
@@ -287,69 +289,8 @@ module Rbs
         true
       end
 
-      def root_boundary_lines_for(kind, analysis)
-        return [] unless analysis&.respond_to?(:comment_augmenter)
-
-        comment_only_lines = comment_only_boundary_lines_for(kind, analysis)
-        return comment_only_lines if comment_only_lines.any?
-
-        region = root_boundary_region(kind, analysis)
-        return [] unless region_present?(region)
-
-        start_line, end_line = root_boundary_range(kind, analysis, region)
-        return [] unless start_line && end_line
-        return [] if start_line > end_line
-
-        (start_line..end_line).filter_map { |line_number| analysis.line_at(line_number) }
-      end
-
-      def comment_only_boundary_lines_for(kind, analysis)
-        return [] unless kind == :preamble
-        return [] unless Array(analysis.statements).empty?
-        return [] unless analysis.respond_to?(:comment_nodes) && analysis.comment_nodes.any?
-
-        analysis.lines.dup
-      end
-
-      def root_boundary_region(kind, analysis)
-        augmenter = root_comment_augmenter_for(analysis)
-        return unless augmenter
-
-        kind == :preamble ? augmenter.preamble_region : augmenter.postlude_region
-      end
-
-      def root_comment_augmenter_for(analysis)
-        @root_comment_augmenters ||= {}
-        @root_comment_augmenters[analysis.object_id] ||= analysis.comment_augmenter(owners: analysis.statements)
-      end
-
-      def root_boundary_range(kind, analysis, region)
-        statements = Array(analysis.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.respond_to?(:end_line)
-        end
-
-        case kind
-        when :preamble
-          end_line = if statements.any?
-                       statements.map(&:start_line).compact.min.to_i - 1
-                     else
-                       analysis.lines.length
-                     end
-          [1, end_line]
-        when :postlude
-          start_line = if statements.any?
-                         statements.map(&:end_line).compact.max.to_i + 1
-                       else
-                         region.start_line || 1
-                       end
-          [start_line, analysis.lines.length]
-        end
-      end
-
       def first_statement_for(analysis)
-        Array(analysis&.statements)
-          .select { |statement| statement.respond_to?(:start_line) && statement.start_line }
-          .min_by(&:start_line)
+        first_owner_for(analysis)
       end
 
       def first_statement_has_leading_comments?(analysis)
@@ -375,6 +316,7 @@ module Rbs
           if entry[:template_decl].is_a?(FreezeNode)
             @result.add_freeze_block(entry[:template_decl])
           else
+            add_retained_leading_gap(entry[:dest_decl], @dest_analysis, decision: resolution[:decision])
             @result.add_from_template(
               entry[:template_index],
               decision: resolution[:decision],
@@ -386,6 +328,7 @@ module Rbs
           if entry[:dest_decl].is_a?(FreezeNode)
             @result.add_freeze_block(entry[:dest_decl])
           else
+            add_retained_leading_gap(entry[:dest_decl], @dest_analysis, decision: resolution[:decision])
             @result.add_from_destination(entry[:dest_index], decision: resolution[:decision])
           end
         when :recursive
@@ -426,36 +369,11 @@ module Rbs
       end
 
       def removed_declaration_comment_lines(decl, analysis)
-        attachment = analysis.comment_attachment_for(decl)
-        leading_region = leading_region_for(decl, analysis)
-        start_line = get_start_line(decl)
-        trailing_lines = if (trailing_region = attachment&.trailing_region)
-                           trailing_region.nodes.filter_map do |node|
-                             if node.respond_to?(:slice)
-                               node.slice.to_s
-                             elsif node.respond_to?(:text)
-                               node.text.to_s
-                             else
-                               node.to_s
-                             end
-                           end
-                         else
-                           []
-                         end
+        lines = removed_owner_preserved_lines_for(decl, analysis)
+        return lines if lines.any?
 
-        if region_present?(leading_region)
-          region_start = region_start_line(leading_region)
-          if region_start && start_line && region_start < start_line
-            leading_start = preceding_blank_line_start(region_start, analysis)
-            lines = (leading_start...start_line).filter_map { |ln| analysis.line_at(ln) }
-            lines.concat(trailing_lines)
-            trailing_gap = attachment&.trailing_gap
-            if trailing_gap&.effective_controller_side(removed_owners: [decl]) == :after
-              lines.concat(trailing_gap.lines)
-            end
-            return lines
-          end
-        elsif decl.respond_to?(:comment) && decl.comment
+        if decl.respond_to?(:comment) && decl.comment
+          start_line = get_start_line(decl)
           comment_start = decl.comment.location&.start_line
           if comment_start && start_line && comment_start < start_line
             return (comment_start...start_line).filter_map do |ln|
@@ -464,9 +382,15 @@ module Rbs
           end
         end
 
-        return trailing_lines if trailing_lines.any?
-
         []
+      end
+
+      def add_retained_leading_gap(decl, analysis, decision:)
+        lines = retained_owner_leading_gap_lines_for(decl, analysis)
+        return if lines.empty?
+        return if @result.blank_lines?(lines) && @result.ends_with_blank_line?
+
+        @result.add_raw(lines, decision: decision)
       end
 
       # Process recursive merge for container declarations
@@ -524,7 +448,7 @@ module Rbs
 
           if region_start && leading_end && region_start < leading_end
             leading_start = leading_segment_start_for_output(
-              output_decl: decl,
+              output_owner: decl,
               output_analysis: analysis,
               source_region_start: region_start,
               source_region: leading_region,
@@ -552,14 +476,15 @@ module Rbs
           end
         end
 
-        recursive_body_lines_for_declaration(
+        body_lines = recursive_body_lines_for_declaration(
           template_decl,
           dest_decl,
           decl,
           analysis,
           start_line: start_line,
           end_line: end_line
-        ).join("\n") + "\n"
+        )
+        body_lines.join("\n") + "\n"
       end
 
       def recursive_body_lines_for_declaration(template_decl, dest_decl, selected_decl, selected_analysis,
@@ -579,16 +504,19 @@ module Rbs
 
         if selected_members.empty?
           return empty_container_header_lines(selected_analysis, start_line: start_line, end_line: end_line) +
-                 merge_member_lines(template_members, dest_members) +
+                 merge_member_lines(template_members, dest_members, template_owners: template_members,
+                                                                    dest_owners: dest_members) +
                  empty_container_footer_lines(selected_analysis, start_line: start_line, end_line: end_line)
         end
 
         container_header_lines(selected_decl, selected_analysis) +
-          merge_member_lines(template_members, dest_members) +
+          merge_member_lines(template_members, dest_members, template_owners: template_members,
+                                                             dest_owners: dest_members) +
           container_footer_lines(selected_decl, selected_analysis)
       end
 
-      def merge_member_lines(template_members, dest_members)
+      def merge_member_lines(template_members, dest_members, template_owners: nil, dest_owners: nil)
+        emitted_preserved_destination_lines = Set.new
         align_member_lists(template_members, dest_members).each_with_object([]) do |entry, lines|
           case entry[:type]
           when :match
@@ -602,15 +530,30 @@ module Rbs
             case resolution[:source]
             when :template
               lines.concat(
+                retained_member_leading_gap_lines(
+                  entry[:dest_decl],
+                  dest_owners: dest_owners,
+                  emitted_preserved_destination_lines: emitted_preserved_destination_lines
+                )
+              )
+              lines.concat(
                 extract_statement_lines_with_leading_comments(
                   entry[:template_decl],
                   @template_analysis,
                   comment_source_statement: entry[:dest_decl],
-                  comment_source_analysis: @dest_analysis
+                  comment_source_analysis: @dest_analysis,
+                  owners: template_owners,
+                  comment_source_owners: dest_owners
                 )
               )
             when :destination
-              lines.concat(extract_statement_lines_with_leading_comments(entry[:dest_decl], @dest_analysis))
+              lines.concat(
+                extract_statement_lines_with_leading_comments(
+                  entry[:dest_decl],
+                  @dest_analysis,
+                  owners: dest_owners
+                )
+              )
             when :recursive
               lines.concat(
                 reconstruct_declaration_with_merged_members(
@@ -624,14 +567,41 @@ module Rbs
           when :template_only
             next unless @add_template_only_nodes
 
-            lines.concat(extract_statement_lines_with_leading_comments(entry[:template_decl], @template_analysis))
+            lines.concat(
+              extract_statement_lines_with_leading_comments(
+                entry[:template_decl],
+                @template_analysis,
+                owners: template_owners
+              )
+            )
           when :dest_only
             if @remove_template_missing_nodes
-              lines.concat(removed_declaration_comment_lines(entry[:dest_decl], @dest_analysis))
+              preserved_lines = removed_declaration_comment_lines(entry[:dest_decl], @dest_analysis)
+              lines.concat(preserved_lines)
+              emitted_preserved_destination_lines.merge(
+                removed_owner_preserved_line_numbers_for(entry[:dest_decl], @dest_analysis, owners: dest_owners)
+              )
             else
-              lines.concat(extract_statement_lines_with_leading_comments(entry[:dest_decl], @dest_analysis))
+              lines.concat(
+                extract_statement_lines_with_leading_comments(
+                  entry[:dest_decl],
+                  @dest_analysis,
+                  owners: dest_owners
+                )
+              )
             end
           end
+        end
+      end
+
+      def retained_member_leading_gap_lines(decl, dest_owners:, emitted_preserved_destination_lines:)
+        gap = retained_owner_leading_gap_for(decl, @dest_analysis, owners: dest_owners)
+        return [] unless gap
+
+        (gap.start_line..gap.end_line).filter_map do |line_number|
+          next if emitted_preserved_destination_lines.include?(line_number)
+
+          @dest_analysis.line_at(line_number)
         end
       end
 
@@ -780,7 +750,8 @@ module Rbs
       end
 
       def extract_statement_lines_with_leading_comments(statement, analysis, comment_source_statement: nil,
-                                                        comment_source_analysis: nil)
+                                                        comment_source_analysis: nil, owners: nil,
+                                                        comment_source_owners: nil)
         start_line = get_start_line(statement)
         return [] unless start_line
 
@@ -788,7 +759,9 @@ module Rbs
           statement,
           analysis,
           comment_source_decl: comment_source_statement,
-          comment_source_analysis: comment_source_analysis
+          comment_source_analysis: comment_source_analysis,
+          owners: owners,
+          comment_source_owners: comment_source_owners
         )
 
         leading_lines = if leading_region && leading_statement
@@ -797,7 +770,7 @@ module Rbs
 
                           if region_start && leading_end && region_start < leading_end
                             leading_start = leading_segment_start_for_output(
-                              output_decl: statement,
+                              output_owner: statement,
                               output_analysis: analysis,
                               source_region_start: region_start,
                               source_region: leading_region,
@@ -813,7 +786,24 @@ module Rbs
                           []
                         end
 
-        leading_lines + extract_raw_statement_lines(statement, analysis)
+        leading_gap_lines = if leading_lines.empty?
+                              layout_gap_lines_for(statement, analysis, side: :leading,
+                                                                        owners: owners)
+                            else
+                              []
+                            end
+
+        leading_gap_lines + leading_lines + extract_raw_statement_lines(statement, analysis)
+      end
+
+      def layout_gap_lines_for(statement, analysis, side:, owners: nil)
+        return [] unless statement && analysis&.respond_to?(:comment_attachment_for)
+
+        attachment = analysis.comment_attachment_for(statement, owners: owners)
+        gap = side == :leading ? attachment.leading_gap : attachment.trailing_gap
+        return [] unless gap&.controls_output_for?(statement)
+
+        gap.lines
       end
 
       def empty_container_header_lines(analysis, start_line:, end_line:)
@@ -836,6 +826,9 @@ module Rbs
 
         start_line = get_start_line(decl)
         end_line = get_start_line(first_member) - 1
+        leading_region = leading_region_for(first_member, analysis, owners: members)
+        leading_start = region_start_line(leading_region) if region_present?(leading_region)
+        end_line = leading_start - 1 if leading_start && leading_start <= end_line
         return [] unless start_line && end_line && start_line <= end_line
 
         (start_line..end_line).map { |ln| analysis.line_at(ln) }
@@ -853,12 +846,14 @@ module Rbs
         (start_line..end_line).map { |ln| analysis.line_at(ln) }
       end
 
-      def preferred_leading_region(decl, analysis, comment_source_decl: nil, comment_source_analysis: nil)
-        primary_region = leading_region_for(decl, analysis)
+      def preferred_leading_region(decl, analysis, comment_source_decl: nil, comment_source_analysis: nil,
+                                   owners: nil, comment_source_owners: nil)
+        primary_region = leading_region_for(decl, analysis, owners: owners)
         return [primary_region, analysis, decl] if region_present?(primary_region)
 
         if comment_source_decl && comment_source_analysis
-          source_region = leading_region_for(comment_source_decl, comment_source_analysis)
+          source_region = leading_region_for(comment_source_decl, comment_source_analysis,
+                                             owners: comment_source_owners)
           return [source_region, comment_source_analysis, comment_source_decl] if region_present?(source_region)
         end
 
@@ -880,7 +875,7 @@ module Rbs
         return [] unless region_start && statement_start && region_start < statement_start
 
         leading_start = leading_segment_start_for_output(
-          output_decl: statement,
+          output_owner: statement,
           output_analysis: analysis,
           source_region_start: region_start,
           source_region: leading_region,
@@ -889,107 +884,6 @@ module Rbs
         lines = (leading_start...statement_start).filter_map { |line_number| analysis.line_at(line_number) }
         comments, = leading_standalone_comment_run(lines.join("\n"))
         comments
-      end
-
-      def leading_region_for(decl, analysis)
-        return unless decl && analysis&.respond_to?(:comment_attachment_for)
-
-        attachment = analysis.comment_attachment_for(decl)
-        attachment.leading_region if attachment.respond_to?(:leading_region)
-      end
-
-      def region_present?(region)
-        return false unless region
-        return !region.empty? if region.respond_to?(:empty?)
-        return region.nodes.any? if region.respond_to?(:nodes)
-
-        true
-      end
-
-      def region_start_line(region)
-        return region.start_line if region.respond_to?(:start_line) && region.start_line
-        return unless region.respond_to?(:nodes)
-
-        region.nodes.filter_map { |node| node.respond_to?(:line_number) ? node.line_number : nil }.min
-      end
-
-      def preceding_blank_line_start(region_start, analysis)
-        line_num = region_start
-        while line_num > 1
-          previous_line = analysis.line_at(line_num - 1)
-          break unless previous_line && previous_line.strip.empty?
-
-          line_num -= 1
-        end
-
-        line_num
-      end
-
-      def leading_segment_start_for_output(output_decl:, output_analysis:, source_region_start:, source_analysis:,
-                                           source_region: nil)
-        source_region_start - desired_blank_line_count_before_leading_region(
-          output_decl: output_decl,
-          output_analysis: output_analysis,
-          source_region_start: source_region_start,
-          source_region: source_region,
-          source_analysis: source_analysis
-        )
-      end
-
-      def desired_blank_line_count_before_leading_region(output_decl:, output_analysis:, source_region_start:,
-                                                         source_analysis:, source_region: nil)
-        target_region = leading_region_for(output_decl, output_analysis)
-        target_region_start = region_start_line(target_region)
-        output_start_line = get_start_line(output_decl)
-
-        if target_region_start && output_start_line && target_region_start < output_start_line
-          blank_line_count_before(target_region_start, output_analysis)
-        elsif source_region && previous_statement_trailing_region_matches?(output_decl, output_analysis, source_region)
-          0
-        else
-          blank_line_count_before(source_region_start, source_analysis)
-        end
-      end
-
-      def blank_line_count_before(line_num, analysis)
-        count = 0
-        current = line_num - 1
-
-        while current >= 1
-          previous_line = analysis.line_at(current)
-          break unless previous_line && previous_line.strip.empty?
-
-          count += 1
-          current -= 1
-        end
-
-        count
-      end
-
-      def previous_statement_trailing_region_matches?(decl, analysis, source_region)
-        previous_decl = previous_statement_for(decl, analysis)
-        return false unless previous_decl
-
-        previous_trailing_region = analysis.comment_attachment_for(previous_decl)&.trailing_region
-        regions_equivalent?(previous_trailing_region, source_region)
-      end
-
-      def previous_statement_for(decl, analysis)
-        statements = Array(analysis&.statements).select do |statement|
-          statement.respond_to?(:start_line) && statement.start_line
-        end
-        index = statements.index(decl)
-        return unless index && index.positive?
-
-        statements[index - 1]
-      end
-
-      def regions_equivalent?(left, right)
-        return false unless left && right
-
-        left.respond_to?(:normalized_content) &&
-          right.respond_to?(:normalized_content) &&
-          left.normalized_content == right.normalized_content
       end
 
       STANDALONE_RBS_COMMENT_LINE_RE = /\A\s*#.*\z/

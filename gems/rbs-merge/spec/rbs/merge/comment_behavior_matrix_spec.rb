@@ -19,5 +19,7 @@ RSpec.describe Rbs::Merge::SmartMerger, 'comment behavior matrix' do
         quoted_hash_inline_literals: 'intentional syntax limit: quoted hash-inline comment scenarios do not exist in RBS syntax, so this is not a pending matrix gap'
       }
     )
+
+    it_behaves_like 'Ast::Merge::RetainedBlankGapCompliance'
   end
 end

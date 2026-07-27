@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
 require "kettle/jem/cli"
 require "stringio"
 
@@ -138,6 +137,52 @@ RSpec.describe Kettle::Jem::CLI do
     end
   end
 
+  it "emits newline-delimited JSON template events" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+      })
+
+      status, out, err = run_cli(["plan", root, "--accept", "--events"])
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      events = out.lines.map { |line| JSON.parse(line) }
+      expect(events.first).to include("event_version" => 1, "type" => "run_start", "mode" => "plan")
+      expect(events).to include(include("type" => "phase_start", "phase" => "recipes"))
+      expect(events).to include(include("type" => "phase_finish", "phase" => "recipes", "status" => "ok"))
+      expect(events).to include(include("type" => "recipe", "path" => Kettle::Jem::KETTLE_CONFIG_PATH))
+      expect(events.last).to include("type" => "summary", "mode" => "plan")
+    end
+  end
+
+  it "filters newline-delimited JSON events by type" do
+    Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
+      write_tree(root, {
+        "example.gemspec" => <<~RUBY
+          Gem::Specification.new do |spec|
+            spec.name = "example"
+            spec.summary = "Example gem"
+            spec.required_ruby_version = ">= 4.0"
+          end
+        RUBY
+      })
+
+      status, out, err = run_cli(["plan", root, "--accept", "--events=recipe,summary"])
+
+      expect(status).to eq(0)
+      expect(err).to eq("")
+      events = out.lines.map { |line| JSON.parse(line) }
+      expect(events.map { |event| event.fetch("type") }.uniq).to contain_exactly("recipe", "summary")
+    end
+  end
+
   it "maps old executable option semantics into the shared report contract" do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       write_tree(root, {
@@ -171,7 +216,10 @@ RSpec.describe Kettle::Jem::CLI do
         "Gemfile,Rakefile",
         "--include",
         "gemfiles/modular/**",
-        "--skip-commit"
+        "--skip-commit",
+        "--skip-drift-check",
+        "--skip-rubocop-gradual",
+        "--skip-binstubs"
       ])
 
       expect(status).to eq(0)
@@ -188,6 +236,9 @@ RSpec.describe Kettle::Jem::CLI do
         only: ["Gemfile", "Rakefile"],
         include: ["gemfiles/modular/**"],
         skip_commit: true,
+        skip_drift_check: true,
+        skip_rubocop_gradual: true,
+        skip_binstubs: true,
         accept_config: true,
         bootstrap_mode: true,
         template_profile: "",
@@ -273,7 +324,14 @@ RSpec.describe Kettle::Jem::CLI do
       )
       allow(Kettle::Jem::Tasks::TemplateTask).to receive(:run)
 
-      status, out, err = run_cli(["template", root, "--skip-commit"], env: {"K_JEM_TEMPLATING" => "true"})
+      status, out, err = run_cli([
+        "template",
+        root,
+        "--skip-commit",
+        "--skip-drift-check",
+        "--skip-rubocop-gradual",
+        "--skip-binstubs"
+      ], env: {"K_JEM_TEMPLATING" => "true"})
 
       expect(status).to eq(0)
       expect(err).to eq("")
@@ -281,7 +339,12 @@ RSpec.describe Kettle::Jem::CLI do
       expect(Kettle::Jem::Tasks::InstallTask).to have_received(:run).with(
         project_root: root,
         env: {"K_JEM_TEMPLATING" => "true"},
-        run_options: include(skip_commit: true)
+        run_options: include(
+          skip_commit: true,
+          skip_drift_check: true,
+          skip_rubocop_gradual: true,
+          skip_binstubs: true
+        )
       )
       expect(Kettle::Jem::Tasks::TemplateTask).not_to have_received(:run)
     end
@@ -340,14 +403,14 @@ RSpec.describe Kettle::Jem::CLI do
     Dir.mktmpdir("kettle-jem-cli", tmp_root) do |root|
       allow(Kettle::Jem).to receive(:plan_project).and_raise(Kettle::Jem::Error, "debug failure")
 
-      status, out, err = run_cli(["plan", root, "--quiet"], env: {"DEBUG" => "true", "KETTLE_RB_DEV" => "true"})
+      status, out, err = run_cli(["plan", root, "--quiet"], env: {"DEBUG" => "true", "KETTLE_DEV_DEV" => "true"})
 
       expect(status).to eq(1)
       expect(out).to eq("")
       expect(err).to include("[kettle-jem] DEBUG: early environment snapshot")
       expect(err).to include("command=\"plan\"")
       expect(err).to include("DEBUG=\"true\"")
-      expect(err).to include("KETTLE_RB_DEV=\"true\"")
+      expect(err).to include("KETTLE_DEV_DEV=\"true\"")
       expect(err).to include("Kettle::Jem::Error: debug failure")
       expect(err).to include("kettle/jem/cli.rb")
     end

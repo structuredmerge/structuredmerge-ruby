@@ -20,17 +20,38 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Added
 
+- `ast-crispr` now provides `Ast::Crispr::DeleteBatch` for deleting matches from
+  multiple structural selectors through one parsed document context.
+- Added `html-merge` as a StructuredMerge Ruby family member with TreeHaver
+  HTML parsing, feature profile reporting, and an initial ast-crispr-backed HTML
+  structural edit adapter.
 - TreeHaver RSpec dependency tags now support parser capability checks, and
   `ruby-merge` exposes TSLP Ruby capability tags for import records, top-level
   call records, and namespace-form equivalence.
+- `kettle-jem` benchmark results now include README timing breakdowns for both
+  the baseline and fastest non-baseline variant.
 
 ### Changed
 
+- `kettle-jem` now migrates existing SimpleCov bootstrap files for packaged
+  monorepo subgems even when the selected template profile does not otherwise
+  manage per-gem harness files.
 - `kettle-jem` RuboCop guidance now treats `.rubocop_gradual.lock` as a work
   list rather than a baseline, and documents explicit config and inline
   exceptions for intentional style deviations.
 - Current CI now detects changed monorepo gems and runs each changed gem's own
   `kettle-test` suite instead of installing the root aggregate bundle.
+- `kettle-jem` templating now defaults no-option runs to classified thread
+  planning and file work with half of the available CPU cores.
+- `kettle-jem` Ractor-backed file work now batches file units by worker count
+  instead of spawning one Ractor per file.
+- `kettle-jem` README processing now reuses structural owner scans and batches
+  several Markdown deletions to reduce repeated parser passes.
+- `kettle-jem` main Gemfile templating now removes repeated direct sibling
+  execution blocks left behind by older `nomono` bootstrap output while applying
+  the simplified `require "nomono/bundler"` loader.
+- `smorg-rb` diff-driver output now appends a unified review hunk with exact
+  removed and added source text after the semantic structured-diff summary.
 - Retemplated generated project metadata, support documentation, CI workflows,
   binstubs, and development dependency floors across the StructuredMerge Ruby
   gem family with `kettle-jem` v7.0.0.
@@ -39,12 +60,38 @@ Please file a bug if you notice a violation of semantic versioning.
   on bespoke workspace scripts.
 - `kettle-jem` gem templates now require `kettle-dev` 2.0.8 or newer.
 - `ast-merge` now requires `token-resolver` 2.0.1 or newer.
-- Gems that use `tree_sitter_language_pack` now resolve it through the
-  StructuredMerge Ruby 4-compatible fork branch in their development Gemfiles
-  until an upstream Ruby 4-compatible release is available.
+- `ast-merge` now provides shared comment/layout emission helpers for root
+  boundary text, leading segments, retained blank lines, and equivalent-region
+  ownership checks, and RBS, Bash, dotenv, and Psych merges now use that common
+  path where their semantics are format-neutral. Those helpers reuse shared
+  line-range normalization instead of duplicating owner location handling.
+- RBS, Bash, and dotenv removal-mode comment promotion now uses the shared
+  `ast-merge` removed-owner preservation path for leading segments, trailing
+  regions, and fallback layout gaps.
+- `ast-merge` now provides shared source-region report helpers for comment-block
+  attachment and blank interstitial ownership, and `ruby-merge` uses those
+  helpers for its Ruby fixture/report APIs instead of carrying local copies of
+  format-neutral ownership mechanics. The shared helpers now also cover
+  interstitial region construction, public owner projection, source spans,
+  source content slices, and attached leading comment regions.
+- `kettle-jem` benchmark runs now support `--only` and
+  `KETTLE_JEM_BENCHMARK_ONLY` selectors so combined worker variants can be
+  measured without also running planning-only and file-only split variants.
+- Root architecture specs now guard merge emission files against new ad hoc
+  comment or blank-line ownership scans, keeping the remaining cleanup debt
+  explicit while shared ast-merge attachment and layout helpers are adopted.
+- Development Gemfiles for gems that use `tree_sitter_language_pack` now default
+  to the StructuredMerge fork branch with the Ruby ABI platform-gem fix until
+  that fix is released upstream.
 - Structured merge gems now fail closed when no registered TreeHaver backend is
   available instead of falling back to direct parser-library paths outside the
   TreeHaver and ast-merge stack.
+- `TreeHaver.parser_for` now accepts backend-type and contract constraints so
+  substrate gems can request normalized tree-sitter semantics without being
+  hijacked by parser-specific provider gems registered for the same language.
+- `yaml-merge` now routes merge emission through TreeHaver/TSLP-backed AST
+  owners and ast-merge result mechanics instead of canonicalizing merged YAML
+  through Ruby object rendering.
 
 ### Deprecated
 
@@ -55,6 +102,41 @@ Please file a bug if you notice a violation of semantic versioning.
 
 ### Fixed
 
+- TreeHaver now smoke-tests `tree_sitter_language_pack` parser execution for the
+  requested language before registering the TSLP backend, so broken native gem
+  artifacts fail closed with a useful reason instead of surfacing parser
+  self-conversion `TypeError`s during JSON merges.
+- `json-merge` file analysis now registers its TreeHaver JSON backend before
+  direct parsing, preventing templating from failing with `No parser registered
+  for json` when JSON smart merges instantiate file analysis directly.
+- RBS recursive member merges no longer duplicate destination-owned comments
+  before matched nested declarations across repeated templating runs.
+- RBS merges now preserve retained declaration and nested member blank-line
+  gaps, preventing templating from compacting existing `.rbs` whitespace.
+- Bash merges now preserve floating first-owner and removed-node comment gaps,
+  and avoid duplicating a comment block that was already promoted from a removed
+  destination-only node.
+- Bash and RBS removal-mode merges no longer duplicate a blank gap when a
+  removed destination-only owner preserves the same gap later seen as a retained
+  matched owner's leading gap.
+- Bash, dotenv, and RBS merges now share a retained blank-gap compliance
+  contract and preserve destination-owned blank gaps between retained matched
+  owners, including template-preferred matched output.
+- RBS recursive member merges now use a shared retained blank-gap contract and
+  preserve destination-owned nested member separators when template-preferred
+  member bodies are emitted.
+- TOML template-preferred merges now preserve destination-owned retained blank
+  gaps for matched top-level keys and keys inside matched tables.
+- JSON template-preferred merges now preserve destination-owned retained blank
+  gaps for matched top-level and nested object pairs.
+- Ruby merges now preserve destination-owned retained blank gaps between matched
+  top-level declarations when emitting TSLP-backed merge results.
+- YAML merges now preserve comments, blank lines, anchors, aliases,
+  multi-document separators, and scalar spelling for the shared formatting
+  preservation fixture while retaining destination-owned sequence values.
+- Markdown backend feature fixtures now account for optional provider backends
+  that are only available after their provider gems register concrete TreeHaver
+  integrations in the current process.
 - Ast-merge changed-gem CI no longer times out or fails when exercising
   isolated fixture integrations that require Prism-backed Ruby merging.
 - Changed-gem CI suites now pass in isolated gem bundles by loading required
@@ -65,6 +147,9 @@ Please file a bug if you notice a violation of semantic versioning.
   template-only direct methods during scoped intra-owner declaration merges.
 - TreeHaver now normalizes nested object fields from tree-sitter-language-pack
   process results, including span objects, before building parser analysis.
+- `bash-merge` now routes explicit `parser_path:` overrides through scoped
+  TreeHaver language registration instead of passing parser library paths
+  directly to parser construction.
 
 - Byte-offset rewrites in `kettle-jem` and `prism-merge` now splice source with
   byte-aware slicing so non-ASCII content before an edited AST node does not
@@ -82,7 +167,7 @@ Please file a bug if you notice a violation of semantic versioning.
 - `kettle-jem` JRuby 9.4 workflow templates now install RubyGems 3.6.9 and
   Bundler 2.6.9 instead of using the default JRuby toolchain.
 - Local template stack reinstalls now uninstall the selected StructuredMerge Ruby
-  gems before reinstalling them, and no longer install sibling `kettle-rb` or
+  gems before reinstalling them, and no longer install sibling `kettle-dev` or
   `galtzo-floss` gems by default.
 - Ruby merges now place template-only top-level nodes at their template anchor by
   default instead of appending them to the destination tail.
@@ -102,6 +187,10 @@ Please file a bug if you notice a violation of semantic versioning.
   raising during recursive merge policy checks.
 - `kettle-jem` now normalizes GitHub Actions pins for all existing workflow
   files after templating, including workflows outside the active recipe set.
+- `kettle-jem install` now completes raw `bundle gem` skeleton bootstrap by
+  generating the modular Gemfiles required by the generated Gemfile before
+  running setup, and skips RuboCop Gradual autocorrect when the destination does
+  not define that task.
 
 ### Security
 

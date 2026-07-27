@@ -254,6 +254,41 @@ RSpec.describe 'Ruby::Merge' do
     expect(result.dig(:merge_planning, :intra_owner_merges, :strategy)).to eq('destination_wins_scoped_owner_body')
   end
 
+  it 'preserves destination-owned blank gaps between retained top-level Ruby owners' do
+    template_source = <<~RUBY
+      class Existing
+      end
+
+      class Kept
+      end
+    RUBY
+    destination_source = "class Existing\nend\n\n\nclass Kept\nend\n"
+    template_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [
+        process_item(kind: 'class', name: 'Existing', start_row: 0, end_row: 1),
+        process_item(kind: 'class', name: 'Kept', start_row: 3, end_row: 4)
+      ],
+      imports: []
+    )
+    destination_process = RubyMergeSpecProcessAnalysis.new(
+      structure: [
+        process_item(kind: 'class', name: 'Existing', start_row: 0, end_row: 1),
+        process_item(kind: 'class', name: 'Kept', start_row: 4, end_row: 5)
+      ],
+      imports: []
+    )
+
+    allow(RUBY_MERGE).to receive(:parse_ruby) do |source, dialect|
+      expect(dialect).to eq('ruby')
+      ruby_parse_result(source, source == template_source ? template_process : destination_process)
+    end
+
+    result = RUBY_MERGE.merge_ruby(template_source, destination_source, 'ruby')
+
+    expect(result[:ok]).to be(true)
+    expect(result[:output]).to eq(destination_source)
+  end
+
   it 'fails closed when the TSLP-backed Ruby merge sees unmodeled top-level content' do
     template_source = <<~RUBY
       class Existing

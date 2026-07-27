@@ -97,6 +97,7 @@ Gem::Specification.new do |spec|
   # Utilities
   spec.add_dependency 'ast-merge', "= #{spec.version}"
   spec.add_dependency 'ast-merge-git', "= #{spec.version}"
+  spec.add_dependency('diff-lcs', '~> 1.5')
   spec.add_dependency 'go-merge', "= #{spec.version}"
   spec.add_dependency 'json-merge', "= #{spec.version}"
   spec.add_dependency 'kettle-jem', "= #{spec.version}"

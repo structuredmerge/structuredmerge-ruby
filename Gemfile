@@ -1,26 +1,17 @@
-kettle_rb_dev = ENV.fetch("KETTLE_RB_DEV", "false")
+kettle_dev_dev = ENV.fetch("KETTLE_DEV_DEV", "false")
 
 source "https://rubygems.org"
 
-tslp_dev = ENV.fetch("TSLP_DEV", nil)
-if tslp_dev.to_s.empty?
-  gem(
-    "tree_sitter_language_pack",
-    git: "https://github.com/structuredmerge/tree-sitter-language-pack.git",
-    branch: "fix/ruby-parser-api-methods",
-    glob: "packages/ruby/*.gemspec",
-  )
-else
-  gem "tree_sitter_language_pack", path: tslp_dev
-end
+# Use released TSLP with the Ruby ABI platform-gem fix.
+gem "tree_sitter_language_pack", "~> 1.13", ">= 1.13.3"
 
-unless kettle_rb_dev.casecmp("false").zero?
+unless kettle_dev_dev.casecmp("false").zero?
   require "nomono/bundler"
 
   eval_nomono_gems(
     gems: %w[kettle-dev kettle-family kettle-test],
-    prefix: "KETTLE_RB",
-    path_env: "KETTLE_RB_DEV",
+    prefix: "KETTLE_DEV",
+    path_env: "KETTLE_DEV_DEV",
     vendored_gems_env: "VENDORED_GEMS",
     vendor_gem_dir_env: "VENDOR_GEM_DIR",
     debug_env: "KETTLE_DEV_DEBUG",
@@ -79,10 +70,10 @@ gem "appraisal2", "~> 3.1", ">= 3.1.1"
 
 gem "bundler-audit", "~> 0.9.3"
 
-if kettle_rb_dev.casecmp("false").zero?
+if kettle_dev_dev.casecmp("false").zero?
   gem "kettle-dev", "~> 2.2", ">= 2.2.25"
 
-  gem "kettle-family", ">= 1.0.0"
+  gem "kettle-family", ">= 1.0.4"
 
   gem "kettle-test", "~> 2.0", ">= 2.0.11"
 end

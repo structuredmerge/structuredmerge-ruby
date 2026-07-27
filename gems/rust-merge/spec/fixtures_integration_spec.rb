@@ -78,7 +78,7 @@ RSpec.describe Rust::Merge do
     expect(result[:ok]).to be(false)
     expect(result[:diagnostics]).to eq(
       [{ severity: 'error', category: 'unsupported_feature',
-         message: 'Unsupported Rust backend kreuzberg-language-pack.' }]
+         message: 'Unsupported Rust backend tree-sitter.' }]
     )
   end
 end

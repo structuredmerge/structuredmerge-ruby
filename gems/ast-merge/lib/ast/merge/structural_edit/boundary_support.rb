@@ -12,6 +12,7 @@ module Ast
       # (`start_line` / `end_line` or `source_position`).
       module BoundarySupport
         extend self
+        include LineRangeSupport
 
         # Build a boundary descriptor for a surviving statement adjacent to a splice.
         #
@@ -67,11 +68,7 @@ module Ast
         # @param statement [Object]
         # @return [Integer, nil]
         def statement_start_line(statement)
-          if statement.respond_to?(:start_line)
-            statement.start_line
-          elsif statement.respond_to?(:source_position)
-            statement.source_position&.dig(:start_line)
-          end
+          object_start_line(statement)
         end
 
         # Return the ending line for a statement-like object.
@@ -79,11 +76,7 @@ module Ast
         # @param statement [Object]
         # @return [Integer, nil]
         def statement_end_line(statement)
-          if statement.respond_to?(:end_line)
-            statement.end_line
-          elsif statement.respond_to?(:source_position)
-            statement.source_position&.dig(:end_line)
-          end
+          object_end_line(statement)
         end
 
         private

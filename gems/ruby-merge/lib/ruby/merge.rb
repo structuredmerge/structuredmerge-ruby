@@ -20,6 +20,7 @@ require_relative 'merge/signature_support'
 module Ruby
   module Merge
     extend self
+    include Ast::Merge::SourceRegionReportSupport
 
     PACKAGE_NAME = 'ruby-merge'
     TREE_SITTER_BACKEND = TreeHaver::KREUZBERG_LANGUAGE_PACK_BACKEND
@@ -76,8 +77,8 @@ module Ruby
     end
 
     def ruby_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
+      requested = requested_tree_sitter_backend_id(backend)
+      unless ruby_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
       end
 
@@ -104,20 +105,27 @@ module Ruby
 
     def ruby_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-      registrations = TreeHaver.registered_languages(:ruby)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:ruby, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:ruby, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
 
     def parse_ruby(source, dialect, backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
+      requested = backend.to_s.empty? ? nil : backend.to_s
       return unsupported_feature_result("Unsupported Ruby dialect #{dialect}.") unless dialect == 'ruby'
-      unless requested == TREE_SITTER_BACKEND.id && ruby_backend_available_for_analysis?(requested)
-        return unsupported_feature_result("Unsupported Ruby backend #{requested}.")
+
+      unless ruby_backend_available_for_analysis?(requested)
+        diagnostic_backend = requested || TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_result("Unsupported Ruby backend #{diagnostic_backend}.")
       end
 
-      tree = TreeHaver.with_backend(requested) { TreeHaver.parser_for(:ruby).parse(source) }
+      tree = parse_tree_sitter_source(:ruby, source, backend: requested)
       collect_parse_errors(tree.root_node)
 
       process_analysis = ruby_process_analysis_from_tree(source, tree.root_node)
@@ -130,6 +138,23 @@ module Ruby
     rescue TreeHaver::Error, StandardError => e
       parse_failure_result(e)
     end
+
+    def parse_tree_sitter_source(language, source, backend: nil)
+      if backend
+        TreeHaver.with_backend(backend) { TreeHaver.parser_for(language, backend_type: :tree_sitter).parse(source) }
+      else
+        TreeHaver.parser_for(language, backend_type: :tree_sitter).parse(source)
+      end
+    end
+    private_class_method :parse_tree_sitter_source
+
+    def requested_tree_sitter_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+    end
+    private_class_method :requested_tree_sitter_backend_id
 
     def match_ruby_owners(template, destination)
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
@@ -229,7 +254,7 @@ module Ruby
       destination_paths = destination_declarations.to_h { |entry| [entry[:merge_key], true] }
       sections = []
       preamble = destination_context.fetch(:preamble)
-      sections << preamble unless preamble.empty?
+      sections << { text: preamble } unless preamble.empty?
       requires = if merge_template_requires
                    merge_ruby_requires(destination_requires,
                                        template_requires)
@@ -237,21 +262,24 @@ module Ruby
                    destination_requires
                  end
       require_block = requires.map { |entry| entry[:text] }.join("\n").strip
-      sections << require_block unless require_block.empty?
+      sections << ruby_top_level_section(require_block, requires) unless require_block.empty?
       sections.concat(
         destination_declarations.map do |entry|
-          merge_ruby_declaration_entry(template_declarations_by_key[entry[:merge_key]], entry)[:text]
+          ruby_top_level_section(
+            merge_ruby_declaration_entry(template_declarations_by_key[entry[:merge_key]], entry)[:text],
+            [entry]
+          )
         end
       )
       sections.concat(
         template_declarations.reject do |entry|
           destination_paths[entry[:merge_key]]
-        end.map { |entry| entry[:text] }
+        end.map { |entry| { text: entry[:text] } }
       )
       destination_footer = destination_context.fetch(:footer)
-      sections << destination_footer unless destination_footer.empty?
+      sections << { text: destination_footer } unless destination_footer.empty?
 
-      output = "#{sections.join("\n\n").strip}\n"
+      output = emit_ruby_top_level_sections(destination_source, sections)
       matching_reports = [ruby_method_move_detection(template_source, destination_source, dialect)]
       moved_method_count = matching_reports.sum do |report|
         Array(report[:matches]).count { |entry| entry[:moved] }
@@ -326,7 +354,7 @@ module Ruby
       owners = top_level_source_region_owners(lines)
 
       {
-        regions: interleave_source_regions(lines, owners),
+        regions: source_interleaved_regions_for_report(lines: lines, owners: owners),
         trailing_newline: normalize_source(source).end_with?("\n")
       }
     end
@@ -851,42 +879,17 @@ module Ruby
     def ruby_interstitial_comment_attachment_report(source)
       lines = normalize_source(source).lines(chomp: true)
       owners = top_level_source_region_owners(lines)
-      comment_blocks = source_comment_blocks(lines)
-
-      {
-        comments: comment_blocks.map do |block|
-          previous_owner = owners.reverse.find { |owner| owner[:end_index] < block[:start_index] }
-          next_owner = owners.find do |owner|
-            owner.fetch(:declaration_start_index, owner[:start_index]) > block[:end_index]
-          end
-          next_owner_index = next_owner&.fetch(:declaration_start_index, next_owner&.fetch(:start_index))
-          attachment = if next_owner_index && block[:end_index] + 1 == next_owner_index
-                         'following_owner'
-                       elsif previous_owner && next_owner_index && (block[:end_index] + 1...next_owner_index).any? do |index|
-                         lines[index].to_s.strip.empty?
-                       end
-                         'preceding_owner'
-                       elsif previous_owner && next_owner.nil?
-                         'preceding_owner'
-                       else
-                         'standalone'
-                       end
-          compact_region(
-            attachment: attachment,
-            previous_owner: previous_owner&.fetch(:address),
-            next_owner: next_owner&.fetch(:address),
-            span: line_span(block[:start_index], block[:end_index]),
-            content: source_region_content(lines, block[:start_index], block[:end_index])
-          )
-        end
-      }
+      source_comment_block_attachment_report(
+        lines: lines,
+        owners: owners,
+        comment_line: method(:comment_line?)
+      )
     end
 
     def ruby_blank_line_ownership_report(source)
       regions = ruby_source_regions(source)[:regions]
-      blank_regions = collect_blank_line_regions(regions)
       {
-        blank_line_regions: blank_regions
+        blank_line_regions: source_blank_line_ownership_regions(regions: regions)
       }
     end
 
@@ -1553,7 +1556,9 @@ module Ruby
         text = lines[item.span.start_row..item.span.end_row].to_a.join("\n").rstrip
         {
           path: "/requires/#{item.source}",
-          text: text
+          text: text,
+          start_index: item.span.start_row,
+          end_index: item.span.end_row
         }
       end
     end
@@ -1749,9 +1754,49 @@ module Ruby
           name: name,
           kind: kind,
           merge_key: "#{kind}:#{name}",
-          text: lines[start_index..finish_index].to_a.join("\n").strip
+          text: lines[start_index..finish_index].to_a.join("\n").strip,
+          start_index: start_index,
+          end_index: finish_index
         }
       end
+    end
+
+    def ruby_top_level_section(text, entries)
+      positioned_entries = entries.select do |entry|
+        entry[:start_index].is_a?(Integer) && entry[:end_index].is_a?(Integer)
+      end
+      return { text: text } if positioned_entries.empty?
+
+      {
+        text: text,
+        start_index: positioned_entries.map { |entry| entry[:start_index] }.min,
+        end_index: positioned_entries.map { |entry| entry[:end_index] }.max
+      }
+    end
+
+    def emit_ruby_top_level_sections(destination_source, sections)
+      lines = normalize_source(destination_source).split("\n", -1)
+      emitted = sections.reject { |section| section[:text].to_s.strip.empty? }
+      previous = nil
+      output = +''
+
+      emitted.each do |section|
+        output << ruby_top_level_section_separator(lines, previous, section) if previous
+        output << section.fetch(:text).strip
+        previous = section
+      end
+
+      "#{output.strip}\n"
+    end
+
+    def ruby_top_level_section_separator(lines, previous, current)
+      return "\n\n" unless previous[:end_index].is_a?(Integer) && current[:start_index].is_a?(Integer)
+      return "\n\n" unless current[:start_index] > previous[:end_index]
+
+      gap = lines[(previous[:end_index] + 1)...current[:start_index]].to_a
+      return "\n\n" if gap.empty?
+
+      "\n#{gap.join("\n")}\n"
     end
 
     def ruby_top_level_process_structure_items(process_analysis)
@@ -2215,8 +2260,8 @@ module Ruby
             match_key: require_path,
             start_index: index,
             end_index: index,
-            span: line_span(index, index),
-            content: source_region_content(lines, index, index)
+            span: source_report_line_span(index, index),
+            content: source_report_region_content(lines, index, index)
           }
           pending_comments = []
           index += 1
@@ -2237,13 +2282,17 @@ module Ruby
             start_index: start_index,
             declaration_start_index: index,
             end_index: finish_index,
-            span: line_span(start_index, finish_index),
-            declaration_span: line_span(index, finish_index),
-            content: source_region_content(lines, start_index, finish_index)
+            span: source_report_line_span(start_index, finish_index),
+            declaration_span: source_report_line_span(index, finish_index),
+            content: source_report_region_content(lines, start_index, finish_index)
           }
           owner[:child_regions] = container_child_source_regions(lines, declaration, index, finish_index) if %w[class
                                                                                                                 module].include?(declaration[:kind])
-          attached_comments = attached_comment_regions(lines, start_index, index)
+          attached_comments = source_attached_comment_regions_for_report(
+            lines: lines,
+            start_index: start_index,
+            declaration_index: index
+          )
           owner[:attached_comments] = attached_comments unless attached_comments.empty?
           owners << owner
           pending_comments = []
@@ -2304,164 +2353,28 @@ module Ruby
           match_key: method_name,
           start_index: start_index,
           end_index: method_finish_index,
-          span: line_span(start_index, method_finish_index),
-          content: source_region_content(lines, start_index, method_finish_index)
+          span: source_report_line_span(start_index, method_finish_index),
+          content: source_report_region_content(lines, start_index, method_finish_index)
         }
-        owner[:declaration_span] = line_span(index, method_finish_index) if start_index != index
-        attached_comments = attached_comment_regions(lines, start_index, index)
+        owner[:declaration_span] = source_report_line_span(index, method_finish_index) if start_index != index
+        attached_comments = source_attached_comment_regions_for_report(
+          lines: lines,
+          start_index: start_index,
+          declaration_index: index
+        )
         owner[:attached_comments] = attached_comments unless attached_comments.empty?
         owners << owner
         pending_comments = []
         index = method_finish_index + 1
       end
 
-      interleave_source_regions(
-        lines,
-        owners,
+      source_interleaved_regions_for_report(
+        lines: lines,
+        owners: owners,
         container_name: declaration[:name],
         container_start_index: declaration_index,
         container_end_index: finish_index
       )
-    end
-
-    def interleave_source_regions(lines, owners, container_name: nil, container_start_index: 0,
-                                  container_end_index: nil)
-      container_end_index ||= lines.length - 1
-      regions = []
-      cursor = container_start_index
-      previous_owner = nil
-
-      owners.each do |owner|
-        if cursor < owner[:start_index]
-          regions << source_interstitial_region(
-            lines,
-            cursor,
-            owner[:start_index] - 1,
-            previous_owner,
-            owner,
-            container_name: container_name
-          )
-        end
-
-        regions << public_source_region(owner)
-        previous_owner = owner
-        cursor = owner[:end_index] + 1
-      end
-
-      if cursor <= container_end_index
-        regions << source_interstitial_region(
-          lines,
-          cursor,
-          container_end_index,
-          previous_owner,
-          nil,
-          container_name: container_name
-        )
-      end
-
-      regions
-    end
-
-    def source_interstitial_region(lines, start_index, end_index, previous_owner, next_owner, container_name: nil)
-      position = if previous_owner.nil? && next_owner
-                   container_name ? 'container_header' : 'file_header'
-                 elsif previous_owner && next_owner
-                   'between'
-                 elsif container_name
-                   'container_footer'
-                 else
-                   'file_footer'
-                 end
-
-      region_id = case position
-                  when 'container_header'
-                    "class_header:#{container_name}"
-                  when 'container_footer'
-                    "class_footer:#{container_name}"
-                  when 'file_header'
-                    'file_header'
-                  when 'file_footer'
-                    'file_footer'
-                  else
-                    "between:#{previous_owner[:region_id]}:#{next_owner[:region_id]}"
-                  end
-
-      compact_region(
-        region_id: region_id,
-        region_kind: 'interstitial',
-        position: position,
-        previous_owner: previous_owner&.fetch(:address),
-        next_owner: next_owner&.fetch(:address),
-        span: line_span(start_index, end_index),
-        content: source_region_content(lines, start_index, end_index)
-      )
-    end
-
-    def source_comment_blocks(lines)
-      blocks = []
-      index = 0
-      while index < lines.length
-        unless comment_line?(lines[index])
-          index += 1
-          next
-        end
-
-        start_index = index
-        index += 1 while index < lines.length && comment_line?(lines[index])
-        blocks << { start_index: start_index, end_index: index - 1 }
-      end
-      blocks
-    end
-
-    def collect_blank_line_regions(regions)
-      regions.flat_map do |region|
-        child_regions = region[:child_regions] ? collect_blank_line_regions(region[:child_regions]) : []
-        current = if region[:region_kind] == 'interstitial' && region[:content].to_s.lines.all? do |line|
-          line.strip.empty?
-        end
-                    [
-                      compact_region(
-                        region_id: region[:region_id],
-                        position: region[:position],
-                        previous_owner: region[:previous_owner],
-                        next_owner: region[:next_owner],
-                        span: region[:span],
-                        ownership: 'declared_interstitial_region'
-                      )
-                    ]
-                  else
-                    []
-                  end
-        current + child_regions
-      end
-    end
-
-    def public_source_region(region)
-      region.reject { |key, _value| %i[start_index declaration_start_index end_index].include?(key) }
-    end
-
-    def line_span(start_index, end_index)
-      {
-        start_line: start_index + 1,
-        end_line: end_index + 1
-      }
-    end
-
-    def source_region_content(lines, start_index, end_index)
-      "#{lines[start_index..end_index].join("\n")}\n"
-    end
-
-    def attached_comment_regions(lines, start_index, declaration_index)
-      return [] unless start_index < declaration_index
-
-      [
-        {
-          attachment: 'leading',
-          start_line: start_index + 1,
-          end_line: declaration_index,
-          content: source_region_content(lines, start_index, declaration_index - 1)
-        }
-      ]
     end
 
     def compact_region(region)
@@ -2478,7 +2391,7 @@ module Ruby
       end
 
       def call
-        tree = TreeHaver.parser_for(:ruby).parse(source)
+        tree = TreeHaver.parser_for(:ruby, backend_type: :tree_sitter).parse(source)
         root = if tree.respond_to?(:parse_result)
                  tree.parse_result.value
                else

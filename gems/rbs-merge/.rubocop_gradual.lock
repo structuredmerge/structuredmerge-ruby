@@ -1,5 +1,5 @@
 {
-  ".simplecov:2483172942": [
+  ".simplecov:4195855765": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
   "Rakefile:3295679373": [
@@ -15,13 +15,20 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/cgi/r4/v0.5.gemfile:367169322": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/cgi/vHEAD.gemfile:2729540777": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/erb/r2/v3.0.gemfile:1688285565": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r3/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r3/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
-  "gemfiles/modular/erb/r4/v5.0.gemfile:2150258305": [
+  "gemfiles/modular/erb/r4/v5.0.gemfile:2394062339": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
   ],
   "gemfiles/modular/erb/vHEAD.gemfile:981929959": [
@@ -57,6 +64,13 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
+  "gemfiles/modular/webrick/r4/v1.9.gemfile:3092661193": [
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
+  "gemfiles/modular/webrick/vHEAD.gemfile:3867684682": [
+    [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
+    [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177602]
+  ],
   "gemfiles/modular/x_std_libs.gemfile:2324400122": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
@@ -66,10 +80,10 @@
   "gemfiles/modular/x_std_libs/r3/libs.gemfile:4030570297": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/r4/libs.gemfile:909736663": [
+  "gemfiles/modular/x_std_libs/r4/libs.gemfile:732451732": [
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
-  "gemfiles/modular/x_std_libs/vHEAD.gemfile:907917303": [
+  "gemfiles/modular/x_std_libs/vHEAD.gemfile:2390363993": [
     [1, 1, 0, "Naming/FileName: The name of this source file (`vHEAD.gemfile`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177600]
   ],
@@ -77,9 +91,9 @@
     [1, 1, 0, "Naming/FileName: The name of this source file (`rbs-merge.rb`) should use snake_case.", 5381],
     [1, 1, 1, "Style/FrozenStringLiteralComment: Missing frozen string literal comment.", 177542]
   ],
-  "lib/rbs/merge.rb:1873081658": [
+  "lib/rbs/merge.rb:688136140": [
     [17, 3, 12, "Style/Documentation: Missing top-level documentation comment for `module Rbs::Merge`.", 2866359175],
-    [103, 7, 1197, "Metrics/MethodLength: Method has too many lines. [22/10]", 564456261]
+    [104, 7, 1197, "Metrics/MethodLength: Method has too many lines. [22/10]", 564456261]
   ],
   "lib/rbs/merge/backends/rbs_backend.rb:2885387755": [
     [48, 11, 555, "Metrics/MethodLength: Method has too many lines. [13/10]", 2078142514],
@@ -97,20 +111,19 @@
     [28, 7, 767, "Metrics/MethodLength: Method has too many lines. [15/10]", 752916075],
     [60, 7, 416, "Metrics/MethodLength: Method has too many lines. [12/10]", 2715172162]
   ],
-  "lib/rbs/merge/conflict_resolver.rb:1305396962": [
-    [16, 5, 11045, "Metrics/ClassLength: Class has too many lines. [174/100]", 330576807],
-    [44, 7, 1614, "Metrics/MethodLength: Method has too many lines. [23/10]", 1004723330],
-    [44, 45, 14, "Lint/UnusedMethodArgument: Unused method argument - `template_index`.", 1809801172],
-    [44, 62, 10, "Lint/UnusedMethodArgument: Unused method argument - `dest_index`.", 2703999490],
-    [122, 7, 717, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `resolve_preference` is too high. [8/7]", 2783267415],
-    [122, 7, 717, "Metrics/MethodLength: Method has too many lines. [12/10]", 2783267415],
-    [156, 7, 949, "Metrics/AbcSize: Assignment Branch Condition size for `extract_declaration_text` is too high. [<9, 19, 14> 25.26/17]", 4132302840],
-    [156, 7, 949, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_declaration_text` is too high. [13/7]", 4132302840],
-    [156, 7, 949, "Metrics/MethodLength: Method has too many lines. [18/10]", 4132302840],
-    [156, 7, 949, "Metrics/PerceivedComplexity: Perceived complexity for `extract_declaration_text` is too high. [14/8]", 4132302840],
-    [181, 39, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [279, 7, 565, "Metrics/MethodLength: Method has too many lines. [13/10]", 375776463],
-    [279, 11, 12, "Naming/PredicatePrefix: Rename `has_members?` to `members?`.", 496913372]
+  "lib/rbs/merge/conflict_resolver.rb:16534551": [
+    [16, 5, 9993, "Metrics/ClassLength: Class has too many lines. [147/100]", 1570883163],
+    [46, 7, 1614, "Metrics/MethodLength: Method has too many lines. [23/10]", 1004723330],
+    [46, 45, 14, "Lint/UnusedMethodArgument: Unused method argument - `template_index`.", 1809801172],
+    [46, 62, 10, "Lint/UnusedMethodArgument: Unused method argument - `dest_index`.", 2703999490],
+    [124, 7, 717, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `resolve_preference` is too high. [8/7]", 2783267415],
+    [124, 7, 717, "Metrics/MethodLength: Method has too many lines. [12/10]", 2783267415],
+    [158, 7, 949, "Metrics/AbcSize: Assignment Branch Condition size for `extract_declaration_text` is too high. [<9, 19, 14> 25.26/17]", 4132302840],
+    [158, 7, 949, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_declaration_text` is too high. [13/7]", 4132302840],
+    [158, 7, 949, "Metrics/MethodLength: Method has too many lines. [18/10]", 4132302840],
+    [158, 7, 949, "Metrics/PerceivedComplexity: Perceived complexity for `extract_declaration_text` is too high. [14/8]", 4132302840],
+    [244, 7, 565, "Metrics/MethodLength: Method has too many lines. [13/10]", 375776463],
+    [244, 11, 12, "Naming/PredicatePrefix: Rename `has_members?` to `members?`.", 496913372]
   ],
   "lib/rbs/merge/file_aligner.rb:157117932": [
     [32, 7, 128, "Lint/UselessMethodDefinition: Useless method definition detected.", 4031328363]
@@ -159,25 +172,25 @@
     [150, 7, 891, "Metrics/PerceivedComplexity: Perceived complexity for `extract_node_name` is too high. [13/8]", 1223188123],
     [162, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5861336]
   ],
-  "lib/rbs/merge/merge_result.rb:1707720872": [
-    [18, 5, 15586, "Metrics/ClassLength: Class has too many lines. [276/100]", 817348545],
-    [89, 7, 966, "Metrics/MethodLength: Method has too many lines. [14/10]", 3349669346],
-    [176, 7, 1770, "Metrics/AbcSize: Assignment Branch Condition size for `extract_lines` is too high. [<15, 21, 16> 30.36/17]", 3951991352],
-    [176, 7, 1770, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_lines` is too high. [15/7]", 3951991352],
-    [176, 7, 1770, "Metrics/MethodLength: Method has too many lines. [29/10]", 3951991352],
-    [176, 7, 1770, "Metrics/PerceivedComplexity: Perceived complexity for `extract_lines` is too high. [16/8]", 3951991352],
-    [226, 44, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [232, 7, 606, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `trailing_lines_for` is too high. [9/7]", 518209980],
-    [232, 7, 606, "Metrics/MethodLength: Method has too many lines. [13/10]", 518209980],
-    [232, 7, 606, "Metrics/PerceivedComplexity: Perceived complexity for `trailing_lines_for` is too high. [10/8]", 518209980],
-    [233, 47, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [266, 33, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [271, 7, 682, "Metrics/AbcSize: Assignment Branch Condition size for `deduplicate_leading_comment_overlap` is too high. [<4, 15, 9> 17.94/17]", 4227245480],
-    [271, 7, 682, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `deduplicate_leading_comment_overlap` is too high. [8/7]", 4227245480],
-    [271, 7, 682, "Metrics/MethodLength: Method has too many lines. [11/10]", 4227245480],
-    [335, 23, 24, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 1487466207],
-    [371, 7, 893, "Metrics/MethodLength: Method has too many lines. [11/10]", 1066420963],
-    [371, 121, 13, "Layout/LineLength: Line is too long. [133/120]", 2582953496]
+  "lib/rbs/merge/merge_result.rb:3535749451": [
+    [18, 5, 12502, "Metrics/ClassLength: Class has too many lines. [214/100]", 1397119540],
+    [91, 7, 966, "Metrics/MethodLength: Method has too many lines. [14/10]", 3349669346],
+    [178, 7, 1846, "Metrics/AbcSize: Assignment Branch Condition size for `extract_lines` is too high. [<15, 23, 16> 31.78/17]", 1426505008],
+    [178, 7, 1846, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_lines` is too high. [15/7]", 1426505008],
+    [178, 7, 1846, "Metrics/MethodLength: Method has too many lines. [31/10]", 1426505008],
+    [178, 7, 1846, "Metrics/PerceivedComplexity: Perceived complexity for `extract_lines` is too high. [16/8]", 1426505008],
+    [229, 7, 709, "Metrics/AbcSize: Assignment Branch Condition size for `trailing_lines_for` is too high. [<4, 15, 9> 17.94/17]", 3530206652],
+    [229, 7, 709, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `trailing_lines_for` is too high. [9/7]", 3530206652],
+    [229, 7, 709, "Metrics/MethodLength: Method has too many lines. [18/10]", 3530206652],
+    [229, 7, 709, "Metrics/PerceivedComplexity: Perceived complexity for `trailing_lines_for` is too high. [10/8]", 3530206652],
+    [230, 47, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [252, 7, 475, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `layout_gap_lines_for` is too high. [9/7]", 1865599133],
+    [252, 7, 475, "Metrics/PerceivedComplexity: Perceived complexity for `layout_gap_lines_for` is too high. [9/8]", 1865599133],
+    [254, 47, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [265, 33, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [270, 7, 682, "Metrics/AbcSize: Assignment Branch Condition size for `deduplicate_leading_comment_overlap` is too high. [<4, 15, 9> 17.94/17]", 4227245480],
+    [270, 7, 682, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `deduplicate_leading_comment_overlap` is too high. [8/7]", 4227245480],
+    [270, 7, 682, "Metrics/MethodLength: Method has too many lines. [11/10]", 4227245480]
   ],
   "lib/rbs/merge/node_type_normalizer.rb:2788764230": [
     [65, 5, 10747, "Metrics/ModuleLength: Module has too many lines. [199/100]", 63560324],
@@ -214,76 +227,74 @@
     [487, 7, 583, "Metrics/PerceivedComplexity: Perceived complexity for `extract_tree_sitter_visibility_kind` is too high. [9/8]", 2002684122],
     [532, 7, 557, "Metrics/MethodLength: Method has too many lines. [14/10]", 1753294094]
   ],
-  "lib/rbs/merge/smart_merger.rb:4114819804": [
-    [43, 5, 38956, "Metrics/ClassLength: Class has too many lines. [785/100]", 3732361716],
-    [85, 7, 1188, "Metrics/MethodLength: Method has too many lines. [17/10]", 2908064588],
-    [85, 21, 447, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [14/5]", 1344979847],
-    [181, 7, 805, "Metrics/AbcSize: Assignment Branch Condition size for `perform_merge` is too high. [<6, 15, 8> 18.03/17]", 1638854701],
-    [181, 7, 805, "Metrics/MethodLength: Method has too many lines. [14/10]", 1638854701],
-    [207, 7, 572, "Metrics/MethodLength: Method has too many lines. [15/10]", 3471574631],
-    [290, 7, 621, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `root_boundary_lines_for` is too high. [9/7]", 354795708],
-    [290, 7, 621, "Metrics/PerceivedComplexity: Perceived complexity for `root_boundary_lines_for` is too high. [9/8]", 354795708],
-    [291, 34, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [323, 9, 44, "Lint/HashCompareByIdentity: Use `Hash#compare_by_identity` instead of using `object_id` for keys.", 748374760],
-    [326, 7, 794, "Metrics/AbcSize: Assignment Branch Condition size for `root_boundary_range` is too high. [<4, 22, 11> 24.92/17]", 2546634651],
-    [326, 7, 794, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `root_boundary_range` is too high. [10/7]", 2546634651],
-    [326, 7, 794, "Metrics/MethodLength: Method has too many lines. [19/10]", 2546634651],
-    [326, 7, 794, "Metrics/PerceivedComplexity: Perceived complexity for `root_boundary_range` is too high. [11/8]", 2546634651],
-    [365, 7, 1030, "Metrics/AbcSize: Assignment Branch Condition size for `process_match` is too high. [<1, 22, 7> 23.11/17]", 333057092],
-    [365, 7, 1030, "Metrics/MethodLength: Method has too many lines. [27/10]", 333057092],
-    [428, 7, 1830, "Metrics/AbcSize: Assignment Branch Condition size for `removed_declaration_comment_lines` is too high. [<13, 31, 25> 41.89/17]", 276966259],
-    [428, 7, 1830, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `removed_declaration_comment_lines` is too high. [21/7]", 276966259],
-    [428, 7, 1830, "Metrics/MethodLength: Method has too many lines. [38/10]", 276966259],
-    [428, 7, 1830, "Metrics/PerceivedComplexity: Perceived complexity for `removed_declaration_comment_lines` is too high. [24/8]", 276966259],
-    [476, 7, 675, "Metrics/MethodLength: Method has too many lines. [13/10]", 1415352570],
-    [502, 7, 2604, "Metrics/AbcSize: Assignment Branch Condition size for `reconstruct_declaration_with_merged_members` is too high. [<19, 23, 22> 37.07/17]", 1250076424],
-    [502, 7, 2604, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `reconstruct_declaration_with_merged_members` is too high. [17/7]", 1250076424],
-    [502, 7, 2604, "Metrics/MethodLength: Method has too many lines. [49/10]", 1250076424],
-    [502, 7, 2604, "Metrics/PerceivedComplexity: Perceived complexity for `reconstruct_declaration_with_merged_members` is too high. [17/8]", 1250076424],
-    [540, 20, 46, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1375387925],
-    [555, 9, 210, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 3589424565],
-    [565, 7, 1271, "Metrics/AbcSize: Assignment Branch Condition size for `recursive_body_lines_for_declaration` is too high. [<8, 23, 9> 25.96/17]", 2123349984],
-    [565, 7, 1271, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `recursive_body_lines_for_declaration` is too high. [10/7]", 2123349984],
-    [565, 7, 1271, "Metrics/MethodLength: Method has too many lines. [18/10]", 2123349984],
-    [565, 7, 1271, "Metrics/PerceivedComplexity: Perceived complexity for `recursive_body_lines_for_declaration` is too high. [10/8]", 2123349984],
-    [565, 47, 139, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 652517575],
-    [591, 7, 1910, "Metrics/AbcSize: Assignment Branch Condition size for `merge_member_lines` is too high. [<4, 35, 12> 37.22/17]", 1631109354],
-    [591, 7, 1910, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_member_lines` is too high. [11/7]", 1631109354],
-    [591, 7, 1910, "Metrics/MethodLength: Method has too many lines. [42/10]", 1631109354],
-    [592, 9, 1837, "Metrics/BlockLength: Block has too many lines. [40/25]", 3339652106],
-    [638, 7, 1779, "Metrics/AbcSize: Assignment Branch Condition size for `align_member_lists` is too high. [<14, 26, 14> 32.68/17]", 3585753868],
-    [638, 7, 1779, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `align_member_lists` is too high. [14/7]", 3585753868],
-    [638, 7, 1779, "Metrics/MethodLength: Method has too many lines. [49/10]", 3585753868],
-    [638, 7, 1779, "Metrics/PerceivedComplexity: Perceived complexity for `align_member_lists` is too high. [15/8]", 3585753868],
-    [745, 7, 605, "Metrics/AbcSize: Assignment Branch Condition size for `split_top_level_return_type` is too high. [<7, 14, 10> 18.57/17]", 1731525207],
-    [745, 7, 605, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `split_top_level_return_type` is too high. [8/7]", 1731525207],
-    [745, 7, 605, "Metrics/MethodLength: Method has too many lines. [17/10]", 1731525207],
-    [782, 7, 1684, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_statement_lines_with_leading_comments` is too high. [8/7]", 3625004207],
-    [782, 7, 1684, "Metrics/MethodLength: Method has too many lines. [29/10]", 3625004207],
-    [782, 7, 1684, "Metrics/PerceivedComplexity: Perceived complexity for `extract_statement_lines_with_leading_comments` is too high. [10/8]", 3625004207],
-    [869, 33, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [874, 7, 840, "Metrics/MethodLength: Method has too many lines. [15/10]", 3400690599],
-    [895, 39, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
-    [982, 23, 24, "Style/SafeNavigation: Use safe navigation (`&.`) instead of checking if an object exists before calling the method.", 1487466207],
-    [998, 7, 1788, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_cross_source_preamble_prefixes` is too high. [<14, 21, 9> 26.8/17]", 3130187278],
-    [998, 7, 1788, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/7]", 3130187278],
-    [998, 7, 1788, "Metrics/MethodLength: Method has too many lines. [31/10]", 3130187278],
-    [998, 7, 1788, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/8]", 3130187278],
-    [1038, 7, 533, "Metrics/MethodLength: Method has too many lines. [15/10]", 4188914818]
+  "lib/rbs/merge/smart_merger.rb:30342291": [
+    [43, 5, 35445, "Metrics/ClassLength: Class has too many lines. [704/100]", 1644944892],
+    [87, 7, 1188, "Metrics/MethodLength: Method has too many lines. [17/10]", 2908064588],
+    [87, 21, 447, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [14/5]", 1344979847],
+    [183, 7, 805, "Metrics/AbcSize: Assignment Branch Condition size for `perform_merge` is too high. [<6, 15, 8> 18.03/17]", 1638854701],
+    [183, 7, 805, "Metrics/MethodLength: Method has too many lines. [14/10]", 1638854701],
+    [209, 7, 572, "Metrics/MethodLength: Method has too many lines. [15/10]", 3471574631],
+    [306, 7, 1240, "Metrics/AbcSize: Assignment Branch Condition size for `process_match` is too high. [<1, 28, 7> 28.88/17]", 1632629493],
+    [306, 7, 1240, "Metrics/MethodLength: Method has too many lines. [29/10]", 1632629493],
+    [371, 7, 550, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `removed_declaration_comment_lines` is too high. [9/7]", 112034646],
+    [371, 7, 550, "Metrics/MethodLength: Method has too many lines. [12/10]", 112034646],
+    [371, 7, 550, "Metrics/PerceivedComplexity: Perceived complexity for `removed_declaration_comment_lines` is too high. [9/8]", 112034646],
+    [400, 7, 675, "Metrics/MethodLength: Method has too many lines. [13/10]", 1415352570],
+    [426, 7, 2637, "Metrics/AbcSize: Assignment Branch Condition size for `reconstruct_declaration_with_merged_members` is too high. [<20, 23, 22> 37.59/17]", 1250076424],
+    [426, 7, 2637, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `reconstruct_declaration_with_merged_members` is too high. [17/7]", 1250076424],
+    [426, 7, 2637, "Metrics/MethodLength: Method has too many lines. [50/10]", 1250076424],
+    [426, 7, 2637, "Metrics/PerceivedComplexity: Perceived complexity for `reconstruct_declaration_with_merged_members` is too high. [17/8]", 1250076424],
+    [464, 20, 46, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 1375387925],
+    [487, 9, 28, "Style/StringConcatenation: Prefer string interpolation to string concatenation.", 2709565617],
+    [490, 7, 1524, "Metrics/AbcSize: Assignment Branch Condition size for `recursive_body_lines_for_declaration` is too high. [<8, 23, 9> 25.96/17]", 1351072746],
+    [490, 7, 1524, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `recursive_body_lines_for_declaration` is too high. [10/7]", 1351072746],
+    [490, 7, 1524, "Metrics/MethodLength: Method has too many lines. [20/10]", 1351072746],
+    [490, 7, 1524, "Metrics/PerceivedComplexity: Perceived complexity for `recursive_body_lines_for_declaration` is too high. [10/8]", 1351072746],
+    [490, 47, 139, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 652517575],
+    [518, 7, 2987, "Metrics/AbcSize: Assignment Branch Condition size for `merge_member_lines` is too high. [<6, 42, 12> 44.09/17]", 1498622641],
+    [518, 7, 2987, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `merge_member_lines` is too high. [11/7]", 1498622641],
+    [518, 7, 2987, "Metrics/MethodLength: Method has too many lines. [74/10]", 1498622641],
+    [520, 9, 2820, "Metrics/BlockLength: Block has too many lines. [71/25]", 3843526257],
+    [608, 7, 1779, "Metrics/AbcSize: Assignment Branch Condition size for `align_member_lists` is too high. [<14, 26, 14> 32.68/17]", 3585753868],
+    [608, 7, 1779, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `align_member_lists` is too high. [14/7]", 3585753868],
+    [608, 7, 1779, "Metrics/MethodLength: Method has too many lines. [49/10]", 3585753868],
+    [608, 7, 1779, "Metrics/PerceivedComplexity: Perceived complexity for `align_member_lists` is too high. [15/8]", 3585753868],
+    [715, 7, 605, "Metrics/AbcSize: Assignment Branch Condition size for `split_top_level_return_type` is too high. [<7, 14, 10> 18.57/17]", 1731525207],
+    [715, 7, 605, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `split_top_level_return_type` is too high. [8/7]", 1731525207],
+    [715, 7, 605, "Metrics/MethodLength: Method has too many lines. [17/10]", 1731525207],
+    [752, 7, 2211, "Metrics/AbcSize: Assignment Branch Condition size for `extract_statement_lines_with_leading_comments` is too high. [<10, 12, 12> 19.7/17]", 3268393611],
+    [752, 7, 2211, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `extract_statement_lines_with_leading_comments` is too high. [9/7]", 3268393611],
+    [752, 7, 2211, "Metrics/MethodLength: Method has too many lines. [37/10]", 3268393611],
+    [752, 7, 2211, "Metrics/PerceivedComplexity: Perceived complexity for `extract_statement_lines_with_leading_comments` is too high. [12/8]", 3268393611],
+    [752, 56, 235, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 3178974338],
+    [800, 47, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [822, 7, 688, "Metrics/AbcSize: Assignment Branch Condition size for `container_header_lines` is too high. [<8, 12, 11> 18.14/17]", 1754168481],
+    [822, 7, 688, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `container_header_lines` is too high. [10/7]", 1754168481],
+    [822, 7, 688, "Metrics/PerceivedComplexity: Perceived complexity for `container_header_lines` is too high. [10/8]", 1754168481],
+    [849, 35, 148, "Metrics/ParameterLists: Avoid parameter lists longer than 5 parameters. [6/5]", 2125883980],
+    [864, 33, 2, "Lint/RedundantSafeNavigation: Redundant safe navigation detected, use `.` instead.", 5858765],
+    [869, 7, 841, "Metrics/MethodLength: Method has too many lines. [15/10]", 3400690599],
+    [892, 7, 1788, "Metrics/AbcSize: Assignment Branch Condition size for `collapse_cross_source_preamble_prefixes` is too high. [<14, 21, 9> 26.8/17]", 3130187278],
+    [892, 7, 1788, "Metrics/CyclomaticComplexity: Cyclomatic complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/7]", 3130187278],
+    [892, 7, 1788, "Metrics/MethodLength: Method has too many lines. [31/10]", 3130187278],
+    [892, 7, 1788, "Metrics/PerceivedComplexity: Perceived complexity for `collapse_cross_source_preamble_prefixes` is too high. [9/8]", 3130187278],
+    [932, 7, 533, "Metrics/MethodLength: Method has too many lines. [15/10]", 4188914818]
   ],
-  "rbs-merge.gemspec:2636606176": [
+  "rbs-merge.gemspec:435779253": [
     [126, 121, 20, "Layout/LineLength: Line is too long. [140/120]", 2821357214],
-    [134, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
+    [137, 121, 50, "Layout/LineLength: Line is too long. [170/120]", 3888612416],
+    [138, 121, 29, "Layout/LineLength: Line is too long. [149/120]", 981994949]
   ],
-  "spec/integration/reproducible_merge_spec.rb:4124333249": [
-    [9, 1, 6937, "Metrics/BlockLength: Block has too many lines. [155/25]", 1482304086],
+  "spec/integration/reproducible_merge_spec.rb:884028812": [
+    [9, 1, 7880, "Metrics/BlockLength: Block has too many lines. [181/25]", 921020609],
     [14, 3, 4384, "Metrics/BlockLength: Block has too many lines. [85/25]", 628655161],
     [15, 5, 3507, "Metrics/BlockLength: Block has too many lines. [65/25]", 2935184196],
     [56, 121, 2, "Layout/LineLength: Line is too long. [122/120]", 5858910],
     [62, 121, 9, "Layout/LineLength: Line is too long. [129/120]", 50415752],
-    [87, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 1546684737]
+    [87, 121, 6, "Layout/LineLength: Line is too long. [126/120]", 1546684737],
+    [133, 3, 1507, "Metrics/BlockLength: Block has too many lines. [37/25]", 1415839468]
   ],
-  "spec/rbs/merge/comment_behavior_matrix_spec.rb:2666227529": [
+  "spec/rbs/merge/comment_behavior_matrix_spec.rb:2043528618": [
     [14, 45, 6, "Lint/UnusedBlockArgument: Unused block argument - `inline`. If it's necessary, use `_` or `_inline` as an argument name to indicate that it won't be used.", 1605470060],
     [18, 121, 24, "Layout/LineLength: Line is too long. [144/120]", 253885993],
     [19, 121, 45, "Layout/LineLength: Line is too long. [165/120]", 1702591521]
@@ -362,37 +373,38 @@
     [7, 1, 1860, "Metrics/BlockLength: Block has too many lines. [66/25]", 3469987127],
     [8, 3, 1798, "Metrics/BlockLength: Block has too many lines. [65/25]", 778477682]
   ],
-  "spec/rbs/merge/smart_merger_spec.rb:3451189224": [
-    [14, 1, 43498, "Metrics/BlockLength: Block has too many lines. [1190/25]", 1106962],
-    [149, 3, 10886, "Metrics/BlockLength: Block has too many lines. [286/25]", 1693926280],
-    [315, 5, 985, "Metrics/BlockLength: Block has too many lines. [26/25]", 3397066157],
-    [351, 5, 1063, "Metrics/BlockLength: Block has too many lines. [26/25]", 2718784043],
-    [461, 5, 1135, "Metrics/BlockLength: Block has too many lines. [26/25]", 3797285781],
-    [497, 5, 1213, "Metrics/BlockLength: Block has too many lines. [26/25]", 3686078390],
-    [536, 3, 2766, "Metrics/BlockLength: Block has too many lines. [84/25]", 3927490181],
-    [649, 3, 1714, "Metrics/BlockLength: Block has too many lines. [54/25]", 386494661],
-    [721, 3, 5393, "Metrics/BlockLength: Block has too many lines. [138/25]", 2457897034],
-    [925, 3, 4479, "Metrics/BlockLength: Block has too many lines. [134/25]", 3856958364],
-    [926, 5, 1327, "Metrics/BlockLength: Block has too many lines. [33/25]", 4009192695],
-    [970, 5, 953, "Metrics/BlockLength: Block has too many lines. [29/25]", 902715698],
-    [1008, 5, 1147, "Metrics/BlockLength: Block has too many lines. [37/25]", 3544491851],
-    [1058, 5, 955, "Metrics/BlockLength: Block has too many lines. [27/25]", 2688118410],
-    [1096, 3, 1031, "Metrics/BlockLength: Block has too many lines. [32/25]", 663517347],
-    [1097, 5, 970, "Metrics/BlockLength: Block has too many lines. [31/25]", 1575476639],
-    [1135, 3, 882, "Metrics/BlockLength: Block has too many lines. [27/25]", 3845382500],
-    [1136, 5, 813, "Metrics/BlockLength: Block has too many lines. [26/25]", 1755501948],
-    [1171, 3, 805, "Metrics/BlockLength: Block has too many lines. [26/25]", 3413285873],
-    [1204, 3, 2200, "Metrics/BlockLength: Block has too many lines. [70/25]", 3541894760],
-    [1205, 5, 1202, "Metrics/BlockLength: Block has too many lines. [38/25]", 3971143978],
-    [1235, 121, 1, "Layout/LineLength: Line is too long. [121/120]", 177610],
-    [1251, 5, 923, "Metrics/BlockLength: Block has too many lines. [28/25]", 3867507419],
-    [1288, 3, 1175, "Metrics/BlockLength: Block has too many lines. [36/25]", 1587654554],
-    [1289, 5, 1103, "Metrics/BlockLength: Block has too many lines. [35/25]", 3885176914],
-    [1368, 3, 1252, "Metrics/BlockLength: Block has too many lines. [28/25]", 4206068435],
-    [1407, 3, 1278, "Metrics/BlockLength: Block has too many lines. [28/25]", 1372687996],
-    [1446, 3, 1265, "Metrics/BlockLength: Block has too many lines. [28/25]", 3208600846],
-    [1485, 3, 1265, "Metrics/BlockLength: Block has too many lines. [28/25]", 212464082],
-    [1524, 3, 1262, "Metrics/BlockLength: Block has too many lines. [28/25]", 4277366491]
+  "spec/rbs/merge/smart_merger_spec.rb:40056830": [
+    [14, 1, 46017, "Metrics/BlockLength: Block has too many lines. [1256/25]", 36529752],
+    [179, 3, 10886, "Metrics/BlockLength: Block has too many lines. [286/25]", 1693926280],
+    [345, 5, 985, "Metrics/BlockLength: Block has too many lines. [26/25]", 3397066157],
+    [381, 5, 1063, "Metrics/BlockLength: Block has too many lines. [26/25]", 2718784043],
+    [491, 5, 1135, "Metrics/BlockLength: Block has too many lines. [26/25]", 3797285781],
+    [527, 5, 1213, "Metrics/BlockLength: Block has too many lines. [26/25]", 3686078390],
+    [566, 3, 2766, "Metrics/BlockLength: Block has too many lines. [84/25]", 3927490181],
+    [679, 3, 1714, "Metrics/BlockLength: Block has too many lines. [54/25]", 386494661],
+    [751, 3, 5393, "Metrics/BlockLength: Block has too many lines. [138/25]", 2457897034],
+    [955, 3, 4479, "Metrics/BlockLength: Block has too many lines. [134/25]", 3856958364],
+    [956, 5, 1327, "Metrics/BlockLength: Block has too many lines. [33/25]", 4009192695],
+    [1000, 5, 953, "Metrics/BlockLength: Block has too many lines. [29/25]", 902715698],
+    [1038, 5, 1147, "Metrics/BlockLength: Block has too many lines. [37/25]", 3544491851],
+    [1088, 5, 955, "Metrics/BlockLength: Block has too many lines. [27/25]", 2688118410],
+    [1126, 3, 2440, "Metrics/BlockLength: Block has too many lines. [69/25]", 1545633152],
+    [1127, 5, 970, "Metrics/BlockLength: Block has too many lines. [31/25]", 1575476639],
+    [1164, 5, 1403, "Metrics/BlockLength: Block has too many lines. [34/25]", 1311674864],
+    [1207, 3, 882, "Metrics/BlockLength: Block has too many lines. [27/25]", 3845382500],
+    [1208, 5, 813, "Metrics/BlockLength: Block has too many lines. [26/25]", 1755501948],
+    [1243, 3, 805, "Metrics/BlockLength: Block has too many lines. [26/25]", 3413285873],
+    [1276, 3, 2200, "Metrics/BlockLength: Block has too many lines. [70/25]", 3541894760],
+    [1277, 5, 1202, "Metrics/BlockLength: Block has too many lines. [38/25]", 3971143978],
+    [1307, 121, 1, "Layout/LineLength: Line is too long. [121/120]", 177610],
+    [1323, 5, 923, "Metrics/BlockLength: Block has too many lines. [28/25]", 3867507419],
+    [1360, 3, 1175, "Metrics/BlockLength: Block has too many lines. [36/25]", 1587654554],
+    [1361, 5, 1103, "Metrics/BlockLength: Block has too many lines. [35/25]", 3885176914],
+    [1441, 3, 1321, "Metrics/BlockLength: Block has too many lines. [29/25]", 1361304889],
+    [1481, 3, 1347, "Metrics/BlockLength: Block has too many lines. [29/25]", 1505210076],
+    [1521, 3, 1334, "Metrics/BlockLength: Block has too many lines. [29/25]", 3208600846],
+    [1561, 3, 1334, "Metrics/BlockLength: Block has too many lines. [29/25]", 212464082],
+    [1601, 3, 1331, "Metrics/BlockLength: Block has too many lines. [29/25]", 4277366491]
   ],
   "spec/rbs/merge_spec.rb:3352331478": [
     [5, 1, 1389, "Metrics/BlockLength: Block has too many lines. [37/25]", 373922011],

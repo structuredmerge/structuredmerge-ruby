@@ -13,6 +13,7 @@ module Toml
 
       include ::Ast::Merge::TrailingGroups::DestIterate
       include ::Ast::Merge::StructuredEmitterProvenanceSupport
+      include ::Ast::Merge::CommentLayoutEmissionSupport
 
       attr_reader :corruption_handling
 
@@ -184,6 +185,7 @@ module Toml
                 dest_analysis,
                 prev_emitted_end_line,
                 prev_emitted_analysis,
+                dest_owners: dest_nodes,
                 skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
                                                                                                       dest_analysis)
               )
@@ -242,6 +244,7 @@ module Toml
               dest_analysis,
               prev_emitted_end_line,
               prev_emitted_analysis,
+              dest_owners: dest_nodes,
               skip_for_borrowed_leading_region: @preference == :template && leading_region_present?(dest_node,
                                                                                                     dest_analysis)
             )
@@ -374,7 +377,9 @@ module Toml
         prev_emitted_end_line = nil
         prev_emitted_analysis = nil
 
-        entries.sort_by { |node, _analysis| node.respond_to?(:key_name) ? node.key_name.to_s : node.type.to_s }.each do |node, analysis|
+        entries.sort_by do |node, _analysis|
+          node.respond_to?(:key_name) ? node.key_name.to_s : node.type.to_s
+        end.each do |node, analysis|
           emit_gap_before_node(node, analysis, prev_emitted_end_line, prev_emitted_analysis)
           emit_node(node, analysis)
           prev_emitted_end_line = emitted_end_line_for(node)
@@ -1027,6 +1032,7 @@ module Toml
 
       def emit_gap_before_matched_node(selected_node, selected_analysis, template_node, template_analysis, dest_node,
                                        dest_analysis, prev_end_line, prev_analysis,
+                                       dest_owners: nil,
                                        skip_for_borrowed_leading_region: false)
         before_count = @emitter.lines.length
         emit_gap_before_node(
@@ -1038,12 +1044,25 @@ module Toml
         )
         return if @emitter.lines.length > before_count
 
-        alternate_node, alternate_analysis = if selected_node.equal?(dest_node)
-                                               [template_node, template_analysis]
-                                             else
-                                               [dest_node, dest_analysis]
-                                             end
+        alternate_node, alternate_analysis =
+          if selected_node.equal?(dest_node)
+            [template_node, template_analysis]
+          else
+            [dest_node, dest_analysis]
+          end
         emit_gap_before_node(alternate_node, alternate_analysis, prev_end_line, prev_analysis)
+        return unless selected_node.equal?(template_node)
+
+        emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: dest_owners)
+      end
+
+      def emit_retained_gap_before_matched_template_node(dest_node, dest_analysis, owners: nil)
+        gap_lines = retained_owner_leading_gap_lines_for(dest_node, dest_analysis, owners: owners)
+        return if gap_lines.empty?
+        return if @emitter.blank_lines?(gap_lines) && @emitter.ends_with_blank_line?
+
+        gap = retained_owner_leading_gap_for(dest_node, dest_analysis, owners: owners)
+        @emitter.emit_raw_lines(gap_lines, metadata: emitter_block_metadata(dest_analysis, gap.start_line))
       end
 
       def leading_region_present?(node, analysis)

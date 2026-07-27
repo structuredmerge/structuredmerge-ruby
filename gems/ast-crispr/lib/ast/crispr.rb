@@ -580,6 +580,10 @@ module Ast
           family: :removal,
           description: 'Delete selected content without inserting replacement text'
         },
+        delete_batch: {
+          family: :removal,
+          description: 'Delete content selected by multiple structural selectors in one source pass'
+        },
         insert: {
           family: :insertion,
           description: 'Insert explicit text at a destination anchor or append fallback'
@@ -665,7 +669,7 @@ module Ast
 
       private
 
-      def normalize_requirement(value, field_name)
+      def normalize_requirement(value, _field_name)
         value&.to_sym
       end
 
@@ -1019,6 +1023,11 @@ module Ast
       def context_for(content:, source_label:, target: nil)
         adapter = target&.metadata&.[](:adapter)
         DocumentContext.new(content: content, source_label: source_label, adapter: adapter || Adapters::Null.new)
+      end
+
+      def context_for_targets(content:, source_label:, targets:)
+        first_target = Array(targets).first
+        context_for(content: content, source_label: source_label, target: first_target)
       end
 
       def enforce_limit!(target, count)
@@ -1407,6 +1416,56 @@ module Ast
         self.match_count = actor.match_count
         self.changed = actor.changed
         self.captured_text = actor.captured_text
+      end
+    end
+
+    class DeleteBatch < Actor
+      include OperationSupport
+      include OperationProfilable
+
+      declare_operation_profile(
+        operation_kind: :delete_batch,
+        source_requirement: :required,
+        destination_requirement: :none,
+        replacement_source: :none,
+        captures_source_text: true,
+        supports_if_missing: false
+      )
+
+      input :content, type: String
+      input :targets, default: -> { [] }
+      input :source_label, type: String, default: 'source'
+
+      output :updated_content
+      output :matches, default: -> { [] }
+      output :match_count, type: Integer, default: 0
+      output :changed, default: false
+      output :captured_text, allow_nil: true, default: nil
+      output :operation_profile
+
+      def call
+        self.operation_profile = self.class.operation_profile
+        selector_targets = Array(targets)
+        if selector_targets.empty?
+          self.updated_content = content
+          self.changed = false
+          return
+        end
+
+        context = context_for_targets(content: content, source_label: source_label, targets: selector_targets)
+        self.matches = selector_targets.flat_map { |target| normalize_matches(target, context) }
+        self.match_count = matches.size
+        self.captured_text = capture_text(content, matches)
+        if matches.empty?
+          self.updated_content = content
+          self.changed = false
+          return
+        end
+
+        self.updated_content = replace_line_ranges(content, matches, '')
+        self.changed = updated_content != content
+      rescue Error => e
+        crispr_fail!(e)
       end
     end
 

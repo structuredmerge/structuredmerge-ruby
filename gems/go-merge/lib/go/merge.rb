@@ -37,8 +37,8 @@ module Go
     end
 
     def go_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id && go_backend_available_for_analysis?(requested)
+      requested = requested_tree_sitter_backend_id(backend)
+      unless go_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported Go backend #{requested}.")
       end
 
@@ -64,9 +64,9 @@ module Go
     end
 
     def parse_go(source, dialect)
-      requested = TREE_SITTER_BACKEND.id
-      unless requested == TREE_SITTER_BACKEND.id && go_backend_available_for_analysis?(requested)
-        return unsupported_feature_result("Unsupported Go backend #{requested}.")
+      unless go_backend_available_for_analysis?(nil)
+        diagnostic_backend = TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_result("Unsupported Go backend #{diagnostic_backend}.")
       end
       return analyze_go_module(source) if dialect == 'go'
 
@@ -76,11 +76,24 @@ module Go
 
     def go_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-      registrations = TreeHaver.registered_languages(:go)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:go, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:go, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
+
+    def requested_tree_sitter_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+    end
+    private_class_method :requested_tree_sitter_backend_id
 
     def match_go_owners(template, destination)
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
@@ -114,7 +127,7 @@ module Go
     end
 
     def analyze_go_module(source)
-      parser = TreeHaver.parser_for(:go)
+      parser = TreeHaver.parser_for(:go, backend_type: :tree_sitter)
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 

@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "spec_helper"
-
 RSpec.describe Kettle::Jem do
   it "records migration decisions for every old executable and task spec family" do
     audit = JSON.parse(

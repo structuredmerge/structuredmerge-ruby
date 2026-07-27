@@ -70,9 +70,11 @@ module Ast
     autoload :FileAnalyzable, 'ast/merge/file_analyzable'
     autoload :Freezable, 'ast/merge/freezable'
     autoload :FreezeNodeBase, 'ast/merge/freeze_node_base'
+    autoload :CommentLayoutEmissionSupport, 'ast/merge/comment_layout_emission_support'
     autoload :Healer, 'ast/merge/healer'
     autoload :JaccardSimilarity, 'ast/merge/jaccard_similarity'
     autoload :Layout, 'ast/merge/layout'
+    autoload :LineRangeSupport, 'ast/merge/line_range_support'
     autoload :MatchRefinerBase, 'ast/merge/match_refiner_base'
     autoload :MatchScoreBase, 'ast/merge/match_score_base'
     autoload :MergeResultBase, 'ast/merge/merge_result_base'
@@ -85,6 +87,7 @@ module Ast
     autoload :PartialTemplateMergerBase, 'ast/merge/partial_template_merger_base'
     autoload :SectionTyping, 'ast/merge/section_typing'
     autoload :SmartMergerBase, 'ast/merge/smart_merger_base'
+    autoload :SourceRegionReportSupport, 'ast/merge/source_region_report_support'
     autoload :StructuralEdit, 'ast/merge/structural_edit'
     autoload :StructuredEmitterProvenanceSupport, 'ast/merge/structured_emitter_provenance_support'
     autoload :StructuredReviewApplySupport, 'ast/merge/structured_review_apply_support'
@@ -847,7 +850,7 @@ module Ast
                                     :path_placeholder, :expected_exit_code, :expected_current_file_updated, keyword_init: true)
     GitDriverSmokeSuite = Struct.new(:suite_id, :version, :driver_name, :cases, :diagnostics, keyword_init: true)
     DiffDriverSmokeCase = Struct.new(:case_id, :argument_count, :argument_roles, :expected_exit_code,
-                                     :expected_output_kind, keyword_init: true)
+                                     :expected_output_kind, :expected_output_fragments, keyword_init: true)
     DiffDriverSmokeSuite = Struct.new(:suite_id, :version, :driver_name, :cases, :diagnostics, keyword_init: true)
     PerformanceTimeoutDiagnostic = Struct.new(:severity, :category, :code, :fallback, keyword_init: true)
     PerformanceGuardrails = Struct.new(:guardrail_id, :version, :max_bytes, :max_nodes, :max_match_candidates,

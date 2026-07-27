@@ -27,6 +27,32 @@ RSpec.describe Ast::Merge::EmitterBase do
   let(:owner) { LayoutOwner.new(start_line: 3, end_line: 3, label: :owner) }
   let(:after_owner) { LayoutOwner.new(start_line: 4, end_line: 4, label: :after) }
 
+  describe '#blank_lines?' do
+    it 'returns true when every provided line is blank' do
+      expect(emitter.blank_lines?(['', '  '])).to be(true)
+    end
+
+    it 'returns false when any provided line has content' do
+      expect(emitter.blank_lines?(['', 'value'])).to be(false)
+    end
+  end
+
+  describe '#ends_with_blank_line?' do
+    it 'returns true when the output ends with a blank line' do
+      emitter.emit_raw_lines(['value', ''])
+
+      expect(emitter.ends_with_blank_line?).to be(true)
+    end
+
+    it 'returns false when the output is empty or ends with content' do
+      expect(emitter.ends_with_blank_line?).to be(false)
+
+      emitter.emit_raw_lines(['value'])
+
+      expect(emitter.ends_with_blank_line?).to be(false)
+    end
+  end
+
   describe '#emit_comment_region' do
     it 'emits full-line regions and preserves blank gaps from source lines' do
       region = Ast::Merge::Comment::TrackedHashAdapter.region(

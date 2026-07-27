@@ -37,8 +37,8 @@ module TypeScript
     end
 
     def type_script_backend_feature_profile(backend: nil)
-      requested = backend.to_s.empty? ? TREE_SITTER_BACKEND.id : backend.to_s
-      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
+      requested = requested_tree_sitter_backend_id(backend)
+      unless type_script_backend_available_for_analysis?(requested)
         return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
       end
 
@@ -64,9 +64,9 @@ module TypeScript
     end
 
     def parse_type_script(source, dialect)
-      requested = TREE_SITTER_BACKEND.id
-      unless requested == TREE_SITTER_BACKEND.id && type_script_backend_available_for_analysis?(requested)
-        return unsupported_feature_result("Unsupported TypeScript backend #{requested}.")
+      unless type_script_backend_available_for_analysis?(nil)
+        diagnostic_backend = TreeHaver.current_backend_id || 'tree-sitter'
+        return unsupported_feature_result("Unsupported TypeScript backend #{diagnostic_backend}.")
       end
       return analyze_type_script_module(source) if dialect == 'typescript'
 
@@ -76,11 +76,24 @@ module TypeScript
 
     def type_script_backend_available_for_analysis?(backend_id)
       register_backend!
-      return false unless backend_id.to_s == TREE_SITTER_BACKEND.id
 
-      registrations = TreeHaver.registered_languages(:typescript)
-      registrations.key?(:tree_sitter) || registrations.key?(:tslp)
+      if backend_id.to_s.empty?
+        TreeHaver.parser_for(:typescript, backend_type: :tree_sitter)
+      else
+        TreeHaver.with_backend(backend_id) { TreeHaver.parser_for(:typescript, backend_type: :tree_sitter) }
+      end
+      true
+    rescue TreeHaver::Error, ArgumentError
+      false
     end
+
+    def requested_tree_sitter_backend_id(backend)
+      return backend.to_s unless backend.to_s.empty?
+
+      contextual = TreeHaver.current_backend_id || ENV['TREE_HAVER_BACKEND']
+      contextual.to_s.empty? || contextual.to_s == 'auto' ? TREE_SITTER_BACKEND.id : contextual.to_s
+    end
+    private_class_method :requested_tree_sitter_backend_id
 
     def match_type_script_owners(template, destination)
       Ast::Merge::OwnerSelection.match_by_path(template, destination)
@@ -115,7 +128,7 @@ module TypeScript
     end
 
     def analyze_type_script_module(source)
-      parser = TreeHaver.parser_for(:typescript)
+      parser = TreeHaver.parser_for(:typescript, backend_type: :tree_sitter)
       tree = parser.parse(source)
       collect_parse_errors(tree.root_node)
 
